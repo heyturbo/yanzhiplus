@@ -161,6 +161,30 @@
             color: white;
             border-radius: 5px;
         }
+        .quality-info {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            text-align: left;
+        }
+        .quality-info .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .quality-info .progress-bar div {
+            height: 20px;
+            background-color: #007bff;
+            text-align: right;
+            padding-right: 5px;
+            color: white;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -218,7 +242,7 @@
         </select>
     </div>
     <div class="description-box" id="description-box"></div>
-    <div class="info-card" id="info-card">
+    <div class="quality-info" id="quality-info">
         <div>名称: <span id="quality-name">胭脂</span></div>
         <div>段位: <span id="quality-tier">普通</span></div>
         <div>成长率: <span id="quality-growth-rate">100%</span></div>
@@ -542,38 +566,39 @@
             updateQualityCard();
         }
 
-        function updateQualityCard() {
-            document.getElementById("quality-name").innerText = currentPet.name;
-            document.getElementById("quality-tier").innerText = currentPet.qualities.tier;
-            document.getElementById("quality-growth-rate").innerText = currentPet.qualities.growthRate + "%";
-            document.getElementById("quality-mutated").innerText = currentPet.qualities.mutated ? "变异" : "未变异";
+function updateQualityCard() {
+    document.getElementById("quality-name").innerText = currentPet.name;
+    document.getElementById("quality-tier").innerText = currentPet.qualities.tier;
+    document.getElementById("quality-growth-rate").innerText = currentPet.qualities.growthRate + "%";
+    document.getElementById("quality-mutated").innerText = currentPet.qualities.mutated ? "变异" : "未变异";
 
-            const endurance = currentPet.qualities.endurance;
-            const strength = currentPet.qualities.strength;
-            const faith = currentPet.qualities.faith;
-            const agility = currentPet.qualities.agility;
-            const intelligence = currentPet.qualities.intelligence;
+    const endurance = currentPet.qualities.endurance;
+    const strength = currentPet.qualities.strength;
+    const faith = currentPet.qualities.faith;
+    const agility = currentPet.qualities.agility;
+    const intelligence = currentPet.qualities.intelligence;
 
-            document.getElementById("endurance-current").innerText = endurance.current;
-            document.getElementById("endurance-max").innerText = endurance.max;
-            document.getElementById("endurance-bar").style.width = (endurance.current / endurance.max * 100) + "%";
+    document.getElementById("endurance-current").innerText = endurance.current;
+    document.getElementById("endurance-max").innerText = endurance.max;
+    document.getElementById("endurance-bar").style.width = (endurance.current / endurance.max * 100) + "%";
 
-            document.getElementById("strength-current").innerText = strength.current;
-            document.getElementById("strength-max").innerText = strength.max;
-            document.getElementById("strength-bar").style.width = (strength.current / strength.max * 100) + "%";
+    document.getElementById("strength-current").innerText = strength.current;
+    document.getElementById("strength-max").innerText = strength.max;
+    document.getElementById("strength-bar").style.width = (strength.current / strength.max * 100) + "%";
 
-            document.getElementById("faith-current").innerText = faith.current;
-            document.getElementById("faith-max").innerText = faith.max;
-            document.getElementById("faith-bar").style.width = (faith.current / faith.max * 100) + "%";
+    document.getElementById("faith-current").innerText = faith.current;
+    document.getElementById("faith-max").innerText = faith.max;
+    document.getElementById("faith-bar").style.width = (faith.current / faith.max * 100) + "%";
 
-            document.getElementById("agility-current").innerText = agility.current;
-            document.getElementById("agility-max").innerText = agility.max;
-            document.getElementById("agility-bar").style.width = (agility.current / agility.max * 100) + "%";
+    document.getElementById("agility-current").innerText = agility.current;
+    document.getElementById("agility-max").innerText = agility.max;
+    document.getElementById("agility-bar").style.width = (agility.current / agility.max * 100) + "%";
 
-            document.getElementById("intelligence-current").innerText = intelligence.current;
-            document.getElementById("intelligence-max").innerText = intelligence.max;
-            document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
-        }
+    document.getElementById("intelligence-current").innerText = intelligence.current;
+    document.getElementById("intelligence-max").innerText = intelligence.max;
+    document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
+}
+
 
         function rebornPet() {
             if (rebornPill < 1) {

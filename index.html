@@ -185,6 +185,26 @@
             color: white;
             border-radius: 5px;
         }
+        .core-area-wrapper {
+            display: flex;
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            justify-content: space-between;
+        }
+
+        .quality-info {
+            flex: 0 0 48%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            text-align: left;
+        }
     </style>
 </head>
 <body>
@@ -223,25 +243,6 @@
         </div>
         <div class="skills" id="skills-area"></div>
     </div>
-    <div class="bottom-bar">
-        <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
-            <div>宠物名称: <span id="pet-name">胭脂</span></div>
-        </div>
-        <div class="info">
-            <div>当前悟性: <span id="current-wisdom">0</span></div>
-            <div>洗练次数: <span id="train-count">0</span></div>
-            <div>技能评分: <span id="skill-score">0</span></div>
-            <div>最高记录: <span id="highest-score">0</span></div>
-        </div>
-    </div>
-    <div class="pet-selector">
-        <select id="pet-select" onchange="changePet()">
-            <option value="yanzhi">胭脂</option>
-            <option value="daming">妲茗儿</option>
-        </select>
-    </div>
-    <div class="description-box" id="description-box"></div>
     <div class="quality-info" id="quality-info">
         <div>名称: <span id="quality-name">胭脂</span></div>
         <div>段位: <span id="quality-tier">普通</span></div>
@@ -267,6 +268,25 @@
             智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
             <div id="intelligence-bar" style="width: 50%"></div>
         </div>
+    <div class="bottom-bar">
+        <div class="pet-image">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
+            <div>宠物名称: <span id="pet-name">胭脂</span></div>
+        </div>
+        <div class="info">
+            <div>当前悟性: <span id="current-wisdom">0</span></div>
+            <div>洗练次数: <span id="train-count">0</span></div>
+            <div>技能评分: <span id="skill-score">0</span></div>
+            <div>最高记录: <span id="highest-score">0</span></div>
+        </div>
+    </div>
+    <div class="pet-selector">
+        <select id="pet-select" onchange="changePet()">
+            <option value="yanzhi">胭脂</option>
+            <option value="daming">妲茗儿</option>
+        </select>
+    </div>
+    <div class="description-box" id="description-box"></div>
     </div>
 
     <script>
@@ -476,31 +496,35 @@
             });
         }
 
-        function updateSkillScore(selectedSkills) {
-            let score = selectedSkills.reduce((sum, skill) => {
-                if (skill.rarity === 'B') return sum + 200;
-                if (skill.rarity === 'A') return sum + 1000;
-                if (skill.rarity === 'S') return sum + 6000;
-                if (skill.rarity === 'SS') return sum + 10000;
-            }, 0);
+function updateSkillScore(selectedSkills = []) {
+    let score = selectedSkills.reduce((sum, skill) => {
+        if (skill.rarity === 'B') return sum + 200;
+        if (skill.rarity === 'A') return sum + 1000;
+        if (skill.rarity === 'S') return sum + 6000;
+        if (skill.rarity === 'SS') return sum + 10000;
+    }, 0);
 
-            const hasS = selectedSkills.some(skill => skill.rarity === 'S');
-            const hasSS = selectedSkills.some(skill => skill.rarity === 'SS');
-            const numS = selectedSkills.filter(skill => skill.rarity === 'S').length;
-            const numSS = selectedSkills.filter(skill => skill.rarity === 'SS').length;
+    const hasS = selectedSkills.some(skill => skill.rarity === 'S');
+    const hasSS = selectedSkills.some(skill => skill.rarity === 'SS');
+    const numS = selectedSkills.filter(skill => skill.rarity === 'S').length;
+    const numSS = selectedSkills.filter(skill => skill.rarity === 'SS').length;
 
-            if (hasS && hasSS) score += 20000;
-            if (numS > 1) score += 10000;
-            if (numSS > 1) score += 20000;
+    if (hasS && hasSS) score += 20000;
+    if (numS > 1) score += 10000;
+    if (numSS > 1) score += 20000;
 
-            skillScore = score;
-            document.getElementById("skill-score").innerText = skillScore;
+    // 添加宠物资质值对技能评分的影响
+    const qualityTotal = (currentPet.qualities.endurance.current + currentPet.qualities.strength.current + currentPet.qualities.faith.current + currentPet.qualities.agility.current + currentPet.qualities.intelligence.current) / 10;
+    score += qualityTotal;
 
-            if (score > highestScore) {
-                highestScore = score;
-                document.getElementById("highest-score").innerText = highestScore;
-            }
-        }
+    skillScore = score;
+    document.getElementById("skill-score").innerText = skillScore;
+
+    if (score > highestScore) {
+        highestScore = score;
+        document.getElementById("highest-score").innerText = highestScore;
+    }
+}
 
         function upgradeWisdomTo() {
             const target = prompt("你期待将宠物悟性提升至__ (请输入1-20之间的整数):");
@@ -709,16 +733,10 @@ function updateQualityCard() {
             }
 
             currentPet.qualities.tier = Math.random() < 0.5 ? '卓越' : '完美';
-            currentPet.qualities.growthRate = currentPet.qualities.tier === '卓越' ? getRandomInt(300, 320) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+            currentPet.qualities.growthRate = currentPet.qualities.tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
             currentPet.qualities.mutated = true;
 
             const qualities = currentPet.qualities;
-            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
-            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
-            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
-            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
-            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
-
             qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
             qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
             qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
@@ -726,6 +744,7 @@ function updateQualityCard() {
             qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
 
             updateQualityCard();
+            updateSkillScore();
         }
 
         function getRandomInt(min, max) {

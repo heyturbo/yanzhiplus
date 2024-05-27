@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神兽天赋洗练机</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        .top-bar, .bottom-bar {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 10px;
+        }
+        .top-bar div, .bottom-bar div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-bar img, .bottom-bar img {
+            width: 50px;
+            height: 50px;
+        }
+        .core-area {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 10px;
+        }
+        .core-area .buttons {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        .core-area .buttons button {
+            flex: 0 0 auto;
+            margin: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .core-area .buttons button:active {
+            background-color: #0056b3;
+        }
+        .core-area .skills {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+        .core-area .skills div {
+            width: 100%;
+            padding: 10px;
+            background-color: #e0e0e0;
+            text-align: center;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+        .core-area .skills .s-skill {
+            border: 2px solid gold;
+        }
+        .core-area .skills .ss-skill {
+            border: 2px solid gold;
+            background-color: gold;
+        }
+        .bottom-bar .info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .bottom-bar .info div {
+            margin: 5px 0;
+        }
+        .description-box {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .pet-selector {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .pet-selector select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .pet-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .pet-image img {
+            width: 140px;
+            height: 140px;
+            border-radius: 10px;
+        }
+        .info-card {
+            display: none;
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .info-card.active {
+            display: block;
+        }
+        .info-card .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .info-card .progress-bar div {
+            height: 20px;
+            background-color: #007bff;
+            text-align: right;
+            padding-right: 5px;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div>
+            <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
+            <div>高级悟性丹</div>
+            <div><span id="high-grade-pill">1000</span></div>
+        </div>
+        <div>
+            <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png" alt="万化灵丹">
+            <div>万化灵丹</div>
+            <div><span id="transmutation-pill">100</span></div>
+        </div>
+        <div>
+            <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
+            <div>神兽还童丹</div>
+            <div><span id="reborn-pill">100</span></div>
+        </div>
+        <div>
+            <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
+            <div>资质重生丹</div>
+            <div><span id="quality-pill">100</span></div>
+        </div>
+    </div>
+    <div class="core-area">
+        <div class="buttons">
+            <button onclick="upgradeWisdom()">提悟</button>
+            <button onclick="trainSkills()">洗练</button>
+            <button onclick="upgradeWisdomTo()">顿悟</button>
+            <button onclick="resetGame()">刷新</button>
+            <button onclick="rebornPet()">还童</button>
+            <button onclick="trainQuality()">深造</button>
+            <button onclick="enhanceQuality()">提资</button>
+            <button onclick="mutatePet()">变异</button>
+        </div>
+        <div class="skills" id="skills-area"></div>
+    </div>
+    <div class="bottom-bar">
+        <div class="pet-image">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
+            <div>宠物名称: <span id="pet-name">胭脂</span></div>
+        </div>
+        <div class="info">
+            <div>当前悟性: <span id="current-wisdom">0</span></div>
+            <div>洗练次数: <span id="train-count">0</span></div>
+            <div>技能评分: <span id="skill-score">0</span></div>
+            <div>最高记录: <span id="highest-score">0</span></div>
+        </div>
+    </div>
+    <div class="pet-selector">
+        <select id="pet-select" onchange="changePet()">
+            <option value="yanzhi">胭脂</option>
+            <option value="daming">妲茗儿</option>
+        </select>
+    </div>
+    <div class="description-box" id="description-box"></div>
+    <div class="info-card" id="info-card">
+        <div>名称: <span id="quality-name">胭脂</span></div>
+        <div>段位: <span id="quality-tier">普通</span></div>
+        <div>成长率: <span id="quality-growth-rate">100%</span></div>
+        <div>变异: <span id="quality-mutated">未变异</span></div>
+        <div class="progress-bar">
+            耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
+            <div id="endurance-bar" style="width: 50%"></div>
+        </div>
+        <div class="progress-bar">
+            强壮: <span id="strength-current">2250</span> / <span id="strength-max">3750</span>
+            <div id="strength-bar" style="width: 50%"></div>
+        </div>
+        <div class="progress-bar">
+            信仰: <span id="faith-current">2250</span> / <span id="faith-max">3750</span>
+            <div id="faith-bar" style="width: 50%"></div>
+        </div>
+        <div class="progress-bar">
+            敏捷: <span id="agility-current">2500</span> / <span id="agility-max">4300</span>
+            <div id="agility-bar" style="width: 50%"></div>
+        </div>
+        <div class="progress-bar">
+            智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
+            <div id="intelligence-bar" style="width: 50%"></div>
+        </div>
+    </div>
+
+    <script>
+        const pets = {
+            yanzhi: {
+                name: '胭脂',
+                image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
+                skills: [
+                    { name: '法术精通', rarity: 'A', description: '被动技能，法术攻击上升' },
+                    { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复' },
+                    { name: '万法归宗', rarity: 'B', description: '被动技能，法术暴击上升' },
+                    { name: '仙风道骨', rarity: 'A', description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '长寿', rarity: 'B', description: '被动技能，寿命上限上升' },
+                    { name: '法力吸取·法术', rarity: 'B', description: '对目标造成法术伤害并吸取一定得法力值' },
+                    { name: '女神外壳', rarity: 'A', description: '被动技能，物理和法术防御上升。' },
+                    { name: '全面进化', rarity: 'S', description: '被动技能，耐力、敏捷、强壮上升' },
+                    { name: '妩媚身姿', rarity: 'A', description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
+                    { name: '智慧守护', rarity: 'S', description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
+                    { name: '月之祝福', rarity: 'A', description: '被动技能，耐力、敏捷、智力上升' },
+                    { name: '硕果累累', rarity: 'SS', description: '胭脂抖了抖身，漫天果实坠落，对横排敌人造成法术伤害，并以35%的概率，施加3回合迟缓状态。根据自身血量上限增加威力。' },
+                    { name: '琼珠玉液', rarity: 'SS', description: '胭脂小手一挥，消耗自身60%寿命，百分百驱散我方全体成员的部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽）并恢复血量，胭脂血量上限越高回复量越多。' },
+                    { name: '灼若旭日', rarity: 'SS', description: '胭脂单手投掷石榴花给单体目标造成法术伤害，按伤害量20%减少目标HP上限，单次最多可减少目标2%HP上限，并根据伤害少量恢复我方全体成员的血量。' },
+                    { name: '春风徐徐', rarity: 'SS', description: '被动技能，胭脂每回合有概率生成霸体护盾，护盾可免疫部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽），成功生成时，将消耗一定的寿命。' },
+                    { name: '榴花如丹', rarity: 'SS', description: '被动技能，榴花如丹红似火，源源不断为胭脂永久提升耐力。' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 4500, min: 4500, max: 8700 },
+                    strength: { current: 2250, min: 2250, max: 3750 },
+                    faith: { current: 2250, min: 2250, max: 3750 },
+                    agility: { current: 2500, min: 2500, max: 4300 },
+                    intelligence: { current: 5250, min: 5250, max: 10350 },
+                    mutated: false
+                }
+            },
+            daming: {
+                name: '妲茗儿',
+                image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c23a4.gif',
+                skills: [
+                    { name: '长寿', rarity: 'B', description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
+                    { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复' },
+                    { name: '元素力量（宽容）', rarity: 'SS', description: '被动技能，借助元素的力量，在受到群体攻击时，减免部分伤害。减免的额度与技能等级有关。' },
+                    { name: '法力灼烧', rarity: 'A', description: '对敌方单一目标喷吐火焰，将目标法力蒸发，并同时造成伤害。产生的伤害需以使用者的法术攻击为基础。' },
+                    { name: '智慧守护', rarity: 'A', description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
+                    { name: '仙风道骨', rarity: 'SS', description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '女神外壳', rarity: 'A', description: '被动技能，物理和法术防御上升。' },
+                    { name: '美腿术', rarity: 'A', description: '被动技能，一双美腿是她引以为豪的本钱，学会此技能可为她增加速度。' },
+                    { name: '妩媚身姿', rarity: 'A', description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
+                    { name: '疗伤解毒', rarity: 'SS', description: '被动技能，妲茗儿和在天宫捣药的前辈学到了疗伤解毒技能，使自己免疫一切中毒、流血和灼烧效果。但是需以寿命做献祭，每回合消耗40点寿命。' },
+                    { name: '上善若水', rarity: 'SS', description: '被动技能，会疗伤的妲茗儿爱主人胜过爱自己，妲茗儿的主人受到伤害后妲茗儿会主动治疗主人（不治疗中毒和流血、等负面效果造成的伤害）。妲茗儿法术攻击越高治疗效果越好。' },
+                    { name: '步步生莲', rarity: 'SS', description: '妲茗儿曼妙的舞姿迷惑敌人后对敌方所有目标进行攻击，我方血量最低1个单位受到鼓舞恢复一定血量。' },
+                    { name: '气急攻心', rarity: 'SS', description: '被动技能，妲茗儿天生是个急性子，每回合结束后消耗当前生命1%，恢复最大生命1%的血量，恢复生命需要以寿命作为献祭，每回合扣除100寿命（技能16级以后不消耗寿命）。' },
+                    { name: '狡兔三窟', rarity: 'SS', description: '被动技能，妲茗儿每次战斗可以免疫2次致死伤害，触发狡兔三窟后会回复最大血量的5%，最大法力的5%，每次触发狡兔三窟以20%寿命做献祭。' },
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 5400, min: 5400, max: 7050 },
+                    strength: { current: 3000, min: 3000, max: 3750 },
+                    faith: { current: 3000, min: 3000, max: 3750 },
+                    agility: { current: 6200, min: 6200, max: 8150 },
+                    intelligence: { current: 6200, min: 6200, max: 8150 },
+                    mutated: false
+                }
+            }
+        };
+
+        let currentPet = pets.yanzhi;
+        let highGradePill = 1000;
+        let transmutationPill = 100;
+        let rebornPill = 100;
+        let qualityPill = 100;
+        let currentWisdom = 0;
+        let trainCount = 0;
+        let skillScore = 0;
+        let highestScore = 0;
+
+        const descriptions = [
+            "通过提升悟性值，可以很大程度上提高获取高级天赋技能的概率，以及有更大的可能洗练出多个天赋技能！",
+            "天赋技能的评分由各天赋的评级决定，B技能为200分，A技能为1000分，S技能为6000分，SS技能为10000分。当你洗出多个S或SS技能时，还会有额外分值！",
+            "悟性提升会有几率失败，请谨慎操作！"
+        ];
+
+        function upgradeWisdom() {
+            if (highGradePill < 1) {
+                alert("您的高级悟性丹已耗尽！");
+                return;
+            }
+
+            highGradePill--;
+            document.getElementById("high-grade-pill").innerText = highGradePill;
+
+            let successRate;
+            if (currentWisdom < 7) successRate = 0.9;
+            else if (currentWisdom < 13) successRate = 0.55;
+            else if (currentWisdom < 18) successRate = 0.35;
+            else if (currentWisdom < 20) successRate = 0.15;
+            else successRate = 0.05;
+
+            if (Math.random() < successRate) {
+                currentWisdom = Math.min(currentWisdom + 1, 20);
+            } else {
+                if (currentWisdom > 0) {
+                    if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
+                    else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
+                    else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
+                    else currentWisdom = Math.max(15, currentWisdom - 2);
+                }
+            }
+            document.getElementById("current-wisdom").innerText = currentWisdom;
+        }
+
+        function trainSkills() {
+            if (transmutationPill < 1) {
+                alert("您的道具不够，请刷新后重试！");
+                return;
+            }
+
+            transmutationPill--;
+            document.getElementById("transmutation-pill").innerText = transmutationPill;
+            trainCount++;
+            document.getElementById("train-count").innerText = trainCount;
+
+            let skillNum;
+            if (currentWisdom < 7) {
+                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
+            } else if (currentWisdom < 13) {
+                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+            } else if (currentWisdom < 17) {
+                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
+            } else if (currentWisdom < 20) {
+                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
+            } else {
+                skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+            }
+
+            const selectedSkills = [];
+            for (let i = 0; i < skillNum; i++) {
+                let skill;
+                do {
+                    const rarityRoll = Math.random() * 100;
+                    if (currentWisdom < 7) {
+                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                        else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                    } else if (currentWisdom < 13) {
+                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                        else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                    } else if (currentWisdom < 17) {
+                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                    } else if (currentWisdom < 20) {
+                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                    } else {
+                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                    }
+                } while (!skill || selectedSkills.includes(skill));
+                selectedSkills.push(skill);
+            }
+
+            if (selectedSkills.length >= 8) {
+                if (!confirm("您洗出了好！多！技！能！确定不留着看看吗？")) {
+                    return;
+                }
+            }
+
+            updateSkillsArea(selectedSkills);
+            updateSkillScore(selectedSkills);
+        }
+
+        function getRandomSkillNum(probabilities) {
+            const total = probabilities.reduce((sum, prob) => sum + prob, 0);
+            let rand = Math.random() * total;
+            for (let i = 0; i < probabilities.length; i++) {
+                if (rand < probabilities[i]) {
+                    return i + 1;
+                }
+                rand -= probabilities[i];
+            }
+            return 1;
+        }
+
+        function updateSkillsArea(selectedSkills) {
+            const skillsArea = document.getElementById("skills-area");
+            skillsArea.innerHTML = "";
+            selectedSkills.forEach(skill => {
+                const skillDiv = document.createElement("div");
+                skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+                skillDiv.onclick = () => {
+                    document.getElementById("description-box").innerText = skill.description;
+                };
+                if (skill.rarity === 'S') {
+                    skillDiv.classList.add('s-skill');
+                } else if (skill.rarity === 'SS') {
+                    skillDiv.classList.add('ss-skill');
+                }
+                skillsArea.appendChild(skillDiv);
+            });
+        }
+
+        function updateSkillScore(selectedSkills) {
+            let score = selectedSkills.reduce((sum, skill) => {
+                if (skill.rarity === 'B') return sum + 200;
+                if (skill.rarity === 'A') return sum + 1000;
+                if (skill.rarity === 'S') return sum + 6000;
+                if (skill.rarity === 'SS') return sum + 10000;
+            }, 0);
+
+            const hasS = selectedSkills.some(skill => skill.rarity === 'S');
+            const hasSS = selectedSkills.some(skill => skill.rarity === 'SS');
+            const numS = selectedSkills.filter(skill => skill.rarity === 'S').length;
+            const numSS = selectedSkills.filter(skill => skill.rarity === 'SS').length;
+
+            if (hasS && hasSS) score += 20000;
+            if (numS > 1) score += 10000;
+            if (numSS > 1) score += 20000;
+
+            skillScore = score;
+            document.getElementById("skill-score").innerText = skillScore;
+
+            if (score > highestScore) {
+                highestScore = score;
+                document.getElementById("highest-score").innerText = highestScore;
+            }
+        }
+
+        function upgradeWisdomTo() {
+            const target = prompt("你期待将宠物悟性提升至__ (请输入1-20之间的整数):");
+            if (target === null) return;
+
+            if (target === "super") {
+                currentWisdom = 20;
+                highGradePill = 0;
+                document.getElementById("high-grade-pill").innerText = highGradePill;
+                document.getElementById("current-wisdom").innerText = currentWisdom;
+                document.getElementById("description-box").innerText = `您消耗了全部高级悟性丹，将悟性提升至${currentWisdom}`;
+                return;
+            }
+
+            const targetValue = parseInt(target, 10);
+            if (isNaN(targetValue) || targetValue < 1 || targetValue > 20) {
+                alert("无效输入，请输入1到20之间的数字");
+                return;
+            }
+
+            let initialWisdom = currentWisdom;
+            while (currentWisdom < targetValue && highGradePill > 0) {
+                upgradeWisdom();
+            }
+
+            let usedPills = initialWisdom < currentWisdom ? highGradePill + initialWisdom - currentWisdom : 0;
+            document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
+        }
+
+        function resetGame() {
+            location.reload();
+        }
+
+        function updateDescriptionBox() {
+            const descriptionBox = document.getElementById("description-box");
+            const randomIndex = Math.floor(Math.random() * descriptions.length);
+            descriptionBox.innerText = descriptions[randomIndex];
+        }
+
+        function changePet() {
+            const selectedPet = document.getElementById("pet-select").value;
+            currentPet = pets[selectedPet];
+            document.getElementById("pet-name").innerText = currentPet.name;
+            document.getElementById("pet-image").src = currentPet.image;
+            highGradePill = 1000;
+            transmutationPill = 100;
+            rebornPill = 100;
+            qualityPill = 100;
+            currentWisdom = 0;
+            trainCount = 0;
+            skillScore = 0;
+            highestScore = 0;
+            document.getElementById("high-grade-pill").innerText = highGradePill;
+            document.getElementById("transmutation-pill").innerText = transmutationPill;
+            document.getElementById("reborn-pill").innerText = rebornPill;
+            document.getElementById("quality-pill").innerText = qualityPill;
+            document.getElementById("current-wisdom").innerText = currentWisdom;
+            document.getElementById("train-count").innerText = trainCount;
+            document.getElementById("skill-score").innerText = skillScore;
+            document.getElementById("highest-score").innerText = highestScore;
+            document.getElementById("skills-area").innerHTML = "";
+            document.getElementById("description-box").innerText = "";
+            updateQualityCard();
+        }
+
+        function updateQualityCard() {
+            document.getElementById("quality-name").innerText = currentPet.name;
+            document.getElementById("quality-tier").innerText = currentPet.qualities.tier;
+            document.getElementById("quality-growth-rate").innerText = currentPet.qualities.growthRate + "%";
+            document.getElementById("quality-mutated").innerText = currentPet.qualities.mutated ? "变异" : "未变异";
+
+            const endurance = currentPet.qualities.endurance;
+            const strength = currentPet.qualities.strength;
+            const faith = currentPet.qualities.faith;
+            const agility = currentPet.qualities.agility;
+            const intelligence = currentPet.qualities.intelligence;
+
+            document.getElementById("endurance-current").innerText = endurance.current;
+            document.getElementById("endurance-max").innerText = endurance.max;
+            document.getElementById("endurance-bar").style.width = (endurance.current / endurance.max * 100) + "%";
+
+            document.getElementById("strength-current").innerText = strength.current;
+            document.getElementById("strength-max").innerText = strength.max;
+            document.getElementById("strength-bar").style.width = (strength.current / strength.max * 100) + "%";
+
+            document.getElementById("faith-current").innerText = faith.current;
+            document.getElementById("faith-max").innerText = faith.max;
+            document.getElementById("faith-bar").style.width = (faith.current / faith.max * 100) + "%";
+
+            document.getElementById("agility-current").innerText = agility.current;
+            document.getElementById("agility-max").innerText = agility.max;
+            document.getElementById("agility-bar").style.width = (agility.current / agility.max * 100) + "%";
+
+            document.getElementById("intelligence-current").innerText = intelligence.current;
+            document.getElementById("intelligence-max").innerText = intelligence.max;
+            document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
+        }
+
+        function rebornPet() {
+            if (rebornPill < 1) {
+                alert("您的神兽还童丹已耗尽！");
+                return;
+            }
+
+            rebornPill--;
+            document.getElementById("reborn-pill").innerText = rebornPill;
+
+            let tier, growthRate;
+            const roll = Math.random() * 100;
+            if (roll < 50) {
+                tier = '普通';
+                growthRate = 100;
+            } else if (roll < 75) {
+                tier = '优秀';
+                growthRate = 220;
+            } else if (roll < 90) {
+                tier = '杰出';
+                growthRate = 280;
+            } else if (roll < 97.5) {
+                tier = '卓越';
+                growthRate = 320;
+            } else if (roll < 99.95) {
+                tier = '完美';
+                growthRate = 400;
+            } else {
+                tier = Math.random() < 0.5 ? '卓越' : '完美';
+                growthRate = tier === '卓越' ? getRandomInt(300, 320) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+                currentPet.qualities.mutated = true;
+                if (!confirm("您的宠物已经变异，请问是否继续操作？")) {
+                    return;
+                }
+            }
+
+            currentPet.qualities.tier = tier;
+            currentPet.qualities.growthRate = growthRate;
+
+            const qualities = currentPet.qualities;
+            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
+            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
+            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
+            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
+            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+
+            if (currentPet.qualities.mutated) {
+                qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
+                qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
+                qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
+                qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
+                qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
+            }
+
+            updateQualityCard();
+        }
+
+        function trainQuality() {
+            const targetTier = prompt("请选择预期段位（普通，优秀，杰出，卓越，完美）:");
+            if (targetTier === null) return;
+            const stopOnMutation = confirm("遇变异则停止？");
+
+            let achieved = false;
+            while (rebornPill > 0 && !achieved) {
+                rebornPet();
+                if (currentPet.qualities.tier === targetTier) {
+                    achieved = true;
+                }
+                if (stopOnMutation && currentPet.qualities.mutated) {
+                    achieved = true;
+                }
+            }
+
+            document.getElementById("description-box").innerText = `您消耗了${100 - rebornPill}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
+        }
+
+        function enhanceQuality() {
+            if (qualityPill < 1) {
+                alert("您的资质重生丹已耗尽！");
+                return;
+            }
+
+            qualityPill--;
+            document.getElementById("quality-pill").innerText = qualityPill;
+
+            const qualities = currentPet.qualities;
+            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
+            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
+            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
+            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
+            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+
+            if (qualities.mutated) {
+                qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
+                qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
+                qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
+                qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
+                qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
+            }
+
+            updateQualityCard();
+        }
+
+        function mutatePet() {
+            if (currentPet.qualities.mutated) {
+                alert("您的宠物已经变异，无法再次变异！");
+                return;
+            }
+
+            currentPet.qualities.tier = Math.random() < 0.5 ? '卓越' : '完美';
+            currentPet.qualities.growthRate = currentPet.qualities.tier === '卓越' ? getRandomInt(300, 320) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+            currentPet.qualities.mutated = true;
+
+            const qualities = currentPet.qualities;
+            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
+            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
+            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
+            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
+            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+
+            qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
+            qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
+            qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
+            qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
+            qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
+
+            updateQualityCard();
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function getWeightedRandom(values, weights) {
+            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+            let rand = Math.random() * totalWeight;
+            for (let i = 0; i < values.length; i++) {
+                if (rand < weights[i]) {
+                    return values[i];
+                }
+                rand -= weights[i];
+            }
+            return values[0];
+        }
+
+        setInterval(updateDescriptionBox, 30000);
+        updateDescriptionBox(); // 初始化描述框
+        updateQualityCard(); // 初始化资质卡片
+    </script>
+</body>
+</html>

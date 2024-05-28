@@ -10,7 +10,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f0f0f0;
+            background-image: url('https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png');
+            background-repeat: repeat; /* 图片平铺 */
+            background-size: auto; /* 保持原图大小 */
+            background-attachment: fixed; /* 背景固定 */
             margin: 0;
             padding: 0;
         }
@@ -294,7 +297,7 @@
     <div class="top-bar">
         <div>
             <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
-            <div>高级悟性丹</div>
+            <div>悟性丹</div>
             <div><span id="high-grade-pill">1000</span></div>
         </div>
         <div>
@@ -304,12 +307,12 @@
         </div>
         <div>
             <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
-            <div>神兽还童丹</div>
+            <div>还童丹</div>
             <div><span id="reborn-pill">100</span></div>
         </div>
         <div>
             <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
-            <div>资质重生丹</div>
+            <div>资质丹</div>
             <div><span id="quality-pill">100</span></div>
         </div>
         <div>
@@ -399,6 +402,7 @@
     <div class="pet-selector">
         <select id="pet-select" onchange="changePet()">
             <option value="yanzhi">胭脂</option>
+            <option value="zhulin">竹林隐士</option>
             <option value="daming">妲茗儿</option>
         </select>
     </div>
@@ -436,6 +440,36 @@
                     faith: { current: 2250, min: 2250, max: 3750 },
                     agility: { current: 2500, min: 2500, max: 4300 },
                     intelligence: { current: 5250, min: 5250, max: 10350 },
+                    mutated: false
+                }
+            },
+            zhulin: {
+                name: '竹林隐士',
+                image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7ab.gif',
+                skills: [
+                { name: '长寿', rarity: 'B', description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
+                { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复' },
+                { name: '意念凝聚', rarity: 'B', description: '被动技能，竹林隐士集中意念，攻击可大幅度忽略敌人的物理闪避和物理防御' },
+                { name: '防护结界', rarity: 'B', description: '被动技能，法术防御上升' },
+                { name: '仙风道骨', rarity: 'A', description: '被动技能，耐力、敏捷、强壮大幅提升' },
+                { name: '智慧守护', rarity: 'A', description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
+                { name: '离子护盾', rarity: 'A', description: '被动技能，被离子护盾包围，击中竹林神灵的敌人会有几率触电而被百分比破甲，破甲效果随技能等级和宠物修为增加而增强' },
+                { name: '神威之怒', rarity: 'S', description: '被动技能，此技能可使宠物获得大量的物理攻击力' },
+                { name: '雷魔爆', rarity: 'S', description: '主动技能（群体物理攻击），对敌全体造成物理伤害并有几率附加破甲效果' },
+                { name: '高能电弧', rarity: 'S', description: '主动技能（单体），竹林隐士献祭30%最大寿命，全力激发一道高能电弧传导至指定友方目标，为自身及目标充能，充能效果会大幅增加速度，增加的速度同竹林隐士的法术攻击力及技能等级有关' },
+                { name: '雷霆万钧', rarity: 'SS', description: '主动技能（单体物理攻击），竹林隐士献祭15%最大寿命，以雷霆万钧之速对敌方单体目标造成毁灭性的一击！（必中），双方的速度差距越大，技能所造成的伤害越高' },
+                { name: '静电屏蔽', rarity: 'SS', description: '被动技能，竹林隐士出场时有几率使主人和自身免疫一切控制技能，几率随技能等级提升而增加' },
+                { name: '怒意能场', rarity: 'SS', description: '被动技能，竹林隐士每成功闪避一次敌方的攻击，就会将自己的怒意转化为自己的物理攻击力，怒意状态最大可叠加三次，被击中则蓄能状态在本回合末结束' },
+                { name: '离子风暴', rarity: 'SS', description: '主动技能（群体物理攻击），竹林隐士将布满雷电的斗笠扔向敌人，对敌方全体造成极大物理伤害，同时大幅提升自己的物理暴击几率' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 2700, min: 2700, max: 4300 },
+                    strength: { current: 9000, min: 9000, max: 12000 },
+                    faith: { current: 3600, min: 3600, max: 5400 },
+                    agility: { current: 3600, min: 3600, max: 5400 },
+                    intelligence: { current: 1800, min: 1800, max: 3200 },
                     mutated: false
                 }
             },
@@ -638,6 +672,14 @@ function buyItem() {
                 skillDiv.classList.add('ss-skill');
             }
             document.getElementById("skills-area").appendChild(skillDiv);
+
+            // 调用更新技能评分函数
+            const currentSkills = Array.from(document.querySelectorAll("#skills-area div"))
+                .map(div => {
+                    const [name, rarity] = div.innerText.split(" (");
+                    return { name, rarity: rarity.replace(")", "") };
+                });
+            updateSkillScore(currentSkills);
         }
     } else {
         // 更新顶部道具栏数量
@@ -940,11 +982,36 @@ function updateSkillScore(selectedSkills = []) {
 
 function updateQualityCard() {
     const qualityInfo = document.getElementById("quality-info");
+    const tierElement = document.getElementById("quality-tier");
+    const growthRateElement = document.getElementById("quality-growth-rate");
+    
     document.getElementById("quality-name").innerText = currentPet.name;
-    document.getElementById("quality-tier").innerText = currentPet.qualities.tier;
-    document.getElementById("quality-growth-rate").innerText = currentPet.qualities.growthRate + "%";
+    tierElement.innerText = currentPet.qualities.tier;
+    growthRateElement.innerText = currentPet.qualities.growthRate + "%";
     document.getElementById("quality-mutated").innerText = currentPet.qualities.mutated ? "变异" : "未变异";
 
+    // 设置段位和成长率的颜色
+    let color;
+    switch (currentPet.qualities.tier) {
+        case '优秀':
+            color = 'lightgreen';
+            break;
+        case '杰出':
+            color = 'lightblue';
+            break;
+        case '卓越':
+            color = 'lightpurple';
+            break;
+        case '完美':
+            color = 'lightorange';
+            break;
+        default:
+            color = 'black';
+    }
+    tierElement.style.color = color;
+    growthRateElement.style.color = color;
+
+    // 更新资质条
     const endurance = currentPet.qualities.endurance;
     const strength = currentPet.qualities.strength;
     const faith = currentPet.qualities.faith;
@@ -1039,6 +1106,17 @@ function rebornPet() {
 
     updateQualityCard();
     updateSkillScore();
+
+    // 还童后更新技能
+    const skillNum = getRandomInt(0, 3);
+    const newSkills = [];
+    const bSkills = currentPet.skills.filter(skill => skill.rarity === 'B');
+    for (let i = 0; i < skillNum; i++) {
+        const skill = bSkills[Math.floor(Math.random() * bSkills.length)];
+        newSkills.push(skill);
+    }
+    updateSkillsArea(newSkills);
+    updateSkillScore(newSkills);
 }
 
         function trainQuality() {

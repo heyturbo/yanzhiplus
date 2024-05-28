@@ -34,8 +34,8 @@
             align-items: center;
         }
         .top-bar img, .bottom-bar img {
-            width: 50px;
-            height: 50px;
+            width: 45px;
+            height: 45px;
         }
         .core-area {
             width: 90%;
@@ -137,8 +137,8 @@
             align-items: center;
         }
         .pet-image img {
-            width: 140px;
-            height: 140px;
+            width: 180px;
+            height: 180px;
             border-radius: 10px;
         }
         .info-card {
@@ -517,6 +517,7 @@ function updateTopBarItems() {
     document.getElementById("reborn-pill").innerText = rebornPill;
     document.getElementById("quality-pill").innerText = qualityPill;
     document.getElementById("miraculous-pill").innerText = miraculousPill;
+    document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;  // 确保还童金丹数量更新
 }
 
         let goldenRebornPill = 0;
@@ -525,11 +526,6 @@ function updateTopBarItems() {
 function useGoldenRebornPill() {
     if (goldenRebornPill < 1) {
         alert("您的还童金丹已耗尽！");
-        return;
-    }
-
-    // 弹窗确认
-    if (!confirm("您即将使用还童金丹更改宠物的成长率，但不会更改其变异状态，是否继续？")) {
         return;
     }
 

@@ -311,6 +311,11 @@
             <div><span id="reborn-pill">100</span></div>
         </div>
         <div>
+            <img src="https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png" alt="还童金丹">
+            <div>还童金丹</div>
+            <div><span id="golden-reborn-pill">0</span></div>
+        </div>
+        <div>
             <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
             <div>资质丹</div>
             <div><span id="quality-pill">100</span></div>
@@ -364,6 +369,7 @@
             <div>段位: <span id="quality-tier">普通</span></div>
             <div>成长率: <span id="quality-growth-rate">100%</span></div>
             <div>变异: <span id="quality-mutated">未变异</span></div>
+            <button onclick="useGoldenRebornPill()">使用还童金丹</button>
             <div class="progress-bar">
                 耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
                 <div id="endurance-bar" style="width: 50%"></div>
@@ -408,7 +414,6 @@
     </div>
     <div class="description-box" id="description-box"></div>
     </div>
-
     <script>
         const pets = {
             yanzhi: {
@@ -513,6 +518,42 @@ function updateTopBarItems() {
     document.getElementById("quality-pill").innerText = qualityPill;
     document.getElementById("miraculous-pill").innerText = miraculousPill;
 }
+
+        let goldenRebornPill = 0;
+        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+
+function useGoldenRebornPill() {
+    if (goldenRebornPill < 1) {
+        alert("您的还童金丹已耗尽！");
+        return;
+    }
+
+    // 弹窗确认
+    if (!confirm("您即将使用还童金丹更改宠物的成长率，但不会更改其变异状态，是否继续？")) {
+        return;
+    }
+
+    goldenRebornPill--;
+    document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+
+    const qualities = currentPet.qualities;
+    if (qualities.mutated) {
+        qualities.tier = Math.random() < 0.5 ? '卓越' : '完美';
+        qualities.growthRate = qualities.tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+    } else {
+        qualities.tier = '普通';
+        qualities.growthRate = 100;
+    }
+
+    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
+    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
+    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
+    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
+    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+
+    updateQualityCard();
+    updateSkillScore();
+}
  
         let goldAmount = 1000; // 初始金子数量
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -601,6 +642,7 @@ function getRandomCommonItem() {
         { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', price: getRandomInt(20, 220) },
         { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 220) },
         { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
+        { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(20, 220) },
         { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(20, 220) }
     ];
     return commonItems[Math.floor(Math.random() * commonItems.length)];
@@ -688,6 +730,7 @@ function buyItem() {
         else if (itemName === '神兽还童丹') rebornPill++;
         else if (itemName === '资质重生丹') qualityPill++;
         else if (itemName === '灵异金丹') miraculousPill++;
+        else if (itemName === '还童金丹') goldenRebornPill++;
         updateTopBarItems();
     }
 
@@ -744,9 +787,9 @@ function resetPet() {
         let highestScore = 0;
 
         const descriptions = [
-            "通过提升悟性值，可以很大程度上提高获取高级天赋技能的概率，以及有更大的可能洗练出多个天赋技能！",
+            "欢迎试玩养宠模拟机！本模拟机只用于娱乐，不对游戏进行任何功能性测试。本模拟机功能较多，请耐心探索~",
             "天赋技能的评分由各天赋的评级决定，B技能为200分，A技能为1000分，S技能为6000分，SS技能为10000分。当你洗出多个S或SS技能时，还会有额外分值！",
-            "悟性提升会有几率失败，请谨慎操作！"
+            "这一切都是概率的游戏，每一次都意味着下一次，谨慎操作！"
         ];
 
         function toggleDrawer() {
@@ -756,10 +799,18 @@ function resetPet() {
             info.classList.toggle('open');
         }
 
-        function checkDrawerOpen() {
-            const drawer = document.getElementById('quality-drawer');
-            return drawer.classList.contains('open');
-        }
+function checkDrawerOpen() {
+    const drawer = document.getElementById('quality-drawer');
+    if (!drawer.classList.contains('open')) {
+        const messageBox = document.createElement('div');
+        messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
+        messageBox.innerHTML = `<p>请先打开资质面板！</p>
+                                <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
+        document.body.appendChild(messageBox);
+        return false;
+    }
+    return true;
+}
 
         function upgradeWisdom() {
             if (highGradePill < 1) {
@@ -916,33 +967,68 @@ function updateSkillScore(selectedSkills = []) {
     }
 }
 
-        function upgradeWisdomTo() {
-            const target = prompt("你期待将宠物悟性提升至__ (请输入1-20之间的整数):");
-            if (target === null) return;
+function upgradeWisdomTo() {
+    const target = prompt("你期待将宠物悟性提升至__ (请输入1-20之间的整数):");
+    if (target === null) return;
 
-            if (target === "super") {
-                currentWisdom = 20;
-                highGradePill = 0;
-                document.getElementById("high-grade-pill").innerText = highGradePill;
-                document.getElementById("current-wisdom").innerText = currentWisdom;
-                document.getElementById("description-box").innerText = `您消耗了全部高级悟性丹，将悟性提升至${currentWisdom}`;
-                return;
-            }
+    if (target === "super") {
+        currentWisdom = 20;
+        highGradePill = 0;
+        document.getElementById("high-grade-pill").innerText = highGradePill;
+        document.getElementById("current-wisdom").innerText = currentWisdom;
+        document.getElementById("description-box").innerText = `您消耗了全部高级悟性丹，将悟性提升至${currentWisdom}`;
+        return;
+    }
 
-            const targetValue = parseInt(target, 10);
-            if (isNaN(targetValue) || targetValue < 1 || targetValue > 20) {
-                alert("无效输入，请输入1到20之间的数字");
-                return;
-            }
+    if (target === "666") {
+        goldAmount += 10000;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        document.getElementById("description-box").innerText = "您获得了10000金子！";
+        return;
+    }
 
-            let initialWisdom = currentWisdom;
-            while (currentWisdom < targetValue && highGradePill > 0) {
-                upgradeWisdom();
-            }
+    if (target === "banjiu") {
+        transmutationPill += 1000;
+        document.getElementById("transmutation-pill").innerText = transmutationPill;
+        document.getElementById("description-box").innerText = "您获得了1000个万化灵丹！";
+        return;
+    }
 
-            let usedPills = initialWisdom < currentWisdom ? highGradePill + initialWisdom - currentWisdom : 0;
-            document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
-        }
+    if (target === "888") {
+        rebornPill += 1000;
+        document.getElementById("reborn-pill").innerText = rebornPill;
+        document.getElementById("description-box").innerText = "您获得了1000个神兽还童丹！";
+        return;
+    }
+
+    if (target === "haha") {
+        qualityPill += 1000;
+        document.getElementById("quality-pill").innerText = qualityPill;
+        document.getElementById("description-box").innerText = "您获得了1000个资质重生丹！";
+        return;
+    }
+
+    if (target === "yeye") {
+        miraculousPill += 100;
+        document.getElementById("miraculous-pill").innerText = miraculousPill;
+        document.getElementById("description-box").innerText = "您获得了100个灵异金丹！";
+        return;
+    }
+
+    const targetValue = parseInt(target, 10);
+    if (isNaN(targetValue) || targetValue < 1 || targetValue > 20) {
+        alert("无效输入，请输入1到20之间的数字");
+        return;
+    }
+
+    let initialWisdom = currentWisdom;
+    while (currentWisdom < targetValue && highGradePill > 0) {
+        upgradeWisdom();
+    }
+
+    let usedPills = initialWisdom < currentWisdom ? highGradePill + initialWisdom - currentWisdom : 0;
+    document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
+}
 
         function resetGame() {
             location.reload();
@@ -1051,10 +1137,7 @@ function updateQualityCard() {
 }
 
 function rebornPet() {
-    if (!checkDrawerOpen()) {
-        alert("请先打开资质面板！");
-        return;
-    }
+    if (!checkDrawerOpen()) return;
 
     if (rebornPill < 1) {
         alert("您的神兽还童丹已耗尽！");
@@ -1119,30 +1202,35 @@ function rebornPet() {
     updateSkillScore(newSkills);
 }
 
-        function trainQuality() {
-            const targetTier = prompt("请选择预期段位（普通，优秀，杰出，卓越，完美）:");
-            if (targetTier === null) return;
-            const stopOnMutation = confirm("遇变异则停止？");
+function trainQuality() {
+    if (!checkDrawerOpen()) return;
 
-            let achieved = false;
-            while (rebornPill > 0 && !achieved) {
-                rebornPet();
-                if (currentPet.qualities.tier === targetTier) {
-                    achieved = true;
-                }
-                if (stopOnMutation && currentPet.qualities.mutated) {
-                    achieved = true;
-                }
-            }
+    const targetTier = prompt("请选择预期段位（普通，优秀，杰出，卓越，完美）:");
+    if (targetTier === null) return;
+    const stopOnMutation = confirm("遇变异则停止？");
 
-            document.getElementById("description-box").innerText = `您消耗了${100 - rebornPill}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
+    let achieved = false;
+    while (rebornPill > 0 && !achieved) {
+        rebornPet();
+        if (currentPet.qualities.tier === targetTier) {
+            achieved = true;
         }
+        if (stopOnMutation && currentPet.qualities.mutated) {
+            achieved = true;
+        }
+    }
+
+    const message = `您消耗了${100 - rebornPill}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
+    const messageBox = document.createElement('div');
+    messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
+    messageBox.innerHTML = `<p>${message}</p>
+                            <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
+    document.body.appendChild(messageBox);
+}
+
 
 function enhanceQuality() {
-    if (!checkDrawerOpen()) {
-        alert("请先打开资质面板！");
-        return;
-    }
+    if (!checkDrawerOpen()) return;
 
     if (qualityPill < 1) {
         alert("您的资质重生丹已耗尽！");
@@ -1189,10 +1277,7 @@ function enhanceQuality() {
 let miraculousPill = 1; // 初始化灵异金丹数量
 
 function mutatePet() {
-    if (!checkDrawerOpen()) {
-        alert("请先打开资质面板！");
-        return;
-    }
+    if (!checkDrawerOpen()) return;
 
     if (miraculousPill < 1) {
         alert("您的灵异金丹数量不足！");

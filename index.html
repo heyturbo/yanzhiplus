@@ -601,24 +601,56 @@ function buyItem() {
     }
 
     const price = parseInt(selectedItem.dataset.price, 10);
+    const itemName = selectedItem.dataset.name;
+
     if (goldAmount < price) {
         alert("金子不够，购买失败！");
         return;
     }
 
+    // 判断是否为天赋道具
+    const [petName, skillName] = itemName.split('·');
+    if (skillName) {
+        // 判断当前宠物是否能够获得该技能
+        if (petName !== currentPet.name) {
+            alert("您的当前宠物不会此技能，购买失败！");
+            return;
+        }
+
+        // 判断当前宠物技能位是否已有该技能
+        if (document.getElementById('skills-area').innerText.includes(skillName)) {
+            alert("您的当前宠物已经拥有此技能，购买失败！");
+            return;
+        }
+
+        // 查找技能对象
+        const skill = currentPet.skills.find(skill => skill.name === skillName);
+        if (skill) {
+            // 更新技能位
+            const skillDiv = document.createElement("div");
+            skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+            skillDiv.onclick = () => {
+                document.getElementById("description-box").innerText = skill.description;
+            };
+            if (skill.rarity === 'S') {
+                skillDiv.classList.add('s-skill');
+            } else if (skill.rarity === 'SS') {
+                skillDiv.classList.add('ss-skill');
+            }
+            document.getElementById("skills-area").appendChild(skillDiv);
+        }
+    } else {
+        // 更新顶部道具栏数量
+        if (itemName === '高级悟性丹') highGradePill++;
+        else if (itemName === '万化灵丹') transmutationPill++;
+        else if (itemName === '神兽还童丹') rebornPill++;
+        else if (itemName === '资质重生丹') qualityPill++;
+        else if (itemName === '灵异金丹') miraculousPill++;
+        updateTopBarItems();
+    }
+
     goldAmount -= price;
     document.getElementById("gold-amount").innerText = goldAmount;
-
-    // 更新顶部道具栏数量
-    const itemName = selectedItem.dataset.name;
-    if (itemName === '高级悟性丹') highGradePill++;
-    else if (itemName === '万化灵丹') transmutationPill++;
-    else if (itemName === '神兽还童丹') rebornPill++;
-    else if (itemName === '资质重生丹') qualityPill++;
-    else if (itemName === '灵异金丹') miraculousPill++;
-    // 其他道具逻辑
-
-    updateTopBarItems();
     selectedItem.remove();
 }
 

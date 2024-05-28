@@ -47,13 +47,17 @@
         }
         .core-area .buttons {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             width: 100%;
             overflow-x: auto;
-            white-space: nowrap;
         }
-        .core-area .buttons button {
-            flex: 0 0 auto;
+        .core-area .button-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .core-area .button-row button {
+            flex: 1;
             margin: 5px;
             padding: 10px;
             background-color: #007bff;
@@ -63,7 +67,7 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .core-area .buttons button:active {
+        .core-area .button-row button:active {
             background-color: #0056b3;
         }
         .core-area .skills {
@@ -161,14 +165,33 @@
             color: white;
             border-radius: 5px;
         }
-        .quality-info {
-            width: 90%;
-            margin: 10px 0;
-            padding: 10px;
+        .quality-drawer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
             background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            text-align: left;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px 10px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        .quality-drawer.open {
+            transform: translateY(0);
+        }
+        .drawer-toggle {
+            padding: 10px;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px 10px 0 0;
+        }
+        .quality-info {
+            display: none;
+            padding: 10px;
+        }
+        .quality-info.open {
+            display: block;
         }
         .quality-info .progress-bar {
             width: 100%;
@@ -185,25 +208,85 @@
             color: white;
             border-radius: 5px;
         }
-        .core-area-wrapper {
-            display: flex;
-            width: 90%;
-            margin: 10px 0;
-            padding: 10px;
+        /* 商店抽屉的样式优化 */
+        .shop-drawer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
             background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            justify-content: space-between;
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px 10px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
         }
-
-        .quality-info {
-            flex: 0 0 48%;
-            margin: 10px 0;
+        .shop-drawer.open {
+            transform: translateY(0);
+        }
+        .shop-info {
+            display: none;
             padding: 10px;
-            background-color: #fff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            text-align: left;
+        }
+        .shop-info.open {
+            display: block;
+        }
+        .shop-items {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        .shop-item {
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .shop-item.selected {
+            border-color: #007bff;
+            background-color: #e0f7ff;
+        }
+        .shop-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .shop-bar button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .shop-bar button:active {
+            background-color: #0056b3;
+        }
+        .shop-timer {
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+        .shop-timer button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .shop-timer button:active {
+            background-color: #0056b3;
+        }
+        /* 变异状态视觉效果 */
+        .mutated .pet-image img {
+            border: 3px solid gold;
+        }
+        .mutated .info div {
+            font-weight: bold;
+            color: blue;
         }
     </style>
 </head>
@@ -229,51 +312,84 @@
             <div>资质重生丹</div>
             <div><span id="quality-pill">100</span></div>
         </div>
+        <div>
+            <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
+            <div>灵异金丹</div>
+            <div><span id="miraculous-pill">1</span></div>
+        </div>
     </div>
     <div class="core-area">
         <div class="buttons">
-            <button onclick="upgradeWisdom()">提悟</button>
-            <button onclick="trainSkills()">洗练</button>
-            <button onclick="upgradeWisdomTo()">顿悟</button>
-            <button onclick="resetGame()">刷新</button>
-            <button onclick="rebornPet()">还童</button>
-            <button onclick="trainQuality()">深造</button>
-            <button onclick="enhanceQuality()">提资</button>
-            <button onclick="mutatePet()">变异</button>
+            <div class="button-row">
+                <button onclick="toggleDrawer()">资质</button>
+                <button onclick="upgradeWisdom()">提悟</button>
+                <button onclick="trainSkills()">洗练</button>
+                <button onclick="upgradeWisdomTo()">瞬悟</button>
+                <button onclick="resetGame()">重置</button>
+            </div>
+            <div class="button-row">
+                <button onclick="rebornPet()">还童</button>
+                <button onclick="trainQuality()">深造</button>
+                <button onclick="enhanceQuality()">提资</button>
+                <button onclick="mutatePet()">变异</button>
+                <button onclick="toggleShop()">商店</button> 
+            </div>
         </div>
         <div class="skills" id="skills-area"></div>
     </div>
-    <div class="quality-info" id="quality-info">
-        <div>名称: <span id="quality-name">胭脂</span></div>
-        <div>段位: <span id="quality-tier">普通</span></div>
-        <div>成长率: <span id="quality-growth-rate">100%</span></div>
-        <div>变异: <span id="quality-mutated">未变异</span></div>
-        <div class="progress-bar">
-            耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
-            <div id="endurance-bar" style="width: 50%"></div>
+    <div class="shop-drawer" id="shop-drawer">
+        <div class="drawer-toggle" onclick="toggleShop()">商店</div>
+        <div class="shop-info" id="shop-info">
+            <div class="shop-items" id="shop-items">
+                <!-- 商店商品展示区 -->
+            </div>
+            <div class="shop-bar">
+                <button onclick="buyItem()">购买</button>
+                <button onclick="sellPet()">出售</button>
+                <div class="shop-timer">
+                    <span id="shop-timer">05:00</span>
+                    <button onclick="refreshShop()">刷新</button>
+                </div>
+            </div>
         </div>
-        <div class="progress-bar">
-            强壮: <span id="strength-current">2250</span> / <span id="strength-max">3750</span>
-            <div id="strength-bar" style="width: 50%"></div>
+    </div>
+    <div class="quality-drawer" id="quality-drawer">
+        <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
+        <div class="quality-info" id="quality-info">
+            <!-- 资质信息内容 -->
+            <div>名称: <span id="quality-name">胭脂</span></div>
+            <div>段位: <span id="quality-tier">普通</span></div>
+            <div>成长率: <span id="quality-growth-rate">100%</span></div>
+            <div>变异: <span id="quality-mutated">未变异</span></div>
+            <div class="progress-bar">
+                耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
+                <div id="endurance-bar" style="width: 50%"></div>
+            </div>
+            <div class="progress-bar">
+                强壮: <span id="strength-current">2250</span> / <span id="strength-max">3750</span>
+                <div id="strength-bar" style="width: 50%"></div>
+            </div>
+            <div class="progress-bar">
+                信仰: <span id="faith-current">2250</span> / <span id="faith-max">3750</span>
+                <div id="faith-bar" style="width: 50%"></div>
+            </div>
+            <div class="progress-bar">
+                敏捷: <span id="agility-current">2500</span> / <span id="agility-max">4300</span>
+                <div id="agility-bar" style="width: 50%"></div>
+            </div>
+            <div class="progress-bar">
+                智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
+                <div id="intelligence-bar" style="width: 50%"></div>
+            </div>
         </div>
-        <div class="progress-bar">
-            信仰: <span id="faith-current">2250</span> / <span id="faith-max">3750</span>
-            <div id="faith-bar" style="width: 50%"></div>
-        </div>
-        <div class="progress-bar">
-            敏捷: <span id="agility-current">2500</span> / <span id="agility-max">4300</span>
-            <div id="agility-bar" style="width: 50%"></div>
-        </div>
-        <div class="progress-bar">
-            智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
-            <div id="intelligence-bar" style="width: 50%"></div>
-        </div>
+    </div>
     <div class="bottom-bar">
         <div class="pet-image">
             <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
             <div>宠物名称: <span id="pet-name">胭脂</span></div>
         </div>
         <div class="info">
+            <div>剩余金子: <span id="gold-amount">1000</span></div> <!-- 新增剩余金子显示 -->
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>技能评分: <span id="skill-score">0</span></div>
@@ -355,6 +471,194 @@
             }
         };
 
+// 更新顶栏道具数量
+function updateTopBarItems() {
+    document.getElementById("high-grade-pill").innerText = highGradePill;
+    document.getElementById("transmutation-pill").innerText = transmutationPill;
+    document.getElementById("reborn-pill").innerText = rebornPill;
+    document.getElementById("quality-pill").innerText = qualityPill;
+    document.getElementById("miraculous-pill").innerText = miraculousPill;
+}
+ 
+        let goldAmount = 1000; // 初始金子数量
+        document.getElementById("gold-amount").innerText = goldAmount;
+
+function toggleShop() {
+    const drawer = document.getElementById('shop-drawer');
+    const info = document.getElementById('shop-info');
+    drawer.classList.toggle('open');
+    info.classList.toggle('open');
+}
+
+function initShop() {
+    refreshShop(true);  // 初始加载商品
+    startShopTimer();   // 启动倒计时
+}
+
+function startShopTimer() {
+    let timer = 300; // 5分钟倒计时，单位：秒
+    const timerDisplay = document.getElementById('shop-timer');
+
+    const interval = setInterval(() => {
+        timer--;
+        const minutes = Math.floor(timer / 60);
+        const seconds = timer % 60;
+        timerDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timer <= 0) {
+            clearInterval(interval);
+            refreshShop(true);  // 自动刷新
+        }
+    }, 1000);
+}
+
+// 页面加载完成后初始化商店
+document.addEventListener('DOMContentLoaded', initShop);
+
+function refreshShop(auto = false) {
+    if (!auto && goldAmount < 100) {
+        alert("您的金子不足，无法刷新！");
+        return;
+    }
+
+    if (!auto) {
+        goldAmount -= 100;
+        document.getElementById("gold-amount").innerText = goldAmount;
+    }
+
+    const shopItems = document.getElementById('shop-items');
+    shopItems.innerHTML = '';
+
+    let numItems = auto ? getRandomInt(1, 5) : getRandomInt(1, 16);
+    let probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
+    let rareItemCount = 0;
+
+    for (let i = 0; i < numItems; i++) {
+        let isRare = Math.random() < probabilities[1];
+        if (!auto && isRare && rareItemCount >= 3) {
+            isRare = false;
+        }
+        if (isRare) rareItemCount++;
+
+        let item;
+        if (isRare) {
+            item = getRandomRareItem();
+        } else {
+            item = getRandomCommonItem();
+        }
+
+        const itemDiv = document.createElement('div');
+        itemDiv.classList.add('shop-item');
+        itemDiv.dataset.name = item.name;
+        itemDiv.dataset.price = item.price;
+        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 金子</div>`;
+        itemDiv.addEventListener('click', () => {
+            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
+            itemDiv.classList.add('selected');
+        });
+        shopItems.appendChild(itemDiv);
+    }
+
+    if (auto) startShopTimer();
+}
+
+function getRandomCommonItem() {
+    const commonItems = [
+        { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', price: getRandomInt(20, 220) },
+        { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 220) },
+        { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
+        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(20, 220) }
+    ];
+    return commonItems[Math.floor(Math.random() * commonItems.length)];
+}
+
+function getRandomRareItem() {
+    const rareItems = [
+        { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(688, 1988) },
+    ];
+
+    for (let petKey in pets) {
+        let pet = pets[petKey];
+        pet.skills.forEach(skill => {
+            if (skill.rarity === 'SS') {
+                rareItems.push({
+                    name: `${pet.name}·${skill.name}`,
+                    url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
+                    price: getRandomInt(688, 1988)
+                });
+            }
+        });
+    }
+
+    return rareItems[Math.floor(Math.random() * rareItems.length)];
+}
+
+function buyItem() {
+    const selectedItem = document.querySelector('.shop-item.selected');
+    if (!selectedItem) {
+        alert("请选择一个商品进行购买！");
+        return;
+    }
+
+    const price = parseInt(selectedItem.dataset.price, 10);
+    if (goldAmount < price) {
+        alert("金子不够，购买失败！");
+        return;
+    }
+
+    goldAmount -= price;
+    document.getElementById("gold-amount").innerText = goldAmount;
+
+    // 更新顶部道具栏数量
+    const itemName = selectedItem.dataset.name;
+    if (itemName === '高级悟性丹') highGradePill++;
+    else if (itemName === '万化灵丹') transmutationPill++;
+    else if (itemName === '神兽还童丹') rebornPill++;
+    else if (itemName === '资质重生丹') qualityPill++;
+    else if (itemName === '灵异金丹') miraculousPill++;
+    // 其他道具逻辑
+
+    updateTopBarItems();
+    selectedItem.remove();
+}
+
+// 初始化商店和倒计时
+document.addEventListener('DOMContentLoaded', initShop);
+
+function sellPet() {
+    const sellPrice = Math.floor(skillScore / 10);
+    if (confirm(`当前仅支持出售您的宠物，当您出售宠物后，您的宠物数值将复位。宠物价格与其评分有关，目前您的宠物价值${sellPrice}元，请问是否出售？`)) {
+        goldAmount += sellPrice;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        resetPet();
+    }
+}
+
+function resetPet() {
+    currentPet = pets.yanzhi;
+    highGradePill = 1000;
+    transmutationPill = 100;
+    rebornPill = 100;
+    qualityPill = 100;
+    miraculousPill = 1;
+    currentWisdom = 0;
+    trainCount = 0;
+    skillScore = 0;
+    highestScore = 0;
+    document.getElementById("high-grade-pill").innerText = highGradePill;
+    document.getElementById("transmutation-pill").innerText = transmutationPill;
+    document.getElementById("reborn-pill").innerText = rebornPill;
+    document.getElementById("quality-pill").innerText = qualityPill;
+    document.getElementById("miraculous-pill").innerText = miraculousPill;
+    document.getElementById("current-wisdom").innerText = currentWisdom;
+    document.getElementById("train-count").innerText = trainCount;
+    document.getElementById("skill-score").innerText = skillScore;
+    document.getElementById("highest-score").innerText = highestScore;
+    document.getElementById("skills-area").innerHTML = "";
+    document.getElementById("description-box").innerText = "";
+    updateQualityCard();
+}
+
         let currentPet = pets.yanzhi;
         let highGradePill = 1000;
         let transmutationPill = 100;
@@ -370,6 +674,18 @@
             "天赋技能的评分由各天赋的评级决定，B技能为200分，A技能为1000分，S技能为6000分，SS技能为10000分。当你洗出多个S或SS技能时，还会有额外分值！",
             "悟性提升会有几率失败，请谨慎操作！"
         ];
+
+        function toggleDrawer() {
+            const drawer = document.getElementById('quality-drawer');
+            const info = document.getElementById('quality-info');
+            drawer.classList.toggle('open');
+            info.classList.toggle('open');
+        }
+
+        function checkDrawerOpen() {
+            const drawer = document.getElementById('quality-drawer');
+            return drawer.classList.contains('open');
+        }
 
         function upgradeWisdom() {
             if (highGradePill < 1) {
@@ -591,6 +907,7 @@ function updateSkillScore(selectedSkills = []) {
         }
 
 function updateQualityCard() {
+    const qualityInfo = document.getElementById("quality-info");
     document.getElementById("quality-name").innerText = currentPet.name;
     document.getElementById("quality-tier").innerText = currentPet.qualities.tier;
     document.getElementById("quality-growth-rate").innerText = currentPet.qualities.growthRate + "%";
@@ -621,64 +938,76 @@ function updateQualityCard() {
     document.getElementById("intelligence-current").innerText = intelligence.current;
     document.getElementById("intelligence-max").innerText = intelligence.max;
     document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
+
+    // Update mutation effect
+    const petImage = document.querySelector('.pet-image img');
+    const petInfo = document.querySelector('.bottom-bar .info');
+    if (currentPet.qualities.mutated) {
+        petImage.classList.add('mutated');
+        petInfo.classList.add('mutated');
+    } else {
+        petImage.classList.remove('mutated');
+        petInfo.classList.remove('mutated');
+    }
 }
 
+function rebornPet() {
+    if (!checkDrawerOpen()) {
+        alert("请先打开资质面板！");
+        return;
+    }
 
-        function rebornPet() {
-            if (rebornPill < 1) {
-                alert("您的神兽还童丹已耗尽！");
-                return;
-            }
+    if (rebornPill < 1) {
+        alert("您的神兽还童丹已耗尽！");
+        return;
+    }
 
-            rebornPill--;
-            document.getElementById("reborn-pill").innerText = rebornPill;
-
-            let tier, growthRate;
-            const roll = Math.random() * 100;
-            if (roll < 50) {
-                tier = '普通';
-                growthRate = 100;
-            } else if (roll < 75) {
-                tier = '优秀';
-                growthRate = 220;
-            } else if (roll < 90) {
-                tier = '杰出';
-                growthRate = 280;
-            } else if (roll < 97.5) {
-                tier = '卓越';
-                growthRate = 320;
-            } else if (roll < 99.95) {
-                tier = '完美';
-                growthRate = 400;
-            } else {
-                tier = Math.random() < 0.5 ? '卓越' : '完美';
-                growthRate = tier === '卓越' ? getRandomInt(300, 320) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
-                currentPet.qualities.mutated = true;
-                if (!confirm("您的宠物已经变异，请问是否继续操作？")) {
-                    return;
-                }
-            }
-
-            currentPet.qualities.tier = tier;
-            currentPet.qualities.growthRate = growthRate;
-
-            const qualities = currentPet.qualities;
-            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
-            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
-            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
-            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
-            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
-
-            if (currentPet.qualities.mutated) {
-                qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
-                qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
-                qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
-                qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
-                qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
-            }
-
-            updateQualityCard();
+    if (currentPet.qualities.mutated) {
+        if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
+            return;
         }
+        currentPet.qualities.mutated = false;
+    }
+
+    rebornPill--;
+    document.getElementById("reborn-pill").innerText = rebornPill;
+
+    let tier, growthRate;
+    const roll = Math.random() * 100;
+    if (roll < 50) {
+        tier = '普通';
+        growthRate = 100;
+    } else if (roll < 75) {
+        tier = '优秀';
+        growthRate = 220;
+    } else if (roll < 90) {
+        tier = '杰出';
+        growthRate = 280;
+    } else if (roll < 97.5) {
+        tier = '卓越';
+        growthRate = 320;
+    } else if (roll < 99.95) {
+        tier = '完美';
+        growthRate = 400;
+    } else {
+        tier = Math.random() < 0.5 ? '卓越' : '完美';
+        growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+        currentPet.qualities.mutated = true;
+    }
+
+    currentPet.qualities.tier = tier;
+    currentPet.qualities.growthRate = growthRate;
+
+    const qualities = currentPet.qualities;
+    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
+    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
+    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
+    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
+    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+
+    updateQualityCard();
+    updateSkillScore();
+}
 
         function trainQuality() {
             const targetTier = prompt("请选择预期段位（普通，优秀，杰出，卓越，完美）:");
@@ -699,53 +1028,89 @@ function updateQualityCard() {
             document.getElementById("description-box").innerText = `您消耗了${100 - rebornPill}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
         }
 
-        function enhanceQuality() {
-            if (qualityPill < 1) {
-                alert("您的资质重生丹已耗尽！");
-                return;
+function enhanceQuality() {
+    if (!checkDrawerOpen()) {
+        alert("请先打开资质面板！");
+        return;
+    }
+
+    if (qualityPill < 1) {
+        alert("您的资质重生丹已耗尽！");
+        return;
+    }
+
+    qualityPill--;
+    document.getElementById("quality-pill").innerText = qualityPill;
+
+    const qualities = currentPet.qualities;
+    const dimensions = ['endurance', 'strength', 'faith', 'agility', 'intelligence'];
+    const maxedDimensions = [];
+    let newQualities = {};
+
+    dimensions.forEach(dim => {
+        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max);
+    });
+
+    if (!currentPet.qualities.mutated) {
+        dimensions.forEach(dim => {
+            if (Math.random() < 0.1) {
+                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max * 0.9));
+                maxedDimensions.push(dim);
             }
+        });
 
-            qualityPill--;
-            document.getElementById("quality-pill").innerText = qualityPill;
-
-            const qualities = currentPet.qualities;
-            qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
-            qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
-            qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
-            qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
-            qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
-
-            if (qualities.mutated) {
-                qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
-                qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
-                qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
-                qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
-                qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
-            }
-
-            updateQualityCard();
+        while (maxedDimensions.length > 2) {
+            const dimToReset = maxedDimensions.pop();
+            newQualities[dimToReset] = getRandomInt(qualities[dimToReset].min, qualities[dimToReset].max);
         }
+    }
 
-        function mutatePet() {
-            if (currentPet.qualities.mutated) {
-                alert("您的宠物已经变异，无法再次变异！");
-                return;
-            }
-
-            currentPet.qualities.tier = Math.random() < 0.5 ? '卓越' : '完美';
-            currentPet.qualities.growthRate = currentPet.qualities.tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
-            currentPet.qualities.mutated = true;
-
-            const qualities = currentPet.qualities;
-            qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
-            qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
-            qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
-            qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
-            qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
-
-            updateQualityCard();
-            updateSkillScore();
+    dimensions.forEach(dim => {
+        qualities[dim].current = newQualities[dim];
+        if (currentPet.qualities.mutated) {
+            qualities[dim].current = Math.floor(qualities[dim].current * 1.1);
         }
+    });
+
+    updateQualityCard();
+    updateSkillScore();
+}
+
+let miraculousPill = 1; // 初始化灵异金丹数量
+
+function mutatePet() {
+    if (!checkDrawerOpen()) {
+        alert("请先打开资质面板！");
+        return;
+    }
+
+    if (miraculousPill < 1) {
+        alert("您的灵异金丹数量不足！");
+        return;
+    }
+
+    miraculousPill--;
+    document.getElementById("miraculous-pill").innerText = miraculousPill;
+
+    if (currentPet.qualities.mutated) {
+        alert("您的宠物已经变异，无法再次变异！");
+        return;
+    }
+
+    currentPet.qualities.tier = Math.random() < 0.5 ? '卓越' : '完美';
+    currentPet.qualities.growthRate = currentPet.qualities.tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+    currentPet.qualities.mutated = true;
+
+    const qualities = currentPet.qualities;
+    qualities.endurance.current = Math.floor(qualities.endurance.current * 1.1);
+    qualities.strength.current = Math.floor(qualities.strength.current * 1.1);
+    qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
+    qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
+    qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
+
+    updateQualityCard();
+    updateSkillScore();
+}
 
         function getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;

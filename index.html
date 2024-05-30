@@ -614,7 +614,7 @@
             <div>宠物名称: <span id="pet-name">胭脂</span></div>
         </div>
         <div class="info">
-            <div>剩余金子: <span id="gold-amount">5000</span></div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">20000</span></div> <!-- 新增剩余金子显示 -->
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>宠物评分: <span id="skill-score">0</span></div>
@@ -1050,6 +1050,7 @@ function evolvePet() {
         updateSkillScore();
         alert("进化成功！");
     } else {
+        jinnangItems[requiredItem]--;
         alert("进化失败！");
     }
 }
@@ -1742,7 +1743,7 @@ function useGoldenRebornPill() {
     updateSkillScore();
 }
  
-        let goldAmount = 5000; // 初始金子数量
+        let goldAmount = 20000; // 初始金子数量
         document.getElementById("gold-amount").innerText = goldAmount;
 
 function toggleShop() {

@@ -349,6 +349,7 @@
     background-color: #f9f9f9;
     border-radius: 5px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    text-align: center;
 }
 .treasure-action {
     display: flex;
@@ -471,7 +472,7 @@
     <div class="core-area">
         <div class="buttons">
             <div class="button-row">
-                <button onclick="showGuide()">引导</button>
+                <button onclick="showGuide()">玩法</button>
                 <button onclick="showBiography()">传记</button> 
                 <button onclick="upgradeWisdom()">提悟</button>
                 <button onclick="upgradeWisdomTo()">瞬悟</button>
@@ -490,7 +491,6 @@
     <div class="jinnang-drawer" id="jinnang-drawer">
         <div class="drawer-toggle" onclick="toggleJinnangDrawer()">宝库</div>
         <div class="jinnang-info" id="jinnang-info">
-            <div id="jinnang-description" class="description-box"></div>
             <div class="jinnang-reward" id="jinnang-reward"></div>
         </div>
     </div>
@@ -498,17 +498,29 @@
         <div class="drawer-toggle" onclick="toggleTreasureDrawer()">宝箱</div>
         <div class="treasure-info" id="treasure-info">
             <div class="treasure-bar">
+            <div>
                 <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('经验宝箱')">
+                <div>经验宝箱</div>
+            </div>
+            <div>
                 <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('资质宝箱')">
-                <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('至尊宝箱')">
+                <div>资质宝箱</div>
+            </div>
+            <div>
                 <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('灵魂宝箱')">
+                <div>灵魂宝箱</div>
+            </div>
+            <div>
+                <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('至尊宝箱')">
+                <div>至尊宝箱</div>
+            </div>
             </div>
             <div id="treasure-description" class="description-box"></div>
+            <div id="treasure-reward" class="reward-box"></div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">打开宝箱</button>
                 <button onclick="collectTreasure()">取出奖品</button>
             </div>
-            <div id="treasure-reward" class="reward-box"></div>
         </div>
     </div>
     <div class="attribute-drawer" id="attribute-drawer">
@@ -541,12 +553,11 @@
             <div class="progress-bar">
                 信仰: <span id="attribute-faith"></span>
             </div>
-            <button onclick="trainAttributes()">培养</button>
-            <button onclick="refreshAttributes()">刷新</button>
-            <button onclick="absorbExperience()">升1级</button>
-            <button onclick="absorbAdvancedExperience()">升3级</button>
-            <button onclick="ascend()">飞升</button>
-            <button onclick="useSupremeWisdomPill()">神悟</button>
+            <button onclick="trainAttributes()">培养宠物</button>
+            <button onclick="absorbExperience()">普通修炼</button>
+            <button onclick="absorbAdvancedExperience()">高级修炼</button>
+            <button onclick="useSupremeWisdomPill()">神级领悟</button>
+            <button onclick="ascend()">飞升突破</button>
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
@@ -575,12 +586,11 @@
             <div>变异: <span id="quality-mutated">未变异</span></div>
             <div>进化等级: <span id="evolution-level">0</span></div>
             <div class="button-row">
-                <button onclick="rebornPet()">还童</button>
-                <button onclick="trainQuality()">一键还童</button>
-                <button onclick="enhanceQuality()">刷新资质</button>
-                <button onclick="mutatePet()">变异</button>
+                <button onclick="rebornPet()">普通还童</button>
                 <button onclick="useGoldenRebornPill()">还童金丹</button>
-                <button onclick="evolvePet()">进化</button>
+                <button onclick="enhanceQuality()">刷新资质</button>
+                <button onclick="mutatePet()">变异宠物</button>
+                <button onclick="evolvePet()">进化宠物</button>
             </div>
             <div class="progress-bar">
                 耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
@@ -614,7 +624,7 @@
             <div>宠物名称: <span id="pet-name">胭脂</span></div>
         </div>
         <div class="info">
-            <div>剩余金子: <span id="gold-amount">20000</span></div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">1000</span></div> <!-- 新增剩余金子显示 -->
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>宠物评分: <span id="skill-score">0</span></div>
@@ -1657,37 +1667,38 @@ function showGuide() {
         overflow: auto; 
         font-size: 16px;
     `;
-    messageBox.innerHTML = `<p>欢迎大侠试玩养宠模拟器！当前是V3.0</p>
-                            <p>-修复宠物出售的某些bug</p>
-                            <p>-新增多个培养功能</p>
-                            <p>-按钮和界面优化</p>
+    messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V4.0</p>
+                            <p>- 1. 调整了网页布局和修改了部分错误信息</p>
+                            <p>- 2. 问题log：一键还童功能失效。该功能调试中，现已屏蔽。</p>
+                            <p>- 3. 问题log:使用还童丹无法重置宠物技能</p>
+                            <p>- 4. 问题log：切换宠物、出售宠物时，宠物信息无法正常复位</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、深造、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
-                            <p>1️⃣引导按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
+                            <p>1️⃣玩法按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
                             <p>2️⃣传记按钮：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
                             <p>3️⃣提悟按钮：消耗1颗悟性丹，为你的当前宠物提升1点悟性。悟性是影响宠物洗练技能的重要属性，宠物的悟性越高，越可能洗练出更稀有的技能！当然，提升悟性也是有概率失败的，请谨慎操作！</p>
                             <p>4️⃣瞬悟按钮：如果大侠厌倦了手动提悟的枯燥，可以尝试输入你的预期悟性值，玩概率的事交给系统来。</p>
                             <p>5️⃣洗练按钮：消耗1颗万化灵丹，为你的当前宠物随机生成技能。所生成的技能可以通过点击来查看技能说明。悟性越高，越有可能生成多个技能，稀有技能也越可能出现。</p>
                             <p>6️⃣资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由段位、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
                             <p>资质内部有多个功能</p>
-                            <p>1.还童按钮：消耗1颗还童丹重新生成当前宠物的资质和技能，并有极低的概率让宠物变异。</p>
+                            <p>a.普通还童按钮：消耗1颗还童丹重新生成当前宠物的资质和技能，并有极低的概率让宠物变异。</p>
                             <p>当宠物变异后，宠物的资质会有概率突破上限值，且段位必定为卓越或完美。一般而言，变异的宠物比未变异的宠物更强大。</p>
                             <p>当宠物变异后，继续使用还童丹将会使当前宠物失去变异状态。如果你对变异宠物的段位和成长率不满意，你可以在资质面板中的“使用还童金丹”按钮，消耗1颗还童金丹对当前宠物执行更新资质的操作，还童金丹不会改变宠物的变异状态。</p>
-                            <p>2. 一键还童按钮：如果你厌倦了手动还童，想交给系统一键提升，你可以按照弹窗指引进行输入。请注意，你也有可能消耗所有还童丹而未能达成预期结果。</p>
-                            <p>3. 刷新资质按钮：消耗1颗资质丹，在不改变段位、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
-                            <p>4. 变异按钮：消耗1颗稀有道具“灵异金丹”使当前宠物立即变异。</p>
+                            <p>b. (该功能暂时关闭)一键还童按钮：如果你厌倦了手动还童，想交给系统一键提升，你可以按照弹窗指引进行输入。请注意，你也有可能消耗所有还童丹而未能达成预期结果。</p>
+                            <p>c. 刷新资质按钮：消耗1颗资质丹，在不改变段位、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
+                            <p>d. 变异宠物按钮：消耗1颗稀有道具“灵异金丹”使当前宠物立即变异。</p>
                             <p>变异后的宠物，资质值有机会爆棚：变为未变异状态上限值的1.1倍。灵异金丹会直接在宠物当前未变异的资质值上乘以1.1倍。因此，未变异状态下，宠物资质值越高，使用灵异金丹的收益越大。</p>
-                            <p>5. 还童金丹按钮：还童金丹可以在商店购买，当宠物变异后，使用还童金丹可以在不改变变异状态的情况下刷新宠物的成长率。</p>
-                            <p>6. 进化：宠物可以最大进化30级，每次进化需要消耗进化之灵，宝箱可以开出不同的进化之灵。颤抖之灵用于1~6级进化，发光之灵用于7~12级进化，活跃之灵用于13~18级进化，跳动之灵用于19~24级进化，闪耀之灵用于25~30级进化。</p>
+                            <p>e. 还童金丹按钮：还童金丹可以在商店购买，当宠物变异后，使用还童金丹可以在不改变变异状态的情况下刷新宠物的成长率。</p>
+                            <p>f. 进化宠物按钮：宠物可以最大进化30级，每次进化需要消耗进化之灵，宝箱可以开出不同的进化之灵。颤抖之灵用于1~6级进化，发光之灵用于7~12级进化，活跃之灵用于13~18级进化，跳动之灵用于19~24级进化，闪耀之灵用于25~30级进化。</p>
                             <p>宠物成功进化后，会随机增加各项资质的当前值。</p>
                             <p>7️⃣属性按钮：显示当前宠物的属性面板。宠物的资质越高，各项属性也会越高。属性是影响宠物评分的重要因素，请用心培养。属性界面中有很多按钮，功能分别如下：</p>
-                            <p>培养：宠物在1级、60级、120级和180级时会分别获得一次培养机会，每次培养需要花费一定数量的金子，培养成功后宠物的各项属性值会按一定倍数增加。</p>
-                            <p>刷新：刷新当前属性页面</p>
-                            <p>升1级：消耗一本普通经验书（宝箱获得），让宠物提升一级。宠物等级提升时，属性会增加。</p>
-                            <p>升3级：消耗一本高级经验书（宝箱获得），让宠物提升三级。宠物等级提升时，属性会增加。</p>
-                            <p>飞升：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
-                            <p>神悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
+                            <p>a. 培养宠物：宠物在1级、60级、120级和180级时会分别获得一次培养机会，每次培养需要花费一定数量的金子，培养成功后宠物的各项属性值会按一定倍数增加。（请注意，在第一次培养后，后期培养只有当宠物刚好为规定等级时才可以执行！）</p>
+                            <p>b. 普通修炼：消耗一本普通经验书（宝箱获得），让宠物提升一级。宠物等级提升时，属性会增加。</p>
+                            <p>c. 高级修炼：消耗一本高级经验书（宝箱获得），让宠物提升三级。宠物等级提升时，属性会增加。</p>
+                            <p>d. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
+                            <p>e. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
                             <p>8️⃣商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
                             <p>商店所出售的道具根据其品质会随机定价，购买后会直接添加至道具栏中。</p>
                             <p>如果你购买的是宠物的天赋技能，你需要判断当前宠物的名称是否和天赋技能的宠物名称一致，其次保证你的当前宠物没有该技能，否则你将不能购买。一旦购买成功，这个技能会直接打在你的宠物技能位里。</p>
@@ -1697,7 +1708,7 @@ function showGuide() {
                             <p>9️⃣宝箱按钮：玩家可以在宝箱界面花费金子打开各种宝箱，获得奇珍异宝和神秘道具！</p>
                             <p>🔟宝库按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
                             <p>💁请大侠尽情探索，本游戏还会继续更新功能，敬请期待！</p>
-                            <button onclick="document.body.removeChild(this.parentNode)">确认</button>`;
+                            <button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>`;
     document.body.appendChild(messageBox);
 }
 
@@ -2052,9 +2063,34 @@ function sellPet() {
     if (confirm(`当前仅支持出售您的宠物，当您出售宠物后，您的宠物数值将复位。宠物价格与其评分有关，目前您的宠物价值${sellPrice}金子，请问是否出售？`)) {
         goldAmount += sellPrice;
         document.getElementById("gold-amount").innerText = goldAmount;
+        updateQualityCard();
+        updateAttributePanel();
+        updateTopBarItems(); // 确保顶栏道具数量更新
         resetPet();
     }
 }
+
+        function changePet() {
+            const selectedPet = document.getElementById("pet-select").value;
+            currentPet = pets[selectedPet];
+            document.getElementById("pet-name").innerText = currentPet.name;
+            document.getElementById("pet-image").src = currentPet.image;
+            currentWisdom = 0;
+            trainCount = 0;
+            skillScore = 0;
+            highestScore = 0;
+            document.getElementById("high-grade-pill").innerText = highGradePill;
+            document.getElementById("transmutation-pill").innerText = transmutationPill;
+            document.getElementById("reborn-pill").innerText = rebornPill;
+            document.getElementById("quality-pill").innerText = qualityPill;
+            document.getElementById("current-wisdom").innerText = currentWisdom;
+            document.getElementById("train-count").innerText = trainCount;
+            document.getElementById("skill-score").innerText = skillScore;
+            document.getElementById("highest-score").innerText = highestScore;
+            document.getElementById("skills-area").innerHTML = "";
+            document.getElementById("description-box").innerText = "";
+            updateQualityCard();
+        }
 
 function resetPet() {
     currentPet.qualities.tier = '普通';
@@ -2391,28 +2427,6 @@ function upgradeWisdomTo() {
             descriptionBox.innerText = descriptions[randomIndex];
         }
 
-        function changePet() {
-            const selectedPet = document.getElementById("pet-select").value;
-            currentPet = pets[selectedPet];
-            document.getElementById("pet-name").innerText = currentPet.name;
-            document.getElementById("pet-image").src = currentPet.image;
-            currentWisdom = 0;
-            trainCount = 0;
-            skillScore = 0;
-            highestScore = 0;
-            document.getElementById("high-grade-pill").innerText = highGradePill;
-            document.getElementById("transmutation-pill").innerText = transmutationPill;
-            document.getElementById("reborn-pill").innerText = rebornPill;
-            document.getElementById("quality-pill").innerText = qualityPill;
-            document.getElementById("current-wisdom").innerText = currentWisdom;
-            document.getElementById("train-count").innerText = trainCount;
-            document.getElementById("skill-score").innerText = skillScore;
-            document.getElementById("highest-score").innerText = highestScore;
-            document.getElementById("skills-area").innerHTML = "";
-            document.getElementById("description-box").innerText = "";
-            updateQualityCard();
-        }
-
 function updateQualityCard() {
     document.getElementById("evolution-level").innerText = evolutionLevel;
     const qualityInfo = document.getElementById("quality-info");
@@ -2529,11 +2543,11 @@ function rebornPet() {
     currentPet.qualities.growthRate = growthRate;
 
     const qualities = currentPet.qualities;
-    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max);
-    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max);
-    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max);
-    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
-    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
+    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max*0.8);
+    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max*0.8);
+    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max*0.8);
+    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max*0.8);
+    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max*0.8);
 
     updateQualityCard();
     updateSkillScore();
@@ -2552,6 +2566,7 @@ function rebornPet() {
     updateSkillScore(newSkills);
 }
 
+//一键还童报错，暂时屏蔽该功能
 function trainQuality() {
     if (!checkDrawerOpen()) return;
 
@@ -2578,7 +2593,6 @@ function trainQuality() {
     document.body.appendChild(messageBox);
 }
 
-
 function enhanceQuality() {
     if (!checkDrawerOpen()) return;
 
@@ -2602,7 +2616,7 @@ function enhanceQuality() {
     if (!currentPet.qualities.mutated) {
         dimensions.forEach(dim => {
             if (Math.random() < 0.1) {
-                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max * 0.9));
+                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max * 0.8));
                 maxedDimensions.push(dim);
             }
         });

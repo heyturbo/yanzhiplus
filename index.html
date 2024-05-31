@@ -2610,13 +2610,13 @@ function enhanceQuality() {
     let newQualities = {};
 
     dimensions.forEach(dim => {
-        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max);
+        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max*0.8);
     });
 
     if (!currentPet.qualities.mutated) {
         dimensions.forEach(dim => {
             if (Math.random() < 0.1) {
-                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max * 0.8));
+                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max));
                 maxedDimensions.push(dim);
             }
         });

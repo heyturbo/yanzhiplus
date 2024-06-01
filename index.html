@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>神兽天赋洗练机</title>
+    <title>快来培养你的神兽吧！</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -2717,21 +2717,21 @@ function mutatePet() {
     updateSkillScore();
 }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-        function getWeightedRandom(values, weights) {
-            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-            let rand = Math.random() * totalWeight;
-            for (let i = 0; i < values.length; i++) {
-                if (rand < weights[i]) {
-                    return values[i];
-                }
-                rand -= weights[i];
-            }
-            return values[0];
+function getWeightedRandom(values, weights) {
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    let rand = Math.random() * totalWeight;
+    for (let i = 0; i < values.length; i++) {
+        if (rand < weights[i]) {
+            return values[i];
         }
+        rand -= weights[i];
+    }
+    return values[0];
+}
 
         setInterval(updateDescriptionBox, 30000);
         updateDescriptionBox(); // 初始化描述框

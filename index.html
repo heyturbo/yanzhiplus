@@ -27,6 +27,8 @@
             justify-content: space-around;
             align-items: center;
             border-radius: 10px;
+            flex-direction: row;
+            flex-wrap: nowrap;
         }
         .top-bar div, .bottom-bar div {
             display: flex;
@@ -63,7 +65,7 @@
             flex: 1;
             margin: 5px;
             padding: 10px;
-            background-color: #007bff;
+            background-color: #e4bb5c;
             color: white;
             border: none;
             border-radius: 5px;
@@ -108,7 +110,7 @@
         }
         .description-box {
             width: 90%;
-            margin: 10px 0;
+            margin: 10px 20px;
             padding: 10px;
             background-color: #fff;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -184,7 +186,7 @@
         .drawer-toggle {
             padding: 10px;
             text-align: center;
-            background-color: #007bff;
+            background-color: #e4bb5c;
             color: white;
             cursor: pointer;
             border-radius: 10px 10px 0 0;
@@ -198,14 +200,14 @@
         }
         .quality-info .progress-bar {
             width: 100%;
-            background-color: #e0e0e0;
+            background-color: #e3e3e3;
             border-radius: 5px;
             overflow: hidden;
             margin-bottom: 10px;
         }
         .quality-info .progress-bar div {
             height: 20px;
-            background-color: #007bff;
+            background-color: #0a8c00;
             text-align: right;
             padding-right: 5px;
             color: white;
@@ -234,8 +236,8 @@
         }
         .shop-items {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
         }
         .shop-item {
             text-align: center;
@@ -252,11 +254,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 20px;
         }
         .shop-bar button {
             padding: 10px 20px;
-            background-color: #007bff;
+            background-color: #e4bb5c;
             color: white;
             border: none;
             border-radius: 5px;
@@ -269,16 +271,16 @@
         .shop-timer {
             display: flex;
             align-items: center;
-            font-size: 16px;
+            font-size: 20px;
         }
         .shop-timer button {
-            padding: 5px 10px;
-            background-color: #007bff;
+            padding: 10px 5px;
+            background-color: #e4bb5c;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
         }
         .shop-timer button:active {
             background-color: #0056b3;
@@ -334,7 +336,7 @@
 }
 .treasure-info {
     display: none;
-    padding: 10px;
+    padding: 20px;
 }
 .treasure-info.open {
     display: block;
@@ -347,7 +349,7 @@
     margin-top: 10px;
     padding: 10px;
     background-color: #f9f9f9;
-    border-radius: 5px;
+    border-radius: 10px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     text-align: center;
 }
@@ -358,7 +360,7 @@
 }
 .treasure-action button {
     padding: 10px 20px;
-    background-color: #007bff;
+    background-color: #e4bb5c;
     color: white;
     border: none;
     border-radius: 5px;
@@ -384,14 +386,16 @@
 }
 .jinnang-info {
     display: none;
-    padding: 10px;
+    padding: 30px;
 }
 .jinnang-info.open {
     display: block;
 }
 .jinnang-reward {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    justify-content: center;
     margin-top: 10px;
 }
 .jinnang-reward img {
@@ -678,7 +682,7 @@
                     agility: { current: 2500, min: 2500, max: 4300 },
                     intelligence: { current: 5250, min: 5250, max: 10350 },
                     mutated: false
-                }
+                },
             },
             zhulin: {
                 name: '竹林隐士',
@@ -1005,6 +1009,7 @@ const biographies = {
 let evolutionLevel = 0;
 
 function evolvePet() {
+    // 定义不同进化阶段所需的道具。
     const evolutionItems = {
         0: 'shakingSoul',
         7: 'glowingSoul',
@@ -1013,10 +1018,11 @@ function evolvePet() {
         25: 'radiantSoul'
     };
 
-    let requiredItem;
-    let successRate;
-    let increaseValue = 0;
+    let requiredItem; // 存储当前进化所需的道具。
+    let successRate;  // 存储当前进化的成功率。
+    let increaseValue = 0; // 存储进化成功时资质提升的数值。
 
+    // 根据当前的进化等级设置所需的道具、成功率和资质提升数值。
     if (evolutionLevel < 7) {
         requiredItem = evolutionItems[0];
         successRate = 0.8;
@@ -1038,68 +1044,63 @@ function evolvePet() {
         successRate = 0.8;
         increaseValue = 100;
     } else {
+        // 如果进化等级达到上限，提示用户并退出函数。
         alert("您的宠物已达进化等级上限！");
         return;
     }
 
+    // 检查用户是否有足够的所需道具，如果没有，提示用户并退出函数。
     if (jinnangItems[requiredItem] < 1) {
         alert(`您的${getItemName(requiredItem)}不足！`);
         return;
     }
 
+    // 随机生成一个数，如果小于成功率，则进化成功。
     if (Math.random() < successRate) {
-        if (evolutionLevel < 19) {
+        // 如果进化等级小于31，提升随机资质。
+        if (evolutionLevel < 31) {
             increaseRandomQuality(increaseValue);
         }
 
+        // 减少用户的所需道具数量。
         jinnangItems[requiredItem]--;
+        // 增加进化等级。
         evolutionLevel++;
+        // 更新用户的道具数量显示。
         updateJinnangItems();
+        // 更新进化等级的显示。
         document.getElementById("evolution-level").innerText = evolutionLevel;
+        // 更新资质卡片和技能分数的显示。
         updateQualityCard();
         updateSkillScore();
+        // 提示用户进化成功。
         alert("进化成功！");
     } else {
+        // 如果进化失败，减少用户的所需道具数量，并提示用户进化失败。
         jinnangItems[requiredItem]--;
         alert("进化失败！");
     }
 }
 
-// 添加用于显示信息的消息框
-function showMessage(message) {
-    const messageBox = document.getElementById("message-box");
-    const messageText = document.getElementById("message-text");
-
-    // 设置消息内容
-    messageText.innerText = message;
-    messageBox.style.display = "block";
-
-    // 清除任何之前设置的定时器，避免多次调用导致问题
-    clearTimeout(messageBox.timer);
-
-    // 2秒后自动关闭
-    messageBox.timer = setTimeout(() => {
-        messageBox.style.display = "none";
-    }, 2000);
-}
-
-function closeMessage() {
-    const messageBox = document.getElementById("message-box");
-    messageBox.style.display = "none";
-    clearTimeout(messageBox.timer); // 清除定时器
-}
-
 function increaseRandomQuality(increaseValue) {
+    // 获取当前宠物的资质
     const qualities = currentPet.qualities;
+    // 定义需要提升的资质属性
     const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    // 标记是否增加了资质值
     let addedValue = false;
 
+    // 遍历每个资质属性
     for (let i = 0; i < attributes.length; i++) {
         const attribute = attributes[i];
+        // 获取该属性的最大值
         const maxValue = qualities[attribute].max;
 
+        // 如果当前资质值小于最大值
         if (qualities[attribute].current < maxValue) {
+            // 增加当前资质值，但不超过最大值
             qualities[attribute].current = Math.min(qualities[attribute].current + increaseValue, maxValue);
+            // 标记为已增加资质值
             addedValue = true;
             break;
         }
@@ -1107,25 +1108,19 @@ function increaseRandomQuality(increaseValue) {
 
     // 如果没有任何资质值被增加，说明所有资质都已达最大值
     if (!addedValue) {
-        console.log("所有资质已达最大值，进化不带来任何资质值的提升");
+        console.log("所有资质已达最大值，进化不会带来任何资质值的提升");
     }
 
+    // 更新资质卡片
     updateQualityCard();
 }
 
-function showMessage(message) {
-    const messageBox = document.getElementById("message-box");
-    messageBox.innerText = message;
-    messageBox.style.display = "block";
-}
-
-// 关闭信息框
-function closeMessage() {
-    const messageBox = document.getElementById("message-box");
-    messageBox.style.display = "none";
-}
-
 function useSupremeWisdomPill() {
+    if (!currentPet || !currentPet.qualities) { // 添加检查
+    console.warn("当前宠物未被正确初始化。");
+    return;
+    }
+
     if (currentWisdom >= 20) {
         alert("宠物的悟性已经达到20，无法再次提升！");
         return;
@@ -1549,24 +1544,24 @@ function updateAttributePanel() {
             return (level - 1) * 2;
         }
 
-let trainingCosts = [200, 2000, 10000, 24000];
-let trainingMultipliers = [1.1, 1.08, 1.06, 1.4];
-let trainingCount = 0; // 初始化金培次数
+let trainingCosts = [200, 2000, 10000, 24000]; // 定义每次金子培养所需的金子数量
+let trainingMultipliers = [1.1, 1.08, 1.06, 1.01]; // 定义每次金子培养的属性提升倍数
+let trainingCount = 0; // 初始化金子培养次数
 
 function trainAttributes() {
-    // 获取当前宠物等级
+    // 获取当前宠物的等级
     const petLevel = currentPet.qualities.level;
 
-    // 计算金培次数
-    let availableTrainingCount = 1;
-    if (petLevel >= 0) availableTrainingCount++;
-    if (petLevel >= 60) availableTrainingCount++;
-    if (petLevel >= 120) availableTrainingCount++;
-    if (petLevel >= 180) availableTrainingCount++;
+    // 计算可用的金子培养次数
+    let availableTrainingCount = 4;
+    if (petLevel >= 0) availableTrainingCount++; // 宠物等级大于等于0时增加一次
+    if (petLevel >= 60) availableTrainingCount++; // 宠物等级大于等于60时增加一次
+    if (petLevel >= 120) availableTrainingCount++; // 宠物等级大于等于120时增加一次
+    if (petLevel >= 180) availableTrainingCount++; // 宠物等级大于等于180时增加一次
 
-    // 检查是否还有金培次数
+    // 检查当前培养次数是否达到可用次数
     if (trainingCount >= availableTrainingCount) {
-        alert("您的宠物没有金培次数了！");
+        alert("您的宠物没有金培次数了！"); // 如果没有剩余次数，提示用户
         return;
     }
 
@@ -1575,28 +1570,28 @@ function trainAttributes() {
 
     // 提示玩家当前花费
     if (!confirm(`这次金子培养需要${cost}金子，是否继续？`)) {
-        return;
+        return; // 如果玩家取消，退出函数
     }
 
-    // 检查金子是否足够
+    // 检查金子数量是否足够
     if (goldAmount < cost) {
-        alert("金子不足！");
+        alert("金子不足！"); // 如果金子不足，提示用户
         return;
     }
 
     // 扣除金子
     goldAmount -= cost;
-    document.getElementById("gold-amount").innerText = goldAmount;
+    document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
 
-    // 进行金子培养，提升属性
+    // 获取当前培养的属性提升倍数
     const multiplier = trainingMultipliers[trainingCount];
-    currentPet.qualities.endurance.current *= multiplier;
-    currentPet.qualities.intelligence.current *= multiplier;
-    currentPet.qualities.strength.current *= multiplier;
-    currentPet.qualities.agility.current *= multiplier;
-    currentPet.qualities.faith.current *= multiplier;
+    currentPet.qualities.endurance.current *= multiplier; // 提升耐力属性
+    currentPet.qualities.intelligence.current *= multiplier; // 提升智力属性
+    currentPet.qualities.strength.current *= multiplier; // 提升力量属性
+    currentPet.qualities.agility.current *= multiplier; // 提升敏捷属性
+    currentPet.qualities.faith.current *= multiplier; // 提升信念属性
 
-    // 增加金培次数
+    // 增加金子培养次数
     trainingCount++;
 
     // 更新属性面板
@@ -1855,11 +1850,11 @@ function refreshShop(auto = false) {
 
 function getRandomCommonItem() {
     const commonItems = [
-        { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', price: getRandomInt(20, 220) },
-        { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 220) },
+        { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', price: getRandomInt(20, 100) },
+        { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 130) },
         { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
-        { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(20, 220) },
-        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(20, 220) }
+        { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(60, 220) },
+        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) }
     ];
 
     // 包裹的生成逻辑
@@ -1876,44 +1871,70 @@ function getRandomCommonItem() {
 }
 
 function getRandomRareItem() {
+    // 定义初始稀有物品数组
     const rareItems = [
         { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(688, 1988) }
     ];
 
+    // 定义空数组用于存储SS级技能和S级技能
     const ssSkills = [];
+    const sSkills = [];
 
+    // 遍历所有宠物，查找SS级技能
     for (let petKey in pets) {
         let pet = pets[petKey];
         pet.skills.forEach(skill => {
             if (skill.rarity === 'SS') {
                 ssSkills.push({
                     name: `${pet.name}·${skill.name}`,
-                    url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                    price: getRandomInt(688, 1988)
+                    url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
+                    price: getRandomInt(1688, 3988)
                 });
             }
         });
     }
 
+    // 遍历所有宠物，查找S级技能
+    for (let petKey in pets) {
+        let pet = pets[petKey];
+        pet.skills.forEach(skill => {
+            if (skill.rarity === 'S') {
+                sSkills.push({
+                    name: `${pet.name}·${skill.name}`,
+                    url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
+                    price: getRandomInt(1288, 2988)
+                });
+            }
+        });
+    }
+
+    // 如果有SS级技能，将其添加到rareItems数组中
     if (ssSkills.length > 0) {
         rareItems.push(...ssSkills);
     }
 
+    // 如果有S级技能，将其添加到rareItems数组中
+    if (sSkills.length > 0) {
+        rareItems.push(...sSkills);
+    }
+
     // 包裹的生成逻辑，不生成天赋道具的包裹
     if (Math.random() < 0.2 && rareItems.length > 1) { // 20%概率生成包裹，且排除天赋道具
-        const nonSkillItems = rareItems.filter(item => !item.name.includes('·'));
+        const nonSkillItems = rareItems.filter(item => !item.name.includes('·')); // 过滤掉包含技能的物品
         if (nonSkillItems.length > 0) {
-            const item = nonSkillItems[Math.floor(Math.random() * nonSkillItems.length)];
-            const quantity = getRandomInt(2, 3);
-            item.name += ` 包裹 (${quantity})`;
-            item.price *= quantity;
-            item.url = 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png';
-            return item;
+            const item = nonSkillItems[Math.floor(Math.random() * nonSkillItems.length)]; // 随机选择一个非技能物品
+            const quantity = getRandomInt(2, 3); // 生成一个2到3之间的随机数量
+            item.name += ` 包裹 (${quantity})`; // 更新物品名称
+            item.price *= quantity; // 更新物品价格
+            item.url = 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png'; // 更新物品图片URL
+            return item; // 返回生成的包裹物品
         }
     }
 
+    // 随机选择一个稀有物品并返回
     return rareItems[Math.floor(Math.random() * rareItems.length)];
 }
+
 
 function buyItem() {
     const selectedItem = document.querySelector('.shop-item.selected');
@@ -1966,6 +1987,7 @@ function buyItem() {
                 return;
         }
         updateTopBarItems(); // 更新顶部bar道具数量
+        updateJinnangItems(); // 更新锦囊内的道具数量显示
     } else {
         // 处理非包裹类型物品
         const [petName, skillName] = itemName.split('·');
@@ -1987,21 +2009,7 @@ function buyItem() {
                 skillDiv.onclick = () => {
                     document.getElementById("description-box").innerText = skill.description;
                 };
-                if (skill.rarity === 'S') {
-                    skillDiv.classList.add('s-skill');
-                    // 确保金子被扣除并更新显示
-                    goldAmount -= price;
-                    document.getElementById("gold-amount").innerText = goldAmount;
-                    // 确保道具被移除
-                    selectedItem.remove();
-                } else if (skill.rarity === 'SS') {
-                    skillDiv.classList.add('ss-skill');
-                    // 确保金子被扣除并更新显示
-                    goldAmount -= price;
-                    document.getElementById("gold-amount").innerText = goldAmount;
-                    // 确保道具被移除
-                    selectedItem.remove();
-                }
+                skillDiv.classList.add(skill.rarity.toLowerCase() + '-skill');
                 document.getElementById("skills-area").appendChild(skillDiv);
 
                 const currentSkills = Array.from(document.querySelectorAll("#skills-area div"))
@@ -2039,6 +2047,7 @@ function buyItem() {
         }
     }
 
+    // 扣除金子并更新显示
     goldAmount -= price;
     document.getElementById("gold-amount").innerText = goldAmount;
     selectedItem.remove();
@@ -2047,93 +2056,112 @@ function buyItem() {
 // 初始化商店和倒计时
 document.addEventListener('DOMContentLoaded', initShop);
 
+
+// 初始化商店和倒计时
+document.addEventListener('DOMContentLoaded', initShop);
+
 function sellPet() {
     const skillScoreElement = document.getElementById("skill-score");
-    const skillScore = parseInt(skillScoreElement.innerText, 10);
+    const skillScore = parseInt(skillScoreElement.innerText, 10); // 获取宠物的技能分数并转换为整数
     
     // 检查宠物当前分数是否低于10000分
     if (skillScore < 10000) {
-        alert("宠物当前分数低于10000分，无法出售！");
-        return;
+        alert("宠物当前分数低于10000分，无法出售！"); // 提示分数低于10000分，无法出售
+        return; // 退出函数
     }
 
     // 计算出售价格
-    const sellPrice = Math.floor(skillScore / 100);
+    const sellPrice = Math.floor(skillScore / 50); // 出售价格为技能分数除以50的整数部分
 
+    // 确认出售
     if (confirm(`当前仅支持出售您的宠物，当您出售宠物后，您的宠物数值将复位。宠物价格与其评分有关，目前您的宠物价值${sellPrice}金子，请问是否出售？`)) {
-        goldAmount += sellPrice;
-        document.getElementById("gold-amount").innerText = goldAmount;
-        updateQualityCard();
-        updateAttributePanel();
+        goldAmount += sellPrice; // 增加用户的金子数量
+        document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
+        updateQualityCard(); // 更新资质卡片
+        updateAttributePanel(); // 更新属性面板
         updateTopBarItems(); // 确保顶栏道具数量更新
-        resetPet();
+        resetPet(); // 重置宠物的数值
     }
 }
 
-        function changePet() {
-            const selectedPet = document.getElementById("pet-select").value;
-            currentPet = pets[selectedPet];
-            document.getElementById("pet-name").innerText = currentPet.name;
-            document.getElementById("pet-image").src = currentPet.image;
-            currentWisdom = 0;
-            trainCount = 0;
-            skillScore = 0;
-            highestScore = 0;
-            document.getElementById("high-grade-pill").innerText = highGradePill;
-            document.getElementById("transmutation-pill").innerText = transmutationPill;
-            document.getElementById("reborn-pill").innerText = rebornPill;
-            document.getElementById("quality-pill").innerText = qualityPill;
-            document.getElementById("current-wisdom").innerText = currentWisdom;
-            document.getElementById("train-count").innerText = trainCount;
-            document.getElementById("skill-score").innerText = skillScore;
-            document.getElementById("highest-score").innerText = highestScore;
-            document.getElementById("skills-area").innerHTML = "";
-            document.getElementById("description-box").innerText = "";
-            updateQualityCard();
-        }
+
+let currentPetKey = pets.yanzhi;
+let currentPet = currentPetKey;;
+
+function changePet() {
+    const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
+    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
+
+    currentPetKey = selectedPetKey;
+    currentPet = pets[selectedPetKey]; // 将当前宠物设为选择的宠物
+
+    document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
+    document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
+    document.getElementById("description-box").innerText = `您将当前宠物更换为：${currentPet.name} `;
+    resetPet(); // 重置宠物的数值
+}
+
 
 function resetPet() {
-    currentPet.qualities.tier = '普通';
-    currentPet.qualities.growthRate = 100;
-    currentPet.qualities.mutated = false;
-    currentPet.qualities.endurance.current = currentPet.qualities.endurance.min;
-    currentPet.qualities.strength.current = currentPet.qualities.strength.min;
-    currentPet.qualities.faith.current = currentPet.qualities.faith.min;
-    currentPet.qualities.agility.current = currentPet.qualities.agility.min;
-    currentPet.qualities.intelligence.current = currentPet.qualities.intelligence.min;
-    
+    currentPet.qualities.tier = '普通'; // 重置宠物资质为普通
+    currentPet.qualities.growthRate = 100; // 重置宠物成长率为100
+    currentPet.qualities.mutated = false; // 重置宠物变异状态为未变异
+    currentPet.qualities.endurance.current = currentPet.qualities.endurance.min; // 重置耐力当前值为最小值
+    currentPet.qualities.strength.current = currentPet.qualities.strength.min; // 重置力量当前值为最小值
+    currentPet.qualities.faith.current = currentPet.qualities.faith.min; // 重置信念当前值为最小值
+    currentPet.qualities.agility.current = currentPet.qualities.agility.min; // 重置敏捷当前值为最小值
+    currentPet.qualities.intelligence.current = currentPet.qualities.intelligence.min; // 重置智力当前值为最小值
+
+    // 更新显示的资质和属性值
+    setInnerText("tier", currentPet.qualities.tier);
+    setInnerText("growth-rate", currentPet.qualities.growthRate);
+    setInnerText("mutated", currentPet.qualities.mutated ? "是" : "否");
+    setInnerText("endurance-current", currentPet.qualities.endurance.current);
+    setInnerText("strength-current", currentPet.qualities.strength.current);
+    setInnerText("faith-current", currentPet.qualities.faith.current);
+    setInnerText("agility-current", currentPet.qualities.agility.current);
+    setInnerText("intelligence-current", currentPet.qualities.intelligence.current);
+
     // 初始化等级和进化等级
-    petLevel = 1;
-    evolutionLevel = 0;
-    remainingPoints = 0;
-    trainingCount = 0; // 重置金培次数
+    petLevel = 1; // 重置宠物等级为1
+    evolutionLevel = 0; // 重置进化等级为0
+    remainingPoints = 0; // 重置剩余点数为0
+    trainingCount = 0; // 重置金培次数为0
 
     // 初始化评分
-    skillScore = 0;
-    highestScore = Math.max(highestScore, skillScore);
-    document.getElementById("skill-score").innerText = skillScore;
-    document.getElementById("highest-score").innerText = highestScore;
-    
+    skillScore = 0; // 重置技能分数为0
+    setInnerText("skill-score", skillScore);
+
     // 清空技能区域
-    document.getElementById("skills-area").innerHTML = "";
+    const skillsArea = document.getElementById("skills-area");
+    if (skillsArea) {
+        skillsArea.innerHTML = "";
+    }
 
     // 更新显示的各项数值
-    document.getElementById("current-wisdom").innerText = 0;
-    document.getElementById("train-count").innerText = 0;
-    document.getElementById("attribute-endurance").innerText = 0;
-    document.getElementById("attribute-intelligence").innerText = 0;
-    document.getElementById("attribute-strength").innerText = 0;
-    document.getElementById("attribute-agility").innerText = 0;
-    document.getElementById("attribute-faith").innerText = 0;
-    document.getElementById("pet-level").innerText = petLevel;
-    document.getElementById("evolution-level").innerText = evolutionLevel;
-    document.getElementById("remaining-points").innerText = remainingPoints;
+    setInnerText("current-wisdom", 0);
+    setInnerText("train-count", 0);
+    setInnerText("attribute-endurance", currentPet.qualities.endurance.current);
+    setInnerText("attribute-intelligence", currentPet.qualities.intelligence.current);
+    setInnerText("attribute-strength", currentPet.qualities.strength.current);
+    setInnerText("attribute-agility", currentPet.qualities.agility.current);
+    setInnerText("attribute-faith", currentPet.qualities.faith.current);
+    setInnerText("pet-level", petLevel);
+    setInnerText("evolution-level", evolutionLevel);
 
-    updateQualityCard();
+    updateQualityCard(); // 更新资质卡片
     updateTopBarItems(); // 确保顶栏道具数量更新
 }
 
-        let currentPet = pets.yanzhi;
+function setInnerText(id, value) {
+    const element = document.getElementById(id);
+    if (element) {
+        element.innerText = value;
+    } else {
+        console.warn(`元素ID为 ${id} 的元素未找到。`);
+    }
+}
+
         let highGradePill = 100;
         let transmutationPill = 20;
         let rebornPill = 20;
@@ -2141,7 +2169,6 @@ function resetPet() {
         let currentWisdom = 0;
         let trainCount = 0;
         let skillScore = 0;
-        let highestScore = 0;
 
         const descriptions = [
             "欢迎试玩养宠模拟机！本模拟机只用于娱乐，不对游戏进行任何功能性测试。本模拟机功能较多，请耐心探索~",
@@ -2351,7 +2378,6 @@ function updateSkillScore(selectedSkills = []) {
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillScore;
     document.getElementById("skill-score").innerText = totalScore;
-    document.getElementById("highest-score").innerText = Math.max(totalScore, highestScore);
 }
 
 function upgradeWisdomTo() {
@@ -2500,6 +2526,10 @@ function updateQualityCard() {
 
 function rebornPet() {
     if (!checkDrawerOpen()) return;
+    if (!currentPet || !currentPet.qualities) { // 添加检查
+        console.warn("当前宠物未被正确初始化。");
+        return;
+    }
 
     if (rebornPill < 1) {
         alert("您的神兽还童丹已耗尽！");
@@ -2594,46 +2624,62 @@ function trainQuality() {
 }
 
 function enhanceQuality() {
-    if (!checkDrawerOpen()) return;
+    if (!currentPet || !currentPet.qualities) { // 添加检查
+        console.warn("当前宠物未被正确初始化。");
+        return;
+    }
 
+    // 如果资质重生丹的数量小于1，提示用户并退出函数。
     if (qualityPill < 1) {
         alert("您的资质重生丹已耗尽！");
         return;
     }
 
+    // 减少资质重生丹的数量并更新显示。
     qualityPill--;
     document.getElementById("quality-pill").innerText = qualityPill;
 
+    // 获取当前宠物的资质。
     const qualities = currentPet.qualities;
+    // 定义需要提升的资质维度。
     const dimensions = ['endurance', 'strength', 'faith', 'agility', 'intelligence'];
+    // 用于存储达到最大值的维度。
     const maxedDimensions = [];
+    // 用于存储新的资质值。
     let newQualities = {};
 
+    // 遍历每个维度，生成一个在指定范围内的新资质值。
     dimensions.forEach(dim => {
-        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max*0.85);
+        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max * 0.92);
     });
 
+    // 如果宠物的资质未发生变异，
     if (!currentPet.qualities.mutated) {
+        // 遍历每个维度，如果随机数小于0.1，将该维度的资质值设为最大值，并添加到maxedDimensions数组。
         dimensions.forEach(dim => {
             if (Math.random() < 0.01) {
-                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max)*0.85);
+                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max) * 0.92);
                 maxedDimensions.push(dim);
             }
         });
 
+        // 如果有超过1个维度达到最大值，从maxedDimensions数组中弹出一个维度并重新生成该维度的资质值，直到只有2个或更少维度达到最大值。
         while (maxedDimensions.length > 1) {
             const dimToReset = maxedDimensions.pop();
             newQualities[dimToReset] = getRandomInt(qualities[dimToReset].min, qualities[dimToReset].max);
         }
     }
 
+    // 遍历每个维度，将新生成的资质值应用到当前宠物的资质。
     dimensions.forEach(dim => {
         qualities[dim].current = newQualities[dim];
+        // 如果宠物的资质发生了变异，将资质值提升10%。
         if (currentPet.qualities.mutated) {
             qualities[dim].current = Math.floor(qualities[dim].current * 1.1);
         }
     });
 
+    // 更新资质卡片和技能分数。
     updateQualityCard();
     updateSkillScore();
 }

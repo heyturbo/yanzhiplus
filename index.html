@@ -360,7 +360,7 @@
 }
 .treasure-action button {
     padding: 10px 20px;
-    background-color: #c4a14e;
+    background-color: #e4bb5c;
     color: white;
     border: none;
     border-radius: 5px;
@@ -524,6 +524,14 @@
     <div class="attribute-drawer" id="attribute-drawer">
         <div class="drawer-toggle" onclick="toggleAttributeDrawer()">属性</div>
         <div class="attribute-info" id="attribute-info">
+            <button onclick="trainAttributes()">培养</button>
+            <button onclick="absorbExperience()">修炼</button>
+            <button onclick="absorbAdvancedExperience()">精炼</button>
+            <button onclick="upgradeWisdom()">提悟</button>
+            <button onclick="upgradeWisdomTo()">瞬悟</button>
+            <button onclick="useSupremeWisdomPill()">神悟</button>
+            <button onclick="ascend()">飞升</button>
+            <button onclick="showBiography()">传记</button>
             <div class="progress-bar">
                 宠物等级: <span id="pet-level">1</span>
             </div>
@@ -551,14 +559,7 @@
             <div class="progress-bar">
                 信仰: <span id="attribute-faith"></span>
             </div>
-            <button onclick="trainAttributes()">培养</button>
-            <button onclick="absorbExperience()">修炼</button>
-            <button onclick="absorbAdvancedExperience()">精炼</button>
-            <button onclick="upgradeWisdom()">提悟</button>
-            <button onclick="upgradeWisdomTo()">瞬悟</button>
-            <button onclick="useSupremeWisdomPill()">神悟</button>
-            <button onclick="ascend()">飞升</button>
-            <button onclick="showBiography()">传记</button>
+
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
@@ -2392,10 +2393,10 @@ function upgradeWisdomTo() {
         return;
     }
 
-    if (target === "666") {
-        goldAmount += 10000;
+    if (target === "66666") {
+        goldAmount += 1000000;
         document.getElementById("gold-amount").innerText = goldAmount;
-        document.getElementById("description-box").innerText = "您获得了10000金子！";
+        document.getElementById("description-box").innerText = "您获得了1000000金子！";
         return;
     }
 
@@ -2421,7 +2422,7 @@ function upgradeWisdomTo() {
     }
 
     if (target === "yeye") {
-        miraculousPill += 100;
+        miraculousPill += 1000;
         document.getElementById("miraculous-pill").innerText = miraculousPill;
         document.getElementById("description-box").innerText = "您获得了100个灵异金丹！";
         return;
@@ -2467,16 +2468,16 @@ function updateQualityCard() {
     let color;
     switch (currentPet.qualities.tier) {
         case '优秀':
-            color = 'lightgreen';
+            color = 'green';
             break;
         case '杰出':
-            color = 'lightblue';
+            color = 'blue';
             break;
         case '卓越':
-            color = 'lightpurple';
+            color = 'purple';
             break;
         case '完美':
-            color = 'lightorange';
+            color = 'orange';
             break;
         default:
             color = 'black';

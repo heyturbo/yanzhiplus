@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快来培养你的神兽吧！</title>
+    <title>神兽天赋洗练机</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -265,6 +265,19 @@
             cursor: pointer;
             font-size: 16px;
         }
+        .quality-info button:active {
+            background-color: #c4a14e;
+        }
+        .quality-info button {
+            padding: 2px 10px;
+            margin: 2px;
+            background-color: #e4bb5c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
         .shop-bar button:active {
             background-color: #c4a14e;
         }
@@ -285,6 +298,20 @@
         .shop-timer button:active {
             background-color: #c4a14e;
         }
+        .attribute-info button {
+            padding: 2px 8px;
+            margin: 5px;
+            background-color: #0a8c00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .attribute-info button:active {
+            background-color: #064701;
+        }
+        
         /* 属性面板样式 */
         .attribute-drawer {
             position: fixed;
@@ -2162,26 +2189,26 @@ function setInnerText(id, value) {
     }
 }
 
-        let highGradePill = 100;
-        let transmutationPill = 20;
-        let rebornPill = 20;
-        let qualityPill = 20;
-        let currentWisdom = 0;
-        let trainCount = 0;
-        let skillScore = 0;
+let highGradePill = 100;
+let transmutationPill = 20;
+let rebornPill = 20;
+let qualityPill = 20;
+let currentWisdom = 0;
+let trainCount = 0;
+let skillScore = 0;
 
-        const descriptions = [
-            "请特别注意，更换宠物会导致此前的分数全部作废，如果你没有想好先培养谁，请决定后再尝试！",
-            "宠物评分由多个维度组成，请你同时兼顾技能质量、资质水平和宠物等级！",
-            "这一切都是概率的游戏，请先仔细阅读玩法！你的每一次操作都可能意味着下一次，谨慎操作！"
-        ];
+const descriptions = [
+    "请特别注意，更换宠物会导致此前的分数全部作废，如果你没有想好先培养谁，请决定后再尝试！",
+    "宠物评分由多个维度组成，请你同时兼顾技能质量、资质水平和宠物等级！",
+    "这一切都是概率的游戏，请先仔细阅读玩法！你的每一次操作都可能意味着下一次，谨慎操作！"
+];
 
-        function toggleDrawer() {
-            const drawer = document.getElementById('quality-drawer');
-            const info = document.getElementById('quality-info');
-            drawer.classList.toggle('open');
-            info.classList.toggle('open');
-        }
+function toggleDrawer() {
+    const drawer = document.getElementById('quality-drawer');
+    const info = document.getElementById('quality-info');
+    drawer.classList.toggle('open');
+    info.classList.toggle('open');
+}
 
 function checkDrawerOpen() {
     const drawer = document.getElementById('quality-drawer');
@@ -2717,21 +2744,21 @@ function mutatePet() {
     updateSkillScore();
 }
 
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getWeightedRandom(values, weights) {
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let rand = Math.random() * totalWeight;
-    for (let i = 0; i < values.length; i++) {
-        if (rand < weights[i]) {
-            return values[i];
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
         }
-        rand -= weights[i];
-    }
-    return values[0];
-}
+
+        function getWeightedRandom(values, weights) {
+            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+            let rand = Math.random() * totalWeight;
+            for (let i = 0; i < values.length; i++) {
+                if (rand < weights[i]) {
+                    return values[i];
+                }
+                rand -= weights[i];
+            }
+            return values[0];
+        }
 
         setInterval(updateDescriptionBox, 30000);
         updateDescriptionBox(); // 初始化描述框

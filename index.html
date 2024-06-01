@@ -65,7 +65,7 @@
             flex: 1;
             margin: 5px;
             padding: 10px;
-            background-color: #e4bb5c;
+            background-color: #e0b454;
             color: white;
             border: none;
             border-radius: 5px;
@@ -73,11 +73,11 @@
             font-size: 16px;
         }
         .core-area .button-row button:active {
-            background-color: #e4bb5c;
+            background-color: #c4a14e;
         }
         .core-area .skills {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             width: 100%;
         }
@@ -248,7 +248,7 @@
         }
         .shop-item.selected {
             border-color: #e4bb5c;
-            background-color: #e4bb5c;
+            background-color: #fff;
         }
         .shop-bar {
             display: flex;
@@ -266,7 +266,7 @@
             font-size: 16px;
         }
         .shop-bar button:active {
-            background-color: #e4bb5c;
+            background-color: #c4a14e;
         }
         .shop-timer {
             display: flex;
@@ -283,7 +283,7 @@
             font-size: 16px;
         }
         .shop-timer button:active {
-            background-color: #e4bb5c;
+            background-color: #c4a14e;
         }
         /* 属性面板样式 */
         .attribute-drawer {
@@ -360,7 +360,7 @@
 }
 .treasure-action button {
     padding: 10px 20px;
-    background-color: #e4bb5c;
+    background-color: #c4a14e;
     color: white;
     border: none;
     border-radius: 5px;
@@ -368,7 +368,7 @@
     font-size: 16px;
 }
 .treasure-action button:active {
-    background-color: #e4bb5c;
+    background-color: #c4a14e;
 }
 /* 锦囊抽屉样式 */
 .jinnang-drawer {
@@ -477,12 +477,6 @@
         <div class="buttons">
             <div class="button-row">
                 <button onclick="showGuide()">玩法</button>
-                <button onclick="showBiography()">传记</button> 
-                <button onclick="upgradeWisdom()">提悟</button>
-                <button onclick="upgradeWisdomTo()">瞬悟</button>
-                <button onclick="trainSkills()">洗练</button>
-            </div>
-            <div class="button-row">
                 <button onclick="toggleDrawer()">资质</button>
                 <button onclick="toggleAttributeDrawer()">属性</button>
                 <button onclick="toggleShop()">商店</button> 
@@ -557,11 +551,13 @@
             <div class="progress-bar">
                 信仰: <span id="attribute-faith"></span>
             </div>
-            <button onclick="trainAttributes()">培养宠物</button>
-            <button onclick="absorbExperience()">普通修炼</button>
-            <button onclick="absorbAdvancedExperience()">高级修炼</button>
-            <button onclick="useSupremeWisdomPill()">神级领悟</button>
-            <button onclick="ascend()">飞升突破</button>
+            <button onclick="trainAttributes()">培养</button>
+            <button onclick="absorbExperience()">修炼</button>
+            <button onclick="absorbAdvancedExperience()">精炼</button>
+            <button onclick="upgradeWisdomTo()">瞬悟</button>
+            <button onclick="useSupremeWisdomPill()">神悟</button>
+            <button onclick="ascend()">飞升</button>
+            <button onclick="showBiography()">传记</button>
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
@@ -595,6 +591,7 @@
                 <button onclick="enhanceQuality()">刷新资质</button>
                 <button onclick="mutatePet()">变异宠物</button>
                 <button onclick="evolvePet()">进化宠物</button>
+                <button onclick="trainSkills()">洗练技能</button>
             </div>
             <div class="progress-bar">
                 耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
@@ -2226,6 +2223,7 @@ function checkDrawerOpen() {
         }
 
         function trainSkills() {
+            if (!checkDrawerOpen()) return;
             if (transmutationPill < 1) {
                 alert("您的道具不够，请刷新后重试！");
                 return;

@@ -395,10 +395,10 @@
         .attributes-container {
             display: flex;
              /* 使两个子容器分布在容器的两边 */
-            gap: 10px; /* 调整两列之间的间距 */
+            gap: 0px; /* 调整两列之间的间距 */
             align-content: flex-start;
             flex-direction: row;
-            justify-content: space-between;
+            justify-content: space-evenly;
         }
         .progress-bars, .secondary-attributes {
             display: flex;
@@ -411,10 +411,10 @@
             justify-content: center;
             align-items: center;
             /* 设置图片框的尺寸，可以根据需要调整 */
-            width: 230px;
-            height: 230px;
-            border: 1px solid #ccc; /* 添加边框 */
-            margin: auto 3px; /* 在容器内垂直居中 */
+            width: 200px;
+            height: 200px;
+            border: 0px solid #ccc; /* 添加边框 */
+            margin: auto 0px; /* 在容器内垂直居中 */
         }
         .quality-container {
             display: flex;
@@ -428,8 +428,8 @@
             gap: 1px; /* 调整每个条目之间的间距 */
         }
         .image-frame img {
-            max-width: 100%;
-            max-height: 100%;
+            max-width: 90%;
+            max-height: 90%;
         }
         .button-grid {
             display: grid;
@@ -698,12 +698,12 @@
                     <img src="https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png" alt="神兽之地">
                 </div>
                 <div class="secondary-attributes">
-                    <div>生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                    <div>法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                    <div>物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                    <div>物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                    <div>法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                    <div>法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                    <div>HP: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                    <div>MP: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                    <div>物攻: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                    <div>物防: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                    <div>法攻: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                    <div>法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
                     <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                 </div>
             </div>
@@ -1237,6 +1237,10 @@ if (window.GestureEvent || (navigator.maxTouchPoints && navigator.maxTouchPoints
             e.preventDefault();
         }
         lastTouchEnd = now;
+    }, { passive: false });
+
+    document.body.addEventListener('dblclick', function (e) {
+        e.preventDefault();
     }, { passive: false });
 }
 

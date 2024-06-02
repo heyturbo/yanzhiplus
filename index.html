@@ -1858,11 +1858,11 @@ function showBiography() {
     const skillScore = parseInt(document.getElementById("skill-score").innerText, 10);
 
     let message;
-    if (skillScore < 10000) {
+    if (skillScore < 20000) {
         message = "您的宠物评分过低，请提升到10000后再试！（宠物传记共有3段，当评分到达10000、200000、600000会各自解锁）";
-    } else if (skillScore < 200000) {
-        message = biography[0];
     } else if (skillScore < 600000) {
+        message = biography[0];
+    } else if (skillScore < 1200000) {
         message = biography[0] + "<br>" + biography[1];
     } else {
         message = biography[0] + "<br>" + biography[1] + "<br>" + biography[2];
@@ -1913,7 +1913,9 @@ function showGuide() {
                             <p>- 5. 修复了其他显示问题；</p>
                             <p>- 6. 新增道具冰魄还童丹和相关功能；</p>
                             <p>- 7. 新增宠物战神阿毛和腾蛇；</p>
-                            <p>- 8. 优化了开宝箱体验，玩家可以连续点击打开宝箱，系统会自动取出道具；</p>
+                            <p>- 8. 新增宠物二级属性，二级属性会参与宠物评分。后续会逐步开放战斗、任务等功能；</p>
+                            <p>- 9. 优化了开宝箱体验，玩家可以连续点击打开宝箱，系统会自动取出道具；</p>
+                            <p>- 10. 优化宠物变异后的界面显示；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
@@ -2822,6 +2824,8 @@ function useBingpoRebornPill() {
         qualities.intelligence.current = Math.floor(qualities.intelligence.current / 1.1);
 
         currentPet.qualities.mutated = false;
+        // 恢复原背景
+        document.body.style.backgroundImage = "";
     }
 
     bingpoRebornPill--;
@@ -2849,6 +2853,9 @@ function useBingpoRebornPill() {
         tier = Math.random() < 0.5 ? '卓越' : '完美';
         growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
         currentPet.qualities.mutated = true;
+        // 设置背景为变异背景
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+        document.body.style.backgroundRepeat = "repeat";
     }
     
     currentPet.qualities.tier = tier;
@@ -2907,6 +2914,8 @@ function rebornPet() {
         qualities.intelligence.current = Math.floor(qualities.intelligence.current / 1.1);
 
         currentPet.qualities.mutated = false;
+        // 恢复原背景
+        document.body.style.backgroundImage = "";
     }
 
     rebornPill--;
@@ -2933,6 +2942,9 @@ function rebornPet() {
         tier = Math.random() < 0.5 ? '卓越' : '完美';
         growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
         currentPet.qualities.mutated = true;
+        // 设置背景为变异背景
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+        document.body.style.backgroundRepeat = "repeat";
     }
 
     currentPet.qualities.tier = tier;
@@ -2968,9 +2980,9 @@ function rebornPet() {
     document.getElementById("pet-level").innerText = petLevel;
     document.getElementById("current-wisdom").innerText = 0;
 
-    updatePetLevel;
-    updatePetWisdom;
-    updateAttributePanel;
+    updatePetLevel();
+    updatePetWisdom();
+    updateAttributePanel();
 }
 
 function trainQuality() {
@@ -3088,6 +3100,10 @@ function mutatePet() {
     qualities.faith.current = Math.floor(qualities.faith.current * 1.1);
     qualities.agility.current = Math.floor(qualities.agility.current * 1.1);
     qualities.intelligence.current = Math.floor(qualities.intelligence.current * 1.1);
+
+    // 设置背景为变异背景
+    document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+    document.body.style.backgroundRepeat = "repeat";
 
     updateQualityCard();
     updateSkillScore();

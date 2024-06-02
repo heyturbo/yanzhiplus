@@ -184,14 +184,29 @@
         .info-card.active {
             display: block;
         }
-        .info-card .progress-bar {
+        .info-card {
             width: 100%;
             background-color: #e0e0e0;
             border-radius: 5px;
             overflow: hidden;
             margin-bottom: 10px;
         }
-        .info-card .progress-bar div {
+        .info-card div {
+            height: 20px;
+            background-color: #e4bb5c;
+            text-align: right;
+            padding-right: 5px;
+            color: white;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .progress-bar div {
             height: 20px;
             background-color: #e4bb5c;
             text-align: right;
@@ -367,7 +382,7 @@
             background-color: #e0e0e0;
             border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: -5px;
         }
         .attribute-info .progress-bar div {
             height: 20px;
@@ -377,13 +392,53 @@
             color: white;
             border-radius: 5px;
         }
+        .attributes-container {
+            display: flex;
+             /* 使两个子容器分布在容器的两边 */
+            gap: 10px; /* 调整两列之间的间距 */
+            align-content: flex-start;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        .progress-bars, .secondary-attributes {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* 调整每个条目之间的间距 */
+            justify-content: space-evenly;
+        }
+        .image-frame {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* 设置图片框的尺寸，可以根据需要调整 */
+            width: 230px;
+            height: 230px;
+            border: 1px solid #ccc; /* 添加边框 */
+            margin: auto 3px; /* 在容器内垂直居中 */
+        }
+        .quality-container {
+            display: flex;
+            justify-content: space-between; /* 使两个子容器分布在容器的两边 */
+            gap: 10px; /* 调整两列之间的间距 */
+        }
+        
+        .quality-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1px; /* 调整每个条目之间的间距 */
+        }
+        .image-frame img {
+            max-width: 100%;
+            max-height: 100%;
+        }
         .button-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px; /* 调整按钮之间的间距 */
+            gap: 5px; /* 调整按钮之间的间距 */
+            align-content: center;
         }
         .button-grid button {
-            padding: 5px;
+            padding: 10px;
             width: 90%;
             font-size: 14px; /* 调整按钮字体大小 */
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
@@ -600,49 +655,58 @@
         <div class="drawer-toggle" onclick="toggleAttributeDrawer()">属性</div>
         <div class="attribute-info" id="attribute-info">
             <div class="button-grid">
-                <button onclick="trainAttributes()">金子培养</button>
+                <button onclick="trainAttributes()">宠物培养</button>
                 <button onclick="absorbExperience()">普通修炼</button>
                 <button onclick="absorbAdvancedExperience()">高级修炼</button>
                 <button onclick="upgradeWisdom()">提升悟性</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
-                <button onclick="useSupremeWisdomPill()">神级提悟</button>
+                <button onclick="useSupremeWisdomPill()">神级领悟</button>
                 <button onclick="ascend()">飞升突破</button>
-                <button onclick="showBiography()">宠物传记</button>
+                <button onclick="showBiography()">解锁传记</button>
             </div>
-            <div class="progress-bar">
-                宠物等级: <span id="pet-level">1</span>
+            <div class="attributes-container">
+                <div class="progress-bars">
+                    <div class="progress-bar">
+                        宠物等级: <span id="pet-level">1</span>
+                    </div>
+                    <div class="progress-bar">
+                        段位: <span id="attribute-tier"></span>
+                    </div>
+                    <div class="progress-bar">
+                        成长率: <span id="attribute-growth-rate"></span>
+                    </div>
+                    <div class="progress-bar">
+                        悟性: <span id="attribute-wisdom"></span>
+                    </div>
+                    <div class="progress-bar">
+                        耐力: <span id="attribute-endurance"></span>
+                    </div>
+                    <div class="progress-bar">
+                        智力: <span id="attribute-intelligence"></span>
+                    </div>
+                    <div class="progress-bar">
+                        强壮: <span id="attribute-strength"></span>
+                    </div>
+                    <div class="progress-bar">
+                        敏捷: <span id="attribute-agility"></span>
+                    </div>
+                    <div class="progress-bar">
+                        信仰: <span id="attribute-faith"></span>
+                    </div>
+                </div>
+                <div class="image-frame">
+                    <img src="https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png" alt="神兽之地">
+                </div>
+                <div class="secondary-attributes">
+                    <div>生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                    <div>法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                    <div>物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                    <div>物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                    <div>法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                    <div>法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                    <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                </div>
             </div>
-            <div class="progress-bar">
-                段位: <span id="attribute-tier"></span>
-            </div>
-            <div class="progress-bar">
-                成长率: <span id="attribute-growth-rate"></span>
-            </div>
-            <div class="progress-bar">
-                悟性: <span id="attribute-wisdom"></span>
-            </div>
-            <div class="progress-bar">
-                耐力: <span id="attribute-endurance"></span>
-            </div>
-            <div class="progress-bar">
-                智力: <span id="attribute-intelligence"></span>
-            </div>
-            <div class="progress-bar">
-                强壮: <span id="attribute-strength"></span>
-            </div>
-            <div class="progress-bar">
-                敏捷: <span id="attribute-agility"></span>
-            </div>
-            <div class="progress-bar">
-                信仰: <span id="attribute-faith"></span>
-            </div>
-            <div>生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-            <div>法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-            <div>物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-            <div>物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-            <div>法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-            <div>法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-            <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
@@ -664,21 +728,24 @@
     <div class="quality-drawer" id="quality-drawer">
         <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
         <div class="quality-info" id="quality-info">
-            <!-- 资质信息内容 -->
-            <div>名称: <span id="quality-name">胭脂</span></div>
-            <div>段位: <span id="quality-tier">普通</span></div>
-            <div>成长率: <span id="quality-growth-rate">100%</span></div>
-            <div>变异: <span id="quality-mutated">未变异</span></div>
-            <div>进化等级: <span id="evolution-level">0</span></div>
-            <div class="button-grid">
-                <button onclick="rebornPet()">普通还童</button>
-                <button onclick="trainQuality()">快速还童</button>
-                <button onclick="useGoldenRebornPill()">还童金丹</button>
-                <button onclick="useBingpoRebornPill()">冰魄还童</button>
-                <button onclick="enhanceQuality()">刷新资质</button>
-                <button onclick="mutatePet()">变异宠物</button>
-                <button onclick="evolvePet()">进化宠物</button>
-                <button onclick="trainSkills()">洗练技能</button>
+            <div class="quality-container">
+                <div class="quality-details">
+                    <div>名称: <span id="quality-name">胭脂</span></div>
+                    <div>段位: <span id="quality-tier">普通</span></div>
+                    <div>成长率: <span id="quality-growth-rate">100%</span></div>
+                    <div>变异: <span id="quality-mutated">未变异</span></div>
+                    <div>进化等级: <span id="evolution-level">0</span></div>
+                </div>
+                <div class="button-grid">
+                    <button onclick="rebornPet()">普通还童</button>
+                    <button onclick="trainQuality()">快速还童</button>
+                    <button onclick="useGoldenRebornPill()">还童金丹</button>
+                    <button onclick="useBingpoRebornPill()">冰魄还童</button>
+                    <button onclick="enhanceQuality()">刷新资质</button>
+                    <button onclick="mutatePet()">变异宠物</button>
+                    <button onclick="evolvePet()">进化宠物</button>
+                    <button onclick="trainSkills()">洗练技能</button>
+                </div>
             </div>
             <div class="progress-bar">
                 耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
@@ -737,27 +804,6 @@
     <div class="description-box" id="description-box"></div>
     </div>
     <script>
-        
-        if (window.GestureEvent || (navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) {
-    document.body.addEventListener('touchstart', function (e) {
-        if (!isInteractiveElement(e.target)) {
-            e.preventDefault();
-        }
-    });
-}
-
-function isInteractiveElement(e) {
-    let {nodeName} = e;
-    if (nodeName === 'A' && e.hasAttribute('href') ||
-        ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(nodeName) ||
-        nodeName === 'LABEL' && (e.htmlFor || e.querySelector('input')) ||
-        ['IMG', 'OBJECT'].includes(nodeName) && e.hasAttribute('usemap') ||
-        ['AUDIO', 'VIDEO'].includes(nodeName) && e.hasAttribute('controls') ||
-        ['SUMMARY', 'IFRAME', 'EMBED'].includes(nodeName)) {
-        return true;
-    }
-    return e.hasAttribute('tabindex');
-}
         const pets = {
             yanzhi: {
                 name: '胭脂',
@@ -1176,6 +1222,37 @@ const biographies = {
     ]
 };
 
+if (window.GestureEvent || (navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) {
+    let lastTouchEnd = 0;
+
+    document.body.addEventListener('touchstart', function (e) {
+        if (!isInteractiveElement(e.target)) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    document.body.addEventListener('touchend', function (e) {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, { passive: false });
+}
+
+function isInteractiveElement(e) {
+    let { nodeName } = e;
+    if (nodeName === 'A' && e.hasAttribute('href') ||
+        ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(nodeName) ||
+        nodeName === 'LABEL' && (e.htmlFor || e.querySelector('input')) ||
+        ['IMG', 'OBJECT'].includes(nodeName) && e.hasAttribute('usemap') ||
+        ['AUDIO', 'VIDEO'].includes(nodeName) && e.hasAttribute('controls') ||
+        ['SUMMARY', 'IFRAME', 'EMBED'].includes(nodeName)) {
+        return true;
+    }
+    return e.hasAttribute('tabindex');
+}
+        
 let evolutionLevel = 0;
 
 function evolvePet() {
@@ -1880,7 +1957,7 @@ function showBiography() {
 
     let message;
     if (skillScore < 20000) {
-        message = "您的宠物评分过低，请提升到10000后再试！（宠物传记共有3段，当评分到达10000、200000、600000会各自解锁）";
+        message = "您的宠物评分过低，请提升到20000后再试！（宠物传记共有3段，当评分到达20000、600000、1200000会各自解锁）";
     } else if (skillScore < 600000) {
         message = biography[0];
     } else if (skillScore < 1200000) {
@@ -1963,12 +2040,12 @@ function showGuide() {
                             <p>f. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
                             <p>g. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
                             <p>h. 宠物传记：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
-                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
+                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费50金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
                             <p>商店所出售的道具根据其品质会随机定价，购买后会直接添加至道具栏中。</p>
                             <p>如果你购买的是宠物的天赋技能，你需要判断当前宠物的名称是否和天赋技能的宠物名称一致，其次保证你的当前宠物没有该技能，否则你将不能购买。一旦购买成功，这个技能会直接打在你的宠物技能位里。</p>
                             <p>在本游戏中，宠物的SS技能无法全部通过洗练生成，因此，如果你想要让宠物习得更多强力技能增加评分，你需要在商店里购买并使用天赋道具。</p>
                             <p>商店面板中，你可以进行宠物出售的操作，当宠物评分不足10000时，将无法出售。</p>
-                            <p>当你点击出售按钮时，系统会根据你当前宠物评分的百分之一进行出价，成功出售后，当前宠物各项属性会归零，同时得到等量金子。</p>
+                            <p>当你点击出售按钮时，系统会根据你当前宠物评分的1/50进行出价，成功出售后，当前宠物各项属性会归零，同时得到等量金子。</p>
                             <p>宝箱按钮：玩家可以在宝箱界面花费金子打开各种宝箱，获得奇珍异宝和神秘道具！</p>
                             <p>宝库按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
                             <p>💁请大侠尽情探索，本游戏还会继续更新功能，敬请期待！</p>
@@ -2401,6 +2478,7 @@ function resetPet() {
     remainingPoints = 0; // 重置剩余点数为0
     trainingCount = 0; // 重置金培次数为0
     currentWisdom = 0;
+    petAscended = false;
     petWisdom = currentWisdom;
 
     // 初始化评分

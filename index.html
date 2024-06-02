@@ -737,6 +737,27 @@
     <div class="description-box" id="description-box"></div>
     </div>
     <script>
+        
+        if (window.GestureEvent || (navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) {
+    document.body.addEventListener('touchstart', function (e) {
+        if (!isInteractiveElement(e.target)) {
+            e.preventDefault();
+        }
+    });
+}
+
+function isInteractiveElement(e) {
+    let {nodeName} = e;
+    if (nodeName === 'A' && e.hasAttribute('href') ||
+        ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA'].includes(nodeName) ||
+        nodeName === 'LABEL' && (e.htmlFor || e.querySelector('input')) ||
+        ['IMG', 'OBJECT'].includes(nodeName) && e.hasAttribute('usemap') ||
+        ['AUDIO', 'VIDEO'].includes(nodeName) && e.hasAttribute('controls') ||
+        ['SUMMARY', 'IFRAME', 'EMBED'].includes(nodeName)) {
+        return true;
+    }
+    return e.hasAttribute('tabindex');
+}
         const pets = {
             yanzhi: {
                 name: '胭脂',

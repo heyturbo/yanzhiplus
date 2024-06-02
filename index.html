@@ -17,7 +17,8 @@
             margin: 0;
             padding: 0;
         }
-        .top-bar, .bottom-bar {
+        /* 顶部栏样式 */
+        .top-bar {
             width: 90%;
             margin: 10px 0;
             padding: 10px;
@@ -30,12 +31,40 @@
             flex-direction: row;
             flex-wrap: nowrap;
         }
-        .top-bar div, .bottom-bar div {
+        
+        .top-bar div {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-        .top-bar img, .bottom-bar img {
+        
+        .top-bar img {
+            width: 45px;
+            height: 45px;
+        }
+        
+        /* 底部栏样式 */
+        .bottom-bar {
+            width: 90%;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-radius: 10px;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+        
+        .bottom-bar div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .bottom-bar img {
             width: 45px;
             height: 45px;
         }
@@ -266,12 +295,12 @@
             font-size: 16px;
         }
         .quality-info button:active {
-            background-color: #c4a14e;
+            background-color: #074b02;
         }
         .quality-info button {
             padding: 2px 10px;
             margin: 2px;
-            background-color: #e4bb5c;
+            background-color: #0a8c00;
             color: white;
             border: none;
             border-radius: 5px;
@@ -347,6 +376,17 @@
             padding-right: 5px;
             color: white;
             border-radius: 5px;
+        }
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px; /* 调整按钮之间的间距 */
+        }
+        .button-grid button {
+            padding: 5px;
+            width: 90%;
+            font-size: 14px; /* 调整按钮字体大小 */
+            /* 你可以在这里添加更多的样式来定制按钮的外观 */
         }
         .treasure-drawer {
             position: fixed;
@@ -429,6 +469,9 @@
             width: 50px;
             height: 50px;
         }
+        .red-text {
+            color: red;
+        }
         .message-box {
             display: none;
             position: fixed;
@@ -458,13 +501,13 @@
             background-color: #0056b3; /* 按钮悬停颜色 */
         }
         /* 变异状态视觉效果 */
-        .mutated .pet-image img {
+        .mutated .bottom-bar img {
             border: 3px solid gold;
         }
-        .mutated .info div {
+        .mutated .bottom-bar div {
             font-weight: bold;
             color: blue;
-        }
+                }
     </style>
 </head>
 <body>
@@ -490,13 +533,18 @@
             <div><span id="golden-reborn-pill">5</span></div>
         </div>
         <div>
+            <img src="https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png" alt="冰魄还童丹">
+            <div>冰魄丹</div>
+            <div><span id="bingpo-reborn-pill">5</span></div>
+        </div>
+        <div>
             <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
-            <div>资质丹</div>
+            <div>资质金丹</div>
             <div><span id="quality-pill">20</span></div>
         </div>
         <div>
             <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
-            <div>灵异金丹</div>
+            <div>灵异丹</div>
             <div><span id="miraculous-pill">1</span></div>
         </div>
     </div>
@@ -551,14 +599,16 @@
     <div class="attribute-drawer" id="attribute-drawer">
         <div class="drawer-toggle" onclick="toggleAttributeDrawer()">属性</div>
         <div class="attribute-info" id="attribute-info">
-            <button onclick="trainAttributes()">培养</button>
-            <button onclick="absorbExperience()">修炼</button>
-            <button onclick="absorbAdvancedExperience()">精炼</button>
-            <button onclick="upgradeWisdom()">提悟</button>
-            <button onclick="upgradeWisdomTo()">瞬悟</button>
-            <button onclick="useSupremeWisdomPill()">神悟</button>
-            <button onclick="ascend()">飞升</button>
-            <button onclick="showBiography()">传记</button>
+            <div class="button-grid">
+                <button onclick="trainAttributes()">金子培养</button>
+                <button onclick="absorbExperience()">普通修炼</button>
+                <button onclick="absorbAdvancedExperience()">高级修炼</button>
+                <button onclick="upgradeWisdom()">提升悟性</button>
+                <button onclick="upgradeWisdomTo()">一键提悟</button>
+                <button onclick="useSupremeWisdomPill()">神级提悟</button>
+                <button onclick="ascend()">飞升突破</button>
+                <button onclick="showBiography()">宠物传记</button>
+            </div>
             <div class="progress-bar">
                 宠物等级: <span id="pet-level">1</span>
             </div>
@@ -586,7 +636,13 @@
             <div class="progress-bar">
                 信仰: <span id="attribute-faith"></span>
             </div>
-
+            <div>生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+            <div>法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+            <div>物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+            <div>物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+            <div>法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+            <div>法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+            <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
@@ -614,10 +670,11 @@
             <div>成长率: <span id="quality-growth-rate">100%</span></div>
             <div>变异: <span id="quality-mutated">未变异</span></div>
             <div>进化等级: <span id="evolution-level">0</span></div>
-            <div class="button-row">
+            <div class="button-grid">
                 <button onclick="rebornPet()">普通还童</button>
                 <button onclick="trainQuality()">快速还童</button>
                 <button onclick="useGoldenRebornPill()">还童金丹</button>
+                <button onclick="useBingpoRebornPill()">冰魄还童</button>
                 <button onclick="enhanceQuality()">刷新资质</button>
                 <button onclick="mutatePet()">变异宠物</button>
                 <button onclick="evolvePet()">进化宠物</button>
@@ -669,11 +726,11 @@
             <option value="tengshe">腾蛇</option>
             <option value="qingmou">青眸白虎</option>
             <option value="jingjue">净角神将</option>
-           <option value="shanggu">上古神藤</option>
-           <option value="guhe">古河锦鲤</option>
-           <option value="banlan">斑斓公主</option>
-           <option value="juling">巨灵战姬</option>
-           <option value="aoshi">敖十七</option>
+            <option value="shanggu">上古神藤</option>
+            <option value="guhe">古河锦鲤</option>
+            <option value="banlan">斑斓公主</option>
+            <option value="juling">巨灵战姬</option>
+            <option value="aoshi">敖十七</option>
             <option value="daming">妲茗儿</option>
         </select>
     </div>
@@ -713,6 +770,59 @@
                     mutated: false
                 },
             },
+            zhanshen: {
+                name: '战神阿毛',
+                image: 'https://pic.imgdb.cn/item/665c7002d9c307b7e9897757.gif',
+                skills: [
+                    { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复。' },
+                    { name: '长寿', rarity: 'B', description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '破军神力', rarity: 'B', description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
+                    { name: '黄金战甲', rarity: 'B', description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
+                    { name: '元素力量（宽容）（17悟）', rarity: 'A', description: '被动技能，减免受到群体攻击的伤害。' },
+                    { name: '神威之怒（18悟）', rarity: 'A', description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
+                    { name: '法力吸取（物理）', rarity: 'A', description: '主动技能（单体），单体物理攻击并吸取法力值。' },
+                    { name: '离子护盾（19悟）', rarity: 'S', description: '被动技能，被离子护盾包围，受到敌人攻击后敌人会有几率触电而被百分比破甲，破甲效果随技能等级和宠物修为增加而增强。' },
+                    { name: '刮痧刃（17式）', rarity: 'S', description: '主动技能（群体），战神阿毛引以为傲的刀法，对敌方连续发动十次物理攻击，给予敌方沉痛打击。' },
+                    { name: '追日', rarity: 'S', description: '被动技能，速度大幅度提升。' },
+                    { name: '刮痧刃（奥义）（天奇徽章：1000）', rarity: 'SS', description: '主动技能（竖排），刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，同时有几率晕眩敌人，技能伤害和晕眩几率随技能等级提升而提升。' },
+                    { name: '誓死守护（20悟）', rarity: 'SS', description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
+                ],
+                qualities: {
+                    endurance: { current: 4500, min: 4500, max: 6500 },
+                    strength: { current: 6750, min: 6750, max: 9250 },
+                    faith: { current: 1800, min: 1800, max: 3200 },
+                    agility: { current: 4950, min: 4950, max: 7050 },
+                    intelligence: { current: 1350, min: 1350, max: 2650 },
+                    mutated: false
+                }
+            },
+            tengshe: {
+                name: '腾蛇',
+                image: 'https://pic.imgdb.cn/item/665c7002d9c307b7e98976fe.gif',
+                skills: [
+                    { name: '长寿', rarity: 'B', description: '被动技能，寿命上升' },
+                    { name: '战斗专注', rarity: 'B', description: '被动技能，法术暴击上升' },
+                    { name: '法术精通', rarity: 'B', description: '被动技能，法功上升' },
+                    { name: '生命祝福', rarity: 'B', description: '被动技能，生命值上升' },
+                    { name: '美腿术', rarity: 'A', description: '被动技能，速度上升' },
+                    { name: '女神外壳', rarity: 'A', description: '被动技能，物理和法术防御上升' },
+                    { name: '智慧守护（17悟）', rarity: 'A', description: '被动技能，法力值抵消一部分受到的伤害' },
+                    { name: '全面进化（18悟）', rarity: 'A', description: '被动技能，敏捷、耐力强壮增加' },
+                    { name: '腾蛇突袭（19悟）', rarity: 'S', description: '主动技能（单体），腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害，同时恢复本身血量，技能效果随技能等级提升而提升。' },
+                    { name: '火焰反噬（20悟）', rarity: 'S', description: '主动技能（2单位群体），腾蛇可以借助火之灵的力量将火焰精华加诸于己方竖排2个单位身上，对试图进行物理攻击的敌方目标造成灼烧状态.借助火之灵的力量需以自身寿命为献祭.灼烧造成的伤害与宠物的速度有关。' },
+                    { name: '高级冥想', rarity: 'SS', description: '被动技能，通过冥想，回合结束时（所有人行动完毕后）恢复自身大量魔法，恢复魔法百分比随技能等级提升而提升,每场战斗结束后寿命额外减少10点。' },
+                    { name: '红莲业火', rarity: 'SS', description: '主动技能（群体），腾蛇施放红莲业火对敌方报复，对敌方全体目标造成巨大法术伤害，并且造成灼烧效果,灼烧效果造成的伤害与宠物的速度有关。' },
+                    { name: '幽冥剧毒', rarity: 'SS', description: '主动技能（单体），腾蛇施放幽冥剧毒，对敌方单体目标造成法术伤害，同时剧毒腐蚀敌人百分比法术护甲，腐蚀程度随技能等级、宠物修为增加而增强。' }
+                ],
+                qualities: {
+                    endurance: { current: 2700, min: 2700, max: 4300 },
+                    strength: { current: 900, min: 900, max: 2100 },
+                    faith: { current: 2700, min: 2700, max: 4300 },
+                    agility: { current: 6750, min: 6750, max: 9250 },
+                    intelligence: { current: 6750, min: 6750, max: 9250 },
+                    mutated: false
+                }
+            },
             zhulin: {
                 name: '竹林隐士',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7ab.gif',
@@ -740,59 +850,6 @@
                     faith: { current: 3600, min: 3600, max: 5400 },
                     agility: { current: 3600, min: 3600, max: 5400 },
                     intelligence: { current: 1800, min: 1800, max: 3200 },
-                    mutated: false
-                }
-            },
-            zhanshen: {
-                name: '战神阿毛',
-                image: 'http://t.imop.com/upfiles/fck/tianshu/wangxiao/20220128092541139.gif',
-                skills: [
-                    { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复。' },
-                    { name: '长寿', rarity: 'B', description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '破军神力', rarity: 'B', description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
-                    { name: '黄金战甲', rarity: 'B', description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
-                    { name: '元素力量（宽容）（17悟）', rarity: 'A', description: '被动技能，减免受到群体攻击的伤害。' },
-                    { name: '神威之怒（18悟）', rarity: 'A', description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
-                    { name: '法力吸取（物理）', rarity: 'A', description: '主动技能（单体），单体物理攻击并吸取法力值。' },
-                    { name: '离子护盾（19悟）', rarity: 'S', description: '被动技能，被离子护盾包围，受到敌人攻击后敌人会有几率触电而被百分比破甲，破甲效果随技能等级和宠物修为增加而增强。' },
-                    { name: '刮痧刃（17式）', rarity: 'S', description: '主动技能（群体），战神阿毛引以为傲的刀法，对敌方连续发动十次物理攻击，给予敌方沉痛打击。' },
-                    { name: '追日', rarity: 'S', description: '被动技能，速度大幅度提升。' },
-                    { name: '刮痧刃（奥义）（天奇徽章：1000）', rarity: 'SS', description: '主动技能（竖排），刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，同时有几率晕眩敌人，技能伤害和晕眩几率随技能等级提升而提升。' },
-                    { name: '誓死守护（20悟）', rarity: 'SS', description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
-                ],
-                qualities: {
-                    endurance: { current: 4500, min: 4500, max: 6500 },
-                    strength: { current: 6750, min: 6750, max: 9250 },
-                    faith: { current: 1800, min: 1800, max: 3200 },
-                    agility: { current: 4950, min: 4950, max: 7050 },
-                    intelligence: { current: 1350, min: 1350, max: 2650 },
-                    mutated: false
-                }
-            },
-            tengshe: {
-                name: '腾蛇',
-                image: 'http://t.imop.com/upfiles/fck/tianshu/wangxiao/20180528161819140.gif',
-                skills: [
-                    { name: '长寿', rarity: 'B', description: '被动技能，寿命上升' },
-                    { name: '战斗专注', rarity: 'B', description: '被动技能，法术暴击上升' },
-                    { name: '法术精通', rarity: 'B', description: '被动技能，法功上升' },
-                    { name: '生命祝福', rarity: 'B', description: '被动技能，生命值上升' },
-                    { name: '美腿术', rarity: 'A', description: '被动技能，速度上升' },
-                    { name: '女神外壳', rarity: 'A', description: '被动技能，物理和法术防御上升' },
-                    { name: '智慧守护（17悟）', rarity: 'A', description: '被动技能，法力值抵消一部分受到的伤害' },
-                    { name: '全面进化（18悟）', rarity: 'A', description: '被动技能，敏捷、耐力强壮增加' },
-                    { name: '腾蛇突袭（19悟）', rarity: 'S', description: '主动技能（单体），腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害，同时恢复本身血量，技能效果随技能等级提升而提升。' },
-                    { name: '火焰反噬（20悟）', rarity: 'S', description: '主动技能（2单位群体），腾蛇可以借助火之灵的力量将火焰精华加诸于己方竖排2个单位身上，对试图进行物理攻击的敌方目标造成灼烧状态.借助火之灵的力量需以自身寿命为献祭.灼烧造成的伤害与宠物的速度有关。' },
-                    { name: '高级冥想', rarity: 'SS', description: '被动技能，通过冥想，回合结束时（所有人行动完毕后）恢复自身大量魔法，恢复魔法百分比随技能等级提升而提升,每场战斗结束后寿命额外减少10点。' },
-                    { name: '红莲业火', rarity: 'SS', description: '主动技能（群体），腾蛇施放红莲业火对敌方报复，对敌方全体目标造成巨大法术伤害，并且造成灼烧效果,灼烧效果造成的伤害与宠物的速度有关。' },
-                    { name: '幽冥剧毒', rarity: 'SS', description: '主动技能（单体），腾蛇施放幽冥剧毒，对敌方单体目标造成法术伤害，同时剧毒腐蚀敌人百分比法术护甲，腐蚀程度随技能等级、宠物修为增加而增强。' }
-                ],
-                qualities: {
-                    endurance: { current: 2700, min: 2700, max: 4300 },
-                    strength: { current: 900, min: 900, max: 2100 },
-                    faith: { current: 2700, min: 2700, max: 4300 },
-                    agility: { current: 6750, min: 6750, max: 9250 },
-                    intelligence: { current: 6750, min: 6750, max: 9250 },
                     mutated: false
                 }
             },
@@ -1037,14 +1094,14 @@
 
 const biographies = {
     yanzhi: [
-        "1️⃣——我叫胭脂，是被仙境之主选中的使者，肩负着寻找仙境之子的重任。仙境即将迎来16周年庆典，作为仙境的一部分，我从小便沐浴在仙气之中，学习各种仙术。为了完成这项任务，我必须离开熟悉的仙境，踏入人间。第一次踏上这片陌生的土地，我感受到人间的繁华与喧嚣，与仙境的宁静截然不同。按照仙境之主的指引，我需要找到那个具有仙境血脉的孩子，他将成为下一任仙境之主。我穿越山川河流，走过一个个村庄，时刻保持警惕，感受着空气中微弱的仙气。每一个黄昏，我都会找一个安静的地方，盘膝而坐，感受着来自远方的呼唤，希望能尽早找到他。",
-        "2️⃣——在一个宁静的小村庄，我感受到了一股强烈的仙气。这是我在凡间感受到最接近仙境的气息，我知道，我离目标已经很近了。村庄里的人们对我充满了好奇和善意，他们从未见过如此装束的人。我隐瞒了自己的身份，只说自己是个旅人。一天傍晚，我遇到了一位老人，他似乎知道我的来历和目的。他告诉我，村里有一个孩子，自小便与众不同，天生灵气逼人。这个孩子叫斑鸠，正是我苦苦寻找的仙境之子。我心中一阵狂喜，但也明白任务才刚刚开始。我要保护斑鸠，并教导他仙术，让他在16周年庆典上顺利接管仙人之位。",
-        "3️⃣——时间一天天过去，我与斑鸠在村庄里度过了许多美好的时光。我教他如何运用仙术，告诉他关于仙境的一切。斑鸠聪慧异常，很快掌握了基础的仙术。然而，我们的行动并不总是一帆风顺。人间的阴险与险恶远超我的预料，我们曾遭遇过邪恶势力的袭击，也曾被怀疑和排斥。但每一次困难都让我和斑鸠更加坚定。终于，在仙境16周年庆典的前夕，斑鸠已经成长为一个强大的仙术师。我们踏上了返回仙境的道路，迎接那一刻的到来。在庆典之夜，斑鸠顺利接管了仙人之位，而我也完成了自己的使命。看着他站在仙境之主的位置上，我感到无比的骄傲和欣慰。我的任务结束了，但我的故事仍在继续，我会继续守护这片仙境，等待新的挑战和冒险。"
+        "1️⃣————我叫胭脂，是被仙境之主选中的使者，肩负着寻找仙境之子的重任。仙境即将迎来16周年庆典，作为仙境的一部分，我从小便沐浴在仙气之中，学习各种仙术。为了完成这项任务，我必须离开熟悉的仙境，踏入人间。第一次踏上这片陌生的土地，我感受到人间的繁华与喧嚣，与仙境的宁静截然不同。按照仙境之主的指引，我需要找到那个具有仙境血脉的孩子，他将成为下一任仙境之主。我穿越山川河流，走过一个个村庄，时刻保持警惕，感受着空气中微弱的仙气。每一个黄昏，我都会找一个安静的地方，盘膝而坐，感受着来自远方的呼唤，希望能尽早找到他。",
+        "2️⃣————在一个宁静的小村庄，我感受到了一股强烈的仙气。这是我在凡间感受到最接近仙境的气息，我知道，我离目标已经很近了。村庄里的人们对我充满了好奇和善意，他们从未见过如此装束的人。我隐瞒了自己的身份，只说自己是个旅人。一天傍晚，我遇到了一位老人，他似乎知道我的来历和目的。他告诉我，村里有一个孩子，自小便与众不同，天生灵气逼人。这个孩子叫斑鸠，正是我苦苦寻找的仙境之子。我心中一阵狂喜，但也明白任务才刚刚开始。我要保护斑鸠，并教导他仙术，让他在16周年庆典上顺利接管仙人之位。",
+        "3️⃣————时间一天天过去，我与斑鸠在村庄里度过了许多美好的时光。我教他如何运用仙术，告诉他关于仙境的一切。斑鸠聪慧异常，很快掌握了基础的仙术。然而，我们的行动并不总是一帆风顺。人间的阴险与险恶远超我的预料，我们曾遭遇过邪恶势力的袭击，也曾被怀疑和排斥。但每一次困难都让我和斑鸠更加坚定。终于，在仙境16周年庆典的前夕，斑鸠已经成长为一个强大的仙术师。我们踏上了返回仙境的道路，迎接那一刻的到来。在庆典之夜，斑鸠顺利接管了仙人之位，而我也完成了自己的使命。看着他站在仙境之主的位置上，我感到无比的骄傲和欣慰。我的任务结束了，但我的故事仍在继续，我会继续守护这片仙境，等待新的挑战和冒险。"
     ],
     zhulin: [
-        "1️⃣——我叫蓝猫，是竹林中的隐士，以雷电之术闻名于世。很多人都说我性格豪爽，其实我只是不喜欢拐弯抹角，遇到事情总是直来直去。那一天，我正在竹林中修炼，忽然听到远处传来一阵喧闹声。循声望去，我看到一群山贼正在欺负一对父女。那女孩年纪轻轻，眼中却充满了无畏和愤怒，这让我心生敬意。豪爽之人岂能坐视不理？我飞身上前，手中雷电翻滚，只见雷光一闪，那群山贼已被击退。父女俩对我千恩万谢，我却只是挥了挥手，告诉他们：“走吧，这世道还是得靠自己保护自己。”",
-        "2️⃣——有一天，我收到一封信，是我多年未见的好友传来的。信中说，他所在的村子遭受了一伙邪恶修士的侵袭，急需援助。我二话不说，带上我的雷电之术，奔赴好友的村庄。到了那里，我发现情况比想象的更糟糕，那些邪恶修士使用黑魔法，村民们苦不堪言。我与好友并肩作战，毫不畏惧地冲进敌阵。我的雷电之术在战斗中大放异彩，一道道闪电劈向敌人，邪恶修士们一个个被击退。最终，我们成功击败了这些邪恶势力，村庄恢复了平静。好友握着我的手，感激地说：“蓝猫，你真是我一生的兄弟。”我拍了拍他的肩膀，豪爽地笑道：“兄弟有难，岂能不帮？这就是忠义！”",
-        "3️⃣——经历了无数次的战斗和冒险，我决定返回那片让我心安的竹林。竹林中宁静祥和，我喜欢在这里与自然为伴，修炼我的雷电之术。一天傍晚，我在竹林深处发现一个受伤的少年，他看起来很虚弱，但眼神中透着坚毅。我把他带回我的隐居之所，细心为他疗伤。少年醒来后告诉我，他叫小雷，正是因为仰慕我的雷电之术，才来竹林中寻找我。我见他心诚，决定收他为徒，传授他雷电之术。小雷的进步很快，他的豪爽性格也让我想起了年轻时的自己。我们师徒二人一起修炼，一起战斗，共同守护这片竹林。我的故事还在继续，而我的忠义和豪爽，也将在小雷身上传承下去。"
+        "1️⃣————我叫蓝猫，是竹林中的隐士，以雷电之术闻名于世。很多人都说我性格豪爽，其实我只是不喜欢拐弯抹角，遇到事情总是直来直去。那一天，我正在竹林中修炼，忽然听到远处传来一阵喧闹声。循声望去，我看到一群山贼正在欺负一对父女。那女孩年纪轻轻，眼中却充满了无畏和愤怒，这让我心生敬意。豪爽之人岂能坐视不理？我飞身上前，手中雷电翻滚，只见雷光一闪，那群山贼已被击退。父女俩对我千恩万谢，我却只是挥了挥手，告诉他们：“走吧，这世道还是得靠自己保护自己。”",
+        "2️⃣————有一天，我收到一封信，是我多年未见的好友传来的。信中说，他所在的村子遭受了一伙邪恶修士的侵袭，急需援助。我二话不说，带上我的雷电之术，奔赴好友的村庄。到了那里，我发现情况比想象的更糟糕，那些邪恶修士使用黑魔法，村民们苦不堪言。我与好友并肩作战，毫不畏惧地冲进敌阵。我的雷电之术在战斗中大放异彩，一道道闪电劈向敌人，邪恶修士们一个个被击退。最终，我们成功击败了这些邪恶势力，村庄恢复了平静。好友握着我的手，感激地说：“蓝猫，你真是我一生的兄弟。”我拍了拍他的肩膀，豪爽地笑道：“兄弟有难，岂能不帮？这就是忠义！”",
+        "3️⃣————经历了无数次的战斗和冒险，我决定返回那片让我心安的竹林。竹林中宁静祥和，我喜欢在这里与自然为伴，修炼我的雷电之术。一天傍晚，我在竹林深处发现一个受伤的少年，他看起来很虚弱，但眼神中透着坚毅。我把他带回我的隐居之所，细心为他疗伤。少年醒来后告诉我，他叫小雷，正是因为仰慕我的雷电之术，才来竹林中寻找我。我见他心诚，决定收他为徒，传授他雷电之术。小雷的进步很快，他的豪爽性格也让我想起了年轻时的自己。我们师徒二人一起修炼，一起战斗，共同守护这片竹林。我的故事还在继续，而我的忠义和豪爽，也将在小雷身上传承下去。"
     ],
     zhanshen: [
         "1️⃣——我总是想得太多。你们看到的是我一刀劈开山河，一脚踏碎虚空，但你们看不到的是我的思索。什么是力量的本质？那是对生命的敬畏和对死亡的理解。我燃烧着，不只是因为战斗，而是因为心中的火焰。我站在这座古老的神殿前，思索着宇宙的起源和人类的终极命运。每次挥剑，我都在问自己：生命的意义是什么？或许在红莲业火的光芒中，我找到了答案，那就是在战斗中找到自我，在毁灭中追寻重生。每一个敌人，每一个挑战，都是我对世界发出的质问，而我的刀刃，就是答案。",
@@ -1057,44 +1114,44 @@ const biographies = {
         "3️⃣——尽管腾蛇拯救了无数人，但它始终保持着低调，从不炫耀自己的功绩。在确定百姓们的生活恢复安定之后，腾蛇决定归隐山林。它飞回了自己曾经栖息的山谷，继续过着隐居的生活。然而，它的传奇故事在百姓中口口相传，成为了不朽的神话。每年春天，百姓们都会来到腾蛇的庙宇，举行盛大的祭祀仪式，纪念这位伟大的神兽。他们相信，腾蛇的精神永远守护着他们，使得王国永远繁荣昌盛。腾蛇的故事激励着一代又一代的人，告诉他们只要心怀正义，勇敢无畏，就能够战胜一切困难，创造奇迹。腾蛇虽然归隐，但它的名字将永远铭刻在历史的长河中，成为人们心中不灭的传奇。"
     ],
     qingmou: [
-        "1️⃣——我是虎子，江湖人称青眸白虎。自幼便与电火为伴，练就了烈光之术。我的技艺无人能及，行动如风，变幻莫测。这一天，我隐居在山中的修行被一阵喧嚣打断。我跃上树梢，看到山脚下一个村庄正遭受袭击。那些山贼猖獗无比，村民们无力反抗。我冷哼一声，雷电之力在掌中凝聚，一声怒吼，电火如龙般冲向山贼，瞬间将他们烧得落荒而逃。村民们看向我的目光充满敬畏，而我只是轻轻一跃，消失在茫茫竹林中。",
-        "2️⃣——江湖传言青眸白虎无影无踪，行踪飘忽。这次，我接受了一项极为隐秘的任务——潜入敌国，摧毁他们正在开发的秘密武器。夜色如墨，我化身黑影，悄然潜入敌国要塞。要塞守卫森严，但我如鬼魅般穿梭其间，烈光之术使我的身形更加迅捷。终于，我找到了那座秘密工厂，内部机关重重。我手中雷电之力暴涨，将所有阻拦我的敌人化为灰烬。火光映照下，我看到那武器已被摧毁，而我也在夜色掩护下，迅速离开，留下一片狼藉的战场。",
-        "3️⃣——我一直以为自己是孤独的战士，直到那天遇到了一个叫小虎的少年。他在一次战斗中目睹了我的烈光之术，便执意要拜我为师。我见他天资聪颖，便决定传授他我的技艺。我们在深山中隐居，白日里他勤学苦练，夜晚则跟随我行走江湖。一次，我们遇到了一伙邪教徒，他们妄图统治江湖。我和小虎并肩作战，烈光之术在黑夜中闪耀，我们的合作天衣无缝。最终，邪教徒被我们彻底击败。看着小虎从一个稚嫩的少年成长为独当一面的侠客，我感到无比自豪。烈光之术在他手中愈发强大，而我，也终于找到了一生的传承。"
+        "1️⃣————我是虎子，江湖人称青眸白虎。自幼便与电火为伴，练就了烈光之术。我的技艺无人能及，行动如风，变幻莫测。这一天，我隐居在山中的修行被一阵喧嚣打断。我跃上树梢，看到山脚下一个村庄正遭受袭击。那些山贼猖獗无比，村民们无力反抗。我冷哼一声，雷电之力在掌中凝聚，一声怒吼，电火如龙般冲向山贼，瞬间将他们烧得落荒而逃。村民们看向我的目光充满敬畏，而我只是轻轻一跃，消失在茫茫竹林中。",
+        "2️⃣————江湖传言青眸白虎无影无踪，行踪飘忽。这次，我接受了一项极为隐秘的任务——潜入敌国，摧毁他们正在开发的秘密武器。夜色如墨，我化身黑影，悄然潜入敌国要塞。要塞守卫森严，但我如鬼魅般穿梭其间，烈光之术使我的身形更加迅捷。终于，我找到了那座秘密工厂，内部机关重重。我手中雷电之力暴涨，将所有阻拦我的敌人化为灰烬。火光映照下，我看到那武器已被摧毁，而我也在夜色掩护下，迅速离开，留下一片狼藉的战场。",
+        "3️⃣————我一直以为自己是孤独的战士，直到那天遇到了一个叫小虎的少年。他在一次战斗中目睹了我的烈光之术，便执意要拜我为师。我见他天资聪颖，便决定传授他我的技艺。我们在深山中隐居，白日里他勤学苦练，夜晚则跟随我行走江湖。一次，我们遇到了一伙邪教徒，他们妄图统治江湖。我和小虎并肩作战，烈光之术在黑夜中闪耀，我们的合作天衣无缝。最终，邪教徒被我们彻底击败。看着小虎从一个稚嫩的少年成长为独当一面的侠客，我感到无比自豪。烈光之术在他手中愈发强大，而我，也终于找到了一生的传承。"
     ],
     jingjue: [
-        "1️⃣——我的故事始于战火纷飞的年代，那时的我，胸怀大志，立誓要结束乱世，重建和平。我从小就展现出非凡的武艺，力拔山兮气盖世。很快，我便在众多将士中崭露头角，成为了众人敬仰的英雄。随着战争的不断推进，我的声名远播，所向披靡，敌人闻风丧胆。然而，越是接近胜利，我心中那份不安却越发强烈。江山虽近，但我却总感觉命运在我身后静静注视，等待着最后的审判。",
-        "2️⃣——战争如火如荼，最终迎来了决定性的一战。我率领军队与敌军决战于乌江，敌我双方都已筋疲力尽，胜负只在一线之间。就在此时，传来了爱姬虞姬被困的消息。我心如刀割，但战场上无暇顾及，唯有将胜负寄托于一场豪赌。激战正酣，敌军援兵赶到，我军节节败退。我挥舞着巨大的战刀，试图挽回败局，但终究力不从心。爱姬虞姬见状，毅然决然地以剑自刎，她的鲜血洒满战场，仿佛在诉说我们未尽的情缘。那一刻，我的心彻底碎了，英雄的梦也随之破灭。",
-        "3️⃣——大势已去，军队溃散，乌江的流水似在为我哀鸣。身边仅剩数十骑忠勇之士，我却明白已无力回天。面对无尽的敌军，我毅然决定结束这场悲剧。拔出佩剑，我站在乌江边，望着那滚滚江水，回忆起往昔的荣光与爱姬的笑颜。战士们劝我渡江逃生，但我岂能苟且偷生，留下千古骂名？“力拔山兮气盖世，时不利兮骓不逝。骓不逝兮可奈何？虞兮虞兮奈若何！”一声长叹，我纵身跃入江中，结束了自己悲壮的一生。江水吞噬了我的身体，却无法淹没我的传说。净角神将，虽败犹荣，化作江上一抹不灭的英雄魂魄。"
+        "1️⃣————我的故事始于战火纷飞的年代，那时的我，胸怀大志，立誓要结束乱世，重建和平。我从小就展现出非凡的武艺，力拔山兮气盖世。很快，我便在众多将士中崭露头角，成为了众人敬仰的英雄。随着战争的不断推进，我的声名远播，所向披靡，敌人闻风丧胆。然而，越是接近胜利，我心中那份不安却越发强烈。江山虽近，但我却总感觉命运在我身后静静注视，等待着最后的审判。",
+        "2️⃣————战争如火如荼，最终迎来了决定性的一战。我率领军队与敌军决战于乌江，敌我双方都已筋疲力尽，胜负只在一线之间。就在此时，传来了爱姬虞姬被困的消息。我心如刀割，但战场上无暇顾及，唯有将胜负寄托于一场豪赌。激战正酣，敌军援兵赶到，我军节节败退。我挥舞着巨大的战刀，试图挽回败局，但终究力不从心。爱姬虞姬见状，毅然决然地以剑自刎，她的鲜血洒满战场，仿佛在诉说我们未尽的情缘。那一刻，我的心彻底碎了，英雄的梦也随之破灭。",
+        "3️⃣————大势已去，军队溃散，乌江的流水似在为我哀鸣。身边仅剩数十骑忠勇之士，我却明白已无力回天。面对无尽的敌军，我毅然决定结束这场悲剧。拔出佩剑，我站在乌江边，望着那滚滚江水，回忆起往昔的荣光与爱姬的笑颜。战士们劝我渡江逃生，但我岂能苟且偷生，留下千古骂名？“力拔山兮气盖世，时不利兮骓不逝。骓不逝兮可奈何？虞兮虞兮奈若何！”一声长叹，我纵身跃入江中，结束了自己悲壮的一生。江水吞噬了我的身体，却无法淹没我的传说。净角神将，虽败犹荣，化作江上一抹不灭的英雄魂魄。"
     ],
     shanggu: [
-        "1️⃣——曾经，亿万年前大地神树的一根枝蔓，满载着神力降临人间，我便是那上古的神藤。那时的大地，还是一片原始的净土，生机盎然。作为大地神树的一部分，我见证了万物的诞生与成长，感受着生命的脉动和自然的和谐。我们的神树根系深深扎入大地，与大地融为一体，吸收着宇宙的精华。每当晨曦初现，我会感受到第一缕阳光的温暖；每当夜幕降临，我会聆听星辰的低语。我的存在，承载着大地的祝福与希望。然而，随着时间的流逝，我也开始目睹生灵的苦难和悲欢离合，这让我心生悲悯，决心用我的神力庇护众生。",
-        "2️⃣——时光荏苒，宇宙间沧海桑田，大地不断变迁。曾经的净土变得繁华，而繁华之后又归于寂静。无数次的轮回，我依然屹立不倒，静静守护着这片大地。某一天，人类文明兴起，他们建造了高楼大厦，开垦了田野，但也带来了战争和破坏。我亲眼目睹了无数生灵的离散与凋零，内心无比痛苦。我用神力修复着大地的创伤，用藤蔓庇护着无助的生命。我曾将一个受伤的孩子紧紧拥入怀中，用我的藤蔓疗愈他的伤痛。孩子露出了纯真的笑容，那一刻，我感受到自己存在的意义。然而，这种短暂的宁静很快被新的战争打破，悲剧一次次上演，我的悲悯之心也愈发深沉。",
-        "3️⃣——亿万年的岁月过去，我的藤蔓早已成为大地的一部分，与这片土地密不可分。我见证了文明的兴衰，感受着自然的无常，但我的心依然充满了对生命的热爱和对和平的渴望。即使在最黑暗的时刻，我也未曾放弃希望。每当春天来临，我的枝蔓会绽放出美丽的花朵，为大地带来生机。无数次的轮回中，我学会了与时间共舞，学会了在悲痛中寻找美好。我知道，自己的使命永远不会结束，因为只要这片大地还在，只要还有生灵需要庇护，我就会一直守护下去。即使宇宙再度轮回，我的悲悯之心也将永远不变，成为大地上最温柔、最坚定的守护者。"
+        "1️⃣————曾经，亿万年前大地神树的一根枝蔓，满载着神力降临人间，我便是那上古的神藤。那时的大地，还是一片原始的净土，生机盎然。作为大地神树的一部分，我见证了万物的诞生与成长，感受着生命的脉动和自然的和谐。我们的神树根系深深扎入大地，与大地融为一体，吸收着宇宙的精华。每当晨曦初现，我会感受到第一缕阳光的温暖；每当夜幕降临，我会聆听星辰的低语。我的存在，承载着大地的祝福与希望。然而，随着时间的流逝，我也开始目睹生灵的苦难和悲欢离合，这让我心生悲悯，决心用我的神力庇护众生。",
+        "2️⃣————时光荏苒，宇宙间沧海桑田，大地不断变迁。曾经的净土变得繁华，而繁华之后又归于寂静。无数次的轮回，我依然屹立不倒，静静守护着这片大地。某一天，人类文明兴起，他们建造了高楼大厦，开垦了田野，但也带来了战争和破坏。我亲眼目睹了无数生灵的离散与凋零，内心无比痛苦。我用神力修复着大地的创伤，用藤蔓庇护着无助的生命。我曾将一个受伤的孩子紧紧拥入怀中，用我的藤蔓疗愈他的伤痛。孩子露出了纯真的笑容，那一刻，我感受到自己存在的意义。然而，这种短暂的宁静很快被新的战争打破，悲剧一次次上演，我的悲悯之心也愈发深沉。",
+        "3️⃣————亿万年的岁月过去，我的藤蔓早已成为大地的一部分，与这片土地密不可分。我见证了文明的兴衰，感受着自然的无常，但我的心依然充满了对生命的热爱和对和平的渴望。即使在最黑暗的时刻，我也未曾放弃希望。每当春天来临，我的枝蔓会绽放出美丽的花朵，为大地带来生机。无数次的轮回中，我学会了与时间共舞，学会了在悲痛中寻找美好。我知道，自己的使命永远不会结束，因为只要这片大地还在，只要还有生灵需要庇护，我就会一直守护下去。即使宇宙再度轮回，我的悲悯之心也将永远不变，成为大地上最温柔、最坚定的守护者。"
     ],
     guhe: [
-        "1️⃣——我是古河锦鲤，三途川的引导者，负责带领不安的亡魂找到安息之地。每天，我在这幽深的河流中游弋，用催眠的力量平息亡魂的痛苦。见证了无数次的生死离别，我的心渐渐麻木，仿佛一切都变得无关紧要。亡魂们的哭泣与哀号，在我的耳中如同风过耳畔，来去无痕。我只机械地履行着我的职责，仿佛一具没有情感的傀儡。曾几何时，我也是如此充满激情，但如今的我，只剩下冰冷的职责。",
-        "2️⃣——某天，我遇到了一个特别的亡魂，她是一个年轻的女子，生前为了救她的孩子而不幸身亡。她的魂魄充满了不舍和牵挂。我的催眠术竟然对她无效，她的真情打破了我的防线。女子恳求我，让她再见孩子一面，我被她的真情所感动，破例帮助她完成了这个心愿。她与孩子的重逢充满了泪水与温情，这一幕深深触动了我的心。渐渐地，我感觉到心中那份久违的温暖与柔情。",
-        "3️⃣——自从那次帮助亡魂重逢后，我开始重新审视自己的职责。虽然我依旧是三途川的引导者，但每一次的引导，我都会用心去聆听亡魂们的故事。人间的真情再次唤醒了我的感受，让我不再只是冷漠的引导者。我明白，正是这些真挚的情感，才使得生死轮回不再那么冰冷。我决定，用我的力量不仅仅是引导，更要安抚这些亡魂，让他们在离开人间前，感受到最后一丝温暖与关怀。我的使命不再只是引导，而是带来希望与安慰。"
+        "1️⃣————我是古河锦鲤，三途川的引导者，负责带领不安的亡魂找到安息之地。每天，我在这幽深的河流中游弋，用催眠的力量平息亡魂的痛苦。见证了无数次的生死离别，我的心渐渐麻木，仿佛一切都变得无关紧要。亡魂们的哭泣与哀号，在我的耳中如同风过耳畔，来去无痕。我只机械地履行着我的职责，仿佛一具没有情感的傀儡。曾几何时，我也是如此充满激情，但如今的我，只剩下冰冷的职责。",
+        "2️⃣————某天，我遇到了一个特别的亡魂，她是一个年轻的女子，生前为了救她的孩子而不幸身亡。她的魂魄充满了不舍和牵挂。我的催眠术竟然对她无效，她的真情打破了我的防线。女子恳求我，让她再见孩子一面，我被她的真情所感动，破例帮助她完成了这个心愿。她与孩子的重逢充满了泪水与温情，这一幕深深触动了我的心。渐渐地，我感觉到心中那份久违的温暖与柔情。",
+        "3️⃣————自从那次帮助亡魂重逢后，我开始重新审视自己的职责。虽然我依旧是三途川的引导者，但每一次的引导，我都会用心去聆听亡魂们的故事。人间的真情再次唤醒了我的感受，让我不再只是冷漠的引导者。我明白，正是这些真挚的情感，才使得生死轮回不再那么冰冷。我决定，用我的力量不仅仅是引导，更要安抚这些亡魂，让他们在离开人间前，感受到最后一丝温暖与关怀。我的使命不再只是引导，而是带来希望与安慰。"
     ],
     banlan: [
-        "1️⃣——斑斓公主，人们亲切地称她为虎妞，是苏州村民抚养长大的神虎化身。她天生具有破军神力，但因不懂得控制，经常好心办坏事。一次洪水突袭村庄，虎妞想用力量筑坝，但用力过猛，反而加剧了灾难。村民们虽没有责怪她，但她心中满是愧疚。这次经历让她明白，光有力量是不够的，还需要智慧和技巧。于是，她开始学习如何更好地控制自己的神力，立志为村民们做真正有益的事情。",
-        "2️⃣——在村中一位智者的指导下，虎妞开始了她的学习之旅。智者教导她如何精确控制力量，如何在关键时刻保持冷静。一天，村庄受到一群强盗的袭击，村民们惶恐不安。虎妞不再像以前那样只靠蛮力冲锋，而是冷静地分析敌情，利用学到的技巧巧妙制服了强盗。村民们见她如此英勇又智慧，纷纷为她喝彩。这次胜利让虎妞意识到，真正的英雄不仅需要强大的力量，还需要冷静的头脑和对力量的掌控。",
-        "3️⃣——村外山中出现了一只巨大的恶兽，威胁着村民们的安全。虎妞决心前往应战。经过长时间的修炼和实践，她已经能够自如地控制破军神力。面对恶兽，她设下巧妙的陷阱，将恶兽引入陷阱之中，然后用精准的力量将其制服。村民们为她欢呼，称赞她不仅有强大的力量，还有保护他们的智慧和勇气。从那天起，虎妞不再是那个好心办坏事的斑斓公主，而是村民们心目中真正的守护者，真正的英雄。她用自己的行动，赢得了所有人的信任和尊敬。"
+        "1️⃣————斑斓公主，人们亲切地称她为虎妞，是苏州村民抚养长大的神虎化身。她天生具有破军神力，但因不懂得控制，经常好心办坏事。一次洪水突袭村庄，虎妞想用力量筑坝，但用力过猛，反而加剧了灾难。村民们虽没有责怪她，但她心中满是愧疚。这次经历让她明白，光有力量是不够的，还需要智慧和技巧。于是，她开始学习如何更好地控制自己的神力，立志为村民们做真正有益的事情。",
+        "2️⃣————在村中一位智者的指导下，虎妞开始了她的学习之旅。智者教导她如何精确控制力量，如何在关键时刻保持冷静。一天，村庄受到一群强盗的袭击，村民们惶恐不安。虎妞不再像以前那样只靠蛮力冲锋，而是冷静地分析敌情，利用学到的技巧巧妙制服了强盗。村民们见她如此英勇又智慧，纷纷为她喝彩。这次胜利让虎妞意识到，真正的英雄不仅需要强大的力量，还需要冷静的头脑和对力量的掌控。",
+        "3️⃣————村外山中出现了一只巨大的恶兽，威胁着村民们的安全。虎妞决心前往应战。经过长时间的修炼和实践，她已经能够自如地控制破军神力。面对恶兽，她设下巧妙的陷阱，将恶兽引入陷阱之中，然后用精准的力量将其制服。村民们为她欢呼，称赞她不仅有强大的力量，还有保护他们的智慧和勇气。从那天起，虎妞不再是那个好心办坏事的斑斓公主，而是村民们心目中真正的守护者，真正的英雄。她用自己的行动，赢得了所有人的信任和尊敬。"
     ],
     juling: [
-        "1️⃣——巨灵战姬，自幼便展现出非凡的战斗天赋。但她内心深处总有一种孤独感，仿佛缺失了什么。一天，她在古老的森林中迷失，偶然遇到了一位沉睡的巨灵神。巨灵神从沉睡中苏醒，目光中充满了温柔与力量。巨灵战姬感受到一股前所未有的亲切感，仿佛找到了命中注定的伙伴。巨灵神低声说道：“你就是我等待的战士，我们的命运已然交织。”就这样，巨灵战姬与巨灵神缔结了生命之契，从此她不再孤单，拥有了无尽的勇气与力量。",
-        "2️⃣——缔结契约后，巨灵战姬与巨灵神开始了他们的冒险旅程。某日，邪恶势力袭击了一个小村庄，巨灵战姬毫不犹豫地站了出来，迎战强敌。巨灵神在她身后漂浮，为她提供无尽的力量和护盾。面对妖邪的攻击，她毫不退缩，勇敢地保护着村民们。巨灵神的力量与她完美结合，形成一道坚不可摧的屏障。最终，邪恶势力被击败，村民们得救了。巨灵战姬深知，这是她与巨灵神的默契与信任，让她能够无畏地面对一切挑战。",
-        "3️⃣——随着时间的推移，巨灵战姬和巨灵神的默契愈发深厚。一次，她们面对一个强大的古老恶灵，恶灵的力量足以摧毁一切。巨灵战姬深知此战凶险，但她坚定地站在最前线。巨灵神在她身后闪耀着光芒，给予她无尽的勇气。两人联手，经过一场惊心动魄的激战，终于将恶灵封印。战斗结束后，巨灵战姬看着巨灵神，感受到契约的力量愈加深厚。她明白，无论未来多么险恶，她们的契约将永远不朽，巨灵神将一直陪伴在她身边，守护她，也守护着她所爱的一切。"
+        "1️⃣————巨灵战姬，自幼便展现出非凡的战斗天赋。但她内心深处总有一种孤独感，仿佛缺失了什么。一天，她在古老的森林中迷失，偶然遇到了一位沉睡的巨灵神。巨灵神从沉睡中苏醒，目光中充满了温柔与力量。巨灵战姬感受到一股前所未有的亲切感，仿佛找到了命中注定的伙伴。巨灵神低声说道：“你就是我等待的战士，我们的命运已然交织。”就这样，巨灵战姬与巨灵神缔结了生命之契，从此她不再孤单，拥有了无尽的勇气与力量。",
+        "2️⃣————缔结契约后，巨灵战姬与巨灵神开始了他们的冒险旅程。某日，邪恶势力袭击了一个小村庄，巨灵战姬毫不犹豫地站了出来，迎战强敌。巨灵神在她身后漂浮，为她提供无尽的力量和护盾。面对妖邪的攻击，她毫不退缩，勇敢地保护着村民们。巨灵神的力量与她完美结合，形成一道坚不可摧的屏障。最终，邪恶势力被击败，村民们得救了。巨灵战姬深知，这是她与巨灵神的默契与信任，让她能够无畏地面对一切挑战。",
+        "3️⃣————随着时间的推移，巨灵战姬和巨灵神的默契愈发深厚。一次，她们面对一个强大的古老恶灵，恶灵的力量足以摧毁一切。巨灵战姬深知此战凶险，但她坚定地站在最前线。巨灵神在她身后闪耀着光芒，给予她无尽的勇气。两人联手，经过一场惊心动魄的激战，终于将恶灵封印。战斗结束后，巨灵战姬看着巨灵神，感受到契约的力量愈加深厚。她明白，无论未来多么险恶，她们的契约将永远不朽，巨灵神将一直陪伴在她身边，守护她，也守护着她所爱的一切。"
     ],
     aoshi: [
-        "1️⃣——敖十七是龙王的第十七个孩子，虽年纪尚小，但心中充满了对外界的好奇。一天，他决定离开龙宫，开始他的第一次冒险。敖十七飞越山川湖海，来到了一片美丽的森林。在那里，他遇到了一群被困的精灵，受到恶龙的威胁。敖十七毫不犹豫地出手相助，他用龙息驱散了恶龙，救出了精灵。精灵们感激不尽，为他献上了魔法之花。这次冒险让敖十七明白了勇气与善良的意义，也让他在精灵们的心中留下了深刻的印象。",
-        "2️⃣——在一次旅行中，敖十七来到了一个古老的城镇。镇上的人们正在为解决一道古老的谜题而烦恼，这道谜题已经困扰了他们几代人。敖十七听闻后，决定一试。他静心观察，运用自己在龙宫学到的智慧，最终成功解开了谜题。镇民们无比惊喜，为他举行了盛大的庆典。敖十七不仅得到了丰厚的奖励，更赢得了人们的敬佩。这次经历让他明白，智慧同样是一种强大的力量。",
-        "3️⃣——在一片浩瀚的沙漠，敖十七听闻有一座被诅咒的城市。许多勇者前去探险，却无一生还。敖十七决定前去一探究竟。经过长途跋涉，他终于找到这座城市，并发现了隐藏在其中的黑暗力量。敖十七用龙鳞反射出耀眼的光芒，驱散了黑暗，解除了诅咒。被拯救的城市恢复了生机，居民们为他树立了纪念碑，称他为“勇者之龙”。敖十七的名声传遍了四方，他的勇气与智慧也在每一段旅程中不断增长。通过这些经历，他渐渐成长为一位真正的龙族英雄。"
+        "1️⃣————敖十七是龙王的第十七个孩子，虽年纪尚小，但心中充满了对外界的好奇。一天，他决定离开龙宫，开始他的第一次冒险。敖十七飞越山川湖海，来到了一片美丽的森林。在那里，他遇到了一群被困的精灵，受到恶龙的威胁。敖十七毫不犹豫地出手相助，他用龙息驱散了恶龙，救出了精灵。精灵们感激不尽，为他献上了魔法之花。这次冒险让敖十七明白了勇气与善良的意义，也让他在精灵们的心中留下了深刻的印象。",
+        "2️⃣————在一次旅行中，敖十七来到了一个古老的城镇。镇上的人们正在为解决一道古老的谜题而烦恼，这道谜题已经困扰了他们几代人。敖十七听闻后，决定一试。他静心观察，运用自己在龙宫学到的智慧，最终成功解开了谜题。镇民们无比惊喜，为他举行了盛大的庆典。敖十七不仅得到了丰厚的奖励，更赢得了人们的敬佩。这次经历让他明白，智慧同样是一种强大的力量。",
+        "3️⃣————在一片浩瀚的沙漠，敖十七听闻有一座被诅咒的城市。许多勇者前去探险，却无一生还。敖十七决定前去一探究竟。经过长途跋涉，他终于找到这座城市，并发现了隐藏在其中的黑暗力量。敖十七用龙鳞反射出耀眼的光芒，驱散了黑暗，解除了诅咒。被拯救的城市恢复了生机，居民们为他树立了纪念碑，称他为“勇者之龙”。敖十七的名声传遍了四方，他的勇气与智慧也在每一段旅程中不断增长。通过这些经历，他渐渐成长为一位真正的龙族英雄。"
     ],
     daming: [
-        "1️⃣——妲茗儿因在天宫捣药出错，被嫦娥仙子罚下凡间修行。她精通医术，尤其擅长解毒疗伤。一天，她在林中采药时遇到了受伤的侠客皇甫云。妲茗儿悉心照料，利用自己的医术为他解毒疗伤。皇甫云感激不已，两人因此结下深厚友谊。妲茗儿仰慕侠之大者，决定跟随皇甫云，贴心辅佐他行侠仗义。两人行走江湖，妲茗儿不仅治愈了许多受伤的百姓，还在关键时刻帮助皇甫云化险为夷。她逐渐成为皇甫云不可或缺的伙伴。",
-        "2️⃣——皇甫云接到朝廷委托，要摧毁一个盘踞在深山中的凶兽群。妲茗儿与他一同前往。途中，他们遭遇了凶兽头领设下的埋伏，皇甫云身中剧毒，命悬一线。妲茗儿毫不犹豫地用自己体内的仙灵之气为他解毒，但这种解毒方法会让她自身的修为大减，甚至有生命危险。她毅然决然地为皇甫云疗伤，最终皇甫云苏醒过来，而妲茗儿却因耗尽仙灵之气陷入昏迷。皇甫云看着昏迷不醒的妲茗儿，心中感激涌动，发誓要保护她一生一世。",
-        "3️⃣——妲茗儿的善行最终传到了嫦娥仙子的耳中，嫦娥被她的诚心所感动，决定原谅她，召她回天宫。然而，妲茗儿却已心有所属。她对嫦娥仙子表达了自己对皇甫云的敬仰与爱慕，决心留在凡间，继续与皇甫云并肩行侠仗义。嫦娥仙子理解她的选择，祝福她在人间找到真正的幸福。妲茗儿与皇甫云继续他们的江湖之旅，救助弱小，惩恶扬善，成为了江湖中人人敬仰的一对侠侣。妲茗儿用自己的行动证明了，即使身处凡间，也能实现心中的梦想与使命。"
+        "1️⃣————妲茗儿因在天宫捣药出错，被嫦娥仙子罚下凡间修行。她精通医术，尤其擅长解毒疗伤。一天，她在林中采药时遇到了受伤的侠客皇甫云。妲茗儿悉心照料，利用自己的医术为他解毒疗伤。皇甫云感激不已，两人因此结下深厚友谊。妲茗儿仰慕侠之大者，决定跟随皇甫云，贴心辅佐他行侠仗义。两人行走江湖，妲茗儿不仅治愈了许多受伤的百姓，还在关键时刻帮助皇甫云化险为夷。她逐渐成为皇甫云不可或缺的伙伴。",
+        "2️⃣————皇甫云接到朝廷委托，要摧毁一个盘踞在深山中的凶兽群。妲茗儿与他一同前往。途中，他们遭遇了凶兽头领设下的埋伏，皇甫云身中剧毒，命悬一线。妲茗儿毫不犹豫地用自己体内的仙灵之气为他解毒，但这种解毒方法会让她自身的修为大减，甚至有生命危险。她毅然决然地为皇甫云疗伤，最终皇甫云苏醒过来，而妲茗儿却因耗尽仙灵之气陷入昏迷。皇甫云看着昏迷不醒的妲茗儿，心中感激涌动，发誓要保护她一生一世。",
+        "3️⃣————妲茗儿的善行最终传到了嫦娥仙子的耳中，嫦娥被她的诚心所感动，决定原谅她，召她回天宫。然而，妲茗儿却已心有所属。她对嫦娥仙子表达了自己对皇甫云的敬仰与爱慕，决心留在凡间，继续与皇甫云并肩行侠仗义。嫦娥仙子理解她的选择，祝福她在人间找到真正的幸福。妲茗儿与皇甫云继续他们的江湖之旅，救助弱小，惩恶扬善，成为了江湖中人人敬仰的一对侠侣。妲茗儿用自己的行动证明了，即使身处凡间，也能实现心中的梦想与使命。"
     ]
 };
 
@@ -1221,9 +1278,9 @@ function useSupremeWisdomPill() {
     if (jinnangItems.supremeWisdomPill > 0) {
         jinnangItems.supremeWisdomPill--;
         currentWisdom = 20;
-        petWisdom = 20; // 同步更新petWisdom
         updateJinnangItems();
-        updatePetWisdom();
+        updateAttributePanel();
+        document.getElementById("current-wisdom").innerText = currentWisdom;
         alert("您使用了举世无双悟性丹，宠物的悟性已提升至20！");
     } else {
         alert("您没有举世无双悟性丹，无法将宠物瞬间提升到20悟性！");
@@ -1232,7 +1289,7 @@ function useSupremeWisdomPill() {
 
 let petLevel = 1;
 let petMaxLevel = 160;
-let petWisdom = 0; // 假设初始悟性为20
+let petWisdom = 0; 
 let petAscended = false;
 
 function absorbExperience() {
@@ -1375,11 +1432,6 @@ function updateJinnangItems() {
     }
 }
 
-    function updatePetWisdom() {
-        document.getElementById("current-wisdom").innerText = petWisdom;
-        document.getElementById("attribute-wisdom").innerText = petWisdom; // 更新属性面板中的悟性
-    }
-
 function getItemName(item) {
     switch (item) {
         case 'normalExperienceBook':
@@ -1432,7 +1484,7 @@ function getItemImage(item) {
 }
 
 let selectedTreasure = null;
-let reward = null;
+let rewards = [];
 
 function toggleTreasureDrawer() {
     const drawer = document.getElementById('treasure-drawer');
@@ -1470,38 +1522,63 @@ function openTreasure() {
         alert("金子不足！");
         return;
     }
+
+    // 自动收集上次未取出的奖品
+    collectTreasure();
+
     goldAmount -= getTreasureCost(selectedTreasure);
     document.getElementById("gold-amount").innerText = goldAmount;
 
-    reward = getRandomReward(selectedTreasure);
-    document.getElementById('treasure-reward').innerHTML = `<img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div>`;
+    // 根据概率随机生成 1~3 个奖品
+    let rewardCount;
+    const random = Math.random() * 100;
+    if (random < 95) {
+        rewardCount = 1;
+    } else if (random < 99) {
+        rewardCount = 2;
+    } else {
+        rewardCount = 3;
+    }
+
+    rewards = [];
+    for (let i = 0; i < rewardCount; i++) {
+        rewards.push(getRandomReward(selectedTreasure));
+    }
+
+    // 更新页面显示多个奖品
+    let rewardHTML = '';
+    for (const reward of rewards) {
+        rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
+    }
+    document.getElementById('treasure-reward').innerHTML = rewardHTML;
 }
 
 function collectTreasure() {
-    if (!reward) {
-        alert("没有奖品可取！");
+    if (rewards.length === 0) {
         return;
     }
 
-    switch (reward.name) {
-        case '普通经验书':
-        case '高级经验书':
-        case '飞升之石':
-        case '举世无双悟性丹':
-        case '闪耀之灵':
-        case '颤抖之灵':
-        case '发光之灵':
-        case '活跃之灵':
-        case '跳动之灵':
-            addItemToJinnang(reward); // 添加新道具到锦囊
-            break;
-        default:
-            addItemToTopBar(reward);
-            break;
+    for (const reward of rewards) {
+        switch (reward.name) {
+            case '普通经验书':
+            case '高级经验书':
+            case '飞升之石':
+            case '举世无双悟性丹':
+            case '闪耀之灵':
+            case '颤抖之灵':
+            case '发光之灵':
+            case '活跃之灵':
+            case '跳动之灵':
+                addItemToJinnang(reward); // 添加新道具到锦囊
+                break;
+            default:
+                addItemToTopBar(reward);
+                break;
+        }
     }
 
     // 清空奖品
-    reward = null;
+    rewards = [];
     document.getElementById('treasure-reward').innerHTML = "";
 }
 
@@ -1558,6 +1635,7 @@ function selectReward(rewardList) {
     }
 }
 
+
 function addItemToTopBar(item) {
     switch (item.name) {
         case '普通经验书':
@@ -1597,16 +1675,41 @@ function addItemToTopBar(item) {
     updateTopBarItems();
 }
 
-        function toggleAttributeDrawer() {
-            const drawer = document.getElementById('attribute-drawer');
-            const info = document.getElementById('attribute-info');
-            drawer.classList.toggle('open');
-            info.classList.toggle('open');
-            updateAttributePanel();
-        }
+function toggleAttributeDrawer() {
+    const drawer = document.getElementById('attribute-drawer');
+    const info = document.getElementById('attribute-info');
+    drawer.classList.toggle('open');
+    info.classList.toggle('open');
+    updateAttributePanel();
+}
 
 function refreshAttributes() {
     updateAttributePanel();
+}
+        
+function calculateAttribute(currentValue, growthRate) {
+    return Math.floor((currentValue / 2000) * growthRate * 4* petLevel);
+}
+        
+function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
+    // 基于当前悟性计算递增倍率
+    const multiplier = 1 + (currentWisdom * 0.005);
+
+    const endurance = currentAttributes.endurance;
+    const intelligence = currentAttributes.intelligence;
+    const strength = currentAttributes.strength;
+    const agility = currentAttributes.agility;
+    const faith = currentAttributes.faith;
+
+    return {
+        health: Math.floor((endurance * 24 + intelligence * 1 + strength * 2 + agility * 3 + faith * 3) * multiplier),
+        mana: Math.floor((endurance * 1 + intelligence * 10 + strength * 2 + agility * 2 + faith * 2) * multiplier),
+        physicalAttack: Math.floor((endurance * 0.1 + intelligence * 0.1 + strength * 2.2 + agility * 0.2 + faith * 0.2) * multiplier),
+        physicalDefense: Math.floor((endurance * 0.1 + intelligence * 0.1 + strength * 0.2 + agility * 0.2 + faith * 2.2) * multiplier),
+        magicAttack: Math.floor((endurance * 0 + intelligence * 1.7 + strength * 0 + agility * 0 + faith * 0) * multiplier),
+        magicDefense: Math.floor((endurance * 2.2 + intelligence * 0 + strength * 0 + agility * 0 + faith * 0) * multiplier),
+        speed: Math.floor((endurance * 0.2 + intelligence * 0.1 + strength * 0.2 + agility * 2 + faith * 0.2) * multiplier),
+    };
 }
 
 function updateAttributePanel() {
@@ -1614,27 +1717,68 @@ function updateAttributePanel() {
     const qualities = pet.qualities;
     const growthRate = qualities.growthRate / 100;
 
+    const currentAttributes = {
+        endurance: calculateAttribute(qualities.endurance.current, growthRate),
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate),
+        strength: calculateAttribute(qualities.strength.current, growthRate),
+        agility: calculateAttribute(qualities.agility.current, growthRate),
+        faith: calculateAttribute(qualities.faith.current, growthRate)
+    };
+
     document.getElementById("attribute-tier").innerText = qualities.tier;
     document.getElementById("attribute-growth-rate").innerText = qualities.growthRate + "%";
     document.getElementById("attribute-wisdom").innerText = currentWisdom; // 确保使用currentWisdom
-    document.getElementById("attribute-endurance").innerText = calculateAttribute(qualities.endurance.current, growthRate);
-    document.getElementById("attribute-intelligence").innerText = calculateAttribute(qualities.intelligence.current, growthRate);
-    document.getElementById("attribute-strength").innerText = calculateAttribute(qualities.strength.current, growthRate);
-    document.getElementById("attribute-agility").innerText = calculateAttribute(qualities.agility.current, growthRate);
-    document.getElementById("attribute-faith").innerText = calculateAttribute(qualities.faith.current, growthRate);
+    document.getElementById("attribute-endurance").innerText = currentAttributes.endurance;
+    document.getElementById("attribute-intelligence").innerText = currentAttributes.intelligence;
+    document.getElementById("attribute-strength").innerText = currentAttributes.strength;
+    document.getElementById("attribute-agility").innerText = currentAttributes.agility;
+    document.getElementById("attribute-faith").innerText = currentAttributes.faith;
+
+    // 计算并更新二级属性
+    const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
+    const wisdomBonus = currentWisdom * 0.5;
+
+    document.getElementById("secondary-health").innerText = secondaryAttributes.health;
+    const healthBonusElement = document.getElementById("secondary-health-bonus");
+    healthBonusElement.innerText = `(+${wisdomBonus}%)`;
+    healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
+    const manaBonusElement = document.getElementById("secondary-mana-bonus");
+    manaBonusElement.innerText = `(+${wisdomBonus}%)`;
+    manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
+    const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
+    physicalAttackBonusElement.innerText = `(+${wisdomBonus}%)`;
+    physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
+    const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
+    physicalDefenseBonusElement.innerText = `(+${wisdomBonus}%)`;
+    physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
+    const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
+    magicAttackBonusElement.innerText = `(+${wisdomBonus}%)`;
+    magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
+    const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
+    magicDefenseBonusElement.innerText = `(+${wisdomBonus}%)`;
+    magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
+    const speedBonusElement = document.getElementById("secondary-speed-bonus");
+    speedBonusElement.innerText = `(+${wisdomBonus}%)`;
+    speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
     updateSkillScore(Array.from(document.querySelectorAll("#skills-area div")).map(div => {
         const [name, rarity] = div.innerText.split(" (");
         return { name, rarity: rarity.replace(")", "") };
     }));
 }
 
-        function calculateAttribute(currentValue, growthRate) {
-            return Math.floor((currentValue / 2000) * growthRate * 4* petLevel);
-        }
-
-        function calculateRemainingPoints(level) {
-            return (level - 1) * 2;
-        }
 
 let trainingCosts = [200, 2000, 10000, 24000]; // 定义每次金子培养所需的金子数量
 let trainingMultipliers = [1.1, 1.08, 1.06, 1.01]; // 定义每次金子培养的属性提升倍数
@@ -1702,6 +1846,12 @@ function updatePetLevel() {
     updateSkillScore();
 }
 
+function updatePetWisdom() {
+    document.getElementById("current-wisdom").innerText = petWisdom;
+    document.getElementById("attribute-wisdom").innerText = petWisdom; // 更新属性面板中的悟性
+    updateAttributePanel();
+}
+        
 function showBiography() {
     const currentPetName = document.getElementById("pet-select").value;
     const biography = biographies[currentPetName];
@@ -1755,45 +1905,49 @@ function showGuide() {
         font-size: 16px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V4.0</p>
-                            <p>- 1. 调整了网页布局和修改了部分错误信息</p>
-                            <p>- 2. 问题log：一键还童功能失效。该功能调试中，现已屏蔽。</p>
-                            <p>- 3. 问题log: 使用还童丹无法重置宠物技能</p>
-                            <p>- 4. 问题log：切换宠物、出售宠物时，宠物信息无法正常复位</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V5.0</p>
+                            <p>- 1. 调整了部分按钮位置和配色</p>
+                            <p>- 2. 修复了一键还童功能；</p>
+                            <p>- 3. 修复了使用还童丹无法重置宠物技能、等级和悟性等信息的问题；</p>
+                            <p>- 4. 修复了切换宠物、出售宠物时，宠物信息无法正常复位的问题；</p>
+                            <p>- 5. 修复了其他显示问题；</p>
+                            <p>- 6. 新增道具冰魄还童丹和相关功能；</p>
+                            <p>- 7. 新增宠物战神阿毛和腾蛇；</p>
+                            <p>- 8. 优化了开宝箱体验，玩家可以连续点击打开宝箱，系统会自动取出道具；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
-                            <p>养宠模拟器可以让大侠通过各种操作，如还童、深造、变异等，来让您的宠物变得更强。</p>
+                            <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
-                            <p>1️⃣玩法按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
-                            <p>2️⃣传记按钮：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
-                            <p>3️⃣提悟按钮：消耗1颗悟性丹，为你的当前宠物提升1点悟性。悟性是影响宠物洗练技能的重要属性，宠物的悟性越高，越可能洗练出更稀有的技能！当然，提升悟性也是有概率失败的，请谨慎操作！</p>
-                            <p>4️⃣瞬悟按钮：如果大侠厌倦了手动提悟的枯燥，可以尝试输入你的预期悟性值，玩概率的事交给系统来。</p>
-                            <p>5️⃣洗练按钮：消耗1颗万化灵丹，为你的当前宠物随机生成技能。所生成的技能可以通过点击来查看技能说明。悟性越高，越有可能生成多个技能，稀有技能也越可能出现。</p>
-                            <p>6️⃣资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由段位、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
+                            <p>玩法按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
+                            <p>资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由段位、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
                             <p>资质内部有多个功能</p>
-                            <p>a.普通还童按钮：消耗1颗还童丹重新生成当前宠物的资质和技能，并有极低的概率让宠物变异。</p>
+                            <p>a.普通还童：消耗1颗还童丹重新生成当前宠物的资质和技能，并有极低的概率让宠物变异。</p>
                             <p>当宠物变异后，宠物的资质会有概率突破上限值，且段位必定为卓越或完美。一般而言，变异的宠物比未变异的宠物更强大。</p>
                             <p>当宠物变异后，继续使用还童丹将会使当前宠物失去变异状态。如果你对变异宠物的段位和成长率不满意，你可以在资质面板中的“使用还童金丹”按钮，消耗1颗还童金丹对当前宠物执行更新资质的操作，还童金丹不会改变宠物的变异状态。</p>
-                            <p>b. (该功能暂时关闭)一键还童按钮：如果你厌倦了手动还童，想交给系统一键提升，你可以按照弹窗指引进行输入。请注意，你也有可能消耗所有还童丹而未能达成预期结果。</p>
-                            <p>c. 刷新资质按钮：消耗1颗资质丹，在不改变段位、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
-                            <p>d. 变异宠物按钮：消耗1颗稀有道具“灵异金丹”使当前宠物立即变异。</p>
+                            <p>b. 快速还童：如果你厌倦了手动还童，想交给系统一键提升，你可以按照弹窗指引进行输入。请注意，你也有可能消耗所有还童丹而未能达成预期结果。</p>
+                            <p>c. 还童金丹：还童金丹可以在商店购买，当宠物变异后，使用还童金丹可以在不改变变异状态的情况下刷新宠物的成长率。</p>
+                            <p>d. 冰魄还童：冰魄还童丹可以在不改变宠物资质的情况下更新宠物段位和成长率。</p>
+                            <p>e. 刷新资质：消耗1颗资质丹，在不改变段位、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
+                            <p>f. 变异宠物：消耗1颗稀有道具“灵异金丹”使当前宠物立即变异。</p>
                             <p>变异后的宠物，资质值有机会爆棚：变为未变异状态上限值的1.1倍。灵异金丹会直接在宠物当前未变异的资质值上乘以1.1倍。因此，未变异状态下，宠物资质值越高，使用灵异金丹的收益越大。</p>
-                            <p>e. 还童金丹按钮：还童金丹可以在商店购买，当宠物变异后，使用还童金丹可以在不改变变异状态的情况下刷新宠物的成长率。</p>
-                            <p>f. 进化宠物按钮：宠物可以最大进化30级，每次进化需要消耗进化之灵，宝箱可以开出不同的进化之灵。颤抖之灵用于1~6级进化，发光之灵用于7~12级进化，活跃之灵用于13~18级进化，跳动之灵用于19~24级进化，闪耀之灵用于25~30级进化。</p>
-                            <p>宠物成功进化后，会随机增加各项资质的当前值。</p>
-                            <p>7️⃣属性按钮：显示当前宠物的属性面板。宠物的资质越高，各项属性也会越高。属性是影响宠物评分的重要因素，请用心培养。属性界面中有很多按钮，功能分别如下：</p>
+                            <p>g. 进化宠物：宠物成功进化后，会随机增加各项资质的当前值。宠物可以最大进化30级，每次进化需要消耗进化之灵，宝箱可以开出不同的进化之灵。颤抖之灵用于1~6级进化，发光之灵用于7~12级进化，活跃之灵用于13~18级进化，跳动之灵用于19~24级进化，闪耀之灵用于25~30级进化。</p>
+                            <p>h. 洗练技能：消耗1颗万化灵丹，为你的当前宠物随机生成技能。所生成的技能可以通过点击来查看技能说明。悟性越高，越有可能生成多个技能，稀有技能也越可能出现。</p>
+                            <p>属性按钮：显示当前宠物的属性面板。宠物的资质越高，各项属性也会越高。属性是影响宠物评分的重要因素，请用心培养。属性界面中有很多按钮，功能分别如下：</p>
                             <p>a. 培养宠物：宠物在1级、60级、120级和180级时会分别获得一次培养机会，每次培养需要花费一定数量的金子，培养成功后宠物的各项属性值会按一定倍数增加。（请注意，在第一次培养后，后期培养只有当宠物刚好为规定等级时才可以执行！）</p>
                             <p>b. 普通修炼：消耗一本普通经验书（宝箱获得），让宠物提升一级。宠物等级提升时，属性会增加。</p>
                             <p>c. 高级修炼：消耗一本高级经验书（宝箱获得），让宠物提升三级。宠物等级提升时，属性会增加。</p>
-                            <p>d. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
-                            <p>e. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
-                            <p>8️⃣商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
+                            <p>d. 提升悟性：玩家可以通过使用悟性丹来使宠物随机增加一点悟性，提升悟性失败时，会减少悟性值。</p>
+                            <p>e. 一键提悟：玩家可以输入目标悟性值，由系统计算并使用道具，当悟性丹不够时，会自动停止。</p>
+                            <p>f. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
+                            <p>g. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
+                            <p>h. 宠物传记：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
+                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
                             <p>商店所出售的道具根据其品质会随机定价，购买后会直接添加至道具栏中。</p>
                             <p>如果你购买的是宠物的天赋技能，你需要判断当前宠物的名称是否和天赋技能的宠物名称一致，其次保证你的当前宠物没有该技能，否则你将不能购买。一旦购买成功，这个技能会直接打在你的宠物技能位里。</p>
                             <p>在本游戏中，宠物的SS技能无法全部通过洗练生成，因此，如果你想要让宠物习得更多强力技能增加评分，你需要在商店里购买并使用天赋道具。</p>
                             <p>商店面板中，你可以进行宠物出售的操作，当宠物评分不足10000时，将无法出售。</p>
                             <p>当你点击出售按钮时，系统会根据你当前宠物评分的百分之一进行出价，成功出售后，当前宠物各项属性会归零，同时得到等量金子。</p>
-                            <p>9️⃣宝箱按钮：玩家可以在宝箱界面花费金子打开各种宝箱，获得奇珍异宝和神秘道具！</p>
-                            <p>🔟宝库按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
+                            <p>宝箱按钮：玩家可以在宝箱界面花费金子打开各种宝箱，获得奇珍异宝和神秘道具！</p>
+                            <p>宝库按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
                             <p>💁请大侠尽情探索，本游戏还会继续更新功能，敬请期待！</p>
                             <button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>`;
     document.body.appendChild(messageBox);
@@ -1807,11 +1961,12 @@ function updateTopBarItems() {
     document.getElementById("reborn-pill").innerText = rebornPill;
     document.getElementById("quality-pill").innerText = qualityPill;
     document.getElementById("miraculous-pill").innerText = miraculousPill;
+    document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
     document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
 }
 
-        let goldenRebornPill = 5;
-        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+let goldenRebornPill = 5;
+document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
 
 function useGoldenRebornPill() {
     if (goldenRebornPill < 1) {
@@ -1841,8 +1996,8 @@ function useGoldenRebornPill() {
     updateSkillScore();
 }
  
-        let goldAmount = 20000; // 初始金子数量
-        document.getElementById("gold-amount").innerText = goldAmount;
+let goldAmount = 20000; // 初始金子数量
+document.getElementById("gold-amount").innerText = goldAmount;
 
 function toggleShop() {
     const drawer = document.getElementById('shop-drawer');
@@ -1946,6 +2101,7 @@ function getRandomCommonItem() {
         { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 130) },
         { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
         { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(60, 220) },
+        { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: getRandomInt(99, 299) },
         { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) }
     ];
 
@@ -2062,6 +2218,9 @@ function buyItem() {
             case '万化灵丹':
                 transmutationPill += itemQuantity;
                 break;
+            case '冰魄还童丹':
+                bingpoRebornPill += itemQuantity;
+                break;
             case '神兽还童丹':
                 rebornPill += itemQuantity;
                 break;
@@ -2119,6 +2278,9 @@ function buyItem() {
                 case '万化灵丹':
                     transmutationPill++;
                     break;
+                case '冰魄还童丹':
+                    bingpoRebornPill++;
+                    break;
                 case '神兽还童丹':
                     rebornPill++;
                     break;
@@ -2144,10 +2306,6 @@ function buyItem() {
     document.getElementById("gold-amount").innerText = goldAmount;
     selectedItem.remove();
 }
-
-// 初始化商店和倒计时
-document.addEventListener('DOMContentLoaded', initShop);
-
 
 // 初始化商店和倒计时
 document.addEventListener('DOMContentLoaded', initShop);
@@ -2219,6 +2377,8 @@ function resetPet() {
     evolutionLevel = 0; // 重置进化等级为0
     remainingPoints = 0; // 重置剩余点数为0
     trainingCount = 0; // 重置金培次数为0
+    currentWisdom = 0;
+    petWisdom = currentWisdom;
 
     // 初始化评分
     skillScore = 0; // 重置技能分数为0
@@ -2257,6 +2417,7 @@ function setInnerText(id, value) {
 let highGradePill = 100;
 let transmutationPill = 20;
 let rebornPill = 20;
+let bingpoRebornPill = 5;
 let qualityPill = 20;
 let currentWisdom = 0;
 let trainCount = 0;
@@ -2288,113 +2449,117 @@ function checkDrawerOpen() {
     return true;
 }
 
-        function upgradeWisdom() {
-            if (highGradePill < 1) {
-                alert("您的高级悟性丹已耗尽！");
-                return;
-            }
+function upgradeWisdom() {
+    if (highGradePill < 1) {
+        alert("您的高级悟性丹已耗尽！");
+        return;
+    }
 
-            highGradePill--;
-            document.getElementById("high-grade-pill").innerText = highGradePill;
+    highGradePill--;
+    document.getElementById("high-grade-pill").innerText = highGradePill;
 
-            let successRate;
-            if (currentWisdom < 7) successRate = 0.9;
-            else if (currentWisdom < 13) successRate = 0.55;
-            else if (currentWisdom < 18) successRate = 0.35;
-            else if (currentWisdom < 20) successRate = 0.15;
-            else successRate = 0.05;
+    let successRate;
+    if (currentWisdom < 7) successRate = 0.9;
+    else if (currentWisdom < 13) successRate = 0.75;
+    else if (currentWisdom < 18) successRate = 0.45;
+    else if (currentWisdom < 20) successRate = 0.15;
+    else successRate = 0.05;
 
-            if (Math.random() < successRate) {
-                currentWisdom = Math.min(currentWisdom + 1, 20);
-            } else {
-                if (currentWisdom > 0) {
-                    if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
-                    else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
-                    else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
-                    else currentWisdom = Math.max(15, currentWisdom - 2);
-                }
-            }
-            document.getElementById("current-wisdom").innerText = currentWisdom;
+    if (Math.random() < successRate) {
+        currentWisdom = Math.min(currentWisdom + 1, 20);
+    } else {
+        if (currentWisdom > 0) {
+            if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
+            else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
+            else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
+            else currentWisdom = Math.max(15, currentWisdom - 2);
         }
+    }
+    
+    document.getElementById("current-wisdom").innerText = currentWisdom;
+    document.getElementById("attribute-wisdom").value = currentWisdom; // 更新输入框的值
 
-        function trainSkills() {
-            if (!checkDrawerOpen()) return;
-            if (transmutationPill < 1) {
-                alert("您的道具不够，请刷新后重试！");
-                return;
-            }
+    updateAttributePanel(); // 更新属性面板
+}
 
-            transmutationPill--;
-            document.getElementById("transmutation-pill").innerText = transmutationPill;
-            trainCount++;
-            document.getElementById("train-count").innerText = trainCount;
+function trainSkills() {
+    if (!checkDrawerOpen()) return;
+    if (transmutationPill < 1) {
+        alert("您的道具不够，请刷新后重试！");
+        return;
+    }
 
-            let skillNum;
+    transmutationPill--;
+    document.getElementById("transmutation-pill").innerText = transmutationPill;
+    trainCount++;
+    document.getElementById("train-count").innerText = trainCount;
+
+    let skillNum;
+    if (currentWisdom < 7) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
+    } else if (currentWisdom < 13) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+    } else if (currentWisdom < 17) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
+    } else if (currentWisdom < 20) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
+    } else {
+        skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+    }
+
+    const selectedSkills = [];
+    for (let i = 0; i < skillNum; i++) {
+        let skill;
+        do {
+            const rarityRoll = Math.random() * 100;
             if (currentWisdom < 7) {
-                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
             } else if (currentWisdom < 13) {
-                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
             } else if (currentWisdom < 17) {
-                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
             } else if (currentWisdom < 20) {
-                skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
             } else {
-                skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
             }
+        } while (!skill || selectedSkills.includes(skill));
+        selectedSkills.push(skill);
+    }
 
-            const selectedSkills = [];
-            for (let i = 0; i < skillNum; i++) {
-                let skill;
-                do {
-                    const rarityRoll = Math.random() * 100;
-                    if (currentWisdom < 7) {
-                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                        else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                    } else if (currentWisdom < 13) {
-                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                        else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                    } else if (currentWisdom < 17) {
-                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                    } else if (currentWisdom < 20) {
-                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                    } else {
-                        if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                        else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                        else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                        else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                    }
-                } while (!skill || selectedSkills.includes(skill));
-                selectedSkills.push(skill);
-            }
-
-            if (selectedSkills.length >= 8) {
-                if (!confirm("您洗出了好！多！技！能！确定不留着看看吗？")) {
-                    return;
-                }
-            }
-
-            updateSkillsArea(selectedSkills);
-            updateSkillScore(selectedSkills);
+    if (selectedSkills.length >= 8) {
+        if (!confirm("您洗出了好！多！技！能！确定不留着看看吗？")) {
+            return;
         }
+    }
 
-        function getRandomSkillNum(probabilities) {
-            const total = probabilities.reduce((sum, prob) => sum + prob, 0);
-            let rand = Math.random() * total;
-            for (let i = 0; i < probabilities.length; i++) {
-                if (rand < probabilities[i]) {
-                    return i + 1;
-                }
-                rand -= probabilities[i];
-            }
-            return 1;
+    updateSkillsArea(selectedSkills);
+    updateSkillScore(selectedSkills);
+}
+
+function getRandomSkillNum(probabilities) {
+    const total = probabilities.reduce((sum, prob) => sum + prob, 0);
+    let rand = Math.random() * total;
+    for (let i = 0; i < probabilities.length; i++) {
+        if (rand < probabilities[i]) {
+            return i + 1;
         }
+        rand -= probabilities[i];
+    }
+    return 1;
+}
 
 function updateSkillsArea(selectedSkills) {
     const skillsArea = document.getElementById("skills-area");
@@ -2438,6 +2603,17 @@ function updateSkillScore(selectedSkills = []) {
 
     const attributeScore = enduranceAttr * 28 + intelligenceAttr * 15 + strengthAttr * 8 + agilityAttr * 41 + faithAttr * 48;
 
+    // 计算二级属性评分
+    const health = parseInt(document.getElementById("secondary-health").innerText);
+    const mana = parseInt(document.getElementById("secondary-mana").innerText);
+    const physicalAttack = parseInt(document.getElementById("secondary-physical-attack").innerText);
+    const physicalDefense = parseInt(document.getElementById("secondary-physical-defense").innerText);
+    const magicAttack = parseInt(document.getElementById("secondary-magic-attack").innerText);
+    const magicDefense = parseInt(document.getElementById("secondary-magic-defense").innerText);
+    const speed = parseInt(document.getElementById("secondary-speed").innerText);
+
+    const secondaryAttributeScore = health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed;
+
     // 计算技能评分
     let skillScore = 0;
     let aSkillCount = 0;
@@ -2466,10 +2642,10 @@ function updateSkillScore(selectedSkills = []) {
 
     if (aSkillCount > 1) skillScore += 1000;
     if (sSkillCount > 1) skillScore += 10000;
-    if (ssSkillCount > 1) skillScore += 20000;
+    if (ssSkillCount > 1) skillScore += 50000;
 
     // 计算总评分
-    const totalScore = qualityScore + attributeScore + skillScore;
+    const totalScore = qualityScore + attributeScore + skillScore + secondaryAttributeScore;
     document.getElementById("skill-score").innerText = totalScore;
 }
 
@@ -2536,15 +2712,15 @@ function upgradeWisdomTo() {
     document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
 }
 
-        function resetGame() {
-            location.reload();
-        }
+function resetGame() {
+    location.reload();
+}
 
-        function updateDescriptionBox() {
-            const descriptionBox = document.getElementById("description-box");
-            const randomIndex = Math.floor(Math.random() * descriptions.length);
-            descriptionBox.innerText = descriptions[randomIndex];
-        }
+function updateDescriptionBox() {
+    const descriptionBox = document.getElementById("description-box");
+    const randomIndex = Math.floor(Math.random() * descriptions.length);
+    descriptionBox.innerText = descriptions[randomIndex];
+}
 
 function updateQualityCard() {
     document.getElementById("evolution-level").innerText = evolutionLevel;
@@ -2605,18 +2781,107 @@ function updateQualityCard() {
     document.getElementById("intelligence-max").innerText = intelligence.max;
     document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
 
-    // Update mutation effect
-    const petImage = document.querySelector('.pet-image img');
-    const petInfo = document.querySelector('.bottom-bar .info');
-    if (currentPet.qualities.mutated) {
-        petImage.classList.add('mutated');
-        petInfo.classList.add('mutated');
-    } else {
-        petImage.classList.remove('mutated');
-        petInfo.classList.remove('mutated');
+    // 更新变异效果
+    const petImage = document.querySelector('.pet-image img'); // 选择宠物图片的img元素
+    const petInfo = document.querySelector('.bottom-bar .info'); // 选择底部栏信息的info元素
+    const bottombar = document.querySelector('.bottom-bar'); // 选择底部栏元素
+    
+    if (currentPet.qualities.mutated) { // 如果当前宠物的qualities属性中的mutated为真
+        petImage.classList.add('mutated'); // 给宠物图片添加'mutated'类
+        petInfo.classList.add('mutated'); // 给宠物信息添加'mutated'类
+        bottombar.classList.add('mutated'); // 给底部栏添加'mutated'类
+    } else { // 如果当前宠物的qualities属性中的mutated为假
+        petImage.classList.remove('mutated'); // 移除宠物图片的'mutated'类
+        petInfo.classList.remove('mutated'); // 移除宠物信息的'mutated'类
+        bottombar.classList.remove('mutated'); // 移除底部栏的'mutated'类
     }
 }
 
+function useBingpoRebornPill() {
+    if (!checkDrawerOpen()) return;
+    if (!currentPet || !currentPet.qualities) { // 添加检查
+        console.warn("当前宠物未被正确初始化。");
+        return;
+    }
+
+    if (bingpoRebornPill < 1) {
+        alert("您的冰魄还童丹已耗尽！");
+        return;
+    }
+
+    if (currentPet.qualities.mutated) {
+        if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
+            return;
+        }
+        
+        const qualities = currentPet.qualities;
+        qualities.endurance.current = Math.floor(qualities.endurance.current / 1.1);
+        qualities.strength.current = Math.floor(qualities.strength.current / 1.1);
+        qualities.faith.current = Math.floor(qualities.faith.current / 1.1);
+        qualities.agility.current = Math.floor(qualities.agility.current / 1.1);
+        qualities.intelligence.current = Math.floor(qualities.intelligence.current / 1.1);
+
+        currentPet.qualities.mutated = false;
+    }
+
+    bingpoRebornPill--;
+    document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
+
+    // 仅重置宠物的当前段位、和成长率
+    let tier, growthRate;
+    const roll = Math.random() * 100;
+    if (roll < 50) {
+        tier = '普通';
+        growthRate = 100;
+    } else if (roll < 75) {
+        tier = '优秀';
+        growthRate = 220;
+    } else if (roll < 90) {
+        tier = '杰出';
+        growthRate = 280;
+    } else if (roll < 97.5) {
+        tier = '卓越';
+        growthRate = 320;
+    } else if (roll < 99.95) {
+        tier = '完美';
+        growthRate = 400;
+    } else {
+        tier = Math.random() < 0.5 ? '卓越' : '完美';
+        growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
+        currentPet.qualities.mutated = true;
+    }
+    
+    currentPet.qualities.tier = tier;
+    currentPet.qualities.growthRate = growthRate;
+
+    updateQualityCard();
+    updateSkillScore();
+
+    // 更新技能
+    const skillNum = getRandomInt(0, 3);
+    const newSkills = [];
+    const bSkills = currentPet.skills.filter(skill => skill.rarity === 'B');
+    for (let i = 0; i < skillNum; i++) {
+        const skill = bSkills[Math.floor(Math.random() * bSkills.length)];
+        if (!newSkills.some(s => s.name === skill.name)) {
+            newSkills.push(skill);
+        }
+    }
+    updateSkillsArea(newSkills);
+    updateSkillScore(newSkills);
+
+    petLevel = 1;
+    currentWisdom = 0;
+    petWisdom = currentWisdom;
+
+    document.getElementById("pet-level").innerText = petLevel;
+    document.getElementById("current-wisdom").innerText = currentWisdom;
+
+    updatePetLevel();
+    updatePetWisdom();
+    updateAttributePanel();
+}
+        
 function rebornPet() {
     if (!checkDrawerOpen()) return;
     if (!currentPet || !currentPet.qualities) { // 添加检查
@@ -2633,6 +2898,14 @@ function rebornPet() {
         if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
             return;
         }
+        // 当宠物失去变异状态时，资质会除以1.1
+        const qualities = currentPet.qualities;
+        qualities.endurance.current = Math.floor(qualities.endurance.current / 1.1);
+        qualities.strength.current = Math.floor(qualities.strength.current / 1.1);
+        qualities.faith.current = Math.floor(qualities.faith.current / 1.1);
+        qualities.agility.current = Math.floor(qualities.agility.current / 1.1);
+        qualities.intelligence.current = Math.floor(qualities.intelligence.current / 1.1);
+
         currentPet.qualities.mutated = false;
     }
 
@@ -2666,11 +2939,11 @@ function rebornPet() {
     currentPet.qualities.growthRate = growthRate;
 
     const qualities = currentPet.qualities;
-    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max*0.8);
-    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max*0.8);
-    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max*0.8);
-    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max*0.8);
-    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max*0.8);
+    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max*0.85);
+    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max*0.85);
+    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max*0.85);
+    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max*0.85);
+    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max*0.85);
 
     updateQualityCard();
     updateSkillScore();
@@ -2687,6 +2960,17 @@ function rebornPet() {
     }
     updateSkillsArea(newSkills);
     updateSkillScore(newSkills);
+
+    petLevel = 1;
+    currentWisdom = 0;
+    petWisdom = currentWisdom;
+
+    document.getElementById("pet-level").innerText = petLevel;
+    document.getElementById("current-wisdom").innerText = 0;
+
+    updatePetLevel;
+    updatePetWisdom;
+    updateAttributePanel;
 }
 
 function trainQuality() {
@@ -2809,25 +3093,25 @@ function mutatePet() {
     updateSkillScore();
 }
 
-        function getRandomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
-        function getWeightedRandom(values, weights) {
-            const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-            let rand = Math.random() * totalWeight;
-            for (let i = 0; i < values.length; i++) {
-                if (rand < weights[i]) {
-                    return values[i];
-                }
-                rand -= weights[i];
-            }
-            return values[0];
+function getWeightedRandom(values, weights) {
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+    let rand = Math.random() * totalWeight;
+    for (let i = 0; i < values.length; i++) {
+        if (rand < weights[i]) {
+            return values[i];
         }
+        rand -= weights[i];
+    }
+    return values[0];
+}
 
-        setInterval(updateDescriptionBox, 30000);
-        updateDescriptionBox(); // 初始化描述框
-        updateQualityCard(); // 初始化资质卡片
+setInterval(updateDescriptionBox, 30000);
+updateDescriptionBox(); // 初始化描述框
+updateQualityCard(); // 初始化资质卡片
 
 document.addEventListener('DOMContentLoaded', () => {
     initShop();

@@ -1227,7 +1227,7 @@ if (window.GestureEvent || (navigator.maxTouchPoints && navigator.maxTouchPoints
 
     document.body.addEventListener('touchend', function (e) {
         const now = Date.now();
-        if (now - lastTouchEnd <= 300) {
+        if (now - lastTouchEnd <= 200) {
             e.preventDefault(); // 阻止双击放大
         }
         lastTouchEnd = now;

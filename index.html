@@ -281,8 +281,12 @@
         }
         .shop-items {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
+            padding: 0px;
+            margin: 0;
+            font-size: 12px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 1px;
+            align-items: stretch;
         }
         .shop-item {
             text-align: center;
@@ -1299,6 +1303,7 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png",
     "https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png",
     "https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png",
+    "https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png",
     "https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png"
 ];
 preloadImages(imageUrls);
@@ -1371,8 +1376,6 @@ function evolvePet() {
         // 更新资质卡片和技能分数的显示。
         updateQualityCard();
         updateSkillScore();
-        // 提示用户进化成功。
-        alert("进化成功！");
     } else {
         // 如果进化失败，减少用户的所需道具数量，并提示用户进化失败。
         jinnangItems[requiredItem]--;
@@ -1476,27 +1479,27 @@ function ascend() {
     // Retrieve the current pet level and wisdom from the attribute panel
     let petLevel = parseInt(document.getElementById('pet-level').innerText);
     let petWisdom = parseInt(document.getElementById('current-wisdom').innerText);
-    
+
     // Check if the pet has already ascended
     if (petAscended) {
         alert("您的宠物已经飞升！使用道具失败！");
         return;
     }
-    
+
     // Check if the pet meets the level and wisdom requirements and if there is an ascension stone in the inventory
-    if (petLevel < 160 || petWisdom < 20 || jinnangItems.ascensionStone <= 0) {
-        alert("您的飞升石不够，且宠物飞升必须满足160级和20悟两个条件！");
+    if (petLevel < 160 || petWisdom < 24 || jinnangItems.ascensionStone <= 0) {
+        alert("您的飞升石不够，且宠物飞升必须满足160级和24悟两个条件！(20级悟性之后，需要使用商店所售道具“特级悟性丹”才能继续提升悟性。)");
         return;
     }
-    
+
     // Deduct one ascension stone from the inventory
     jinnangItems.ascensionStone--;
     updateJinnangItems();
-    
+
     // Update pet's max level and ascension status
     petMaxLevel = 180;
     petAscended = true;
-    
+
     alert("恭喜大侠的爱宠飞升成功！");
 }
 
@@ -1659,6 +1662,7 @@ function selectReward(rewardList) {
 // 新增全局变量
 let jinnangItems = {
     normalExperienceBook: 0,
+    tejiWisdomPill: 0, //特级悟性丹
     advancedExperienceBook: 0,
     ascensionStone: 0,
     supremeWisdomPill: 0,
@@ -1691,6 +1695,9 @@ function addItemToJinnang(item) {
             break;
         case '举世无双悟性丹':
             jinnangItems.supremeWisdomPill++;
+            break;
+        case '特级悟性丹':
+            jinnangItems.tejiWisdomPill++;
             break;
         case '闪耀之灵':
             jinnangItems.radiantSoul++;
@@ -1743,6 +1750,8 @@ function getItemName(item) {
             return '飞升之石';
         case 'supremeWisdomPill':
             return '举世无双悟性丹';
+        case 'tejiWisdomPill':
+            return '特级悟性丹';
         case 'radiantSoul':
             return '闪耀之灵';
         case 'shakingSoul': // 颤抖之灵
@@ -1769,6 +1778,8 @@ function getItemImage(item) {
             return 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png';
         case 'supremeWisdomPill':
             return 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909845a.png';
+        case 'tejiWisdomPill':
+            return 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png';
         case 'radiantSoul':
             return 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png';
         case 'shakingSoul': // 颤抖之灵
@@ -1827,7 +1838,32 @@ function calculateAttribute(currentValue, growthRate) {
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     // 基于当前悟性计算递增倍率
-    const multiplier = 1 + (currentWisdom * 0.005);
+    let multiplier;
+    if (currentWisdom <= 12) {
+        multiplier = 1 + (currentWisdom * 0.005);
+    } else if (currentWisdom <= 20) {
+        multiplier = 1 + (currentWisdom * 0.01);
+    } else {
+        switch (currentWisdom) {
+            case 21:
+                multiplier = 1.20;
+                break;
+            case 22:
+                multiplier = 1.21;
+                break;
+            case 23:
+                multiplier = 1.22;
+                break;
+            case 24:
+                multiplier = 1.23;
+                break;
+            case 25:
+                multiplier = 1.25;
+                break;
+            default:
+                multiplier = 1;
+        }
+    }
 
     const endurance = currentAttributes.endurance;
     const intelligence = currentAttributes.intelligence;
@@ -1870,7 +1906,32 @@ function updateAttributePanel() {
 
     // 计算并更新二级属性
     const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
-    const wisdomBonus = currentWisdom * 0.5;
+    let wisdomBonus;
+    if (currentWisdom <= 12) {
+        wisdomBonus = currentWisdom * 0.5;
+    } else if (currentWisdom <= 20) {
+        wisdomBonus = 6 + (currentWisdom - 12) * 1;
+    } else {
+        switch (currentWisdom) {
+            case 21:
+                wisdomBonus = 20;
+                break;
+            case 22:
+                wisdomBonus = 21;
+                break;
+            case 23:
+                wisdomBonus = 22;
+                break;
+            case 24:
+                wisdomBonus = 23;
+                break;
+            case 25:
+                wisdomBonus = 25;
+                break;
+            default:
+                wisdomBonus = 0;
+        }
+    }
 
     document.getElementById("secondary-health").innerText = secondaryAttributes.health;
     const healthBonusElement = document.getElementById("secondary-health-bonus");
@@ -1912,7 +1973,6 @@ function updateAttributePanel() {
         return { name, rarity: rarity.replace(")", "") };
     }));
 }
-
 
 let trainingCosts = [200, 2000, 10000, 24000]; // 定义每次金子培养所需的金子数量
 let trainingMultipliers = [1.1, 1.08, 1.06, 1.01]; // 定义每次金子培养的属性提升倍数
@@ -2186,7 +2246,7 @@ function refreshShop(auto = false) {
     const shopItems = document.getElementById('shop-items');
     shopItems.innerHTML = '';
 
-    let numItems = auto ? getRandomInt(1, 5) : getRandomInt(1, 16);
+    let numItems = auto ? getRandomInt(1, 5) : getRandomInt(2, 24);
     let probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
     let rareItemCount = 0;
     let commonBundleCount = 0;
@@ -2244,7 +2304,8 @@ function getRandomCommonItem() {
         { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
         { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(60, 220) },
         { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: getRandomInt(99, 299) },
-        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) }
+        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) },
+        { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: getRandomInt(388, 788) }
     ];
 
     // 包裹的生成逻辑
@@ -2372,6 +2433,9 @@ function buyItem() {
             case '灵异金丹':
                 miraculousPill += itemQuantity;
                 break;
+            case '特级悟性丹':
+                jinnangItems.tejiWisdomPill += itemQuantity; // 更新锦囊
+                break;
             case '还童金丹':
                 goldenRebornPill += itemQuantity;
                 break;
@@ -2432,6 +2496,9 @@ function buyItem() {
                 case '灵异金丹':
                     miraculousPill++;
                     break;
+                case '特级悟性丹':
+                    jinnangItems.tejiWisdomPill++; // 更新锦囊
+                    break;
                 case '还童金丹':
                     goldenRebornPill++;
                     break;
@@ -2440,6 +2507,7 @@ function buyItem() {
                     return;
             }
             updateTopBarItems();
+            updateJinnangItems(); // 更新锦囊内的道具数量显示
         }
     }
 
@@ -2448,6 +2516,7 @@ function buyItem() {
     document.getElementById("gold-amount").innerText = goldAmount;
     selectedItem.remove();
 }
+
 
 // 初始化商店和倒计时
 document.addEventListener('DOMContentLoaded', initShop);
@@ -2573,7 +2642,7 @@ let skillScore = 0;
 const descriptions = [
     "请特别注意，更换宠物会导致此前的分数全部作废，如果你没有想好先培养谁，请决定后再尝试！",
     "宠物评分由多个维度组成，请你同时兼顾技能质量、资质水平和宠物等级！",
-    "这一切都是概率的游戏，请先仔细阅读玩法！你的每一次操作都可能意味着下一次，谨慎操作！"
+    "如果你需要删除某个技能，你可以长按该技能确认删除。（如果是PC端，你需要右键确认）"
 ];
 
 function toggleDrawer() {
@@ -2597,32 +2666,54 @@ function checkDrawerOpen() {
 }
 
 function upgradeWisdom() {
-    if (highGradePill < 1) {
-        alert("您的高级悟性丹已耗尽！");
-        return;
-    }
-
-    highGradePill--;
-    document.getElementById("high-grade-pill").innerText = highGradePill;
-
     let successRate;
-    if (currentWisdom < 7) successRate = 0.9;
-    else if (currentWisdom < 13) successRate = 0.75;
-    else if (currentWisdom < 18) successRate = 0.45;
-    else if (currentWisdom < 20) successRate = 0.15;
-    else successRate = 0.05;
 
-    if (Math.random() < successRate) {
-        currentWisdom = Math.min(currentWisdom + 1, 20);
+    if (currentWisdom < 20) {
+        if (highGradePill < 1) {
+            alert("您的高级悟性丹已耗尽！");
+            return;
+        }
+
+        highGradePill--;
+        document.getElementById("high-grade-pill").innerText = highGradePill;
+
+        if (currentWisdom < 7) successRate = 0.9;
+        else if (currentWisdom < 13) successRate = 0.75;
+        else if (currentWisdom < 18) successRate = 0.45;
+        else successRate = 0.15;
+
+        if (Math.random() < successRate) {
+            currentWisdom = Math.min(currentWisdom + 1, 20);
+        } else {
+            if (currentWisdom > 0) {
+                if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
+                else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
+                else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
+                else currentWisdom = Math.max(15, currentWisdom - 2);
+            }
+        }
     } else {
-        if (currentWisdom > 0) {
-            if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
-            else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
-            else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
-            else currentWisdom = Math.max(15, currentWisdom - 2);
+        if (jinnangItems.tejiWisdomPill < 1) {
+            alert("您的特级悟性丹已耗尽！");
+            return;
+        }
+
+        jinnangItems.tejiWisdomPill--;
+        updateJinnangItems();
+
+        if (currentWisdom == 20) successRate = 0.85;
+        else if (currentWisdom == 21) successRate = 0.65;
+        else if (currentWisdom == 22) successRate = 0.45;
+        else if (currentWisdom == 23) successRate = 0.25;
+        else successRate = 0.05;
+
+        if (Math.random() < successRate) {
+            currentWisdom = Math.min(currentWisdom + 1, 25);
+        } else {
+            currentWisdom = Math.max(20, currentWisdom - 2);
         }
     }
-    
+
     document.getElementById("current-wisdom").innerText = currentWisdom;
     document.getElementById("attribute-wisdom").value = currentWisdom; // 更新输入框的值
 
@@ -2724,9 +2815,44 @@ function updateSkillsArea(selectedSkills) {
             } else if (skill.rarity === 'SS') {
                 skillDiv.classList.add('ss-skill');
             }
+
+            // 添加长按事件监听器
+            skillDiv.addEventListener('contextmenu', (e) => {
+                e.preventDefault(); // 阻止默认的右键菜单
+                deleteSkill(skill, skillDiv, skillsArea);
+            });
+
             skillsArea.appendChild(skillDiv);
         }
     });
+}
+
+function deleteSkill(skill, skillDiv, skillsArea) {
+    const messageBox = document.createElement('div');
+    messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
+    messageBox.innerHTML = `
+        <p>确定要删除技能 ${skill.name} 吗？</p>
+        <button id="confirm-delete">确认</button>
+        <button id="cancel-delete">取消</button>
+    `;
+
+    document.body.appendChild(messageBox);
+
+    document.getElementById("confirm-delete").onclick = () => {
+        skillsArea.removeChild(skillDiv);
+        document.body.removeChild(messageBox);
+
+        // 获取当前技能列表并更新评分
+        const remainingSkills = Array.from(skillsArea.children).map(div => {
+            const [name, rarity] = div.innerText.split(' (');
+            return { name, rarity: rarity.replace(')', '') };
+        });
+        updateSkillScore(remainingSkills);
+    };
+
+    document.getElementById("cancel-delete").onclick = () => {
+        document.body.removeChild(messageBox);
+    };
 }
 
 function updateSkillScore(selectedSkills = []) {
@@ -2807,14 +2933,18 @@ function upgradeWisdomTo() {
         return;
     }
 
-    if (target === "ceshi") {
+    if (target === "111") {
         transmutationPill += 999;
         rebornPill += 999;
         bingpoRebornPill += 999;
         goldenRebornPill += 999;
         miraculousPill += 999;
         qualityPill += 999;
+        highGradePill += 999;
+        goldAmount += 999999;
+        document.getElementById("gold-amount").innerText = goldAmount;
         document.getElementById("quality-pill").innerText = qualityPill;
+        document.getElementById("high-grade-pill").innerText = highGradePill;
         document.getElementById("miraculous-pill").innerText = miraculousPill;
         document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
         document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
@@ -2826,6 +2956,7 @@ function upgradeWisdomTo() {
         'advancedExperienceBook',
         'ascensionStone',
         'supremeWisdomPill',
+        'tejiWisdomPill',
         'radiantSoul',
         'shakingSoul',
         'glowingSoul',

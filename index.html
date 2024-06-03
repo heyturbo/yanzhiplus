@@ -247,11 +247,11 @@
             background-color: #e3e3e3;
             border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 10px;
-            font-size: 12px;
+            margin-bottom: 6px;
+            font-size: 14px;
         }
         .quality-info .progress-bar div {
-            height: 20px;
+            height: 10px;
             background-color: #0a8c00;
             text-align: right;
             padding-right: 5px;
@@ -315,8 +315,8 @@
         }
         .quality-info button {
             padding: 2px 10px;
-            margin: 6px;
-            height: 75%;
+            margin: 5px;
+            height: 60%;
             background-color: #0a8c00;
             color: white;
             border: none;
@@ -431,8 +431,9 @@
         .quality-details {
             display: flex;
             flex-direction: column;
-            gap: 4px; /* 调整每个条目之间的间距 */
-            font-size: 12px;
+            gap: 2px; /* 调整每个条目之间的间距 */
+            font-size: 14px;
+            justify-content: center;
         }
         .image-frame img {
             max-width: 90%;
@@ -441,15 +442,14 @@
         .button-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 2px; /* 调整按钮之间的间距 */
+            gap: 5px; /* 调整按钮之间的间距 */
             align-items: stretch;
-            justify-content: space-between;
             justify-items: stretch;
         }
         .button-grid button {
-            padding: 12px;
+            padding: 5px;
             width: 90%;
-            font-size: 12px; /* 调整按钮字体大小 */
+            font-size: 14px; /* 调整按钮字体大小 */
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
         }
         .treasure-drawer {
@@ -1637,9 +1637,9 @@ function getRandomReward(type) {
         ],
         '至尊宝箱': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 5 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 30 },
-            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909845a.png', chance: 30 },
-            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 35 }
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 20 },
+            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909845a.png', chance: 5 },
+            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 70 }
         ]
     };
     return selectReward(rewards[type]);
@@ -2128,6 +2128,12 @@ function useGoldenRebornPill() {
     qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max);
     qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max);
 
+    petLevel = 1;
+    currentWisdom = 0;
+    petWisdom = currentWisdom;
+    petAscended = false; //新增宠物失去飞升的还童规则
+    petMaxLevel = 160;
+    
     updateQualityCard();
     updateSkillScore();
 }
@@ -2508,15 +2514,19 @@ function resetPet() {
     setInnerText("agility-current", currentPet.qualities.agility.current);
     setInnerText("intelligence-current", currentPet.qualities.intelligence.current);
 
-    // 初始化等级和进化等级
+    // 初始化等级和进化等级等基础属性
     petLevel = 1; // 重置宠物等级为1
     evolutionLevel = 0; // 重置进化等级为0
     remainingPoints = 0; // 重置剩余点数为0
     trainingCount = 0; // 重置金培次数为0
     currentWisdom = 0;
     petAscended = false;
+    petMaxLevel = 160;
     petWisdom = currentWisdom;
-
+    // 取消变异和恢复原背景
+    currentPet.qualities.mutated = false;    
+    document.body.style.backgroundImage = "";
+    
     // 初始化评分
     skillScore = 0; // 重置技能分数为0
     setInnerText("skill-score", skillScore);
@@ -2790,24 +2800,28 @@ function upgradeWisdomTo() {
     const target = prompt("你期待将宠物悟性提升至__ (请输入1-20之间的整数):");
     if (target === null) return;
 
-    if (target === "super") {
-        currentWisdom = 20;
-        highGradePill = 0;
-        document.getElementById("high-grade-pill").innerText = highGradePill;
-        document.getElementById("current-wisdom").innerText = currentWisdom;
-        document.getElementById("description-box").innerText = `您消耗了全部高级悟性丹，将悟性提升至${currentWisdom}`;
-        return;
-    }
-
     if (target === "66666") {
-        goldAmount += 1000000;
+        goldAmount += 999999;
         document.getElementById("gold-amount").innerText = goldAmount;
-        document.getElementById("description-box").innerText = "您获得了1000000金子！";
+        document.getElementById("description-box").innerText = "您获得了999999金子！";
         return;
     }
 
     if (target === "ceshi") {
-    const itemsToIncrease = [
+        transmutationPill += 999;
+        rebornPill += 999;
+        bingpoRebornPill += 999;
+        goldenRebornPill += 999;
+        miraculousPill += 999;
+        qualityPill += 999;
+        document.getElementById("quality-pill").innerText = qualityPill;
+        document.getElementById("miraculous-pill").innerText = miraculousPill;
+        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+        document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
+        document.getElementById("transmutation-pill").innerText = transmutationPill;
+        document.getElementById("reborn-pill").innerText = rebornPill;
+
+        const itemsToIncrease = [
         'normalExperienceBook',
         'advancedExperienceBook',
         'ascensionStone',
@@ -2827,10 +2841,11 @@ function upgradeWisdomTo() {
     }
 
     updateJinnangItems();
-    document.getElementById("description-box").innerText = "您获得了作弊大礼包！";
+    document.getElementById("description-box").innerText = "您获得了万能锦囊！";
     return;
+        return;
     }
-
+    
 
     const targetValue = parseInt(target, 10);
     if (isNaN(targetValue) || targetValue < 1 || targetValue > 20) {
@@ -2838,17 +2853,43 @@ function upgradeWisdomTo() {
         return;
     }
 
-    let initialWisdom = currentWisdom;
-    while (currentWisdom < targetValue && highGradePill > 0) {
-        upgradeWisdom();
+    // 若输入的为整数
+    const targetInt = parseInt(target, 10);
+    if (!isNaN(targetInt) && targetInt >= 1 && targetInt <= 20) {
+        const initialWisdom = currentWisdom;
+        let usedPills = 0;
+
+        while (currentWisdom < targetInt && highGradePill > 0) {
+            highGradePill--;
+            usedPills++;
+            document.getElementById("high-grade-pill").innerText = highGradePill;
+
+            let successRate;
+            if (currentWisdom < 7) successRate = 0.9;
+            else if (currentWisdom < 13) successRate = 0.75;
+            else if (currentWisdom < 18) successRate = 0.45;
+            else if (currentWisdom < 20) successRate = 0.15;
+            else successRate = 0.05;
+
+            if (Math.random() < successRate) {
+                currentWisdom = Math.min(currentWisdom + 1, 20);
+            } else {
+                if (currentWisdom > 0) {
+                    if (currentWisdom < 8) currentWisdom = Math.max(0, currentWisdom - 2);
+                    else if (currentWisdom < 13) currentWisdom = Math.max(8, currentWisdom - 2);
+                    else if (currentWisdom < 18) currentWisdom = Math.max(13, currentWisdom - 2);
+                    else currentWisdom = Math.max(15, currentWisdom - 2);
+                }
+            }
+
+            document.getElementById("current-wisdom").innerText = currentWisdom;
+        }
+
+        document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
+        updateAttributePanel(); // 更新属性面板
+    } else {
+        alert("请输入1-20之间的整数！");
     }
-
-    let usedPills = initialWisdom < currentWisdom ? highGradePill + initialWisdom - currentWisdom : 0;
-    document.getElementById("description-box").innerText = `您消耗了${usedPills}颗高级悟性丹，将悟性提升至${currentWisdom}`;
-}
-
-function resetGame() {
-    location.reload();
 }
 
 function updateDescriptionBox() {
@@ -2944,27 +2985,25 @@ function useBingpoRebornPill() {
         return;
     }
 
+    // 检查并处理变异状态
     if (currentPet.qualities.mutated) {
         if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
             return;
         }
-        
+        // 当宠物失去变异状态时，资质会除以1.1
         const qualities = currentPet.qualities;
-        qualities.endurance.current = Math.floor(qualities.endurance.current / 1.1);
-        qualities.strength.current = Math.floor(qualities.strength.current / 1.1);
-        qualities.faith.current = Math.floor(qualities.faith.current / 1.1);
-        qualities.agility.current = Math.floor(qualities.agility.current / 1.1);
-        qualities.intelligence.current = Math.floor(qualities.intelligence.current / 1.1);
+        qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
+        qualities.strength.current = Math.round(qualities.strength.current / 1.1);
+        qualities.faith.current = Math.round(qualities.faith.current / 1.1);
+        qualities.agility.current = Math.round(qualities.agility.current / 1.1);
+        qualities.intelligence.current = Math.round(qualities.intelligence.current / 1.1);
 
         currentPet.qualities.mutated = false;
         // 恢复原背景
         document.body.style.backgroundImage = "";
     }
 
-    bingpoRebornPill--;
-    document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
-
-    // 仅重置宠物的当前段位、和成长率
+    // 重置宠物的段位和成长率
     let tier, growthRate;
     const roll = Math.random() * 100;
     if (roll < 50) {
@@ -2986,10 +3025,19 @@ function useBingpoRebornPill() {
         tier = Math.random() < 0.5 ? '卓越' : '完美';
         growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
         currentPet.qualities.mutated = true;
+        const qualities = currentPet.qualities;
+        qualities.endurance.current = Math.round(qualities.endurance.current * 1.1);
+        qualities.strength.current = Math.round(qualities.strength.current * 1.1);
+        qualities.faith.current = Math.round(qualities.faith.current * 1.1);
+        qualities.agility.current = Math.round(qualities.agility.current * 1.1);
+        qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
         // 设置背景为变异背景
         document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
         document.body.style.backgroundRepeat = "repeat";
     }
+
+    bingpoRebornPill--;
+    document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
     
     currentPet.qualities.tier = tier;
     currentPet.qualities.growthRate = growthRate;
@@ -3076,10 +3124,10 @@ function rebornPet() {
         growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
         currentPet.qualities.mutated = true;
         // 设置背景为变异背景
-        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7252d9c307b7e98c3b0b.png')";
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
         document.body.style.backgroundRepeat = "repeat";
     }
-
+    
     currentPet.qualities.tier = tier;
     currentPet.qualities.growthRate = growthRate;
 
@@ -3110,6 +3158,7 @@ function rebornPet() {
     currentWisdom = 0;
     petWisdom = currentWisdom;
     petAscended = false; //新增宠物失去飞升的还童规则
+    petMaxLevel = 160;
 
     document.getElementById("pet-level").innerText = petLevel;
     document.getElementById("current-wisdom").innerText = currentWisdom;
@@ -3126,7 +3175,9 @@ function trainQuality() {
     if (targetTier === null) return;
     const stopOnMutation = confirm("遇变异则停止？");
 
+    const initialRebornPill = rebornPill; // 记录初始的还童丹数量
     let achieved = false;
+
     while (rebornPill > 0 && !achieved) {
         rebornPet();
         if (currentPet.qualities.tier === targetTier) {
@@ -3137,13 +3188,15 @@ function trainQuality() {
         }
     }
 
-    const message = `您消耗了${100 - rebornPill}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
+    const usedRebornPills = initialRebornPill - rebornPill; // 计算消耗的还童丹数量
+    const message = `您消耗了${usedRebornPills}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
     const messageBox = document.createElement('div');
     messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
     messageBox.innerHTML = `<p>${message}</p>
                             <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
     document.body.appendChild(messageBox);
 }
+
 
 function enhanceQuality() {
     if (!currentPet || !currentPet.qualities) { // 添加检查

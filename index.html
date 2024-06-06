@@ -48,7 +48,7 @@
         /* 底部栏样式 */
         .bottom-bar {
             width: 90%;
-            margin: 10px 5px;
+            margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 90%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
@@ -71,7 +71,7 @@
         }
         .core-area {
             width: 90%;
-            margin: 10px 5px;
+            margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 90%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
@@ -83,7 +83,7 @@
         .button-row {
             display: flex;
             grid-template-columns: repeat(4, 1fr);
-            gap: 5px 5px;
+            gap: 5px 10px;
             margin: 0px 0px;
             padding: 0px;
             flex-direction: row;
@@ -102,7 +102,7 @@
             background-position: center; /* 背景图像居中 */
             background-repeat: no-repeat; /* 防止背景图像平铺 */
             width: 70px; /* 根据需要调整宽度 */
-            height: 45px; /* 根据需要调整高度 */
+            height: 40px; /* 根据需要调整高度 */
         }
         
         /* 为每个按钮设置不同的背景图片 */
@@ -141,20 +141,22 @@
         .core-area .skills {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            padding: 10px 0px;
+            padding: 0px 0px;
             margin: 2px 0px;
-            gap: 10px;
+            gap: 5px 5px;
             width: 100%;
         }
         .core-area .skills div {
             width: 100%;
-            padding: 10px;
+            height: 90%;
+            padding: 5px;
+            margin: 5px 0px;
             background-color: #ffffffcf;
             text-align: center;
             border-radius: 5px;
             font-size: 12px;
             font-weight: bold;
-            box-shadow: 0 2px 2px rgb(0 0 0 / 30%);
+            box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
             box-sizing: border-box;
             cursor: pointer;
         }
@@ -172,7 +174,7 @@
             margin: 5px 0;
         }
         .description-box {
-            margin: 10px 0px;
+            margin: 5px 0px;
             padding: 5px;
             width: 90%;
             /* border: #ffc900; */
@@ -184,7 +186,7 @@
         .pet-selector {
             width: 90%;
             height: 90%;
-            margin: 0px 5px;
+            margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 95%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
@@ -613,6 +615,21 @@
     </style>
 </head>
 <body>
+    <div class="core-area">
+        <div class="buttons">
+            <div class="button-row">
+                <button id="guideButton" onclick="showGuide()">玩法</button>
+                <button id="drawerButton" onclick="toggleDrawer()">资质</button>
+                <button id="attributeButton" onclick="toggleAttributeDrawer()">属性</button>
+                <button id="shopButton" onclick="toggleShop()">商店</button> 
+                <button id="treasureButton" onclick="toggleTreasureDrawer()">宝箱</button>
+                <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
+                <button id="fightingButton" onclick="togglefightingDrawer()">战斗</button>
+                <button id="missionButton" onclick="togglemissionDrawer()">任务</button>
+            </div>
+        </div>
+        <div class="skills" id="skills-area"></div>
+    </div>
     <div class="top-bar">
         <div>
             <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
@@ -650,22 +667,7 @@
             <div><span id="miraculous-pill">1</span></div>
         </div>
     </div>
-    <div class="core-area">
-        <div class="buttons">
-            <div class="button-row">
-                <button id="guideButton" onclick="showGuide()">玩法</button>
-                <button id="drawerButton" onclick="toggleDrawer()">资质</button>
-                <button id="attributeButton" onclick="toggleAttributeDrawer()">属性</button>
-                <button id="shopButton" onclick="toggleShop()">商店</button> 
-                <button id="treasureButton" onclick="toggleTreasureDrawer()">宝箱</button>
-                <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
-                <button id="fightingButton" onclick="togglefightingDrawer()">战斗</button>
-                <button id="missionButton" onclick="togglemissionDrawer()">任务</button>
-            </div>
-        </div>
-        <div class="skills" id="skills-area"></div>
-    </div>
-        <div class="pet-selector">
+    <div class="pet-selector">
         <select id="pet-select" onchange="changePet()">
             <option value="yanzhi">胭脂</option>
             <option value="zhulin">竹林隐士</option>
@@ -3764,7 +3766,7 @@ function trainQuality() {
         alert("您的宠物已经觉醒，无法还童！");
         return;
     }
-    const targetTier = prompt("请选择预期段位（普通，优秀，杰出，卓越，完美）:");
+    const targetTier = prompt("请选择预期成长（普通，优秀，杰出，卓越，完美）:");
     if (targetTier === null) return;
     const stopOnMutation = confirm("遇变异则停止？");
 

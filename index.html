@@ -53,7 +53,7 @@
             background-color: rgb(255 255 255 / 90%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             align-items: stretch;
             border-radius: 10px;
             flex-direction: row;
@@ -142,13 +142,11 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             padding: 0px 0px;
-            margin: 2px 0px;
+            margin: 5px 0px;
             gap: 5px 5px;
-            width: 100%;
+            width: 95%;
         }
         .core-area .skills div {
-            /* width: 100%; */
-            /* height: 90%; */
             padding: 10px;
             margin: 5px 0px;
             background-color: #ffffffcf;
@@ -156,7 +154,7 @@
             border-radius: 5px;
             font-size: 12px;
             font-weight: bold;
-            box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+            box-shadow: 0px 0px 1px 1px rgb(0 0 0 / 30%);
             box-sizing: border-box;
             cursor: pointer;
         }
@@ -169,6 +167,8 @@
             flex-direction: column;
             align-items: stretch;
             justify-content: center;
+            padding: 0px 10px;
+            margin: 0px 10px;
         }
         .bottom-bar .info div {
             margin: 5px 0;
@@ -177,7 +177,14 @@
             margin: 5px 0px;
             padding: 5px;
             width: 90%;
-            /* border: #ffc900; */
+            background-color: rgb(255 255 255 / 90%);
+            border-radius: 10px;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            text-align: justify;
+        }
+        .treasure-description-box {
+            margin: 5px 5px;
+            padding: 20px;
             background-color: rgb(255 255 255 / 90%);
             border-radius: 10px;
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
@@ -210,6 +217,8 @@
             width: 180px;
             height: 180px;
             border-radius: 10px;
+            padding: 0px 5px;
+            margin: 5px 0px;
         }
         .info-card {
             display: none;
@@ -335,7 +344,7 @@
             border-radius: 5px;
         }
         .shop-item.selected {
-            border-color: #e4bb5c;
+            border-color: #0a8c00;
             background-color: #fff;
         }
         .shop-bar {
@@ -368,7 +377,7 @@
             font-size: 16px;
         }
         .shop-bar button:active {
-            background-color: #c4a14e;
+            background-color: #064701;
         }
         .shop-timer {
             display: flex;
@@ -385,12 +394,12 @@
             font-size: 14px;
         }
         .shop-timer button:active {
-            background-color: #c4a14e;
+            background-color: #064701;
         }
         .attribute-info button {
             padding: 2px 8px;
             margin: 5px;
-            background-color: #0a8c00;
+            background-color: #064701;
             color: white;
             border: none;
             border-radius: 5px;
@@ -519,14 +528,17 @@
         .treasure-bar {
             display: flex;
             justify-content: space-around;
+            align-items: center;
         }
         .reward-box {
+            display: flex;
             margin-top: 10px;
-            padding: 0px;
-            background-color: #fff;
+            padding: 0;
+            background-color: #f1f0f0;
             border-radius: 10px;
-            box-shadow: 1 1px 1px rgba(0, 0, 0, 0.1);
             text-align: center;
+            flex-direction: row;
+            justify-content: center;
         }
         .treasure-action {
             display: flex;
@@ -570,7 +582,7 @@
         .jinnang-reward {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
+            gap: 5px 5px;
             justify-content: center;
             margin-top: 5px;
         }
@@ -602,7 +614,7 @@
         .message-box button {
             margin-top: 10px; /* 按钮与文本之间的间距 */
             padding: 5px 10px; /* 按钮内边距 */
-            background-color: #e4bb5c; /* 按钮背景颜色 */
+            background-color: #0a8c00; /* 按钮背景颜色 */
             color: white; /* 按钮文本颜色 */
             border: none; /* 去除边框 */
             border-radius: 3px; /* 按钮圆角 */
@@ -696,10 +708,10 @@
                 </div>
                 <div class="button-grid">
                     <button onclick="rebornPet()">普通还童</button>
-                    <button onclick="trainQuality()">快速还童</button>
+                    <button onclick="trainQuality()">一键还童</button>
                     <button onclick="useGoldenRebornPill()">还童金丹</button>
                     <button onclick="useBingpoRebornPill()">冰魄还童</button>
-                    <button onclick="enhanceQuality()">刷新资质</button>
+                    <button onclick="enhanceQuality()">更新资质</button>
                     <button onclick="mutatePet()">变异宠物</button>
                     <button onclick="evolvePet()">进化宠物</button>
                     <button onclick="trainSkills()">洗练技能</button>
@@ -830,7 +842,7 @@
                 <div>至尊宝箱</div>
             </div>
             </div>
-            <div id="treasure-description" class="description-box"></div>
+            <div id="treasure-description" class="treasure-description-box"></div>
             <div id="treasure-reward" class="reward-box"></div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">打开宝箱</button>
@@ -852,7 +864,7 @@
             <div>宠物名称: <span id="pet-name">胭脂</span></div>
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
-            <div>剩余金子: <span id="gold-amount">20000</span></div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>
     <div class="description-box" id="description-box"></div>
@@ -2177,7 +2189,7 @@ function useGoldenRebornPill() {
     updateSkillScore();
 }
  
-let goldAmount = 20000; // 初始金子数量
+let goldAmount = 50000; // 初始金子数量
 document.getElementById("gold-amount").innerText = goldAmount;
 
 function toggleShop() {
@@ -2810,7 +2822,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
     const messageBox = document.createElement('div');
     messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
     messageBox.innerHTML = `
-        <p>技能描述：${skill.description}</p>
+        <p>描述：${skill.description}</p>
         <p>是否删除？</p>
         <button id="confirm-delete">删除</button>
         <button id="cancel-delete">取消</button>
@@ -2865,7 +2877,7 @@ function updateSkillScore(selectedSkills = []) {
     const magicDefense = parseInt(document.getElementById("secondary-magic-defense").innerText);
     const speed = parseInt(document.getElementById("secondary-speed").innerText);
 
-    const secondaryAttributeScore = health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed;
+    const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
     // 计算技能评分
     let skillScore = 0;
@@ -2910,7 +2922,7 @@ function updateSkillScore(selectedSkills = []) {
 function upgradeWisdomTo() {
     const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后，你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
     if (target === null) return;
-    
+
     if (target === "111") {
         transmutationPill += 999;
         rebornPill += 999;
@@ -2952,9 +2964,17 @@ function upgradeWisdomTo() {
         }
     
         updateJinnangItems();
-        document.getElementById("description-box").innerText = "您获得了万能锦囊！";
+        document.getElementById("description-box").innerText = "您获得了超绝白金VIP礼包！";
         return;
     }
+
+    if (target === "999") {
+        goldAmount += 999999;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        document.getElementById("description-box").innerText = "您获得了一大袋金子！";
+        return;
+    }
+    
     const targetValue = parseInt(target, 10);
     if (isNaN(targetValue) || targetValue < 1 || targetValue > (awakened ? 25 : 20)) {
         alert(`无效输入，请输入1到${awakened ? 25 : 20}之间的数字`);
@@ -3067,10 +3087,15 @@ function awakenPet() {
 
     const awakenPillItem = jinnangItems.find(i => i.name === 'awakenPill');
     if (!awakenPillItem || awakenPillItem.quantity < 1) {
-        alert("您的醒悟丹不足！");
+        alert("必要道具：醒悟丹 数量不足！");
         return;
     }
 
+    const confirmation = confirm("觉醒宠物会收取一个稀有道具“醒悟丹”（宝箱获得），觉醒后的宠物资质会提升，成长率也会提升。宠物的当前属性会提高20%，悟性上限提升至25，等级上限提高至160级。是否觉醒？");
+    if (!confirmation) {
+        return;
+    }
+    
     const qualities = currentPet.qualities;
     const growthRate = qualities.growthRate / 100;
     const baseLevel = petLevel; // 觉醒前的等级设为当前等级
@@ -3098,7 +3123,7 @@ function awakenPet() {
     petMaxLevel = 160;
     awakened = true;
 
-    alert("您的宠物成功觉醒，等级上限提升至160！");
+    alert("成功觉醒，宠物的当前属性提高20%，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
     updatePetLevel();
     updateAttributePanel();
     updateQualityCard();
@@ -3180,11 +3205,11 @@ function levelUpPet() {
                     growthRate = 460 / 100; // 固定值
                 } else {
                     growthRateDisplay = `${minGrowthRate}% ~ 460%`;
-                    growthRate = (minGrowthRate + 460) / 200; // 平均值
+                    growthRate = (Math.floor(Math.random() * (460 - minGrowthRate + 1)) + minGrowthRate) / 100; // 随机值
                 }
             } else {
                 growthRateDisplay = `400% ~ 460%`;
-                growthRate = (460 + 400) / 200; // 平均值
+                growthRate = (Math.floor(Math.random() * (460 - 400 + 1)) + 400) / 100; // 随机值
             }
         } else {
             growthRate = qualities.growthRate / 100;
@@ -3193,6 +3218,7 @@ function levelUpPet() {
     
         return { growthRateDisplay, growthRate };
     }
+
     
     function updatePrimaryAttributes(totalAttributes) {
         document.getElementById("attribute-endurance").innerText = Math.round(totalAttributes.endurance);

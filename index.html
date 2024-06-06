@@ -82,12 +82,12 @@
         }
         .button-row {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 0px 5px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px 15px;
             margin: 0px 0px;
             padding: 0px;
             flex-direction: row;
-            justify-content: space-between;
+            flex-wrap: wrap;
         }
         
         .button-row button {
@@ -128,7 +128,16 @@
         
         #jinnangButton {
             background-image: url('https://pic.imgdb.cn/item/66616fe95e6d1bfa05b0103d.png');
-        }                
+        }
+        
+        #fightingButton {
+            background-image: url('https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png');
+        }
+        
+        #missionButton {
+            background-image: url('https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png');
+        }
+        
         .core-area .skills {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -648,6 +657,8 @@
                 <button id="shopButton" onclick="toggleShop()">商店</button> 
                 <button id="treasureButton" onclick="toggleTreasureDrawer()">宝箱</button>
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
+                <button id="fightingButton" onclick="togglefightingDrawer()">战斗</button>
+                <button id="missionButton" onclick="togglemissionDrawer()">任务</button>
             </div>
         </div>
         <div class="skills" id="skills-area"></div>
@@ -1335,12 +1346,58 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png",
     "https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png",
     "https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png",
+    "https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png",
+    "https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png",
     "https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png",
     "https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png"
 ];
 preloadImages(imageUrls);
 
 
+function togglefightingDrawer() {
+    const messageBox = document.createElement('div');
+    messageBox.style = `
+        width: 50%; 
+        height: 10%; 
+        padding: 10px; 
+        background: white; 
+        border: 1px solid black; 
+        border-radius:10px;
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 1000;
+        overflow: auto; 
+        font-size: 14px;
+    `;
+    messageBox.innerHTML =  `<p>功能暂未开放</p>
+                            <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
+    document.body.appendChild(messageBox);
+}
+
+function togglemissionDrawer() {
+    const messageBox = document.createElement('div');
+    messageBox.style = `
+        width: 50%; 
+        height: 10%; 
+        padding: 10px; 
+        background: white; 
+        border: 1px solid black; 
+        border-radius:10px;
+        position: fixed; 
+        top: 50%; 
+        left: 50%; 
+        transform: translate(-50%, -50%); 
+        z-index: 1000;
+        overflow: auto; 
+        font-size: 14px;
+    `;
+    messageBox.innerHTML =  `<p>功能暂未开放</p>
+                            <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
+    document.body.appendChild(messageBox);
+}
+        
 function showGuide() {
     const messageBox = document.createElement('div');
     messageBox.style = `

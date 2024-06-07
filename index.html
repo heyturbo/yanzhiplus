@@ -158,6 +158,10 @@
             box-sizing: border-box;
             cursor: pointer;
         }
+        .core-area .skills .s-skill {
+            border: 2px solid gold;
+            background-color: #fefefc;
+        }
         .core-area .skills .ss-skill {
             border: 2px solid gold;
             background-color: #ffc900;
@@ -285,7 +289,7 @@
         }
         .quality-info {
             display: none;
-            padding: 10px;
+            padding: 5px;
         }
         .quality-info.open {
             display: block;
@@ -295,7 +299,7 @@
             background-color: #e3e3e3;
             border-radius: 5px;
             overflow: hidden;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             font-size: 14px;
         }
         .quality-info .progress-bar div {
@@ -449,53 +453,57 @@
         .attributes-container {
             display: flex;
              /* 使两个子容器分布在容器的两边 */
-            gap: 2px; /* 调整两列之间的间距 */
-            flex-direction: row;
+            gap: 0px; /* 调整两列之间的间距 */
             align-items: stretch;
             font-size: 14px;
             justify-content: space-between;
+            flex-direction: row-reverse;
         }
         .progress-bars {
             display: flex;
-            gap: 2px; /* 调整每个条目之间的间距 */
+            gap: 5px; /* 调整每个条目之间的间距 */
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
+            justify-content: space-around;
         }
         .secondary-attributes {
             display: flex;
             flex-direction: column;
-            gap: 2px; /* 调整每个条目之间的间距 */
+            gap: 5px; /* 调整每个条目之间的间距 */
             align-items: center;
             flex-wrap: nowrap;
             justify-content: space-evenly;
         }
         .image-frame {
             display: flex;
-            justify-content: flex-end;
+            
             
             /* 设置图片框的尺寸，可以根据需要调整 */
-            width: 170px;
-            height: 190px;
-            /* border: 1px solid #0a8c00; */ /* 添加边框 */
-            margin: 0px; /* 在容器内垂直居中 */
+            width: 180px;
+            height: 180px;
+             /* 添加边框 */
+            margin: 2px; /* 在容器内垂直居中 */
+            top: 50%;
+            left: 50%;
             align-items: center;
             align-content: center;
+            flex-wrap: nowrap;
             flex-direction: column;
-            flex-wrap: wrap;
+            justify-content: space-around;
         }
         .attributes-container .increase-btn {
             background-color: #0a8c00; /* 绿色 */
             border: none;
-            color: white;
-            /* padding: 0px 0px; */
-            /* text-align: justify; */
-            /* text-decoration: none; */
-            /* display: flex; */
-            font-size: 14px;
+            color: #fff;
+            padding: 1px 5px;
+            text-align: justify;
+            text-decoration: none;
+            display: flow;
+            font-size: 12px;
             gap: 0px;
-            margin: 0px 0px 0px 10px;
+            margin: 0px 0px 0px 0px;
             cursor: pointer;
-            /* border-radius: 4px; */
+            border-radius: 5px;
         }    
         
         .attributes-container .increase-btn:hover {
@@ -510,15 +518,18 @@
         }
         
         .quality-details {
-            display: flex;
-            flex-direction: column;
-            gap: 2px; /* 调整每个条目之间的间距 */
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            flex-direction: row;
+            padding: 0px 0px 10px 0px;
+            gap: 5px 0px; /* 调整每个条目之间的间距 */
             font-size: 14px;
-            justify-content: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
         }
         .image-frame img {
-            max-width: 90%;
-            max-height: 90%;
+            max-width: 100%;
+            max-height: 100%;
         }
         .button-grid {
             display: grid;
@@ -528,9 +539,9 @@
             justify-items: stretch;
         }
         .button-grid button {
-            padding: 5px;
-            width: 85%;
-            font-size: 14px; /* 调整按钮字体大小 */
+            padding: 8px 0px;
+            width: 90%;
+            font-size: 12px; /* 调整按钮字体大小 */
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
         }
         .treasure-drawer {
@@ -583,7 +594,7 @@
             font-size: 14px;
         }
         .treasure-action button:active {
-            background-color: #c4a14e;
+            background-color: #064701;
         }
         /* 锦囊抽屉样式 */
         .jinnang-drawer {
@@ -709,6 +720,7 @@
     </div>
     <div class="pet-selector">
         <select id="pet-select" onchange="changePet()">
+            <option value="yanzhi">未选择</option>
             <option value="yanzhi">胭脂</option>
             <option value="zhulin">竹林隐士</option>
             <option value="zhanshen">战神阿毛</option>
@@ -734,16 +746,6 @@
                     <div>变异: <span id="quality-mutated">未变异</span></div>
                     <div>进化等级: <span id="evolution-level">0</span></div>
                 </div>
-                <div class="button-grid">
-                    <button onclick="rebornPet()">普通还童</button>
-                    <button onclick="trainQuality()">一键还童</button>
-                    <button onclick="useGoldenRebornPill()">还童金丹</button>
-                    <button onclick="useBingpoRebornPill()">冰魄还童</button>
-                    <button onclick="enhanceQuality()">更新资质</button>
-                    <button onclick="mutatePet()">变异宠物</button>
-                    <button onclick="evolvePet()">进化宠物</button>
-                    <button onclick="showBiography()">解锁传记</button>
-                </div>
             </div>
             <div class="progress-bar">
                 耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
@@ -765,6 +767,16 @@
                 智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
                 <div id="intelligence-bar" style="width: 50%"></div>
             </div>
+                <div class="button-grid">
+                    <button onclick="rebornPet()">普通还童</button>
+                    <button onclick="trainQuality()">一键还童</button>
+                    <button onclick="useGoldenRebornPill()">还童金丹</button>
+                    <button onclick="useBingpoRebornPill()">冰魄还童</button>
+                    <button onclick="enhanceQuality()">更新资质</button>
+                    <button onclick="mutatePet()">变异宠物</button>
+                    <button onclick="evolvePet()">进化宠物</button>
+                    <button onclick="showBiography()">解锁传记</button>
+                </div>
             <div id="message-box" class="message-box">
                 <span id="message-text"></span>
                 <button onclick="closeMessage()">关闭</button>
@@ -776,18 +788,6 @@
         <div class="attribute-info" id="attribute-info">
             <div class="attributes-container">
                 <div class="progress-bars">
-                    <div class="progress-bar">
-                        宠物等级: <span id="pet-level">1</span>
-                    </div>
-                    <div class="progress-bar">
-                        段位: <span id="attribute-tier"></span>
-                    </div>
-                    <div class="progress-bar">
-                        成长率: <span id="attribute-growth-rate"></span>
-                    </div>
-                    <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span>
-                    </div>
                     <div class="progress-bar">
                         耐力: <span id="attribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">＋</button>
                     </div>
@@ -803,13 +803,26 @@
                     <div class="progress-bar">
                         信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
                     </div>
-                    <div id="remaining-points-display">剩余点数: 0</div>                         
+                    <div id="remaining-points-display">剩余点数: 0</div>
+                    <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
                 <div class="image-frame">
                     <img src="https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png" alt="神兽之地">
                     <div>修炼之地</div>
                 </div>
                 <div class="secondary-attributes">
+                    <div class="progress-bar">
+                        宠物等级: <span id="pet-level">1</span>
+                    </div>
+                    <div class="progress-bar">
+                        品质: <span id="attribute-tier"></span>
+                    </div>
+                    <div class="progress-bar">
+                        成长率: <span id="attribute-growth-rate"></span>
+                    </div>
+                    <div class="progress-bar">
+                        悟性: <span id="attribute-wisdom"></span>
+                    </div>
                     <div>HP: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                     <div>MP: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
                     <div>物攻: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
@@ -817,7 +830,6 @@
                     <div>法攻: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
                     <div>法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
                     <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
-                    <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
             </div>
             <div class="button-grid">
@@ -887,10 +899,10 @@
     </div>
     <div class="bottom-bar">
         <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png" alt="默认">
         </div>
         <div class="info">
-            <div>宠物名称: <span id="pet-name">胭脂</span></div>
+            <div>宠物名称: <span id="pet-name">未选择</span></div>
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
@@ -1361,6 +1373,20 @@ function preloadImages(imageUrls) {
 const imageUrls = [
     "https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png",
+    "https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif",
+    "https://pic.imgdb.cn/item/665c7002d9c307b7e9897757.gif",
+    "https://pic.imgdb.cn/item/665c7002d9c307b7e98976fe.gif",
+    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7ab.gif",
+    "https://pic.imgdb.cn/item/665433e7d9c307b7e93ac709.gif",
+    "https://pic.imgdb.cn/item/665433e7d9c307b7e93ac709.gif",
+    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac76d.gif",
+    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif",
+    "https://pic.imgdb.cn/item/66542638d9c307b7e92c22fd.gif",
+    "https://pic.imgdb.cn/item/665425a9d9c307b7e92b8c0b.gif",
+    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7e1.gif",
+    "https://pic.imgdb.cn/item/6655c106d9c307b7e9dad024.gif",
+    "https://pic.imgdb.cn/item/66542639d9c307b7e92c23a4.gif",
+    "https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png",
     "https://pic.imgdb.cn/item/66616fe95e6d1bfa05b0103d.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0117c.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0121c.png",
@@ -1900,9 +1926,9 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '资质宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 18 },
-            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 18 },
-            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 18 },
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 33 },
+            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 33 },
+            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 33 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 1 }
         ],
         '灵魂宝箱': [
@@ -2633,6 +2659,7 @@ function resetPet() {
     petWisdom = currentWisdom;
     awakened = false;
     hallucinated = false;
+    hallucinationLevel = 0;
     bonusAttributes = {
     endurance: 0,
     intelligence: 0,

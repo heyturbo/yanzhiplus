@@ -397,14 +397,14 @@
             background-color: #064701;
         }
         .attribute-info button {
-            padding: 2px 8px;
-            margin: 5px;
+            padding: 0px 5px;
+            margin: 0px 2px;
             background-color: #0a8c00;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
         }
         .attribute-info button:active {
             background-color: #064701;
@@ -455,11 +455,19 @@
             font-size: 14px;
             justify-content: space-between;
         }
-        .progress-bars, .secondary-attributes {
+        .progress-bars {
+            display: flex;
+            gap: 4px; /* 调整每个条目之间的间距 */
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .secondary-attributes {
             display: flex;
             flex-direction: column;
             gap: 2px; /* 调整每个条目之间的间距 */
-            justify-content: space-between;
+            align-items: center;
+            flex-wrap: nowrap;
+            justify-content: space-evenly;
         }
         .image-frame {
             display: flex;
@@ -474,6 +482,25 @@
             align-content: center;
             flex-direction: column;
         }
+        .attributes-container .increase-btn {
+            background-color: #0a8c00; /* 绿色 */
+            border: none;
+            color: white;
+            /* padding: 0px 0px; */
+            /* text-align: justify; */
+            /* text-decoration: none; */
+            /* display: flex; */
+            font-size: 14px;
+            gap: 0px;
+            margin: 0px 0px 0px 10px;
+            cursor: pointer;
+            /* border-radius: 4px; */
+        }    
+        
+        .attributes-container .increase-btn:hover {
+            background-color: #45a049; /* 深绿色 */
+        }
+
         .quality-container {
             display: flex;
              /* 使两个子容器分布在容器的两边 */
@@ -495,7 +522,7 @@
         .button-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 2px; /* 调整按钮之间的间距 */
+            gap: 5px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
             justify-items: stretch;
         }
@@ -714,7 +741,7 @@
                     <button onclick="enhanceQuality()">更新资质</button>
                     <button onclick="mutatePet()">变异宠物</button>
                     <button onclick="evolvePet()">进化宠物</button>
-                    <button onclick="trainSkills()">洗练技能</button>
+                    <button onclick="showBiography()">解锁传记</button>
                 </div>
             </div>
             <div class="progress-bar">
@@ -761,20 +788,21 @@
                         悟性: <span id="attribute-wisdom"></span>
                     </div>
                     <div class="progress-bar">
-                        耐力: <span id="attribute-endurance"></span>
+                        耐力: <span id="attribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">＋</button>
                     </div>
                     <div class="progress-bar">
-                        智力: <span id="attribute-intelligence"></span>
+                        智力: <span id="attribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">＋</button>
                     </div>
                     <div class="progress-bar">
-                        强壮: <span id="attribute-strength"></span>
+                        强壮: <span id="attribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">＋</button>
                     </div>
                     <div class="progress-bar">
-                        敏捷: <span id="attribute-agility"></span>
+                        敏捷: <span id="attribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">＋</button>
                     </div>
                     <div class="progress-bar">
-                        信仰: <span id="attribute-faith"></span>
+                        信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
                     </div>
+                    <div id="remaining-points-display">剩余点数: 0</div>                         
                 </div>
                 <div class="image-frame">
                     <img src="https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png" alt="神兽之地">
@@ -792,16 +820,16 @@
                 </div>
             </div>
             <div class="button-grid">
-                <button onclick="trainAttributes()">宠物培养</button>
+                <button onclick="trainSkills()">洗练技能</button>
+                <button onclick="trainAttributes()">金子培养</button>
                 <button onclick="absorbExperience()">普通修炼</button>
                 <button onclick="absorbAdvancedExperience()">高级修炼</button>
                 <button onclick="upgradeWisdom()">提升悟性</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">神级领悟</button>
+                <button onclick="ascend()">飞升突破</button>
                 <button onclick="awakenPet()">觉醒宠物</button>
                 <button onclick="hallucinatePet()">幻化提升</button>
-                <button onclick="ascend()">飞升突破</button>
-                <button onclick="showBiography()">解锁传记</button>
             </div>
         </div>
     </div>
@@ -1637,6 +1665,27 @@ function useSupremeWisdomPill() {
     }
 }
 
+function increasePetLevel(levels) {
+    if (petLevel >= petMaxLevel) {
+        alert("宠物等级已达上限，无法继续升级！");
+        console.log("Level Up Error: Max level reached.");
+        return;
+    }
+
+    const oldLevel = petLevel;
+    petLevel += levels;
+    if (petLevel > petMaxLevel) petLevel = petMaxLevel; // 确保等级不超过上限
+
+    const actualLevelsIncreased = petLevel - oldLevel;
+    remainingPoints += actualLevelsIncreased * 2; // 每提升1级增加2个可分配点数
+
+    updatePetLevel();
+    updateAttributePanel();
+    updateRemainingPointsDisplay();
+
+    console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
+}
+        
 function absorbExperience() {
     const item = jinnangItems.find(i => i.name === 'normalExperienceBook');
     if (item.quantity <= 0) {
@@ -1648,11 +1697,9 @@ function absorbExperience() {
         return;
     }
     item.quantity--;
-    petLevel++;
     updateJinnangItems();
-    updatePetLevel();
+    increasePetLevel(1);
 }
-
 
 function absorbAdvancedExperience() {
     const item = jinnangItems.find(i => i.name === 'advancedExperienceBook');
@@ -1665,11 +1712,10 @@ function absorbAdvancedExperience() {
         return;
     }
     item.quantity--;
-    petLevel += 3;
-    if (petLevel > petMaxLevel) petLevel = petMaxLevel; // 确保等级不超过上限
     updateJinnangItems();
-    updatePetLevel();
+    increasePetLevel(3);
 }
+
 
 let petLevel = 1;
 let petMaxLevel = 149;
@@ -2075,12 +2121,17 @@ function trainAttributes() {
     // 获取当前培养的属性提升倍数
     const multiplier = trainingMultipliers[trainingCount];
 
-    // 提升currentPet中的qualities值
-    currentPet.qualities.endurance.current *= multiplier;
-    currentPet.qualities.intelligence.current *= multiplier;
-    currentPet.qualities.strength.current *= multiplier;
-    currentPet.qualities.agility.current *= multiplier;
-    currentPet.qualities.faith.current *= multiplier;
+    // 获取当前属性值
+    const currentAttributes = calculateCurrentAttributes();
+
+    // 提升bonusAttributes中的值
+    bonusAttributes.endurance += Math.floor(currentAttributes.endurance * (multiplier - 1));
+    bonusAttributes.intelligence += Math.floor(currentAttributes.intelligence * (multiplier - 1));
+    bonusAttributes.strength += Math.floor(currentAttributes.strength * (multiplier - 1));
+    bonusAttributes.agility += Math.floor(currentAttributes.agility * (multiplier - 1));
+    bonusAttributes.faith += Math.floor(currentAttributes.faith * (multiplier - 1));
+
+    console.log("Updated Bonus Attributes:", bonusAttributes);
 
     // 增加金子培养次数
     trainingCount++;
@@ -2088,6 +2139,7 @@ function trainAttributes() {
     // 更新属性面板
     updateAttributePanel();
 }
+
 
 function updatePetLevel() {
     document.getElementById('pet-level').innerText = petLevel;
@@ -2119,18 +2171,19 @@ function showBiography() {
 
     const messageBox = document.createElement('div');
     messageBox.style = `
-        width: 350px; 
-        height: 500px; 
-        padding: 20px; 
-        background: white; 
-        border: 1px solid black; 
-        position: fixed; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
+        width: 90%;
+        height: 60%;
+        padding: 5px;
+        background: rgb(255 255 255 / 95%);
+        border: 1px solid black;
+        position: fixed;
+        border-radius: 10px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         z-index: 1000;
-        overflow: auto; 
-        font-size: 16px;
+        overflow: auto;
+        font-size: 14px;
     `;
     messageBox.innerHTML = `<p>${message}</p>
                             <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
@@ -2570,6 +2623,7 @@ function resetPet() {
     // 初始化等级和其他基础属性
     petLevel = 1;
     evolutionLevel = 0;
+    growthRate = 1;
     remainingPoints = 0;
     trainingCount = 0;
     currentWisdom = 0;
@@ -2578,7 +2632,15 @@ function resetPet() {
     petWisdom = currentWisdom;
     awakened = false;
     hallucinated = false;
+    bonusAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+    };
     document.body.style.backgroundImage = "";
+
 
     // 重置基础属性为初始值，调用calculateAttribute
     baseAttributes = {
@@ -2719,7 +2781,6 @@ function upgradeWisdom() {
 
 
 function trainSkills() {
-    if (!checkDrawerOpen()) return;
     if (transmutationPill < 1) {
         alert("您的道具不够，请刷新后重试！");
         return;
@@ -2820,7 +2881,7 @@ function updateSkillsArea(selectedSkills) {
 
 function deleteSkill(skill, skillDiv, skillsArea) {
     const messageBox = document.createElement('div');
-    messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
+    messageBox.style = "padding: 5px; font-size: 14px; border-radius: 10px; background: rgb(255 255 255 / 90%); border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
     messageBox.innerHTML = `
         <p>描述：${skill.description}</p>
         <p>是否删除？</p>
@@ -3045,181 +3106,6 @@ function upgradeWisdomTo() {
         alert(`请输入1到${awakened ? 25 : 20}之间的整数！`);
     }
 }
-
-let awakened = false; // 复位觉醒状态
-let baseAttributes = {
-    endurance: 0,
-    intelligence: 0,
-    strength: 0,
-    agility: 0,
-    faith: 0
-};
-
-function calculateCurrentAttributes() {
-    const qualities = currentPet.qualities;
-    const growthRate = qualities.growthRate / 100;
-    const baseLevel = awakened ? qualities.baseLevel : 0;
-
-    return {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened),
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened),
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel, baseLevel, awakened),
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel, baseLevel, awakened),
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel, baseLevel, awakened)
-    };
-}
-
-function calculateAttribute(currentValue, growthRate, level, baseLevel, isAwakened) {
-    if (isAwakened && level > baseLevel - 1) {
-        const awakenedLevels = level - baseLevel;
-        return Math.floor((currentValue / 2000) * growthRate * 4 * awakenedLevels * 0.6);
-    } else {
-        return Math.floor((currentValue / 2000) * growthRate * 4 * level * 0.6);
-    }
-}
-        
-// 宠物觉醒函数
-function awakenPet() {
-    if (awakened) {
-        alert("您的宠物已经觉醒，无法再次觉醒！");
-        return;
-    }
-
-    const awakenPillItem = jinnangItems.find(i => i.name === 'awakenPill');
-    if (!awakenPillItem || awakenPillItem.quantity < 1) {
-        alert("必要道具：醒悟丹 数量不足！");
-        return;
-    }
-
-    const confirmation = confirm("觉醒宠物会收取一个稀有道具“醒悟丹”（宝箱获得），觉醒后的宠物资质会提升，成长率也会提升。宠物的当前属性会提高20%，悟性上限提升至25，等级上限提高至160级。是否觉醒？");
-    if (!confirmation) {
-        return;
-    }
-    
-    const qualities = currentPet.qualities;
-    const growthRate = qualities.growthRate / 100;
-    const baseLevel = petLevel; // 觉醒前的等级设为当前等级
-    const isAwakened = false; // 觉醒前标志设为false
-
-    // 记录觉醒前的属性值
-    baseAttributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel, baseLevel, isAwakened) * 1.2,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel, baseLevel, isAwakened) * 1.2,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel, baseLevel, isAwakened) * 1.2,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel, baseLevel, isAwakened) * 1.2,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel, baseLevel, isAwakened) * 1.2
-    };
-    
-    // 记录觉醒前的等级
-    currentPet.qualities.baseLevel = petLevel;
-
-    // 更新段位和成长率
-    currentPet.qualities.tier = '超凡';
-    currentPet.qualities.growthRate = Math.floor(Math.random() * 61) + 400; // 随机生成400-460之间的成长率
-
-    awakenPillItem.quantity--;
-    updateJinnangItems();
-
-    petMaxLevel = 160;
-    awakened = true;
-
-    alert("成功觉醒，宠物的当前属性提高20%，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
-    updatePetLevel();
-    updateAttributePanel();
-    updateQualityCard();
-}
-
-function levelUpPet() {
-    if (petLevel >= petMaxLevel) {
-        alert("您的宠物已达到当前等级上限！");
-        return;
-    }
-
-    petLevel++;
-    const growthRateRange = awakened ? [400 + (hallucinationLevel) * 5, 460] : [currentPet.qualities.growthRate, currentPet.qualities.growthRate];
-    const randomGrowthRate = Math.floor(Math.random() * (growthRateRange[1] - growthRateRange[0] + 1)) + growthRateRange[0];
-
-    const qualities = currentPet.qualities;
-    const newAttributes = {
-        //(currentValue / 2000) * growthRate * 4 * awakenedLevels * 0.6
-        endurance: Math.floor((qualities.endurance.current / 2000) * randomGrowthRate * 4 * 0.6),
-        intelligence: Math.floor((qualities.intelligence.current / 2000) * randomGrowthRate * 4 * 0.6),
-        strength: Math.floor((qualities.strength.current / 2000) * randomGrowthRate * 4 * 0.6),
-        agility: Math.floor((qualities.agility.current / 2000) * randomGrowthRate * 4 * 0.6),
-        faith: Math.floor((qualities.faith.current / 2000) * randomGrowthRate * 4 * 0.6)
-    };
-
-    // 无论是否觉醒，更新基础属性
-    baseAttributes.endurance += newAttributes.endurance;
-    baseAttributes.intelligence += newAttributes.intelligence;
-    baseAttributes.strength += newAttributes.strength;
-    baseAttributes.agility += newAttributes.agility;
-    baseAttributes.faith += newAttributes.faith;
-
-    updatePetLevel();
-    updateAttributePanel(); // 更新属性面板
-    updateQualityCard(); // 更新资质卡片
-}
-
-//以下是原function updateAttributePanel()分离之后的函数组        
-
-    function updateAttributePanel() {
-        const pet = currentPet;
-        const qualities = pet.qualities;
-        const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    
-        const currentAttributes = calculateCurrentAttributes();
-    
-        // 计算总属性值
-        const totalAttributes = {
-            endurance: currentAttributes.endurance + baseAttributes.endurance,
-            intelligence: currentAttributes.intelligence + baseAttributes.intelligence,
-            strength: currentAttributes.strength + baseAttributes.strength,
-            agility: currentAttributes.agility + baseAttributes.agility,
-            faith: currentAttributes.faith + baseAttributes.faith
-        };
-    
-        // 更新属性面板
-        document.getElementById("attribute-tier").innerText = qualities.tier;
-        document.getElementById("attribute-growth-rate").innerText = growthRateDisplay;
-        document.getElementById("attribute-wisdom").innerText = currentWisdom; // 确保使用currentWisdom
-    
-        updatePrimaryAttributes(totalAttributes);
-        updateSecondaryAttributes(totalAttributes, currentWisdom);
-    
-        updateSkillScore(Array.from(document.querySelectorAll("#skills-area div")).map(div => {
-            const [name, rarity] = div.innerText.split(" (");
-            return { name, rarity: rarity.replace(")", "") };
-        }));
-    }
-    
-    function calculateGrowthRateDisplayAndValue(qualities) {
-        let growthRateDisplay;
-        let growthRate;
-    
-        if (awakened) {
-            if (hallucinated) {
-                const minGrowthRate = 400 + (hallucinationLevel) * 5;
-                if (hallucinationLevel >= 12) {
-                    growthRateDisplay = `460%`;
-                    growthRate = 460 / 100; // 固定值
-                } else {
-                    growthRateDisplay = `${minGrowthRate}% ~ 460%`;
-                    growthRate = (Math.floor(Math.random() * (460 - minGrowthRate + 1)) + minGrowthRate) / 100; // 随机值
-                }
-            } else {
-                growthRateDisplay = `400% ~ 460%`;
-                growthRate = (Math.floor(Math.random() * (460 - 400 + 1)) + 400) / 100; // 随机值
-            }
-        } else {
-            growthRate = qualities.growthRate / 100;
-            growthRateDisplay = `${Math.round(growthRate * 100)}%`;
-        }
-    
-        return { growthRateDisplay, growthRate };
-    }
-
-    
     function updatePrimaryAttributes(totalAttributes) {
         document.getElementById("attribute-endurance").innerText = Math.round(totalAttributes.endurance);
         document.getElementById("attribute-intelligence").innerText = Math.round(totalAttributes.intelligence);
@@ -3293,9 +3179,217 @@ function levelUpPet() {
         speedBonusElement.innerText = `+${wisdomBonus}%`;
         speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
     }
-//以上是原function updateAttributePanel()分离之后的函数组
         
-// 宠物觉醒后，每一级成长率随机在400~460之间更新
+let awakened = false; // 复位觉醒状态
+
+let bonusAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+};
+
+let baseAttributes = {
+    endurance: 5,
+    intelligence: 6,
+    strength: 2,
+    agility: 3,
+    faith: 2
+};
+
+function calculateAttribute(currentValue, growthRate, level) {
+    return Math.floor((currentValue / 2000) * growthRate * 4 * level);
+}
+
+function calculateAwakenedAttributes(currentValue, growthRate, level, baseLevel) {
+    const awakenedLevels = level - baseLevel;
+    return calculateAttribute(currentValue, growthRate, awakenedLevels);
+}
+
+function calculatePreAwakenedAttributes(currentValue, growthRate, level) {
+    return calculateAttribute(currentValue, growthRate, level);
+}
+
+function calculateBonusAttributes(attribute, bonus) {
+    return attribute + Math.floor(attribute * bonus);
+}
+
+function calculateTotalAttributes(currentValue, growthRate, level, baseLevel, isAwakened) {
+    const baseAttribute = isAwakened ?
+        calculateAwakenedAttributes(currentValue, growthRate, level, baseLevel) :
+        calculatePreAwakenedAttributes(currentValue, growthRate, level);
+
+    return baseAttribute;
+}
+
+function updateAttributePanel() {
+    const pet = currentPet;
+    const qualities = pet.qualities;
+    const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+
+    const currentAttributes = calculateCurrentAttributes();
+
+    const totalAttributes = {
+        endurance: currentAttributes.endurance,
+        intelligence: currentAttributes.intelligence,
+        strength: currentAttributes.strength,
+        agility: currentAttributes.agility,
+        faith: currentAttributes.faith
+    };
+
+    console.log("Total Attributes:", totalAttributes);
+
+    document.getElementById("attribute-tier").innerText = qualities.tier;
+    document.getElementById("attribute-growth-rate").innerText = growthRateDisplay;
+    document.getElementById("attribute-wisdom").innerText = currentWisdom;
+
+    updatePrimaryAttributes(totalAttributes);
+    updateSecondaryAttributes(totalAttributes, currentWisdom);
+    updateSkillScore(Array.from(document.querySelectorAll("#skills-area div")).map(div => {
+        const [name, rarity] = div.innerText.split(" (");
+        return { name, rarity: rarity.replace(")", "") };
+    }));
+
+    // 更新总属性显示
+    document.getElementById("attribute-endurance").innerText = totalAttributes.endurance;
+    document.getElementById("attribute-intelligence").innerText = totalAttributes.intelligence;
+    document.getElementById("attribute-strength").innerText = totalAttributes.strength;
+    document.getElementById("attribute-agility").innerText = totalAttributes.agility;
+    document.getElementById("attribute-faith").innerText = totalAttributes.faith;
+
+    updateRemainingPointsDisplay();
+}
+
+function calculateGrowthRateDisplayAndValue(qualities) {
+    let growthRateDisplay;
+    let growthRate;
+
+    if (awakened) {
+        growthRate = 400 + hallucinationLevel * 5;
+        growthRateDisplay = `${growthRate}%`;
+        growthRate = growthRate / 100;
+    } else {
+        growthRate = qualities.growthRate / 100;
+        growthRateDisplay = `${Math.round(growthRate * 100)}%`;
+    }
+
+    console.log("Growth Rate:", growthRate);
+    console.log("Growth Rate Display:", growthRateDisplay);
+
+    return { growthRateDisplay, growthRate };
+}
+        
+function calculateCurrentAttributes() {
+    const qualities = currentPet.qualities;
+    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const baseLevel = awakened ? qualities.baseLevel : 0;
+
+    const attributes = {
+        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.endurance,
+        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.intelligence,
+        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.strength,
+        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.agility,
+        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.faith
+    };
+
+    console.log("Current Attributes:", attributes);
+    console.log("Bonus Attributes:", bonusAttributes);
+
+    return attributes;
+}
+
+let remainingPoints = 0;
+const allocationHistory = [];
+        
+function updateRemainingPointsDisplay() {
+    document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
+    console.log(`Remaining Points Display Updated: ${remainingPoints}`);
+}    
+        
+function increaseBonusAttribute(attribute) {
+    if (remainingPoints <= 0) {
+        alert("您的宠物没有可分配点数了！");
+        return;
+    }
+
+    bonusAttributes[attribute] += 1;
+    remainingPoints -= 1;
+    allocationHistory.push({ attribute, value: 1 });
+    updateAttributePanel();
+    updateRemainingPointsDisplay();
+
+    console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+}
+
+// 动态修改额外属性的函数
+function addBonusAttribute(attribute, value) {
+    if (bonusAttributes.hasOwnProperty(attribute)) {
+        bonusAttributes[attribute] += value;
+    }
+}
+
+function removeBonusAttribute(attribute, value) {
+    if (bonusAttributes.hasOwnProperty(attribute)) {
+        bonusAttributes[attribute] -= value;
+        if (bonusAttributes[attribute] < 0) {
+            bonusAttributes[attribute] = 0;
+        }
+    }
+}
+        
+function awakenPet() {
+    if (awakened) {
+        alert("您的宠物已经觉醒，无法再次觉醒！");
+        return;
+    }
+
+    const awakenPillItem = jinnangItems.find(i => i.name === 'awakenPill');
+    if (!awakenPillItem || awakenPillItem.quantity < 1) {
+        alert("必要道具：醒悟丹 数量不足！");
+        return;
+    }
+
+    const confirmation = confirm("觉醒宠物会收取一个稀有道具“醒悟丹”（宝箱获得），觉醒后的宠物资质会提升，成长率也会提升。宠物的当前属性会大幅提升，悟性上限提升至25，等级上限提高至160级。是否觉醒？");
+    if (!confirmation) {
+        return;
+    }
+
+    const qualities = currentPet.qualities;
+    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const baseLevel = petLevel;
+
+    const newAttributes = {
+        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
+        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
+        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
+        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
+        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
+    };
+
+    // 计算bonusAttributes
+    bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
+    bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
+    bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
+    bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
+    bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
+
+    currentPet.qualities.baseLevel = petLevel;
+    currentPet.qualities.tier = '超凡';
+    currentPet.qualities.growthRate = 400 + hallucinationLevel * 5;
+
+    awakenPillItem.quantity--;
+    updateJinnangItems();
+
+    petMaxLevel = 160;
+    awakened = true;
+
+    alert("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
+    updatePetLevel();
+    updateAttributePanel();
+    updateQualityCard();
+}
+
 let hallucinated = false;
 let hallucinationLevel = 0;
 
@@ -3361,140 +3455,7 @@ function hallucinatePet() {
     updateAttributePanel(); // 确保更新属性面板
 }
 
-//检查属性面板的错误值
-function checkForNaNAttributes(attributes) {
-    for (let key in attributes) {
-        if (isNaN(attributes[key])) {
-            console.error(`NaN detected in attribute: ${key}`);
-        }
-    }
-}
 
-// Update the panel with a check for NaN values
-function updateAttributePanelWithCheck() {
-    const pet = currentPet;
-    const qualities = pet.qualities;
-    let growthRateDisplay;
-    let growthRate;
-
-    if (awakened) {
-        if (hallucinated) {
-            const minGrowthRate = 400 + (hallucinationLevel) * 5;
-            if (hallucinationLevel >= 12) {
-                growthRateDisplay = `460%`;
-                growthRate = 460 / 100; // 固定值
-            } else {
-                growthRateDisplay = `${minGrowthRate}% ~ 460%`;
-                growthRate = (minGrowthRate + 460) / 200; // 平均值
-            }
-        } else {
-            growthRateDisplay = `400% ~ 460%`;
-            growthRate = (460 + 400) / 200; // 平均值
-        }
-    } else {
-        growthRate = qualities.growthRate / 100;
-        growthRateDisplay = `${Math.round(growthRate * 100)}%`;
-    }
-
-    const baseLevel = awakened ? qualities.baseLevel : 0;
-    const currentAttributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened),
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened),
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel, baseLevel, awakened),
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel, baseLevel, awakened),
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel, baseLevel, awakened)
-    };
-
-    // Check for NaN values
-    checkForNaNAttributes(currentAttributes);
-
-    // 将当前属性值累加到基础属性上
-    if (awakened) {
-        currentAttributes.endurance += baseAttributes.endurance;
-        currentAttributes.intelligence += baseAttributes.intelligence;
-        currentAttributes.strength += baseAttributes.strength;
-        currentAttributes.agility += baseAttributes.agility;
-        currentAttributes.faith += baseAttributes.faith;
-    }
-
-    document.getElementById("attribute-tier").innerText = qualities.tier;
-    document.getElementById("attribute-growth-rate").innerText = growthRateDisplay;
-    document.getElementById("attribute-wisdom").innerText = currentWisdom; // 确保使用currentWisdom
-    document.getElementById("attribute-endurance").innerText = Math.round(currentAttributes.endurance);
-    document.getElementById("attribute-intelligence").innerText = Math.round(currentAttributes.intelligence);
-    document.getElementById("attribute-strength").innerText = Math.round(currentAttributes.strength);
-    document.getElementById("attribute-agility").innerText = Math.round(currentAttributes.agility);
-    document.getElementById("attribute-faith").innerText = Math.round(currentAttributes.faith);
-
-    // 计算并更新二级属性
-    const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
-    let wisdomBonus;
-    if (currentWisdom <= 12) {
-        wisdomBonus = currentWisdom * 0.5;
-    } else if (currentWisdom <= 20) {
-        wisdomBonus = 6 + (currentWisdom - 12) * 1;
-    } else {
-        switch (currentWisdom) {
-            case 21:
-                wisdomBonus = 20;
-                break;
-            case 22:
-                wisdomBonus = 21;
-                break;
-            case 23:
-                wisdomBonus = 22;
-                break;
-            case 24:
-                wisdomBonus = 23;
-                break;
-            case 25:
-                wisdomBonus = 25;
-                break;
-            default:
-                wisdomBonus = 0;
-        }
-    }
-
-    document.getElementById("secondary-health").innerText = secondaryAttributes.health;
-    const healthBonusElement = document.getElementById("secondary-health-bonus");
-    healthBonusElement.innerText = `+${wisdomBonus}%`;
-    healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
-    const manaBonusElement = document.getElementById("secondary-mana-bonus");
-    manaBonusElement.innerText = `+${wisdomBonus}%`;
-    manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
-    const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
-    physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
-    physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
-    const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
-    physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-    physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
-    const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
-    magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
-    magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
-    const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
-    magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-    magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
-    const speedBonusElement = document.getElementById("secondary-speed-bonus");
-    speedBonusElement.innerText = `+${wisdomBonus}%`;
-    speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-
-    updateSkillScore(Array.from(document.querySelectorAll("#skills-area div")).map(div => {
-        const [name, rarity] = div.innerText.split(" (");
-        return { name, rarity: rarity.replace(")", "") };
-    }));
-}
 function updateQualityCard() {
     document.getElementById("evolution-level").innerText = evolutionLevel;
     const qualityInfo = document.getElementById("quality-info");

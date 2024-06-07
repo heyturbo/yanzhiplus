@@ -457,7 +457,7 @@
         }
         .progress-bars {
             display: flex;
-            gap: 4px; /* 调整每个条目之间的间距 */
+            gap: 2px; /* 调整每个条目之间的间距 */
             flex-direction: column;
             align-items: flex-start;
         }
@@ -474,13 +474,14 @@
             justify-content: flex-end;
             
             /* 设置图片框的尺寸，可以根据需要调整 */
-            width: 180px;
+            width: 170px;
             height: 190px;
             /* border: 1px solid #0a8c00; */ /* 添加边框 */
             margin: 0px; /* 在容器内垂直居中 */
             align-items: center;
             align-content: center;
             flex-direction: column;
+            flex-wrap: wrap;
         }
         .attributes-container .increase-btn {
             background-color: #0a8c00; /* 绿色 */
@@ -1779,7 +1780,7 @@ function selectTreasure(type) {
             break;
         case '至尊宝箱':
             description = "价值连城的宝箱，每次开启花费1000金子，您可能获得举世无双悟性丹，飞升之石等超稀有道具，甚至还有神秘觉醒法宝等你来拿！";
-            break;
+            break;        
     }
     document.getElementById('treasure-description').innerText = description;
 }
@@ -1899,10 +1900,10 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '资质宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 33.3 },
-            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 33.3 },
-            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 33.3 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 0.1 }
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 18 },
+            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 18 },
+            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 18 },
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -3455,9 +3456,10 @@ function hallucinatePet() {
     updateAttributePanel(); // 确保更新属性面板
 }
 
-
+// 更新显示函数
 function updateQualityCard() {
     document.getElementById("evolution-level").innerText = evolutionLevel;
+
     const qualityInfo = document.getElementById("quality-info");
     const tierElement = document.getElementById("quality-tier");
     const growthRateElement = document.getElementById("quality-growth-rate");
@@ -3504,6 +3506,7 @@ function updateQualityCard() {
     tierElement.style.color = color;
     growthRateElement.style.color = color;
 
+    // 更新各项属性的当前值和最大值，以及进度条
     const endurance = currentPet.qualities.endurance;
     const strength = currentPet.qualities.strength;
     const faith = currentPet.qualities.faith;
@@ -3530,6 +3533,7 @@ function updateQualityCard() {
     document.getElementById("intelligence-max").innerText = intelligence.max;
     document.getElementById("intelligence-bar").style.width = (intelligence.current / intelligence.max * 100) + "%";
 
+    // 更新变异状态的外观效果
     const petImage = document.querySelector('.pet-image img');
     const petInfo = document.querySelector('.bottom-bar .info');
     const bottombar = document.querySelector('.bottom-bar');
@@ -3544,6 +3548,7 @@ function updateQualityCard() {
         bottombar.classList.remove('mutated');
     }
 }
+
 
 function useBingpoRebornPill() {
     if (!checkDrawerOpen()) return;

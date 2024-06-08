@@ -742,7 +742,7 @@
     margin: 5px;
     gap: 2px;
     padding: 5px;
-    background-color: #0a8c00;
+    background-color: #b30008;
     border-radius: 50%;
     border: none;
     color: white;
@@ -750,30 +750,73 @@
 }
 
 #lotteryNumberButtons button:hover {
-    background-color: #218838;
+    background-color: #6a0700;
 }
 
 .lottery-controls {
     display: flex;
     justify-content: center;
     gap: 0px 10px;
+    padding: 0px;
     flex-direction: row;
 }
 
 .lottery-footer button {
-    width: 100%;
+    width: 21%;
     display: flex;
     margin-top: 5px;
     background-color: #0a8c00;
     padding: 5px;
     color: rgb(255 255 255 / 90%);
-    font-size: 16px;
+    font-size: 14px;
     justify-content: center;
+    border-radius: 10px;
 }
 
 .lottery-footer button:hover {
     background-color: #086600;
 }
+/* lottery.css */
+.lottery-controls button {
+    padding: 5px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.lottery-controls #lotteryBetButton {
+    background-color: #0056b3;
+    color: white;
+}
+
+.lottery-controls #lotteryBetButton:hover {
+    background-color: #003670;
+    transform: scale(1.05);
+}
+
+.lottery-controls #lotteryIncreaseBet {
+    background-color: #0a8c00;
+    color: white;
+}
+
+.lottery-controls #lotteryIncreaseBet:hover {
+    background-color: #064701;
+    transform: scale(1.05);
+}
+
+.lottery-controls #lotteryDecreaseBet {
+    background-color: #dc3545;
+    color: white;
+}
+
+.lottery-controls #lotteryDecreaseBet:hover {
+    background-color: #841520;
+    transform: scale(1.05);
+}
+
     </style>
 </head>
 <body>
@@ -1022,8 +1065,8 @@
             </div>
             <div class="lottery-controls">
                 <button id="lotteryBetButton">投注</button>
-                <button id="lotteryIncreaseBet">+</button>
-                <button id="lotteryDecreaseBet">-</button>
+                <button id="lotteryIncreaseBet">+1</button>
+                <button id="lotteryDecreaseBet">-1</button>
             </div>
         </div>
         <div class="lottery-section lottery-bottom">

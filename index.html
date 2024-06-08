@@ -899,7 +899,7 @@
     </div>
     <div class="bottom-bar">
         <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png" alt="默认">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png" alt="未选择">
         </div>
         <div class="info">
             <div>宠物名称: <span id="pet-name">未选择</span></div>
@@ -2914,7 +2914,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
         <p>描述：${skill.description}</p>
         <p>是否删除？</p>
         <button id="confirm-delete">删除</button>
-        <button id="cancel-delete">取消</button>
+        <button onclick="document.body.removeChild(this.parentNode)">关闭</button>
     `;
 
     document.body.appendChild(messageBox);
@@ -2931,9 +2931,6 @@ function deleteSkill(skill, skillDiv, skillsArea) {
         updateSkillScore(remainingSkills);
     };
 
-    document.getElementById("cancel-delete").onclick = () => {
-        document.body.removeChild(messageBox);
-    };
 }
 
 function updateSkillScore(selectedSkills = []) {

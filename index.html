@@ -742,11 +742,13 @@
     margin: 5px;
     gap: 2px;
     padding: 5px;
-    background-color: #b30008;
+    background-color: #ff1100;
     border-radius: 50%;
     border: none;
     color: white;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
 }
 
 #lotteryNumberButtons button:hover {
@@ -1053,9 +1055,9 @@
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
-            <div class="lottery-box" id="lotteryPrizePool">奖池: 9999999999</div>
+            <div class="lottery-box" id="lotteryPrizePool">奖金池: 9999999999</div>
             <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
-            <div class="lottery-box" id="lotteryBetAmount">投注金额: 0</div>
+            <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
         </div>
         <div class="lottery-section lottery-middle">
             <div class="lottery-number-box" id="lotterySelectedNumbers">本次选号: </div>
@@ -1700,7 +1702,8 @@ function calculateLotteryPrize(winningNumbers) {
         '3:exact': 10000,
         '3:any': 5000,
         '2:exact': 1000,
-        '2:any': 100
+        '2:any': 500,
+        '1:any': 200
     };
 
     const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers);
@@ -1807,9 +1810,9 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
 });
 
 function updateLotteryDisplay() {
-    document.getElementById('lotteryPrizePool').textContent = `奖池: ${lotteryPrizePool}`;
+    document.getElementById('lotteryPrizePool').textContent = `奖金池: ${lotteryPrizePool}`;
     document.getElementById('lotteryBetCount').textContent = `投注数: ${lotteryBetCount}`;
-    document.getElementById('lotteryBetAmount').textContent = `投注金额: ${lotteryBetAmount}`;
+    document.getElementById('lotteryBetAmount').textContent = `投注金: ${lotteryBetAmount}`;
     document.getElementById('lotteryResultAmount').innerHTML = pendingPrize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${pendingPrize}</span>` : '奖金区: 0';
 }
 

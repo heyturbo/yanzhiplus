@@ -772,7 +772,7 @@
     background-color: #0a8c00;
     padding: 5px;
     color: rgb(255 255 255 / 90%);
-    font-size: 14px;
+    font-size: 16px;
     justify-content: center;
     border-radius: 10px;
 }
@@ -786,7 +786,7 @@
     margin: 5px;
     border: none;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s, transform 0.3s;
 }
@@ -1057,7 +1057,7 @@
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
-            <div class="lottery-box" id="lotteryPrizePool">奖金池: 9999999999</div>
+            <div class="lottery-box" id="lotteryPrizePool">奖金池: 无上限奖池</div>
             <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
             <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
         </div>
@@ -1078,7 +1078,7 @@
             <div class="lottery-box" id="lotteryResultAmount">奖金区: 0</div>
         </div>
         <div class="lottery-section lottery-footer">
-            <div class="lottery-box" id="lotteryCountdown">倒计时: 15s</div>
+            <div class="lottery-box" id="lotteryCountdown">倒计时: 10s</div>
             <button id="lotteryClaimPrize">领取奖金</button>
         </div>
     </div>
@@ -1634,7 +1634,7 @@ function togglefightingDrawer() {
 }
 
 // lottery.js
-let lotteryPrizePool = 9999999999;
+let lotteryPrizePool = "无上限奖池";
 let lotteryBetCount = 0;
 let lotteryBetAmount = 0;
 let lotterySelectedNumbers = [];
@@ -1660,7 +1660,7 @@ function startLotteryCountdown() {
         document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
         if (lotteryCountdown === 0) {
             performLotteryDraw();
-            lotteryCountdown = 15;
+            lotteryCountdown = 10;
             canBet = true;
         }
     }, 1000);
@@ -1668,7 +1668,7 @@ function startLotteryCountdown() {
 
 function stopLotteryCountdown() {
     clearInterval(lotteryDrawInterval);
-    lotteryCountdown = 15;
+    lotteryCountdown = 10;
     document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
 }
 

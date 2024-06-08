@@ -134,8 +134,8 @@
             background-image: url('https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png');
         }
         
-        #missionButton {
-            background-image: url('https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png');
+        #lotteryButton {
+            background-image: url('https://pic.imgdb.cn/item/666466225e6d1bfa05b95973.png');
         }
         
         .core-area .skills {
@@ -476,8 +476,6 @@
         }
         .image-frame {
             display: flex;
-            
-            
             /* 设置图片框的尺寸，可以根据需要调整 */
             width: 180px;
             height: 180px;
@@ -663,6 +661,119 @@
         .message-box button:hover {
             background-color: #0056b3; /* 按钮悬停颜色 */
         }
+        
+/* lottery.css */
+.lottery-drawer {
+    position: fixed;
+    bottom: 0px;
+    width: 95%;
+    background-color: rgb(255 255 255 / 95%);
+    
+     /* 图片平铺 */
+     /* 保持原图大小 */
+     /* 背景固定 */
+    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px 10px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s;
+    /* z-index: 0; */
+    max-height: 90%;
+    overflow-y: auto;
+}
+
+.lottery-drawer.open {
+    transform: translateY(0);
+}
+
+.lottery-section {
+    padding: 5px 0px 0px 0px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: space-around;
+    justify-content: space-evenly;
+}
+
+.lottery-top {
+    margin-bottom: 0px;
+    width: 100%;
+}
+.lottery-middle {
+    margin-bottom: 0px;
+    width: 100%;
+    align-items: center;
+}
+.lottery-bottom {
+    margin-bottom: 0px;
+    width: 100%;
+}
+.lottery-footer {
+    margin-bottom: 0px;
+    width: 100%;
+    display: flex;
+}
+.lottery-box, .lottery-number-box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 0px;
+    margin: 0px 0;
+    text-align: justify;
+    background-color: #f9f9f9;
+}
+.lottery-number-box {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 5px 0;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.lottery-number-box {
+    display: flex;
+    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+    gap: 0px;
+    padding: 10px;
+    flex-direction: column;
+}
+
+#lotteryNumberButtons button {
+    margin: 5px;
+    gap: 2px;
+    padding: 5px;
+    background-color: #0a8c00;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#lotteryNumberButtons button:hover {
+    background-color: #218838;
+}
+
+.lottery-controls {
+    display: flex;
+    justify-content: center;
+    gap: 0px 10px;
+    flex-direction: row;
+}
+
+.lottery-footer button {
+    width: 100%;
+    display: flex;
+    margin-top: 5px;
+    background-color: #0a8c00;
+    padding: 5px;
+    color: rgb(255 255 255 / 90%);
+    font-size: 16px;
+    justify-content: center;
+}
+
+.lottery-footer button:hover {
+    background-color: #086600;
+}
     </style>
 </head>
 <body>
@@ -676,7 +787,7 @@
                 <button id="treasureButton" onclick="toggleTreasureDrawer()">宝箱</button>
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
                 <button id="fightingButton" onclick="togglefightingDrawer()">战斗</button>
-                <button id="missionButton" onclick="togglemissionDrawer()">任务</button>
+                <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
             </div>
         </div>
         <div class="skills" id="skills-area"></div>
@@ -895,6 +1006,33 @@
         <div class="drawer-toggle" onclick="toggleJinnangDrawer()">背包</div>
         <div class="jinnang-info" id="jinnang-info">
             <div class="jinnang-reward" id="jinnang-reward"></div>
+        </div>
+    </div>
+    <div class="lottery-drawer" id="lotteryDrawer">
+        <div class="lottery-section lottery-top">
+            <div class="lottery-box" id="lotteryPrizePool">奖池: 9999999999</div>
+            <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
+            <div class="lottery-box" id="lotteryBetAmount">投注金额: 0</div>
+        </div>
+        <div class="lottery-section lottery-middle">
+            <div class="lottery-number-box" id="lotterySelectedNumbers">本次选号: </div>
+            <div class="lottery-box" id="lastSelectedNumbers">上次选号: </div>
+            <div class="lottery-number-box" id="lotteryAvailableNumbers">备选区: 
+                <div id="lotteryNumberButtons"></div>
+            </div>
+            <div class="lottery-controls">
+                <button id="lotteryBetButton">投注</button>
+                <button id="lotteryIncreaseBet">+</button>
+                <button id="lotteryDecreaseBet">-</button>
+            </div>
+        </div>
+        <div class="lottery-section lottery-bottom">
+            <div class="lottery-box" id="lotteryDrawResults">开奖区: </div>
+            <div class="lottery-box" id="lotteryResultAmount">奖金区: 0</div>
+        </div>
+        <div class="lottery-section lottery-footer">
+            <div class="lottery-box" id="lotteryCountdown">倒计时: 15s</div>
+            <button id="lotteryClaimPrize">领取奖金</button>
         </div>
     </div>
     <div class="bottom-bar">
@@ -1394,6 +1532,7 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/66616feb5e6d1bfa05b01297.png",
     "https://pic.imgdb.cn/item/66616feb5e6d1bfa05b01312.png",
     "https://pic.imgdb.cn/item/66616fec5e6d1bfa05b013ec.png",
+    "https://pic.imgdb.cn/item/666466225e6d1bfa05b95973.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png",
     "https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png",
     "https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png",
@@ -1447,27 +1586,233 @@ function togglefightingDrawer() {
     document.body.appendChild(messageBox);
 }
 
-function togglemissionDrawer() {
-    const messageBox = document.createElement('div');
-    messageBox.style = `
-        width: 50%; 
-        height: 10%; 
-        padding: 10px; 
-        background: white; 
-        border: 1px solid black; 
-        border-radius:10px;
-        position: fixed; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
-        z-index: 1000;
-        overflow: auto; 
-        font-size: 14px;
-    `;
-    messageBox.innerHTML =  `<p>功能暂未开放</p>
-                            <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
-    document.body.appendChild(messageBox);
+// lottery.js
+let lotteryPrizePool = 9999999999;
+let lotteryBetCount = 0;
+let lotteryBetAmount = 0;
+let lotterySelectedNumbers = [];
+let lastSelectedNumbers = [];
+let lotteryCountdown = 10;
+let lotteryDrawInterval;
+let canBet = true;
+let pendingPrize = 0;
+
+function toggleLotteryDrawer() {
+    const drawer = document.getElementById('lotteryDrawer');
+    drawer.classList.toggle('open');
+    if (drawer.classList.contains('open')) {
+        startLotteryCountdown();
+    } else {
+        stopLotteryCountdown();
+    }
 }
+
+function startLotteryCountdown() {
+    lotteryDrawInterval = setInterval(() => {
+        lotteryCountdown--;
+        document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
+        if (lotteryCountdown === 0) {
+            performLotteryDraw();
+            lotteryCountdown = 15;
+            canBet = true;
+        }
+    }, 1000);
+}
+
+function stopLotteryCountdown() {
+    clearInterval(lotteryDrawInterval);
+    lotteryCountdown = 15;
+    document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
+}
+
+function performLotteryDraw() {
+    const winningNumbers = generateLotteryWinningNumbers();
+    document.getElementById('lotteryDrawResults').textContent = `开奖区: ${winningNumbers.join(', ')}`;
+    const prize = calculateLotteryPrize(winningNumbers);
+    if (prize > 0) {
+        pendingPrize += prize;
+        updateDescriptionBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
+    }
+    highlightMatchingNumbers(winningNumbers);
+    clearSelections();
+}
+
+function generateLotteryWinningNumbers() {
+    const numbers = [];
+    while (numbers.length < 5) {
+        const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+        if (!numbers.includes(num)) {
+            numbers.push(num);
+        }
+    }
+    return numbers;
+}
+
+function calculateLotteryPrize(winningNumbers) {
+    const prizeTable = {
+        '5:exact': 200000,
+        '5:any': 150000,
+        '4:exact': 100000,
+        '4:any': 50000,
+        '3:exact': 10000,
+        '3:any': 5000,
+        '2:exact': 1000,
+        '2:any': 100
+    };
+
+    const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers);
+    const key = `${matchDetails.count}:${matchDetails.type}`;
+    const prize = prizeTable[key] ? prizeTable[key] * lotteryBetCount : 0;
+    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: red; font-weight: bold;">${pendingPrize}</span>` : `奖金区: ${pendingPrize}`;
+    return prize;
+}
+
+function getMatchDetails(winningNumbers, selectedNumbers) {
+    const matchedNumbers = selectedNumbers.filter(num => winningNumbers.includes(num));
+    const matchCount = matchedNumbers.length;
+    let matchType = 'any';
+
+    if (matchCount === 5 && arraysEqual(selectedNumbers, winningNumbers)) {
+        matchType = 'exact';
+    } else if (matchCount === 4 && arraysEqual(matchedNumbers, winningNumbers.slice(0, 4))) {
+        matchType = 'exact';
+    } else if (matchCount === 3 && arraysEqual(matchedNumbers, winningNumbers.slice(0, 3))) {
+        matchType = 'exact';
+    } else if (matchCount === 2 && arraysEqual(matchedNumbers, winningNumbers.slice(0, 2))) {
+        matchType = 'exact';
+    }
+
+    return { count: matchCount, type: matchType };
+}
+
+function arraysEqual(arr1, arr2) {
+    if (arr1.length !== arr2.length) return false;
+    for (let i = 0; i < arr1.length; i++) {
+        if (arr1[i] !== arr2[i]) return false;
+    }
+    return true;
+}
+
+function highlightMatchingNumbers(winningNumbers) {
+    const lastSelectedElement = document.getElementById('lastSelectedNumbers');
+    lastSelectedElement.innerHTML = '上次选号: ';
+    lastSelectedNumbers.forEach(num => {
+        const span = document.createElement('span');
+        span.textContent = num;
+        if (winningNumbers.includes(num)) {
+            span.style.fontWeight = 'bold';
+            span.style.color = 'red';
+        }
+        lastSelectedElement.appendChild(span);
+        lastSelectedElement.appendChild(document.createTextNode(' '));
+    });
+}
+
+document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
+    if (!canBet) {
+        alert('请等待本次开奖！');
+        return;
+    }
+    lotteryBetCount++;
+    lotteryBetAmount += 200;
+    updateLotteryDisplay();
+});
+
+document.getElementById('lotteryDecreaseBet').addEventListener('click', () => {
+    if (!canBet) {
+        alert('请等待本次开奖！');
+        return;
+    }
+    if (lotteryBetCount > 1) {
+        lotteryBetCount--;
+        lotteryBetAmount -= 200;
+        updateLotteryDisplay();
+    }
+});
+
+document.getElementById('lotteryBetButton').addEventListener('click', () => {
+    if (!canBet) {
+        alert('请等待当前开奖结束');
+        return;
+    }
+    if (lotterySelectedNumbers.length === 5) {
+        if (lotteryBetCount === 0) {
+            alert('请加注后点击投注按钮进行投注！');
+            return;
+        }
+        if (goldAmount >= lotteryBetAmount) {
+            goldAmount -= lotteryBetAmount;
+            lastSelectedNumbers = [...lotterySelectedNumbers];
+            document.getElementById("gold-amount").innerText = goldAmount;
+            canBet = false; // Disable further bets until next draw
+            document.getElementById('lastSelectedNumbers').textContent = `已选: ${lastSelectedNumbers.join(', ')}`;
+            updateLotteryDisplay();
+        } else {
+            alert('余额不足');
+        }
+    } else {
+        alert('请选择5个数字');
+    }
+});
+
+document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
+    goldAmount += pendingPrize;
+    document.getElementById("gold-amount").innerText = goldAmount;
+    pendingPrize = 0;
+    document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
+    updateLotteryDisplay();
+});
+
+function updateLotteryDisplay() {
+    document.getElementById('lotteryPrizePool').textContent = `奖池: ${lotteryPrizePool}`;
+    document.getElementById('lotteryBetCount').textContent = `投注数: ${lotteryBetCount}`;
+    document.getElementById('lotteryBetAmount').textContent = `投注金额: ${lotteryBetAmount}`;
+    document.getElementById('lotteryResultAmount').innerHTML = pendingPrize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${pendingPrize}</span>` : '奖金区: 0';
+}
+
+function clearSelections() {
+    lotterySelectedNumbers = [];
+    lotteryBetCount = 0;
+    lotteryBetAmount = 0;
+    document.getElementById('lotterySelectedNumbers').textContent = '本次选号: ';
+    updateLotteryDisplay();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const numberButtons = document.getElementById('lotteryNumberButtons');
+    for (let i = 1; i <= 30; i++) {
+        const button = document.createElement('button');
+        button.textContent = String(i).padStart(2, '0');
+        button.addEventListener('click', () => {
+            if (lotterySelectedNumbers.length < 5 && !lotterySelectedNumbers.includes(button.textContent)) {
+                lotterySelectedNumbers.push(button.textContent);
+                document.getElementById('lotterySelectedNumbers').textContent = `本次选号: ${lotterySelectedNumbers.join(', ')}`;
+            }
+        });
+        numberButtons.appendChild(button);
+    }    
+    
+    const autoSelectButton = document.createElement('button');
+    autoSelectButton.textContent = '系统选号';
+    autoSelectButton.addEventListener('click', () => {
+        lotterySelectedNumbers = [];
+        while (lotterySelectedNumbers.length < 5) {
+            const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+            if (!lotterySelectedNumbers.includes(num)) {
+                lotterySelectedNumbers.push(num);
+            }
+        }
+        document.getElementById('lotterySelectedNumbers').textContent = `本次选号: ${lotterySelectedNumbers.join(', ')}`;
+    });
+    document.querySelector('.lottery-footer').appendChild(autoSelectButton);
+});
+
+
+function updateDescriptionBox(message) {
+    const descriptionBox = document.getElementById("description-box");
+    descriptionBox.innerText = message;
+}
+
         
 function showGuide() {
     const messageBox = document.createElement('div');

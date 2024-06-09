@@ -1732,7 +1732,7 @@ function toggleLotteryDrawer() {
 document.getElementById('lotteryRuleButton').addEventListener('click', () => {
     const ruleContent = document.getElementById('ruleContent');
     ruleContent.innerHTML = `
-        <h2>彩票规则</h2>
+        <h2>彩券规则</h2>
         <p>金子不够花，想要以小博大？</p>
         <ul>
             <li>玩家需选择6个数字，其中最后一个为蓝球。</li>
@@ -1742,21 +1742,22 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
             <li>选号数字分为红球和蓝球，蓝球独立计算。详细奖金规则：</li>
             <ul>
-                <li>5个红球全中且排列顺序一致：300000金子</li>
+                <li>5个红球全中且排列顺序一致：5000000金子</li>
                 <li>5个红球全中：150000金子</li>
-                <li>4个红球且排列顺序一致：100000金子</li>
+                <li>4个红球且排列顺序一致：1000000金子</li>
                 <li>4个红球全中：50000金子</li>
-                <li>3个红球全中且排列顺序一致：10000金子</li>
+                <li>3个红球全中且排列顺序一致：100000金子</li>
                 <li>3个红球全中：5000金子</li>
-                <li>2个红球全中且排列顺序一致：1000金子</li>
+                <li>2个红球全中且排列顺序一致：10000金子</li>
                 <li>2个红球全中：500金子</li>
                 <li>只中1个红球：200金子</li>
             </ul>
             <li>蓝球规则：</li>
             <ul>
-                <li>如果蓝球一致且中奖，奖金翻10倍。</li>
-                <li>如果蓝球一致但未中奖，奖金+1000金子。</li>
+                <li>如果蓝球一致且红球中奖，奖金翻10倍。</li>
+                <li>如果蓝球一致但红球未中奖，奖金+1000金子。</li>
             </ul>
+            <li>本系统只用于游戏货币道具的随机获取，赌博是违法犯罪的行为，请勿铤而走险！</li>
         </ul>
     `;
     document.getElementById('lotteryRuleModal').style.display = 'block';
@@ -1818,13 +1819,13 @@ function generateLotteryWinningNumbers() {
 
 function calculateLotteryPrize(winningNumbers, winningBlueBall) {
     const prizeTable = {
-        '5:exact': 300000,
+        '5:exact': 5000000,
         '5:any': 150000,
-        '4:exact': 100000,
+        '4:exact': 1000000,
         '4:any': 50000,
-        '3:exact': 10000,
+        '3:exact': 100000,
         '3:any': 5000,
-        '2:exact': 1000,
+        '2:exact': 10000,
         '2:any': 500,
         '1:any': 200
     };

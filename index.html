@@ -719,7 +719,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 0px;
-    margin: 0px 0;
+    margin: 5px 0;
     text-align: justify;
     background-color: #f9f9f9;
 }
@@ -727,7 +727,7 @@
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 10px;
-    margin: 5px 0;
+    margin: 15px 0;
     text-align: center;
     background-color: #f9f9f9;
 }
@@ -735,8 +735,8 @@
 .lottery-number-box {
     display: flex;
     grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-    gap: 0px;
-    padding: 10px;
+    gap: 5px;
+    padding: 0px;
     flex-direction: column;
 }
 
@@ -782,8 +782,8 @@
 }
 /* lottery.css */
 .lottery-controls button {
-    padding: 5px 15px;
-    margin: 5px;
+    padding: 2px 10px;
+    margin: 2px;
     border: none;
     border-radius: 10px;
     font-size: 16px;
@@ -810,7 +810,24 @@
     background-color: #064701;
     transform: scale(1.05);
 }
+.lottery-controls #lotteryIncreaseTenBet {
+    background-color: #0a8c00;
+    color: white;
+}
 
+.lottery-controls #lotteryIncreaseTenBet:hover {
+    background-color: #064701;
+    transform: scale(1.05);
+}
+.lottery-controls #lotteryRuleButton {
+    background-color: #0056b3;
+    color: white;
+}
+
+.lottery-controls #lotteryRuleButton:hover {
+    background-color: #003670;
+    transform: scale(1.05);
+}
 .lottery-controls #lotteryDecreaseBet {
     background-color: #dc3545;
     color: white;
@@ -819,6 +836,55 @@
 .lottery-controls #lotteryDecreaseBet:hover {
     background-color: #841520;
     transform: scale(1.05);
+}
+/* lottery.css */
+.highlight {
+    animation: highlight 1s ease-in-out;
+}
+
+@keyframes highlight {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5);
+    }
+}
+/* lottery.css */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 10px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
 }
 
     </style>
@@ -1057,12 +1123,12 @@
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
-            <div class="lottery-box" id="lotteryPrizePool">奖金池: 无上限奖池</div>
+            <div class="lottery-box" id="lotteryPrizePool">奖池: 无上限奖池</div>
             <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
             <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
         </div>
         <div class="lottery-section lottery-middle">
-            <div class="lottery-number-box" id="lotterySelectedNumbers">本次选号: </div>
+            <div class="lottery-box" id="lotteryDrawResults">开奖区: </div>
             <div class="lottery-box" id="lastSelectedNumbers">上次选号: </div>
             <div class="lottery-number-box" id="lotteryAvailableNumbers">备选区: 
                 <div id="lotteryNumberButtons"></div>
@@ -1070,11 +1136,20 @@
             <div class="lottery-controls">
                 <button id="lotteryBetButton">投注</button>
                 <button id="lotteryIncreaseBet">+1</button>
+                <button id="lotteryIncreaseTenBet">+10</button>
                 <button id="lotteryDecreaseBet">-1</button>
+                <button id="lotteryRuleButton">规则</button>
+                <!-- 规则信息框 -->
+                <div id="lotteryRuleModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <div id="ruleContent"></div>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="lottery-section lottery-bottom">
-            <div class="lottery-box" id="lotteryDrawResults">开奖区: </div>
+            <div class="lottery-number-box" id="lotterySelectedNumbers">本次选号: </div>
             <div class="lottery-box" id="lotteryResultAmount">奖金区: 0</div>
         </div>
         <div class="lottery-section lottery-footer">
@@ -1653,6 +1728,48 @@ function toggleLotteryDrawer() {
         stopLotteryCountdown();
     }
 }
+document.getElementById('lotteryRuleButton').addEventListener('click', () => {
+    const ruleContent = document.getElementById('ruleContent');
+    ruleContent.innerHTML = `
+        <h2>彩票规则</h2>
+        <p>金子不够花，想要以小博大？</p>
+        <ul>
+            <li>玩家需选择6个数字，其中最后一个为蓝球。</li>
+            <li>每注200金子，最低投注1注。</li>
+            <li>上次选号区会以红色显示当次中奖的数字。</li>
+            <li>倒计时10秒实时开奖，离开彩券界面会暂停计时。</li>
+            <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
+            <li>选号数字分为红球和蓝球，蓝球独立计算。详细奖金规则：</li>
+            <ul>
+                <li>5个红球全中且排列顺序一致：300000金子</li>
+                <li>5个红球全中：150000金子</li>
+                <li>4个红球且排列顺序一致：100000金子</li>
+                <li>4个红球全中：50000金子</li>
+                <li>3个红球全中且排列顺序一致：10000金子</li>
+                <li>3个红球全中：5000金子</li>
+                <li>2个红球全中且排列顺序一致：1000金子</li>
+                <li>2个红球全中：500金子</li>
+                <li>只中1个红球：200金子</li>
+            </ul>
+            <li>蓝球规则：</li>
+            <ul>
+                <li>如果蓝球一致且中奖，奖金翻10倍。</li>
+                <li>如果蓝球一致但未中奖，奖金+1000金子。</li>
+            </ul>
+        </ul>
+    `;
+    document.getElementById('lotteryRuleModal').style.display = 'block';
+});
+
+document.querySelector('.modal .close').addEventListener('click', () => {
+    document.getElementById('lotteryRuleModal').style.display = 'none';
+});
+
+window.addEventListener('click', (event) => {
+    if (event.target == document.getElementById('lotteryRuleModal')) {
+        document.getElementById('lotteryRuleModal').style.display = 'none';
+    }
+});
 
 function startLotteryCountdown() {
     lotteryDrawInterval = setInterval(() => {
@@ -1673,16 +1790,17 @@ function stopLotteryCountdown() {
 }
 
 function performLotteryDraw() {
-    const winningNumbers = generateLotteryWinningNumbers();
-    document.getElementById('lotteryDrawResults').textContent = `开奖区: ${winningNumbers.join(', ')}`;
-    const prize = calculateLotteryPrize(winningNumbers);
+    const { numbers: winningNumbers, blueBall: winningBlueBall } = generateLotteryWinningNumbers();
+    document.getElementById('lotteryDrawResults').innerHTML = `开奖区: ${winningNumbers.join(', ')} <span style="color: blue;">${winningBlueBall}</span>`;
+    const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
     if (prize > 0) {
         pendingPrize += prize;
         updateDescriptionBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
     }
-    highlightMatchingNumbers(winningNumbers);
+    highlightMatchingNumbers(winningNumbers, winningBlueBall);
     clearSelections();
 }
+
 
 function generateLotteryWinningNumbers() {
     const numbers = [];
@@ -1692,10 +1810,12 @@ function generateLotteryWinningNumbers() {
             numbers.push(num);
         }
     }
-    return numbers;
+    const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+    return { numbers, blueBall };
 }
 
-function calculateLotteryPrize(winningNumbers) {
+
+function calculateLotteryPrize(winningNumbers, winningBlueBall) {
     const prizeTable = {
         '5:exact': 300000,
         '5:any': 150000,
@@ -1708,12 +1828,30 @@ function calculateLotteryPrize(winningNumbers) {
         '1:any': 200
     };
 
-    const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers);
+
+    const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers.slice(0, 5));
     const key = `${matchDetails.count}:${matchDetails.type}`;
-    const prize = prizeTable[key] ? prizeTable[key] * lotteryBetCount : 0;
-    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: red; font-weight: bold;">${pendingPrize}</span>` : `奖金区: ${pendingPrize}`;
+    let prize = prizeTable[key] ? prizeTable[key] * lotteryBetCount : 0;
+    
+    const playerBlueBall = lotterySelectedNumbers[5];
+    if (playerBlueBall === winningBlueBall) {
+        if (prize > 0) {
+            prize *= 10;
+        } else {
+            prize += 1000;
+        }
+        // 奖金区数字放大和闪烁效果
+        const resultAmountElement = document.getElementById('lotteryResultAmount');
+        resultAmountElement.classList.add('highlight');
+        setTimeout(() => {
+            resultAmountElement.classList.remove('highlight');
+        }, 1000);
+    }
+    
+    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `结果区: <span style="color: gold; font-weight: bold;">${prize}</span>` : `结果区: ${prize}`;
     return prize;
 }
+
 
 function getMatchDetails(winningNumbers, selectedNumbers) {
     const matchedNumbers = selectedNumbers.filter(num => winningNumbers.includes(num));
@@ -1741,20 +1879,32 @@ function arraysEqual(arr1, arr2) {
     return true;
 }
 
-function highlightMatchingNumbers(winningNumbers) {
+function highlightMatchingNumbers(winningNumbers, winningBlueBall) {
     const lastSelectedElement = document.getElementById('lastSelectedNumbers');
     lastSelectedElement.innerHTML = '上次选号: ';
-    lastSelectedNumbers.forEach(num => {
+    lastSelectedNumbers.forEach((num, index) => {
         const span = document.createElement('span');
         span.textContent = num;
-        if (winningNumbers.includes(num)) {
+        if (index === 5) {
+            span.style.color = 'blue'; // 固定蓝色字体
+        }
+        if (winningNumbers.includes(num) || (index === 5 && num === winningBlueBall)) {
             span.style.fontWeight = 'bold';
-            span.style.color = 'red';
+            span.style.color = (index === 5) ? 'blue' : 'red';
+            if (index === 5 && num === winningBlueBall) {
+                // 添加放大和闪烁效果
+                span.classList.add('highlight');
+                setTimeout(() => {
+                    span.classList.remove('highlight');
+                }, 1000);
+            }
         }
         lastSelectedElement.appendChild(span);
         lastSelectedElement.appendChild(document.createTextNode(' '));
     });
 }
+
+
 
 document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     if (!canBet) {
@@ -1763,6 +1913,16 @@ document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     }
     lotteryBetCount++;
     lotteryBetAmount += 200;
+    updateLotteryDisplay();
+});
+
+document.getElementById('lotteryIncreaseTenBet').addEventListener('click', () => {
+    if (!canBet) {
+        alert('请等待本次开奖！');
+        return;
+    }
+    lotteryBetCount += 10; // 使用正确的语法增加10注
+    lotteryBetAmount += 2000; // 对应增加2000
     updateLotteryDisplay();
 });
 
@@ -1783,7 +1943,7 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
         alert('请等待当前开奖结束');
         return;
     }
-    if (lotterySelectedNumbers.length === 5) {
+    if (lotterySelectedNumbers.length === 6) {
         if (lotteryBetCount === 0) {
             alert('请加注后点击投注按钮进行投注！');
             return;
@@ -1793,15 +1953,19 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             lastSelectedNumbers = [...lotterySelectedNumbers];
             document.getElementById("gold-amount").innerText = goldAmount;
             canBet = false; // Disable further bets until next draw
-            document.getElementById('lastSelectedNumbers').textContent = `已选: ${lastSelectedNumbers.join(', ')}`;
+
+            // 修改这里使得第六个数字显示为蓝色
+            document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
+            
             updateLotteryDisplay();
         } else {
             alert('余额不足');
         }
     } else {
-        alert('请选择5个数字');
+        alert('请选择6个数字');
     }
 });
+
 
 document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
     goldAmount += pendingPrize;
@@ -1835,25 +1999,40 @@ document.addEventListener('DOMContentLoaded', () => {
             if (lotterySelectedNumbers.length < 5 && !lotterySelectedNumbers.includes(button.textContent)) {
                 lotterySelectedNumbers.push(button.textContent);
                 document.getElementById('lotterySelectedNumbers').textContent = `本次选号: ${lotterySelectedNumbers.join(', ')}`;
+            } else if (lotterySelectedNumbers.length === 5 && !lotterySelectedNumbers.includes(button.textContent)) {
+                lotterySelectedNumbers.push(button.textContent);
+                document.getElementById('lotterySelectedNumbers').innerHTML = `本次选号: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${button.textContent}</span>`;
             }
         });
         numberButtons.appendChild(button);
-    }    
+    }
     
-    const autoSelectButton = document.createElement('button');
-    autoSelectButton.textContent = '系统选号';
-    autoSelectButton.addEventListener('click', () => {
-        lotterySelectedNumbers = [];
-        while (lotterySelectedNumbers.length < 5) {
-            const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
-            if (!lotterySelectedNumbers.includes(num)) {
-                lotterySelectedNumbers.push(num);
-            }
-        }
-        document.getElementById('lotterySelectedNumbers').textContent = `本次选号: ${lotterySelectedNumbers.join(', ')}`;
+    document.getElementById('lotteryAutoSelect').addEventListener('click', () => {
+        autoSelectNumbers();
     });
-    document.querySelector('.lottery-footer').appendChild(autoSelectButton);
 });
+
+    
+const autoSelectButton = document.createElement('button');
+autoSelectButton.textContent = '系统选号';
+autoSelectButton.addEventListener('click', () => {
+    if (!canBet) {
+        alert('本轮您已经选号，请等待开奖！');
+        return;
+    }
+    lotterySelectedNumbers = [];
+    while (lotterySelectedNumbers.length < 5) {
+        const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+        if (!lotterySelectedNumbers.includes(num)) {
+            lotterySelectedNumbers.push(num);
+        }
+    }
+    const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+    lotterySelectedNumbers.push(blueBall);
+    document.getElementById('lotterySelectedNumbers').innerHTML = `本次选号: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
+});
+document.querySelector('.lottery-footer').appendChild(autoSelectButton);
+
 
 
 function updateDescriptionBox(message) {

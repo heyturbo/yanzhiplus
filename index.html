@@ -716,12 +716,13 @@
     display: flex;
 }
 .lottery-box, .lottery-number-box {
-    border: 1px solid #ccc;
+    border: 1px solid #e0e0e0;
     border-radius: 5px;
     padding: 0px;
     margin: 5px 0;
     text-align: justify;
     background-color: #f9f9f9;
+    font-weight: bold;
 }
 .lottery-number-box {
     border: 1px solid #ccc;
@@ -1149,7 +1150,7 @@
             </div>
         </div>
         <div class="lottery-section lottery-bottom">
-            <div class="lottery-number-box" id="lotterySelectedNumbers">本次选号: </div>
+            <div class="lottery-number-box" id="lotterySelectedNumbers">已选: </div>
             <div class="lottery-box" id="lotteryResultAmount">奖金区: 0</div>
         </div>
         <div class="lottery-section lottery-footer">
@@ -1986,7 +1987,7 @@ function clearSelections() {
     lotterySelectedNumbers = [];
     lotteryBetCount = 0;
     lotteryBetAmount = 0;
-    document.getElementById('lotterySelectedNumbers').textContent = '本次选号: ';
+    document.getElementById('lotterySelectedNumbers').textContent = '已选: ';
     updateLotteryDisplay();
 }
 
@@ -1998,10 +1999,10 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', () => {
             if (lotterySelectedNumbers.length < 5 && !lotterySelectedNumbers.includes(button.textContent)) {
                 lotterySelectedNumbers.push(button.textContent);
-                document.getElementById('lotterySelectedNumbers').textContent = `本次选号: ${lotterySelectedNumbers.join(', ')}`;
+                document.getElementById('lotterySelectedNumbers').textContent = `已选: ${lotterySelectedNumbers.join(', ')}`;
             } else if (lotterySelectedNumbers.length === 5 && !lotterySelectedNumbers.includes(button.textContent)) {
                 lotterySelectedNumbers.push(button.textContent);
-                document.getElementById('lotterySelectedNumbers').innerHTML = `本次选号: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${button.textContent}</span>`;
+                document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${button.textContent}</span>`;
             }
         });
         numberButtons.appendChild(button);
@@ -2029,7 +2030,7 @@ autoSelectButton.addEventListener('click', () => {
     }
     const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
     lotterySelectedNumbers.push(blueBall);
-    document.getElementById('lotterySelectedNumbers').innerHTML = `本次选号: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
+    document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
 });
 document.querySelector('.lottery-footer').appendChild(autoSelectButton);
 

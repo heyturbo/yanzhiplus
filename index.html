@@ -355,7 +355,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 10px;
+            padding: 15px;
         }
         .shop-bar button {
             padding: 5px 10px;
@@ -456,38 +456,37 @@
             gap: 0px; /* 调整两列之间的间距 */
             align-items: stretch;
             font-size: 14px;
+            flex-direction: row;
             justify-content: space-between;
-            flex-direction: row-reverse;
         }
         .progress-bars {
             display: flex;
-            gap: 5px; /* 调整每个条目之间的间距 */
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
+            gap: 0px; /* 调整每个条目之间的间距 */
+            flex-direction: column-reverse;
+            align-items: flex-start;
+            justify-content: space-evenly;
         }
         .secondary-attributes {
             display: flex;
             flex-direction: column;
             gap: 5px; /* 调整每个条目之间的间距 */
-            align-items: center;
-            flex-wrap: nowrap;
+            align-items: flex-start;
+            flex-wrap: wrap;
             justify-content: space-evenly;
         }
         .image-frame {
             display: flex;
             /* 设置图片框的尺寸，可以根据需要调整 */
-            width: 180px;
-            height: 180px;
+            width: 140px;
+            padding: 60px 0px;
+            height: 140px;
              /* 添加边框 */
-            margin: 2px; /* 在容器内垂直居中 */
+            margin: 0px; /* 在容器内垂直居中 */
             top: 50%;
             left: 50%;
             align-items: center;
-            align-content: center;
             flex-wrap: nowrap;
             flex-direction: column;
-            justify-content: space-around;
         }
         .attributes-container .increase-btn {
             background-color: #0a8c00; /* 绿色 */
@@ -532,9 +531,10 @@
         .button-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 5px 0px; /* 调整按钮之间的间距 */
+            gap: 15px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
             justify-items: stretch;
+            padding: 15px 0px;
         }
         .button-grid button {
             padding: 8px 0px;
@@ -569,18 +569,19 @@
         }
         .reward-box {
             display: flex;
-            margin-top: 10px;
-            padding: 0;
             background-color: #f1f0f0;
             border-radius: 10px;
             text-align: center;
             flex-direction: row;
             justify-content: center;
+            margin: 5px;
+            padding: 5px;
         }
         .treasure-action {
             display: flex;
             justify-content: space-around;
-            margin-top: 10px;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
         .treasure-action button {
             padding: 5px 10px;
@@ -669,7 +670,7 @@
     padding: 20px 0px 0px 0px;
     bottom: 0px;
     width: 95%;
-    background-color: rgb(255 255 255 / 95%);
+    background-color: rgb(255 255 255 / 90%);
     
      /* 图片平铺 */
      /* 保持原图大小 */
@@ -711,7 +712,7 @@
     width: 100%;
 }
 .lottery-footer {
-    margin-bottom: 0px;
+    margin-bottom: 10px;
     width: 100%;
     display: flex;
 }
@@ -762,7 +763,7 @@
     display: flex;
     justify-content: center;
     gap: 0px 10px;
-    padding: 0px;
+    padding: 5px;
     flex-direction: row;
 }
 
@@ -2122,9 +2123,21 @@ let skillScore = 0;
 let petWisdom = 0; 
         
 const descriptions = [
-    "请特别注意，更换宠物会导致此前的分数全部作废，如果你没有想好先培养谁，请决定后再尝试！",
+    "请特别注意，更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
+    "宠物的资质可以用“资质重生丹”洗练到更高的程度",
+    "本游戏尽量还原养宠机制，但概率和具体玩法会有所不同，请勿视为参考",
+    "二级属性会随着悟性的提高得到百分比的增长",
+    "合理的分配金子培养机会可以让你的宠物评分得到最大化！",
+    "5爆400？极品宠物需要更多的耐心和更专业的培养方式，当然，对金子的消耗也会更大",
+    "宠物的S技能和SS技能属于稀缺技能，很难通过洗练得来，商店直接购买或许是更好的方式",
+    "宠物的成长上限会因为是否觉醒和是否飞升出现较大差异",
+    "为了避免双击页面放大，页面内对双击速度作出了限制",
+    "品质越高、成长率越高的宠物，资质所折算的属性就会越高，总体能力就会更强",
+    "宠物变异时，资质会得到明显的提升，甚至超出原有的资质上限！",
+    "目前共有三种还童丹，每种还童丹的功能各不同，详情可见“玩法”说明",
+    "稀有道具只能通过宝箱开启获得。开启宝箱时，有概率同时出现1~3个奖品",
     "宠物评分由多个维度组成，请你同时兼顾技能质量、资质水平和宠物等级！",
-    "如果你需要删除某个技能，你可以长按该技能确认删除。（如果是PC端，你需要右键确认）"
+    "如果你需要删除某个技能，你可以长按该技能确认删除（如果是PC端，你需要右键确认）"
 ];        
 
 function updateDescriptionBox() {

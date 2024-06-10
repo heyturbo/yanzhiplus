@@ -17,6 +17,40 @@
             margin: 0;
             padding: 0;
         }
+        /* styles.css */
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        
+        #loadingText {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+        
+        #progressBarContainer {
+            width: 80%;
+            background: #ddd;
+            border-radius: 25px;
+        }
+        
+        #progressBar {
+            width: 0%;
+            height: 30px;
+            background: #4caf50;
+            border-radius: 25px;
+        }
+
         /* 顶部栏样式 */
         .top-bar {
             width: 90%;
@@ -888,10 +922,62 @@
     text-decoration: none;
     cursor: pointer;
 }
+.battle-system-drawer {
+    display: none;
+    position: fixed;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgb(0 0 0 / 70%);
+    color: white;
+    box-shadow: -3px 0 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
 
+.battle-system-drawer-toggle {
+    font-size: 16px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.battle-system-content {
+    padding: 5px;
+}
+
+.battle-system-pet-info, .battle-system-enemy-info {
+    border: 1px solid #ccc;
+    padding: 0px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+.battle-system-log {
+    border: 1px solid #ccc;
+    padding: 0px;
+    margin-bottom: 5px;
+    height: 100px; /* 设置固定高度 */
+    overflow-y: scroll; /* 启用滚动条 */
+    font-size: 14px;
+}
+
+.battle-system-actions button {
+    margin: 10px;
+    padding: 0px 0px;
+    cursor: pointer;
+    display: grid;
+    width: 95%;
+    background-color: #fff;
+    color: #000000;
+}
     </style>
 </head>
 <body>
+    <div id="loadingOverlay">
+        <div id="loadingText">Loading... 0%</div>
+        <div id="progressBarContainer">
+            <div id="progressBar"></div>
+        </div>
+    </div>
     <div class="core-area">
         <div class="buttons">
             <div class="button-row">
@@ -901,7 +987,7 @@
                 <button id="shopButton" onclick="toggleShop()">商店</button> 
                 <button id="treasureButton" onclick="toggleTreasureDrawer()">宝箱</button>
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
-                <button id="fightingButton" onclick="togglefightingDrawer()">战斗</button>
+                <button id="fightingButton" onclick="toggleFightingDrawer()">战斗</button>
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
             </div>
         </div>
@@ -946,7 +1032,6 @@
     </div>
     <div class="pet-selector">
         <select id="pet-select" onchange="changePet()">
-            <option value="yanzhi">未选择</option>
             <option value="yanzhi">胭脂</option>
             <option value="zhulin">竹林隐士</option>
             <option value="zhanshen">战神阿毛</option>
@@ -1159,17 +1244,52 @@
             <button id="lotteryClaimPrize">领取奖金</button>
         </div>
     </div>
+    <div id="fightingDrawer" class="battle-system-drawer">
+        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
+        <div class="battle-system-content">
+            <div class="battle-system-pet-info">
+                <h2>当前宠物</h2>
+                <p>生命值: <span id="your-pet-health"></span></p>
+                <p>法力值: <span id="your-pet-mana"></span></p>
+                <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
+                <p>物理防御: <span id="your-pet-physical-defense"></span></p>
+                <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
+                <p>法术防御: <span id="your-pet-magic-defense"></span></p>
+                <p>速度: <span id="your-pet-speed"></span></p>
+            </div>
+            <div class="battle-system-log">
+                <h2>战斗记录</h2>
+                <div id="log"></div>
+            </div>
+            <div class="battle-system-enemy-info">
+                <h2>刷怪箱</h2>
+                <p>生命值: <span id="enemy-pet-health"></span></p>
+                <p>法力值: <span id="enemy-pet-mana"></span></p>
+                <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
+                <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
+                <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
+                <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
+                <p>速度: <span id="enemy-pet-speed"></span></p>
+            </div>
+            <div class="battle-system-actions">
+                <button onclick="performAttack('physical')">物理攻击</button>
+                <button onclick="performAttack('magical')">法术攻击</button>
+                <button onclick="performHeal()">治疗</button>
+            </div>
+        </div>
+    </div>
     <div class="bottom-bar">
         <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png" alt="未选择">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
         </div>
         <div class="info">
-            <div>宠物名称: <span id="pet-name">未选择</span></div>
+            <div>宠物名称: <span id="pet-name">胭脂</span></div>
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>
+    
     <div class="description-box" id="description-box"></div>
     </div>
     <script>
@@ -1591,6 +1711,26 @@ const biographies = {
     ]
 };
 
+// 模拟加载进度
+function simulateLoading() {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 15;
+        if (progress <= 100) {
+            document.getElementById('loadingText').innerText = `Loading... ${progress}%`;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        } else {
+            clearInterval(interval);
+            document.getElementById('loadingOverlay').style.display = 'none';
+        }
+    }, 100);
+}
+
+// 页面加载完成后隐藏进度条和遮罩层
+window.addEventListener('load', () => {
+    simulateLoading();
+});
+        
 if (window.GestureEvent || (navigator.maxTouchPoints > 0)) {
     let lastTouchEnd = 0;
 
@@ -1648,7 +1788,6 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7e1.gif",
     "https://pic.imgdb.cn/item/6655c106d9c307b7e9dad024.gif",
     "https://pic.imgdb.cn/item/66542639d9c307b7e92c23a4.gif",
-    "https://pic.imgdb.cn/item/6663239f5e6d1bfa057623d8.png",
     "https://pic.imgdb.cn/item/66616fe95e6d1bfa05b0103d.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0117c.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0121c.png",
@@ -1687,27 +1826,410 @@ const imageUrls = [
 ];
 preloadImages(imageUrls);
 
+let attributesFetched = false;
+let battleState;
+let enemyPet;
+let playerTurn;
+let battleInterval;
+let battleAttributes; // 用于存储战斗属性的独立容器
+let maxHealth, maxMana; // 独立的最大值变量
+let enemyMaxHealth, enemyMaxMana; // 敌人的最大值变量
 
-function togglefightingDrawer() {
-    const messageBox = document.createElement('div');
-    messageBox.style = `
-        width: 50%; 
-        height: 10%; 
-        padding: 10px; 
-        background: white; 
-        border: 1px solid black; 
-        border-radius:10px;
-        position: fixed; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
-        z-index: 1000;
-        overflow: auto; 
-        font-size: 14px;
-    `;
-    messageBox.innerHTML =  `<p>功能暂未开放</p>
-                            <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
-    document.body.appendChild(messageBox);
+window.onload = function() {
+    initializeEnemyPet(); // 初始化敌人宠物
+    updatePetInfo(); // 更新宠物和敌人宠物的属性
+    document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
+}
+
+function initializeEnemyPet() {
+    enemyPet = {
+        health: 1200,
+        mana: 600,
+        physicalAttack: 125,
+        physicalDefense: 118,
+        magicAttack: 115,
+        magicDefense: 210,
+        speed: 121,
+        silenced: false,
+        stunned: false
+    };
+
+    if (battleState) {
+        battleState.enemy = { ...enemyPet };
+    }
+}
+
+function toggleFightingDrawer() {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    const drawer = document.getElementById('fightingDrawer');
+    const isOpen = drawer.classList.toggle('open');
+
+    if (isOpen) {
+        drawer.style.display = "block";
+        refreshBattleAttributes(); // 刷新战斗属性
+        startBattle();
+    } else {
+        drawer.style.display = "none";
+        stopBattle();
+    }
+}
+
+function updatePetInfo() {
+    if (!currentPet) {
+        console.error("currentPet is not initialized");
+        return;
+    }
+
+    const currentAttributes = calculateCurrentAttributes();
+    const totalAttributes = {
+        endurance: currentAttributes.endurance,
+        intelligence: currentAttributes.intelligence,
+        strength: currentAttributes.strength,
+        agility: currentAttributes.agility,
+        faith: currentAttributes.faith
+    };
+
+    const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
+
+    if (!battleState) {
+        battleState = {
+            player: {
+                health: secondaryAttributes.health,
+                mana: secondaryAttributes.mana,
+                physicalAttack: secondaryAttributes.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense,
+                speed: secondaryAttributes.speed,
+                intelligence: totalAttributes.intelligence
+            },
+            enemy: { ...enemyPet }
+        };
+    } else {
+        battleState.player.health = secondaryAttributes.health;
+        battleState.player.mana = secondaryAttributes.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed;
+        battleState.player.intelligence = totalAttributes.intelligence;
+    }
+
+    battleAttributes = { ...secondaryAttributes }; // 设置战斗属性
+    maxHealth = secondaryAttributes.health; // 设置独立的最大值变量
+    maxMana = secondaryAttributes.mana; // 设置独立的最大值变量
+    enemyMaxHealth = enemyPet.health;
+    enemyMaxMana = enemyPet.mana;
+
+    updateUI();
+    attributesFetched = true;
+}
+
+
+function refreshBattleAttributes() {
+    if (!currentPet) {
+        console.error("currentPet is not initialized");
+        return;
+    }
+
+    const currentAttributes = calculateCurrentAttributes();
+    const totalAttributes = {
+        endurance: currentAttributes.endurance,
+        intelligence: currentAttributes.intelligence,
+        strength: currentAttributes.strength,
+        agility: currentAttributes.agility,
+        faith: currentAttributes.faith
+    };
+
+    const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
+    battleAttributes = { ...secondaryAttributes }; // 刷新战斗属性
+
+    updateUI();
+}
+
+function updateUI() {
+    document.getElementById("your-pet-health").innerText = battleAttributes.health;
+    document.getElementById("your-pet-mana").innerText = battleAttributes.mana;
+    document.getElementById("your-pet-physical-attack").innerText = battleAttributes.physicalAttack;
+    document.getElementById("your-pet-physical-defense").innerText = battleAttributes.physicalDefense;
+    document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack;
+    document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense;
+    document.getElementById("your-pet-speed").innerText = battleAttributes.speed;
+
+    document.getElementById("enemy-pet-health").innerText = battleState.enemy.health;
+    document.getElementById("enemy-pet-mana").innerText = battleState.enemy.mana;
+    document.getElementById("enemy-pet-physical-attack").innerText = battleState.enemy.physicalAttack;
+    document.getElementById("enemy-pet-physical-defense").innerText = battleState.enemy.physicalDefense;
+    document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
+    document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
+    document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
+}
+
+function logBattleEvent(event) {
+    const logDiv = document.getElementById("log");
+    if (logDiv) {
+        const newEvent = document.createElement("p");
+        newEvent.innerText = event;
+        logDiv.appendChild(newEvent);
+        logDiv.scrollTop = logDiv.scrollHeight; // 自动滚动到底部
+    } else {
+        console.error("logDiv not found");
+    }
+}
+
+function performAttack(type) {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleAttributes.health <= 0) {
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        showNextBattlePrompt(false);
+        return;
+    }
+
+    let damage;
+    if (type === 'physical') {
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        const effectiveDefense = battleState.enemy.physicalDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) - effectiveDefense));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+        logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
+    } else if (type === 'magical') {
+        if (battleAttributes.mana < 50) {
+            logBattleEvent("您的法力值不足！");
+            performAttack('physical');
+            return;
+        }
+
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        const effectiveDefense = battleState.enemy.magicDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleAttributes.magicAttack || 0) - effectiveDefense));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+
+        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
+        battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
+        logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+
+        applyMagicEffects();
+    }
+
+    if (battleState.enemy.health <= 0) {
+        logBattleEvent("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
+        goldAmount += 100;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    }
+
+    playerTurn = false; // 轮到敌人回合
+    enemyAttack();
+
+    updateUI();
+}
+
+function applyMagicEffects() {
+    const effects = ['silence', 'armorBreak', 'stun', 'weaken'];
+    const effect = effects[Math.floor(Math.random() * effects.length)];
+    const effectChance = Math.random(); // 生成一个0到1之间的随机数
+
+    if (effectChance < 0.3) { // 30%的概率触发效果
+        switch (effect) {
+            case 'silence':
+                battleState.enemy.silenced = true; // 敌人沉默
+                logBattleEvent("敌人被沉默，无法使用特殊技能。");
+                setTimeout(() => { battleState.enemy.silenced = false; }, 5000); // 沉默5秒
+                break;
+            case 'armorBreak':
+                battleState.enemy.physicalDefense -= 5; // 破甲
+                logBattleEvent("敌人的护甲被破坏，物理防御减少。");
+                break;
+            case 'stun':
+                battleState.enemy.stunned = true; // 敌人眩晕
+                logBattleEvent("敌人被眩晕，无法行动。");
+                setTimeout(() => { battleState.enemy.stunned = false; }, 3000); // 眩晕3秒
+                break;
+            case 'weaken':
+                battleState.enemy.physicalAttack -= 5; // 虚弱
+                logBattleEvent("敌人被虚弱，物理攻击减少。");
+                break;
+        }
+    }
+}
+
+function performHeal() {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    const manaCost = 100;
+    if (battleAttributes.mana < manaCost) {
+        logBattleEvent("您的法力值不足，无法治疗！");
+        return;
+    }
+
+    const healAmount = Math.floor(10 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+    battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+    battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
+
+    logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+    playerTurn = false; // 轮到敌人回合
+    enemyAttack();
+
+    updateUI();
+}
+
+function startBattle() {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    logBattleEvent("战斗开始！");
+
+    playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
+    updateUI();
+
+    if (!playerTurn) {
+        enemyAttack(); // 敌人先攻
+    }
+}
+
+function stopBattle() {
+    clearInterval(battleInterval);
+    logBattleEvent("战斗停止。");
+}
+
+function showNextBattlePrompt(playerWon) {
+    if (playerWon) {
+        alert("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
+        goldAmount += 100;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
+    } else {
+        alert("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        initializeEnemyPet(); // 失败时重置敌人属性
+    }
+    resetBattleState();
+}
+
+function resetBattleState() {
+    updatePetInfo(); // 更新宠物和敌人宠物的属性
+    updateEnemyAttributes(); // 更新敌人的属性
+    updateUI(); // 更新UI显示
+    clearBattleLog(); // 清除战斗日志
+    logBattleEvent("新一轮战斗开始！"); // 记录新一轮战斗开始的事件
+}
+
+function clearBattleLog() {
+    const logDiv = document.getElementById("log");
+    if (logDiv) {
+        logDiv.innerHTML = ""; // 清除日志内容
+    } else {
+        console.error("logDiv not found");
+    }
+}
+
+function enemyAttack() {
+    if (!battleState || !battleAttributes || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleState.enemy.stunned) {
+        logBattleEvent("敌人眩晕，无法行动。");
+        playerTurn = true;
+        return;
+    }
+
+    if (Math.random() < 0.3 && battleState.enemy.mana >= 100) { // 30%的概率治疗
+        enemyHeal();
+        return;
+    }
+
+    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
+    let damage;
+
+    if (attackType === 'physical') {
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        const effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
+        battleAttributes.health = Math.max(0, battleAttributes.health - damage);
+        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
+    } else if (attackType === 'magical' && !battleState.enemy.silenced) {
+        if (battleState.enemy.mana < 50) {
+            logBattleEvent("敌人的法力值不足！");
+            enemyAttack('physical');
+            return;
+        }
+
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
+        battleAttributes.health = Math.max(0, battleAttributes.health - damage);
+
+        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
+        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
+        logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+    } else {
+        logBattleEvent("敌人被沉默，无法进行法术攻击。");
+    }
+
+    if (battleAttributes.health <= 0) {
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        showNextBattlePrompt(false);
+    } else {
+        updateUI();
+        playerTurn = true; // 轮到玩家回合
+    }
+}
+
+
+function enemyHeal() {
+    const manaCost = 100;
+    const healAmount = Math.floor(10 * battleState.enemy.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+    battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healAmount);
+    battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
+
+    logBattleEvent(`敌人治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+    playerTurn = true; // 轮到玩家回合
+
+    updateUI();
+}
+
+
+function updateEnemyAttributes() {
+    const player = battleAttributes;
+    enemyPet.health = Math.floor(enemyPet.health * 1.2);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.2);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.2);
+    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.2);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.2);
+    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.2);
+    enemyPet.speed = Math.floor(enemyPet.speed * 1.2);
+
+    if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
+    if (enemyPet.mana > player.maxMana * 1.5) enemyPet.mana = Math.floor(player.maxMana * 1.5);
+    if (enemyPet.physicalAttack > player.physicalAttack * 1.5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 1.5);
+    if (enemyPet.physicalDefense > player.physicalDefense * 1.5) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 1.5);
+    if (enemyPet.magicAttack > player.magicAttack * 1.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 1.5);
+    if (enemyPet.magicDefense > player.magicDefense * 1.5) enemyPet.magicDefense = Math.floor(player.magicDefense * 1.5);
+    if (enemyPet.speed > player.speed * 1.5) enemyPet.speed = Math.floor(player.speed * 1.5);
+
+    battleState.enemy = { ...enemyPet };
 }
 
 // lottery.js
@@ -1821,9 +2343,9 @@ function generateLotteryWinningNumbers() {
 function calculateLotteryPrize(winningNumbers, winningBlueBall) {
     const prizeTable = {
         '5:exact': 5000000,
-        '5:any': 150000,
+        '5:any': 500000,
         '4:exact': 1000000,
-        '4:any': 50000,
+        '4:any': 150000,
         '3:exact': 100000,
         '3:any': 5000,
         '2:exact': 10000,
@@ -2062,17 +2584,12 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V7.0</p>
-                            <p>- 1. 调整了部分按钮位置和配色</p>
-                            <p>- 2. 修复了使用快捷还童和一键提升悟性的道具消耗显示问题；</p>
-                            <p>- 3. 修复了商店的部分bug；</p>
-                            <p>- 4. 修复了悟性对二级属性的影响错误bug；</p>
-                            <p>- 5. 修复了其他显示问题；</p>
-                            <p>- 6. 新增宠物觉醒和幻化系统（调试中，功能尚不完全）；</p>
-                            <p>- 7. 新增部分新道具；</p>
-                            <p>- 8. 优化宠物金子培养的计数，玩家可以更有针对性地进行分配培养次数了；</p>
-                            <p>- 9. 新增场景系统，玩法会陆续上线；</p>
-                            <p>- 10. 优化部分道具排列；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V9.0</p>
+                            <p>- 1. 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
+                            <p>- 2. 新增彩券系统，拓展金子获取渠道；</p>
+                            <p>- 3. 新增加载页面；</p>
+                            <p>- 4. 优化部分函数逻辑；</p>
+                            <p>- 5. 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
@@ -2642,6 +3159,7 @@ function toggleAttributeDrawer() {
     drawer.classList.toggle('open');
     info.classList.toggle('open');
     updateAttributePanel();
+    updatePetInfo(); // 确保更新属性后设置 attributesFetched
 }
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
@@ -3718,79 +4236,7 @@ function upgradeWisdomTo() {
         alert(`请输入1到${awakened ? 25 : 20}之间的整数！`);
     }
 }
-    function updatePrimaryAttributes(totalAttributes) {
-        document.getElementById("attribute-endurance").innerText = Math.round(totalAttributes.endurance);
-        document.getElementById("attribute-intelligence").innerText = Math.round(totalAttributes.intelligence);
-        document.getElementById("attribute-strength").innerText = Math.round(totalAttributes.strength);
-        document.getElementById("attribute-agility").innerText = Math.round(totalAttributes.agility);
-        document.getElementById("attribute-faith").innerText = Math.round(totalAttributes.faith);
-    }
-    
-    function updateSecondaryAttributes(totalAttributes, currentWisdom) {
-        const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
-        let wisdomBonus;
-    
-        if (currentWisdom <= 12) {
-            wisdomBonus = currentWisdom * 0.5;
-        } else if (currentWisdom <= 20) {
-            wisdomBonus = 6 + (currentWisdom - 12) * 1;
-        } else {
-            switch (currentWisdom) {
-                case 21:
-                    wisdomBonus = 20;
-                    break;
-                case 22:
-                    wisdomBonus = 21;
-                    break;
-                case 23:
-                    wisdomBonus = 22;
-                    break;
-                case 24:
-                    wisdomBonus = 23;
-                    break;
-                case 25:
-                    wisdomBonus = 25;
-                    break;
-                default:
-                    wisdomBonus = 0;
-            }
-        }
-    
-        document.getElementById("secondary-health").innerText = secondaryAttributes.health;
-        const healthBonusElement = document.getElementById("secondary-health-bonus");
-        healthBonusElement.innerText = `+${wisdomBonus}%`;
-        healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
-        const manaBonusElement = document.getElementById("secondary-mana-bonus");
-        manaBonusElement.innerText = `+${wisdomBonus}%`;
-        manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
-        const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
-        physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
-        physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
-        const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
-        physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-        physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
-        const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
-        magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
-        magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
-        const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
-        magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-        magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
-        const speedBonusElement = document.getElementById("secondary-speed-bonus");
-        speedBonusElement.innerText = `+${wisdomBonus}%`;
-        speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    }
+
         
 let awakened = false; // 复位觉醒状态
 
@@ -3872,7 +4318,79 @@ function updateAttributePanel() {
 
     updateRemainingPointsDisplay();
 }
-
+    function updatePrimaryAttributes(totalAttributes) {
+        document.getElementById("attribute-endurance").innerText = Math.round(totalAttributes.endurance);
+        document.getElementById("attribute-intelligence").innerText = Math.round(totalAttributes.intelligence);
+        document.getElementById("attribute-strength").innerText = Math.round(totalAttributes.strength);
+        document.getElementById("attribute-agility").innerText = Math.round(totalAttributes.agility);
+        document.getElementById("attribute-faith").innerText = Math.round(totalAttributes.faith);
+    }
+    
+    function updateSecondaryAttributes(totalAttributes, currentWisdom) {
+        const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
+        let wisdomBonus;
+    
+        if (currentWisdom <= 12) {
+            wisdomBonus = currentWisdom * 0.5;
+        } else if (currentWisdom <= 20) {
+            wisdomBonus = 6 + (currentWisdom - 12) * 1;
+        } else {
+            switch (currentWisdom) {
+                case 21:
+                    wisdomBonus = 20;
+                    break;
+                case 22:
+                    wisdomBonus = 21;
+                    break;
+                case 23:
+                    wisdomBonus = 22;
+                    break;
+                case 24:
+                    wisdomBonus = 23;
+                    break;
+                case 25:
+                    wisdomBonus = 25;
+                    break;
+                default:
+                    wisdomBonus = 0;
+            }
+        }
+    
+        document.getElementById("secondary-health").innerText = secondaryAttributes.health;
+        const healthBonusElement = document.getElementById("secondary-health-bonus");
+        healthBonusElement.innerText = `+${wisdomBonus}%`;
+        healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
+        const manaBonusElement = document.getElementById("secondary-mana-bonus");
+        manaBonusElement.innerText = `+${wisdomBonus}%`;
+        manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
+        const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
+        physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
+        physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
+        const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
+        physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
+        physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
+        const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
+        magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
+        magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
+        const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
+        magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
+        magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    
+        document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
+        const speedBonusElement = document.getElementById("secondary-speed-bonus");
+        speedBonusElement.innerText = `+${wisdomBonus}%`;
+        speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+    }
 function calculateGrowthRateDisplayAndValue(qualities) {
     let growthRateDisplay;
     let growthRate;

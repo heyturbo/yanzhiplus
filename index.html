@@ -925,50 +925,58 @@
 .battle-system-drawer {
     display: none;
     position: fixed;
-    right: 0;
+    right: 0px;
     top: 0;
     height: 100%;
     width: 100%;
-    background: rgb(0 0 0 / 70%);
+    background: rgba(0, 0, 0, 0.7);
     color: white;
     box-shadow: -3px 0 5px rgba(0,0,0,0.2);
     z-index: 1000;
+    overflow-y: auto; /* 确保内容可以滚动 */
 }
 
 .battle-system-drawer-toggle {
-    font-size: 16px;
+    font-size: 24px;
     cursor: pointer;
-    padding: 5px;
+    padding: 0px;
 }
 
 .battle-system-content {
-    padding: 5px;
+    padding: 10px;
 }
 
 .battle-system-pet-info, .battle-system-enemy-info {
     border: 1px solid #ccc;
-    padding: 0px;
+    padding: 5px;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 12px;
+    height: 100%;
+    width: 95%;
 }
+
 .battle-system-log {
     border: 1px solid #ccc;
-    padding: 0px;
-    margin-bottom: 5px;
-    height: 100px; /* 设置固定高度 */
-    overflow-y: scroll; /* 启用滚动条 */
-    font-size: 14px;
+    padding: 10px;
+    margin-bottom: 10px;
+    height: 100px; /* 增加高度以适应更多内容 */
+    width: 95%;
+    overflow-y: scroll;
+    font-size: 12px;
 }
 
 .battle-system-actions button {
-    margin: 10px;
-    padding: 0px 0px;
+    margin: 10px 0px;
+    padding: 0px;
     cursor: pointer;
-    display: grid;
-    width: 95%;
-    background-color: #fff;
-    color: #000000;
+    display: block; /* 改为块级元素 */
+    border: 1px solid #ffffff;
+    width: 98%; /* 全宽度 */
+    background-color: #064701;
+    color: #ffffff;
 }
+
+
     </style>
 </head>
 <body>
@@ -2258,12 +2266,12 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
         <h2>彩券规则</h2>
         <p>金子不够花，想要以小博大？</p>
         <ul>
-            <li>玩家需选择6个数字，其中最后一个为蓝球。</li>
+            <li>玩家需选择6个数字，其中前5个数字为红球，第6个数字为蓝球。</li>
             <li>每注200金子，最低投注1注。</li>
             <li>上次选号区会以红色显示当次中奖的数字。</li>
             <li>倒计时10秒实时开奖，离开彩券界面会暂停计时。</li>
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
-            <li>选号数字分为红球和蓝球，蓝球独立计算。详细奖金规则：</li>
+            <li>详细中奖规则：</li>
             <ul>
                 <li>5个红球全中且排列顺序一致：5000000金子</li>
                 <li>5个红球全中：150000金子</li>
@@ -2277,8 +2285,8 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
             </ul>
             <li>蓝球规则：</li>
             <ul>
-                <li>如果蓝球一致且红球中奖，奖金翻10倍。</li>
-                <li>如果蓝球一致但红球未中奖，奖金+1000金子。</li>
+                <li>如果蓝球一致且红球中奖，当前奖金翻10倍。</li>
+                <li>如果蓝球一致但红球未中奖，奖金为固定1000金子。</li>
             </ul>
             <li>本系统只用于游戏货币道具的随机获取，赌博是违法犯罪的行为，请勿铤而走险！</li>
         </ul>

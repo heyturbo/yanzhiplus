@@ -3026,6 +3026,7 @@ function updatePetLevel() {
 
 let selectedTreasure = null;
 let rewards = [];
+let experienceTreasureOpenCount = 0;
 
 function toggleTreasureDrawer() {
     const drawer = document.getElementById('treasure-drawer');
@@ -3039,7 +3040,7 @@ function selectTreasure(type) {
     let description;
     switch (type) {
         case '经验宝箱':
-            description = "充满智慧的宝箱，每次开启花费50金子，您可能获得普通经验书和高级经验书，甚至还能获得法宝飞升之石！";
+            description = "充满智慧的宝箱，初次开启为100金，后续每次开启花费根据次数变化。您可能获得普通经验书和高级经验书，甚至还能获得法宝飞升之石！";
             break;
         case '资质宝箱':
             description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得稀有道具灵异金丹！";
@@ -3092,6 +3093,10 @@ function openTreasure() {
         rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
     }
     document.getElementById('treasure-reward').innerHTML = rewardHTML;
+    
+    if (selectedTreasure === '经验宝箱') {
+        experienceTreasureOpenCount++; // 增加经验宝箱开启次数
+    }
 }
 
 function collectTreasure() {
@@ -3149,9 +3154,21 @@ function collectTreasure() {
 }
 
 function getTreasureCost(type) {
+    if (type === '经验宝箱') {
+        if (experienceTreasureOpenCount < 20) {
+            return 100;
+        } else if (experienceTreasureOpenCount < 40) {
+            return 100 + (experienceTreasureOpenCount * 5);
+        } else if (experienceTreasureOpenCount < 60) {
+            return 200 + (experienceTreasureOpenCount * 10);
+        } else if (experienceTreasureOpenCount < 80) {
+            return 500 + (experienceTreasureOpenCount * 15);
+        } else {
+            return 2000;
+        }
+    }
+
     switch (type) {
-        case '经验宝箱':
-            return 50;
         case '资质宝箱':
             return 150;
         case '灵魂宝箱':

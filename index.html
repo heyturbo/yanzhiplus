@@ -924,64 +924,127 @@
 }
 .battle-system-drawer {
     display: none;
-    position: fixed;
+    position: absolute;
     right: 0px;
     top: 0;
     height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.8);
     color: white;
     box-shadow: -3px 0 5px rgba(0,0,0,0.2);
     z-index: 1000;
-    overflow-y: auto; /* 确保内容可以滚动 */
+    overflow-y: auto;
+    padding: 10px 0px 0px 0px;
 }
 
 .battle-system-drawer-toggle {
     font-size: 24px;
     cursor: pointer;
-    padding: 0px;
+    padding: 10px;
+    text-align: left;
 }
 
 .battle-system-content {
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
     padding: 10px;
+    width: 100%;
+}
+
+.battle-system-info-wrapper {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    width: 95%;
+    flex-direction: row;
 }
 
 .battle-system-pet-info, .battle-system-enemy-info {
     border: 1px solid #ccc;
-    padding: 5px;
-    margin-bottom: 5px;
-    font-size: 12px;
-    height: 100%;
-    width: 95%;
+    padding: 10px;
+    margin-bottom: 0;
+    font-size: 14px;
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
 }
 
 .battle-system-log {
     border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-    height: 100px; /* 增加高度以适应更多内容 */
+    padding: 0px;
+    margin-bottom: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     width: 95%;
-    overflow-y: scroll;
-    font-size: 12px;
+}
+
+.battle-system-actions {
+    display: flex;
+    gap: 10px;
+    width: 95%;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 
 .battle-system-actions button {
-    margin: 10px 0px;
-    padding: 0px;
+    padding: 5px;
     cursor: pointer;
-    display: block; /* 改为块级元素 */
     border: 1px solid #ffffff;
-    width: 98%; /* 全宽度 */
-    background-color: #064701;
+    width: 100%;
+    background-color: #0a8c00;
     color: #ffffff;
+    font-size: 14px;
+    text-align: center;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
+.battle-system-actions button:hover {
+    background-color: #064701;
+}
+#visualEffectsContainer {
+    position: relative;
+    width: 95%;
+    height: 0;
+    /* margin-top: 10px; */
+}
 
-    </style>
+.visual-effect {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    opacity: 0;
+    transform: scale(0);
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+#playerEffect {
+    left: 20%;
+    top: 50%;
+    background-color: rgba(0, 255, 0, 0.5);
+}
+
+#enemyEffect {
+    right: 20%;
+    top: 50%;
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+.show-effect {
+    opacity: 1;
+    transform: scale(1);
+}
+   </style>
 </head>
 <body>
     <div id="loadingOverlay">
-        <div id="loadingText">Loading... 0%</div>
+        <div id="loadingText">加载中... 0%</div>
         <div id="progressBarContainer">
             <div id="progressBar"></div>
         </div>
@@ -1253,31 +1316,40 @@
         </div>
     </div>
     <div id="fightingDrawer" class="battle-system-drawer">
-        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
         <div class="battle-system-content">
-            <div class="battle-system-pet-info">
-                <h2>当前宠物</h2>
-                <p>生命值: <span id="your-pet-health"></span></p>
-                <p>法力值: <span id="your-pet-mana"></span></p>
-                <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
-                <p>物理防御: <span id="your-pet-physical-defense"></span></p>
-                <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
-                <p>法术防御: <span id="your-pet-magic-defense"></span></p>
-                <p>速度: <span id="your-pet-speed"></span></p>
+        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
+            <div class="battle-system-info-wrapper">
+                <div class="battle-system-pet-info">
+                    <h2>当前宠物</h2>
+                    <p>生命值: <span id="your-pet-health"></span></p>
+                    <p>法力值: <span id="your-pet-mana"></span></p>
+                    <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
+                    <p>物理防御: <span id="your-pet-physical-defense"></span></p>
+                    <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
+                    <p>法术防御: <span id="your-pet-magic-defense"></span></p>
+                    <p>速度: <span id="your-pet-speed"></span></p>
+                    <div id="exp-bar-container">
+                    <p>经验值:<span id="exp-bar">0 / 208</span></p>
+                    </div>
+                </div>
+                <div class="battle-system-enemy-info">
+                    <h2>刷怪箱</h2>
+                    <p>生命值: <span id="enemy-pet-health"></span></p>
+                    <p>法力值: <span id="enemy-pet-mana"></span></p>
+                    <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
+                    <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
+                    <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
+                    <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
+                    <p>速度: <span id="enemy-pet-speed"></span></p>
+                </div>
+            </div>
+            <div id="visualEffectsContainer">
+                <div id="playerEffect" class="visual-effect"></div>
+                <div id="enemyEffect" class="visual-effect"></div>
             </div>
             <div class="battle-system-log">
                 <h2>战斗记录</h2>
                 <div id="log"></div>
-            </div>
-            <div class="battle-system-enemy-info">
-                <h2>刷怪箱</h2>
-                <p>生命值: <span id="enemy-pet-health"></span></p>
-                <p>法力值: <span id="enemy-pet-mana"></span></p>
-                <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
-                <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
-                <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
-                <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
-                <p>速度: <span id="enemy-pet-speed"></span></p>
             </div>
             <div class="battle-system-actions">
                 <button onclick="performAttack('physical')">物理攻击</button>
@@ -1725,7 +1797,7 @@ function simulateLoading() {
     const interval = setInterval(() => {
         progress += 15;
         if (progress <= 100) {
-            document.getElementById('loadingText').innerText = `Loading... ${progress}%`;
+            document.getElementById('loadingText').innerText = `加载中... ${progress}%`;
             document.getElementById('progressBar').style.width = `${progress}%`;
         } else {
             clearInterval(interval);
@@ -1784,18 +1856,6 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png",
     "https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif",
-    "https://pic.imgdb.cn/item/665c7002d9c307b7e9897757.gif",
-    "https://pic.imgdb.cn/item/665c7002d9c307b7e98976fe.gif",
-    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7ab.gif",
-    "https://pic.imgdb.cn/item/665433e7d9c307b7e93ac709.gif",
-    "https://pic.imgdb.cn/item/665433e7d9c307b7e93ac709.gif",
-    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac76d.gif",
-    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif",
-    "https://pic.imgdb.cn/item/66542638d9c307b7e92c22fd.gif",
-    "https://pic.imgdb.cn/item/665425a9d9c307b7e92b8c0b.gif",
-    "https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7e1.gif",
-    "https://pic.imgdb.cn/item/6655c106d9c307b7e9dad024.gif",
-    "https://pic.imgdb.cn/item/66542639d9c307b7e92c23a4.gif",
     "https://pic.imgdb.cn/item/66616fe95e6d1bfa05b0103d.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0117c.png",
     "https://pic.imgdb.cn/item/66616fea5e6d1bfa05b0121c.png",
@@ -1842,11 +1902,36 @@ let battleInterval;
 let battleAttributes; // 用于存储战斗属性的独立容器
 let maxHealth, maxMana; // 独立的最大值变量
 let enemyMaxHealth, enemyMaxMana; // 敌人的最大值变量
+let battleRounds = 0; // 记录玩家胜利的轮次
+let currentExp = 0; // 当前经验值
+let maxExp = 208; // 经验值上限
+let enemyHealCount = 0; // 记录怪物治疗次数
 
 window.onload = function() {
     initializeEnemyPet(); // 初始化敌人宠物
     updatePetInfo(); // 更新宠物和敌人宠物的属性
     document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
+    updateExpBar(); // 更新经验条
+}
+
+function forceScrollToBottom(element) {
+    element.scrollTop = element.scrollHeight;
+    setTimeout(() => {
+        element.scrollTop = element.scrollHeight;
+    }, 0);
+    setTimeout(() => {
+        element.scrollTop = element.scrollHeight;
+    }, 50);
+    setTimeout(() => {
+        element.scrollTop = element.scrollHeight;
+    }, 100);
+}
+function showEffect(effectId) {
+    const effect = document.getElementById(effectId);
+    effect.classList.add('show-effect');
+    setTimeout(() => {
+        effect.classList.remove('show-effect');
+    }, 500);
 }
 
 function initializeEnemyPet() {
@@ -1865,6 +1950,9 @@ function initializeEnemyPet() {
     if (battleState) {
         battleState.enemy = { ...enemyPet };
     }
+
+    enemyMaxHealth = enemyPet.health;
+    enemyMaxMana = enemyPet.mana;
 }
 
 function toggleFightingDrawer() {
@@ -1877,7 +1965,7 @@ function toggleFightingDrawer() {
     const isOpen = drawer.classList.toggle('open');
 
     if (isOpen) {
-        drawer.style.display = "block";
+        drawer.style.display = "flex";
         refreshBattleAttributes(); // 刷新战斗属性
         startBattle();
     } else {
@@ -1984,11 +2072,14 @@ function logBattleEvent(event) {
         const newEvent = document.createElement("p");
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
-        logDiv.scrollTop = logDiv.scrollHeight; // 自动滚动到底部
+
+        // 使用强制滚动函数确保在 DOM 更新后执行滚动操作
+        forceScrollToBottom(logDiv);
     } else {
         console.error("logDiv not found");
     }
 }
+
 
 function performAttack(type) {
     if (!attributesFetched) {
@@ -2014,6 +2105,7 @@ function performAttack(type) {
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
+        showEffect('enemyEffect');
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -2029,7 +2121,7 @@ function performAttack(type) {
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
-
+        showEffect('enemyEffect');
         applyMagicEffects();
     }
 
@@ -2096,7 +2188,7 @@ function performHeal() {
     logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
     playerTurn = false; // 轮到敌人回合
     enemyAttack();
-
+    showEffect('enemyEffect');
     updateUI();
 }
 
@@ -2123,20 +2215,40 @@ function stopBattle() {
 
 function showNextBattlePrompt(playerWon) {
     if (playerWon) {
-        alert("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
+        alert(`您赢得了此次战斗，金子+100！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
         goldAmount += 100;
         document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
+        gainExp(); // 获取经验
     } else {
         alert("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
-        initializeEnemyPet(); // 失败时重置敌人属性
     }
-    resetBattleState();
+    resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
 }
 
-function resetBattleState() {
+function gainExp() {
+    const gainedExp = Math.floor(maxExp * 0.12 + (12 * battleRounds) * 0.1);
+    currentExp += gainedExp;
+    if (currentExp >= maxExp) {
+        currentExp = 0;
+        maxExp = Math.floor(maxExp * 1.2);
+        alert("恭喜您升级了！");
+        increasePetLevel(1); // 提升宠物一级
+    }
+    updateExpBar();
+}
+
+function updateExpBar() {
+    document.getElementById("exp-bar").innerText = `${currentExp} / ${maxExp}`;
+}
+
+function resetBattleState(playerWon) {
+    enemyHealCount = 0; // 重置怪物治疗次数
     updatePetInfo(); // 更新宠物和敌人宠物的属性
-    updateEnemyAttributes(); // 更新敌人的属性
+    if (!playerWon) {
+        // 如果玩家没有获胜，则初始化怪物属性
+        initializeEnemyPet(); 
+    }
     updateUI(); // 更新UI显示
     clearBattleLog(); // 清除战斗日志
     logBattleEvent("新一轮战斗开始！"); // 记录新一轮战斗开始的事件
@@ -2177,6 +2289,7 @@ function enemyAttack() {
         damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
         battleAttributes.health = Math.max(0, battleAttributes.health - damage);
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
+        showEffect('enemyEffect');
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
             logBattleEvent("敌人的法力值不足！");
@@ -2192,6 +2305,7 @@ function enemyAttack() {
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+        showEffect('enemyEffect');
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。");
     }
@@ -2207,17 +2321,22 @@ function enemyAttack() {
 
 
 function enemyHeal() {
+    if (enemyHealCount >= 10) {
+        logBattleEvent("敌人无法继续治疗，治疗次数已达上限！");
+        return;
+    }
+
     const manaCost = 100;
     const healAmount = Math.floor(10 * battleState.enemy.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
     battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healAmount);
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
+    enemyHealCount += 1; // 增加治疗次数
 
     logBattleEvent(`敌人治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
     playerTurn = true; // 轮到玩家回合
-
+    showEffect('enemyEffect');
     updateUI();
 }
-
 
 function updateEnemyAttributes() {
     const player = battleAttributes;

@@ -3038,19 +3038,21 @@ function toggleTreasureDrawer() {
 function selectTreasure(type) {
     selectedTreasure = type;
     let description;
-    switch (type) {
-        case '经验宝箱':
-            description = `充满智慧的宝箱，本次开启将花费${cost}金子。您可能获得普通经验书和高级经验书，甚至还能获得法宝飞升之石！`;
-            break;
-        case '资质宝箱':
-            description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得稀有道具灵异金丹！";
-            break;
-        case '灵魂宝箱':
-            description = "神秘莫测的宝箱，每次开启花费300金子，您可能获得宠物进化所需的各种灵魂！";
-            break;
-        case '至尊宝箱':
-            description = "价值连城的宝箱，每次开启花费1000金子，您可能获得举世无双悟性丹，飞升之石等超稀有道具，甚至还有神秘觉醒法宝等你来拿！";
-            break;        
+    if (type === '经验宝箱') {
+        const cost = getTreasureCost('经验宝箱');
+        description = `充满智慧的宝箱，本次开启将花费${cost}金子。有概率获得宠物升级的经验书和飞升之石。`;
+    } else {
+        switch (type) {
+            case '资质宝箱':
+                description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得稀有道具灵异金丹！";
+                break;
+            case '灵魂宝箱':
+                description = "神秘莫测的宝箱，每次开启花费300金子，您可能获得宠物进化所需的各种灵魂！";
+                break;
+            case '至尊宝箱':
+                description = "价值连城的宝箱，每次开启花费1000金子，您可能获得举世无双悟性丹，飞升之石等超稀有道具，甚至还有神秘进化法宝等你来拿！";
+                break;
+        }
     }
     document.getElementById('treasure-description').innerText = description;
 }

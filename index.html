@@ -3025,8 +3025,8 @@ function updatePetLevel() {
 }
 
 let selectedTreasure = null;
-let rewards = [];
-let experienceTreasureOpenCount = 0;
+let rewards = []; // 定义全局变量来存储奖品
+let experienceTreasureOpenCount = 0; // 定义经验宝箱打开次数的全局变量
 
 function toggleTreasureDrawer() {
     const drawer = document.getElementById('treasure-drawer');
@@ -3062,7 +3062,9 @@ function openTreasure() {
         alert("请先选择一个宝箱！");
         return;
     }
-    if (goldAmount < getTreasureCost(selectedTreasure)) {
+
+    const cost = getTreasureCost(selectedTreasure);
+    if (goldAmount < cost) {
         alert("金子不足！");
         return;
     }
@@ -3070,7 +3072,11 @@ function openTreasure() {
     // 自动收集上次未取出的奖品
     collectTreasure();
 
-    goldAmount -= getTreasureCost(selectedTreasure);
+    if (selectedTreasure === '经验宝箱') {
+        experienceTreasureOpenCount++; // 增加经验宝箱开启次数
+    }
+
+    goldAmount -= cost;
     document.getElementById("gold-amount").innerText = goldAmount;
 
     // 根据概率随机生成 1~3 个奖品
@@ -3095,10 +3101,6 @@ function openTreasure() {
         rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
     }
     document.getElementById('treasure-reward').innerHTML = rewardHTML;
-    
-    if (selectedTreasure === '经验宝箱') {
-        experienceTreasureOpenCount++; // 增加经验宝箱开启次数
-    }
 }
 
 function collectTreasure() {

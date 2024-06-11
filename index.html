@@ -2129,9 +2129,7 @@ function performAttack(type) {
     }
 
     if (battleState.enemy.health <= 0) {
-        logBattleEvent("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
-        goldAmount += 100;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        logBattleEvent("您赢得了此次战斗，点击进入下一轮战斗！");
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
@@ -2156,7 +2154,7 @@ function applyMagicEffects() {
                 setTimeout(() => { battleState.enemy.silenced = false; }, 5000); // 沉默5秒
                 break;
             case 'armorBreak':
-                battleState.enemy.physicalDefense -= 5; // 破甲
+                battleState.enemy.physicalDefense -= 500; // 破甲
                 logBattleEvent("敌人的护甲被破坏，物理防御减少。");
                 break;
             case 'stun':
@@ -2165,7 +2163,7 @@ function applyMagicEffects() {
                 setTimeout(() => { battleState.enemy.stunned = false; }, 3000); // 眩晕3秒
                 break;
             case 'weaken':
-                battleState.enemy.physicalAttack -= 5; // 虚弱
+                battleState.enemy.physicalAttack -= 500; // 虚弱
                 logBattleEvent("敌人被虚弱，物理攻击减少。");
                 break;
         }
@@ -2221,8 +2219,8 @@ function showNextBattlePrompt(playerWon) {
         const minRewardMultiplier = 0.75;
         const maxRewardMultiplier = 1.5;
         const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
-        let reward = Math.floor(1000 * battleRounds * rewardMultiplier);
-        reward = Math.max(reward, 1000); // 确保最低奖励为 1000
+        let reward = Math.floor(200 * battleRounds * rewardMultiplier);
+        reward = Math.max(reward, 200); // 确保最低奖励为 200
         
         goldAmount += reward;
         alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
@@ -2354,8 +2352,8 @@ function enemyHeal() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
-    enemyPet.health = Math.floor(enemyPet.health * 1.02);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.02);
+    enemyPet.health = Math.floor(enemyPet.health * 1.12);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.1);
     enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.1);
     enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.1);
     enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.1);

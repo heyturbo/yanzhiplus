@@ -3037,6 +3037,10 @@ function toggleTreasureDrawer() {
 
 function selectTreasure(type) {
     selectedTreasure = type;
+    updateTreasureDescription(type);
+}
+
+function updateTreasureDescription(type) {
     let description;
     if (type === '经验宝箱') {
         const cost = getTreasureCost('经验宝箱');
@@ -3155,6 +3159,10 @@ function collectTreasure() {
     // 清空奖品
     rewards = [];
     document.getElementById('treasure-reward').innerHTML = "";
+    // 更新经验宝箱描述
+    if (selectedTreasure === '经验宝箱') {
+        updateTreasureDescription('经验宝箱');
+    }
 }
 
 function getTreasureCost(type) {

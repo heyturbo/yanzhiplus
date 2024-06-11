@@ -1914,18 +1914,6 @@ window.onload = function() {
     updateExpBar(); // 更新经验条
 }
 
-function forceScrollToBottom(element) {
-    element.scrollTop = element.scrollHeight;
-    setTimeout(() => {
-        element.scrollTop = element.scrollHeight;
-    }, 0);
-    setTimeout(() => {
-        element.scrollTop = element.scrollHeight;
-    }, 50);
-    setTimeout(() => {
-        element.scrollTop = element.scrollHeight;
-    }, 100);
-}
 function showEffect(effectId) {
     const effect = document.getElementById(effectId);
     effect.classList.add('show-effect');
@@ -2073,8 +2061,23 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 使用强制滚动函数确保在 DOM 更新后执行滚动操作
-        forceScrollToBottom(logDiv);
+        // 检查日志条目数，如果超过 5 条，则删除最早的条目
+        const logs = logDiv.getElementsByTagName("p");
+        while (logs.length > 5) {
+            logDiv.removeChild(logs[0]);
+        }
+
+        // 尝试强制滚动到最底部
+        logDiv.scrollTop = logDiv.scrollHeight;
+        setTimeout(() => {
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }, 0);
+        setTimeout(() => {
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }, 50);
+        setTimeout(() => {
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }, 100);
     } else {
         console.error("logDiv not found");
     }
@@ -2215,13 +2218,24 @@ function stopBattle() {
 
 function showNextBattlePrompt(playerWon) {
     if (playerWon) {
-        alert(`您赢得了此次战斗，金子+100！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
-        goldAmount += 100;
+        const minRewardMultiplier = 0.75;
+        const maxRewardMultiplier = 1.5;
+        const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
+        let reward = Math.floor(1000 * battleRounds * rewardMultiplier);
+        reward = Math.max(reward, 1000); // 确保最低奖励为 1000
+        
+        goldAmount += reward;
+        alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
+        
+        battleRounds++;
         document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
         gainExp(); // 获取经验
     } else {
-        alert("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        const penalty = 500;
+        goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
+        alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击进入下一轮战斗！`);
+        document.getElementById("gold-amount").innerText = goldAmount;
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
 }
@@ -2275,7 +2289,7 @@ function enemyAttack() {
         return;
     }
 
-    if (Math.random() < 0.3 && battleState.enemy.mana >= 100) { // 30%的概率治疗
+    if (Math.random() < 0.1 && battleState.enemy.mana >= 100) { // 10%的概率治疗
         enemyHeal();
         return;
     }
@@ -2311,7 +2325,7 @@ function enemyAttack() {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
         showNextBattlePrompt(false);
     } else {
         updateUI();
@@ -2321,7 +2335,7 @@ function enemyAttack() {
 
 
 function enemyHeal() {
-    if (enemyHealCount >= 10) {
+    if (enemyHealCount >= 5) {
         logBattleEvent("敌人无法继续治疗，治疗次数已达上限！");
         return;
     }
@@ -2340,13 +2354,13 @@ function enemyHeal() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
-    enemyPet.health = Math.floor(enemyPet.health * 1.2);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.2);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.2);
-    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.2);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.2);
-    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.2);
-    enemyPet.speed = Math.floor(enemyPet.speed * 1.2);
+    enemyPet.health = Math.floor(enemyPet.health * 1.02);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.02);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.1);
+    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.1);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.1);
+    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.1);
+    enemyPet.speed = Math.floor(enemyPet.speed * 1.1);
 
     if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
     if (enemyPet.mana > player.maxMana * 1.5) enemyPet.mana = Math.floor(player.maxMana * 1.5);

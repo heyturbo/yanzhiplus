@@ -407,7 +407,7 @@
             padding: 2px 10px;
             margin: 5px;
             /* height: 66%; */
-            background-color: #0a8c00;
+            background-color: #088c01;
             color: white;
             border: none;
             border-radius: 5px;
@@ -565,7 +565,7 @@
         .button-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 15px 0px; /* 调整按钮之间的间距 */
+            gap: 10px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
             justify-items: stretch;
             padding: 15px 0px;
@@ -974,7 +974,7 @@
     border: 1px solid #ccc;
     padding: 0px;
     margin-bottom: 0;
-    max-height: 150px;
+    max-height: 180px;
     overflow-y: auto;
     font-size: 14px;
     background: rgba(255, 255, 255, 0.1);
@@ -1010,7 +1010,18 @@
     position: relative;
     width: 95%;
     height: 0;
-    /* margin-top: 10px; */
+}
+@keyframes critical-hit {
+    0% {
+        border: 5px solid red;
+    }
+    100% {
+        border: 1px solid rgb(255 255 255 / 0%);
+    }
+}
+
+.battle-system-log.critical-hit {
+    animation: critical-hit 0.3s forwards;
 }
 
 .visual-effect {
@@ -1871,7 +1882,6 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png",
     "https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png",
     "https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png",
-    "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png",
     "https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png",
     "https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png",
     "https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png",
@@ -1906,6 +1916,7 @@ let battleRounds = 0; // 记录玩家胜利的轮次
 let currentExp = 0; // 当前经验值
 let maxExp = 208; // 经验值上限
 let enemyHealCount = 0; // 记录怪物治疗次数
+let enemyInitialState; // 存储每轮开始时的敌人初始状态
 
 window.onload = function() {
     initializeEnemyPet(); // 初始化敌人宠物
@@ -1924,11 +1935,11 @@ function showEffect(effectId) {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 1200,
+        health: 878,
         mana: 600,
-        physicalAttack: 125,
+        physicalAttack: 65,
         physicalDefense: 118,
-        magicAttack: 115,
+        magicAttack: 35,
         magicDefense: 210,
         speed: 121,
         silenced: false,
@@ -1941,6 +1952,8 @@ function initializeEnemyPet() {
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
+
+    storeEnemyInitialState(); // 存储初始状态
 }
 
 function toggleFightingDrawer() {
@@ -2061,9 +2074,9 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 5 条，则删除最早的条目
+        // 检查日志条目数，如果超过 4 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 5) {
+        while (logs.length > 4) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -2102,13 +2115,27 @@ function performAttack(type) {
     }
 
     let damage;
+    let isCritical = false;
+    let critMultiplier = 1;
+    const critChance = battleAttributes.speed / 10000; // 计算暴击概率
+
+    if (Math.random() < critChance) {
+        isCritical = true;
+        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
+        logBattleEvent("你发动了暴击，造成了双倍伤害！");
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
+    }
+
     if (type === 'physical') {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleState.enemy.physicalDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) * critMultiplier - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
-        showEffect('enemyEffect');
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -2118,13 +2145,12 @@ function performAttack(type) {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleState.enemy.magicDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleAttributes.magicAttack || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.magicAttack || 0) * critMultiplier - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
-        showEffect('enemyEffect');
         applyMagicEffects();
     }
 
@@ -2176,13 +2202,13 @@ function performHeal() {
         return;
     }
 
-    const manaCost = 100;
+    const manaCost = 100 * battleRounds;
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！");
         return;
     }
 
-    const healAmount = Math.floor(10 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+    const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
@@ -2216,11 +2242,11 @@ function stopBattle() {
 
 function showNextBattlePrompt(playerWon) {
     if (playerWon) {
-        const minRewardMultiplier = 0.75;
-        const maxRewardMultiplier = 1.5;
+        const minRewardMultiplier = 0.35;
+        const maxRewardMultiplier = 1.75;
         const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
-        let reward = Math.floor(200 * battleRounds * rewardMultiplier);
-        reward = Math.max(reward, 200); // 确保最低奖励为 200
+        let reward = Math.floor(288 * battleRounds * rewardMultiplier);
+        reward = Math.max(reward, 288); // 确保最低奖励为 288
         
         goldAmount += reward;
         alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
@@ -2239,11 +2265,11 @@ function showNextBattlePrompt(playerWon) {
 }
 
 function gainExp() {
-    const gainedExp = Math.floor(maxExp * 0.12 + (12 * battleRounds) * 0.1);
+    const gainedExp = Math.floor(maxExp * 0.12 + (12 * battleRounds) * 0.3);
     currentExp += gainedExp;
     if (currentExp >= maxExp) {
         currentExp = 0;
-        maxExp = Math.floor(maxExp * 1.2);
+        maxExp = Math.floor(maxExp * 2.4);
         alert("恭喜您升级了！");
         increasePetLevel(1); // 提升宠物一级
     }
@@ -2258,12 +2284,23 @@ function resetBattleState(playerWon) {
     enemyHealCount = 0; // 重置怪物治疗次数
     updatePetInfo(); // 更新宠物和敌人宠物的属性
     if (!playerWon) {
-        // 如果玩家没有获胜，则初始化怪物属性
-        initializeEnemyPet(); 
+        // 如果玩家没有获胜，则恢复怪物属性到本轮初始状态
+        restoreEnemyState();
     }
     updateUI(); // 更新UI显示
     clearBattleLog(); // 清除战斗日志
-    logBattleEvent("新一轮战斗开始！"); // 记录新一轮战斗开始的事件
+    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`); // 记录新一轮战斗开始的事件
+    // 存储怪物的初始状态
+    storeEnemyInitialState();
+}
+
+function storeEnemyInitialState() {
+    enemyInitialState = { ...enemyPet };
+}
+
+function restoreEnemyState() {
+    enemyPet = { ...enemyInitialState };
+    battleState.enemy = { ...enemyPet };
 }
 
 function clearBattleLog() {
@@ -2287,21 +2324,30 @@ function enemyAttack() {
         return;
     }
 
-    if (Math.random() < 0.1 && battleState.enemy.mana >= 100) { // 10%的概率治疗
-        enemyHeal();
-        return;
+    let damage;
+    let isCritical = false;
+    let critMultiplier = 1;
+    const critChance = battleState.enemy.speed / 10000; // 计算暴击概率
+
+    if (Math.random() < critChance) {
+        isCritical = true;
+        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
+        logBattleEvent("敌人发动了暴击，造成了双倍伤害！");
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
     }
 
     const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
-    let damage;
 
     if (attackType === 'physical') {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) * critMultiplier - effectiveDefense));
         battleAttributes.health = Math.max(0, battleAttributes.health - damage);
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
-        showEffect('enemyEffect');
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
             logBattleEvent("敌人的法力值不足！");
@@ -2311,19 +2357,18 @@ function enemyAttack() {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) * critMultiplier - effectiveDefense));
         battleAttributes.health = Math.max(0, battleAttributes.health - damage);
 
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
-        showEffect('enemyEffect');
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。");
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
         showNextBattlePrompt(false);
     } else {
         updateUI();
@@ -2331,15 +2376,14 @@ function enemyAttack() {
     }
 }
 
-
 function enemyHeal() {
-    if (enemyHealCount >= 5) {
+    if (enemyHealCount >= 3) {
         logBattleEvent("敌人无法继续治疗，治疗次数已达上限！");
         return;
     }
 
     const manaCost = 100;
-    const healAmount = Math.floor(10 * battleState.enemy.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+    const healAmount = Math.floor(3 * battleState.enemy.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
     battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healAmount);
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     enemyHealCount += 1; // 增加治疗次数
@@ -2352,13 +2396,13 @@ function enemyHeal() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
-    enemyPet.health = Math.floor(enemyPet.health * 1.12);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.1);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.1);
-    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.1);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.1);
-    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.1);
-    enemyPet.speed = Math.floor(enemyPet.speed * 1.1);
+    enemyPet.health = Math.floor(enemyPet.health * 1.05);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.05);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.07);
+    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.05);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.07);
+    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.85);
+    enemyPet.speed = Math.floor(enemyPet.speed * 1.035);
 
     if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
     if (enemyPet.mana > player.maxMana * 1.5) enemyPet.mana = Math.floor(player.maxMana * 1.5);
@@ -3934,6 +3978,9 @@ function resetPet() {
     hallucinated = false;
     hallucinationLevel = 0;
     experienceTreasureOpenCount = 0;
+    battleRounds = 0; // 记录玩家胜利的轮次
+    currentExp = 0; // 当前经验值
+    maxExp = 208; // 经验值上限
     bonusAttributes = {
     endurance: 0,
     intelligence: 0,

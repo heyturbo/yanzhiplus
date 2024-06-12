@@ -972,14 +972,14 @@
 
 .battle-system-log {
     border: 1px solid #ccc;
-    padding: 0px;
+    padding: 10px;
     margin-bottom: 0;
     max-height: 180px;
     overflow-y: auto;
-    font-size: 14px;
+    font-size: 12px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    width: 95%;
+    width: 90%;
 }
 
 .battle-system-actions {
@@ -1009,7 +1009,7 @@
 #visualEffectsContainer {
     position: relative;
     width: 95%;
-    height: 0;
+    height: 5px;
 }
 @keyframes critical-hit {
     0% {
@@ -1051,6 +1051,13 @@
     opacity: 1;
     transform: scale(1);
 }
+.status-display {
+    font-size: 14px;
+    margin-top: 0px;
+    color: red;
+    font-weight: bold;
+}
+
    </style>
 </head>
 <body>
@@ -1331,7 +1338,7 @@
         <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
-                    <h2>当前宠物</h2>
+                    <h2>当前宠物</h2><div id="player-status" class="status-display"></div>
                     <p>生命值: <span id="your-pet-health"></span></p>
                     <p>法力值: <span id="your-pet-mana"></span></p>
                     <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
@@ -1344,7 +1351,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>刷怪箱</h2>
+                    <h2>刷怪箱</h2><div id="enemy-status" class="status-display"></div>
                     <p>生命值: <span id="enemy-pet-health"></span></p>
                     <p>法力值: <span id="enemy-pet-mana"></span></p>
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
@@ -1940,7 +1947,7 @@ function initializeEnemyPet() {
         physicalAttack: 65,
         physicalDefense: 118,
         magicAttack: 35,
-        magicDefense: 210,
+        magicDefense: 118,
         speed: 121,
         silenced: false,
         stunned: false
@@ -2065,6 +2072,28 @@ function updateUI() {
     document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
     document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
     document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
+
+    // 更新状态显示
+    document.getElementById("player-status").innerText = getPlayerStatus();
+    document.getElementById("enemy-status").innerText = getEnemyStatus();
+}
+
+function getPlayerStatus() {
+    let status = [];
+    if (battleState.player.silenced) status.push("沉默");
+    if (battleState.player.reflecting) status.push("反弹");
+    if (battleState.player.divineProtection) status.push("仙气护体");
+    return status.join(", ");
+}
+
+function getEnemyStatus() {
+    let status = [];
+    if (battleState.enemy.silenced) status.push("沉默");
+    if (battleState.enemy.poisoned) status.push("中毒");
+    if (battleState.enemy.stunned) status.push("眩晕");
+    if (battleState.enemy.sleeping) status.push("沉睡");
+    if (battleState.enemy.intimidated) status.push("恐吓");
+    return status.join(", ");
 }
 
 function logBattleEvent(event) {
@@ -2130,9 +2159,9 @@ function performAttack(type) {
         }, 300);
     }
 
-    if (type === 'physical') {
+    if (type === 'physical' || battleState.enemy.silenced) { // 沉默时只能使用物理攻击
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = battleState.enemy.physicalDefense * defenseFactor / 2;
+        const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) * critMultiplier - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
@@ -2144,7 +2173,7 @@ function performAttack(type) {
         }
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = battleState.enemy.magicDefense * defenseFactor / 2;
+        const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.magicAttack || 0) * critMultiplier - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
@@ -2152,10 +2181,22 @@ function performAttack(type) {
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
         applyMagicEffects();
+
+        // 检查中毒效果
+        if (battleState.enemy.poisoned) {
+            const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+            logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
+        }
+    }
+
+    if (battleState.enemy.sleeping && type !== 'heal') { // 敌人沉睡状态
+        battleState.enemy.sleeping = false;
+        logBattleEvent("敌人从沉睡中醒来。");
     }
 
     if (battleState.enemy.health <= 0) {
-        logBattleEvent("您赢得了此次战斗，点击进入下一轮战斗！");
+        logBattleEvent("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
@@ -2168,7 +2209,7 @@ function performAttack(type) {
 }
 
 function applyMagicEffects() {
-    const effects = ['silence', 'armorBreak', 'stun', 'weaken'];
+    const effects = ['silence', 'armorBreak', 'stun', 'weaken', 'poison', 'reflect', 'divineProtection', 'sleep', 'intimidate'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
@@ -2180,17 +2221,53 @@ function applyMagicEffects() {
                 setTimeout(() => { battleState.enemy.silenced = false; }, 5000); // 沉默5秒
                 break;
             case 'armorBreak':
-                battleState.enemy.physicalDefense -= 500; // 破甲
-                logBattleEvent("敌人的护甲被破坏，物理防御减少。");
+                const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
+                battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
+                logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`);
+                setTimeout(() => {
+                    battleState.enemy.physicalDefense += armorBreakValue;
+                    logBattleEvent("敌人的破甲状态消失。");
+                }, 10000); // 破甲持续10秒
+                break;
+            case 'weaken':
+                const weakenValue = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.24 - 0.12) + 0.12));
+                battleState.enemy.physicalAttack -= weakenValue; // 虚弱
+                logBattleEvent(`敌人被虚弱，物理攻击减少了 ${weakenValue} 点。`);
+                setTimeout(() => {
+                    battleState.enemy.physicalAttack += weakenValue;
+                    logBattleEvent("敌人的虚弱状态消失。");
+                }, 10000); // 虚弱持续10秒
+                break;
+            case 'poison':
+                battleState.enemy.poisoned = true; // 敌人中毒
+                logBattleEvent("敌人被中毒，每次行动会扣除生命值。");
+                setTimeout(() => { battleState.enemy.poisoned = false; }, 3000); // 中毒持续3秒
+                break;
+            case 'reflect':
+                battleState.player.reflecting = true; // 玩家反弹状态
+                logBattleEvent("你获得了反弹状态，反弹敌人攻击的20%伤害。");
+                setTimeout(() => { battleState.player.reflecting = false; }, 5000); // 反弹持续5秒
+                break;
+            case 'divineProtection':
+                if (Math.random() < 0.15) { // 15%的概率触发仙气护体
+                    battleState.player.divineProtection = true; // 仙气护体
+                    logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。");
+                    setTimeout(() => { battleState.player.divineProtection = false; }, 5000); // 仙气护体持续5秒
+                }
+                break;
+            case 'sleep':
+                battleState.enemy.sleeping = true; // 敌人沉睡
+                logBattleEvent("敌人进入沉睡状态，不会行动但会恢复生命值。");
+                break; // 沉睡状态会在玩家攻击时解除
+            case 'intimidate':
+                battleState.enemy.intimidated = true; // 敌人恐吓状态
+                logBattleEvent("敌人被恐吓，无法暴击。");
+                setTimeout(() => { battleState.enemy.intimidated = false; }, 5000); // 恐吓持续5秒
                 break;
             case 'stun':
                 battleState.enemy.stunned = true; // 敌人眩晕
                 logBattleEvent("敌人被眩晕，无法行动。");
                 setTimeout(() => { battleState.enemy.stunned = false; }, 3000); // 眩晕3秒
-                break;
-            case 'weaken':
-                battleState.enemy.physicalAttack -= 500; // 虚弱
-                logBattleEvent("敌人被虚弱，物理攻击减少。");
                 break;
         }
     }
@@ -2202,7 +2279,7 @@ function performHeal() {
         return;
     }
 
-    const manaCost = 100 * battleRounds;
+    const manaCost = 88 * battleRounds;
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！");
         return;
@@ -2213,6 +2290,14 @@ function performHeal() {
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+
+    // 检查仙气护体效果
+    if (Math.random() < 0.15) {
+        battleState.player.divineProtection = true; // 仙气护体
+        logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。");
+        setTimeout(() => { battleState.player.divineProtection = false; }, 5000); // 仙气护体持续5秒
+    }
+
     playerTurn = false; // 轮到敌人回合
     enemyAttack();
     showEffect('enemyEffect');
@@ -2378,7 +2463,7 @@ function enemyAttack() {
 
 function enemyHeal() {
     if (enemyHealCount >= 3) {
-        logBattleEvent("敌人无法继续治疗，治疗次数已达上限！");
+        logBattleEvent("敌人尝试使用治疗术，但被我方打断了！");
         return;
     }
 
@@ -2398,10 +2483,10 @@ function updateEnemyAttributes() {
     const player = battleAttributes;
     enemyPet.health = Math.floor(enemyPet.health * 1.05);
     enemyPet.mana = Math.floor(enemyPet.mana * 1.05);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.07);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.05);
     enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.05);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.07);
-    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.85);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.05);
+    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.05);
     enemyPet.speed = Math.floor(enemyPet.speed * 1.035);
 
     if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
@@ -4035,6 +4120,7 @@ function resetPet() {
     updateQualityCard();
     updateAttributePanel();
     updateTopBarItems();
+    initializeEnemyPet();
 }
 
 function setInnerText(id, value) {
@@ -4141,16 +4227,16 @@ function trainSkills() {
     document.getElementById("train-count").innerText = trainCount;
 
     let skillNum;
-    if (currentWisdom < 7) {
+    if (currentWisdom < 13) {
         skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
-    } else if (currentWisdom < 13) {
-        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
     } else if (currentWisdom < 17) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+    } else if (currentWisdom < 19) {
         skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
     } else if (currentWisdom < 20) {
         skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
     } else {
-        skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+        skillNum = Math.max(5, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
     }
 
     const selectedSkills = [];

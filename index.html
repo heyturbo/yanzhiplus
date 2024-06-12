@@ -1057,6 +1057,34 @@
     color: red;
     font-weight: bold;
 }
+#battle-spirit-modal {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    width: 75%;
+    border: 2px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+#battle-spirit-modal .modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#battle-spirit-modal button {
+    background: #a70b00;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+    ga'padding: gap';
+    border-radius: 5px;
+    margin: 5px;
+}
 
    </style>
 </head>
@@ -1271,8 +1299,8 @@
                 <div>经验宝箱</div>
             </div>
             <div>
-                <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('资质宝箱')">
-                <div>资质宝箱</div>
+                <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('奇馈宝箱')">
+                <div>奇馈宝箱</div>
             </div>
             <div>
                 <img src="https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png" onclick="selectTreasure('灵魂宝箱')">
@@ -1365,6 +1393,24 @@
                 <div id="playerEffect" class="visual-effect"></div>
                 <div id="enemyEffect" class="visual-effect"></div>
             </div>
+            <!-- 战斗精灵弹出界面 -->
+            <div id="battle-spirit-modal" style="display: none;">
+                <div>
+                    <h2>觉醒的战斗精灵</h2>
+                    <p>等级: <span id="spirit-level">1</span></p>
+                    <p>倍率增幅: <span id="spirit-multiplier">1.00</span></p>
+                    <p>生命值增加: <span id="spirit-health">0</span></p>
+                    <p>法力值增加: <span id="spirit-mana">0</span></p>
+                    <p>物理攻击增加: <span id="spirit-physical-attack">0</span></p>
+                    <p>物理防御增加: <span id="spirit-physical-defense">0</span></p>
+                    <p>法术攻击增加: <span id="spirit-magic-attack">0</span></p>
+                    <p>法术防御增加: <span id="spirit-magic-defense">0</span></p>
+                    <p>速度增加: <span id="spirit-speed">0</span></p>
+                    <button id="level-up-spirit">精灵升级</button>
+                    <button id="enhance-spirit">觉醒洗练</button>
+                    <button id="close-spirit-modal">关闭面板</button>
+                </div>
+            </div>
             <div class="battle-system-log">
                 <h2>战斗记录</h2>
                 <div id="log"></div>
@@ -1372,8 +1418,10 @@
             <div class="battle-system-actions">
                 <button onclick="performAttack('physical')">物理攻击</button>
                 <button onclick="performAttack('magical')">法术攻击</button>
-                <button onclick="performHeal()">治疗</button>
+                <button onclick="performHeal()">治疗之术</button>
+                <button id="battle-spirit-button">精灵面板</button>
             </div>
+            
         </div>
     </div>
     <div class="bottom-bar">
@@ -1911,6 +1959,136 @@ const imageUrls = [
 ];
 preloadImages(imageUrls);
 
+// 战斗精灵属性
+let spiritLevel = 1;
+let spiritMultiplier = 1.00;
+const maxSpiritLevel = 100;
+const minSpiritMultiplier = 0.01;
+const maxSpiritMultiplier = 2.15;
+
+// 获取精灵提供的基础属性增益
+function getBaseSpiritAttributes() {
+    return {
+        health: 28,
+        mana: 28,
+        physicalAttack: 11,
+        physicalDefense: 18,
+        magicAttack: 11,
+        magicDefense: 18,
+        speed: 8
+    };
+}
+
+// 计算精灵当前等级和倍数提供的属性增益
+function getCurrentSpiritAttributes() {
+    const baseAttributes = getBaseSpiritAttributes();
+    return {
+        health: Math.floor(baseAttributes.health * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        mana: Math.floor(baseAttributes.mana * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        physicalAttack: Math.floor(baseAttributes.physicalAttack * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        physicalDefense: Math.floor(baseAttributes.physicalDefense * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        magicAttack: Math.floor(baseAttributes.magicAttack * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        magicDefense: Math.floor(baseAttributes.magicDefense * Math.pow(1.1, spiritLevel) * spiritMultiplier),
+        speed: Math.floor(baseAttributes.speed * Math.pow(1.1, spiritLevel) * spiritMultiplier)
+    };
+}
+
+// 更新精灵属性显示
+function updateSpiritDisplay() {
+    const spiritAttributes = getCurrentSpiritAttributes();
+    document.getElementById('spirit-level').innerText = spiritLevel;
+    document.getElementById('spirit-multiplier').innerText = spiritMultiplier.toFixed(2);
+    document.getElementById('spirit-health').innerText = spiritAttributes.health;
+    document.getElementById('spirit-mana').innerText = spiritAttributes.mana;
+    document.getElementById('spirit-physical-attack').innerText = spiritAttributes.physicalAttack;
+    document.getElementById('spirit-physical-defense').innerText = spiritAttributes.physicalDefense;
+    document.getElementById('spirit-magic-attack').innerText = spiritAttributes.magicAttack;
+    document.getElementById('spirit-magic-defense').innerText = spiritAttributes.magicDefense;
+    document.getElementById('spirit-speed').innerText = spiritAttributes.speed;
+}
+
+// 显示战斗精灵按钮
+function checkAwakening() {
+    if (awakened) {
+        document.getElementById('battle-spirit-button').style.display = 'block';
+    } else {
+        document.getElementById('battle-spirit-button').style.display = 'block';
+    }
+}
+
+// 打开战斗精灵界面
+document.getElementById('battle-spirit-button').addEventListener('click', () => {
+    if (!awakened) {
+        alert('战斗时，宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
+    } else {
+        document.getElementById('battle-spirit-modal').style.display = 'block';
+        updateSpiritDisplay(); // 打开时更新显示
+    }
+});
+
+// 关闭战斗精灵界面
+document.getElementById('close-spirit-modal').addEventListener('click', () => {
+    document.getElementById('battle-spirit-modal').style.display = 'none';
+});
+
+// 精灵洗练
+document.getElementById('level-up-spirit').addEventListener('click', () => {
+    if (spiritLevel >= maxSpiritLevel) {
+        alert('战斗精灵已达到最大等级！');
+        return;
+    }
+
+    if (useItem('spiritRefreshStone')) {
+        const successChance = Math.random();
+        if (successChance < 0.8) { // 80% 成功率
+            spiritLevel += 1;
+            updateSpiritDisplay(); // 更新显示
+            refreshBattleAttributes(); // 刷新战斗属性
+        } else {
+            alert('战斗精灵洗练失败！');
+        }
+    } else {
+        alert('您的精灵精炼石不足！');
+    }
+});
+
+
+// 精灵觉醒
+document.getElementById('enhance-spirit').addEventListener('click', () => {
+    if (useItem('spiritAwakenStone')) {
+        const newMultiplier = (Math.random() * (maxSpiritMultiplier - minSpiritMultiplier) + minSpiritMultiplier).toFixed(2);
+        spiritMultiplier = parseFloat(newMultiplier);
+        updateSpiritDisplay(); // 更新显示
+        refreshBattleAttributes(); // 刷新战斗属性
+    } else {
+        alert('您的精灵觉醒石不足！');
+    }
+});
+
+
+// 使用道具
+function useItem(itemName) {
+    const itemIndex = jinnangItems.findIndex(item => item.name === itemName);
+    if (itemIndex !== -1) {
+        jinnangItems[itemIndex].quantity -= 1;
+        if (jinnangItems[itemIndex].quantity <= 0) {
+            jinnangItems.splice(itemIndex, 1);
+        }
+        updateJinnangItems();
+        return true;
+    }
+    return false;
+}
+
+// 初始化检查觉醒状态
+window.onload = function() {
+    initializeEnemyPet(); // 初始化敌人宠物
+    updatePetInfo(); // 更新宠物和敌人宠物的属性
+    document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
+    checkAwakening(); // 检查宠物觉醒状态
+    updateExpBar(); // 更新经验条
+}
+        
 let attributesFetched = false;
 let battleState;
 let enemyPet;
@@ -1924,13 +2102,6 @@ let currentExp = 0; // 当前经验值
 let maxExp = 208; // 经验值上限
 let enemyHealCount = 0; // 记录怪物治疗次数
 let enemyInitialState; // 存储每轮开始时的敌人初始状态
-
-window.onload = function() {
-    initializeEnemyPet(); // 初始化敌人宠物
-    updatePetInfo(); // 更新宠物和敌人宠物的属性
-    document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
-    updateExpBar(); // 更新经验条
-}
 
 function showEffect(effectId) {
     const effect = document.getElementById(effectId);
@@ -1998,42 +2169,51 @@ function updatePetInfo() {
     };
 
     const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
+    const spiritAttributes = getCurrentSpiritAttributes();
 
     if (!battleState) {
         battleState = {
             player: {
-                health: secondaryAttributes.health,
-                mana: secondaryAttributes.mana,
-                physicalAttack: secondaryAttributes.physicalAttack,
-                physicalDefense: secondaryAttributes.physicalDefense,
-                magicAttack: secondaryAttributes.magicAttack,
-                magicDefense: secondaryAttributes.magicDefense,
-                speed: secondaryAttributes.speed,
+                health: secondaryAttributes.health + spiritAttributes.health,
+                mana: secondaryAttributes.mana + spiritAttributes.mana,
+                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense,
+                speed: secondaryAttributes.speed + spiritAttributes.speed,
                 intelligence: totalAttributes.intelligence
             },
             enemy: { ...enemyPet }
         };
     } else {
-        battleState.player.health = secondaryAttributes.health;
-        battleState.player.mana = secondaryAttributes.mana;
-        battleState.player.physicalAttack = secondaryAttributes.physicalAttack;
-        battleState.player.physicalDefense = secondaryAttributes.physicalDefense;
-        battleState.player.magicAttack = secondaryAttributes.magicAttack;
-        battleState.player.magicDefense = secondaryAttributes.magicDefense;
-        battleState.player.speed = secondaryAttributes.speed;
+        battleState.player.health = secondaryAttributes.health + spiritAttributes.health;
+        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed;
         battleState.player.intelligence = totalAttributes.intelligence;
     }
 
-    battleAttributes = { ...secondaryAttributes }; // 设置战斗属性
-    maxHealth = secondaryAttributes.health; // 设置独立的最大值变量
-    maxMana = secondaryAttributes.mana; // 设置独立的最大值变量
+    battleAttributes = {
+        health: secondaryAttributes.health + spiritAttributes.health,
+        mana: secondaryAttributes.mana + spiritAttributes.mana,
+        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack,
+        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense,
+        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack,
+        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense,
+        speed: secondaryAttributes.speed + spiritAttributes.speed
+    }; // 设置战斗属性
+
+    maxHealth = battleAttributes.health; // 设置独立的最大值变量
+    maxMana = battleAttributes.mana; // 设置独立的最大值变量
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
 
     updateUI();
     attributesFetched = true;
 }
-
 
 function refreshBattleAttributes() {
     if (!currentPet) {
@@ -2051,7 +2231,17 @@ function refreshBattleAttributes() {
     };
 
     const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
-    battleAttributes = { ...secondaryAttributes }; // 刷新战斗属性
+    const spiritAttributes = getCurrentSpiritAttributes();
+
+    battleAttributes = {
+        health: secondaryAttributes.health + spiritAttributes.health,
+        mana: secondaryAttributes.mana + spiritAttributes.mana,
+        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack,
+        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense,
+        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack,
+        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense,
+        speed: secondaryAttributes.speed + spiritAttributes.speed
+    }; // 刷新战斗属性
 
     updateUI();
 }
@@ -2197,16 +2387,19 @@ function performAttack(type) {
 
     if (battleState.enemy.health <= 0) {
         logBattleEvent("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
+        goldAmount += 100;
+        document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
     }
 
     playerTurn = false; // 轮到敌人回合
-    enemyAttack();
+    setTimeout(enemyAttack, 200); // 延迟0.2秒后敌人回合
 
     updateUI();
 }
+
 
 function applyMagicEffects() {
     const effects = ['silence', 'armorBreak', 'stun', 'weaken', 'poison', 'reflect', 'divineProtection', 'sleep', 'intimidate'];
@@ -2460,6 +2653,7 @@ function enemyAttack() {
         playerTurn = true; // 轮到玩家回合
     }
 }
+
 
 function enemyHeal() {
     if (enemyHealCount >= 3) {
@@ -2852,12 +3046,13 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V9.0</p>
-                            <p>- 1. 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
-                            <p>- 2. 新增彩券系统，拓展金子获取渠道；</p>
-                            <p>- 3. 新增加载页面；</p>
-                            <p>- 4. 优化部分函数逻辑；</p>
-                            <p>- 5. 优化部分显示效果；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V9.1</p>
+                            <p>- 新增战斗精灵系统和相关道具，战斗精灵会给玩家提供战斗时的属性加成，觉醒后功能会完全开放；</p>
+                            <p>- 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
+                            <p>- 新增彩券系统，拓展金子获取渠道；</p>
+                            <p>- 新增加载页面；</p>
+                            <p>- 优化部分函数逻辑；</p>
+                            <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
@@ -3176,8 +3371,8 @@ function updateTreasureDescription(type) {
         description = `充满智慧的宝箱，本次开启将花费${cost}金子。有概率获得宠物升级的经验书和飞升之石。`;
     } else {
         switch (type) {
-            case '资质宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得稀有道具灵异金丹！";
+            case '奇馈宝箱':
+                description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得培养战斗精灵的稀有道具！";
                 break;
             case '灵魂宝箱':
                 description = "神秘莫测的宝箱，每次开启花费300金子，您可能获得宠物进化所需的各种灵魂！";
@@ -3279,6 +3474,12 @@ function collectTreasure() {
             case '凝魄石':
                 addItemToJinnang('coagulateStone');
                 break;
+            case '精灵精炼石':
+                addItemToJinnang('spiritRefreshStone');
+                break;
+            case '精灵觉醒石':
+                addItemToJinnang('spiritAwakenStone');
+                break;
             default:
                 addItemToTopBar(reward);
                 break;
@@ -3310,7 +3511,7 @@ function getTreasureCost(type) {
     }
 
     switch (type) {
-        case '资质宝箱':
+        case '奇馈宝箱':
             return 150;
         case '灵魂宝箱':
             return 300;
@@ -3326,11 +3527,13 @@ function getRandomReward(type) {
             { name: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 19.95 },
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
-        '资质宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 33 },
-            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 33 },
-            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 33 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 1 }
+        '奇馈宝箱': [
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 19 },
+            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 19 },
+            { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 19 },
+            { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 19 },
+            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 19 },
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 5 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -3372,6 +3575,8 @@ let jinnangItems = [
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', quantity: 0 },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', quantity: 0 },
     { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', quantity: 0 },
+    { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', quantity: 0 },
+    { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', quantity: 0 },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', quantity: 0 },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', quantity: 0 },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', quantity: 0 },
@@ -3778,6 +3983,8 @@ function getRandomCommonItem() {
         { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(60, 220) },
         { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', price: getRandomInt(99, 299) },
         { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) },
+        { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: getRandomInt(188, 388) },
+        { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: getRandomInt(388, 688) },
         { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: getRandomInt(388, 788) }
     ];
 
@@ -3903,6 +4110,16 @@ function buyItem() {
                     addItemToJinnang('tejiWisdomPill');
                 }
                 break;
+            case '精灵精炼石':
+                for (let i = 0; i < itemQuantity; i++) {
+                    addItemToJinnang('spiritRefreshStone');
+                }
+                break;
+            case '精灵觉醒石':
+                for (let i = 0; i < itemQuantity; i++) {
+                    addItemToJinnang('spiritAwakenStone');
+                }
+                break;
             case '还童金丹':
                 goldenRebornPill += itemQuantity;
                 break;
@@ -3972,6 +4189,12 @@ function buyItem() {
                     break;
                 case '特级悟性丹':
                     addItemToJinnang('tejiWisdomPill'); // 更新锦囊
+                    break;
+                case '精灵精炼石':
+                    addItemToJinnang('spiritRefreshStone'); // 更新锦囊
+                    break;
+                case '精灵觉醒石':
+                    addItemToJinnang('spiritAwakenStone'); // 更新锦囊
                     break;
                 case '还童金丹':
                     goldenRebornPill++;
@@ -4444,6 +4667,8 @@ function upgradeWisdomTo() {
             'seperateStone', // 离魂石
             'tejiWisdomPill',
             'radiantSoul',
+            'spiritRefreshStone',
+            'spiritAwakenStone',
             'shakingSoul',
             'glowingSoul',
             'activeSoul',

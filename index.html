@@ -1998,7 +1998,7 @@ preloadImages(imageUrls);
 // 战斗精灵属性
 let spiritLevel = 1;
 let spiritMultiplier = 1.00;
-const maxSpiritLevel = 110;
+const maxSpiritLevel = 100;
 const minSpiritMultiplier = 0.01;
 const maxSpiritMultiplier = 4.15;
 
@@ -2007,11 +2007,11 @@ function getBaseSpiritAttributes() {
     return {
         health: 38,
         mana: 19,
-        physicalAttack: 11,
-        physicalDefense: 18,
-        magicAttack: 11,
-        magicDefense: 18,
-        speed: 2
+        physicalAttack: 6,
+        physicalDefense: 9,
+        magicAttack: 6,
+        magicDefense: 9,
+        speed: 1
     };
 }
 
@@ -2150,11 +2150,11 @@ function initializeEnemyPet() {
     enemyPet = {
         health: 678,
         mana: 336,
-        physicalAttack: 65,
+        physicalAttack: 68,
         physicalDefense: 118,
         magicAttack: 35,
         magicDefense: 118,
-        speed: 121,
+        speed: 208,
         silenced: false,
         stunned: false
     };
@@ -2328,9 +2328,9 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 4 条，则删除最早的条目
+        // 检查日志条目数，如果超过 5 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 4) {
+        while (logs.length > 5) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -2363,7 +2363,7 @@ function performAttack(type) {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击进入下一轮战斗！");
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
         showNextBattlePrompt(false);
         return;
     }
@@ -2371,7 +2371,7 @@ function performAttack(type) {
     let damage;
     let isCritical = false;
     let critMultiplier = 1;
-    const critChance = battleAttributes.speed / 10000; // 计算暴击概率
+    const critChance = battleAttributes.speed / 100000; // 计算暴击概率
 
     if (Math.random() < critChance) {
         isCritical = true;
@@ -2421,9 +2421,7 @@ function performAttack(type) {
     }
 
     if (battleState.enemy.health <= 0) {
-        logBattleEvent("您赢得了此次战斗，金子+100！点击进入下一轮战斗！");
-        goldAmount += 100;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        logBattleEvent("您赢得了此次战斗，点击进入下一轮战斗！");
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
@@ -2569,7 +2567,7 @@ function showNextBattlePrompt(playerWon) {
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
         gainExp(); // 获取经验
     } else {
-        const penalty = 500 * battleRounds;
+        const penalty = 388 * battleRounds;
         goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击进入下一轮战斗！`);
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -2582,7 +2580,7 @@ function gainExp() {
     currentExp += gainedExp;
     if (currentExp >= maxExp) {
         currentExp = 0;
-        maxExp = Math.floor(maxExp * 6.4);
+        maxExp = Math.floor(maxExp * 1.4);
         alert("恭喜您升级了！");
         increasePetLevel(1); // 提升宠物一级
     }
@@ -2640,7 +2638,7 @@ function enemyAttack() {
     let damage;
     let isCritical = false;
     let critMultiplier = 1;
-    const critChance = battleState.enemy.speed / 10000; // 计算暴击概率
+    const critChance = battleState.enemy.speed / 100000; // 计算暴击概率
 
     if (Math.random() < critChance) {
         isCritical = true;
@@ -2679,7 +2677,25 @@ function enemyAttack() {
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。");
     }
+    // 确保 damage 是有效的数值
+    if (isNaN(damage)) {
+        damage = 0;
+    }
+    
+    // 检查反弹状态
+    if (battleState.player.reflecting) {
+        const reflectDamage = Math.floor(damage * 0.2);
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
+        logBattleEvent(`反弹状态触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
+    }
 
+    // 检查仙气护体状态
+    if (battleState.player.divineProtection) {
+        const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+        battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`);
+    }
+    
     if (battleAttributes.health <= 0) {
         logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重新战斗！");
         showNextBattlePrompt(false);
@@ -2710,13 +2726,13 @@ function enemyHeal() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
-    enemyPet.health = Math.floor(enemyPet.health * 1.02);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.01);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.05);
+    enemyPet.health = Math.floor(enemyPet.health * 1.05);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.035);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.055);
     enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.035);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.035);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.045);
     enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.035);
-    enemyPet.speed = Math.floor(enemyPet.speed * 1.005);
+    enemyPet.speed = Math.floor(enemyPet.speed * 1.025);
 
     if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
     if (enemyPet.mana > player.maxMana * 1.5) enemyPet.mana = Math.floor(player.maxMana * 1.5);
@@ -4996,21 +5012,47 @@ function calculateCurrentAttributes() {
 
 let remainingPoints = 0;
 const allocationHistory = [];
-        
+const allocationCount = {}; // 用于记录每个属性的连续分配次数
+
 function updateRemainingPointsDisplay() {
     document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
     console.log(`Remaining Points Display Updated: ${remainingPoints}`);
-}    
-        
+}
+
 function increaseBonusAttribute(attribute) {
     if (remainingPoints <= 0) {
         alert("您的宠物没有可分配点数了！");
         return;
     }
 
-    bonusAttributes[attribute] += 1;
-    remainingPoints -= 1;
+    // 记录属性分配
     allocationHistory.push({ attribute, value: 1 });
+
+    // 更新连续分配次数
+    if (allocationCount[attribute]) {
+        allocationCount[attribute]++;
+    } else {
+        allocationCount[attribute] = 1;
+    }
+
+    // 检查连续分配次数是否达到5次
+    if (allocationCount[attribute] >= 5) {
+        const confirmMessage = `您已连续分配5次${attribute}，是否将剩余的点数全部分配至该属性？`;
+        if (confirm(confirmMessage)) {
+            bonusAttributes[attribute] += remainingPoints;
+            remainingPoints = 0;
+            allocationHistory.push({ attribute, value: remainingPoints });
+            allocationCount[attribute] = 0; // 重置计数
+        } else {
+            allocationCount[attribute] = 0; // 重置计数
+            bonusAttributes[attribute] += 1;
+            remainingPoints -= 1;
+        }
+    } else {
+        bonusAttributes[attribute] += 1;
+        remainingPoints -= 1;
+    }
+
     updateAttributePanel();
     updateRemainingPointsDisplay();
 

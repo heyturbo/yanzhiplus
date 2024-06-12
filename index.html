@@ -940,7 +940,7 @@
 .battle-system-drawer-toggle {
     font-size: 24px;
     cursor: pointer;
-    padding: 10px;
+    padding: 10px 0px 10px 10px;
     text-align: left;
 }
 
@@ -954,10 +954,10 @@
 
 .battle-system-info-wrapper {
     display: flex;
-    justify-content: space-between;
     gap: 10px;
-    width: 95%;
+    width: 100%;
     flex-direction: row;
+    justify-content: space-between;
 }
 
 .battle-system-pet-info, .battle-system-enemy-info {
@@ -973,19 +973,19 @@
 .battle-system-log {
     border: 1px solid #ccc;
     padding: 10px;
-    margin-bottom: 0;
-    max-height: 180px;
+    margin-bottom: 0px;
+    height: 25%;
     overflow-y: auto;
     font-size: 12px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    width: 90%;
+    width: 94%;
 }
 
 .battle-system-actions {
     display: flex;
     gap: 10px;
-    width: 95%;
+    width: 100%;
     flex-direction: row;
     flex-wrap: nowrap;
 }
@@ -1009,7 +1009,7 @@
 #visualEffectsContainer {
     position: relative;
     width: 95%;
-    height: 5px;
+    height: 0px;
 }
 @keyframes critical-hit {
     0% {
@@ -1064,7 +1064,7 @@
     transform: translate(-50%, -50%);
     background: rgba(0, 0, 0, 0.8);
     padding: 10px;
-    width: 75%;
+    width: 80%;
     border: 2px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -1379,7 +1379,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>刷怪箱</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>无尽の怪(物理)</h2><div id="enemy-status" class="status-display"></div>
                     <p>生命值: <span id="enemy-pet-health"></span></p>
                     <p>法力值: <span id="enemy-pet-mana"></span></p>
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
@@ -1396,9 +1396,9 @@
             <!-- 战斗精灵弹出界面 -->
             <div id="battle-spirit-modal" style="display: none;">
                 <div>
-                    <h2>觉醒的战斗精灵</h2>
+                    <h2>战斗精灵（已觉醒）</h2>
                     <p>等级: <span id="spirit-level">1</span></p>
-                    <p>倍率增幅: <span id="spirit-multiplier">1.00</span></p>
+                    <p>增幅: <span id="spirit-multiplier">1.00</span></p>
                     <p>生命值增加: <span id="spirit-health">0</span></p>
                     <p>法力值增加: <span id="spirit-mana">0</span></p>
                     <p>物理攻击增加: <span id="spirit-physical-attack">0</span></p>
@@ -1407,7 +1407,7 @@
                     <p>法术防御增加: <span id="spirit-magic-defense">0</span></p>
                     <p>速度增加: <span id="spirit-speed">0</span></p>
                     <button id="level-up-spirit">精灵升级</button>
-                    <button id="enhance-spirit">觉醒洗练</button>
+                    <button id="enhance-spirit">增幅洗练</button>
                     <button id="close-spirit-modal">关闭面板</button>
                 </div>
             </div>
@@ -2019,7 +2019,7 @@ function checkAwakening() {
 // 打开战斗精灵界面
 document.getElementById('battle-spirit-button').addEventListener('click', () => {
     if (!awakened) {
-        alert('战斗时，宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
+        alert('宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
     } else {
         document.getElementById('battle-spirit-modal').style.display = 'block';
         updateSpiritDisplay(); // 打开时更新显示
@@ -2052,7 +2052,6 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
     }
 });
 
-
 // 精灵觉醒
 document.getElementById('enhance-spirit').addEventListener('click', () => {
     if (useItem('spiritAwakenStone')) {
@@ -2069,10 +2068,10 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
 // 使用道具
 function useItem(itemName) {
     const itemIndex = jinnangItems.findIndex(item => item.name === itemName);
-    if (itemIndex !== -1) {
+    if (itemIndex !== -1 && jinnangItems[itemIndex].quantity > 0) {
         jinnangItems[itemIndex].quantity -= 1;
-        if (jinnangItems[itemIndex].quantity <= 0) {
-            jinnangItems.splice(itemIndex, 1);
+        if (jinnangItems[itemIndex].quantity < 0) {
+            jinnangItems[itemIndex].quantity = 0;
         }
         updateJinnangItems();
         return true;
@@ -5007,7 +5006,7 @@ function awakenPet() {
         return;
     }
 
-    const confirmation = confirm("觉醒宠物会收取一个稀有道具“醒悟丹”（宝箱获得），觉醒后的宠物资质会提升，成长率也会提升。宠物的当前属性会大幅提升，悟性上限提升至25，等级上限提高至160级。是否觉醒？");
+    const confirmation = confirm("觉醒需要消耗一个珍贵道具“醒悟丹”。宠物觉醒后成长率、当前属性会得到极大提升，悟性上限开放至25，等级开放至160，同时开启幻化能力。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
     if (!confirmation) {
         return;
     }

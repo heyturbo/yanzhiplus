@@ -2119,14 +2119,14 @@ let ascensionAttributes = {
 const ascensionSkills = {
     attribute: [
         { name: '力劈华山', effect: level => `提供${4000 + 1000 + level * 2000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 2000 },
-        { name: '慈悲心坏', effect: level => `提供${50000 + 2000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 2000 * level },
+        { name: '慈悲心怀', effect: level => `提供${50000 + 5000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 5000 * level },
         { name: '势如破竹', effect: level => `提供${20000 + 180 + 50 * level}点速度和${24000 + 180 + 50 * level}点法术攻击力`, baseValue: 20000, increment: level => 180 + 50 * level },
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
         { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${2 + 2 * level}%的生命值`, baseValue: 2, increment: level => 2 * level },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗最大法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
-        { name: '以牙还牙', effect: level => `反弹本次承受伤害的${51 + 2 * level}%~${82 + 2 * level}%`, baseValue: 51, increment: level => 2 * level },
+        { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
         { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 2 * level}%`, baseValue: 20, increment: level => 2 * level }
     ],
     settlement: [
@@ -2154,7 +2154,7 @@ function applyAscensionBonus() {
         case '力劈华山':
             ascensionAttributes.physicalAttack = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             break;
-        case '慈悲心坏':
+        case '慈悲心怀':
             ascensionAttributes.health = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             ascensionAttributes.mana = 50000 + ascensionSkill.increment(ascensionSkill.level);
             break;

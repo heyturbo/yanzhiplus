@@ -338,7 +338,7 @@
         }
         .quality-info .progress-bar div {
             height: 10px;
-            background-color: #0056b3;
+            background-color: #064701;
             text-align: right;
             padding-right: 5px;
             color: white;
@@ -1068,6 +1068,7 @@
     border: 2px solid #ccc;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     z-index: 1000;
+    border-radius: 10px;
 }
 
 #battle-spirit-modal .modal-content {
@@ -1084,6 +1085,77 @@
     ga'padding: gap';
     border-radius: 5px;
     margin: 5px;
+}
+.ascension-skill-modal {
+    display: none; /* 默认隐藏 */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4);
+}
+
+.ascension-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.ascension-close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.ascension-close:hover,
+.ascension-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.ascension-header {
+    display: flex;
+    align-items: center;
+}
+
+.ascension-icon {
+    width: 100px;
+    height: 100px;
+}
+
+.ascension-info {
+    margin-left: 20px;
+}
+
+.ascension-body {
+    margin-top: 20px;
+}
+
+.ascension-footer {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ascension-button {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.ascension-skill-button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
    </style>
@@ -1399,7 +1471,7 @@
                 <div>
                     <h2>战斗精灵（已觉醒）</h2>
                     <p>等级: <span id="spirit-level">1</span></p>
-                    <p>增幅: <span id="spirit-multiplier">1.00</span></p>
+                    <p>增幅: <span id="spirit-multiplier">1.00</span>（0.01~4.15）</p>
                     <p>生命值增加: <span id="spirit-health">0</span></p>
                     <p>法力值增加: <span id="spirit-mana">0</span></p>
                     <p>物理攻击增加: <span id="spirit-physical-attack">0</span></p>
@@ -1411,6 +1483,27 @@
                     <button id="enhance-spirit">增幅洗练</button>
                     <button id="close-spirit-modal">关闭面板</button>
                 </div>
+            </div>            
+            <!-- 飞升之术面板 -->
+            <div id="ascension-skill-modal" class="ascension-modal">
+                <div class="ascension-modal-content">
+                    <span id="close-ascension-modal" class="ascension-close">&times;</span>
+                    <div class="ascension-header">
+                        <img id="ascension-icon" src="https://pic.imgdb.cn/item/666aa7b6d9c307b7e9495e97.png" alt="Ascension Skill Icon" class="ascension-icon">
+                        <div class="ascension-info">
+                            <p id="ascension-name">飞升之术名字</p>
+                            <p id="ascension-level">等级: 1</p>
+                        </div>
+                    </div>
+                    <div class="ascension-body">
+                        <p id="ascension-effect">飞升之术的增益效果信息</p>
+                    </div>
+                    <div class="ascension-footer">
+                        <button id="enable-ascension" class="ascension-footer-button">开启增益</button>
+                        <button id="refresh-ascension" class="ascension-footer-button">刷新技能</button>
+                        <button id="level-up-ascension" class="ascension-footer-button">提升技能</button>
+                    </div>
+                </div>
             </div>
             <div class="battle-system-log">
                 <h2>战斗记录</h2>
@@ -1421,6 +1514,7 @@
                 <button onclick="performAttack('magical')">法术攻击</button>
                 <button onclick="performHeal()">治疗之术</button>
                 <button id="battle-spirit-button">精灵面板</button>
+                <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
             </div>
             
         </div>
@@ -1994,7 +2088,62 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png"
 ];
 preloadImages(imageUrls);
+//飞升之术
+document.getElementById('ascension-skill-button').addEventListener('click', () => {
+    if (!petAscended) {
+        alert('您的宠物未飞升，还不会掌握飞升之术！');
+    } else {
+        document.getElementById('ascension-skill-modal').style.display = 'block';
+        updateAscensionDisplay(); // 打开时更新显示
+    }
+});
 
+// 关闭飞升之术面板
+document.getElementById('close-ascension-modal').addEventListener('click', () => {
+    document.getElementById('ascension-skill-modal').style.display = 'none';
+});
+
+// 更新飞升之术面板显示
+function updateAscensionDisplay() {
+    document.getElementById('ascension-icon').src = 'path/to/icon.png'; // 设置图标URL
+    document.getElementById('ascension-name').innerText = '飞升之术名字';
+    document.getElementById('ascension-level').innerText = '等级: 1';
+    document.getElementById('ascension-effect').innerText = '飞升之术的增益效果信息';
+}
+
+// 监听开启增益按钮点击事件
+document.getElementById('enable-ascension').addEventListener('click', () => {
+    if (!ascend) {
+        alert('飞升之术尚未启用！');
+        return;
+    }
+    if (useItem('heartStone')) {
+        alert('飞升之术增益已启用！');
+        applyAscensionBonus(); // 应用飞升之术增益
+    } else {
+        alert('您的心鉴之石不足！');
+    }
+});
+
+// 监听刷新技能按钮点击事件
+document.getElementById('refresh-ascension').addEventListener('click', () => {
+    if (useItem('heartStone')) {
+        alert('飞升之术技能已刷新！');
+        refreshAscensionSkill(); // 刷新飞升之术技能
+    } else {
+        alert('您的心鉴之石不足！');
+    }
+});
+
+// 监听提升技能按钮点击事件
+document.getElementById('level-up-ascension').addEventListener('click', () => {
+    if (useItem('heartStone')) {
+        alert('飞升之术技能已提升！');
+        levelUpAscensionSkill(); // 提升飞升之术技能
+    } else {
+        alert('您的心鉴之石不足！');
+    }
+});
 // 战斗精灵属性
 let spiritLevel = 1;
 let spiritMultiplier = 1.00;
@@ -2081,7 +2230,7 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
             updateSpiritDisplay(); // 更新显示
             refreshBattleAttributes(); // 刷新战斗属性
         } else {
-            alert('战斗精灵洗练失败！');
+            alert('洗练失败！');
         }
     } else {
         alert('您的精灵精炼石不足！');
@@ -2148,9 +2297,9 @@ function showEffect(effectId) {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 678,
+        health: 578,
         mana: 336,
-        physicalAttack: 68,
+        physicalAttack: 58,
         physicalDefense: 118,
         magicAttack: 35,
         magicDefense: 118,
@@ -2428,7 +2577,7 @@ function performAttack(type) {
     }
 
     playerTurn = false; // 轮到敌人回合
-    setTimeout(enemyAttack, 200); // 延迟0.2秒后敌人回合
+    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
 
     updateUI();
 }
@@ -2576,14 +2725,23 @@ function showNextBattlePrompt(playerWon) {
 }
 
 function gainExp() {
-    const gainedExp = Math.floor(maxExp * 0.12 + (12 * battleRounds) * 0.3);
+    const gainedExp = Math.floor(maxExp * 0.18 + (12 * battleRounds) * 0.3);
     currentExp += gainedExp;
+
     if (currentExp >= maxExp) {
         currentExp = 0;
         maxExp = Math.floor(maxExp * 1.4);
-        alert("恭喜您升级了！");
-        increasePetLevel(1); // 提升宠物一级
+
+        if (petLevel >= 200) {
+            alert("宠物已达到最高等级，经验转化为普通经验书！");
+            addItemToJinnang('normalExperienceBook');
+            updateJinnangItems();
+        } else {
+            alert("恭喜您升级了！");
+            increasePetLevel(1); // 提升宠物一级
+        }
     }
+
     updateExpBar();
 }
 
@@ -3209,11 +3367,11 @@ function evolvePet() {
     } else if (evolutionLevel < 25) {
         requiredItem = evolutionItems[19];
         successRate = 0.5;
-        increaseValue = 200;
+        increaseValue = 240;
     } else if (evolutionLevel < 30) {
         requiredItem = evolutionItems[25];
         successRate = 0.8;
-        increaseValue = 100;
+        increaseValue = 160;
     } else {
         // 如果进化等级达到上限，提示用户并退出函数。
         alert("您的宠物已达进化等级上限！");
@@ -3234,6 +3392,7 @@ function evolvePet() {
             increaseRandomQuality(increaseValue);
         }
 
+        remainingPoints += 5; // 增加5个剩余点数
         // 减少用户的所需道具数量。
         item.quantity--;
         // 增加进化等级。
@@ -3244,6 +3403,7 @@ function evolvePet() {
         document.getElementById("evolution-level").innerText = evolutionLevel;
         // 更新资质卡片和技能分数的显示。
         updateQualityCard();
+        updateRemainingPointsDisplay();
         updateSkillScore();
     } else {
         // 如果进化失败，减少用户的所需道具数量，并提示用户进化失败。
@@ -3310,6 +3470,7 @@ function useSupremeWisdomPill() {
     }
 }
 
+// Function to increase the pet's level with level cap adjustment
 function increasePetLevel(levels) {
     if (petLevel >= petMaxLevel) {
         alert("宠物等级已达上限，无法继续升级！");
@@ -3331,6 +3492,7 @@ function increasePetLevel(levels) {
     console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
 }
         
+// Function to handle normal experience absorption
 function absorbExperience() {
     const item = jinnangItems.find(i => i.name === 'normalExperienceBook');
     if (item.quantity <= 0) {
@@ -3339,6 +3501,10 @@ function absorbExperience() {
     }
     if (petLevel >= petMaxLevel) {
         alert("宠物等级已达上限，无法继续升级！");
+        return;
+    }
+    if (petAscended && petLevel >= 180) {
+        alert("强者只有经过战场的淬炼才会得到更惊人的成长");
         return;
     }
     item.quantity--;
@@ -3356,11 +3522,14 @@ function absorbAdvancedExperience() {
         alert("宠物等级已达上限，无法继续升级！");
         return;
     }
+    if (petAscended && petLevel >= 180) {
+        alert("强者只有经过战场的淬炼才会得到更惊人的成长");
+        return;
+    }
     item.quantity--;
     updateJinnangItems();
     increasePetLevel(3);
 }
-
 
 let petLevel = 1;
 let petMaxLevel = 149;
@@ -3389,10 +3558,10 @@ function ascend() {
     updateJinnangItems();
 
     // Update pet's max level and ascension status
-    petMaxLevel = 180;
+    petMaxLevel = 200;
     petAscended = true;
 
-    alert("恭喜大侠的爱宠飞升成功！");
+    alert("恭喜大侠的爱宠飞升成功！等级上限开放至200级。");
 }
 
 function updatePetLevel() {
@@ -3551,13 +3720,13 @@ function getTreasureCost(type) {
         if (experienceTreasureOpenCount < 20) {
             return 100;
         } else if (experienceTreasureOpenCount < 40) {
-            return 100 + (experienceTreasureOpenCount * 5);
+            return 200 + (experienceTreasureOpenCount * 5);
         } else if (experienceTreasureOpenCount < 60) {
-            return 200 + (experienceTreasureOpenCount * 10);
+            return 400 + (experienceTreasureOpenCount * 10);
         } else if (experienceTreasureOpenCount < 80) {
-            return 500 + (experienceTreasureOpenCount * 15);
+            return 800 + (experienceTreasureOpenCount * 15);
         } else {
-            return 2000;
+            return 2400;
         }
     }
 
@@ -3648,9 +3817,12 @@ function addItemToJinnang(itemName) {
     const item = jinnangItems.find(i => i.name === itemName);
     if (item) {
         item.quantity++;
-        updateJinnangItems(); // 更新锦囊内的道具数量显示
+    } else {
+        jinnangItems.push({ name: itemName, quantity: 1 });
     }
+    updateJinnangItems(); // 更新锦囊内的道具数量显示
 }
+
 
 // 更新锦囊内道具数量
 function updateJinnangItems() {
@@ -4003,7 +4175,7 @@ function refreshShop(auto = false) {
         } else {
             item = getRandomCommonItem();
             if (item.name.includes('包裹')) {
-                if (commonBundleCount >= 2) {
+                if (commonBundleCount >= 3) {
                     i--; // 重试生成
                     continue;
                 } else {

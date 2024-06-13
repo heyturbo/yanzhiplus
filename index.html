@@ -3029,8 +3029,8 @@ function enemyAttack() {
 
     // 检查以牙还牙状态
     if (ascensionSkill.name === '以牙还牙') {
-        const reflectMin = 51 + 2 * ascensionSkill.level;
-        const reflectMax = 82 + 2 * ascensionSkill.level;
+        const reflectMin = 15 + 2 * ascensionSkill.level;
+        const reflectMax = 30 + 2 * ascensionSkill.level;
         const reflectPercentage = Math.random() * (reflectMax - reflectMin) + reflectMin;
         const reflectDamage = Math.floor(damage * (reflectPercentage / 100));
         if (isNaN(reflectDamage)) {
@@ -3065,7 +3065,8 @@ function enemyAttack() {
 
     // 检查向死而生
     if (battleAttributes.health <= 0 && ascensionSkill.name === '向死而生') {
-        const manaCost = Math.floor(maxMana * (ascensionSkill.baseValue / 100));
+        const manaCostPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+        const manaCost = Math.floor(maxMana * (manaCostPercentage / 100));
         if (battleAttributes.mana >= manaCost) {
             battleAttributes.health = 1;
             battleAttributes.mana -= manaCost;
@@ -3073,6 +3074,7 @@ function enemyAttack() {
             updateUI();
         }
     }
+
 
     if (battleAttributes.health <= 0) {
         logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重新战斗！");

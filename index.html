@@ -1228,7 +1228,36 @@
     margin-bottom: 20px;
     font-size: 14px;
 }
+/* 防止 "pull-to-refresh" 行为 */
+@media screen and (pointer: coarse) {
+    @supports (-webkit-backdrop-filter: blur(1px)) {
+        /* Safari 16+ */
+        @supports (overscroll-behavior-y: none) {
+            html {
+                min-height: 100.3%;
+                overscroll-behavior-y: none;
+            }
+        }
+        /* Safari 9-15 */
+        @supports (not (overscroll-behavior-y: none)) {
+            html {
+                height: 100%;
+                overflow: hidden;
+            }
+            body {
+                margin: 0px;
+                max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+    }
+}
 
+/* Chrome 63+ */
+body {
+    overscroll-behavior-y: none;
+}
    </style>
 </head>
 <body>

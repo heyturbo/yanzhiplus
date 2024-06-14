@@ -4466,20 +4466,20 @@ function getRandomReward(type) {
             { name: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', chance: 10 }
         ],
         '武神宝箱': [
-            { name: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', chance: 20 },
-            { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 20 },
-            { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 20 },
+            { name: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', chance: 10 },
+            { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
+            { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 20 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 19 }
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 9 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 50 }
         ],
         '至尊宝箱': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 10 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 20 },
             { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 10 },
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 10 },
-            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 15 },
-            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 15 },
+            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 25 },
+            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 5 },
             { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 20 }
         ]
     };
@@ -4498,26 +4498,27 @@ function selectReward(rewardList) {
 }
 
 // 新增全局变量
+// 新增全局变量
 let jinnangItems = [
-    { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', quantity: 0 },
-    { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', quantity: 0 },
-    { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', quantity: 0 },
-    { name: 'awakenPill', displayName: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', quantity: 0 },
-    { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', quantity: 0 },
-    { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', quantity: 0 },
-    { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', quantity: 0 },
-    { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', quantity: 0 },
-    { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', quantity: 0 },
-    { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', quantity: 0 },
-    { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', quantity: 0 },
-    { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', quantity: 0 },
-    { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', quantity: 0 },
-    { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', quantity: 0 },
-    { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', quantity: 0 },
-    { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', quantity: 0 },
-    { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', quantity: 0 },
-    { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', quantity: 0 },
-    { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', quantity: 0 }
+    { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', quantity: 0, description: '无名者的经验，使用后等级+1' },
+    { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
+    { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', quantity: 0, description: '伟人的经验，使用后等级+3' },
+    { name: 'awakenPill', displayName: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', quantity: 0, description: '宠物觉醒时必不可少的玄妙丹药' },
+    { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', quantity: 0, description: '开启宠物幻化的必要道具' },
+    { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
+    { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
+    { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', quantity: 0, description: '举世无双，灵石点智，一举提升悟性到20' },
+    { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', quantity: 0, description: '提升精灵等级，但也可能会失败' },
+    { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', quantity: 0, description: '刷新精灵的增幅百分比' },
+    { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },
+    { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药' },
+    { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', quantity: 0, description: '配合毒粉，可使施毒成功率大大提升' },
+    { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', quantity: 0, description: '荟萃日月之精华，提升飞升之术等级的必需之物' },
+    { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', quantity: 0, description: '用于宠物25~30进化' },
+    { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', quantity: 0, description: '用于宠物1~6进化' },
+    { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', quantity: 0, description: '用于宠物7~12进化' },
+    { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', quantity: 0, description: '用于宠物13~18进化' },
+    { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', quantity: 0, description: '用于宠物19~24进化' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -4539,6 +4540,44 @@ function addItemToJinnang(itemName) {
     updateJinnangItems(); // 更新锦囊内的道具数量显示
 }
 
+let currentDescriptionBox = null; // 存储当前显示的描述框
+
+// 显示道具描述
+function showItemDescription(description, itemDiv) {
+    // 如果当前有描述框，移除它
+    if (currentDescriptionBox) {
+        currentDescriptionBox.remove();
+        currentDescriptionBox = null;
+    }
+
+    let descriptionBox = document.createElement('div');
+    descriptionBox.className = 'description-box';
+    descriptionBox.style.position = 'fixed';
+    descriptionBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    descriptionBox.style.color = 'white';
+    descriptionBox.style.padding = '10px';
+    descriptionBox.style.borderRadius = '5px';
+    descriptionBox.style.zIndex = '1000';
+    descriptionBox.style.width = '300px';
+    descriptionBox.style.maxWidth = '80%';
+    descriptionBox.style.top = '50%';
+    descriptionBox.style.left = '50%';
+    descriptionBox.style.transform = 'translate(-50%, -50%)';
+    descriptionBox.style.wordWrap = 'break-word';
+    descriptionBox.style.textAlign = 'center';
+    descriptionBox.innerText = description;
+
+    document.body.appendChild(descriptionBox);
+    currentDescriptionBox = descriptionBox;
+
+    // 设置3秒后自动关闭
+    setTimeout(() => {
+        if (descriptionBox) {
+            descriptionBox.remove();
+            currentDescriptionBox = null;
+        }
+    }, 3000);
+}
 
 // 更新锦囊内道具数量
 function updateJinnangItems() {
@@ -4549,11 +4588,14 @@ function updateJinnangItems() {
         if (item.quantity > 0) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'jinnang-item';
+            itemDiv.style.position = 'relative'; // 为了定位描述框
             itemDiv.innerHTML = `
                 <img src="${item.url}" alt="${item.name}">
                 <div>${item.displayName}</div>
                 <div>${item.quantity}</div>
             `;
+            // 添加点击事件监听器
+            itemDiv.addEventListener('click', () => showItemDescription(item.description, itemDiv));
             jinnangReward.appendChild(itemDiv);
         }
     });

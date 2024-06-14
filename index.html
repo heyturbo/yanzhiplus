@@ -901,7 +901,7 @@
         }
         
         .modal-content {
-            background-color: #fefefe;
+            background-color: rgba(0, 0, 0, 0.8);
             margin: 15% auto;
             padding: 10px;
             border: 1px solid #888;
@@ -985,7 +985,7 @@
         
         .battle-system-actions {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px;
             width: 100%;
             flex-direction: row;
@@ -1163,6 +1163,61 @@
             font-size: 16px;
             cursor: pointer;
         }
+.drug-modal .modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+}
+
+.drug-modal .modal-content {
+    background-color: rgba(0, 0, 0, 0.8);
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.drug-modal .close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.drug-modal .close-button:hover,
+.drug-modal .close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.drug-modal .drug-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.drug-modal .drug-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.drug-modal .drug-description {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
    </style>
 </head>
 <body>
@@ -1515,6 +1570,23 @@
                     </div>
                 </div>
             </div>
+            <!-- 使用药物面板 -->
+            <div id="drug-modal" class="drug-modal modal">
+                <div class="modal-content">
+                    <span class="close-button" onclick="closeDrugModal()">&times;</span>
+                    <div class="drug-grid">
+                        <div class="drug-item" onclick="selectDrug('长生泉')">
+                            <img src="https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png" alt="长生泉" width="45" height="45">
+                            <div>长生泉 x<span id="drug-quantity">5</span></div>
+                        </div>
+                    </div>
+                    <div class="drug-description" id="drug-description">
+                        选择药物查看说明
+                    </div>
+                    <button onclick="useSelectedDrug()">使用</button>
+                    <button onclick="closeDrugModal()">关闭</button>
+                </div>
+            </div>
             <div class="battle-system-log">
                 <h2>战斗记录</h2>
                 <div id="log"></div>
@@ -1523,6 +1595,9 @@
                 <button onclick="performAttack('physical')">普通攻击</button>
                 <button onclick="performAttack('magical')">法术攻击</button>
                 <button onclick="performHeal()">治疗之术</button>
+                <button onclick="performPoison()">施毒之法</button>
+                <button onclick="performDefense()">护体格挡</button>
+                <button onclick="useDrug()">使用药物</button>
                 <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
             </div>
@@ -2094,6 +2169,7 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png",
     "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png",
     "https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png",
+    "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png",
     "https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png",
     "https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png",
     "https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png",
@@ -2113,6 +2189,48 @@ function showMessage(message, type = 'info') {
     setTimeout(() => {
         messageContainer.style.display = 'none';
     }, 1000);
+}
+
+let selectedDrug = null;
+let drugInventory = {
+    "长生泉": 5
+};
+
+function useDrug() {
+    document.getElementById('drug-modal').style.display = 'block';
+}
+
+function closeDrugModal() {
+    document.getElementById('drug-modal').style.display = 'none';
+    selectedDrug = null;
+    document.getElementById('drug-description').innerText = '选择药物查看说明';
+}
+
+function selectDrug(drugName) {
+    selectedDrug = drugName;
+    const description = {
+        "长生泉": "让玩家重获新生，回复至满状态"
+    };
+    document.getElementById('drug-description').innerText = description[drugName] || "没有说明";
+}
+
+function useSelectedDrug() {
+    if (!selectedDrug) {
+        alert("请选择一种药物！");
+        return;
+    }
+
+    if (drugInventory[selectedDrug] > 0) {
+        drugInventory[selectedDrug] -= 1;
+        document.getElementById('drug-quantity').innerText = drugInventory[selectedDrug];
+        if (selectedDrug === "长生泉") {
+            refreshBattleAttributes();
+        }
+        alert(`${selectedDrug} 已使用。`);
+        closeDrugModal();
+    } else {
+        alert("药物不足！");
+    }
 }
         
 let ascensionSkill = {
@@ -2437,7 +2555,7 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
         } else {
             if (failPenalty > 0) {
                 spiritLevel = Math.max(minLevelForCurrentRange, spiritLevel - failPenalty);
-                showMessage(`洗练失败，等级下降了 ${failPenalty} 级，但不会低于 ${minLevelForCurrentRange} 级！`, 'error');
+                showMessage(`洗练失败，等级下降了 ${failPenalty} 级，保底 ${minLevelForCurrentRange} 级！`, 'error');
             } else {
                 showMessage('洗练失败！', 'error');
             }
@@ -2634,13 +2752,13 @@ function refreshBattleAttributes() {
     const spiritAttributes = getCurrentSpiritAttributes();
 
     battleAttributes = {
-        health: secondaryAttributes.health + spiritAttributes.health,
-        mana: secondaryAttributes.mana + spiritAttributes.mana,
-        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack,
-        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense,
-        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack,
-        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense,
-        speed: secondaryAttributes.speed + spiritAttributes.speed
+        health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health,
+        mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana,
+        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack,
+        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense,
+        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack,
+        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense,
+        speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed
     }; // 刷新战斗属性
 
     updateUI();
@@ -2714,8 +2832,6 @@ function logBattleEvent(event) {
         console.error("logDiv not found");
     }
 }
-
-
 function performAttack(type) {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
@@ -2755,6 +2871,10 @@ function performAttack(type) {
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) * critMultiplier - effectiveDefense));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
+
+        // 物理攻击触发破甲和恐吓
+        applyPhysicalAttackEffects();
+
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -2771,13 +2891,6 @@ function performAttack(type) {
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
         applyMagicEffects();
-
-        // 检查中毒效果
-        if (battleState.enemy.poisoned) {
-            const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
-            battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-            logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
-        }
     }
 
     if (battleState.enemy.sleeping && type !== 'heal') { // 敌人沉睡状态
@@ -2798,18 +2911,13 @@ function performAttack(type) {
     updateUI();
 }
 
-function applyMagicEffects() {
-    const effects = ['silence', 'armorBreak', 'stun', 'weaken', 'poison', 'reflect', 'divineProtection', 'sleep', 'intimidate'];
+function applyPhysicalAttackEffects() {
+    const effects = ['armorBreak', 'intimidate'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
     if (effectChance < 0.3) { // 30%的概率触发效果
         switch (effect) {
-            case 'silence':
-                battleState.enemy.silenced = true; // 敌人沉默
-                logBattleEvent("敌人被沉默，无法使用特殊技能。");
-                setTimeout(() => { battleState.enemy.silenced = false; }, 5000); // 沉默5秒
-                break;
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
                 battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
@@ -2819,49 +2927,88 @@ function applyMagicEffects() {
                     logBattleEvent("敌人的破甲状态消失。");
                 }, 10000); // 破甲持续10秒
                 break;
-            case 'weaken':
-                const weakenValue = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.24 - 0.12) + 0.12));
-                battleState.enemy.physicalAttack -= weakenValue; // 虚弱
-                logBattleEvent(`敌人被虚弱，物理攻击减少了 ${weakenValue} 点。`);
-                setTimeout(() => {
-                    battleState.enemy.physicalAttack += weakenValue;
-                    logBattleEvent("敌人的虚弱状态消失。");
-                }, 10000); // 虚弱持续10秒
-                break;
-            case 'poison':
-                battleState.enemy.poisoned = true; // 敌人中毒
-                logBattleEvent("敌人被中毒，每次行动会扣除生命值。");
-                setTimeout(() => { battleState.enemy.poisoned = false; }, 3000); // 中毒持续3秒
-                break;
-            case 'reflect':
-                battleState.player.reflecting = true; // 玩家反弹状态
-                logBattleEvent("你获得了反弹状态，反弹敌人攻击的20%伤害。");
-                setTimeout(() => { battleState.player.reflecting = false; }, 5000); // 反弹持续5秒
-                break;
-            case 'divineProtection':
-                if (Math.random() < 0.05) { // 5%的概率触发仙气护体
-                    battleState.player.divineProtection = true; // 仙气护体
-                    logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。");
-                    setTimeout(() => { battleState.player.divineProtection = false; }, 5000); // 仙气护体持续5秒
-                }
-                break;
-            case 'sleep':
-                battleState.enemy.sleeping = true; // 敌人沉睡
-                logBattleEvent("敌人进入沉睡状态，不会行动但会恢复生命值。");
-                break; // 沉睡状态会在玩家攻击时解除
             case 'intimidate':
                 battleState.enemy.intimidated = true; // 敌人恐吓状态
                 logBattleEvent("敌人被恐吓，无法暴击。");
                 setTimeout(() => { battleState.enemy.intimidated = false; }, 5000); // 恐吓持续5秒
                 break;
-            case 'stun':
-                battleState.enemy.stunned = true; // 敌人眩晕
-                logBattleEvent("敌人被眩晕，无法行动。");
-                setTimeout(() => { battleState.enemy.stunned = false; }, 3000); // 眩晕3秒
-                break;
         }
     }
+}
 
+function performPoison() {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleAttributes.health <= 0) {
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
+        showNextBattlePrompt(false);
+        return;
+    }
+
+    const manaCost = Math.floor(maxMana * 0.15);
+    if (battleAttributes.mana < manaCost) {
+        logBattleEvent("您的法力值不足，无法使用施毒之法！");
+        return;
+    }
+
+    battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
+
+    const poisonDamage = Math.floor(battleAttributes.physicalAttack * 0.5 * (Math.random() * (1.1 - 0.9) + 0.9));
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+    logBattleEvent(`你对敌人使用了施毒之法，造成了 ${poisonDamage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+
+    if (Math.random() < 0.3) {
+        battleState.enemy.poisoned = true; // 30% 概率中毒
+        logBattleEvent("敌人被施加了中毒效果，每次行动会扣除生命值。");
+        setTimeout(() => {
+            battleState.enemy.poisoned = false;
+            logBattleEvent("敌人的中毒效果消失了。");
+        }, 3000); // 中毒持续3秒
+    }
+
+    playerTurn = false; // 轮到敌人回合
+    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
+
+    updateUI();
+}
+
+function performDefense() {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleAttributes.health <= 0) {
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
+        showNextBattlePrompt(false);
+        return;
+    }
+
+    const defenseReduction = Math.random() * (0.99 - 0.8) + 0.8;
+    battleState.player.defending = true;
+    battleState.player.defenseReduction = defenseReduction;
+    logBattleEvent(`你使用了护体格挡，本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`);
+
+    playerTurn = false; // 轮到敌人回合
+    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
+
+    updateUI();
+}
+
+function applyMagicEffects() {
     // 应用战斗增益
     switch (ascensionSkill.name) {
         case '魔龙之力':
@@ -2880,13 +3027,155 @@ function applyMagicEffects() {
     }
 }
 
+function enemyAttack() {
+    if (!battleState || !battleAttributes || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleState.enemy.stunned) {
+        logBattleEvent("敌人眩晕，无法行动。");
+        playerTurn = true;
+        return;
+    }
+
+    let damage;
+    let isCritical = false;
+    let critMultiplier = 1;
+    const critChance = battleState.enemy.speed / 100000;
+
+    if (Math.random() < critChance) {
+        isCritical = true;
+        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
+        logBattleEvent("敌人发动了暴击，造成了双倍伤害！");
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
+    }
+
+    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
+
+    if (attackType === 'physical') {
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) * critMultiplier - effectiveDefense));
+        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
+    } else if (attackType === 'magical' && !battleState.enemy.silenced) {
+        if (battleState.enemy.mana < 50) {
+            logBattleEvent("敌人的法力值不足！");
+            enemyAttack('physical');
+            return;
+        }
+
+        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+        const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
+        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) * critMultiplier - effectiveDefense));
+
+        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
+        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
+        logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+    } else {
+        logBattleEvent("敌人被沉默，无法进行法术攻击。");
+    }
+
+    // 确保 damage 是有效的数值
+    if (isNaN(damage)) {
+        damage = 0;
+        console.error("Damage is NaN, setting to 0.");
+    }
+
+    // 检查铜墙铁壁状态，减少伤害
+    if (ascensionSkill.name === '铜墙铁壁') {
+        const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+        const reducedDamage = Math.floor(damage * damageReduction);
+        damage = Math.floor(damage * (1 - damageReduction));
+        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`);
+    }
+
+    // 检查护体格挡状态，减少伤害
+    if (battleState.player.defending) {
+        const defenseReduction = battleState.player.defenseReduction;
+        const reducedDamage = Math.floor(damage * defenseReduction);
+        damage = Math.floor(damage * (1 - defenseReduction));
+        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`);
+        battleState.player.defending = false; // 重置防御状态
+    }
+
+    // 应用伤害到玩家
+    battleAttributes.health = Math.max(0, battleAttributes.health - damage);
+
+    // 检查以牙还牙状态
+    if (ascensionSkill.name === '以牙还牙') {
+        const reflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+        const reflectDamage = Math.floor(damage * reflectPercentage);
+        if (isNaN(reflectDamage)) {
+            reflectDamage = 0;
+            console.error("Reflect damage is NaN, setting to 0.");
+        }
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
+        logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
+    }
+
+    // 检查反弹状态
+    if (battleState.player.reflecting) {
+        const reflectDamage = Math.floor(damage * (battleState.player.reflectPercentage / 100));
+        if (isNaN(reflectDamage)) {
+            reflectDamage = 0;
+            console.error("Reflect damage is NaN, setting to 0.");
+        }
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
+        logBattleEvent(`反弹状态触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
+    }
+
+    // 检查仙气护体状态
+    if (battleState.player.divineProtection) {
+        const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
+        if (isNaN(healAmount)) {
+            healAmount = 0;
+            console.error("Heal amount is NaN, setting to 0.");
+        }
+        battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`);
+    }
+
+    // 检查向死而生
+    if (battleAttributes.health <= 0 && ascensionSkill.name === '向死而生') {
+        const manaCostPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+        const manaCost = Math.floor(maxMana * (manaCostPercentage / 100));
+        if (battleAttributes.mana >= manaCost) {
+            battleAttributes.health = 1;
+            battleAttributes.mana -= manaCost;
+            logBattleEvent('向死而生触发，生命值恢复至1，消耗大量法力值。');
+            updateUI();
+        }
+    }
+
+    // 检查中毒效果
+    if (battleState.enemy.poisoned) {
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
+    }
+
+    if (battleAttributes.health <= 0) {
+        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重新战斗！");
+        showNextBattlePrompt(false);
+    } else {
+        updateUI();
+        playerTurn = true;
+    }
+}
+
+        
 function performHeal() {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
         return;
     }
 
-    const manaCost = 88 * battleRounds;
+    const manaCost = 88 * (battleRounds * 2);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！");
         return;
@@ -3043,134 +3332,6 @@ function clearBattleLog() {
     }
 }
 
-function enemyAttack() {
-    if (!battleState || !battleAttributes || !battleState.enemy) {
-        console.error("战斗状态未初始化");
-        return;
-    }
-
-    if (battleState.enemy.stunned) {
-        logBattleEvent("敌人眩晕，无法行动。");
-        playerTurn = true;
-        return;
-    }
-
-    let damage;
-    let isCritical = false;
-    let critMultiplier = 1;
-    const critChance = battleState.enemy.speed / 100000;
-
-    if (Math.random() < critChance) {
-        isCritical = true;
-        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
-        logBattleEvent("敌人发动了暴击，造成了双倍伤害！");
-        const logDiv = document.getElementById('log');
-        logDiv.classList.add('critical-hit');
-        setTimeout(() => {
-            logDiv.classList.remove('critical-hit');
-        }, 300);
-    }
-
-    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
-
-    if (attackType === 'physical') {
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) * critMultiplier - effectiveDefense));
-        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
-    } else if (attackType === 'magical' && !battleState.enemy.silenced) {
-        if (battleState.enemy.mana < 50) {
-            logBattleEvent("敌人的法力值不足！");
-            enemyAttack('physical');
-            return;
-        }
-
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) * critMultiplier - effectiveDefense));
-
-        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
-        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
-        logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
-    } else {
-        logBattleEvent("敌人被沉默，无法进行法术攻击。");
-    }
-
-    // 确保 damage 是有效的数值
-    if (isNaN(damage)) {
-        damage = 0;
-        console.error("Damage is NaN, setting to 0.");
-    }
-
-    // 检查铜墙铁壁状态，减少伤害
-    if (ascensionSkill.name === '铜墙铁壁') {
-        const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
-        const reducedDamage = Math.floor(damage * damageReduction);
-        damage = Math.floor(damage * (1 - damageReduction));
-        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`);
-    }
-
-    // 应用伤害到玩家
-    battleAttributes.health = Math.max(0, battleAttributes.health - damage);
-
-    // 检查以牙还牙状态
-    if (ascensionSkill.name === '以牙还牙') {
-        const reflectMin = 15 + 2 * ascensionSkill.level;
-        const reflectMax = 30 + 2 * ascensionSkill.level;
-        const reflectPercentage = Math.random() * (reflectMax - reflectMin) + reflectMin;
-        const reflectDamage = Math.floor(damage * (reflectPercentage / 100));
-        if (isNaN(reflectDamage)) {
-            reflectDamage = 0;
-            console.error("Reflect damage is NaN, setting to 0.");
-        }
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
-        logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
-    }
-
-    // 检查反弹状态
-    if (battleState.player.reflecting) {
-        const reflectDamage = Math.floor(damage * (battleState.player.reflectPercentage / 100));
-        if (isNaN(reflectDamage)) {
-            reflectDamage = 0;
-            console.error("Reflect damage is NaN, setting to 0.");
-        }
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
-        logBattleEvent(`反弹状态触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
-    }
-
-    // 检查仙气护体状态
-    if (battleState.player.divineProtection) {
-        const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
-        if (isNaN(healAmount)) {
-            healAmount = 0;
-            console.error("Heal amount is NaN, setting to 0.");
-        }
-        battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`);
-    }
-
-    // 检查向死而生
-    if (battleAttributes.health <= 0 && ascensionSkill.name === '向死而生') {
-        const manaCostPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-        const manaCost = Math.floor(maxMana * (manaCostPercentage / 100));
-        if (battleAttributes.mana >= manaCost) {
-            battleAttributes.health = 1;
-            battleAttributes.mana -= manaCost;
-            logBattleEvent('向死而生触发，生命值恢复至1，消耗大量法力值。');
-            updateUI();
-        }
-    }
-
-
-    if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重新战斗！");
-        showNextBattlePrompt(false);
-    } else {
-        updateUI();
-        playerTurn = true;
-    }
-}
-
 function enemyHeal() {
     if (enemyHealCount >= 3) {
         logBattleEvent("敌人尝试使用治疗术，但被我方打断了！");
@@ -3184,6 +3345,14 @@ function enemyHeal() {
     enemyHealCount += 1; // 增加治疗次数
 
     logBattleEvent(`敌人治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+
+    // 检查中毒效果
+    if (battleState.enemy.poisoned) {
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
+    }
+
     playerTurn = true; // 轮到玩家回合
     showEffect('enemyEffect');
     updateUI();

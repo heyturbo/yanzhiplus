@@ -935,13 +935,13 @@
             box-shadow: -3px 0 5px rgba(0,0,0,0.2);
             z-index: 1000;
             overflow-y: auto;
-            padding: 10px 0px 0px 0px;
+            padding: 0px 0px 0px 0px;
         }
         
         .battle-system-drawer-toggle {
             font-size: 24px;
             cursor: pointer;
-            padding: 0px 0px 10px 0px;
+            padding: 0px 0px 0px 0px;
             text-align: left;
         }
         
@@ -965,10 +965,10 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 0;
-            line-height: 16px;
+            line-height: 14px;
             font-size: 14px;
             flex: 1;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 8px;
         }
         
@@ -976,11 +976,11 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 0px;
-            height: 25%;
+            height: 30%;
             overflow-y: auto;
             font-size: 12px;
             line-height: 14px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             width: 94%;
         }
@@ -1192,14 +1192,14 @@
 .drug-modal .use-button,
 .drug-modal .close-button {
     background-color: #088c01; /* 绿色背景 */
-    border: none; /* 无边框 */
+     /* 无边框 */
     color: #fff; /* 白色文字 */
-    padding: 0px 10px; /* 内边距 */
+    padding: 1px 10px; /* 内边距 */
     text-align: center; /* 文字居中 */
     text-decoration: none; /* 无下划线 */
     display: inline-flex; /* 行内块元素 */
     font-size: 16px; /* 字体大小 */
-    margin: 0px 10px 0px 10px; /* 外边距 */
+    margin: 0px 40px 0px 40px; /* 外边距 */
     cursor: pointer; /* 鼠标指针 */
     border-radius: 10px; /* 圆角边框 */
     border-color: white;
@@ -1551,7 +1551,7 @@
                     <h2>战斗精灵（已觉醒）</h2>
                     <div id="message-container" style="display: none;"></div>
                     <p>等级: <span id="spirit-level">1</span></p>
-                    <p>增幅: <span id="spirit-multiplier">1.00</span>（0.01~4.15）</p>
+                    <p>增幅: <span id="spirit-multiplier">100%</span>（1%~415%）</p>
                     <p>生命值增加: <span id="spirit-health">0</span></p>
                     <p>法力值增加: <span id="spirit-mana">0</span></p>
                     <p>物理攻击增加: <span id="spirit-physical-attack">0</span></p>
@@ -2204,7 +2204,7 @@ function showMessage(message, type = 'info') {
 
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "让玩家重获新生，回复至战斗最初状态" },
+    "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "让玩家重获新生，回复至战满状态" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复3000点生命值" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
@@ -2222,7 +2222,7 @@ function useDrug() {
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
-    document.getElementById('drug-description').innerText = '选择药物查看说明';
+    document.getElementById('drug-description').innerText = '战斗胜利后会随机掉落buff药品';
 }
 
 function updateDrugGrid() {
@@ -2339,8 +2339,6 @@ function applyBuff(drugName) {
     }
 }
 
-
-        
 let ascensionSkill = {
     name: '',
     level: 1,
@@ -2366,7 +2364,7 @@ const ascensionSkills = {
         { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${2 + 2 * level}%的生命值`, baseValue: 2, increment: level => 2 * level },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗最大法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 2 * level}%`, baseValue: 20, increment: level => 2 * level }
+        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level }
     ],
     settlement: [
         { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
@@ -2562,7 +2560,7 @@ function getCurrentSpiritAttributes() {
 function updateSpiritDisplay() {
     const spiritAttributes = getCurrentSpiritAttributes();
     document.getElementById('spirit-level').innerText = spiritLevel;
-    document.getElementById('spirit-multiplier').innerText = spiritMultiplier.toFixed(2);
+    document.getElementById('spirit-multiplier').innerText = (spiritMultiplier * 100).toFixed(2) + '%';
     document.getElementById('spirit-health').innerText = spiritAttributes.health;
     document.getElementById('spirit-mana').innerText = spiritAttributes.mana;
     document.getElementById('spirit-physical-attack').innerText = spiritAttributes.physicalAttack;
@@ -2670,22 +2668,22 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
         let newMultiplier;
         const randomChance = Math.random();
 
-        if (randomChance < 0.8) {
-            // 80%的概率随机更新至0.01~3.00这个区间
+        if (randomChance < 0.95) {
+            // 95%的概率随机更新至0.01~3.00这个区间
             newMultiplier = (Math.random() * (3.00 - 0.01) + 0.01).toFixed(2);
-        } else if (randomChance < 0.95) {
-            // 15%的概率随机更新至3.01~3.99这个区间
+        } else if (randomChance < 0.98) {
+            // 3%的概率随机更新至3.01~3.99这个区间
             newMultiplier = (Math.random() * (3.99 - 3.01) + 3.01).toFixed(2);
         } else if (randomChance < 0.99) {
-            // 4%的概率随机更新至4.00~4.10这个区间
+            // 1%的概率随机更新至4.00~4.10这个区间
             newMultiplier = (Math.random() * (4.10 - 4.00) + 4.00).toFixed(2);
         } else {
             // 1%的概率随机更新至4.11~4.15这个区间
             newMultiplier = (Math.random() * (4.15 - 4.11) + 4.11).toFixed(2);
         }
 
-        // 检查新倍数是否高于3.50
-        if (parseFloat(newMultiplier) > 3.50) {
+        // 检查新倍数是否高于3.80
+        if (parseFloat(newMultiplier) > 3.80) {
             const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，确定继续吗？";
             if (!confirm(confirmMessage)) {
                 return;
@@ -2731,28 +2729,6 @@ function showEffect(effectId) {
     }, 500);
 }
 
-function initializeEnemyPet() {
-    enemyPet = {
-        health: 678,
-        mana: 336,
-        physicalAttack: 58,
-        physicalDefense: 118,
-        magicAttack: 45,
-        magicDefense: 108,
-        speed: 208,
-        silenced: false,
-        stunned: false
-    };
-
-    if (battleState) {
-        battleState.enemy = { ...enemyPet };
-    }
-
-    enemyMaxHealth = enemyPet.health;
-    enemyMaxMana = enemyPet.mana;
-
-    storeEnemyInitialState(); // 存储初始状态
-}
 
 function toggleFightingDrawer() {
     if (!attributesFetched) {
@@ -2822,11 +2798,65 @@ function updatePetInfo() {
     maxMana = battleAttributes.mana; // 设置独立的最大值变量
 
     // 确保 enemyMaxHealth 和 enemyMaxMana 受到玩家属性的约束
-    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 10);
+    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 25);
     enemyMaxMana = Math.min(enemyMaxMana, maxMana * 10);
 
     updateUI();
     attributesFetched = true;
+}
+
+function initializeEnemyPet() {
+    enemyPet = {
+        health: 678,
+        mana: 336,
+        physicalAttack: 68,
+        physicalDefense: 49,
+        magicAttack: 45,
+        magicDefense: 49,
+        speed: 208,
+        silenced: false,
+        stunned: false
+    };
+
+    if (battleState) {
+        battleState.enemy = { ...enemyPet };
+    }
+
+    enemyMaxHealth = enemyPet.health;
+    enemyMaxMana = enemyPet.mana;
+
+    storeEnemyInitialState(); // 存储初始状态
+}
+
+function updateEnemyAttributes() {
+    const player = battleAttributes;
+    
+    // 增强敌人属性
+    enemyPet.health = Math.floor(enemyPet.health * 1.05);
+    enemyPet.mana = Math.floor(enemyPet.mana * 1.035);
+    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.055);
+    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.035);
+    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.045);
+    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.035);
+    enemyPet.speed = Math.floor(enemyPet.speed * 1.03);
+
+    // 更新最大值并确保受到玩家属性的约束
+    enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
+    enemyMaxMana = Math.floor(enemyMaxMana * 1.035);
+
+    if (enemyMaxHealth > player.maxHealth * 25) enemyMaxHealth = Math.floor(player.maxHealth * 25);
+    if (enemyMaxMana > player.maxMana * 10) enemyMaxMana = Math.floor(player.maxMana * 10);
+
+    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
+    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
+    if (enemyPet.physicalAttack > player.physicalAttack * 2) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 2);
+    if (enemyPet.physicalDefense > player.physicalDefense * 1.3) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 1.3);
+    if (enemyPet.magicAttack > player.magicAttack * 2) enemyPet.magicAttack = Math.floor(player.magicAttack * 2);
+    if (enemyPet.magicDefense > player.magicDefense * 1.3) enemyPet.magicDefense = Math.floor(player.magicDefense * 1.3);
+    if (enemyPet.speed > player.speed * 1.5) enemyPet.speed = Math.floor(player.speed * 1.5);
+
+    // 更新战斗状态
+    battleState.enemy = { ...enemyPet };
 }
 
 
@@ -2914,9 +2944,9 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 6 条，则删除最早的条目
+        // 检查日志条目数，如果超过 7 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 6) {
+        while (logs.length > 7) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -3031,7 +3061,7 @@ function applyPhysicalAttackEffects() {
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < 0.3) { // 30%的概率触发效果
+    if (effectChance < 0.05) { // 5%的概率触发效果
         switch (effect) {
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
@@ -3058,7 +3088,7 @@ function applyMagicAttackEffects() {
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < 0.3) { // 30%的概率触发效果
+    if (effectChance < 0.05) { // 5%的概率触发效果
         switch (effect) {
             case 'silence':
                 battleState.enemy.silenced = true; // 敌人沉默
@@ -3138,14 +3168,14 @@ function performPoison() {
     if (!poisonSkillActivated) {
         if (useItem('poisonSkillBook')) {
             poisonSkillActivated = true;
-            logBattleEvent("你使用了施毒之术，现在可以对敌人施毒了。");
+            alert("你使用了施毒之术，现在可以对敌人施毒了。");
         } else {
             alert("你还没有获得施毒之术，请尝试通过武神宝箱获取！");
             return;
         }
     }
 
-    const manaCost = Math.floor(maxMana * 0.15);
+    const manaCost = Math.floor(maxMana * 0.2);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法使用施毒之法！");
         return;
@@ -3160,6 +3190,7 @@ function performPoison() {
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
         poisonChance = 0.7;
+        logBattleEvent("使用了毒粉，毒性加强了。");
     }
 
     if (Math.random() < poisonChance) {
@@ -3246,7 +3277,7 @@ function enemyAttack() {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack * 0.8 || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
@@ -3560,38 +3591,6 @@ function enemyHeal() {
     showEffect('enemyEffect');
     updateUI();
 }
-
-function updateEnemyAttributes() {
-    const player = battleAttributes;
-    
-    // 增强敌人属性
-    enemyPet.health = Math.floor(enemyPet.health * 1.05);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.035);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.055);
-    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.035);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.045);
-    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.035);
-    enemyPet.speed = Math.floor(enemyPet.speed * 1.03);
-
-    // 更新最大值并确保受到玩家属性的约束
-    enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
-    enemyMaxMana = Math.floor(enemyMaxMana * 1.035);
-
-    if (enemyMaxHealth > player.maxHealth * 10) enemyMaxHealth = Math.floor(player.maxHealth * 10);
-    if (enemyMaxMana > player.maxMana * 1.5) enemyMaxMana = Math.floor(player.maxMana * 1.5);
-
-    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
-    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 1.5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 1.5);
-    if (enemyPet.physicalDefense > player.physicalDefense * 1.5) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 1.5);
-    if (enemyPet.magicAttack > player.magicAttack * 1.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 1.5);
-    if (enemyPet.magicDefense > player.magicDefense * 1.5) enemyPet.magicDefense = Math.floor(player.magicDefense * 1.5);
-    if (enemyPet.speed > player.speed * 1.5) enemyPet.speed = Math.floor(player.speed * 1.5);
-
-    // 更新战斗状态
-    battleState.enemy = { ...enemyPet };
-}
-
 
 // lottery.js
 let lotteryPrizePool = "无上限奖池";
@@ -5302,6 +5301,7 @@ function resetPet() {
     updateQualityCard();
     updateAttributePanel();
     updateTopBarItems();
+    updatePetInfo();
     initializeEnemyPet();
 }
 

@@ -2471,9 +2471,9 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
 
         // 检查新倍数是否高于3.50
         if (parseFloat(newMultiplier) > 3.50) {
-            const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，确定继续吗？";
+            const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，赶紧看看吧！";
             if (!confirm(confirmMessage)) {
-                showMessage("操作已取消。", "info");
+                showMessage("你拒绝了这次更新。", "info");
                 return;
             }
         }
@@ -2481,7 +2481,6 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
         spiritMultiplier = parseFloat(newMultiplier);
         updateSpiritDisplay(); // 更新显示
         refreshBattleAttributes(); // 刷新战斗属性
-        showMessage(`精灵增幅成功，新的倍数为 ${newMultiplier}`, "success");
     } else {
         showMessage('您的精灵觉醒石不足！', 'error');
     }

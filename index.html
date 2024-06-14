@@ -2211,7 +2211,7 @@ let drugInventory = {
     "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "30秒内暴击伤害提高50%" },
     "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
     "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "30秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力，计时结束移除该效果" }
+    "武尊秘露": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力，战斗结束或时效期过则移除该效果" }
 };
 
 function useDrug() {
@@ -2273,60 +2273,21 @@ function useSelectedDrug() {
                 logBattleEvent(`使用忘忧水，恢复了3000点生命值。`);
                 break;
             case "武尊秘露":
+            case "神力仙丹":
+            case "狂暴印记":
                 if (!battleState.player.usingBuff) {
-                    const originalPhysicalAttack = battleAttributes.physicalAttack;
-                    battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
-                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`);
-                    battleState.player.usingBuff = true;
-                    setTimeout(() => {
-                        battleAttributes.physicalAttack = originalPhysicalAttack;
-                        logBattleEvent(`武尊秘露效果消失。`);
-                        battleState.player.usingBuff = false;
-                        updateUI();
-                    }, 30000);
+                    applyBuff(selectedDrug);
                 } else {
-                    logBattleEvent("武尊秘露效果尚在持续中，无法叠加使用。");
+                    logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
                 }
                 break;
             case "狂暴之魂":
                 playerCritRate = Math.min(1.0, playerCritRate + 0.10); // 最大100%
                 logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`);
                 break;
-            case "神力仙丹":
-                if (!battleState.player.usingBuff) {
-                    const originalCritDamage = playerCritDamage;
-                    playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
-                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`);
-                    battleState.player.usingBuff = true;
-                    setTimeout(() => {
-                        playerCritDamage = originalCritDamage;
-                        logBattleEvent(`神力仙丹效果消失。`);
-                        battleState.player.usingBuff = false;
-                        updateUI();
-                    }, 30000);
-                } else {
-                    logBattleEvent("神力仙丹效果尚在持续中，无法叠加使用。");
-                }
-                break;
             case "慧心糖果":
                 playerCritDamage = Math.min(5.0, playerCritDamage + 0.10); // 最大500%
                 logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`);
-                break;
-            case "狂暴印记":
-                if (!battleState.player.usingBuff) {
-                    const originalCritRate = playerCritRate;
-                    playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
-                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`);
-                    battleState.player.usingBuff = true;
-                    setTimeout(() => {
-                        playerCritRate = originalCritRate;
-                        logBattleEvent(`狂暴印记效果消失。`);
-                        battleState.player.usingBuff = false;
-                        updateUI();
-                    }, 30000);
-                } else {
-                    logBattleEvent("狂暴印记效果尚在持续中，无法叠加使用。");
-                }
                 break;
         }
 
@@ -2336,6 +2297,48 @@ function useSelectedDrug() {
         alert("药物不足！");
     }
 }
+
+function applyBuff(drugName) {
+    switch (drugName) {
+        case "武尊秘露":
+            const originalPhysicalAttack = battleAttributes.physicalAttack;
+            battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
+            logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`);
+            battleState.player.usingBuff = true;
+            setTimeout(() => {
+                battleAttributes.physicalAttack = originalPhysicalAttack;
+                logBattleEvent(`武尊秘露效果消失。`);
+                battleState.player.usingBuff = false;
+                updateUI();
+            }, 30000);
+            break;
+        case "神力仙丹":
+            const originalCritDamage = playerCritDamage;
+            playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+            logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`);
+            battleState.player.usingBuff = true;
+            setTimeout(() => {
+                playerCritDamage = originalCritDamage;
+                logBattleEvent(`神力仙丹效果消失。`);
+                battleState.player.usingBuff = false;
+                updateUI();
+            }, 30000);
+            break;
+        case "狂暴印记":
+            const originalCritRate = playerCritRate;
+            playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+            logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`);
+            battleState.player.usingBuff = true;
+            setTimeout(() => {
+                playerCritRate = originalCritRate;
+                logBattleEvent(`狂暴印记效果消失。`);
+                battleState.player.usingBuff = false;
+                updateUI();
+            }, 30000);
+            break;
+    }
+}
+
 
         
 let ascensionSkill = {
@@ -3133,7 +3136,7 @@ function performPoison() {
     }
 
     if (!poisonSkillActivated) {
-        if (useItem('施毒之术')) {
+        if (useItem('poisonSkillBook')) {
             poisonSkillActivated = true;
             logBattleEvent("你使用了施毒之术，现在可以对敌人施毒了。");
         } else {
@@ -3155,7 +3158,7 @@ function performPoison() {
     logBattleEvent(`你对敌人使用了施毒之法，造成了 ${poisonDamage} 点伤害，消耗了 ${manaCost} 点法力值。`);
 
     let poisonChance = 0.3;
-    if (useItem('毒粉')) {
+    if (useItem('poisonPowder')) {
         poisonChance = 0.7;
     }
 
@@ -3417,22 +3420,23 @@ function showNextBattlePrompt(playerWon) {
             reward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             logBattleEvent(`财源滚滚触发，额外增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子。`);
         }
-        
+
         goldAmount += reward;
-        alert(`您赢得了此次战斗，金子+${reward}！您可能获得了掉落药物。点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
-        
-        // 掉落药物
-        if (Math.random() < 0.8) {
-            const droppedDrugIndex = Math.floor(Math.random() * Object.keys(drugInventory).length);
-            const droppedDrugName = Object.keys(drugInventory)[droppedDrugIndex];
-            drugInventory[droppedDrugName].quantity++;
-            logBattleEvent(`您获得了药物: ${droppedDrugName}`);
-        }
-        
+        alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
+
         battleRounds++;
         document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
         gainExp(); // 获取经验
+
+        // 随机掉落药物
+        if (Math.random() < 0.8) {
+            const drugKeys = Object.keys(drugInventory);
+            const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+            drugInventory[randomDrug].quantity += 1;
+            logBattleEvent(`你获得了 ${randomDrug} x1`);
+            updateDrugGrid();
+        }
     } else {
         let penalty = 388 * battleRounds;
         if (ascensionSkill.name === '金牌调解') {
@@ -3442,11 +3446,20 @@ function showNextBattlePrompt(playerWon) {
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
-        
+
         alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击进入下一轮战斗！`);
         document.getElementById("gold-amount").innerText = goldAmount;
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
+    resetBuffState();
+}
+
+function resetBuffState() {
+    if (battleState.player.usingBuff) {
+        battleState.player.usingBuff = false;
+        logBattleEvent(`所有时效性药物效果已被重置。`);
+        updateUI();
+    }
 }
 
 function gainExp() {

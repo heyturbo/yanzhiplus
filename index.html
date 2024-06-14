@@ -965,6 +965,7 @@
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 0;
+            line-height: 16px;
             font-size: 14px;
             flex: 1;
             background: rgba(255, 255, 255, 0.1);
@@ -978,6 +979,7 @@
             height: 25%;
             overflow-y: auto;
             font-size: 12px;
+            line-height: 14px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             width: 94%;
@@ -1180,23 +1182,32 @@
 .drug-modal .modal-content {
     background-color: rgba(0, 0, 0, 0.8);
     margin: 5% auto;
+    font-size: 14px;
+    align-items: center;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
 }
 
+.drug-modal .use-button,
 .drug-modal .close-button {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+    background-color: #088c01; /* 绿色背景 */
+    border: none; /* 无边框 */
+    color: #fff; /* 白色文字 */
+    padding: 0px 10px; /* 内边距 */
+    text-align: center; /* 文字居中 */
+    text-decoration: none; /* 无下划线 */
+    display: inline-flex; /* 行内块元素 */
+    font-size: 16px; /* 字体大小 */
+    margin: 0px 10px 0px 10px; /* 外边距 */
+    cursor: pointer; /* 鼠标指针 */
+    border-radius: 10px; /* 圆角边框 */
+    border-color: white;
 }
 
-.drug-modal .close-button:hover,
-.drug-modal .close-button:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+.drug-modal .use-button:hover,
+.drug-modal .close-button:hover {
+    background-color: #45a049; /* 深绿色背景 */
 }
 
 .drug-modal .drug-grid {
@@ -1213,7 +1224,7 @@
 }
 
 .drug-modal .drug-description {
-    margin-top: 20px;
+    margin-top: 50px;
     margin-bottom: 20px;
     font-size: 14px;
 }
@@ -1511,6 +1522,8 @@
                     <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
                     <p>法术防御: <span id="your-pet-magic-defense"></span></p>
                     <p>速度: <span id="your-pet-speed"></span></p>
+                    <p>暴击: <span id="player-crit-rate"></span></p>
+                    <p>暴击伤害: <span id="player-crit-damage"></span></p>
                     <div id="exp-bar-container">
                     <p>经验值:<span id="exp-bar">0 / 208</span></p>
                     </div>
@@ -1524,6 +1537,8 @@
                     <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
                     <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
                     <p>速度: <span id="enemy-pet-speed"></span></p>
+                    <p>暴击: <span id="enemy-crit-rate"></span></p>
+                    <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
                 </div>
             </div>
             <div id="visualEffectsContainer">
@@ -1573,18 +1588,14 @@
             <!-- 使用药物面板 -->
             <div id="drug-modal" class="drug-modal modal">
                 <div class="modal-content">
-                    <span class="close-button" onclick="closeDrugModal()">&times;</span>
-                    <div class="drug-grid">
-                        <div class="drug-item" onclick="selectDrug('长生泉')">
-                            <img src="https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png" alt="长生泉" width="45" height="45">
-                            <div>长生泉 x<span id="drug-quantity">5</span></div>
-                        </div>
+                    <div class="drug-grid" id="drug-grid">
+                        <!-- 药物项会通过JavaScript动态生成 -->
                     </div>
                     <div class="drug-description" id="drug-description">
-                        选择药物查看说明
+                        药物目前只能通过战斗获胜概率获得。合理使用各种药物，能让你事半功倍赢得胜利！
                     </div>
-                    <button onclick="useSelectedDrug()">使用</button>
-                    <button onclick="closeDrugModal()">关闭</button>
+                    <button class="use-button" onclick="useSelectedDrug()">使用</button>
+                    <button class="close-button" onclick="closeDrugModal()">关闭</button>
                 </div>
             </div>
             <div class="battle-system-log">
@@ -1592,7 +1603,7 @@
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
-                <button onclick="performAttack('physical')">普通攻击</button>
+                <button onclick="performAttack('physical')">物理攻击</button>
                 <button onclick="performAttack('magical')">法术攻击</button>
                 <button onclick="performHeal()">治疗之术</button>
                 <button onclick="performPoison()">施毒之法</button>
@@ -2185,19 +2196,27 @@ function showMessage(message, type = 'info') {
     messageContainer.style.display = 'block';
     messageContainer.style.color = type === 'error' ? 'red' : 'white';
 
-    // 1秒后隐藏提示信息
+    // 10秒后隐藏提示信息
     setTimeout(() => {
         messageContainer.style.display = 'none';
-    }, 1000);
+    }, 10000);
 }
 
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": 5
+    "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "让玩家重获新生，回复至战斗最初状态" },
+    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复2000点法力值" },
+    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复3000点生命值" },
+    "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
+    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "30秒内暴击伤害提高50%" },
+    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
+    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "30秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力，计时结束移除该效果" }
 };
 
 function useDrug() {
     document.getElementById('drug-modal').style.display = 'block';
+    updateDrugGrid();
 }
 
 function closeDrugModal() {
@@ -2206,12 +2225,26 @@ function closeDrugModal() {
     document.getElementById('drug-description').innerText = '选择药物查看说明';
 }
 
+function updateDrugGrid() {
+    const drugGrid = document.getElementById('drug-grid');
+    drugGrid.innerHTML = '';
+    for (let drug in drugInventory) {
+        if (drugInventory[drug].quantity > 0) {
+            const drugItem = document.createElement('div');
+            drugItem.className = 'drug-item';
+            drugItem.innerHTML = `
+                <img src="${drugInventory[drug].url}" alt="${drug}" width="45" height="45">
+                <div>${drug} x<span>${drugInventory[drug].quantity}</span></div>
+            `;
+            drugItem.onclick = () => selectDrug(drug);
+            drugGrid.appendChild(drugItem);
+        }
+    }
+}
+
 function selectDrug(drugName) {
     selectedDrug = drugName;
-    const description = {
-        "长生泉": "让玩家重获新生，回复至满状态"
-    };
-    document.getElementById('drug-description').innerText = description[drugName] || "没有说明";
+    document.getElementById('drug-description').innerText = drugInventory[drugName].description;
 }
 
 function useSelectedDrug() {
@@ -2220,18 +2253,90 @@ function useSelectedDrug() {
         return;
     }
 
-    if (drugInventory[selectedDrug] > 0) {
-        drugInventory[selectedDrug] -= 1;
-        document.getElementById('drug-quantity').innerText = drugInventory[selectedDrug];
-        if (selectedDrug === "长生泉") {
-            refreshBattleAttributes();
+    const drug = drugInventory[selectedDrug];
+    if (drug.quantity > 0) {
+        drug.quantity -= 1;
+        updateDrugGrid();
+        logBattleEvent(`${selectedDrug} 已使用。`);
+
+        switch (selectedDrug) {
+            case "长生泉":
+                refreshBattleAttributes();
+                logBattleEvent(`使用长生泉，你如获新生。`);
+                break;
+            case "三花丸":
+                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 2000);
+                logBattleEvent(`使用三花丸，恢复了2000点法力值。`);
+                break;
+            case "忘忧水":
+                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 3000);
+                logBattleEvent(`使用忘忧水，恢复了3000点生命值。`);
+                break;
+            case "武尊秘露":
+                if (!battleState.player.usingBuff) {
+                    const originalPhysicalAttack = battleAttributes.physicalAttack;
+                    battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
+                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`);
+                    battleState.player.usingBuff = true;
+                    setTimeout(() => {
+                        battleAttributes.physicalAttack = originalPhysicalAttack;
+                        logBattleEvent(`武尊秘露效果消失。`);
+                        battleState.player.usingBuff = false;
+                        updateUI();
+                    }, 30000);
+                } else {
+                    logBattleEvent("武尊秘露效果尚在持续中，无法叠加使用。");
+                }
+                break;
+            case "狂暴之魂":
+                playerCritRate = Math.min(1.0, playerCritRate + 0.10); // 最大100%
+                logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`);
+                break;
+            case "神力仙丹":
+                if (!battleState.player.usingBuff) {
+                    const originalCritDamage = playerCritDamage;
+                    playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`);
+                    battleState.player.usingBuff = true;
+                    setTimeout(() => {
+                        playerCritDamage = originalCritDamage;
+                        logBattleEvent(`神力仙丹效果消失。`);
+                        battleState.player.usingBuff = false;
+                        updateUI();
+                    }, 30000);
+                } else {
+                    logBattleEvent("神力仙丹效果尚在持续中，无法叠加使用。");
+                }
+                break;
+            case "慧心糖果":
+                playerCritDamage = Math.min(5.0, playerCritDamage + 0.10); // 最大500%
+                logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`);
+                break;
+            case "狂暴印记":
+                if (!battleState.player.usingBuff) {
+                    const originalCritRate = playerCritRate;
+                    playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`);
+                    battleState.player.usingBuff = true;
+                    setTimeout(() => {
+                        playerCritRate = originalCritRate;
+                        logBattleEvent(`狂暴印记效果消失。`);
+                        battleState.player.usingBuff = false;
+                        updateUI();
+                    }, 30000);
+                } else {
+                    logBattleEvent("狂暴印记效果尚在持续中，无法叠加使用。");
+                }
+                break;
         }
-        alert(`${selectedDrug} 已使用。`);
+
+        updateUI();
         closeDrugModal();
     } else {
         alert("药物不足！");
     }
 }
+
         
 let ascensionSkill = {
     name: '',
@@ -2249,9 +2354,9 @@ let ascensionAttributes = {
 };
 const ascensionSkills = {
     attribute: [
-        { name: '力劈华山', effect: level => `提供${4000 + 1000 + level * 2000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 2000 },
+        { name: '力劈华山', effect: level => `提供${4000 + 1000 + level * 4000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 4000 },
         { name: '慈悲心怀', effect: level => `提供${50000 + 5000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 5000 * level },
-        { name: '势如破竹', effect: level => `提供${20000 + 180 + 50 * level}点速度和${24000 + 180 + 50 * level}点法术攻击力`, baseValue: 20000, increment: level => 180 + 50 * level },
+        { name: '势如破竹', effect: level => `提供${20000 + 180 + 50 * level}点速度和${34000 + 180 + 160 * level}点法术攻击力`, baseValue: 34000, increment: level => 180 + 160 * level },
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
@@ -2291,24 +2396,13 @@ function applyAscensionBonus() {
             break;
         case '势如破竹':
             ascensionAttributes.speed = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            ascensionAttributes.magicAttack = 24000 + ascensionSkill.increment(ascensionSkill.level);
+            ascensionAttributes.magicAttack = 34000 + ascensionSkill.increment(ascensionSkill.level);
             break;
         case '固若金汤':
             ascensionAttributes.physicalDefense = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             ascensionAttributes.magicDefense = 50000 + ascensionSkill.increment(ascensionSkill.level);
             break;
-        case '魔龙之力':
-            clearInterval(battleState.dragonPowerInterval); // 清除之前的间隔调用
-            battleState.dragonPowerInterval = setInterval(() => {
-                const healPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
-                const healAmount = Math.floor(battleAttributes.maxHealth * healPercentage);
-                if (!isNaN(healAmount)) {
-                    battleAttributes.health = Math.min(battleAttributes.maxHealth, battleAttributes.health + healAmount);
-                    logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`);
-                    updateUI();
-                }
-            }, 10000); // 每10秒触发一次
-            break;
+
         // 其他增益的处理...
     }
 
@@ -2780,8 +2874,14 @@ function updateUI() {
     document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
     document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
     document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
-
+            
+    // 更新暴击率和暴击伤害
+    document.getElementById("player-crit-rate").innerText = (playerCritRate * 100).toFixed(2) + '%';
+    document.getElementById("player-crit-damage").innerText = (playerCritDamage * 100).toFixed(2) + '%';
+    document.getElementById("enemy-crit-rate").innerText = (enemyCritRate * 100).toFixed(2) + '%';
+    document.getElementById("enemy-crit-damage").innerText = (enemyCritDamage * 100).toFixed(2) + '%';
     // 更新状态显示
+            
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
 }
@@ -2811,9 +2911,9 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 5 条，则删除最早的条目
+        // 检查日志条目数，如果超过 6 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 5) {
+        while (logs.length > 6) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -2832,6 +2932,21 @@ function logBattleEvent(event) {
         console.error("logDiv not found");
     }
 }
+
+// 定义初始暴击率和暴击伤害
+let playerCritRate = 0.1; // 10%
+let playerCritDamage = 1.5; // 150%
+let enemyCritRate = 0.6; // 60%
+let enemyCritDamage = 1.8; // 180%
+
+function calculateDamage(baseDamage, isCritical, critDamage) {
+    return isCritical ? Math.floor(baseDamage * critDamage) : baseDamage;
+}
+
+function checkCriticalHit(critRate) {
+    return Math.random() < critRate;
+}
+
 function performAttack(type) {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
@@ -2850,31 +2965,18 @@ function performAttack(type) {
     }
 
     let damage;
-    let isCritical = false;
-    let critMultiplier = 1;
-    const critChance = battleAttributes.speed / 100000; // 计算暴击概率
+    let isCritical = checkCriticalHit(playerCritRate);
 
-    if (Math.random() < critChance) {
-        isCritical = true;
-        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
-        logBattleEvent("你发动了暴击，造成了双倍伤害！");
-        const logDiv = document.getElementById('log');
-        logDiv.classList.add('critical-hit');
-        setTimeout(() => {
-            logDiv.classList.remove('critical-hit');
-        }, 300);
-    }
-
-    if (type === 'physical' || battleState.enemy.silenced) { // 沉默时只能使用物理攻击
+    if (type === 'physical' || battleState.enemy.silenced) {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) * critMultiplier - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack || 0) - effectiveDefense));
+        damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你进行了物理攻击，造成了 ${damage} 点伤害。`);
 
-        // 物理攻击触发破甲和恐吓
         applyPhysicalAttackEffects();
-
+        
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -2884,16 +2986,26 @@ function performAttack(type) {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.magicAttack || 0) * critMultiplier - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 || 0) - effectiveDefense));
+        damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
-        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50; // 随机扣除50到100之间的法力值
+        const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
-        applyMagicEffects();
+        applyMagicAttackEffects();
     }
 
-    if (battleState.enemy.sleeping && type !== 'heal') { // 敌人沉睡状态
+    if (isCritical) {
+        logBattleEvent("你发动了暴击，造成了额外伤害！");
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
+    }
+
+    if (battleState.enemy.sleeping && type !== 'heal') {
         battleState.enemy.sleeping = false;
         logBattleEvent("敌人从沉睡中醒来。");
     }
@@ -2905,10 +3017,10 @@ function performAttack(type) {
         return;
     }
 
-    playerTurn = false; // 轮到敌人回合
-    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
-
+    playerTurn = false;
+    setTimeout(enemyAttack, 300);
     updateUI();
+    applyAscensionEffects();
 }
 
 function applyPhysicalAttackEffects() {
@@ -2936,6 +3048,73 @@ function applyPhysicalAttackEffects() {
     }
 }
 
+function applyMagicAttackEffects() {
+    const effects = ['silence', 'stun', 'slow'];
+    // 如果需要启用呆滞效果，可以将其添加到数组中
+    // const effects = ['silence', 'stun', 'slow', 'daze'];
+    const effect = effects[Math.floor(Math.random() * effects.length)];
+    const effectChance = Math.random(); // 生成一个0到1之间的随机数
+
+    if (effectChance < 0.3) { // 30%的概率触发效果
+        switch (effect) {
+            case 'silence':
+                battleState.enemy.silenced = true; // 敌人沉默
+                logBattleEvent("敌人被沉默，无法使用法术攻击。");
+                setTimeout(() => {
+                    battleState.enemy.silenced = false;
+                    logBattleEvent("敌人的沉默状态消失。");
+                }, 3000); // 沉默持续3秒
+                break;
+            case 'stun':
+                battleState.enemy.stunned = true; // 敌人眩晕
+                logBattleEvent("敌人被眩晕，无法行动。");
+                setTimeout(() => {
+                    battleState.enemy.stunned = false;
+                    logBattleEvent("敌人的眩晕状态消失。");
+                }, 3000); // 眩晕持续3秒
+                break;
+            case 'slow':
+                const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
+                battleState.enemy.speed -= slowAmount; // 速度降低
+                logBattleEvent(`敌人的速度降低了 ${slowAmount} 点。`);
+                setTimeout(() => {
+                    battleState.enemy.speed += slowAmount;
+                    logBattleEvent("敌人的迟缓状态消失。");
+                }, 10000); // 迟缓持续10秒
+                break;
+            case 'daze':
+                battleState.enemy.dazed = true; // 敌人呆滞
+                logBattleEvent("敌人被呆滞，可能会攻击自己。");
+                setTimeout(() => {
+                    battleState.enemy.dazed = false;
+                    logBattleEvent("敌人的呆滞状态消失。");
+                }, 10000); // 呆滞持续10秒
+                break;
+        }
+    }
+}
+
+function applyAscensionEffects() {
+    // 应用战斗增益
+    switch (ascensionSkill.name) {
+        case '魔龙之力':
+            const healPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+            const healAmount = Math.floor(maxHealth * healPercentage);
+            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+            logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`);
+            updateUI();
+            break;
+        case '以牙还牙':
+            battleState.player.reflectPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            break;
+        case '焉知非福':
+            battleState.player.divineProtectionDuration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            break;
+    }
+}
+        
+let poisonSkillActivated = false;
+
 function performPoison() {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
@@ -2953,6 +3132,16 @@ function performPoison() {
         return;
     }
 
+    if (!poisonSkillActivated) {
+        if (useItem('施毒之术')) {
+            poisonSkillActivated = true;
+            logBattleEvent("你使用了施毒之术，现在可以对敌人施毒了。");
+        } else {
+            alert("你还没有获得施毒之术，请尝试通过武神宝箱获取！");
+            return;
+        }
+    }
+
     const manaCost = Math.floor(maxMana * 0.15);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法使用施毒之法！");
@@ -2965,8 +3154,13 @@ function performPoison() {
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对敌人使用了施毒之法，造成了 ${poisonDamage} 点伤害，消耗了 ${manaCost} 点法力值。`);
 
-    if (Math.random() < 0.3) {
-        battleState.enemy.poisoned = true; // 30% 概率中毒
+    let poisonChance = 0.3;
+    if (useItem('毒粉')) {
+        poisonChance = 0.7;
+    }
+
+    if (Math.random() < poisonChance) {
+        battleState.enemy.poisoned = true; // 30% 或 70% 概率中毒
         logBattleEvent("敌人被施加了中毒效果，每次行动会扣除生命值。");
         setTimeout(() => {
             battleState.enemy.poisoned = false;
@@ -2976,9 +3170,10 @@ function performPoison() {
 
     playerTurn = false; // 轮到敌人回合
     setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
-
+    applyAscensionEffects();
     updateUI();
 }
+
 
 function performDefense() {
     if (!attributesFetched) {
@@ -3005,26 +3200,9 @@ function performDefense() {
     playerTurn = false; // 轮到敌人回合
     setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
 
-    updateUI();
-}
+    applyAscensionEffects();
 
-function applyMagicEffects() {
-    // 应用战斗增益
-    switch (ascensionSkill.name) {
-        case '魔龙之力':
-            const healPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
-            const healAmount = Math.floor(maxHealth * healPercentage);
-            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-            logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`);
-            updateUI();
-            break;
-        case '以牙还牙':
-            battleState.player.reflectPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '焉知非福':
-            battleState.player.divineProtectionDuration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
-    }
+    updateUI();
 }
 
 function enemyAttack() {
@@ -3040,19 +3218,12 @@ function enemyAttack() {
     }
 
     let damage;
-    let isCritical = false;
-    let critMultiplier = 1;
-    const critChance = battleState.enemy.speed / 100000;
+    let isCritical = checkCriticalHit(enemyCritRate);
 
-    if (Math.random() < critChance) {
-        isCritical = true;
-        critMultiplier = (Math.random() * (1.1 - 0.9) + 0.9) * 2;
-        logBattleEvent("敌人发动了暴击，造成了双倍伤害！");
-        const logDiv = document.getElementById('log');
-        logDiv.classList.add('critical-hit');
-        setTimeout(() => {
-            logDiv.classList.remove('critical-hit');
-        }, 300);
+    // 检查恐吓状态，阻止暴击
+    if (battleState.enemy.intimidated) {
+        isCritical = false;
+        logBattleEvent("敌人被恐吓，无法暴击。");
     }
 
     const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
@@ -3060,7 +3231,8 @@ function enemyAttack() {
     if (attackType === 'physical') {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) * critMultiplier - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
+        damage = calculateDamage(damage, isCritical, enemyCritDamage);
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`);
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
@@ -3071,13 +3243,23 @@ function enemyAttack() {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) * critMultiplier - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
+        damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。");
+    }
+
+    if (isCritical) {
+        logBattleEvent("敌人发动了暴击，造成了额外伤害！");
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
     }
 
     // 确保 damage 是有效的数值
@@ -3100,7 +3282,7 @@ function enemyAttack() {
         const reducedDamage = Math.floor(damage * defenseReduction);
         damage = Math.floor(damage * (1 - defenseReduction));
         logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`);
-        battleState.player.defending = false; // 重置防御状态
+        battleState.player.defending = false;
     }
 
     // 应用伤害到玩家
@@ -3197,6 +3379,7 @@ function performHeal() {
     playerTurn = false; // 轮到敌人回合
     enemyAttack();
     showEffect('enemyEffect');
+    applyAscensionEffects();
     updateUI();
 }
 
@@ -3236,7 +3419,15 @@ function showNextBattlePrompt(playerWon) {
         }
         
         goldAmount += reward;
-        alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
+        alert(`您赢得了此次战斗，金子+${reward}！您可能获得了掉落药物。点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
+        
+        // 掉落药物
+        if (Math.random() < 0.8) {
+            const droppedDrugIndex = Math.floor(Math.random() * Object.keys(drugInventory).length);
+            const droppedDrugName = Object.keys(drugInventory)[droppedDrugIndex];
+            drugInventory[droppedDrugName].quantity++;
+            logBattleEvent(`您获得了药物: ${droppedDrugName}`);
+        }
         
         battleRounds++;
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -3257,7 +3448,6 @@ function showNextBattlePrompt(playerWon) {
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
 }
-
 
 function gainExp() {
     let expMultiplier = 1;
@@ -4190,6 +4380,12 @@ function collectTreasure() {
             case '精灵觉醒石':
                 addItemToJinnang('spiritAwakenStone');
                 break;
+            case '施毒之术':
+                addItemToJinnang('poisonSkillBook');
+                break;
+            case '毒粉':
+                addItemToJinnang('poisonPowder');
+                break;
             case '心鉴之石':
                 addItemToJinnang('heartStone');
                 break;
@@ -4261,7 +4457,9 @@ function getRandomReward(type) {
             { name: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', chance: 20 },
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 20 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 20 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 40 }
+            { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 20 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 19 }
         ],
         '至尊宝箱': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 10 },
@@ -4300,6 +4498,8 @@ let jinnangItems = [
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', quantity: 0 },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', quantity: 0 },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', quantity: 0 },
+    { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', quantity: 0 },
+    { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', quantity: 0 },
     { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', quantity: 0 },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', quantity: 0 },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', quantity: 0 },
@@ -5018,6 +5218,7 @@ function resetPet() {
     currentExp = 0; // 当前经验值
     maxExp = 208; // 经验值上限
     ascensionEnabled = false; //飞升之术关闭
+    poisonSkillActivated = false; //施毒之术关闭
     spiritLevel = 1;
     spiritMultiplier = 1.00;
     bonusAttributes = {
@@ -5417,6 +5618,8 @@ function upgradeWisdomTo() {
             'heartStone', //心鉴之石
             'earthlyEnergy', //天地灵气
             'shakingSoul',
+            'poisonSkillBook', //施毒之术
+            'poisonPowder', //毒粉
             'glowingSoul',
             'activeSoul',
             'jumpingSoul'
@@ -5607,7 +5810,7 @@ function updateAttributePanel() {
         if (currentWisdom <= 12) {
             wisdomBonus = currentWisdom * 0.5;
         } else if (currentWisdom <= 20) {
-            wisdomBonus = 6 + (currentWisdom - 12) * 1;
+            wisdomBonus = 7 + (currentWisdom - 12) * 1;
         } else {
             switch (currentWisdom) {
                 case 21:
@@ -5665,6 +5868,7 @@ function updateAttributePanel() {
         speedBonusElement.innerText = `+${wisdomBonus}%`;
         speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
     }
+
 function calculateGrowthRateDisplayAndValue(qualities) {
     let growthRateDisplay;
     let growthRate;

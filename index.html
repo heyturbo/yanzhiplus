@@ -698,472 +698,471 @@
             background-color: #0056b3; /* 按钮悬停颜色 */
         }
         
-/* lottery.css */
-.lottery-drawer {
-    position: fixed;
-    margin: 0px 0px 0px 0px;
-    padding: 20px 0px 0px 0px;
-    bottom: 0px;
-    width: 95%;
-    background-color: rgb(255 255 255 / 90%);
-    
-     /* 图片平铺 */
-     /* 保持原图大小 */
-     /* 背景固定 */
-    box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-    border-radius: 10px 10px 0 0;
-    transform: translateY(100%);
-    transition: transform 0.3s;
-    /* z-index: 0; */
-    max-height: 90%;
-    overflow-y: auto;
-}
-
-.lottery-drawer.open {
-    transform: translateY(0);
-}
-
-.lottery-section {
-    padding: 5px 0px 10px 0px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    flex-wrap: wrap;
-    align-content: space-around;
-    justify-content: space-evenly;
-}
-
-.lottery-top {
-    margin-bottom: 0px;
-    width: 100%;
-}
-.lottery-middle {
-    margin-bottom: 0px;
-    width: 100%;
-    align-items: center;
-}
-.lottery-bottom {
-    margin-bottom: 0px;
-    width: 100%;
-}
-.lottery-footer {
-    margin-bottom: 10px;
-    width: 100%;
-    display: flex;
-}
-.lottery-box, .lottery-number-box {
-    border: 1px solid #e0e0e0;
-    border-radius: 5px;
-    padding: 0px;
-    margin: 5px 0;
-    text-align: justify;
-    background-color: #f9f9f9;
-    font-weight: bold;
-}
-.lottery-number-box {
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 10px;
-    margin: 15px 0;
-    text-align: center;
-    background-color: #f9f9f9;
-}
-
-.lottery-number-box {
-    display: flex;
-    grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
-    gap: 5px;
-    padding: 0px;
-    flex-direction: column;
-}
-
-#lotteryNumberButtons button {
-    margin: 5px;
-    gap: 2px;
-    padding: 5px;
-    background-color: #ff1100;
-    border-radius: 50%;
-    border: none;
-    color: white;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-#lotteryNumberButtons button:hover {
-    background-color: #6a0700;
-}
-
-.lottery-controls {
-    display: flex;
-    justify-content: center;
-    gap: 0px 10px;
-    padding: 5px;
-    flex-direction: row;
-}
-
-.lottery-footer button {
-    width: 21%;
-    display: flex;
-    margin-top: 5px;
-    background-color: #0a8c00;
-    padding: 5px;
-    color: rgb(255 255 255 / 90%);
-    font-size: 16px;
-    justify-content: center;
-    border-radius: 10px;
-}
-
-.lottery-footer button:hover {
-    background-color: #086600;
-}
-/* lottery.css */
-.lottery-controls button {
-    padding: 2px 10px;
-    margin: 2px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.lottery-controls #lotteryBetButton {
-    background-color: #0056b3;
-    color: white;
-}
-
-.lottery-controls #lotteryBetButton:hover {
-    background-color: #003670;
-    transform: scale(1.05);
-}
-
-.lottery-controls #lotteryIncreaseBet {
-    background-color: #0a8c00;
-    color: white;
-}
-
-.lottery-controls #lotteryIncreaseBet:hover {
-    background-color: #064701;
-    transform: scale(1.05);
-}
-.lottery-controls #lotteryIncreaseTenBet {
-    background-color: #0a8c00;
-    color: white;
-}
-
-.lottery-controls #lotteryIncreaseTenBet:hover {
-    background-color: #064701;
-    transform: scale(1.05);
-}
-.lottery-controls #lotteryRuleButton {
-    background-color: #0056b3;
-    color: white;
-}
-
-.lottery-controls #lotteryRuleButton:hover {
-    background-color: #003670;
-    transform: scale(1.05);
-}
-.lottery-controls #lotteryDecreaseBet {
-    background-color: #dc3545;
-    color: white;
-}
-
-.lottery-controls #lotteryDecreaseBet:hover {
-    background-color: #841520;
-    transform: scale(1.05);
-}
-/* lottery.css */
-.highlight {
-    animation: highlight 1s ease-in-out;
-}
-
-@keyframes highlight {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.5);
-    }
-}
-/* lottery.css */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-}
-
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 10px;
-    border: 1px solid #888;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 10px;
-}
-
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-.battle-system-drawer {
-    display: none;
-    position: absolute;
-    right: 0px;
-    top: 0;
-    height: 100%;
-    width: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    box-shadow: -3px 0 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-    overflow-y: auto;
-    padding: 10px 0px 0px 0px;
-}
-
-.battle-system-drawer-toggle {
-    font-size: 24px;
-    cursor: pointer;
-    padding: 0px 0px 10px 0px;
-    text-align: left;
-}
-
-.battle-system-content {
-    display: flex;
-    gap: 10px;
-    flex-direction: column;
-    padding: 10px;
-    width: 100%;
-}
-
-.battle-system-info-wrapper {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-}
-
-.battle-system-pet-info, .battle-system-enemy-info {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 0;
-    font-size: 14px;
-    flex: 1;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-}
-
-.battle-system-log {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 0px;
-    height: 25%;
-    overflow-y: auto;
-    font-size: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    width: 94%;
-}
-
-.battle-system-actions {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    width: 100%;
-    flex-direction: row;
-    flex-wrap: nowrap;
-}
-
-.battle-system-actions button {
-    padding: 5px;
-    cursor: pointer;
-    border: 1px solid #ffffff;
-    width: 100%;
-    background-color: #0a8c00;
-    color: #ffffff;
-    font-size: 14px;
-    text-align: center;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.battle-system-actions button:hover {
-    background-color: #064701;
-}
-#visualEffectsContainer {
-    position: relative;
-    width: 95%;
-    height: 0px;
-}
-@keyframes critical-hit {
-    0% {
-        border: 5px solid red;
-    }
-    100% {
-        border: 1px solid rgb(255 255 255 / 0%);
-    }
-}
-
-.battle-system-log.critical-hit {
-    animation: critical-hit 0.3s forwards;
-}
-
-.visual-effect {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    opacity: 0;
-    transform: scale(0);
-    transition: transform 0.5s ease, opacity 0.5s ease;
-}
-
-#playerEffect {
-    left: 20%;
-    top: 50%;
-    background-color: rgba(0, 255, 0, 0.5);
-}
-
-#enemyEffect {
-    right: 20%;
-    top: 50%;
-    background-color: rgba(255, 0, 0, 0.5);
-}
-
-.show-effect {
-    opacity: 1;
-    transform: scale(1);
-}
-.status-display {
-    font-size: 14px;
-    margin-top: 0px;
-    color: red;
-    font-weight: bold;
-}
-#battle-spirit-modal {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
-    padding: 10px;
-    width: 80%;
-    border: 2px solid #ccc;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    border-radius: 10px;
-}
-
-#battle-spirit-modal .modal-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#battle-spirit-modal button {
-    background: #a70b00;
-    border-color: rgba(255, 255, 255, 0.1);
-    color: white;
-    font-size: 14px;
-    ga'padding: gap';
-    border-radius: 5px;
-    margin: 5px;
-}
-.ascension-skill-modal {
-    display: none; /* 默认隐藏 */
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
-}
-
-.ascension-modal-content {
-    background-color: rgb(0 0 0 / 40%);
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 85%;
-}
-
-.ascension-close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-}
-
-.ascension-close:hover,
-.ascension-close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-
-.ascension-header {
-    display: flex;
-    align-items: center;
-}
-
-.ascension-icon {
-    width: 75px;
-    height: 75px;
-}
-
-.ascension-info {
-    margin-left: 20px;
-}
-
-.ascension-body {
-    margin-top: 20px;
-}
-
-.ascension-footer {
-    margin-top: 20px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.ascension-button {
-    padding: 5px;
-    font-size: 16px;
-    color: white;
-    cursor: pointer;
-    border-radius: 10px;
-    background-color: #003670;
-    border-color: #ccc;
-}
-
-.ascension-skill-button {
-    margin: 10px;
-    padding: 10px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
+        /* lottery.css */
+        .lottery-drawer {
+            position: fixed;
+            margin: 0px 0px 0px 0px;
+            padding: 20px 0px 0px 0px;
+            bottom: 0px;
+            width: 95%;
+            background-color: rgb(255 255 255 / 90%);
+            
+             /* 图片平铺 */
+             /* 保持原图大小 */
+             /* 背景固定 */
+            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px 10px 0 0;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+            /* z-index: 0; */
+            max-height: 90%;
+            overflow-y: auto;
+        }
+        
+        .lottery-drawer.open {
+            transform: translateY(0);
+        }
+        
+        .lottery-section {
+            padding: 5px 0px 10px 0px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            flex-wrap: wrap;
+            align-content: space-around;
+            justify-content: space-evenly;
+        }
+        
+        .lottery-top {
+            margin-bottom: 0px;
+            width: 100%;
+        }
+        .lottery-middle {
+            margin-bottom: 0px;
+            width: 100%;
+            align-items: center;
+        }
+        .lottery-bottom {
+            margin-bottom: 0px;
+            width: 100%;
+        }
+        .lottery-footer {
+            margin-bottom: 10px;
+            width: 100%;
+            display: flex;
+        }
+        .lottery-box, .lottery-number-box {
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 0px;
+            margin: 5px 0;
+            text-align: justify;
+            background-color: #f9f9f9;
+            font-weight: bold;
+        }
+        .lottery-number-box {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin: 15px 0;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+        
+        .lottery-number-box {
+            display: flex;
+            grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+            gap: 5px;
+            padding: 0px;
+            flex-direction: column;
+        }
+        
+        #lotteryNumberButtons button {
+            margin: 5px;
+            gap: 2px;
+            padding: 5px;
+            background-color: #ff1100;
+            border-radius: 50%;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        #lotteryNumberButtons button:hover {
+            background-color: #6a0700;
+        }
+        
+        .lottery-controls {
+            display: flex;
+            justify-content: center;
+            gap: 0px 10px;
+            padding: 5px;
+            flex-direction: row;
+        }
+        
+        .lottery-footer button {
+            width: 21%;
+            display: flex;
+            margin-top: 5px;
+            background-color: #0a8c00;
+            padding: 5px;
+            color: rgb(255 255 255 / 90%);
+            font-size: 16px;
+            justify-content: center;
+            border-radius: 10px;
+        }
+        
+        .lottery-footer button:hover {
+            background-color: #086600;
+        }
+        /* lottery.css */
+        .lottery-controls button {
+            padding: 2px 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        
+        .lottery-controls #lotteryBetButton {
+            background-color: #0056b3;
+            color: white;
+        }
+        
+        .lottery-controls #lotteryBetButton:hover {
+            background-color: #003670;
+            transform: scale(1.05);
+        }
+        
+        .lottery-controls #lotteryIncreaseBet {
+            background-color: #0a8c00;
+            color: white;
+        }
+        
+        .lottery-controls #lotteryIncreaseBet:hover {
+            background-color: #064701;
+            transform: scale(1.05);
+        }
+        .lottery-controls #lotteryIncreaseTenBet {
+            background-color: #0a8c00;
+            color: white;
+        }
+        
+        .lottery-controls #lotteryIncreaseTenBet:hover {
+            background-color: #064701;
+            transform: scale(1.05);
+        }
+        .lottery-controls #lotteryRuleButton {
+            background-color: #0056b3;
+            color: white;
+        }
+        
+        .lottery-controls #lotteryRuleButton:hover {
+            background-color: #003670;
+            transform: scale(1.05);
+        }
+        .lottery-controls #lotteryDecreaseBet {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .lottery-controls #lotteryDecreaseBet:hover {
+            background-color: #841520;
+            transform: scale(1.05);
+        }
+        /* lottery.css */
+        .highlight {
+            animation: highlight 1s ease-in-out;
+        }
+        
+        @keyframes highlight {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5);
+            }
+        }
+        /* lottery.css */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .battle-system-drawer {
+            display: none;
+            position: absolute;
+            right: 0px;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            box-shadow: -3px 0 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 10px 0px 0px 0px;
+        }
+        
+        .battle-system-drawer-toggle {
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0px 0px 10px 0px;
+            text-align: left;
+        }
+        
+        .battle-system-content {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            padding: 10px;
+            width: 100%;
+        }
+        
+        .battle-system-info-wrapper {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+        
+        .battle-system-pet-info, .battle-system-enemy-info {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 0;
+            font-size: 14px;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .battle-system-log {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 0px;
+            height: 25%;
+            overflow-y: auto;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            width: 94%;
+        }
+        
+        .battle-system-actions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+        
+        .battle-system-actions button {
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid #ffffff;
+            width: 100%;
+            background-color: #0a8c00;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        .battle-system-actions button:hover {
+            background-color: #064701;
+        }
+        #visualEffectsContainer {
+            position: relative;
+            width: 95%;
+            height: 0px;
+        }
+        @keyframes critical-hit {
+            0% {
+                border: 5px solid red;
+            }
+            100% {
+                border: 1px solid rgb(255 255 255 / 0%);
+            }
+        }
+        
+        .battle-system-log.critical-hit {
+            animation: critical-hit 0.3s forwards;
+        }
+        
+        .visual-effect {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+        
+        #playerEffect {
+            left: 20%;
+            top: 50%;
+            background-color: rgba(0, 255, 0, 0.5);
+        }
+        
+        #enemyEffect {
+            right: 20%;
+            top: 50%;
+            background-color: rgba(255, 0, 0, 0.5);
+        }
+        
+        .show-effect {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .status-display {
+            font-size: 14px;
+            margin-top: 0px;
+            color: red;
+            font-weight: bold;
+        }
+        #battle-spirit-modal {
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px;
+            width: 80%;
+            border: 2px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            border-radius: 10px;
+        }
+        
+        #battle-spirit-modal .modal-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        #battle-spirit-modal button {
+            background: #a70b00;
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            ga'padding: gap';
+            border-radius: 5px;
+            margin: 5px;
+        }
+        .ascension-skill-modal {
+            display: none; /* 默认隐藏 */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .ascension-modal-content {
+            background-color: rgb(0 0 0 / 40%);
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 85%;
+        }
+        
+        .ascension-close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        
+        .ascension-close:hover,
+        .ascension-close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        
+        .ascension-header {
+            display: flex;
+            align-items: center;
+        }
+        
+        .ascension-icon {
+            width: 75px;
+            height: 75px;
+        }
+        
+        .ascension-info {
+            margin-left: 20px;
+        }
+        
+        .ascension-body {
+            margin-top: 20px;
+        }
+        
+        .ascension-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .ascension-button {
+            padding: 5px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            background-color: #003670;
+            border-color: #ccc;
+        }
+        
+        .ascension-skill-button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
    </style>
 </head>
 <body>
@@ -1480,6 +1479,7 @@
             <div id="battle-spirit-modal" style="display: none;">
                 <div>
                     <h2>战斗精灵（已觉醒）</h2>
+                    <div id="message-container" style="display: none;"></div>
                     <p>等级: <span id="spirit-level">1</span></p>
                     <p>增幅: <span id="spirit-multiplier">1.00</span>（0.01~4.15）</p>
                     <p>生命值增加: <span id="spirit-health">0</span></p>
@@ -1523,7 +1523,7 @@
                 <button onclick="performAttack('physical')">普通攻击</button>
                 <button onclick="performAttack('magical')">法术攻击</button>
                 <button onclick="performHeal()">治疗之术</button>
-                <button id="battle-spirit-button">精灵面板</button>
+                <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
             </div>
             
@@ -2102,6 +2102,19 @@ const imageUrls = [
 ];
 preloadImages(imageUrls);
 
+// 显示提示信息的函数
+function showMessage(message, type = 'info') {
+    const messageContainer = document.getElementById('message-container');
+    messageContainer.innerText = message;
+    messageContainer.style.display = 'block';
+    messageContainer.style.color = type === 'error' ? 'red' : 'white';
+
+    // 1秒后隐藏提示信息
+    setTimeout(() => {
+        messageContainer.style.display = 'none';
+    }, 1000);
+}
+        
 let ascensionSkill = {
     name: '',
     level: 1,
@@ -2371,33 +2384,106 @@ document.getElementById('close-spirit-modal').addEventListener('click', () => {
 // 精灵洗练
 document.getElementById('level-up-spirit').addEventListener('click', () => {
     if (spiritLevel >= maxSpiritLevel) {
-        alert('战斗精灵已达到最大等级！');
+        showMessage('战斗精灵已达到最大等级！', 'error');
         return;
     }
 
     if (useItem('spiritRefreshStone', 1)) {
-        const successChance = Math.random();
-        if (successChance < 0.8) { // 80% 成功率
+        let successChance;
+        let failPenalty = 0;
+        let minLevelForCurrentRange;
+
+        if (spiritLevel <= 20) {
+            successChance = 1.0; // 100% 成功率
+            minLevelForCurrentRange = 1;
+        } else if (spiritLevel <= 30) {
+            successChance = 0.95; // 95% 成功率
+            minLevelForCurrentRange = 21;
+        } else if (spiritLevel <= 40) {
+            successChance = 0.9; // 90% 成功率
+            failPenalty = 1;
+            minLevelForCurrentRange = 31;
+        } else if (spiritLevel <= 50) {
+            successChance = 0.85; // 85% 成功率
+            failPenalty = 1;
+            minLevelForCurrentRange = 41;
+        } else if (spiritLevel <= 60) {
+            successChance = 0.8; // 80% 成功率
+            failPenalty = 1;
+            minLevelForCurrentRange = 51;
+        } else if (spiritLevel <= 70) {
+            successChance = 0.85; // 85% 成功率
+            failPenalty = 2;
+            minLevelForCurrentRange = 61;
+        } else if (spiritLevel <= 80) {
+            successChance = 0.8; // 80% 成功率
+            failPenalty = 2;
+            minLevelForCurrentRange = 71;
+        } else if (spiritLevel <= 90) {
+            successChance = 0.75; // 75% 成功率
+            failPenalty = 2;
+            minLevelForCurrentRange = 81;
+        } else if (spiritLevel <= 99) {
+            successChance = 0.7; // 70% 成功率
+            failPenalty = 2;
+            minLevelForCurrentRange = 91;
+        }
+
+        const randomChance = Math.random();
+        if (randomChance < successChance) {
             spiritLevel += 1;
             updateSpiritDisplay(); // 更新显示
             refreshBattleAttributes(); // 刷新战斗属性
         } else {
-            alert('洗练失败！');
+            if (failPenalty > 0) {
+                spiritLevel = Math.max(minLevelForCurrentRange, spiritLevel - failPenalty);
+                showMessage(`洗练失败，等级下降了 ${failPenalty} 级，但不会低于 ${minLevelForCurrentRange} 级！`, 'error');
+            } else {
+                showMessage('洗练失败！', 'error');
+            }
+            updateSpiritDisplay(); // 更新显示
+            refreshBattleAttributes(); // 刷新战斗属性
         }
     } else {
-        alert('您的精灵精炼石不足！');
+        showMessage('您的精灵精炼石不足！', 'error');
     }
 });
 
 // 精灵觉醒
 document.getElementById('enhance-spirit').addEventListener('click', () => {
     if (useItem('spiritAwakenStone', 1)) {
-        const newMultiplier = (Math.random() * (maxSpiritMultiplier - minSpiritMultiplier) + minSpiritMultiplier).toFixed(2);
+        let newMultiplier;
+        const randomChance = Math.random();
+
+        if (randomChance < 0.8) {
+            // 80%的概率随机更新至0.01~3.00这个区间
+            newMultiplier = (Math.random() * (3.00 - 0.01) + 0.01).toFixed(2);
+        } else if (randomChance < 0.95) {
+            // 15%的概率随机更新至3.01~3.99这个区间
+            newMultiplier = (Math.random() * (3.99 - 3.01) + 3.01).toFixed(2);
+        } else if (randomChance < 0.99) {
+            // 4%的概率随机更新至4.00~4.10这个区间
+            newMultiplier = (Math.random() * (4.10 - 4.00) + 4.00).toFixed(2);
+        } else {
+            // 1%的概率随机更新至4.11~4.15这个区间
+            newMultiplier = (Math.random() * (4.15 - 4.11) + 4.11).toFixed(2);
+        }
+
+        // 检查新倍数是否高于3.50
+        if (parseFloat(newMultiplier) > 3.50) {
+            const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，确定继续吗？";
+            if (!confirm(confirmMessage)) {
+                showMessage("操作已取消。", "info");
+                return;
+            }
+        }
+
         spiritMultiplier = parseFloat(newMultiplier);
         updateSpiritDisplay(); // 更新显示
         refreshBattleAttributes(); // 刷新战斗属性
+        showMessage(`精灵增幅成功，新的倍数为 ${newMultiplier}`, "success");
     } else {
-        alert('您的精灵觉醒石不足！');
+        showMessage('您的精灵觉醒石不足！', 'error');
     }
 });
 
@@ -2434,7 +2520,7 @@ function showEffect(effectId) {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 578,
+        health: 678,
         mana: 336,
         physicalAttack: 58,
         physicalDefense: 118,
@@ -2466,7 +2552,7 @@ function toggleFightingDrawer() {
 
     if (isOpen) {
         drawer.style.display = "flex";
-        refreshBattleAttributes(); // 刷新战斗属性
+
         startBattle();
     } else {
         drawer.style.display = "none";
@@ -2521,8 +2607,10 @@ function updatePetInfo() {
 
     maxHealth = battleAttributes.health; // 设置独立的最大值变量
     maxMana = battleAttributes.mana; // 设置独立的最大值变量
-    enemyMaxHealth = enemyPet.health;
-    enemyMaxMana = enemyPet.mana;
+
+    // 确保 enemyMaxHealth 和 enemyMaxMana 受到玩家属性的约束
+    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 10);
+    enemyMaxMana = Math.min(enemyMaxMana, maxMana * 10);
 
     updateUI();
     attributesFetched = true;
@@ -2607,9 +2695,9 @@ function logBattleEvent(event) {
         newEvent.innerText = event;
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 6 条，则删除最早的条目
+        // 检查日志条目数，如果超过 5 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 6) {
+        while (logs.length > 5) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -3105,6 +3193,8 @@ function enemyHeal() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
+    
+    // 增强敌人属性
     enemyPet.health = Math.floor(enemyPet.health * 1.05);
     enemyPet.mana = Math.floor(enemyPet.mana * 1.035);
     enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.055);
@@ -3113,16 +3203,25 @@ function updateEnemyAttributes() {
     enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.035);
     enemyPet.speed = Math.floor(enemyPet.speed * 1.03);
 
-    if (enemyPet.health > player.maxHealth * 1.5) enemyPet.health = Math.floor(player.maxHealth * 1.5);
-    if (enemyPet.mana > player.maxMana * 1.5) enemyPet.mana = Math.floor(player.maxMana * 1.5);
+    // 更新最大值并确保受到玩家属性的约束
+    enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
+    enemyMaxMana = Math.floor(enemyMaxMana * 1.035);
+
+    if (enemyMaxHealth > player.maxHealth * 10) enemyMaxHealth = Math.floor(player.maxHealth * 10);
+    if (enemyMaxMana > player.maxMana * 1.5) enemyMaxMana = Math.floor(player.maxMana * 1.5);
+
+    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
+    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
     if (enemyPet.physicalAttack > player.physicalAttack * 1.5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 1.5);
     if (enemyPet.physicalDefense > player.physicalDefense * 1.5) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 1.5);
     if (enemyPet.magicAttack > player.magicAttack * 1.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 1.5);
     if (enemyPet.magicDefense > player.magicDefense * 1.5) enemyPet.magicDefense = Math.floor(player.magicDefense * 1.5);
     if (enemyPet.speed > player.speed * 1.5) enemyPet.speed = Math.floor(player.speed * 1.5);
 
+    // 更新战斗状态
     battleState.enemy = { ...enemyPet };
 }
+
 
 // lottery.js
 let lotteryPrizePool = "无上限奖池";

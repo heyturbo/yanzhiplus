@@ -653,7 +653,7 @@
         }
         .jinnang-reward {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 10px 0px;
             justify-content: center;
             margin-top: 5px;
@@ -980,7 +980,7 @@
             overflow-y: auto;
             font-size: 12px;
             line-height: 14px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgb(0 0 0 / 40%);
             border-radius: 8px;
             width: 94%;
         }
@@ -2233,14 +2233,22 @@ function showMessage(message, type = 'info') {
 
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "让玩家重获新生，回复至战满状态" },
-    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复2000点法力值" },
-    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复3000点生命值" },
+    "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后回复至满状态" },
+    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
+    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
     "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "30秒内暴击伤害提高50%" },
     "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "30秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力，战斗结束或时效期过则移除该效果" }
+    "狂暴印记": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "30秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力。" },
+    "延寿露": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
+    "天山雪莲": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "回复玩家20%的法力值" },
+    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "30秒内敌人暴击率降低至0%" },
+    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "30秒内增加玩家20000速度和20000法术攻击力" },
+    "御之灵根": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "30秒内增加玩家999999物理防御和法术防御" },
+    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
+    "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
+    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" }
 };
 
 function useDrug() {
@@ -2251,7 +2259,7 @@ function useDrug() {
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
-    document.getElementById('drug-description').innerText = '战斗胜利后会随机掉落buff药品';
+    document.getElementById('drug-description').innerText = '本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效';
 }
 
 function updateDrugGrid() {
@@ -2276,9 +2284,16 @@ function selectDrug(drugName) {
     document.getElementById('drug-description').innerText = drugInventory[drugName].description;
 }
 
+let activeBuffs = {};
+
 function useSelectedDrug() {
     if (!selectedDrug) {
         alert("请选择一种药物！");
+        return;
+    }
+
+    if (activeBuffs[selectedDrug]) {
+        logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。` ,'red');
         return;
     }
 
@@ -2286,86 +2301,206 @@ function useSelectedDrug() {
     if (drug.quantity > 0) {
         drug.quantity -= 1;
         updateDrugGrid();
-        logBattleEvent(`${selectedDrug} 已使用。`);
+        logBattleEvent(`${selectedDrug} 已使用。`,'gold');
 
         switch (selectedDrug) {
             case "长生泉":
                 refreshBattleAttributes();
-                logBattleEvent(`使用长生泉，你如获新生。`);
+                logBattleEvent(`使用长生泉，你如获新生。`,'gold');
                 break;
             case "三花丸":
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 2000);
-                logBattleEvent(`使用三花丸，恢复了2000点法力值。`);
+                logBattleEvent(`使用三花丸，恢复了2000点法力值。`,'gold');
                 break;
             case "忘忧水":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 3000);
-                logBattleEvent(`使用忘忧水，恢复了3000点生命值。`);
+                logBattleEvent(`使用忘忧水，恢复了3000点生命值。`,'gold');
                 break;
             case "武尊秘露":
             case "神力仙丹":
             case "狂暴印记":
-                if (!battleState.player.usingBuff) {
+            case "化功散":
+            case "闪电蘑菇":
+            case "御之灵根":
+            case "焚灵之丸":
+                if (!activeBuffs[selectedDrug]) {
                     applyBuff(selectedDrug);
                 } else {
-                    logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
+                    logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。`,'red');
+                    return;  // 提前返回，防止数量减少
                 }
                 break;
             case "狂暴之魂":
                 playerCritRate = Math.min(1.0, playerCritRate + 0.10); // 最大100%
-                logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`);
+                logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`,'gold');
                 break;
             case "慧心糖果":
                 playerCritDamage = Math.min(5.0, playerCritDamage + 0.10); // 最大500%
-                logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`);
+                logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`,'gold');
+                break;
+            case "延寿露":
+                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + Math.floor(maxHealth * 0.2));
+                logBattleEvent(`使用延寿露，恢复了 ${Math.floor(maxHealth * 0.2)} 点生命值。`,'gold');
+                break;
+            case "天山雪莲":
+                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + Math.floor(maxMana * 0.2));
+                logBattleEvent(`使用天山雪莲，恢复了 ${Math.floor(maxMana * 0.2)} 点法力值。`,'gold');
+                break;
+            case "冰莲絮":
+                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 50000);
+                logBattleEvent(`使用冰莲絮，恢复了 50000 点生命值。`,'gold');
+                break;
+            case "晗灵果":
+                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 50000);
+                logBattleEvent(`使用晗灵果，恢复了 50000 点法力值。`,'gold');
                 break;
         }
 
         updateUI();
-        closeDrugModal();
     } else {
-        alert("药物不足！");
+        alert("药物不足！",'red');
     }
 }
 
 function applyBuff(drugName) {
     switch (drugName) {
         case "武尊秘露":
-            const originalPhysicalAttack = battleAttributes.physicalAttack;
-            battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
-            logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`);
-            battleState.player.usingBuff = true;
-            setTimeout(() => {
-                battleAttributes.physicalAttack = originalPhysicalAttack;
-                logBattleEvent(`武尊秘露效果消失。`);
-                battleState.player.usingBuff = false;
-                updateUI();
-            }, 30000);
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalPhysicalAttack = battleAttributes.physicalAttack;
+                    battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
+                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`,'gold');
+                    return () => {
+                        battleAttributes.physicalAttack = originalPhysicalAttack;
+                        logBattleEvent(`武尊秘露效果消失。`,'red');
+                    };
+                },
+                30000
+            );
             break;
         case "神力仙丹":
-            const originalCritDamage = playerCritDamage;
-            playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
-            logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`);
-            battleState.player.usingBuff = true;
-            setTimeout(() => {
-                playerCritDamage = originalCritDamage;
-                logBattleEvent(`神力仙丹效果消失。`);
-                battleState.player.usingBuff = false;
-                updateUI();
-            }, 30000);
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalCritDamage = playerCritDamage;
+                    playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`,'gold');
+                    return () => {
+                        playerCritDamage = originalCritDamage;
+                        logBattleEvent(`神力仙丹效果消失。`,'red');
+                    };
+                },
+                30000
+            );
             break;
         case "狂暴印记":
-            const originalCritRate = playerCritRate;
-            playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
-            logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`);
-            battleState.player.usingBuff = true;
-            setTimeout(() => {
-                playerCritRate = originalCritRate;
-                logBattleEvent(`狂暴印记效果消失。`);
-                battleState.player.usingBuff = false;
-                updateUI();
-            }, 30000);
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalCritRate = playerCritRate;
+                    playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`,'gold');
+                    return () => {
+                        playerCritRate = originalCritRate;
+                        logBattleEvent(`狂暴印记效果消失。`,'red');
+                    };
+                },
+                30000
+            );
+            break;
+        case "化功散":
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalEnemyCritRate = enemyCritRate;
+                    enemyCritRate = 0;
+                    logBattleEvent(`使用化功散，敌人暴击率降低至0%，持续30秒。`,'gold');
+                    return () => {
+                        enemyCritRate = originalEnemyCritRate;
+                        logBattleEvent(`化功散效果消失。`,'red');
+                    };
+                },
+                30000
+            );
+            break;
+        case "闪电蘑菇":
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalSpeed = battleAttributes.speed;
+                    const originalMagicAttack = battleAttributes.magicAttack;
+                    battleAttributes.speed += 20000;
+                    battleAttributes.magicAttack += 20000;
+                    logBattleEvent(`使用闪电蘑菇，增加20000速度和20000法术攻击力，持续30秒。`,'gold');
+                    return () => {
+                        battleAttributes.speed = originalSpeed;
+                        battleAttributes.magicAttack = originalMagicAttack;
+                        logBattleEvent(`闪电蘑菇效果消失。`,'red');
+                    };
+                },
+                30000
+            );
+            break;
+        case "御之灵根":
+            applyTimedBuff(
+                drugName,
+                () => {
+                    const originalPhysicalDefense = battleAttributes.physicalDefense;
+                    const originalMagicDefense = battleAttributes.magicDefense;
+                    battleAttributes.physicalDefense += 999999;
+                    battleAttributes.magicDefense += 999999;
+                    logBattleEvent(`使用御之灵根，增加999999物理防御和法术防御，持续30秒。`,'gold');
+                    return () => {
+                        battleAttributes.physicalDefense = originalPhysicalDefense;
+                        battleAttributes.magicDefense = originalMagicDefense;
+                        logBattleEvent(`御之灵根效果消失。`,'red');
+                    };
+                },
+                30000
+            );
+            break;
+        case "焚灵之丸":
+            if (battleAttributes.health >= maxHealth * 0.2) {
+                applyTimedBuff(
+                    drugName,
+                    () => {
+                        const originalPA = battleAttributes.physicalAttack;
+                        const originalMA = battleAttributes.magicAttack;
+                        const originalCR = playerCritRate;
+                        const originalCD = playerCritDamage;
+                        battleAttributes.health -= Math.floor(maxHealth * 0.2);
+                        battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
+                        battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
+                        playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+                        playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+                        logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续30秒。`,'gold');
+                        return () => {
+                            battleAttributes.physicalAttack = originalPA;
+                            battleAttributes.magicAttack = originalMA;
+                            playerCritRate = originalCR;
+                            playerCritDamage = originalCD;
+                            logBattleEvent(`焚灵之丸效果消失。`,'red');
+                        };
+                    },
+                    30000
+                );
+            } else {
+                logBattleEvent("焚灵之丸效果无法触发，生命值不足20%.",'red');
+            }
             break;
     }
+}
+
+function applyTimedBuff(drugName, applyEffect, duration) {
+    if (activeBuffs[drugName]) return;
+
+    const removeEffect = applyEffect();
+    activeBuffs[drugName] = setTimeout(() => {
+        removeEffect();
+        delete activeBuffs[drugName];
+        updateUI();
+    }, duration);
 }
 
 let ascensionSkill = {
@@ -2390,8 +2525,8 @@ const ascensionSkills = {
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
-        { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${2 + 2 * level}%的生命值`, baseValue: 2, increment: level => 2 * level },
-        { name: '向死而生', effect: level => `受到致命伤害时，消耗最大法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
+        { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${0 + 2 * level}%的生命值`, baseValue: 0, increment: level => 2 * level },
+        { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
         { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level }
     ],
@@ -2966,11 +3101,12 @@ function getEnemyStatus() {
     return status.join(", ");
 }
 
-function logBattleEvent(event) {
+function logBattleEvent(event, color = 'white') {
     const logDiv = document.getElementById("log");
     if (logDiv) {
         const newEvent = document.createElement("p");
         newEvent.innerText = event;
+        newEvent.style.color = color; // 设置文字颜色
         logDiv.appendChild(newEvent);
 
         // 检查日志条目数，如果超过 7 条，则删除最早的条目
@@ -3059,7 +3195,7 @@ function performAttack(type) {
     }
 
     if (isCritical) {
-        logBattleEvent("你发动了暴击，造成了额外伤害！");
+        logBattleEvent("你发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
         logDiv.classList.add('critical-hit');
         setTimeout(() => {
@@ -3095,7 +3231,7 @@ function applyPhysicalAttackEffects() {
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
                 battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
-                logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`);
+                logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'red');
                 setTimeout(() => {
                     battleState.enemy.physicalDefense += armorBreakValue;
                     logBattleEvent("敌人的破甲状态消失。");
@@ -3163,7 +3299,7 @@ function applyAscensionEffects() {
             const healPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
             const healAmount = Math.floor(maxHealth * healPercentage);
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-            logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`);
+            logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`, 'brown');
             updateUI();
             break;
         case '以牙还牙':
@@ -3199,14 +3335,14 @@ function performPoison() {
             poisonSkillActivated = true;
             alert("你使用了施毒之术，现在可以对敌人施毒了。");
         } else {
-            alert("你还没有获得施毒之术，请尝试通过武神宝箱获取！");
+            alert("你还没有获得施毒之术，请尝试通过武神宝箱获取！", 'red');
             return;
         }
     }
 
     const manaCost = Math.floor(maxMana * 0.2);
     if (battleAttributes.mana < manaCost) {
-        logBattleEvent("您的法力值不足，无法使用施毒之法！");
+        logBattleEvent("您的法力值不足，无法使用施毒之法！", 'purple');
         return;
     }
 
@@ -3214,12 +3350,12 @@ function performPoison() {
 
     const poisonDamage = Math.floor(battleAttributes.physicalAttack * 0.5 * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-    logBattleEvent(`你对敌人使用了施毒之法，造成了 ${poisonDamage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+    logBattleEvent(`你对敌人使用了施毒之法，造成了 ${poisonDamage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'purple');
 
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
         poisonChance = 0.7;
-        logBattleEvent("使用了毒粉，毒性加强了。");
+        logBattleEvent("使用了毒粉，毒性加强了。", 'purple');
     }
 
     if (Math.random() < poisonChance) {
@@ -3317,7 +3453,7 @@ function enemyAttack() {
     }
 
     if (isCritical) {
-        logBattleEvent("敌人发动了暴击，造成了额外伤害！");
+        logBattleEvent("敌人发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
         logDiv.classList.add('critical-hit');
         setTimeout(() => {
@@ -3336,7 +3472,7 @@ function enemyAttack() {
         const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const reducedDamage = Math.floor(damage * damageReduction);
         damage = Math.floor(damage * (1 - damageReduction));
-        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`);
+        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'aqua');
     }
 
     // 检查护体格挡状态，减少伤害
@@ -3344,7 +3480,7 @@ function enemyAttack() {
         const defenseReduction = battleState.player.defenseReduction;
         const reducedDamage = Math.floor(damage * defenseReduction);
         damage = Math.floor(damage * (1 - defenseReduction));
-        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`);
+        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`, 'aqua');
         battleState.player.defending = false;
     }
 
@@ -3360,7 +3496,7 @@ function enemyAttack() {
             console.error("Reflect damage is NaN, setting to 0.");
         }
         battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
-        logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
+        logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给敌人。`, 'red');
     }
 
     // 检查反弹状态
@@ -3382,7 +3518,7 @@ function enemyAttack() {
             console.error("Heal amount is NaN, setting to 0.");
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`);
+        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'green');
     }
 
     // 检查向死而生
@@ -3392,7 +3528,7 @@ function enemyAttack() {
         if (battleAttributes.mana >= manaCost) {
             battleAttributes.health = 1;
             battleAttributes.mana -= manaCost;
-            logBattleEvent('向死而生触发，生命值恢复至1，消耗大量法力值。');
+            logBattleEvent('向死而生触发，生命值恢复至1，消耗大量法力值。', 'red');
             updateUI();
         }
     }
@@ -3401,7 +3537,7 @@ function enemyAttack() {
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
+        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`, 'purple');
     }
 
     if (battleAttributes.health <= 0) {
@@ -3430,7 +3566,7 @@ function performHeal() {
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
-    logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+    logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'green');
 
     // 检查仙气护体效果
     if (Math.random() < 0.05) {
@@ -3488,15 +3624,6 @@ function showNextBattlePrompt(playerWon) {
         document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
         gainExp(); // 获取经验
-
-        // 随机掉落药物
-        if (Math.random() < 0.8) {
-            const drugKeys = Object.keys(drugInventory);
-            const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
-            drugInventory[randomDrug].quantity += 1;
-            logBattleEvent(`你获得了 ${randomDrug} x1`);
-            updateDrugGrid();
-        }
     } else {
         let penalty = 388 * battleRounds;
         if (ascensionSkill.name === '金牌调解') {
@@ -3511,14 +3638,22 @@ function showNextBattlePrompt(playerWon) {
         document.getElementById("gold-amount").innerText = goldAmount;
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
-    resetBuffState();
+    resetBuffState(playerWon);
 }
 
-function resetBuffState() {
+function resetBuffState(playerWon) {
     if (battleState.player.usingBuff) {
         battleState.player.usingBuff = false;
-        logBattleEvent(`所有时效性药物效果已被重置。`);
+        logBattleEvent(`即时性药物效果已被重置。`, 'red');
         updateUI();
+    }
+    
+    if (playerWon && Math.random() < 0.8) {
+        const drugKeys = Object.keys(drugInventory);
+        const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+        drugInventory[randomDrug].quantity += 1;
+        logBattleEvent(`你获得了 ${randomDrug} x1`, 'green');
+        updateDrugGrid();
     }
 }
 

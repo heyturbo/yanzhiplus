@@ -117,9 +117,9 @@
         .button-row {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 0px 5px;
+            gap: 0px 10px;
             margin: 0px 0px;
-            padding: 1px;
+            padding: 0px;
             flex-direction: row;
             flex-wrap: wrap;
         }
@@ -135,7 +135,7 @@
             background-size: contain; /* 背景图像保持比例缩放 */
             background-position: center; /* 背景图像居中 */
             background-repeat: no-repeat; /* 防止背景图像平铺 */
-            width: 70px; /* 根据需要调整宽度 */
+            width: 65px; /* 根据需要调整宽度 */
             height: 40px; /* 根据需要调整高度 */
         }
         
@@ -1258,7 +1258,7 @@
 /* 召唤面板特定样式 */
 .summon-popup-panel {
     width: 80%;
-    height: 50%;
+    height: 45%;
     font-size: 14px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
@@ -1287,7 +1287,7 @@
 
 .stamp-quantity {
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold;
 }
 
@@ -1301,6 +1301,9 @@
     margin: 0 5px;
     background-color: #0a8c00;
     color: white;
+    border-radius: 10px;
+    border-color: white;
+    font-size: 14px;
 }
 
 /* 宠物商店特定样式 */
@@ -1340,9 +1343,12 @@
 
 .pet-shop-button {
     width: 100%;
-    margin-top: 10px;
+    margin: 0px 0px 10px 0px;
     background-color: #0a8c00;
     color: white;
+    border-radius: 10px;
+    font-size: 14px;
+    border-color: white;
 }
 
 /* 防止 "pull-to-refresh" 行为 */
@@ -7075,7 +7081,7 @@ function trainQuality() {
     }
 
     const usedRebornPills = initialRebornPill - rebornPill; // 计算消耗的还童丹数量
-    const message = `您消耗了${usedRebornPills}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期段位。`;
+    const message = `您消耗了${usedRebornPills}颗神兽还童丹，${achieved ? '达成了' : '未能达成'}预期成长率。`;
     const messageBox = document.createElement('div');
     messageBox.style = "padding: 20px; background: white; border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
     messageBox.innerHTML = `<p>${message}</p>
@@ -7151,7 +7157,7 @@ function mutatePet() {
     if (!checkDrawerOpen()) return;
 
     if (miraculousPill < 1) {
-        alert("必要道具灵异金丹数量不足！");
+        alert("必要道具：灵异金丹 数量不足！");
         return;
     }
     if (awakened) {

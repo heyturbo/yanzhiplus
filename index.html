@@ -1242,15 +1242,15 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    height: 40%;
+    height: 50%;
     width: 80%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
-    font-size: 14px;
     padding: 20px;
     border: 1px solid #ffffff;
     z-index: 1000;
+    font-size: 14px;
     border-radius: 10px;
     display: none;
 }
@@ -1297,8 +1297,8 @@
 }
 
 .summon-button {
-    flex: 1;
-    margin: 0 5px;
+    flex: auto;
+    margin: 0px 5px;
     background-color: #0a8c00;
     color: white;
     border-radius: 10px;
@@ -1309,7 +1309,7 @@
 /* 宠物商店特定样式 */
 .pet-shop-popup-panel {
     width: 80%;
-    height: 80%;
+    height: 90%;
     border-radius: 10px;
     background-color: rgba(0, 0, 0, 0.8);
     color: #ffffff;
@@ -2720,11 +2720,14 @@ document.getElementById('buySummonCharmButton').addEventListener('click', () => 
 document.getElementById('closeMissionPanel').addEventListener('click', () => {
     document.getElementById('missionPanel').style.display = 'none';
 });
+
 //任务函数
 let tasks = [
     { id: 1, description: '宠物评分达到100万', completed: false, targetScore: 1000000, reward: 200 },
-    { id: 2, description: '宠物评分达到200万', completed: false, targetScore: 2000000, reward: 400 },
-    { id: 3, description: '宠物评分达到300万', completed: false, targetScore: 3000000, reward: 600 }
+    { id: 2, description: '宠物评分达到200万', completed: false, targetScore: 2000000, reward: 600 },
+    { id: 3, description: '宠物评分达到300万', completed: false, targetScore: 3000000, reward: 1200 },
+    { id: 4, description: '宠物评分达到400万', completed: false, targetScore: 4000000, reward: 2000 },
+    { id: 5, description: '宠物评分达到500万', completed: false, targetScore: 5000000, reward: 3000 }
 ];
 
 function showMissionPanel() {

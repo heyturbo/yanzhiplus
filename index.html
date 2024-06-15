@@ -115,11 +115,11 @@
             border-radius: 10px;
         }
         .button-row {
-            display: flex;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 5px 10px;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0px 5px;
             margin: 0px 0px;
-            padding: 0px;
+            padding: 1px;
             flex-direction: row;
             flex-wrap: wrap;
         }
@@ -171,7 +171,14 @@
         #lotteryButton {
             background-image: url('https://pic.imgdb.cn/item/666466225e6d1bfa05b95973.png');
         }
+
+        #missionButton {
+            background-image: url('https://pic.imgdb.cn/item/666d63b4d9c307b7e9fa76fa.png');
+        }
         
+        #summonButton {
+            background-image: url('https://pic.imgdb.cn/item/666d630ed9c307b7e9f96356.webp');
+        }
         .core-area .skills {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -380,6 +387,7 @@
             border: 2px solid transparent;
             padding: 5px;
             border-radius: 5px;
+            di's'padding: disp;
         }
         .shop-item.selected {
             border-color: #0a8c00;
@@ -847,7 +855,7 @@
             background-color: #064701;
             transform: scale(1.05);
         }
-        .lottery-controls #lotteryIncreaseTenBet {
+        .lottery-controls #lotteryIncreaseHundredBet {
             background-color: #0a8c00;
             color: white;
         }
@@ -901,7 +909,7 @@
         }
         
         .modal-content {
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgb(255 255 255 / 90%);
             margin: 15% auto;
             padding: 10px;
             border: 1px solid #888;
@@ -1228,6 +1236,114 @@
     margin-bottom: 20px;
     font-size: 14px;
 }
+
+/* 通用弹出面板样式 */
+.mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    height: 40%;
+    width: 80%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    font-size: 14px;
+    padding: 20px;
+    border: 1px solid #ffffff;
+    z-index: 1000;
+    border-radius: 10px;
+    display: none;
+}
+
+/* 召唤面板特定样式 */
+.summon-popup-panel {
+    width: 80%;
+    font-size: 12px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+    border-radius: 10px;
+}
+
+.summon-close-button {
+    float: right;
+    margin: -40px -10px 10px 10px;
+}
+
+.summon-area {
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    background-color: rgb(0 0 0);
+    margin-bottom: 20px;
+}
+
+.summon-area img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.stamp-quantity {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.summon-button-area {
+    display: flex;
+    justify-content: space-between;
+}
+
+.summon-button {
+    flex: 1;
+    margin: 0 5px;
+    background-color: #0a8c00;
+    color: white;
+}
+
+/* 宠物商店特定样式 */
+.pet-shop-popup-panel {
+    width: 80%;
+    height: 65%;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #ffffff;
+}
+
+.pet-shop-close-button {
+    float: right;
+    margin: -40px -10px 10px 10px;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 5px;
+    font-size: 12px;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+
+.shop-item {
+    text-align: center;
+    :;
+    padding: 5px;
+}
+
+.shop-item img {
+    width: 40px;
+    height: 40px;
+}
+
+.pet-shop-button {
+    width: 100%;
+    margin-top: 10px;
+    background-color: #0a8c00;
+    color: white;
+}
+
 /* 防止 "pull-to-refresh" 行为 */
 @media screen and (pointer: coarse) {
     @supports (-webkit-backdrop-filter: blur(1px)) {
@@ -1271,6 +1387,8 @@ body {
         <div class="buttons">
             <div class="button-row">
                 <button id="guideButton" onclick="showGuide()">玩法</button>
+                <button id="missionButton" onclick="showMissionPanel()">任务</button>
+                <button id="summonButton" onclick="showSummonPanel()">召唤</button>
                 <button id="drawerButton" onclick="toggleDrawer()">资质</button>
                 <button id="attributeButton" onclick="toggleAttributeDrawer()">属性</button>
                 <button id="shopButton" onclick="toggleShop()">商店</button> 
@@ -1278,6 +1396,7 @@ body {
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
                 <button id="fightingButton" onclick="toggleFightingDrawer()">战斗</button>
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
+
             </div>
         </div>
         <div class="skills" id="skills-area"></div>
@@ -1321,19 +1440,8 @@ body {
     </div>
     <div class="pet-selector">
         <select id="pet-select" onchange="changePet()">
-            <option value="yanzhi">胭脂</option>
-            <option value="zhulin">竹林隐士</option>
-            <option value="jinmin">金珉奎</option>
-            <option value="zhanshen">战神阿毛</option>
-            <option value="tengshe">腾蛇</option>
-            <option value="qingmou">青眸白虎</option>
-            <option value="jingjue">净角神将</option>
-            <option value="shanggu">上古神藤</option>
-            <option value="guhe">古河锦鲤</option>
-            <option value="banlan">斑斓公主</option>
-            <option value="juling">巨灵战姬</option>
-            <option value="aoshi">敖十七</option>
-            <option value="daming">妲茗儿</option>
+            <option value="xiaojin">小金牛</option>
+            <!-- 其他宠物 -->
         </select>
     </div>
     <div class="quality-drawer" id="quality-drawer">
@@ -1341,7 +1449,7 @@ body {
         <div class="quality-info" id="quality-info">
             <div class="quality-container">
                 <div class="quality-details">
-                    <div>名称: <span id="quality-name">胭脂</span></div>
+                    <div>名称: <span id="quality-name">小金牛</span></div>
                     <div>段位: <span id="quality-tier">普通</span></div>
                     <div>成长率: <span id="quality-growth-rate">100%</span></div>
                     <div>变异: <span id="quality-mutated">未变异</span></div>
@@ -1349,23 +1457,23 @@ body {
                 </div>
             </div>
             <div class="progress-bar">
-                耐力: <span id="endurance-current">4500</span> / <span id="endurance-max">8700</span>
+                耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
                 <div id="endurance-bar" style="width: 50%"></div>
             </div>
             <div class="progress-bar">
-                强壮: <span id="strength-current">2250</span> / <span id="strength-max">3750</span>
+                强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
                 <div id="strength-bar" style="width: 50%"></div>
             </div>
             <div class="progress-bar">
-                信仰: <span id="faith-current">2250</span> / <span id="faith-max">3750</span>
+                信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
                 <div id="faith-bar" style="width: 50%"></div>
             </div>
             <div class="progress-bar">
-                敏捷: <span id="agility-current">2500</span> / <span id="agility-max">4300</span>
+                敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
                 <div id="agility-bar" style="width: 50%"></div>
             </div>
             <div class="progress-bar">
-                智力: <span id="intelligence-current">5250</span> / <span id="intelligence-max">10350</span>
+                智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
                 <div id="intelligence-bar" style="width: 50%"></div>
             </div>
                 <div class="button-grid">
@@ -1517,7 +1625,7 @@ body {
             <div class="lottery-controls">
                 <button id="lotteryBetButton">投注</button>
                 <button id="lotteryIncreaseBet">+1</button>
-                <button id="lotteryIncreaseTenBet">+10</button>
+                <button id="lotteryIncreaseHundredBet">+100</button>
                 <button id="lotteryDecreaseBet">-1</button>
                 <button id="lotteryRuleButton">规则</button>
                 <!-- 规则信息框 -->
@@ -1644,12 +1752,45 @@ body {
             
         </div>
     </div>
+<div id="missionPanel" class="mission-popup-panel" style="display:none;">
+    <h3>任务面板</h3>
+    <button id="closeMissionPanel" class="mission-close-button">关闭</button>
+    <ul id="taskList">
+        <!-- 任务列表 -->
+    </ul>
+</div>
+<div id="summonPanel" class="summon-popup-panel" style="display:none;">
+    <h3>召唤面板</h3>
+    <button id="closeSummonPanel" class="summon-close-button">关闭</button>
+    <div id="summonArea" class="summon-area">
+        <!-- 召唤区域 -->
+    </div>
+    <div class="summon-button-area">
+        <button id="summonExecuteButton" class="summon-button">召唤</button>
+        <button id="claimButton" class="summon-button">领取</button>
+        <button id="exchangeButton" class="summon-button">兑换</button>
+        <button id="openPetShopButton" class="summon-button">商店</button>
+    </div>
+</div>
+
+<div id="petShop" class="pet-shop-popup-panel" style="display:none;">
+    <h3>宠物商店</h3>
+    <button id="closePetShop" class="pet-shop-close-button">关闭</button>
+    <div id="shopItems" class="shop-grid">
+        <!-- 商店物品列表 -->
+    </div>
+    <div class="pet-shop-actions">
+        <button id="buySummonCharmButton" class="pet-shop-button">购买灵符</button>
+        <div class="stamp-quantity">当前印花: <span id="currentStampCount">1000</span></div>
+    </div>
+</div>
+
     <div class="bottom-bar">
         <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif" alt="胭脂">
+            <img id="pet-image" src="https://pic.imgdb.cn/item/666d5d0fd9c307b7e9ee29f8.png" alt="小金牛">
         </div>
         <div class="info">
-            <div>宠物名称: <span id="pet-name">胭脂</span></div>
+            <div>宠物名称: <span id="pet-name">小金牛</span></div>
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
             <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
@@ -1659,6 +1800,25 @@ body {
     </div>
     <script>
         const pets = {
+            xiaojin: {
+                name: '小金牛',
+                image: 'https://pic.imgdb.cn/item/666d5d0fd9c307b7e9ee29f8.png',
+                skills: [
+                    { name: '野性冲撞', rarity: 'A', description: '小金牛使出浑身解数朝敌人进行致命一击' },
+                    { name: '冥想', rarity: 'B', description: '被动技能，每回合法力值恢复' },
+                    { name: '三倍速冲击', rarity: 'SS', description: '愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 1100, min: 1100, max: 2200 },
+                    strength: { current: 1150, min: 1150, max: 2250 },
+                    faith: { current: 1150, min: 1150, max: 2250 },
+                    agility: { current: 1100, min: 1100, max: 2200 },
+                    intelligence: { current: 1150, min: 1150, max: 2250 },
+                    mutated: false
+                },
+            },
             yanzhi: {
                 name: '胭脂',
                 image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
@@ -2231,6 +2391,280 @@ function showMessage(message, type = 'info') {
     }, 10000);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    updateStampCount();
+});
+        
+let stamps = 1000; // 初始印花数量
+let summonCharmPaper = 1; // 初始召唤灵符数量
+let summonedPet = null;
+let currentPetKey = 'xiaojin';
+let currentPet = pets[currentPetKey]; // 初始化当前宠物
+
+function changePet() {
+    const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
+    console.log('Selected Pet Key:', selectedPetKey);
+    console.log('Pets Array:', pets);
+
+    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
+
+    const selectedPet = pets[selectedPetKey];
+    console.log('Selected Pet:', selectedPet);
+
+    if (selectedPet) { // 检查选中的宠物是否存在
+        currentPetKey = selectedPetKey;
+        currentPet = selectedPet; // 将当前宠物设为选择的宠物
+
+        document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
+        document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
+        document.getElementById("description-box").innerText = `您将当前宠物更换为：${currentPet.name}`;
+        resetPet(); // 重置宠物的数值
+    } else {
+        console.error('无法找到选中的宠物：', selectedPetKey);
+    }
+}
+
+
+function showSummonPanel() {
+    const summonPanel = document.getElementById('summonPanel');
+    summonPanel.style.display = 'block';
+    document.getElementById('summonArea').innerHTML = ''; // 清空召唤区域
+}
+
+document.getElementById('summonButton').addEventListener('click', showSummonPanel);
+
+function updateStampCount() {
+    const stampCountElem = document.getElementById('stampCount');
+    const currentStampCountElem = document.getElementById('currentStampCount');
+
+    if (currentStampCountElem) {
+        currentStampCountElem.innerText = stamps;
+    } else {
+        console.error('元素 #currentStampCount 未找到');
+    }
+}
+// 添加关闭按钮功能
+document.getElementById('closeSummonPanel').addEventListener('click', () => {
+    document.getElementById('summonPanel').style.display = 'none';
+});
+
+document.getElementById('closePetShop').addEventListener('click', () => {
+    document.getElementById('petShop').style.display = 'none';
+});
+
+document.getElementById('summonExecuteButton').addEventListener('click', () => {
+    if (useItem('summonCharmPaper')) {
+        const petKeys = Object.keys(pets);
+        const randomPetKey = petKeys[Math.floor(Math.random() * petKeys.length)];
+        summonedPet = pets[randomPetKey];
+
+        // 显示加载图片
+        document.getElementById('summonArea').innerHTML = `
+            <img src="https://pic.imgdb.cn/item/666d9c32d9c307b7e96da6b1.gif" alt="加载中" id="loadingGif">
+        `;
+
+        const loadingGif = document.getElementById('loadingGif');
+        
+        // 确保图片加载完成后开始计时
+        loadingGif.onload = () => {
+            setTimeout(() => {
+                document.getElementById('summonArea').innerHTML = `
+                    <img src="${summonedPet.image}" alt="${summonedPet.name}">
+                    <div>${summonedPet.name}</div>
+                `;
+                alert(`你召唤了${summonedPet.name}`);
+            }, 1000);
+        };
+    } else {
+        alert('没有召唤灵符！');
+    }
+    updateStampCount(); // 更新印花数量
+});
+
+
+// 点击领取
+document.getElementById('claimButton').addEventListener('click', () => {
+    if (summonedPet) {
+        const petSelect = document.getElementById('pet-select');
+        const petKey = Object.keys(pets).find(key => pets[key].name === summonedPet.name); // 查找宠物键
+
+        if (Array.from(petSelect.options).some(option => option.value === petKey)) {
+            alert('您已经拥有此宠物，将其转化为50印花！');
+            stamps += 50; // 将宠物转化为50印花
+            updateStampCount();
+        } else {
+            const option = document.createElement('option');
+            option.value = petKey; // 使用宠物的键作为选项值
+            option.text = summonedPet.name;
+            petSelect.appendChild(option);
+            alert(`您成功领取了${summonedPet.name}！`);
+        }
+        summonedPet = null;
+        document.getElementById('summonArea').innerHTML = `<div class="stamp-quantity">印花数量: <span id="stampCount">${stamps}</span></div>`;
+        updateStampCount();
+    } else {
+        alert('没有宠物可领取！');
+    }
+});
+
+// 点击兑换
+document.getElementById('exchangeButton').addEventListener('click', () => {
+    if (summonedPet) {
+        stamps += 50; // 兑换获得50印花
+        alert(`${summonedPet.name}已被兑换为50印花`);
+        summonedPet = null;
+        document.getElementById('summonArea').innerHTML = '';
+        updateStampCount();
+    } else {
+        alert('没有宠物可兑换！');
+    }
+});
+
+// 打开宠物商店
+document.getElementById('openPetShopButton').addEventListener('click', showPetShop);
+
+// 购买召唤灵符
+document.getElementById('buySummonCharmButton').addEventListener('click', () => {
+    if (stamps >= 500) {
+        stamps -= 500;
+        addItemToJinnang('summonCharmPaper');
+        alert('成功购买了一张召唤灵符！');
+        updateStampCount();
+    } else {
+        alert('印花数量不足，无法购买召唤灵符。');
+    }
+});
+
+function showPetShop() {
+    const petShop = document.getElementById('petShop');
+    petShop.style.display = 'block';
+    const shopItems = document.getElementById('shopItems');
+    shopItems.innerHTML = '';
+
+    const ownedPets = Array.from(document.getElementById('pet-select').options).map(option => option.value);
+
+    Object.keys(pets).forEach(key => {
+        if (!ownedPets.includes(key)) { // 检查玩家是否已经拥有该宠物
+            const pet = pets[key];
+            const petDiv = document.createElement('div');
+            petDiv.className = 'shop-item';
+            petDiv.innerHTML = `
+                <img src="https://pic.imgdb.cn/item/666d688ed9c307b7e903ce17.png" alt="${pet.name}">
+                <div>${pet.name}</div>
+                <div>价格: 500印花</div>
+            `;
+            petDiv.addEventListener('click', () => {
+                if (window.confirm(`你确定要花费500印花购买${pet.name}吗？`)) {
+                    if (stamps >= 500) {
+                        stamps -= 500;
+                        alert(`你购买了${pet.name}`);
+                        const petSelect = document.getElementById('pet-select');
+                        if (!Array.from(petSelect.options).some(option => option.value === key)) { // 使用键作为选项值
+                            const option = document.createElement('option');
+                            option.value = key;
+                            option.text = pet.name;
+                            petSelect.appendChild(option);
+                        }
+                        petDiv.remove(); // 移除已购买的宠物
+                        updateStampCount();
+                    } else {
+                        alert('印花数量不足！');
+                    }
+                }
+            });
+            shopItems.appendChild(petDiv);
+        }
+    });
+}
+
+// 添加关闭按钮功能
+document.getElementById('closePetShop').addEventListener('click', () => {
+    document.getElementById('petShop').style.display = 'none';
+});
+
+
+// 测试用例：确保 pets 数组和下拉列表匹配
+document.addEventListener('DOMContentLoaded', () => {
+    const petSelect = document.getElementById('pet-select');
+    const options = Array.from(petSelect.options).map(option => option.value);
+    const keys = Object.keys(pets);
+    console.log('Options in select:', options);
+    console.log('Keys in pets:', keys);
+
+    keys.forEach(key => {
+        if (!options.includes(key)) {
+            console.warn(`Pet key ${key} is not in select options`);
+        }
+    });
+
+    options.forEach(option => {
+        if (!keys.includes(option)) {
+            console.warn(`Select option ${option} is not a valid pet key`);
+        }
+    });
+});
+
+document.getElementById('buySummonCharmButton').addEventListener('click', () => {
+    // 购买逻辑
+});
+
+// 添加关闭按钮功能
+document.getElementById('closeMissionPanel').addEventListener('click', () => {
+    document.getElementById('missionPanel').style.display = 'none';
+});
+//任务函数
+let tasks = [
+    { id: 1, description: '宠物评分达到100万', completed: false, targetScore: 1000000, reward: 100 },
+    { id: 2, description: '宠物评分达到200万', completed: false, targetScore: 2000000, reward: 200 },
+    { id: 3, description: '宠物评分达到300万', completed: false, targetScore: 3000000, reward: 300 }
+];
+
+function showMissionPanel() {
+    const missionPanel = document.getElementById('missionPanel');
+    missionPanel.style.display = 'block';
+    updateTaskList();
+}
+
+function completeTask(taskId) {
+    const task = tasks.find(t => t.id === taskId);
+    if (task && !task.completed && window.skillScore >= task.targetScore) {
+        task.completed = true;
+        stamps += task.reward; // 根据任务奖励增加印花
+        updateTaskList();
+        updateStampCount(); // 更新印花显示
+        alert(`任务完成，获得${task.reward}印花！`);
+    }
+}
+
+function updateTaskList() {
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+    tasks.forEach(task => {
+        const taskItem = document.createElement('li');
+        taskItem.innerText = task.description;
+        if (!task.completed && window.skillScore >= task.targetScore) {
+            const submitButton = document.createElement('button');
+            submitButton.innerText = '提交';
+            submitButton.addEventListener('click', () => completeTask(task.id));
+            taskItem.appendChild(submitButton);
+        } else if (task.completed) {
+            taskItem.innerText += ' - 已完成';
+        } else {
+            taskItem.innerText += ` - 进度: ${window.skillScore}/${task.targetScore}`;
+        }
+        taskList.appendChild(taskItem);
+    });
+}
+
+// 初始化任务面板
+document.getElementById('missionButton').addEventListener('click', showMissionPanel);
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateTaskList();
+    updateStampCount();
+});
+
+//以下是药物系统
 let selectedDrug = null;
 let drugInventory = {
     "长生泉": { quantity: 0, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后回复至满状态" },
@@ -3766,6 +4200,7 @@ let lotteryCountdown = 10;
 let lotteryDrawInterval;
 let canBet = true;
 let pendingPrize = 0;
+let hasPlacedBet = false;
 
 function toggleLotteryDrawer() {
     const drawer = document.getElementById('lotteryDrawer');
@@ -3841,15 +4276,17 @@ function stopLotteryCountdown() {
 function performLotteryDraw() {
     const { numbers: winningNumbers, blueBall: winningBlueBall } = generateLotteryWinningNumbers();
     document.getElementById('lotteryDrawResults').innerHTML = `开奖区: ${winningNumbers.join(', ')} <span style="color: blue;">${winningBlueBall}</span>`;
-    const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
-    if (prize > 0) {
-        pendingPrize += prize;
-        updateDescriptionBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
+    if (hasPlacedBet) { // 只有在已投注的情况下才进行奖金判断
+        const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
+        if (prize > 0) {
+            pendingPrize += prize;
+            updateDescriptionBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
+        }
     }
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
     clearSelections();
+    hasPlacedBet = false; // 重置投注标志
 }
-
 
 function generateLotteryWinningNumbers() {
     const numbers = [];
@@ -3953,8 +4390,6 @@ function highlightMatchingNumbers(winningNumbers, winningBlueBall) {
     });
 }
 
-
-
 document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     if (!canBet) {
         alert('请等待本次开奖！');
@@ -3965,13 +4400,13 @@ document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     updateLotteryDisplay();
 });
 
-document.getElementById('lotteryIncreaseTenBet').addEventListener('click', () => {
+document.getElementById('lotteryIncreaseHundredBet').addEventListener('click', () => {
     if (!canBet) {
         alert('请等待本次开奖！');
         return;
     }
-    lotteryBetCount += 10; // 使用正确的语法增加10注
-    lotteryBetAmount += 2000; // 对应增加2000
+    lotteryBetCount += 100; // 使用正确的语法增加10注
+    lotteryBetAmount += 20000; // 对应增加2000
     updateLotteryDisplay();
 });
 
@@ -4003,10 +4438,10 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             document.getElementById("gold-amount").innerText = goldAmount;
             canBet = false; // Disable further bets until next draw
 
-            // 修改这里使得第六个数字显示为蓝色
             document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
             
             updateLotteryDisplay();
+            hasPlacedBet = true; // 更新投注标志
         } else {
             alert('余额不足');
         }
@@ -4015,14 +4450,18 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
     }
 });
 
-
 document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
-    goldAmount += pendingPrize;
-    document.getElementById("gold-amount").innerText = goldAmount;
-    pendingPrize = 0;
-    document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
-    updateLotteryDisplay();
+    if (pendingPrize === 0) {
+        alert('当前没有奖金可以领取！');
+    } else {
+        goldAmount += pendingPrize;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        pendingPrize = 0;
+        document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
+        updateLotteryDisplay();
+    }
 });
+
 
 function updateLotteryDisplay() {
     document.getElementById('lotteryPrizePool').textContent = `奖金池: ${lotteryPrizePool}`;
@@ -4055,34 +4494,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         numberButtons.appendChild(button);
     }
-    
-    document.getElementById('lotteryAutoSelect').addEventListener('click', () => {
-        autoSelectNumbers();
-    });
-});
 
-    
-const autoSelectButton = document.createElement('button');
-autoSelectButton.textContent = '系统选号';
-autoSelectButton.addEventListener('click', () => {
-    if (!canBet) {
-        alert('本轮您已经选号，请等待开奖！');
-        return;
-    }
-    lotterySelectedNumbers = [];
-    while (lotterySelectedNumbers.length < 5) {
-        const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
-        if (!lotterySelectedNumbers.includes(num)) {
-            lotterySelectedNumbers.push(num);
+    const autoSelectButton = document.createElement('button');
+    autoSelectButton.textContent = '系统选号';
+    autoSelectButton.addEventListener('click', () => {
+        if (!canBet) {
+            alert('本轮您已经选号，请等待开奖！');
+            return;
         }
+        lotterySelectedNumbers = [];
+        while (lotterySelectedNumbers.length < 5) {
+            const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+            if (!lotterySelectedNumbers.includes(num)) {
+                lotterySelectedNumbers.push(num);
+            }
+        }
+        const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+        lotterySelectedNumbers.push(blueBall);
+        document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
+        hasPlacedBet = false; // 重置投注标志
+    });
+
+    // 确保 .lottery-footer 元素存在
+    const lotteryFooter = document.querySelector('.lottery-footer');
+    if (lotteryFooter) {
+        lotteryFooter.appendChild(autoSelectButton);
+    } else {
+        console.error('.lottery-footer element not found');
     }
-    const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
-    lotterySelectedNumbers.push(blueBall);
-    document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
 });
-document.querySelector('.lottery-footer').appendChild(autoSelectButton);
-
-
 
 function updateDescriptionBox(message) {
     const descriptionBox = document.getElementById("description-box");
@@ -4108,11 +4548,11 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V9.1</p>
-                            <p>- 新增战斗精灵系统和相关道具，战斗精灵会给玩家提供战斗时的属性加成，觉醒后功能会完全开放；</p>
-                            <p>- 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
-                            <p>- 新增彩券系统，拓展金子获取渠道；</p>
-                            <p>- 新增加载页面；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V10.1</p>
+                            <p>- 新增大量战斗系统功能，目前战斗系统仍然在不断完善；</p>
+                            <p>- 新增任务和召唤系统；</p>
+                            <p>- 修复彩券系统的部分Bug；</p>
+                            <p>- 新增部分图标效果；</p>
                             <p>- 优化部分函数逻辑；</p>
                             <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
@@ -4672,6 +5112,7 @@ let jinnangItems = [
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
     { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', quantity: 0, description: '举世无双，灵石点智，一举提升悟性到20' },
+    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', quantity: 1, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', quantity: 0, description: '刷新精灵的增幅百分比' },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },
@@ -5387,24 +5828,6 @@ function sellPet() {
     }
 }
 
-
-let currentPetKey = pets.yanzhi;
-let currentPet = currentPetKey;;
-
-function changePet() {
-    const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
-    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
-
-    currentPetKey = selectedPetKey;
-    currentPet = pets[selectedPetKey]; // 将当前宠物设为选择的宠物
-
-    document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
-    document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
-    document.getElementById("description-box").innerText = `您将当前宠物更换为：${currentPet.name} `;
-    resetPet(); // 重置宠物的数值
-}
-
-
 function resetPet() {
     // 重置宠物资质和属性
     currentPet.qualities.tier = '普通';
@@ -5435,6 +5858,10 @@ function resetPet() {
     battleRounds = 0; // 记录玩家胜利的轮次
     currentExp = 0; // 当前经验值
     maxExp = 208; // 经验值上限
+    playerCritRate = 0.1; // 10%
+    playerCritDamage = 1.5; // 150%
+    enemyCritRate = 0.6; // 60%
+    enemyCritDamage = 1.8; // 180%
     ascensionEnabled = false; //飞升之术关闭
     poisonSkillActivated = false; //施毒之术关闭
     spiritLevel = 1;
@@ -5798,7 +6225,15 @@ function updateSkillScore(selectedSkills = []) {
     skillScoreElement.innerText = totalScore;
     // 添加 .text 类以应用红色样式
     skillScoreElement.classList.add("gold-text");
+
+    // 更新全局 skillScore 变量
+    window.skillScore = totalScore; // 确保 skillScore 是全局变量
+
+    // 更新任务列表以反映新的宠物评分
+    updateTaskList();
+    console.log(`当前宠物评分: ${totalScore}`);
 }
+
 
 function upgradeWisdomTo() {
     const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后，你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
@@ -5837,6 +6272,7 @@ function upgradeWisdomTo() {
             'heartStone', //心鉴之石
             'earthlyEnergy', //天地灵气
             'shakingSoul',
+            'summonCharmPaper', //召唤灵符
             'poisonSkillBook', //施毒之术
             'poisonPowder', //毒粉
             'glowingSoul',

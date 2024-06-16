@@ -1250,10 +1250,10 @@
     padding: 20px;
     border: 1px solid #ffffff;
     z-index: 1000;
+    /* line-height: 40px; */
     font-size: 14px;
     border-radius: 10px;
     display: none;
-}
 
 /* 召唤面板特定样式 */
 .summon-popup-panel {
@@ -1274,7 +1274,7 @@
     height: 200px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-around;
     border: 1px solid #ccc;
     background-color: rgb(0 0 0);
     margin-bottom: 20px;
@@ -1606,8 +1606,8 @@ body {
             <div id="treasure-description" class="treasure-description-box"></div>
             <div id="treasure-reward" class="reward-box"></div>
             <div class="treasure-action">
-                <button onclick="openTreasure()">打开宝箱</button>
-                <button onclick="collectTreasure()">取出奖品</button>
+                <button onclick="openTreasure()">自动取出</button>
+                <button onclick="collectTreasure()">拿走奖品</button>
             </div>
         </div>
     </div>
@@ -2722,13 +2722,30 @@ document.getElementById('closeMissionPanel').addEventListener('click', () => {
 });
 
 //任务函数
-let tasks = [
-    { id: 1, description: '宠物评分达到100万', completed: false, targetScore: 1000000, reward: 200 },
-    { id: 2, description: '宠物评分达到200万', completed: false, targetScore: 2000000, reward: 600 },
-    { id: 3, description: '宠物评分达到300万', completed: false, targetScore: 3000000, reward: 1200 },
-    { id: 4, description: '宠物评分达到400万', completed: false, targetScore: 4000000, reward: 2000 },
-    { id: 5, description: '宠物评分达到500万', completed: false, targetScore: 5000000, reward: 3000 }
-];
+let tasks = {
+    skillScore: [
+        { id: 1, description: '宠物评分达到100万', completed: false, target: 1000000, reward: 200 },
+        { id: 2, description: '宠物评分达到200万', completed: false, target: 2000000, reward: 600 },
+        { id: 3, description: '宠物评分达到300万', completed: false, target: 3000000, reward: 1200 },
+        { id: 4, description: '宠物评分达到400万', completed: false, target: 4000000, reward: 2000 },
+        { id: 5, description: '宠物评分达到500万', completed: false, target: 5000000, reward: 3000 }
+    ],
+    petLevel: [
+        { id: 6, description: '宠物等级达到60', completed: false, target: 60, reward: 50 },
+        { id: 7, description: '宠物等级达到100', completed: false, target: 100, reward: 100 },
+        { id: 8, description: '宠物等级达到149', completed: false, target: 149, reward: 200 },
+        { id: 9, description: '宠物等级达到180', completed: false, target: 180, reward: 400 },
+        { id: 10, description: '宠物等级达到200', completed: false, target: 200, reward: 750 }
+    ],
+    goldAmount: [
+        { id: 11, description: '金子数量达到100000', completed: false, target: 100000, reward: 1 },
+        { id: 12, description: '金子数量达到300000', completed: false, target: 300000, reward: 3 },
+        { id: 13, description: '金子数量达到700000', completed: false, target: 700000, reward: 5 },
+        { id: 14, description: '金子数量达到1000000', completed: false, target: 1000000, reward: 7 },
+        { id: 15, description: '金子数量达到2000000', completed: false, target: 2000000, reward: 9 }
+    ]
+};
+
 
 function showMissionPanel() {
     const missionPanel = document.getElementById('missionPanel');
@@ -2737,35 +2754,74 @@ function showMissionPanel() {
 }
 
 function completeTask(taskId) {
-    const task = tasks.find(t => t.id === taskId);
-    if (task && !task.completed && window.skillScore >= task.targetScore) {
+    let taskSeries, task;
+    Object.keys(tasks).forEach(series => {
+        task = tasks[series].find(t => t.id === taskId);
+        if (task) taskSeries = series;
+    });
+
+    if (!task || task.completed) return;
+
+    if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
         task.completed = true;
-        stamps += task.reward; // 根据任务奖励增加印花
-        updateTaskList();
-        updateStampCount(); // 更新印花显示
+        stamps += task.reward;
         alert(`任务完成，获得${task.reward}印花！`);
+    } else if (taskSeries === 'petLevel' && petLevel >= task.target) {
+        task.completed = true;
+        stamps += task.reward;
+        alert(`任务完成，获得${task.reward}印花！`);
+    } else if (taskSeries === 'goldAmount' && goldAmount >= task.target) {
+        task.completed = true;
+        addItemToJinnang('summonCharmPaper', task.reward);
+        alert(`任务完成，获得${task.reward}张召唤灵符！`);
     }
+
+    updateTaskList();
+    updateStampCount();
 }
+
 
 function updateTaskList() {
     const taskList = document.getElementById('taskList');
     taskList.innerHTML = '';
-    tasks.forEach(task => {
-        const taskItem = document.createElement('li');
-        taskItem.innerText = task.description;
-        if (!task.completed && window.skillScore >= task.targetScore) {
-            const submitButton = document.createElement('button');
-            submitButton.innerText = '提交';
-            submitButton.addEventListener('click', () => completeTask(task.id));
-            taskItem.appendChild(submitButton);
-        } else if (task.completed) {
-            taskItem.innerText += ' - 已完成';
-        } else {
-            taskItem.innerText += ` - 进度: ${window.skillScore}/${task.targetScore}`;
+
+    Object.keys(tasks).forEach(series => {
+        const seriesTasks = tasks[series];
+        const currentTask = seriesTasks.find(task => !task.completed);
+
+        if (currentTask) {
+            const taskItem = document.createElement('li');
+            taskItem.innerText = currentTask.description;
+
+            if (series === 'skillScore' && window.skillScore >= currentTask.target) {
+                const submitButton = document.createElement('button');
+                submitButton.innerText = '提交';
+                submitButton.addEventListener('click', () => completeTask(currentTask.id));
+                taskItem.appendChild(submitButton);
+            } else if (series === 'petLevel' && petLevel >= currentTask.target) {
+                const submitButton = document.createElement('button');
+                submitButton.innerText = '提交';
+                submitButton.addEventListener('click', () => completeTask(currentTask.id));
+                taskItem.appendChild(submitButton);
+            } else if (series === 'goldAmount' && goldAmount >= currentTask.target) {
+                const submitButton = document.createElement('button');
+                submitButton.innerText = '提交';
+                submitButton.addEventListener('click', () => completeTask(currentTask.id));
+                taskItem.appendChild(submitButton);
+            } else {
+                if (series === 'skillScore') {
+                    taskItem.innerText += ` - 进度: ${window.skillScore}/${currentTask.target}`;
+                } else if (series === 'petLevel') {
+                    taskItem.innerText += ` - 进度: ${petLevel}/${currentTask.target}`;
+                } else if (series === 'goldAmount') {
+                    taskItem.innerText += ` - 进度: ${goldAmount}/${currentTask.target}`;
+                }
+            }
+            taskList.appendChild(taskItem);
         }
-        taskList.appendChild(taskItem);
     });
 }
+
 
 // 初始化任务面板
 document.getElementById('missionButton').addEventListener('click', showMissionPanel);
@@ -2782,18 +2838,22 @@ let drugInventory = {
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
-    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "30秒内暴击伤害提高50%" },
+    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
     "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "30秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "30s内增加150%物理攻击力。" },
+    "狂暴印记": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
     "延寿露": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
     "天山雪莲": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "回复玩家20%的法力值" },
-    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "30秒内敌人暴击率降低至0%" },
-    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "30秒内增加玩家20000速度和20000法术攻击力" },
-    "御之灵根": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "30秒内增加玩家999999物理防御和法术防御" },
+    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内敌人暴击率降低至0%" },
+    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
+    "御之灵根": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "10秒内增加玩家999999物理防御和法术防御" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
-    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" }
+    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
+    "寒天之晶": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
+    "幸运金币": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000金子" },
+    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验*200%" },
+    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验*400%" }
 };
 
 function useDrug() {
@@ -2861,6 +2921,64 @@ function useSelectedDrug() {
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 3000);
                 logBattleEvent(`使用忘忧水，恢复了3000点生命值。`,'gold');
                 break;
+            case "寒天之晶":
+                applyTimedBuff(
+                    selectedDrug,
+                    () => {
+                        const originalPhysicalDefense = battleState.enemy.physicalDefense;
+                        const originalMagicDefense = battleState.enemy.magicDefense;
+                        battleState.enemy.physicalDefense = 0;
+                        battleState.enemy.magicDefense = 0;
+                        logBattleEvent(`使用寒天之晶，10秒内怪物的物理防御和法术防御归0。`,'gold');
+                        return () => {
+                            battleState.enemy.physicalDefense = originalPhysicalDefense;
+                            battleState.enemy.magicDefense = originalMagicDefense;
+                            logBattleEvent(`寒天之晶效果消失。`,'red');
+                        };
+                    },
+                    10000
+                );
+                break;
+            case "幸运金币":
+                if (Math.random() < 0.3) {
+                    battleState.enemy.health = 1;
+                    logBattleEvent(`使用幸运金币，怪物血量变为1。`,'gold');
+                } else {
+                    goldAmount += 2000;
+                    logBattleEvent(`使用幸运金币，获得了2000金子。`,'gold');
+                }
+                updateUI();
+                document.getElementById("gold-amount").innerText = goldAmount;
+                break;
+            case "双倍经验药":
+                applyTimedBuff(
+                    selectedDrug,
+                    () => {
+                        battleState.player.expMultiplier = 2;
+                        logBattleEvent(`使用双倍经验药，60秒内战斗获胜所得经验*200%。`,'gold');
+                        return () => {
+                            battleState.player.expMultiplier = 1;
+                            logBattleEvent(`双倍经验药效果消失。`,'red');
+                        };
+                    },
+                    60000
+                );
+                break;
+            case "四倍经验药":
+                applyTimedBuff(
+                    selectedDrug,
+                    () => {
+                        battleState.player.expMultiplier = 4;
+                        logBattleEvent(`使用四倍经验药，60秒内战斗获胜所得经验*400%。`,'gold');
+                        return () => {
+                            battleState.player.expMultiplier = 1;
+                            logBattleEvent(`四倍经验药效果消失。`,'red');
+                        };
+                    },
+                    60000
+                );
+                break;
+            // 处理其他药品的逻辑...
             case "武尊秘露":
             case "神力仙丹":
             case "狂暴印记":
@@ -2907,6 +3025,7 @@ function useSelectedDrug() {
     }
 }
 
+
 function applyBuff(drugName) {
     switch (drugName) {
         case "武尊秘露":
@@ -2914,14 +3033,14 @@ function applyBuff(drugName) {
                 drugName,
                 () => {
                     const originalPhysicalAttack = battleAttributes.physicalAttack;
-                    battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 2.5);
-                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续30秒。`,'gold');
+                    battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
+                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续10秒。`,'gold');
                     return () => {
                         battleAttributes.physicalAttack = originalPhysicalAttack;
                         logBattleEvent(`武尊秘露效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "神力仙丹":
@@ -2930,13 +3049,13 @@ function applyBuff(drugName) {
                 () => {
                     const originalCritDamage = playerCritDamage;
                     playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
-                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续30秒。`,'gold');
+                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续10秒。`,'gold');
                     return () => {
                         playerCritDamage = originalCritDamage;
                         logBattleEvent(`神力仙丹效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "狂暴印记":
@@ -2945,13 +3064,13 @@ function applyBuff(drugName) {
                 () => {
                     const originalCritRate = playerCritRate;
                     playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
-                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续30秒。`,'gold');
+                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续10秒。`,'gold');
                     return () => {
                         playerCritRate = originalCritRate;
                         logBattleEvent(`狂暴印记效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "化功散":
@@ -2960,13 +3079,13 @@ function applyBuff(drugName) {
                 () => {
                     const originalEnemyCritRate = enemyCritRate;
                     enemyCritRate = 0;
-                    logBattleEvent(`使用化功散，敌人暴击率降低至0%，持续30秒。`,'gold');
+                    logBattleEvent(`使用化功散，敌人暴击率降低至0%，持续10秒。`,'gold');
                     return () => {
                         enemyCritRate = originalEnemyCritRate;
                         logBattleEvent(`化功散效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "闪电蘑菇":
@@ -2977,14 +3096,14 @@ function applyBuff(drugName) {
                     const originalMagicAttack = battleAttributes.magicAttack;
                     battleAttributes.speed += 20000;
                     battleAttributes.magicAttack += 20000;
-                    logBattleEvent(`使用闪电蘑菇，增加20000速度和20000法术攻击力，持续30秒。`,'gold');
+                    logBattleEvent(`使用闪电蘑菇，增加20000速度和20000法术攻击力，持续10秒。`,'gold');
                     return () => {
                         battleAttributes.speed = originalSpeed;
                         battleAttributes.magicAttack = originalMagicAttack;
                         logBattleEvent(`闪电蘑菇效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "御之灵根":
@@ -2995,14 +3114,14 @@ function applyBuff(drugName) {
                     const originalMagicDefense = battleAttributes.magicDefense;
                     battleAttributes.physicalDefense += 999999;
                     battleAttributes.magicDefense += 999999;
-                    logBattleEvent(`使用御之灵根，增加999999物理防御和法术防御，持续30秒。`,'gold');
+                    logBattleEvent(`使用御之灵根，增加999999物理防御和法术防御，持续10秒。`,'gold');
                     return () => {
                         battleAttributes.physicalDefense = originalPhysicalDefense;
                         battleAttributes.magicDefense = originalMagicDefense;
                         logBattleEvent(`御之灵根效果消失。`,'red');
                     };
                 },
-                30000
+                10000
             );
             break;
         case "焚灵之丸":
@@ -3019,7 +3138,7 @@ function applyBuff(drugName) {
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
                         playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
                         playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
-                        logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续30秒。`,'gold');
+                        logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`,'gold');
                         return () => {
                             battleAttributes.physicalAttack = originalPA;
                             battleAttributes.magicAttack = originalMA;
@@ -3028,7 +3147,7 @@ function applyBuff(drugName) {
                             logBattleEvent(`焚灵之丸效果消失。`,'red');
                         };
                     },
-                    30000
+                    10000
                 );
             } else {
                 logBattleEvent("焚灵之丸效果无法触发，生命值不足20%.",'red');
@@ -3048,6 +3167,7 @@ function applyTimedBuff(drugName, applyEffect, duration) {
     }, duration);
 }
 
+//飞升技能系统
 let ascensionSkill = {
     name: '',
     level: 1,
@@ -3073,7 +3193,9 @@ const ascensionSkills = {
         { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${0 + 2 * level}%的生命值`, baseValue: 0, increment: level => 2 * level },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level }
+        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level },
+        { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率同时施放两次法术伤害`, baseValue: 60, increment: level => 2 * level },
+        { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${5 + 0.1 * level}秒`, baseValue: 5, increment: level => 0.1 * level }
     ],
     settlement: [
         { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
@@ -3558,11 +3680,11 @@ function updateEnemyAttributes() {
 
     if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
     if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 2) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 2);
-    if (enemyPet.physicalDefense > player.physicalDefense * 1.3) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 1.3);
+    if (enemyPet.physicalAttack > player.physicalAttack * 3) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 3);
+    if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
     if (enemyPet.magicAttack > player.magicAttack * 2) enemyPet.magicAttack = Math.floor(player.magicAttack * 2);
-    if (enemyPet.magicDefense > player.magicDefense * 1.3) enemyPet.magicDefense = Math.floor(player.magicDefense * 1.3);
-    if (enemyPet.speed > player.speed * 1.5) enemyPet.speed = Math.floor(player.speed * 1.5);
+    if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
+    if (enemyPet.speed > player.speed * 1.2) enemyPet.speed = Math.floor(player.speed * 1.2);
 
     // 更新战斗状态
     battleState.enemy = { ...enemyPet };
@@ -3736,6 +3858,14 @@ function performAttack(type) {
         const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+
+        // 法术精通效果处理
+        if (Math.random() * 100 < battleState.player.spellMasteryChance) {
+            logBattleEvent("法术精通触发，你的法术攻击再次生效！", 'wheat');
+            const additionalDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 || 0) - effectiveDefense));
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - additionalDamage);
+            logBattleEvent(`额外法术攻击，造成了 ${additionalDamage} 点伤害。`);
+        }
         applyMagicAttackEffects();
     }
 
@@ -3852,6 +3982,13 @@ function applyAscensionEffects() {
             break;
         case '焉知非福':
             battleState.player.divineProtectionDuration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            break;
+        case '法术精通':
+            battleState.player.spellMasteryChance = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            break;
+        case '天降甘霖':
+            battleState.player.divineProtectionChance = 0.5; // 固定概率50%
+            battleState.player.divineProtectionDuration = 5 + ascensionSkill.increment(ascensionSkill.level);
             break;
     }
 }
@@ -4103,7 +4240,7 @@ function performHeal() {
 
     const manaCost = 88 * (battleRounds * 2);
     if (battleAttributes.mana < manaCost) {
-        logBattleEvent("您的法力值不足，无法治疗！");
+        logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
     }
 
@@ -4111,13 +4248,22 @@ function performHeal() {
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
-    logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'green');
+    logBattleEvent(`你治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
 
     // 检查仙气护体效果
-    if (Math.random() < 0.05) {
+    let divineProtectionChance = 0.05; // 默认概率5%
+    let divineProtectionDuration = 5; // 默认持续时间5秒
+
+    // 检查天降甘霖增益
+    if (ascensionSkill.name === '天降甘霖') {
+        divineProtectionChance = battleState.player.divineProtectionChance || 0.5;
+        divineProtectionDuration = battleState.player.divineProtectionDuration || 5;
+    }
+
+    if (Math.random() < divineProtectionChance) {
         battleState.player.divineProtection = true; // 仙气护体
-        logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。");
-        setTimeout(() => { battleState.player.divineProtection = false; }, 5000); // 仙气护体持续5秒
+        logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。", 'aqua');
+        setTimeout(() => { battleState.player.divineProtection = false; }, divineProtectionDuration * 1000); // 仙气护体持续指定时间
     }
 
     playerTurn = false; // 轮到敌人回合
@@ -4203,7 +4349,7 @@ function resetBuffState(playerWon) {
 }
 
 function gainExp() {
-    let expMultiplier = 1;
+    let expMultiplier = battleState.player.expMultiplier || 1;
     if (ascensionSkill.name === '举一反三') {
         expMultiplier += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         logBattleEvent(`举一反三触发，经验值增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)}%。`);
@@ -5086,7 +5232,7 @@ function collectTreasure() {
             case '发光之灵':
                 addItemToJinnang('glowingSoul');
                 break;
-                case '召唤灵符':
+            case '召唤灵符':
                 addItemToJinnang('summonCharmPaper');
                 break;
             case '活跃之灵':
@@ -5217,7 +5363,6 @@ function selectReward(rewardList) {
 }
 
 // 新增全局变量
-// 新增全局变量
 let jinnangItems = [
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', quantity: 0, description: '无名者的经验，使用后等级+1' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
@@ -5250,20 +5395,20 @@ function toggleJinnangDrawer() {
     updateJinnangItems();
 }
 
-function addItemToJinnang(itemName) {
+function addItemToJinnang(itemName, quantity = 1) {
     const item = jinnangItems.find(i => i.name === itemName);
     if (item) {
-        item.quantity++;
+        item.quantity += quantity;
     } else {
-        jinnangItems.push({ name: itemName, quantity: 1 });
+        jinnangItems.push({ name: itemName, quantity: quantity });
     }
-    updateJinnangItems(); // 更新锦囊内的道具数量显示
+    updateJinnangItems();
 }
 
 let currentDescriptionBox = null; // 存储当前显示的描述框
 
 // 显示道具描述
-function showItemDescription(description, itemDiv) {
+function showItemDescription(description, itemDiv, item) {
     // 如果当前有描述框，移除它
     if (currentDescriptionBox) {
         currentDescriptionBox.remove();
@@ -5285,7 +5430,13 @@ function showItemDescription(description, itemDiv) {
     descriptionBox.style.transform = 'translate(-50%, -50%)';
     descriptionBox.style.wordWrap = 'break-word';
     descriptionBox.style.textAlign = 'center';
-    descriptionBox.innerText = description;
+    descriptionBox.innerHTML = `<p>${description}</p>`;
+
+    let sellButton = document.createElement('button');
+    sellButton.innerText = '出售道具';
+    sellButton.style.marginTop = '10px';
+    sellButton.addEventListener('click', () => sellItem(item));
+    descriptionBox.appendChild(sellButton);
 
     document.body.appendChild(descriptionBox);
     currentDescriptionBox = descriptionBox;
@@ -5297,6 +5448,29 @@ function showItemDescription(description, itemDiv) {
             currentDescriptionBox = null;
         }
     }, 3000);
+}
+
+// 出售道具函数
+function sellItem(item) {
+    let quantityToSell = prompt('请输入要出售的数量:');
+    if (quantityToSell !== null) {
+        quantityToSell = parseInt(quantityToSell, 10);
+        if (isNaN(quantityToSell) || quantityToSell <= 0) {
+            alert('请输入有效的数量');
+            return;
+        }
+        if (quantityToSell > item.quantity) {
+            alert('您没有足够的道具数量');
+            return;
+        }
+
+        item.quantity -= quantityToSell;
+        goldAmount += quantityToSell * 50; // 假设每个道具卖50金子
+        alert(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * 50}金子`);
+
+        updateJinnangItems();
+        document.getElementById("gold-amount").innerText = goldAmount; // 更新金币数量显示的函数
+    }
 }
 
 // 更新锦囊内道具数量
@@ -5315,7 +5489,7 @@ function updateJinnangItems() {
                 <div>${item.quantity}</div>
             `;
             // 添加点击事件监听器
-            itemDiv.addEventListener('click', () => showItemDescription(item.description, itemDiv));
+            itemDiv.addEventListener('click', () => showItemDescription(item.description, itemDiv, item));
             jinnangReward.appendChild(itemDiv);
         }
     });
@@ -5612,6 +5786,8 @@ function startShopTimer() {
 
 // 页面加载完成后初始化商店
 
+let refreshCount = 0; // 全局计数器，记录刷新次数
+
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 100) {
         alert("您的金子不足，无法刷新！");
@@ -5625,6 +5801,53 @@ function refreshShop(auto = false) {
 
     const shopItems = document.getElementById('shop-items');
     shopItems.innerHTML = '';
+
+    refreshCount++; // 更新刷新计数器
+
+    // 特殊刷新逻辑：第20次刷新时，展示24个技能商品
+    if (refreshCount === 20) {
+        refreshCount = 0; // 重置计数器
+
+        let ssSkills = [];
+        let sSkills = [];
+
+        // 获取SS技能和S技能
+        for (let petKey in pets) {
+            let pet = pets[petKey];
+            pet.skills.forEach(skill => {
+                if (skill.rarity === 'SS' && ssSkills.length < 12) {
+                    ssSkills.push({
+                        name: `${pet.name}·${skill.name}`,
+                        url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
+                        price: getRandomInt(2688, 5988)
+                    });
+                }
+                if (skill.rarity === 'S' && sSkills.length < 12) {
+                    sSkills.push({
+                        name: `${pet.name}·${skill.name}`,
+                        url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
+                        price: getRandomInt(1288, 2988)
+                    });
+                }
+            });
+        }
+
+        // 将SS技能和S技能添加到商店
+        let specialItems = ssSkills.concat(sSkills);
+        specialItems.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.classList.add('shop-item');
+            itemDiv.dataset.name = item.name;
+            itemDiv.dataset.price = item.price;
+            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 金子</div>`;
+            itemDiv.addEventListener('click', () => {
+                document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
+                itemDiv.classList.add('selected');
+            });
+            shopItems.appendChild(itemDiv);
+        });
+        return;
+    }
 
     let numItems = auto ? getRandomInt(1, 5) : getRandomInt(2, 24);
     let probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
@@ -5676,6 +5899,7 @@ function refreshShop(auto = false) {
 
     if (auto) startShopTimer();
 }
+
 
 function getRandomCommonItem() {
     const commonItems = [
@@ -5929,13 +6153,36 @@ function sellPet() {
         return; // 退出函数
     }
 
+    // 获取当前宠物的键值
+    const petSelect = document.getElementById("pet-select");
+    const selectedPetKey = petSelect.value;
+
+    // 检查玩家是否只剩最后一个宠物
+    if (petSelect.options.length <= 1) {
+        alert("这是您的唯一爱宠了，请好好珍惜它！");
+        return; // 退出函数
+    }
+
     // 计算出售价格
     const sellPrice = Math.floor(skillScore / 25); // 出售价格为技能分数除以25的整数部分
 
     // 确认出售
-    if (confirm(`当您出售宠物后，您的宠物数值将复位。宠物价格与其评分有关，目前您的宠物价值${sellPrice}金子，请问是否出售？`)) {
+    if (confirm(`当您出售宠物后，您的宠物将消失。宠物价格与其评分有关，目前您的宠物价值${sellPrice}金子，请问是否出售？`)) {
         goldAmount += sellPrice; // 增加用户的金子数量
         document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
+
+        // 从下拉菜单中移除当前宠物
+        const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
+        if (optionToRemove) {
+            optionToRemove.remove();
+        }
+
+        // 设置默认选择第一个宠物
+        if (petSelect.options.length > 0) {
+            petSelect.value = petSelect.options[0].value;
+            changePet(); // 更新宠物信息
+        }
+
         updateQualityCard(); // 更新资质卡片
         updateAttributePanel(); // 更新属性面板
         updateTopBarItems(); // 确保顶栏道具数量更新

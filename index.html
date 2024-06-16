@@ -1400,6 +1400,52 @@
             content: "*";
             margin: 0 5px;
         }
+            /* 添加必要的样式，并加上唯一标识 petArms 前缀 */
+        .petArms-window {
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 1000;
+            width: 80%;
+            height: 80%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 10px;
+        }
+
+        .petArms-red-text {
+            color: red;
+        }
+
+        .petArms-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .petArms-item img {
+            width: 45px;
+            height: 45px;
+        }
+
+        .petArms-close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .locked {
+            background-color: gray;
+            color: white;
+        }
    </style>
 </head>
 <body>
@@ -1578,7 +1624,7 @@
                 <button onclick="useSupremeWisdomPill()">神级领悟</button>
                 <button onclick="ascend()">飞升突破</button>
                 <button onclick="awakenPet()">觉醒宠物</button>
-                <button onclick="petArms()">宠物武装</button>
+                <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
             </div>
         </div>
@@ -1820,7 +1866,6 @@
         <div class="stamp-quantity">当前印花: <span id="currentStampCount">1000</span></div>
     </div>
 </div>
-
     <div class="bottom-bar">
         <div class="pet-image">
             <img id="pet-image" src="https://pic.imgdb.cn/item/666d5d0fd9c307b7e9ee29f8.png" alt="小金牛">
@@ -2454,6 +2499,160 @@ function showMessage(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
     updateStampCount();
 });
+
+//宠物图鉴功能
+let collectedPetCount = 0; // 全局变量，用于存储已收录宠物的数量
+let collectedPets = [];
+
+function petCollection() {
+    // 清空之前的面板内容
+    const existingCollectionPanel = document.getElementById('collectionPanel');
+    if (existingCollectionPanel) {
+        existingCollectionPanel.remove();
+    }
+
+    // 创建新的图鉴面板
+    const collectionPanel = document.createElement('div');
+    collectionPanel.id = 'collectionPanel';
+    collectionPanel.style.position = 'fixed';
+    collectionPanel.style.top = '50%';
+    collectionPanel.style.left = '50%';
+    collectionPanel.style.transform = 'translate(-50%, -50%)';
+    collectionPanel.style.width = '80%';
+    collectionPanel.style.height = '80%';
+    collectionPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    collectionPanel.style.borderRadius = '10px';
+    collectionPanel.style.zIndex = '1000';
+    collectionPanel.style.padding = '20px';
+    collectionPanel.style.overflowY = 'auto';
+    collectionPanel.style.color = 'white';
+    document.body.appendChild(collectionPanel);
+
+    // 创建关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '关闭';
+    closeButton.style.position = 'absolute';
+    closeButton.style.bottom = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.borderRadius = '5px';
+    closeButton.style.backgroundColor = 'green';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '12px';
+    closeButton.style.border = '1px solid white';
+    closeButton.addEventListener('click', () => collectionPanel.remove());
+    collectionPanel.appendChild(closeButton);
+
+    // 创建图鉴内容
+    const collectionContent = document.createElement('div');
+    collectionContent.id = 'collectionContent';
+    collectionContent.style.display = 'grid';
+    collectionContent.style.gridTemplateColumns = 'repeat(5, 1fr)';
+    collectionContent.style.fontSize = '11px';
+
+    Object.keys(pets).forEach(petKey => {
+        const pet = pets[petKey];
+        const petDiv = document.createElement('div');
+        petDiv.className = 'pet-item';
+        petDiv.style.display = 'flex';
+        petDiv.style.flexDirection = 'column';
+        petDiv.style.alignItems = 'center';
+        petDiv.style.padding = '10px';
+        petDiv.style.border = '1px solid #fff';
+        petDiv.style.borderRadius = '5px';
+
+        const img = document.createElement('img');
+        img.src = 'https://pic.imgdb.cn/item/666f3435d9c307b7e92b5bf9.png'; // 默认图标
+        img.alt = pet.name;
+        img.style.width = '40px';
+        img.style.height = '40px';
+
+        const nameDiv = document.createElement('div');
+        nameDiv.innerText = pet.name;
+
+        const statusDiv = document.createElement('div');
+        statusDiv.innerText = collectedPets.includes(pet.name) ? '已收录' : '未收录';
+
+        const collectButton = document.createElement('button');
+        collectButton.innerText = '收录';
+        collectButton.style.fontSize = '11px';
+        collectButton.disabled = collectedPets.includes(pet.name); // 如果已收录，则禁用按钮
+        collectButton.addEventListener('click', () => {
+            const petSelect = document.getElementById('pet-select');
+            if (!isPetOwned(petKey)) {
+                alert("你还没有该宠物！");
+                return;
+            }
+
+            if (petSelect.options.length <= 1) {
+                alert("这是您的唯一爱宠了，请好好珍惜它！");
+                return;
+            }
+
+            collectedPets.push(pet.name);
+            collectedPetCount++;
+            statusDiv.innerText = '已收录';
+            collectButton.disabled = true;
+
+            // 从下拉菜单中移除当前宠物
+            const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
+            // 设置默认选择第一个宠物
+            if (petSelect.options.length > 0) {
+                petSelect.value = petSelect.options[0].value;
+                changePet(); // 更新宠物信息
+            }
+
+            updateCollectionBonus();
+            const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+            updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
+        });
+
+        petDiv.appendChild(img);
+        petDiv.appendChild(nameDiv);
+        petDiv.appendChild(statusDiv);
+        petDiv.appendChild(collectButton);
+        collectionContent.appendChild(petDiv);
+    });
+
+    collectionPanel.appendChild(collectionContent);
+
+    // 创建图鉴加成信息区
+    const bonusInfoDiv = document.createElement('div');
+    bonusInfoDiv.id = 'bonusInfo';
+    bonusInfoDiv.style.marginTop = '20px';
+    bonusInfoDiv.style.padding = '10px';
+    bonusInfoDiv.style.border = '1px solid #fff';
+    bonusInfoDiv.style.borderRadius = '5px';
+    bonusInfoDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    bonusInfoDiv.style.fontSize = '12px';
+    collectionPanel.appendChild(bonusInfoDiv);
+
+    updateCollectionBonus();
+}
+
+function updateCollectionBonus() {
+    const bonusInfoDiv = document.getElementById('bonusInfo');
+    const hpBonus = Math.floor(collectedPetCount * 0.05 * 100);
+    const mpBonus = Math.floor(collectedPetCount * 0.04 * 100);
+
+    bonusInfoDiv.innerHTML = `
+        <div>图鉴加成</div>
+        <div>收录宠物数量: ${collectedPetCount}</div>
+        <div>HP 加成: +${hpBonus}%</div>
+        <div>MP 加成: +${mpBonus}%</div>
+    `;
+}
+
+function isPetOwned(petKey) {
+    const petSelect = document.getElementById('pet-select');
+    return petSelect && !!petSelect.querySelector(`option[value="${petKey}"]`);
+}
+
+
+
         
 let stamps = 1000; // 初始印花数量
 let summonCharmPaper = 1; // 初始召唤灵符数量
@@ -2784,12 +2983,22 @@ function showMissionPanel() {
 
 function completeTask(taskId) {
     let taskSeries, task;
+    
+    // 遍历所有任务系列，找到任务并确定所属系列
     Object.keys(tasks).forEach(series => {
-        task = tasks[series].find(t => t.id === taskId);
-        if (task) taskSeries = series;
+        const foundTask = tasks[series].find(t => t.id === taskId);
+        if (foundTask) {
+            task = foundTask;
+            taskSeries = series;
+        }
     });
 
-    if (!task || task.completed) return;
+    if (!task || task.completed) {
+        console.error(`任务未找到或已完成: ${taskId}`);
+        return;
+    }
+
+    console.log(`完成任务: ${taskId}, 任务系列: ${taskSeries}`);
 
     if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
         task.completed = true;
@@ -2803,12 +3012,14 @@ function completeTask(taskId) {
         task.completed = true;
         addItemToJinnang('summonCharmPaper', task.reward);
         alert(`任务完成，获得${task.reward}张召唤灵符！`);
+    } else {
+        console.error('任务完成条件未满足');
+        return;
     }
 
     updateTaskList();
     updateStampCount();
 }
-
 
 function updateTaskList() {
     const taskList = document.getElementById('taskList');
@@ -4834,11 +5045,10 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V9.1</p>
-                            <p>- 新增战斗精灵系统和相关道具，战斗精灵会给玩家提供战斗时的属性加成，觉醒后功能会完全开放；</p>
-                            <p>- 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
-                            <p>- 新增彩券系统，拓展金子获取渠道；</p>
-                            <p>- 新增加载页面；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V10.0</p>
+                            <p>- 新增宠物武装、宠物图鉴系统；</p>
+                            <p>- 优化战斗系统；</p>
+                            <p>- 修复部分问题；</p>
                             <p>- 优化部分函数逻辑；</p>
                             <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
@@ -5568,8 +5778,258 @@ function toggleAttributeDrawer() {
     updatePetInfo(); // 确保更新属性后设置 attributesFetched
 }
 
+//宠物武装
+let armsAttributes = {
+    horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png" },
+    fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" },
+    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png" },
+    claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png" },
+    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png" }
+};
+
+let armsOpened = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded: armsOpened:', armsOpened); // 调试输出
+});
+
+function handlePetArmsClick() {
+    console.log('petArms clicked: armsOpened:', armsOpened); // 调试输出
+
+    if (!armsOpened) {
+        openPetArms();
+    } else {
+        showPetArmsWindow();
+    }
+}
+
+function openPetArms() {
+    if (goldAmount >= 100000) {
+        goldAmount -= 100000;
+        alert("你的宠物开启了灵兽武装，现在有更强的能力提升方式了！");
+        document.getElementById("gold-amount").innerText = goldAmount;
+        armsOpened = true;
+        console.log('openPetArms: armsOpened set to true'); // 调试输出
+        showPetArmsWindow();
+    } else {
+        alert("你的金子不足10万，无法开启武装系统！");
+    }
+}
+
+function showPetArmsWindow() {
+    console.log('showPetArmsWindow: armsOpened:', armsOpened); // 调试输出
+
+    // 清空之前的窗口内容
+    const existingArmsWindow = document.getElementById('petArmsWindow');
+    if (existingArmsWindow) {
+        existingArmsWindow.remove();
+    }
+
+    // 创建新的武装窗口
+    const newArmsWindow = document.createElement('div');
+    newArmsWindow.id = 'petArmsWindow';
+    newArmsWindow.style.position = 'fixed';
+    newArmsWindow.style.top = '50%';
+    newArmsWindow.style.left = '50%';
+    newArmsWindow.style.transform = 'translate(-50%, -50%)';
+    newArmsWindow.style.width = '80%';
+    newArmsWindow.style.height = '80%';
+    newArmsWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    newArmsWindow.style.borderRadius = '10px';
+    newArmsWindow.style.zIndex = '1000';
+    newArmsWindow.style.padding = '20px';
+    newArmsWindow.style.overflowY = 'auto';
+    newArmsWindow.style.color = 'white'; // 设置字体颜色为白色
+    document.body.appendChild(newArmsWindow);
+
+    // 创建关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '关闭';
+    closeButton.style.position = 'absolute';
+    closeButton.style.bottom = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.borderRadius = '5px';
+    closeButton.style.backgroundColor = 'green';
+    closeButton.style.color = 'white';
+    closeButton.style.fontSize = '14px';
+    closeButton.style.border = '1px solid white';
+    closeButton.addEventListener('click', closePetArmsWindow);
+    newArmsWindow.appendChild(closeButton);
+
+    // 创建说明按钮
+    const infoButton = document.createElement('button');
+    infoButton.innerText = '说明';
+    infoButton.style.position = 'absolute';
+    infoButton.style.bottom = '10px';
+    infoButton.style.right = '80px';
+    infoButton.style.borderRadius = '5px';
+    infoButton.style.backgroundColor = 'blue';
+    infoButton.style.color = 'white';
+    infoButton.style.fontSize = '14px';
+    infoButton.style.border = '1px solid white';
+    infoButton.addEventListener('click', showInfo);
+    newArmsWindow.appendChild(infoButton);
+
+    // 创建武装内容
+    const armsContent = document.createElement('div');
+    armsContent.id = 'petArmsContent';
+    armsContent.style.display = 'flex';
+    armsContent.style.flexDirection = 'column';
+    armsContent.style.gap = '10px';
+
+    const attributeMap = {
+        physicalAttack: '物攻',
+        magicAttack: '法攻',
+        physicalDefense: '物防',
+        magicDefense: '法防',
+        speed: '速度',
+        health: '生命',
+        mana: '法力'
+    };
+
+    const armKeys = Object.keys(armsAttributes);
+    armKeys.forEach((key, index) => {
+        const arm = armsAttributes[key];
+        const armDiv = document.createElement('div');
+        armDiv.className = 'petArms-item';
+        armDiv.style.display = 'flex';
+        armDiv.style.alignItems = 'center';
+        armDiv.style.padding = '10px';
+        armDiv.style.border = '1px solid #fff';
+        armDiv.style.borderRadius = '5px';
+
+        const img = document.createElement('img');
+        // 确保第一件武装的图标正确显示
+        img.src = index === 0 || arm.unlocked ? arm.url : 'https://pic.imgdb.cn/item/666f194bd9c307b7e907ba91.png';
+        img.alt = arm.type;
+        img.style.width = '45px';
+        img.style.height = '45px';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.style.flexGrow = '1';
+        infoDiv.style.marginLeft = '10px';
+
+        const forgeButton = document.createElement('button');
+        forgeButton.style.borderRadius = '5px';
+        forgeButton.style.backgroundColor = 'green';
+        forgeButton.style.color = 'white';
+        forgeButton.style.fontSize = '14px';
+        forgeButton.style.border = '1px solid white';
+
+        if (index === 0 || arm.unlocked) {
+            const infoText = arm.forgedInfo || `增益: ${arm.value} (${arm.attributes.map(attr => attributeMap[attr]).join(', ')})`;
+            infoDiv.innerHTML = `<div>${arm.type}</div><div>${infoText}</div>`;
+            forgeButton.innerText = '锻造';
+            forgeButton.addEventListener('click', () => forgeArm(key, infoDiv));
+        } else {
+            infoDiv.innerHTML = '<div>？？？</div><div>？？？</div>';
+            forgeButton.innerText = '解锁';
+            forgeButton.classList.add('locked');
+            forgeButton.addEventListener('click', () => unlockArm(index, arm, infoDiv, forgeButton, img));
+        }
+
+        armDiv.appendChild(img);
+        armDiv.appendChild(infoDiv);
+        armDiv.appendChild(forgeButton);
+        armsContent.appendChild(armDiv);
+    });
+
+    newArmsWindow.appendChild(armsContent);
+}
+
+
+function unlockArm(index, arm, infoDiv, forgeButton, img) {
+    if (isUnlocked(index)) {
+        if (!arm.unlocked && goldAmount >= 200000) {
+            goldAmount -= 200000;
+            alert("您支付了20万金子，为宠物解锁了一件武装！");
+            document.getElementById("gold-amount").innerText = goldAmount;
+            arm.unlocked = true; // 更新解锁状态
+            img.src = arm.url; // 更新图标
+            infoDiv.innerHTML = `<div>${arm.type}</div><div>增益: 0</div>`;
+            forgeButton.innerText = '锻造';
+            forgeButton.classList.remove('locked');
+            forgeButton.replaceWith(forgeButton.cloneNode(true)); // 清除解锁事件监听器
+            forgeButton = infoDiv.nextElementSibling; // 获取新添加的按钮
+            forgeButton.addEventListener('click', () => forgeArm(Object.keys(armsAttributes)[index], infoDiv));
+        } else if (arm.unlocked) {
+            alert("武装已经解锁！");
+        } else {
+            alert("金子不足，无法解锁！");
+        }
+    } else {
+        alert("宠物等级不足，无法解锁！");
+    }
+}
+
+function isUnlocked(index) {
+    switch (index) {
+        case 1:
+            return petLevel >= 60;
+        case 2:
+            return petLevel >= 120;
+        case 3:
+            return petLevel >= 180;
+        case 4:
+            return petLevel >= 200;
+        default:
+            return false;
+    }
+}
+
+function closePetArmsWindow() {
+    const armsWindow = document.getElementById('petArmsWindow');
+    if (armsWindow) {
+        armsWindow.style.display = 'none';
+    }
+}
+
+function showInfo() {
+    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至4位数或以上）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。");
+}
+
+function forgeArm(key, infoDiv) {
+    if (goldAmount < 200) {
+        alert("金子不足，无法锻造！");
+        return;
+    }
+
+    goldAmount -= 200;
+    const arm = armsAttributes[key];
+    const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
+    let newValue;
+    let rand = Math.random();
+    if (rand < 0.99) {
+        newValue = Math.floor(100 + Math.random() * 0.01 * (attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 : attribute === "magicAttack" ? 23999 : attribute === "speed" ? 4399 : attribute === "health" || attribute === "mana" ? 10000 : 43999));
+    } else {
+        newValue = Math.floor(100 + Math.random() * (attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 : attribute === "magicAttack" ? 23999 : attribute === "speed" ? 4399 : attribute === "health" || attribute === "mana" ? 10000 : 43999));
+    }
+    arm.value = newValue;
+    arm.attribute = attribute;
+
+    const attributeMap = {
+        physicalAttack: '物攻',
+        magicAttack: '法攻',
+        physicalDefense: '物防',
+        magicDefense: '法防',
+        speed: '速度',
+        health: 'HP',
+        mana: 'MP'
+    };
+
+    const attributeNameInChinese = attributeMap[arm.attribute];
+
+    arm.forgedInfo = `增益: ${arm.value} (${attributeNameInChinese})`; // 保存锻造后的增益信息
+
+    infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
+    document.getElementById("gold-amount").innerText = goldAmount;
+    updateSkillScore();
+    updateAttributePanel();
+}
+
+
+
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
-    // 基于当前悟性计算递增倍率
     let multiplier;
     if (currentWisdom <= 12) {
         multiplier = 1 + (currentWisdom * 0.005);
@@ -5597,22 +6057,100 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
         }
     }
 
-    const endurance = currentAttributes.endurance;
-    const intelligence = currentAttributes.intelligence;
-    const strength = currentAttributes.strength;
-    const agility = currentAttributes.agility;
-    const faith = currentAttributes.faith;
-
-    return {
-        health: Math.floor((endurance * 24 + intelligence * 1 + strength * 2 + agility * 3 + faith * 3) * multiplier),
-        mana: Math.floor((endurance * 1 + intelligence * 10 + strength * 2 + agility * 2 + faith * 2) * multiplier),
-        physicalAttack: Math.floor((endurance * 0.1 + intelligence * 0.1 + strength * 2.2 + agility * 0.2 + faith * 0.2) * multiplier),
-        physicalDefense: Math.floor((endurance * 0.1 + intelligence * 0.1 + strength * 0.2 + agility * 0.2 + faith * 2.2) * multiplier),
-        magicAttack: Math.floor((endurance * 0 + intelligence * 1.7 + strength * 0 + agility * 0 + faith * 0) * multiplier),
-        magicDefense: Math.floor((endurance * 2.2 + intelligence * 0 + strength * 0 + agility * 0 + faith * 0) * multiplier),
-        speed: Math.floor((endurance * 0.2 + intelligence * 0.1 + strength * 0.2 + agility * 2 + faith * 0.2) * multiplier),
+    // 计算基础二级属性
+    const baseSecondaryAttributes = {
+        health: Math.floor((currentAttributes.endurance * 24 + currentAttributes.intelligence * 1 + currentAttributes.strength * 2 + currentAttributes.agility * 3 + currentAttributes.faith * 3) * multiplier),
+        mana: Math.floor((currentAttributes.endurance * 1 + currentAttributes.intelligence * 10 + currentAttributes.strength * 2 + currentAttributes.agility * 2 + currentAttributes.faith * 2) * multiplier),
+        physicalAttack: Math.floor((currentAttributes.endurance * 0.1 + currentAttributes.intelligence * 0.1 + currentAttributes.strength * 2.2 + currentAttributes.agility * 0.2 + currentAttributes.faith * 0.2) * multiplier),
+        physicalDefense: Math.floor((currentAttributes.endurance * 0.1 + currentAttributes.intelligence * 0.1 + currentAttributes.strength * 0.2 + currentAttributes.agility * 0.2 + currentAttributes.faith * 2.2) * multiplier),
+        magicAttack: Math.floor((currentAttributes.endurance * 0 + currentAttributes.intelligence * 1.7 + currentAttributes.strength * 0 + currentAttributes.agility * 0 + currentAttributes.faith * 0) * multiplier),
+        magicDefense: Math.floor((currentAttributes.endurance * 2.2 + currentAttributes.intelligence * 0 + currentAttributes.strength * 0 + currentAttributes.agility * 0 + currentAttributes.faith * 0) * multiplier),
+        speed: Math.floor((currentAttributes.endurance * 0.2 + currentAttributes.intelligence * 0.1 + currentAttributes.strength * 0.2 + currentAttributes.agility * 2 + currentAttributes.faith * 0.2) * multiplier)
     };
+
+    // 图鉴加成
+    const collectionBonusMultiplier = 1 + collectedPetCount * 0.05;
+
+    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * collectionBonusMultiplier);
+    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * collectionBonusMultiplier);
+
+    // 累加武装增益值
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
+        if (arm.attribute) {
+            baseSecondaryAttributes[arm.attribute] += arm.value;
+        }
+    });
+
+    return baseSecondaryAttributes;
 }
+
+function updateSecondaryAttributes(currentAttributes, currentWisdom) {
+    const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
+
+    let wisdomBonus;
+    if (currentWisdom <= 12) {
+        wisdomBonus = currentWisdom * 0.5;
+    } else if (currentWisdom <= 20) {
+        wisdomBonus = 7 + (currentWisdom - 12) * 1;
+    } else {
+        switch (currentWisdom) {
+            case 21:
+                wisdomBonus = 20;
+                break;
+            case 22:
+                wisdomBonus = 21;
+                break;
+            case 23:
+                wisdomBonus = 22;
+                break;
+            case 24:
+                wisdomBonus = 23;
+                break;
+            case 25:
+                wisdomBonus = 25;
+                break;
+            default:
+                wisdomBonus = 0;
+        }
+    }
+
+    document.getElementById("secondary-health").innerText = secondaryAttributes.health;
+    const healthBonusElement = document.getElementById("secondary-health-bonus");
+    healthBonusElement.innerText = `+${wisdomBonus}%`;
+    healthBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
+    const manaBonusElement = document.getElementById("secondary-mana-bonus");
+    manaBonusElement.innerText = `+${wisdomBonus}%`;
+    manaBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
+    const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
+    physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
+    physicalAttackBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
+    const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
+    physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
+    physicalDefenseBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
+    const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
+    magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
+    magicAttackBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
+    const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
+    magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
+    magicDefenseBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+
+    document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
+    const speedBonusElement = document.getElementById("secondary-speed-bonus");
+    speedBonusElement.innerText = `+${wisdomBonus}%`;
+    speedBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+}
+
 
 let trainingCosts = [200, 2000, 10000, 24000]; // 定义每次金子培养所需的金子数量
 let trainingMultipliers = [1.1, 1.08, 1.06, 1.01]; // 定义每次金子培养的属性提升倍数
@@ -6849,71 +7387,7 @@ function updateAttributePanel() {
         document.getElementById("attribute-faith").innerText = Math.round(totalAttributes.faith);
     }
     
-    function updateSecondaryAttributes(totalAttributes, currentWisdom) {
-        const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
-        let wisdomBonus;
     
-        if (currentWisdom <= 12) {
-            wisdomBonus = currentWisdom * 0.5;
-        } else if (currentWisdom <= 20) {
-            wisdomBonus = 7 + (currentWisdom - 12) * 1;
-        } else {
-            switch (currentWisdom) {
-                case 21:
-                    wisdomBonus = 20;
-                    break;
-                case 22:
-                    wisdomBonus = 21;
-                    break;
-                case 23:
-                    wisdomBonus = 22;
-                    break;
-                case 24:
-                    wisdomBonus = 23;
-                    break;
-                case 25:
-                    wisdomBonus = 25;
-                    break;
-                default:
-                    wisdomBonus = 0;
-            }
-        }
-    
-        document.getElementById("secondary-health").innerText = secondaryAttributes.health;
-        const healthBonusElement = document.getElementById("secondary-health-bonus");
-        healthBonusElement.innerText = `+${wisdomBonus}%`;
-        healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
-        const manaBonusElement = document.getElementById("secondary-mana-bonus");
-        manaBonusElement.innerText = `+${wisdomBonus}%`;
-        manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
-        const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
-        physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
-        physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
-        const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
-        physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-        physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
-        const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
-        magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
-        magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
-        const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
-        magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-        magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    
-        document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
-        const speedBonusElement = document.getElementById("secondary-speed-bonus");
-        speedBonusElement.innerText = `+${wisdomBonus}%`;
-        speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
-    }
 
 function calculateGrowthRateDisplayAndValue(qualities) {
     let growthRateDisplay;

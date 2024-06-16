@@ -17,6 +17,35 @@
             margin: 0;
             padding: 0;
         }
+            /* 防止 "pull-to-refresh" 行为 */
+    @media screen and (pointer: coarse) {
+    @supports (-webkit-backdrop-filter: blur(1px)) {
+        /* Safari 16+ */
+        @supports (overscroll-behavior-y: none) {
+            html {
+                min-height: 100.3%;
+    overscroll-behavior-y: none;
+            }
+        }
+        /* Safari 9-15 */
+    @supports (not (overscroll-behavior-y: none)) {
+            html {
+                height: 100%;
+    overflow: hidden;
+            }
+            body {
+    margin: 0px;
+    max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+            }
+        }
+    }
+}
+/* Chrome 63+ */
+    body {
+    overscroll-behavior-y: none;
+}
         /* styles.css */
         #loadingOverlay {
             position: fixed;
@@ -376,9 +405,9 @@
             display: grid;
             padding: 0px;
             margin: 0;
-            font-size: 12px;
+            font-size: 11px;
             grid-template-columns: repeat(6, 1fr);
-            gap: 1px;
+            gap: 0px;
             align-items: stretch;
         }
         .shop-item {
@@ -1239,10 +1268,10 @@
 
 /* 通用弹出面板样式 */
 .mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
-    position: fixed;
+    position: absolute;
     top: 50%;
     left: 50%;
-    height: 50%;
+    height: 85%;
     width: 80%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.8);
@@ -1250,10 +1279,11 @@
     padding: 20px;
     border: 1px solid #ffffff;
     z-index: 1000;
-    /* line-height: 40px; */
+    /* line-height: 30px; */
     font-size: 14px;
     border-radius: 10px;
     display: none;
+
 
 /* 召唤面板特定样式 */
 .summon-popup-panel {
@@ -1275,12 +1305,15 @@
     display: flex;
     align-items: center;
     justify-content: space-around;
-    border: 1px solid #ccc;
+    border: 1px solid #f6e193;
+    padding: 10px;
     background-color: rgb(0 0 0);
     margin-bottom: 20px;
+    border-radius: 10px;
 }
 
-.summon-area img {
+.summon-area
+    img {
     max-width: 100%;
     max-height: 100%;
 }
@@ -1336,7 +1369,8 @@
     padding: 5px;
 }
 
-.shop-item img {
+.shop-item
+    img {
     width: 40px;
     height: 40px;
 }
@@ -1350,37 +1384,22 @@
     font-size: 14px;
     border-color: white;
 }
-
-/* 防止 "pull-to-refresh" 行为 */
-@media screen and (pointer: coarse) {
-    @supports (-webkit-backdrop-filter: blur(1px)) {
-        /* Safari 16+ */
-        @supports (overscroll-behavior-y: none) {
-            html {
-                min-height: 100.3%;
-                overscroll-behavior-y: none;
-            }
+        .container {
+            text-align: center;
+            padding: 0px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin: 30px 0px 0px 0px;
         }
-        /* Safari 9-15 */
-        @supports (not (overscroll-behavior-y: none)) {
-            html {
-                height: 100%;
-                overflow: hidden;
-            }
-            body {
-                margin: 0px;
-                max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
-                overflow: auto;
-                -webkit-overflow-scrolling: touch;
-            }
+        .container p {
+            margin: 10px 0;
+            font-size: 1.2em;
+            font-weight: bold;
         }
-    }
-}
-
-/* Chrome 63+ */
-body {
-    overscroll-behavior-y: none;
-}
+        .container p::before, .container p::after {
+            content: "*";
+            margin: 0 5px;
+        }
    </style>
 </head>
 <body>
@@ -1484,11 +1503,13 @@ body {
                 <div id="intelligence-bar" style="width: 50%"></div>
             </div>
                 <div class="button-grid">
+                    <button onclick="trainSkills()">洗练技能</button>
                     <button onclick="rebornPet()">普通还童</button>
                     <button onclick="trainQuality()">一键还童</button>
                     <button onclick="useGoldenRebornPill()">还童金丹</button>
                     <button onclick="useBingpoRebornPill()">冰魄还童</button>
                     <button onclick="enhanceQuality()">更新资质</button>
+                    <button onclick="hallucinatePet()">幻化提升</button>
                     <button onclick="mutatePet()">变异宠物</button>
                     <button onclick="evolvePet()">进化宠物</button>
                     <button onclick="showBiography()">解锁传记</button>
@@ -1549,7 +1570,6 @@ body {
                 </div>
             </div>
             <div class="button-grid">
-                <button onclick="trainSkills()">洗练技能</button>
                 <button onclick="trainAttributes()">金子培养</button>
                 <button onclick="absorbExperience()">普通修炼</button>
                 <button onclick="absorbAdvancedExperience()">高级修炼</button>
@@ -1558,7 +1578,8 @@ body {
                 <button onclick="useSupremeWisdomPill()">神级领悟</button>
                 <button onclick="ascend()">飞升突破</button>
                 <button onclick="awakenPet()">觉醒宠物</button>
-                <button onclick="hallucinatePet()">幻化提升</button>
+                <button onclick="petArms()">宠物武装</button>
+                <button onclick="petCollection()">宠物图鉴</button>
             </div>
         </div>
     </div>
@@ -1777,6 +1798,14 @@ body {
         <button id="claimButton" class="summon-button">领取</button>
         <button id="exchangeButton" class="summon-button">兑换</button>
         <button id="openPetShopButton" class="summon-button">商店</button>
+    </div>
+    <div class="container">
+        <p>每次召唤需要消耗一张召唤灵符</p>
+        <p>灵符可在本商店购买,亦可通过至尊宝箱获得</p>
+        <p>宠物分R,SR,和SSR,获取难度依次递增</p>
+        <p>印花可通过兑换召唤所得宠物获得</p>
+        <p>除兑换外,完成任务也能获得印花</p>
+        <p>印花是珍贵货币，需要合理分配和使用</p>
     </div>
 </div>
 
@@ -5538,7 +5567,7 @@ function toggleAttributeDrawer() {
     updateAttributePanel();
     updatePetInfo(); // 确保更新属性后设置 attributesFetched
 }
-        
+
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     // 基于当前悟性计算递增倍率
     let multiplier;

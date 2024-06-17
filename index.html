@@ -1913,7 +1913,7 @@
             },
             yanzhi: {
                 name: '胭脂',
-                rank: 'SSR',
+                rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
                 skills: [
                     { name: '法术精通', rarity: 'A', description: '被动技能，法术攻击上升' },
@@ -2093,7 +2093,7 @@
             },
             jingjue: {
                 name: '净角神将',
-                rank: 'SR',
+                rank: 'R',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac76d.gif',
                 skills: [
                 { name: '天生蛮力', rarity: 'B', description: '被动技能，物理攻击上升' },
@@ -2309,6 +2309,11 @@
         };
 
 const biographies = {
+    xiaojin: [
+        "1️⃣————该宠物无传记",
+        "2️⃣————说了没有传记",
+        "3️⃣————小金牛最开心的事情就是把小鸡撞得人仰马翻"
+    ],
     yanzhi: [
         "1️⃣————我叫胭脂，是被仙境之主选中的使者，肩负着寻找仙境之子的重任。仙境即将迎来16周年庆典，作为仙境的一部分，我从小便沐浴在仙气之中，学习各种仙术。为了完成这项任务，我必须离开熟悉的仙境，踏入人间。第一次踏上这片陌生的土地，我感受到人间的繁华与喧嚣，与仙境的宁静截然不同。按照仙境之主的指引，我需要找到那个具有仙境血脉的孩子，他将成为下一任仙境之主。我穿越山川河流，走过一个个村庄，时刻保持警惕，感受着空气中微弱的仙气。每一个黄昏，我都会找一个安静的地方，盘膝而坐，感受着来自远方的呼唤，希望能尽早找到他。",
         "2️⃣————在一个宁静的小村庄，我感受到了一股强烈的仙气。这是我在凡间感受到最接近仙境的气息，我知道，我离目标已经很近了。村庄里的人们对我充满了好奇和善意，他们从未见过如此装束的人。我隐瞒了自己的身份，只说自己是个旅人。一天傍晚，我遇到了一位老人，他似乎知道我的来历和目的。他告诉我，村里有一个孩子，自小便与众不同，天生灵气逼人。这个孩子叫斑鸠，正是我苦苦寻找的仙境之子。我心中一阵狂喜，但也明白任务才刚刚开始。我要保护斑鸠，并教导他仙术，让他在16周年庆典上顺利接管仙人之位。",
@@ -2546,6 +2551,7 @@ function petCollection() {
     const collectionContent = document.createElement('div');
     collectionContent.id = 'collectionContent';
     collectionContent.style.display = 'grid';
+    collectionContent.style.gap = '5px';
     collectionContent.style.gridTemplateColumns = 'repeat(5, 1fr)';
     collectionContent.style.fontSize = '11px';
 
@@ -2582,6 +2588,9 @@ function petCollection() {
                 alert("你还没有该宠物！");
                 return;
             }
+            // 提示用户确认
+            const confirmation = confirm("收录宠物后，宠物会消失，你确定收录吗？");
+            if (!confirmation) return; // 如果用户取消，不进行收录
 
             if (petSelect.options.length <= 1) {
                 alert("这是您的唯一爱宠了，请好好珍惜它！");
@@ -2631,6 +2640,7 @@ function petCollection() {
     collectionPanel.appendChild(bonusInfoDiv);
 
     updateCollectionBonus();
+    updateSkillScore();
 }
 
 function updateCollectionBonus() {
@@ -2667,6 +2677,10 @@ function changePet() {
 
     if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
 
+    // 提示用户确认
+    const confirmation = confirm("更换宠物会导致当前宠物的数据丢失，你确定更换吗？");
+    if (!confirmation) return; // 如果用户取消，不进行更换
+
     const selectedPet = pets[selectedPetKey];
     console.log('Selected Pet:', selectedPet);
 
@@ -2682,6 +2696,7 @@ function changePet() {
         console.error('无法找到选中的宠物：', selectedPetKey);
     }
 }
+
 
 
 function showSummonPanel() {
@@ -5045,10 +5060,11 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V10.0</p>
-                            <p>- 新增宠物武装、宠物图鉴系统；</p>
-                            <p>- 优化战斗系统；</p>
-                            <p>- 修复部分问题；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V9.1</p>
+                            <p>- 新增战斗精灵系统和相关道具，战斗精灵会给玩家提供战斗时的属性加成，觉醒后功能会完全开放；</p>
+                            <p>- 新增战斗系统，目前处于初期框架测试阶段，功能尚不完全，请谨慎游玩；</p>
+                            <p>- 新增彩券系统，拓展金子获取渠道；</p>
+                            <p>- 新增加载页面；</p>
                             <p>- 优化部分函数逻辑；</p>
                             <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
@@ -5985,7 +6001,7 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至4位数或以上）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。");
+    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数或以上）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。");
 }
 
 function forgeArm(key, infoDiv) {
@@ -5999,10 +6015,22 @@ function forgeArm(key, infoDiv) {
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
     let newValue;
     let rand = Math.random();
-    if (rand < 0.99) {
-        newValue = Math.floor(100 + Math.random() * 0.01 * (attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 : attribute === "magicAttack" ? 23999 : attribute === "speed" ? 4399 : attribute === "health" || attribute === "mana" ? 10000 : 43999));
+        if (rand < 0.99) {
+        newValue = Math.floor(100 + Math.random() * 0.1 * (
+            attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
+            attribute === "magicAttack" ? 23999 :
+            attribute === "speed" ? 4399 :
+            attribute === "health" || attribute === "mana" ? 300000 : // 更新生命值和法力值的范围
+            43999
+        ));
     } else {
-        newValue = Math.floor(100 + Math.random() * (attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 : attribute === "magicAttack" ? 23999 : attribute === "speed" ? 4399 : attribute === "health" || attribute === "mana" ? 10000 : 43999));
+        newValue = Math.floor(1000 + Math.random() * (
+            attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
+            attribute === "magicAttack" ? 23999 :
+            attribute === "speed" ? 4399 :
+            attribute === "health" || attribute === "mana" ? 300000 : // 更新生命值和法力值的范围
+            43999
+        ));
     }
     arm.value = newValue;
     arm.attribute = attribute;
@@ -6019,7 +6047,7 @@ function forgeArm(key, infoDiv) {
 
     const attributeNameInChinese = attributeMap[arm.attribute];
 
-    arm.forgedInfo = `增益: ${arm.value} (${attributeNameInChinese})`; // 保存锻造后的增益信息
+    arm.forgedInfo = `增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
 
     infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
     document.getElementById("gold-amount").innerText = goldAmount;
@@ -6118,37 +6146,37 @@ function updateSecondaryAttributes(currentAttributes, currentWisdom) {
     document.getElementById("secondary-health").innerText = secondaryAttributes.health;
     const healthBonusElement = document.getElementById("secondary-health-bonus");
     healthBonusElement.innerText = `+${wisdomBonus}%`;
-    healthBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    healthBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-mana").innerText = secondaryAttributes.mana;
     const manaBonusElement = document.getElementById("secondary-mana-bonus");
     manaBonusElement.innerText = `+${wisdomBonus}%`;
-    manaBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    manaBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-physical-attack").innerText = secondaryAttributes.physicalAttack;
     const physicalAttackBonusElement = document.getElementById("secondary-physical-attack-bonus");
     physicalAttackBonusElement.innerText = `+${wisdomBonus}%`;
-    physicalAttackBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    physicalAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-physical-defense").innerText = secondaryAttributes.physicalDefense;
     const physicalDefenseBonusElement = document.getElementById("secondary-physical-defense-bonus");
     physicalDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-    physicalDefenseBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    physicalDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-magic-attack").innerText = secondaryAttributes.magicAttack;
     const magicAttackBonusElement = document.getElementById("secondary-magic-attack-bonus");
     magicAttackBonusElement.innerText = `+${wisdomBonus}%`;
-    magicAttackBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    magicAttackBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-magic-defense").innerText = secondaryAttributes.magicDefense;
     const magicDefenseBonusElement = document.getElementById("secondary-magic-defense-bonus");
     magicDefenseBonusElement.innerText = `+${wisdomBonus}%`;
-    magicDefenseBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    magicDefenseBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 
     document.getElementById("secondary-speed").innerText = secondaryAttributes.speed;
     const speedBonusElement = document.getElementById("secondary-speed-bonus");
     speedBonusElement.innerText = `+${wisdomBonus}%`;
-    speedBonusElement.classList.toggle("petArms-red-text", wisdomBonus > 0);
+    speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 }
 
 
@@ -6377,26 +6405,34 @@ function refreshShop(auto = false) {
 
         let ssSkills = [];
         let sSkills = [];
+        let allSSSkills = [];
+        let allSSkills = [];
 
-        // 获取SS技能和S技能
+        // 收集所有SS技能和S技能
         for (let petKey in pets) {
             let pet = pets[petKey];
             pet.skills.forEach(skill => {
-                if (skill.rarity === 'SS' && ssSkills.length < 12) {
-                    ssSkills.push({
+                if (skill.rarity === 'SS') {
+                    allSSSkills.push({
                         name: `${pet.name}·${skill.name}`,
                         url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
                         price: getRandomInt(2688, 5988)
                     });
                 }
-                if (skill.rarity === 'S' && sSkills.length < 12) {
-                    sSkills.push({
+                if (skill.rarity === 'S') {
+                    allSSkills.push({
                         name: `${pet.name}·${skill.name}`,
                         url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
                         price: getRandomInt(1288, 2988)
                     });
                 }
             });
+        }
+
+        // 随机选择12个SS技能和12个S技能
+        for (let i = 0; i < 12; i++) {
+            ssSkills.push(allSSSkills.splice(Math.floor(Math.random() * allSSSkills.length), 1)[0]);
+            sSkills.push(allSSkills.splice(Math.floor(Math.random() * allSSkills.length), 1)[0]);
         }
 
         // 将SS技能和S技能添加到商店
@@ -6466,6 +6502,7 @@ function refreshShop(auto = false) {
 
     if (auto) startShopTimer();
 }
+
 
 
 function getRandomCommonItem() {
@@ -6784,6 +6821,7 @@ function resetPet() {
     hallucinated = false;
     hallucinationLevel = 0;
     experienceTreasureOpenCount = 0;
+    armsOpened = false;// 武装上锁
     battleRounds = 0; // 记录玩家胜利的轮次
     currentExp = 0; // 当前经验值
     maxExp = 208; // 经验值上限

@@ -2602,16 +2602,16 @@ function petCollection() {
             statusDiv.innerText = '已收录';
             collectButton.disabled = true;
 
+            // 判断是否是当前宠物，如果是则跳转至默认的第一个选项
+            if (petSelect.value === petKey) {
+                petSelect.value = petSelect.options[0].value;
+                changePet(); // 更新宠物信息
+            }
+
             // 从下拉菜单中移除当前宠物
             const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
             if (optionToRemove) {
                 optionToRemove.remove();
-            }
-
-            // 设置默认选择第一个宠物
-            if (petSelect.options.length > 0) {
-                petSelect.value = petSelect.options[0].value;
-                changePet(); // 更新宠物信息
             }
 
             updateCollectionBonus();

@@ -1554,11 +1554,11 @@
                     <button onclick="trainQuality()">一键还童</button>
                     <button onclick="useGoldenRebornPill()">还童金丹</button>
                     <button onclick="useBingpoRebornPill()">冰魄还童</button>
-                    <button onclick="enhanceQuality()">更新资质</button>
-                    <button onclick="hallucinatePet()">幻化提升</button>
                     <button onclick="mutatePet()">变异宠物</button>
+                    <button onclick="enhanceQuality()">更新资质</button>
                     <button onclick="evolvePet()">进化宠物</button>
-                    <button onclick="showBiography()">解锁传记</button>
+                    <button onclick="awakenPet()">觉醒宠物</button>
+                    <button onclick="hallucinatePet()">幻化提升</button> 
                 </div>
             <div id="message-box" class="message-box">
                 <span id="message-text"></span>
@@ -1623,9 +1623,9 @@
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">神级领悟</button>
                 <button onclick="ascend()">飞升突破</button>
-                <button onclick="awakenPet()">觉醒宠物</button>
                 <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
+                <button onclick="showBiography()">解锁传记</button>
             </div>
         </div>
     </div>
@@ -5900,7 +5900,7 @@ function toggleAttributeDrawer() {
 let armsAttributes = {
     horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png" },
     fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" },
-    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png" },
+    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png" },
     claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png" },
     tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png" }
 };
@@ -6103,7 +6103,7 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数或以上）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。");
+    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
 function forgeArm(key, infoDiv) {
@@ -6117,20 +6117,20 @@ function forgeArm(key, infoDiv) {
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
     let newValue;
     let rand = Math.random();
-        if (rand < 0.99) {
+        if (rand < 0.98) {
         newValue = Math.floor(100 + Math.random() * 0.3 * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 23999 :
-            attribute === "speed" ? 4399 :
-            attribute === "health" || attribute === "mana" ? 300000 : // 更新生命值和法力值的范围
+            attribute === "magicAttack" ? 38999 :
+            attribute === "speed" ? 8899 :
+            attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
             43999
         ));
     } else {
-        newValue = Math.floor(1000 + Math.random() * (
+        newValue = Math.floor(100 + Math.random() * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 23999 :
-            attribute === "speed" ? 4399 :
-            attribute === "health" || attribute === "mana" ? 300000 : // 更新生命值和法力值的范围
+            attribute === "magicAttack" ? 38999 :
+            attribute === "speed" ? 8899 :
+            attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
             43999
         ));
     }

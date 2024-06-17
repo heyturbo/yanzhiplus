@@ -134,7 +134,7 @@
         }
         .core-area {
             width: 90%;
-            margin: 5px 5px;
+            margin: 10px 0px 5px 0px;
             padding: 5px;
             background-color: rgb(255 255 255 / 90%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
@@ -4109,7 +4109,7 @@ function performAttack(type) {
 
         const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
-        logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
+        logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
 
         applyMagicAttackEffects();
 
@@ -4158,7 +4158,7 @@ function performIndependentMagicAttack() {
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-    logBattleEvent(`触发法术精通，造成了 ${damage} 点伤害。, 'wheat'`);
+    logBattleEvent(`触发法术精通，造成了 ${damage} 点伤害。`, 'wheat');
 
     applyMagicAttackEffects();
 

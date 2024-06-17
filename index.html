@@ -2661,8 +2661,6 @@ function isPetOwned(petKey) {
     return petSelect && !!petSelect.querySelector(`option[value="${petKey}"]`);
 }
 
-
-
         
 let stamps = 1000; // 初始印花数量
 let summonCharmPaper = 1; // 初始召唤灵符数量
@@ -2696,7 +2694,6 @@ function changePet() {
         console.error('无法找到选中的宠物：', selectedPetKey);
     }
 }
-
 
 
 function showSummonPanel() {
@@ -4110,18 +4107,16 @@ function performAttack(type) {
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
-        const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds;
+        const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`);
 
-        // 法术精通效果处理
-        if (Math.random() * 100 < battleState.player.spellMasteryChance) {
-            logBattleEvent("法术精通触发，你的法术攻击再次生效！", 'wheat');
-            const additionalDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 || 0) - effectiveDefense));
-            battleState.enemy.health = Math.max(0, battleState.enemy.health - additionalDamage);
-            logBattleEvent(`额外法术攻击，造成了 ${additionalDamage} 点伤害。`);
-        }
         applyMagicAttackEffects();
+
+        // 法术精通效果处理
+        if (battleState.player.spellMasteryChance && Math.random() * 100 < battleState.player.spellMasteryChance) {
+            performIndependentMagicAttack();
+        }
     }
 
     if (isCritical) {
@@ -4149,6 +4144,32 @@ function performAttack(type) {
     setTimeout(enemyAttack, 300);
     updateUI();
     applyAscensionEffects();
+}
+
+function performIndependentMagicAttack() {
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
+    let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 || 0) - effectiveDefense));
+    let isCritical = checkCriticalHit(playerCritRate);
+    damage = calculateDamage(damage, isCritical, playerCritDamage);
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+    logBattleEvent(`触发法术精通，造成了 ${damage} 点伤害。, 'wheat'`);
+
+    applyMagicAttackEffects();
+
+    if (isCritical) {
+        logBattleEvent("你发动了暴击，造成了额外伤害！", 'red');
+        const logDiv = document.getElementById('log');
+        logDiv.classList.add('critical-hit');
+        setTimeout(() => {
+            logDiv.classList.remove('critical-hit');
+        }, 300);
+    }
 }
 
 function applyPhysicalAttackEffects() {
@@ -4183,7 +4204,7 @@ function applyMagicAttackEffects() {
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < 0.05) { // 5%的概率触发效果
+    if (effectChance < 0.1) { // 10%的概率触发效果
         switch (effect) {
             case 'silence':
                 battleState.enemy.silenced = true; // 敌人沉默
@@ -4223,6 +4244,11 @@ function applyMagicAttackEffects() {
 }
 
 function applyAscensionEffects() {
+    // 清除之前的增益效果
+    battleState.player.spellMasteryChance = 0;
+    battleState.player.divineProtectionChance = 0;
+    battleState.player.reflectPercentage = 0;
+
     // 应用战斗增益
     switch (ascensionSkill.name) {
         case '魔龙之力':
@@ -5822,7 +5848,7 @@ function handlePetArmsClick() {
 function openPetArms() {
     if (goldAmount >= 100000) {
         goldAmount -= 100000;
-        alert("你的宠物开启了灵兽武装，现在有更强的能力提升方式了！");
+        alert("你花费10万金子，为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
         document.getElementById("gold-amount").innerText = goldAmount;
         armsOpened = true;
         console.log('openPetArms: armsOpened set to true'); // 调试输出
@@ -5899,8 +5925,8 @@ function showPetArmsWindow() {
         physicalDefense: '物防',
         magicDefense: '法防',
         speed: '速度',
-        health: '生命',
-        mana: '法力'
+        health: 'HP',
+        mana: 'MP'
     };
 
     const armKeys = Object.keys(armsAttributes);
@@ -6016,7 +6042,7 @@ function forgeArm(key, infoDiv) {
     let newValue;
     let rand = Math.random();
         if (rand < 0.99) {
-        newValue = Math.floor(100 + Math.random() * 0.1 * (
+        newValue = Math.floor(100 + Math.random() * 0.3 * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
             attribute === "magicAttack" ? 23999 :
             attribute === "speed" ? 4399 :
@@ -6055,7 +6081,26 @@ function forgeArm(key, infoDiv) {
     updateAttributePanel();
 }
 
+function lockArms() {
+    const armKeys = Object.keys(armsAttributes);
+    armKeys.forEach((key, index) => {
+        if (index > 0) {
+            armsAttributes[key].unlocked = false;
+        }
+    });
+    armsOpened = false;
+    console.log('All arms are now locked.');
+}
 
+function removeArmsAttributes() {
+    const armKeys = Object.keys(armsAttributes);
+    armKeys.forEach(key => {
+        armsAttributes[key].value = 0;
+        armsAttributes[key].attribute = null;
+        armsAttributes[key].forgedInfo = null;
+    });
+    console.log('All arms attributes have been reset to zero.');
+}
 
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     let multiplier;
@@ -6816,6 +6861,8 @@ function resetPet() {
     currentWisdom = 0;
     petAscended = false;
     petMaxLevel = 149;
+    lockArms();
+    removeArmsAttributes();
     petWisdom = currentWisdom;
     awakened = false;
     hallucinated = false;

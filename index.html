@@ -1140,12 +1140,12 @@
         
         #battle-spirit-modal button {
             background: #a70b00;
-            border-color: rgba(255, 255, 255, 0.1);
+            border-color: #fff;
             color: white;
             font-size: 14px;
             ga'padding: gap';
             border-radius: 5px;
-            margin: 5px;
+            margin: 0px;
         }
         .ascension-skill-modal {
             display: none; /* 默认隐藏 */
@@ -1794,6 +1794,7 @@
                     <p>速度增加: <span id="spirit-speed">0</span></p>
                     <button id="level-up-spirit">精灵升级</button>
                     <button id="enhance-spirit">增幅洗练</button>
+                    <button id="auto-level-up-spirit">一键升级</button>
                     <button id="close-spirit-modal">关闭面板</button>
                 </div>
             </div>            
@@ -1816,6 +1817,23 @@
                         <button id="refresh-ascension" class="ascension-button">刷新技能</button>
                         <button id="level-up-ascension" class="ascension-button">提升技能</button>
                         <button id="reenable-ascension" class="ascension-button">再次开启</button>
+                    </div>
+                    <!-- 第二个飞升技能面板，默认隐藏 -->
+                    <div id="second-ascension-skill" class="ascension-second-skill" style="display: none;">
+                        <div class="ascension-header">
+                            <img id="second-ascension-icon" src="https://via.placeholder.com/75" alt="Ascension Skill Icon" class="ascension-icon">
+                            <div class="ascension-info">
+                                <p id="second-ascension-name" class="ascension-name">飞升之术名字</p>
+                                <p id="second-ascension-level" class="ascension-level">等级: 1</p>
+                            </div>
+                        </div>
+                        <div class="ascension-body">
+                            <p id="second-ascension-effect" class="ascension-effect">飞升之术的增益效果信息</p>
+                        </div>
+                        <div class="ascension-footer">
+                            <button id="refresh-second-ascension" class="ascension-button">刷新技能</button>
+                            <button id="level-up-second-ascension" class="ascension-button">提升技能</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3452,6 +3470,11 @@ let ascensionSkill = {
     level: 1,
     effect: ''
 };
+let secondAscensionSkill = {
+    name: '',
+    level: 1,
+    effect: ''
+};
 let ascensionAttributes = {
     health: 0,
     mana: 0,
@@ -3488,9 +3511,9 @@ const ascensionSkills = {
     ]
 };
 
+// 应用双技能增益效果
 function applyAscensionBonus() {
-    // 移除之前的增益效果
-    ascensionAttributes = {
+    let initialAttributes = {
         health: 0,
         mana: 0,
         physicalAttack: 0,
@@ -3500,28 +3523,39 @@ function applyAscensionBonus() {
         speed: 0
     };
 
-    // 根据当前技能应用增益
-    switch (ascensionSkill.name) {
-        case '力劈华山':
-            ascensionAttributes.physicalAttack = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '慈悲心怀':
-            ascensionAttributes.health = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            ascensionAttributes.mana = 50000 + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '势如破竹':
-            ascensionAttributes.speed = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            ascensionAttributes.magicAttack = 34000 + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '固若金汤':
-            ascensionAttributes.physicalDefense = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            ascensionAttributes.magicDefense = 50000 + ascensionSkill.increment(ascensionSkill.level);
-            break;
+    // 应用第一个技能增益
+    initialAttributes = applySingleAscensionBonus(ascensionSkill, initialAttributes);
 
-        // 其他增益的处理...
+    // 应用第二个技能增益
+    if (secondAscensionSkill.name) {
+        initialAttributes = applySingleAscensionBonus(secondAscensionSkill, initialAttributes);
     }
 
+    ascensionAttributes = initialAttributes;
     updatePetInfo(); // 更新宠物信息，应用新的增益
+}
+
+// 复用的应用单个技能增益函数
+function applySingleAscensionBonus(skill, attributes) {
+    switch (skill.name) {
+        case '力劈华山':
+            attributes.physicalAttack += skill.baseValue + skill.increment(skill.level);
+            break;
+        case '慈悲心怀':
+            attributes.health += skill.baseValue + skill.increment(skill.level);
+            attributes.mana += 50000 + skill.increment(skill.level);
+            break;
+        case '势如破竹':
+            attributes.speed += skill.baseValue + skill.increment(skill.level);
+            attributes.magicAttack += 34000 + skill.increment(skill.level);
+            break;
+        case '固若金汤':
+            attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
+            attributes.magicDefense += 50000 + skill.increment(skill.level);
+            break;
+        // 其他技能增益逻辑...
+    }
+    return attributes;
 }
 
 document.getElementById('ascension-skill-button').addEventListener('click', () => {
@@ -3533,6 +3567,76 @@ document.getElementById('ascension-skill-button').addEventListener('click', () =
     }
 });
 
+document.getElementById('reenable-ascension').addEventListener('click', () => {
+    const secondSkillBox = document.getElementById('second-ascension-skill');
+    if (secondSkillBox.style.display === 'none') {
+        if (confirm("你可以消耗10个飞升之石为宠物开启第二个飞升之术，确认请继续")) {
+            if (useItem('ascensionStone', 10)) {
+                secondSkillBox.style.display = 'block';
+                refreshSecondAscensionSkill();
+            } else {
+                alert('您的飞升之石不足！');
+            }
+        }
+    } else {
+        alert('您已经开启过第二个飞升之术了！');
+    }
+});
+
+function refreshSecondAscensionSkill() {
+    let newSkill;
+    do {
+        const allSkills = [...ascensionSkills.attribute, ...ascensionSkills.combat, ...ascensionSkills.settlement];
+        newSkill = allSkills[Math.floor(Math.random() * allSkills.length)];
+    } while (newSkill.name === ascensionSkill.name);
+    secondAscensionSkill = { ...newSkill, level: 1 };
+    updateSecondAscensionDisplay();
+    applyAscensionBonus();
+    applyAscensionEffects();
+}
+
+function levelUpSecondAscensionSkill() {
+    if (secondAscensionSkill.level < 20) {
+        secondAscensionSkill.level += 1;
+        updateSecondAscensionDisplay();
+        applyAscensionBonus();
+        applyAscensionEffects(); // 确保提升后的技能生效
+    } else {
+        alert('飞升之术技能已达最大等级！');
+    }
+}
+
+function updateSecondAscensionDisplay() {
+    const skillBox = document.getElementById('second-ascension-skill');
+    document.getElementById('second-ascension-icon').src = 'https://via.placeholder.com/75';
+    document.getElementById('second-ascension-name').innerText = secondAscensionSkill.name;
+    document.getElementById('second-ascension-level').innerText = '等级: ' + secondAscensionSkill.level;
+    const skill = ascensionSkills.combat.find(skill => skill.name === secondAscensionSkill.name) ||
+                  ascensionSkills.attribute.find(skill => skill.name === secondAscensionSkill.name) ||
+                  ascensionSkills.settlement.find(skill => skill.name === secondAscensionSkill.name);
+    if (skill) {
+        document.getElementById('second-ascension-effect').innerText = skill.effect(secondAscensionSkill.level);
+    }
+}
+
+// 添加第二个技能的刷新和提升按钮事件处理
+document.getElementById('refresh-second-ascension').addEventListener('click', () => {
+    if (useItem('heartStone', 1)) {
+        refreshSecondAscensionSkill();
+    } else {
+        alert('您的心鉴之石不足！');
+    }
+});
+
+
+document.getElementById('level-up-second-ascension').addEventListener('click', () => {
+    if (useItem('earthlyEnergy', 10)) {
+        levelUpSecondAscensionSkill();
+    } else {
+        alert('每次提升技能需要消耗10个天地灵气，你的天地灵气数量不足！');
+    }
+});
+        
 // 关闭飞升之术面板
 document.getElementById('close-ascension-modal').addEventListener('click', () => {
     document.getElementById('ascension-skill-modal').style.display = 'none';
@@ -3776,6 +3880,76 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
     }
 });
 
+        document.getElementById('auto-level-up-spirit').addEventListener('click', () => {
+            const targetLevel = parseInt(prompt('请输入目标精灵等级：'), 10);
+
+            if (isNaN(targetLevel) || targetLevel <= spiritLevel || targetLevel > maxSpiritLevel) {
+                showMessage('无效的目标等级！', 'error');
+                return;
+            }
+
+            let initialLevel = spiritLevel;
+            let stonesUsed = 0;
+
+            while (spiritLevel < targetLevel && useItem('spiritRefreshStone', 1)) {
+                stonesUsed++;
+                let successChance;
+                let failPenalty = 0;
+                let minLevelForCurrentRange;
+
+                if (spiritLevel <= 20) {
+                    successChance = 1.0;
+                    minLevelForCurrentRange = 1;
+                } else if (spiritLevel <= 30) {
+                    successChance = 0.95;
+                    minLevelForCurrentRange = 21;
+                } else if (spiritLevel <= 40) {
+                    successChance = 0.9;
+                    failPenalty = 1;
+                    minLevelForCurrentRange = 31;
+                } else if (spiritLevel <= 50) {
+                    successChance = 0.85;
+                    failPenalty = 1;
+                    minLevelForCurrentRange = 41;
+                } else if (spiritLevel <= 60) {
+                    successChance = 0.8;
+                    failPenalty = 1;
+                    minLevelForCurrentRange = 51;
+                } else if (spiritLevel <= 70) {
+                    successChance = 0.85;
+                    failPenalty = 2;
+                    minLevelForCurrentRange = 61;
+                } else if (spiritLevel <= 80) {
+                    successChance = 0.8;
+                    failPenalty = 2;
+                    minLevelForCurrentRange = 71;
+                } else if (spiritLevel <= 90) {
+                    successChance = 0.75;
+                    failPenalty = 2;
+                    minLevelForCurrentRange = 81;
+                } else if (spiritLevel <= 99) {
+                    successChance = 0.7;
+                    failPenalty = 2;
+                    minLevelForCurrentRange = 91;
+                }
+
+                const randomChance = Math.random();
+                if (randomChance < successChance) {
+                    spiritLevel += 1;
+                    updateSpiritDisplay();
+                    refreshBattleAttributes();
+                } else {
+                    if (failPenalty > 0) {
+                        spiritLevel = Math.max(minLevelForCurrentRange, spiritLevel - failPenalty);
+                    }
+                    updateSpiritDisplay();
+                    refreshBattleAttributes();
+                }
+            }
+
+            showMessage(`您耗费了 ${stonesUsed} 颗精灵精炼石，将精灵升至 ${spiritLevel} 级。`, 'info');
+        });
+
 // 精灵觉醒
 document.getElementById('enhance-spirit').addEventListener('click', () => {
     if (useItem('spiritAwakenStone', 1)) {
@@ -3950,7 +4124,7 @@ function updateEnemyAttributes() {
     
     // 定义增强幅度范围
     const enhanceFactors = {
-        health: [1.03, 1.07],
+        health: [1.04, 1.08],
         mana: [1.02, 1.05],
         physicalAttack: [1.03, 1.07],
         physicalDefense: [1.01, 1.05],
@@ -4131,6 +4305,7 @@ function getSkillByType(type) {
     return skills.length > 0 ? skills[Math.floor(Math.random() * skills.length)] : null;
 }
         
+// 更新 performAttack 函数，确保战斗效果生效
 function performAttack(type) {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
@@ -4153,7 +4328,6 @@ function performAttack(type) {
     let selectedSkills = [];
     let skillMultiplier = 1;
 
-    // 遍历skillArea中的所有技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     skillDivs.forEach(skillDiv => {
@@ -4168,7 +4342,6 @@ function performAttack(type) {
         }
     });
 
-    // 随机选择一个技能
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
@@ -4195,8 +4368,7 @@ function performAttack(type) {
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier || 0) - effectiveDefense));
 
-        // 检查白夜索命
-        if (ascensionSkill.name === '白夜索命' && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
+        if ((ascensionSkill.name === '白夜索命' || secondAscensionSkill.name === '白夜索命') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
             damage = Math.floor(damage * 1.5); // 增加50%伤害
             logBattleEvent("白夜索命触发，伤害增加50%！", 'gold');
         }
@@ -4205,8 +4377,7 @@ function performAttack(type) {
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
 
-        // 检查吸血魔刃
-        if (ascensionSkill.name === '吸血魔刃') {
+        if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
             const healAmount = Math.floor(damage * battleState.player.bloodSuckPercentage);
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
             logBattleEvent(`吸血魔刃触发，吸收了 ${healAmount} 点生命值。`, 'red');
@@ -4232,13 +4403,13 @@ function performAttack(type) {
 
         applyMagicAttackEffects();
 
-        if (battleState.player.spellMasteryChance && Math.random() * 100 < battleState.player.spellMasteryChance) {
+        if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
+            Math.random() * 100 < (battleState.player.spellMasteryChance || 0)) {
             performIndependentMagicAttack();
         }
     }
 
-    // 检查灵魂穿刺
-    if (ascensionSkill.name === '灵魂穿刺' && isCritical && Math.random() < battleState.player.extraCritDamageChance) {
+    if ((ascensionSkill.name === '灵魂穿刺' || secondAscensionSkill.name === '灵魂穿刺') && isCritical && Math.random() < battleState.player.extraCritDamageChance) {
         const extraDamage = Math.floor(battleAttributes.physicalAttack * battleState.player.extraCritDamageMultiplier);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
         logBattleEvent(`灵魂穿刺触发，额外造成了 ${extraDamage} 点伤害。`, 'red');
@@ -4272,15 +4443,13 @@ function performAttack(type) {
 }
 
 
-
-
+// 更新 performIndependentMagicAttack 函数，确保战斗效果生效
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
         return;
     }
 
-    // 遍历技能区域并获取所有类型为 'MA' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -4290,7 +4459,6 @@ function performIndependentMagicAttack() {
 
     let skillMultiplier = 1;
 
-    // 随机选择一个技能
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
@@ -4393,8 +4561,21 @@ function applyMagicAttackEffects() {
     }
 }
 
+// 应用双技能的战斗增益效果
 function applyAscensionEffects() {
     // 清除之前的增益效果
+    resetBattleStateEffects();
+
+    // 应用第一个飞升技能的战斗增益
+    applySingleAscensionEffect(ascensionSkill);
+
+    // 应用第二个飞升技能的战斗增益
+    if (secondAscensionSkill.name) {
+        applySingleAscensionEffect(secondAscensionSkill);
+    }
+}
+
+function resetBattleStateEffects() {
     battleState.player.spellMasteryChance = 0;
     battleState.player.divineProtectionChance = 0;
     battleState.player.reflectPercentage = 0;
@@ -4403,11 +4584,12 @@ function applyAscensionEffects() {
     battleState.player.extraCritDamageChance = 0;
     battleState.player.extraCritDamageMultiplier = 0;
     battleState.player.whiteNightThreshold = 0;
+}
 
-    // 应用战斗增益
-    switch (ascensionSkill.name) {
+function applySingleAscensionEffect(skill) {
+    switch (skill.name) {
         case '魔龙之力':
-            const healPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+            const healPercentage = (skill.baseValue + skill.increment(skill.level)) / 100;
             const healAmount = Math.floor(maxHealth * healPercentage);
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
             logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`, 'brown');
@@ -4415,21 +4597,44 @@ function applyAscensionEffects() {
             break;
         case '天降甘霖':
             battleState.player.divineProtectionChance = 0.5; // 固定概率50%
-            battleState.player.divineProtectionDuration = 5 + ascensionSkill.increment(ascensionSkill.level);
+            battleState.player.divineProtectionDuration = 5 + skill.increment(skill.level);
             break;
         case '白夜索命':
-            battleState.player.whiteNightThreshold = ascensionSkill.increment(ascensionSkill.level) / 100;
+            battleState.player.whiteNightThreshold = skill.increment(skill.level) / 100;
             break;
         case '灵魂穿刺':
-            battleState.player.extraCritDamageChance = ascensionSkill.increment(ascensionSkill.level) / 100;
+            battleState.player.extraCritDamageChance = skill.increment(skill.level) / 100;
             battleState.player.extraCritDamageMultiplier = 1.2; // 固定120%
             break;
         case '吸血魔刃':
-            battleState.player.bloodSuckPercentage = ascensionSkill.increment(ascensionSkill.level) / 100;
+            battleState.player.bloodSuckPercentage = skill.increment(skill.level) / 100;
             break;
         case '无我之境':
-            battleState.player.invincibilityChance = ascensionSkill.increment(ascensionSkill.level) / 100;
+            battleState.player.invincibilityChance = skill.increment(skill.level) / 100;
             break;
+        case '铜墙铁壁':
+            battleState.player.reflectPercentage = skill.increment(skill.level);
+            break;
+        case '法术精通':
+            battleState.player.spellMasteryChance = skill.increment(skill.level);
+            break;
+        case '财源滚滚':
+            battleState.player.goldBonus = skill.increment(skill.level);
+            break;
+        case '金牌调解':
+            battleState.player.noGoldPenalty = true;
+            battleState.player.goldCompensation = skill.increment(skill.level);
+            break;
+        case '焉知非福':
+            battleState.player.protectionDuration = skill.increment(skill.level);
+            break;
+        case '向死而生':
+            battleState.player.survivalChance = skill.increment(skill.level);
+            break;
+        case '举一反三':
+            battleState.player.expBonus = skill.increment(skill.level);
+            break;
+        // 添加其他技能的战斗增益逻辑...
     }
 }
 
@@ -4564,6 +4769,7 @@ function performDefense() {
 }
 
 
+// 更新 enemyAttack 函数，确保战斗效果生效
 function enemyAttack() {
     if (!battleState || !battleAttributes || !battleState.enemy) {
         console.error("战斗状态未初始化");
@@ -4579,7 +4785,6 @@ function enemyAttack() {
     let damage;
     let isCritical = checkCriticalHit(enemyCritRate);
 
-    // 检查恐吓状态，阻止暴击
     if (battleState.enemy.intimidated) {
         isCritical = false;
         logBattleEvent("敌人被恐吓，无法暴击。", 'wheat');
@@ -4602,7 +4807,7 @@ function enemyAttack() {
         }
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = battleAttributes.magicDefense * defenseFactor / 2;
+        const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleState.enemy.magicAttack * 0.8 || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
@@ -4623,27 +4828,23 @@ function enemyAttack() {
         }, 300);
     }
 
-    // 检查无我之境
-    if (ascensionSkill.name === '无我之境' && Math.random() < battleState.player.invincibilityChance) {
+    if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
         damage = 0;
         logBattleEvent("无我之境触发，玩家免疫一切伤害！", 'silver');
     }
 
-    // 确保 damage 是有效的数值
     if (isNaN(damage)) {
         damage = 0;
         console.error("Damage is NaN, setting to 0.");
     }
 
-    // 检查铜墙铁壁状态，减少伤害
-    if (ascensionSkill.name === '铜墙铁壁') {
+    if (ascensionSkill.name === '铜墙铁壁' || secondAscensionSkill.name === '铜墙铁壁') {
         const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const reducedDamage = Math.floor(damage * damageReduction);
         damage = Math.floor(damage * (1 - damageReduction));
         logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'orange');
     }
 
-    // 检查护体格挡状态，减少伤害
     if (battleState.player.defending) {
         const defenseReduction = battleState.player.defenseReduction;
         const reducedDamage = Math.floor(damage * defenseReduction);
@@ -4652,11 +4853,9 @@ function enemyAttack() {
         battleState.player.defending = false;
     }
 
-    // 应用伤害到玩家
     battleAttributes.health = Math.max(0, battleAttributes.health - damage);
 
-    // 检查以牙还牙状态
-    if (ascensionSkill.name === '以牙还牙') {
+    if (ascensionSkill.name === '以牙还牙' || secondAscensionSkill.name === '以牙还牙') {
         const reflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const reflectDamage = Math.floor(damage * reflectPercentage);
         if (isNaN(reflectDamage)) {
@@ -4667,7 +4866,6 @@ function enemyAttack() {
         logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给敌人。`, 'red');
     }
 
-    // 检查反弹状态
     if (battleState.player.reflecting) {
         const reflectDamage = Math.floor(damage * (battleState.player.reflectPercentage / 100));
         if (isNaN(reflectDamage)) {
@@ -4678,7 +4876,6 @@ function enemyAttack() {
         logBattleEvent(`反弹状态触发，反弹了 ${reflectDamage} 点伤害给敌人。`);
     }
 
-    // 检查仙气护体状态
     if (battleState.player.divineProtection) {
         const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8));
         if (isNaN(healAmount)) {
@@ -4690,8 +4887,7 @@ function enemyAttack() {
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6671326ad9c307b7e9ffea12.gif');
     }
 
-    // 检查向死而生
-    if (battleAttributes.health <= 0 && ascensionSkill.name === '向死而生') {
+    if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
         const manaCostPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
         const manaCost = Math.floor(maxMana * (manaCostPercentage / 100));
         if (battleAttributes.mana >= manaCost) {
@@ -4702,7 +4898,6 @@ function enemyAttack() {
         }
     }
 
-    // 检查中毒效果
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
@@ -4717,8 +4912,6 @@ function enemyAttack() {
         playerTurn = true;
     }
 }
-
-
         
 function performHeal() {
     if (!attributesFetched) {
@@ -4726,7 +4919,6 @@ function performHeal() {
         return;
     }
 
-    // 遍历技能区域并获取所有类型为 'PH' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -4760,7 +4952,7 @@ function performHeal() {
     let divineProtectionDuration = 5; // 默认持续时间5秒
 
     // 检查天降甘霖增益
-    if (ascensionSkill.name === '天降甘霖') {
+    if (ascensionSkill.name === '天降甘霖' || secondAscensionSkill.name === '天降甘霖') {
         divineProtectionChance = battleState.player.divineProtectionChance || 0.5;
         divineProtectionDuration = battleState.player.divineProtectionDuration || 5;
     }
@@ -4776,7 +4968,6 @@ function performHeal() {
     applyAscensionEffects();
     updateUI();
 }
-
 
 function startBattle() {
     if (!attributesFetched) {
@@ -4808,8 +4999,8 @@ function showNextBattlePrompt(playerWon) {
         let reward = Math.floor(288 * battleRounds * rewardMultiplier);
         reward = Math.max(reward, 288); // 确保最低奖励为 288
 
-        if (ascensionSkill.name === '财源滚滚') {
-            reward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+        if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
+            reward += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level));
             logBattleEvent(`财源滚滚触发，额外增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子。`, 'gold');
         }
 
@@ -4822,9 +5013,9 @@ function showNextBattlePrompt(playerWon) {
         gainExp(); // 获取经验
     } else {
         let penalty = 388 * battleRounds;
-        if (ascensionSkill.name === '金牌调解') {
+        if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
             penalty = 0;
-            goldAmount += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            goldAmount += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level));
             logBattleEvent(`金牌调解触发，未扣除金子并获得 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子的安慰金。`, 'gold');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
@@ -4836,6 +5027,7 @@ function showNextBattlePrompt(playerWon) {
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
 }
+
 
 function resetBuffState(playerWon) {
     if (battleState.player.usingBuff) {
@@ -4855,8 +5047,13 @@ function resetBuffState(playerWon) {
 
 function gainExp() {
     let expMultiplier = battleState.player.expMultiplier || 1;
-    if (ascensionSkill.name === '举一反三') {
-        expMultiplier += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+    if (ascensionSkill.name === '举一反三' || secondAscensionSkill.name === '举一反三') {
+        if (ascensionSkill.name === '举一反三') {
+            expMultiplier += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+        }
+        if (secondAscensionSkill.name === '举一反三') {
+            expMultiplier += (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) / 100;
+        }
         logBattleEvent(`举一反三触发，经验值增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)}%。`);
     }
 
@@ -4880,6 +5077,8 @@ function gainExp() {
     updateExpBar();
 }
 
+
+
 function updateExpBar() {
     document.getElementById("exp-bar").innerText = `${currentExp} / ${maxExp}`;
 }
@@ -4891,7 +5090,7 @@ function resetBattleState(playerWon) {
         // 如果玩家没有获胜，则恢复怪物属性到本轮初始状态
         restoreEnemyState();
         // 检查焉知非福状态
-        if (ascensionSkill.name === '焉知非福') {
+        if (ascensionSkill.name === '焉知非福' || secondAscensionSkill.name === '焉知非福') {
             battleState.player.divineProtection = true;
             const duration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             logBattleEvent(`焉知非福触发，战斗获得持续 ${duration} 秒的仙气护体。`);
@@ -4907,6 +5106,7 @@ function resetBattleState(playerWon) {
     // 存储怪物的初始状态
     storeEnemyInitialState();
 }
+
 
 function storeEnemyInitialState() {
     enemyInitialState = { ...enemyPet };

@@ -3945,13 +3945,13 @@ function updateEnemyAttributes() {
     
     // 定义增强幅度范围
     const enhanceFactors = {
-        health: [1.02, 1.07],
-        mana: [1.02, 1.05],
-        physicalAttack: [1.02, 1.07],
-        physicalDefense: [1.02, 1.05],
-        magicAttack: [1.01, 1.06],
-        magicDefense: [1.02, 1.05],
-        speed: [1.02, 1.04]
+        health: [0.95, 1.07],
+        mana: [0.92, 1.05],
+        physicalAttack: [0.95, 1.07],
+        physicalDefense: [0.92, 1.05],
+        magicAttack: [0.92, 1.05],
+        magicDefense: [0.92, 1.05],
+        speed: [1.01, 1.04]
     };
 
     // 随机增强函数
@@ -4556,7 +4556,7 @@ function enemyAttack() {
         damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, enemyCritDamage);
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.gif');
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
             logBattleEvent("敌人的法力值不足！");
@@ -4572,7 +4572,7 @@ function enemyAttack() {
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66715129d9c307b7e93f5ed8.gif');
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。", 'wheat');
     }

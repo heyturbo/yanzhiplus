@@ -2505,12 +2505,11 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png",
     "https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png",
     "https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png",
-    "https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png",
-    "https://pic.imgdb.cn/item/66712e4bd9c307b7e9f83878.gif",
-    "https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif",
-    "https://pic.imgdb.cn/item/66712d28d9c307b7e9f5d605.gif",
-    "https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif",
     "https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif",
+    "https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif",
+    "https://pic.imgdb.cn/item/667123f9d9c307b7e9e34049.gif",
+    "https://pic.imgdb.cn/item/6671343bd9c307b7e9031c3d.gif",
+    "https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png",
     "https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png"
 ];
 preloadImages(imageUrls);
@@ -2690,7 +2689,7 @@ function isPetOwned(petKey) {
 
         
 let stamps = 1000; // 初始印花数量
-let summonCharmPaper = 1; // 初始召唤灵符数量
+let summonCharmPaper = 5; // 初始召唤灵符数量
 let summonedPet = null;
 let currentPetKey = 'xiaojin';
 let currentPet = pets[currentPetKey]; // 初始化当前宠物
@@ -4170,11 +4169,19 @@ function performAttack(type) {
         const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
         logBattleEvent(`你施放了 ${selectedSkill.name} 。`, 'gold');
+
+        if (type === 'physical') {
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
+        } else if (type === 'magical') {
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
+        }
     } else {
         if (type === 'physical') {
             logBattleEvent("你用拳头平A了对方。");
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667123f9d9c307b7e9e34049.gif');
         } else if (type === 'magical') {
             logBattleEvent("你操控小树枝击向了对方。");
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/6671343bd9c307b7e9031c3d.gif');
         }
     }
 
@@ -4185,10 +4192,8 @@ function performAttack(type) {
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
-        
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
-        applyPhysicalAttackEffects();
 
+        applyPhysicalAttackEffects();
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -4205,8 +4210,7 @@ function performAttack(type) {
         const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-        
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
+
         applyMagicAttackEffects();
 
         if (battleState.player.spellMasteryChance && Math.random() * 100 < battleState.player.spellMasteryChance) {
@@ -4240,6 +4244,7 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
+
 
 
 function performIndependentMagicAttack() {
@@ -4448,7 +4453,7 @@ function performPoison() {
     const poisonDamage = Math.floor(battleAttributes.physicalAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对敌人造成了 ${poisonDamage} 点中毒伤害，消耗了 ${manaCost} 点法力值。`, 'purple');
-    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712e4bd9c307b7e9f83878.gif');
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
 
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
@@ -4639,6 +4644,7 @@ function enemyAttack() {
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
         logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6671326ad9c307b7e9ffea12.gif');
     }
 
     // 检查向死而生
@@ -4690,7 +4696,6 @@ function performHeal() {
         const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
         logBattleEvent(`你施放了 ${selectedSkill.name} ，治疗效果大大提升。`, 'aqua');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712d28d9c307b7e9f5d605.gif');
     }
 
     const manaCost = 88 * (battleRounds * 3);
@@ -4704,6 +4709,7 @@ function performHeal() {
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     logBattleEvent(`你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66713171d9c307b7e9fe40d2.gif');
 
     // 检查仙气护体效果
     let divineProtectionChance = 0.05; // 默认概率5%
@@ -4723,7 +4729,6 @@ function performHeal() {
 
     playerTurn = false; // 轮到敌人回合
     enemyAttack();
-    showEffect('enemyEffect');
     applyAscensionEffects();
     updateUI();
 }
@@ -5828,7 +5833,7 @@ let jinnangItems = [
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
     { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', price: 200, quantity: 0, description: '举世无双，灵石点智，一举提升悟性到20' },
-    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 1, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
+    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 5, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: 50, quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: 80, quantity: 0, description: '刷新精灵的增幅百分比' },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', price: 150, quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },

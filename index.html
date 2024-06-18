@@ -1076,22 +1076,42 @@
             transition: transform 0.5s ease, opacity 0.5s ease;
         }
         
-        #playerEffect {
-            left: 20%;
-            top: 50%;
-            background-color: rgba(0, 255, 0, 0.5);
-        }
-        
-        #enemyEffect {
-            right: 20%;
-            top: 50%;
-            background-color: rgba(255, 0, 0, 0.5);
-        }
-        
-        .show-effect {
-            opacity: 1;
-            transform: scale(1);
-        }
+#visualEffectsContainer {
+    position: relative;
+    width: 100%;
+    height: 0%;
+    pointer-events: none; /* 确保特效不影响页面其他交互 */
+}
+
+.visual-effect {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s, transform 0.3s;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#playerEffect {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#enemyEffect {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.show-effect {
+    opacity: 1;
+    transform: scale(1);
+}
+
         .status-display {
             font-size: 14px;
             margin-top: 0px;
@@ -1726,6 +1746,9 @@
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
                     <h2>当前宠物</h2><div id="player-status" class="status-display"></div>
+                    <div id="visualEffectsContainer">
+                        <div id="enemyEffect" class="visual-effect"></div>
+                    </div>
                     <p>生命值: <span id="your-pet-health"></span></p>
                     <p>法力值: <span id="your-pet-mana"></span></p>
                     <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
@@ -1741,6 +1764,9 @@
                 </div>
                 <div class="battle-system-enemy-info">
                     <h2>无尽の怪(物理)</h2><div id="enemy-status" class="status-display"></div>
+                    <div id="visualEffectsContainer">
+                        <div id="playerEffect" class="visual-effect"></div>
+                    </div>
                     <p>生命值: <span id="enemy-pet-health"></span></p>
                     <p>法力值: <span id="enemy-pet-mana"></span></p>
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
@@ -1751,10 +1777,6 @@
                     <p>暴击: <span id="enemy-crit-rate"></span></p>
                     <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
                 </div>
-            </div>
-            <div id="visualEffectsContainer">
-                <div id="playerEffect" class="visual-effect"></div>
-                <div id="enemyEffect" class="visual-effect"></div>
             </div>
             <!-- 战斗精灵弹出界面 -->
             <div id="battle-spirit-modal" style="display: none;">
@@ -1886,17 +1908,17 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/666d5d0fd9c307b7e9ee29f8.png',
                 skills: [
-                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 1.5, description: '主动技能，小金牛使出浑身解数朝敌人进行致命一击' },
+                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 1.6, description: '主动技能，小金牛使出浑身解数朝敌人进行致命一击。' },
                     { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
                     { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
                     { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物可获得一定的耐力提升。' },
                     { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
-                    { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛的法术防御得到了微量提升。' },
-                    { name: '生命祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，得到生命祝福的小金牛生命值得到了提升。' },
-                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 2, description: '主动技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
+                    { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '被动技能，小金牛的防御能力得到了微量提升。' },
+                    { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '得到生命祝福的小金牛治疗能力得到了提升。' },
+                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 2.2, description: '主动技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                    { name: '法力恫吓', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，对目标造成物理伤害并使其损失一定法力值' },
+                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害' },
                     { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' }
                 ],
@@ -1927,9 +1949,9 @@
                     { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
                     { name: '智慧守护', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
                     { name: '月之祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、智力上升' },
-                    { name: '硕果累累', rarity: 'SS', type: 'MA', multiplier: 1.6, description: '主动技能，胭脂抖了抖身，漫天果实坠落，对横排敌人造成法术伤害，并以35%的概率，施加3回合迟缓状态。根据自身血量上限增加威力。' },
-                    { name: '琼珠玉液', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，胭脂小手一挥，消耗自身60%寿命，百分百驱散我方全体成员的部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽）并恢复血量，胭脂血量上限越高回复量越多。' },
-                    { name: '灼若旭日', rarity: 'SS', type: 'MA', multiplier: 1.4, description: '主动技能，胭脂单手投掷石榴花给单体目标造成法术伤害，按伤害量20%减少目标HP上限，单次最多可减少目标2%HP上限，并根据伤害少量恢复我方全体成员的血量。' },
+                    { name: '硕果累累', rarity: 'SS', type: 'MA', multiplier: 1.6, description: '主动技能，胭脂抖了抖身，漫天果实坠落，对敌人造成法术伤害，' },
+                    { name: '琼珠玉液', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，胭脂小手一挥，为我方恢复量增加20%。' },
+                    { name: '灼若旭日', rarity: 'SS', type: 'MA', multiplier: 1.8, description: '主动技能，胭脂单手投掷石榴花给单体目标造成法术伤害。' },
                     { name: '春风徐徐', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，胭脂每回合有概率生成霸体护盾，护盾可免疫部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽），成功生成时，将消耗一定的寿命。' },
                     { name: '榴花如丹', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，榴花如丹红似火，源源不断为胭脂永久提升耐力。' }
                 ],
@@ -1955,11 +1977,11 @@
                     { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
                     { name: '元素力量（宽容）（17悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，减免受到群体攻击的伤害。' },
                     { name: '神威之怒（18悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
-                    { name: '法力吸取（物理）', rarity: 'A', type: 'PA', multiplier: 1.2, description: '主动技能，单体物理攻击并吸取法力值。' },
-                    { name: '离子护盾（19悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被离子护盾包围，受到敌人攻击后敌人会有几率触电而被百分比破甲，破甲效果随技能等级和宠物修为增加而增强。' },
-                    { name: '刮痧刃（17式）', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，战神阿毛引以为傲的刀法，对敌方连续发动十次物理攻击，给予敌方沉痛打击。' },
+                    { name: '法力吸取（物理）', rarity: 'A', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击。' },
+                    { name: '离子护盾（19悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被离子护盾包围。' },
+                    { name: '刮痧刃（17式）', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，战神阿毛引以为傲的刀法，给予敌方沉痛打击。' },
                     { name: '追日', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升。' },
-                    { name: '刮痧刃（奥义）（天奇徽章：1000）', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，同时有几率晕眩敌人，技能伤害和晕眩几率随技能等级提升而提升。' },
+                    { name: '刮痧刃（奥义）（天奇徽章：1000）', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，' },
                     { name: '誓死守护（20悟）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
                 ],
                 qualities: {
@@ -1985,7 +2007,7 @@
                     { name: '发现真心', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
                     { name: '日记重现', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，一本旧日记让她找回了失去的记忆，重新记起了他们之间的点点滴滴。' },
                     { name: '心灵触动', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
-                    { name: '保护她', rarity: 'S', type: 'PA', multiplier: 1.5, description: '主动技能，他在关键时刻挺身而出，保护她免受伤害，展现了真正的男子汉气概。' },
+                    { name: '保护她', rarity: 'S', type: 'PA', multiplier: 2.5, description: '主动技能，他在关键时刻挺身而出，保护她免受伤害，展现了真正的男子汉气概。' },
                     { name: '继父威胁', rarity: 'B', type: 'PP', multiplier: 0.5, description: '主动技能，继父的威胁不断升级，他挺身而出，保护她不受伤害。' },
                     { name: '记忆恢复', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，在危机中，她的记忆终于完全恢复，找回了曾经的甜蜜时光。' },
                     { name: '法律制裁', rarity: 'B', type: 'PP', multiplier: 1.2, description: '主动技能，他揭穿了继父的阴谋，让继父受到应有的法律制裁。' },
@@ -2015,11 +2037,11 @@
                     { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升' },
                     { name: '智慧守护（17悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法力值抵消一部分受到的伤害' },
                     { name: '全面进化（18悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，敏捷、耐力强壮增加' },
-                    { name: '腾蛇突袭（19悟）', rarity: 'S', type: 'MA', multiplier: 2, description: '主动技能，腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害，同时恢复本身血量，技能效果随技能等级提升而提升。' },
-                    { name: '火焰反噬（20悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，腾蛇可以借助火之灵的力量将火焰精华加诸于己方竖排2个单位身上，对试图进行物理攻击的敌方目标造成灼烧状态.借助火之灵的力量需以自身寿命为献祭.灼烧造成的伤害与宠物的速度有关。' },
-                    { name: '高级冥想', rarity: 'SS', type: 'PH', multiplier: 1.5, description: '主动技能，通过冥想，回合结束时（所有人行动完毕后）恢复自身大量魔法，恢复魔法百分比随技能等级提升而提升,每场战斗结束后寿命额外减少10点。' },
-                    { name: '红莲业火', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，腾蛇施放红莲业火对敌方报复，对敌方全体目标造成巨大法术伤害，并且造成灼烧效果,灼烧效果造成的伤害与宠物的速度有关。' },
-                    { name: '幽冥剧毒', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，腾蛇施放幽冥剧毒，对敌方单体目标造成法术伤害，同时剧毒腐蚀敌人百分比法术护甲，腐蚀程度随技能等级、宠物修为增加而增强。' }
+                    { name: '腾蛇突袭（19悟）', rarity: 'S', type: 'MA', multiplier: 2, description: '主动技能，腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害。' },
+                    { name: '火焰反噬（20悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，腾蛇可以借助火之灵的力量将火焰精华加诸于己方，增加护盾强效。' },
+                    { name: '高级冥想', rarity: 'SS', type: 'PH', multiplier: 1.5, description: '主动技能，通过冥想，恢复自身大量血量。' },
+                    { name: '红莲业火', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，腾蛇施放红莲业火对敌方报复，对敌方全体目标造成巨大法术伤害。' },
+                    { name: '幽冥剧毒', rarity: 'SS', type: 'PP', multiplier: 3.5, description: '主动技能，腾蛇施放幽冥剧毒，对敌方单体目标造成烈性毒药伤害。' }
                 ],
                 qualities: {
                     endurance: { current: 2700, min: 2700, max: 4300 },
@@ -2038,17 +2060,17 @@
                 { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
                 { name: '意念凝聚', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，竹林隐士集中意念，攻击可大幅度忽略敌人的物理闪避和物理防御' },
-                { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，法术防御上升' },
+                { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，护盾强效上升' },
                 { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升' },
                 { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
-                { name: '离子护盾', rarity: 'A', type: 'PD', multiplier: 2, description: '主动技能，被离子护盾包围，击中竹林神灵的敌人会有几率触电而被百分比破甲，破甲效果随技能等级和宠物修为增加而增强' },
+                { name: '离子护盾', rarity: 'A', type: 'PD', multiplier: 2, description: '主动技能，护盾强效更加稳固。' },
                 { name: '神威之怒', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力' },
                 { name: '雷魔爆', rarity: 'S', type: 'PA', multiplier: 1.8, description: '主动技能，群体物理攻击，对敌全体造成物理伤害并有几率附加破甲效果' },
-                { name: '高能电弧', rarity: 'S', type: 'PH', multiplier: 1.2, description: '主动技能，竹林隐士献祭30%最大寿命，全力激发一道高能电弧传导至指定友方目标，为自身及目标充能，充能效果会大幅增加速度，增加的速度同竹林隐士的法术攻击力及技能等级有关' },
-                { name: '雷霆万钧', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，竹林隐士献祭15%最大寿命，以雷霆万钧之速对敌方单体目标造成毁灭性的一击！（必中），双方的速度差距越大，技能所造成的伤害越高' },
-                { name: '静电屏蔽', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，竹林隐士出场时有几率使主人和自身免疫一切控制技能，几率随技能等级提升而增加' },
+                { name: '高能电弧', rarity: 'S', type: 'PH', multiplier: 1.2, description: '主动技能，竹林隐士献祭法力回复一定生命值' },
+                { name: '雷霆万钧', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，竹林隐士以雷霆万钧之速对敌方单体目标造成毁灭性的一击！' },
+                { name: '静电屏蔽', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，竹林隐士有几率使自身免于一切伤害。' },
                 { name: '怒意能场', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，竹林隐士每成功闪避一次敌方的攻击，就会将自己的怒意转化为自己的物理攻击力，怒意状态最大可叠加三次，被击中则蓄能状态在本回合末结束' },
-                { name: '离子风暴', rarity: 'SS', type: 'PA', multiplier: 3, description: '主动技能，竹林隐士将布满雷电的斗笠扔向敌人，对敌方全体造成极大物理伤害，同时大幅提升自己的物理暴击几率' }
+                { name: '离子风暴', rarity: 'SS', type: 'PA', multiplier: 3.5, description: '主动技能，竹林隐士将布满雷电的斗笠扔向敌人，对敌方全体造成极大物理伤害。' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2068,17 +2090,17 @@
                 skills: [
                 { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
-                { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击并吸取法力值' },
+                { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击。' },
                 { name: '元素力量（两仪）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，白虎身着坚不可摧的的两仪战甲，物理防御、法术防御大幅度上升' },
                 { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定' },
                 { name: '元素力量（赐福）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，智力及强壮上升' },
                 { name: '天神祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法术攻击力大幅提升' },
-                { name: '元素力量（四相）', rarity: 'S', type: 'MA', multiplier: 1.5, description: '主动技能，白虎驭四相之力对敌方十字目标随机附加灼烧、冻伤、虚弱、迟缓效果。元素力量（四相）无法被躲避！' },
+                { name: '元素力量（四相）', rarity: 'S', type: 'MA', multiplier: 1.5, description: '主动技能，白虎驭四相之力对敌方施加无法躲避的法术攻击！' },
                 { name: '虚无', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升' },
-                { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，减免受到群体攻击的伤害' },
-                { name: '元素力量（结界）', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，被动技能，当白虎进入战场时可触发法力结界效果，使其主人首回合免疫一部分法术蓝伤' },
-                { name: '烈光剑阵', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，白虎用法力凝聚成无数灼热的光剑，对敌方横排5个目标造成巨大伤害，100%附加灼烧伤害。敌方速度越快，灼烧伤害越猛烈' },
-                { name: '元素力量（不屈）', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，白虎在最勇猛的战士体内封印不屈的战魂印记，激发其斗志，使其在战斗中时刻保持清醒的神智！仅消耗20%寿命为已方增加一个微量流血状态，使其不会受到持续睡眠的影响。技能等级越高，流血量越低，效果持续回合越多' }
+                { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，减免受到敌方攻击的伤害' },
+                { name: '元素力量（结界）', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，使自身免疫大量伤害' },
+                { name: '烈光剑阵', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，白虎用法力凝聚成无数灼热的光剑，对敌方横造成巨大法术伤害。' },
+                { name: '元素力量（不屈）', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，白虎在最勇猛的战士体内封印不屈的战魂印记，激发其斗志，使其在战斗中时刻保持清醒的神智！大幅增加治疗效果。' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2102,14 +2124,14 @@
                 { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
                 { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升' },
                 { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，法术防御上升' },
-                { name: '黄金战甲', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
-                { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击并吸取法力值' },
+                { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.2, description: '主动技能，格挡能力上升' },
+                { name: '黄金战甲', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，身着坚不可摧的的黄金战甲。格挡能力大幅度上升' },
+                { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击' },
                 { name: '横扫千军', rarity: 'SS', type: 'PA', multiplier: 2, description: '主动技能，净角神将利用手中长刀横扫敌人，对敌方全体造成物理伤害' },
                 { name: '所向披靡', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将可以吸取灵域力量为自己所用，永久增加自身物理攻击力' },
                 { name: '灵域行者', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将进入灵域可以快速穿梭于时空之中，增加自身速度' },
-                { name: '饮鸩止渴', rarity: 'S', type: 'PP', multiplier: 5, description: '主动技能，以毒作引突破身体极限，净角神将牺牲自身寿命的60%增加自身一定物理攻击，持续整场战斗' },
-                { name: '灵域处刑', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，净角神将可以观察到敌人灵魂深处的弱点，对敌方单体造成物理伤害，造成伤害后若敌人生命值低于净角神将物理攻击的50%(随技能等级提高比例)，将被直接斩杀。此技能必中' }
+                { name: '饮鸩止渴', rarity: 'S', type: 'PP', multiplier: 5, description: '主动技能，以毒作引突破身体极限，净角神将给敌人附加跗骨之毒，毒性威震四野' },
+                { name: '灵域处刑', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，净角神将可以观察到敌人灵魂深处的弱点，对敌方单体造成物理伤害' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2131,15 +2153,15 @@
                 { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
                 { name: '风仪玉立', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，上古神藤速度大幅提升' },
                 { name: '高级援护', rarity: 'B', type: 'N', multiplier: 0, description: '援护己方单一目标' },
-                { name: '盘根错节', rarity: 'A', type: 'PA', multiplier: 1.2, description: '主动技能，将自身力量注入大地，大地之子将以树枝穿刺的方法对十字范围内的敌人造成物理伤害，并有几率附加藤蔓缠绕的效果降低目标速度' },
+                { name: '盘根错节', rarity: 'A', type: 'PA', multiplier: 1.4, description: '主动技能，将自身力量注入大地，大地之子将以树枝穿刺的方法对敌人造成物理伤害' },
                 { name: '物华天宝', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，上古神藤经年累月的吸收日月精华成为天地间一奇物，强壮、耐力、敏捷大幅度提升' },
                 { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定' },
                 { name: '破军神力', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，被动技能，在破军星的庇佑下，人类可获得强大的战力，会此技能可使宠物获得大量的物理攻击力和法术攻击力' },
                 { name: '蚍蜉撼树', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，敌人的力量在上古神藤前如同蚍蜉撼树。借助大地守护者的力量，在受到群体攻击时，减免部分伤害，减免的额度与技能等级有关' },
-                { name: '仁者无敌', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，仁慈的强者通过宽恕敌人亦可通往无敌之路。消耗40%寿命治疗敌方六单位并给自身添加2回合霸体效果' },
-                { name: '木魔爆', rarity: 'SS', type: 'PA', multiplier: 1.8, description: '主动技能，召唤木之灵对敌方全体目标造成巨大伤害，并附加藤蔓缠绕效果三回合。木之灵产生的伤害需以召唤者的物理攻击为基础，召唤木之灵需以自身寿命作为祭献，藤蔓缠绕效果会大大降低对手的物理暴击率' },
-                { name: '一叶障目', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，上古神藤神力凝聚的一片树叶，对单个敌人造成伤害，并有几率使敌人失明，此技能无法闪避' },
-                { name: '洞天福地', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，上古神藤通过神力凝聚的洞天福地空间，消耗40%寿命指定己方单体目标释放，洞天福地中可避免部分法术蓝伤和部分控制技能，持续2回合，出手速度随技能等级增加' }
+                { name: '仁者无敌', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，仁慈的强者通过宽恕敌人亦可通往无敌之路。' },
+                { name: '木魔爆', rarity: 'SS', type: 'PA', multiplier: 1.8, description: '主动技能，召唤木之灵对敌方全体目标造成巨大伤害' },
+                { name: '一叶障目', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，上古神藤神力凝聚的一片树叶，对单个敌人造成大量伤害' },
+                { name: '洞天福地', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，上古神藤通过神力凝聚的洞天福地空间，大幅增加自身格挡能力' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2157,19 +2179,19 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/66542638d9c307b7e92c22fd.gif',
                 skills: [
-                    { name: '惊涛骇浪', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，对十字范围造成物理伤害并有几率造成速度和物理攻击力下降' },
+                    { name: '惊涛骇浪', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，对十字范围造成物理伤害' },
                     { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能， 每回合法力值恢复' },
                     { name: '如鱼得水', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，水中的锦鲤能力有所加强，物理攻击和法术攻击上升' },
                     { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术闪避上升' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.2, description: '主动技能，对目标造成法术伤害并吸取一定的法力值' },
+                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害' },
                     { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
                     { name: '水魔爆', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，对敌全体造成物理伤害' },
-                    { name: '相濡以沫', rarity: 'S', type: 'PH', multiplier: 1.5, description: '主动技能，被动技能，传于危难之时，锦鲤会触发一次复活，消耗20%寿命！' },
+                    { name: '相濡以沫', rarity: 'S', type: 'PH', multiplier: 1.5, description: '主动技能，传于危难之时，锦鲤会的治疗能力大大提升！' },
                     { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法术攻击上升' },
                     { name: '借花献佛', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，上善若水，水善利万物而不争。当锦鲤受到伤害时，会将自身的受到的伤害值转化为对我方队友的治疗，治疗范围为以双鲤中心的十字范围队友。转化伤害的比例随技能等级提升。' },
-                    { name: '锦鲤庇佑', rarity: 'SS', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，传说锦鲤受莫大吉运庇佑，战斗中第一次受到致死伤害时不会死亡，血量降为1血，此效果仅触发一次。触发几率随技能等级提升。	' },
-                    { name: '梦幻泡影', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，被动技能，锦鲤消耗30%寿命制造强大的梦境使十字目标进入三回合深层睡眠状态，深层睡眠中的目标受伤降低且只有受到足额伤害才会提前醒来。深度睡眠中的受伤减免和从深层睡眠中醒来所需伤害的额度随技能等级提升。' },
+                    { name: '锦鲤庇佑', rarity: 'SS', type: 'PD', multiplier: 1.2, description: '主动技能，传说锦鲤受莫大吉运庇佑，格挡能力提升。' },
+                    { name: '梦幻泡影', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，锦鲤凝结法术泡沫攻击敌方，造成大量法术伤害。' },
                 ],
                 qualities: {
                     tier: '普通',
@@ -2189,8 +2211,8 @@
                 skills: [
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                     { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: ' 被动技能，每回合法力值恢复' },
-                    { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2.5, description: '主动技能，以三倍速度对目标发动攻击，以目标为中心的十字范围内所有其他目标都会被冲击的余波刮伤。被攻击到的目标有可能会陷入手足无措的状态中。' },
-                    { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，此生物具有极高的法术防御力，可大大降低被法术造成的伤害。' },
+                    { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2.5, description: '主动技能，以三倍速度对目标发动攻击，以目标为中心的十字范围内所有其他目标都会被冲击的余波刮伤。' },
+                    { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，此生物具有极高的格挡能力，可大大降低敌人造成的伤害。' },
                     { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定。' },
@@ -2199,7 +2221,7 @@
                     { name: '虎视眈眈', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，斑斓公主虎视眈眈盯着敌人，积蓄力量，如斑斓公主本回合没有使用主动技能，则回合结束时物攻和物理暴击率上升，此状态最大叠加两次，增加值和技能等级有关。' },
                     { name: '如虎添翼', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，斑斓公主和主人出场时不会受到沉默、眩晕、混乱、睡眠的影响。免疫几率和技能等级有关。' },
                     { name: '生龙活虎', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，每三回合有几率清除身上的部分异常状态，清除几率和技能等级有关。' },
-                    { name: '虎阵龙威', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，对敌方全体造成巨量物理伤害并清除对手一定怒气值，清除量与技能等级和法攻有关。' },
+                    { name: '虎阵龙威', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，对敌方全体造成巨量法术伤害。' },
                 ],
                 qualities: {
                     tier: '普通',
@@ -2220,16 +2242,16 @@
                 { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
                 { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
-                { name: '牛气冲天', rarity: 'B', type: 'PA', multiplier: 2, description: '主动技能，单体攻击有几率令目标晕眩' },
+                { name: '牛气冲天', rarity: 'B', type: 'MA', multiplier: 1.6, description: '主动技能，单体攻击有几率令目标晕眩' },
                 { name: '魔灵诀心', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理攻击力和法术攻击力大幅提升' },
                 { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力及生命值上限上升' },
                 { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
                 { name: '风魔爆', rarity: 'S', type: 'MA', multiplier: 1.8, description: '主动技能，对敌方全体造成法术伤害' },
                 { name: '岳镇渊渟', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，巨灵战姬有无可比拟的防御力。减免战斗中前三回合所受物理伤害，减免比例随技能等级提高而提高' },
-                { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.5, description: '主动技能，减免受到群体攻击的伤害' },
-                { name: '舍生取义', rarity: 'SS', type: 'PP', multiplier: 2, description: '主动技能，巨灵战姬献祭自身生命，斩杀敌方同等血量（具体数值会因目标类型不同，有所高低），对手无法躲避！可献祭的生命比例随技能等级提高而提高' },
-                { name: '霸体援护', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，巨灵战姬擅长在战场上保护队友。仅消耗20%寿命，对我方十字单位目标释放特级援护，巨灵战姬在援护回合内为霸体状态，不受任何debuff影响，援护回合结束后霸体状态消失' },
-                { name: '激浊扬清', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，巨灵战姬擅长清除队友的负伤状态。仅消耗10%寿命，为我方十字目标解除破甲、恐慌、加深状态，并添加一个持续恢复效果，解除几率随技能等级提高而提高' },
+                { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.5, description: '主动技能，减免受到的伤害' },
+                { name: '舍生取义', rarity: 'SS', type: 'PP', multiplier: 2, description: '主动技能，巨灵战姬借助上古巨灵神之威，对敌人施加烈性真实伤害' },
+                { name: '霸体援护', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，巨灵擅长在战场上保护队友，一回合内处于霸体状态' },
+                { name: '激浊扬清', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，巨灵擅长清除队友的负伤状态，回复大量生命值' },
                 { name: '热血图腾', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，巨灵战姬在场时我方斗志昂扬，极大增加我方全体生命上限值，效果随技能等级提高而提高' }
                 ],
                 qualities: {
@@ -2260,7 +2282,7 @@
                     { name: '智慧守护（19悟）', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
                     { name: '龙族后裔（充沛）（20悟）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
                     { name: '万寿无疆', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，寿命无穷无尽，接近永生。每回合回复寿命' },
-                    { name: '闻风丧胆', rarity: 'SS', type: 'PP', multiplier: 3, description: '主动技能，对敌方单体施加惶恐状态，处在惶恐状态的敌人将减少物理攻击和法术攻击。施法者物理攻击越高减少数值越大。技能速度2000' },
+                    { name: '闻风丧胆', rarity: 'SS', type: 'PP', multiplier: 3, description: '主动技能，对敌方单体施加毒性状态，处在惶恐状态的敌人行动时会减少大量生命值。施法者物理攻击越高减少数值越大。' },
                     { name: '有恃无恐', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，以自身物理攻击为引对敌方全体造成大量物理伤害' },
                 ],
                 qualities: {
@@ -2281,19 +2303,19 @@
                 skills: [
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                     { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
-                    { name: '元素力量（宽容）', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，借助元素的力量，在受到群体攻击时，减免部分伤害。减免的额度与技能等级有关。' },
-                    { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 2, description: '对敌方单一目标喷吐火焰，将目标法力蒸发，并同时造成伤害。产生的伤害需以使用者的法术攻击为基础。' },
+                    { name: '元素力量（宽容）', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，借助元素的力量，在受到攻击时，减免部分伤害。' },
+                    { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 2, description: '对敌方单一目标喷吐火焰，将目标生命值蒸发，产生的伤害需以使用者的法术攻击为基础。' },
                     { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
                     { name: '仙风道骨', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '斑斑之鸠', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，持有此技能者将自动拥有北京大学外交学院硕士研究生学历（学信网可查/非函授/全日制）。' },
                     { name: '美腿术', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，一双美腿是她引以为豪的本钱，学会此技能可为她增加速度。' },
                     { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
-                    { name: '疗伤解毒', rarity: 'SS', type: 'PH', multiplier: 1.5, description: '主动技能，妲茗儿和在天宫捣药的前辈学到了疗伤解毒技能，使自己免疫一切中毒、流血和灼烧效果。但是需以寿命做献祭，每回合消耗40点寿命。' },
-                    { name: '上善若水', rarity: 'SS', type: 'PH', multiplier: 1.5, description: '主动技能，会疗伤的妲茗儿爱主人胜过爱自己，妲茗儿的主人受到伤害后妲茗儿会主动治疗主人（不治疗中毒和流血、等负面效果造成的伤害）。妲茗儿法术攻击越高治疗效果越好。' },
+                    { name: '疗伤解毒', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，妲茗儿和在天宫捣药的前辈学到了疗伤解毒技能，增强恢复能力。' },
+                    { name: '上善若水', rarity: 'SS', type: 'PH', multiplier: 1.6, description: '主动技能，会疗伤的妲茗儿治疗能力大大提升，妲茗儿法术攻击越高治疗效果越好。' },
                     { name: '步步生莲', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，妲茗儿曼妙的舞姿迷惑敌人后对敌方所有目标进行攻击，我方血量最低1个单位受到鼓舞恢复一定血量。' },
                     { name: '气急攻心', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，妲茗儿天生是个急性子，每回合结束后消耗当前生命1%，恢复最大生命1%的血量，恢复生命需要以寿命作为献祭，每回合扣除100寿命（技能16级以后不消耗寿命）。' },
-                    { name: '狡兔三窟', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，妲茗儿每次战斗可以免疫2次致死伤害，触发狡兔三窟后会回复最大血量的5%，最大法力的5%，每次触发狡兔三窟以20%寿命做献祭。' },
+                    { name: '狡兔三窟', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，名刀之下，妲茗儿的治疗能力得到提升。' },
                 ],
                 qualities: {
                     tier: '普通',
@@ -2484,6 +2506,11 @@ const imageUrls = [
     "https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png",
     "https://pic.imgdb.cn/item/6661a26a5e6d1bfa05edacf1.png",
     "https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png",
+    "https://pic.imgdb.cn/item/66712e4bd9c307b7e9f83878.gif",
+    "https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif",
+    "https://pic.imgdb.cn/item/66712d28d9c307b7e9f5d605.gif",
+    "https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif",
+    "https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif",
     "https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png"
 ];
 preloadImages(imageUrls);
@@ -2640,7 +2667,7 @@ function petCollection() {
     collectionPanel.appendChild(bonusInfoDiv);
 
     updateCollectionBonus();
-    updateSkillScore();
+    updateAttributePanel();
 }
 
 function updateCollectionBonus() {
@@ -3804,13 +3831,16 @@ let maxExp = 208; // 经验值上限
 let enemyHealCount = 0; // 记录怪物治疗次数
 let enemyInitialState; // 存储每轮开始时的敌人初始状态
 
-function showEffect(effectId) {
+function showEffect(effectId, imageUrl) {
     const effect = document.getElementById(effectId);
+    effect.style.backgroundImage = `url(${imageUrl})`;
     effect.classList.add('show-effect');
     setTimeout(() => {
         effect.classList.remove('show-effect');
-    }, 500);
+        effect.style.backgroundImage = ''; // 移除背景图，避免残留
+    }, 300); // 显示0.3秒
 }
+
 
 
 function toggleFightingDrawer() {
@@ -3914,14 +3944,31 @@ function initializeEnemyPet() {
 function updateEnemyAttributes() {
     const player = battleAttributes;
     
+    // 定义增强幅度范围
+    const enhanceFactors = {
+        health: [1.02, 1.07],
+        mana: [1.02, 1.05],
+        physicalAttack: [1.02, 1.07],
+        physicalDefense: [1.02, 1.05],
+        magicAttack: [1.01, 1.06],
+        magicDefense: [1.02, 1.05],
+        speed: [1.02, 1.04]
+    };
+
+    // 随机增强函数
+    function enhanceAttribute(attribute, range) {
+        const factor = Math.random() * (range[1] - range[0]) + range[0];
+        return Math.floor(attribute * factor);
+    }
+
     // 增强敌人属性
-    enemyPet.health = Math.floor(enemyPet.health * 1.05);
-    enemyPet.mana = Math.floor(enemyPet.mana * 1.035);
-    enemyPet.physicalAttack = Math.floor(enemyPet.physicalAttack * 1.055);
-    enemyPet.physicalDefense = Math.floor(enemyPet.physicalDefense * 1.035);
-    enemyPet.magicAttack = Math.floor(enemyPet.magicAttack * 1.045);
-    enemyPet.magicDefense = Math.floor(enemyPet.magicDefense * 1.035);
-    enemyPet.speed = Math.floor(enemyPet.speed * 1.03);
+    enemyPet.health = enhanceAttribute(enemyPet.health, enhanceFactors.health);
+    enemyPet.mana = enhanceAttribute(enemyPet.mana, enhanceFactors.mana);
+    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, enhanceFactors.physicalAttack);
+    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, enhanceFactors.physicalDefense);
+    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, enhanceFactors.magicAttack);
+    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, enhanceFactors.magicDefense);
+    enemyPet.speed = enhanceAttribute(enemyPet.speed, enhanceFactors.speed);
 
     // 更新最大值并确保受到玩家属性的约束
     enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
@@ -4099,40 +4146,50 @@ function performAttack(type) {
 
     let damage;
     let isCritical = checkCriticalHit(playerCritRate);
-    let selectedSkill = null;
+    let selectedSkills = [];
     let skillMultiplier = 1;
 
-    // 获取对应类型的技能
-    if (type === 'physical' || battleState.enemy.silenced) {
-        selectedSkill = getSkillByType('PA');
-    } else if (type === 'magical') {
-        selectedSkill = getSkillByType('MA');
-    }
+    // 遍历skillArea中的所有技能
+    const skillsArea = document.getElementById('skills-area');
+    const skillDivs = Array.from(skillsArea.children);
+    skillDivs.forEach(skillDiv => {
+        const skillName = skillDiv.innerText.split(' ')[0];
+        const skill = currentPet.skills.find(skill => skill.name === skillName);
+        if (skill) {
+            if (type === 'physical' && skill.type === 'PA') {
+                selectedSkills.push(skill);
+            } else if (type === 'magical' && skill.type === 'MA') {
+                selectedSkills.push(skill);
+            }
+        }
+    });
 
-    if (selectedSkill) {
+    // 随机选择一个技能
+    if (selectedSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+        const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
         logBattleEvent(`你施放了 ${selectedSkill.name} 。`, 'gold');
+    } else {
+        if (type === 'physical') {
+            logBattleEvent("你用拳头平A了对方。");
+        } else if (type === 'magical') {
+            logBattleEvent("你操控小树枝击向了对方。");
+        }
     }
 
     if (type === 'physical' || battleState.enemy.silenced) {
-        if (!selectedSkill) {
-            logBattleEvent("本回合使用普通物理攻击。");
-        }
-        
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'silver');
-
-        applyPhysicalAttackEffects();
+        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
         
-    } else if (type === 'magical') {
-        if (!selectedSkill) {
-            logBattleEvent("本回合使用普通法术攻击。");
-        }
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
+        applyPhysicalAttackEffects();
 
+    } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
             performAttack('physical');
@@ -4148,7 +4205,8 @@ function performAttack(type) {
         const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-
+        
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
         applyMagicAttackEffects();
 
         if (battleState.player.spellMasteryChance && Math.random() * 100 < battleState.player.spellMasteryChance) {
@@ -4183,19 +4241,30 @@ function performAttack(type) {
     applyAscensionEffects();
 }
 
+
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
         return;
     }
 
-    // 获取对应类型的技能
-    const selectedSkill = getSkillByType('MA');
+    // 遍历技能区域并获取所有类型为 'MA' 的技能
+    const skillsArea = document.getElementById('skills-area');
+    const skillDivs = Array.from(skillsArea.children);
+    const selectedSkills = skillDivs
+        .map(skillDiv => skillDiv.innerText.split(' ')[0])
+        .map(skillName => currentPet.skills.find(skill => skill.name === skillName && skill.type === 'MA'))
+        .filter(skill => skill);
+
     let skillMultiplier = 1;
 
-    if (selectedSkill) {
+    // 随机选择一个技能
+    if (selectedSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+        const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
         logBattleEvent(`触发法术精通，你再次施放了 ${selectedSkill.name} 。`, 'wheat');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
     } else {
         logBattleEvent("触发法术精通，但没有可用的法术攻击技能，使用普通法术攻击。");
     }
@@ -4231,7 +4300,7 @@ function applyPhysicalAttackEffects() {
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
                 battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
-                logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'silver');
+                logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'white');
                 setTimeout(() => {
                     battleState.enemy.physicalDefense += armorBreakValue;
                     logBattleEvent("敌人的破甲状态消失。");
@@ -4239,7 +4308,7 @@ function applyPhysicalAttackEffects() {
                 break;
             case 'intimidate':
                 battleState.enemy.intimidated = true; // 敌人恐吓状态
-                logBattleEvent("敌人被恐吓，无法暴击。", 'silver');
+                logBattleEvent("敌人被恐吓，无法暴击。", 'white');
                 setTimeout(() => { battleState.enemy.intimidated = false; }, 5000); // 恐吓持续5秒
                 break;
         }
@@ -4352,16 +4421,25 @@ function performPoison() {
         }
     }
 
-    let selectedSkill = getSkillByType('PP');
+    // 遍历技能区域并获取所有类型为 'PP' 的技能
+    const skillsArea = document.getElementById('skills-area');
+    const skillDivs = Array.from(skillsArea.children);
+    const selectedSkills = skillDivs
+        .map(skillDiv => skillDiv.innerText.split(' ')[0])
+        .map(skillName => currentPet.skills.find(skill => skill.name === skillName && skill.type === 'PP'))
+        .filter(skill => skill);
+
     let skillMultiplier = 1;
-    if (selectedSkill) {
+    if (selectedSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+        const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
         logBattleEvent(`你施放了 ${selectedSkill.name} ，毒性大大加强。`, 'purple');
     }
 
     const manaCost = Math.floor(maxMana * 0.2);
     if (battleAttributes.mana < manaCost) {
-        logBattleEvent("您的法力值不足，无法使用施毒之法！", 'purple');
+        logBattleEvent("您的法力值不足，无法使用施毒之法！", 'red');
         return;
     }
 
@@ -4370,6 +4448,7 @@ function performPoison() {
     const poisonDamage = Math.floor(battleAttributes.physicalAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对敌人造成了 ${poisonDamage} 点中毒伤害，消耗了 ${manaCost} 点法力值。`, 'purple');
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712e4bd9c307b7e9f83878.gif');
 
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
@@ -4379,7 +4458,7 @@ function performPoison() {
 
     if (Math.random() < poisonChance) {
         battleState.enemy.poisoned = true; // 30% 或 70% 概率中毒
-        logBattleEvent("敌人被施加了中毒效果，每次行动会扣除生命值。");
+        logBattleEvent("敌人被施加了中毒效果，每次行动会扣除生命值。", 'purple');
         setTimeout(() => {
             battleState.enemy.poisoned = false;
             logBattleEvent("敌人的中毒效果消失了。");
@@ -4391,8 +4470,6 @@ function performPoison() {
     applyAscensionEffects();
     updateUI();
 }
-
-
 
 function performDefense() {
     if (!attributesFetched) {
@@ -4411,20 +4488,30 @@ function performDefense() {
         return;
     }
 
-    let selectedSkill = getSkillByType('PD');
+    // 遍历技能区域并获取所有类型为 'PD' 的技能
+    const skillsArea = document.getElementById('skills-area');
+    const skillDivs = Array.from(skillsArea.children);
+    const selectedSkills = skillDivs
+        .map(skillDiv => skillDiv.innerText.split(' ')[0])
+        .map(skillName => currentPet.skills.find(skill => skill.name === skillName && skill.type === 'PD'))
+        .filter(skill => skill);
+
     let skillMultiplier = 1;
-    if (selectedSkill) {
+    if (selectedSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+        const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} 。`);
+        logBattleEvent(`你施放了 ${selectedSkill.name} ，有更坚硬的护盾了。`, 'orange');
     }
 
-    let defenseReduction = (Math.random() * (0.99 - 0.8) + 0.8) * skillMultiplier;
+    let defenseReduction = (Math.random() * (0.99 - 0.8) + 0.5) * skillMultiplier;
     if (defenseReduction > 1) {
         defenseReduction = 1; // 将减伤倍数限制为最大100%
     }
     battleState.player.defending = true;
     battleState.player.defenseReduction = defenseReduction;
-    logBattleEvent(`你本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`);
+    logBattleEvent(`你本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
 
     playerTurn = false; // 轮到敌人回合
     setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
@@ -4463,7 +4550,8 @@ function enemyAttack() {
         let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
         damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, enemyCritDamage);
-        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'silver');
+        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
             logBattleEvent("敌人的法力值不足！");
@@ -4479,8 +4567,9 @@ function enemyAttack() {
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
     } else {
-        logBattleEvent("敌人被沉默，无法进行法术攻击。");
+        logBattleEvent("敌人被沉默，无法进行法术攻击。", 'wheat');
     }
 
     if (isCritical) {
@@ -4503,7 +4592,7 @@ function enemyAttack() {
         const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const reducedDamage = Math.floor(damage * damageReduction);
         damage = Math.floor(damage * (1 - damageReduction));
-        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'aqua');
+        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'orange');
     }
 
     // 检查护体格挡状态，减少伤害
@@ -4511,7 +4600,7 @@ function enemyAttack() {
         const defenseReduction = battleState.player.defenseReduction;
         const reducedDamage = Math.floor(damage * defenseReduction);
         damage = Math.floor(damage * (1 - defenseReduction));
-        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`, 'aqua');
+        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`, 'orange');
         battleState.player.defending = false;
     }
 
@@ -4587,14 +4676,24 @@ function performHeal() {
         return;
     }
 
-    let selectedSkill = getSkillByType('PH');
+    // 遍历技能区域并获取所有类型为 'PH' 的技能
+    const skillsArea = document.getElementById('skills-area');
+    const skillDivs = Array.from(skillsArea.children);
+    const selectedSkills = skillDivs
+        .map(skillDiv => skillDiv.innerText.split(' ')[0])
+        .map(skillName => currentPet.skills.find(skill => skill.name === skillName && skill.type === 'PH'))
+        .filter(skill => skill);
+
     let skillMultiplier = 1;
-    if (selectedSkill) {
+    if (selectedSkills.length > 0) {
+        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+        const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} 。`, 'aqua');
+        logBattleEvent(`你施放了 ${selectedSkill.name} ，治疗效果大大提升。`, 'aqua');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712d28d9c307b7e9f5d605.gif');
     }
 
-    const manaCost = 88 * (battleRounds * 2);
+    const manaCost = 88 * (battleRounds * 3);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
@@ -4662,7 +4761,7 @@ function showNextBattlePrompt(playerWon) {
 
         if (ascensionSkill.name === '财源滚滚') {
             reward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            logBattleEvent(`财源滚滚触发，额外增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子。`);
+            logBattleEvent(`财源滚滚触发，额外增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子。`, 'gold');
         }
 
         goldAmount += reward;
@@ -4677,7 +4776,7 @@ function showNextBattlePrompt(playerWon) {
         if (ascensionSkill.name === '金牌调解') {
             penalty = 0;
             goldAmount += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子的安慰金。`);
+            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子的安慰金。`, 'gold');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
@@ -4700,7 +4799,7 @@ function resetBuffState(playerWon) {
         const drugKeys = Object.keys(drugInventory);
         const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
         drugInventory[randomDrug].quantity += 1;
-        logBattleEvent(`你获得了 ${randomDrug} x1`, 'green');
+        logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
         updateDrugGrid();
     }
 }
@@ -4790,13 +4889,13 @@ function enemyHeal() {
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     enemyHealCount += 1; // 增加治疗次数
 
-    logBattleEvent(`敌人治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`);
+    logBattleEvent(`敌人治疗了自己，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
 
     // 检查中毒效果
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`);
+        logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`, 'purple');
     }
 
     playerTurn = true; // 轮到玩家回合

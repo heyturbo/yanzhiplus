@@ -3469,6 +3469,10 @@ const ascensionSkills = {
     ],
     combat: [
         { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${0 + 2 * level}%的生命值`, baseValue: 0, increment: level => 2 * level },
+        { name: '白夜索命', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加50%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 20, increment: level => 20 + 2.5 * (level - 1) },
+        { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${23 + 3 * (level - 1)}%的生命值`, baseValue: 20, increment: level => 20 + 3 * (level - 1) },
+        { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
         { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level },
@@ -4189,9 +4193,23 @@ function performAttack(type) {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier || 0) - effectiveDefense));
+
+        // 检查白夜索命
+        if (ascensionSkill.name === '白夜索命' && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
+            damage = Math.floor(damage * 1.5); // 增加50%伤害
+            logBattleEvent("白夜索命触发，伤害增加50%！", 'gold');
+        }
+
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+
+        // 检查吸血魔刃
+        if (ascensionSkill.name === '吸血魔刃') {
+            const healAmount = Math.floor(damage * battleState.player.bloodSuckPercentage);
+            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+            logBattleEvent(`吸血魔刃触发，吸收了 ${healAmount} 点生命值。`, 'red');
+        }
 
         applyPhysicalAttackEffects();
     } else if (type === 'magical') {
@@ -4216,6 +4234,13 @@ function performAttack(type) {
         if (battleState.player.spellMasteryChance && Math.random() * 100 < battleState.player.spellMasteryChance) {
             performIndependentMagicAttack();
         }
+    }
+
+    // 检查灵魂穿刺
+    if (ascensionSkill.name === '灵魂穿刺' && isCritical && Math.random() < battleState.player.extraCritDamageChance) {
+        const extraDamage = Math.floor(battleAttributes.physicalAttack * battleState.player.extraCritDamageMultiplier);
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
+        logBattleEvent(`灵魂穿刺触发，额外造成了 ${extraDamage} 点伤害。`, 'red');
     }
 
     if (isCritical) {
@@ -4244,6 +4269,7 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
+
 
 
 
@@ -4371,6 +4397,11 @@ function applyAscensionEffects() {
     battleState.player.spellMasteryChance = 0;
     battleState.player.divineProtectionChance = 0;
     battleState.player.reflectPercentage = 0;
+    battleState.player.bloodSuckPercentage = 0;
+    battleState.player.invincibilityChance = 0;
+    battleState.player.extraCritDamageChance = 0;
+    battleState.player.extraCritDamageMultiplier = 0;
+    battleState.player.whiteNightThreshold = 0;
 
     // 应用战斗增益
     switch (ascensionSkill.name) {
@@ -4381,21 +4412,26 @@ function applyAscensionEffects() {
             logBattleEvent(`魔龙之力触发，恢复了 ${healAmount} 点生命值。`, 'brown');
             updateUI();
             break;
-        case '以牙还牙':
-            battleState.player.reflectPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '焉知非福':
-            battleState.player.divineProtectionDuration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
-        case '法术精通':
-            battleState.player.spellMasteryChance = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            break;
         case '天降甘霖':
             battleState.player.divineProtectionChance = 0.5; // 固定概率50%
             battleState.player.divineProtectionDuration = 5 + ascensionSkill.increment(ascensionSkill.level);
             break;
+        case '白夜索命':
+            battleState.player.whiteNightThreshold = ascensionSkill.increment(ascensionSkill.level) / 100;
+            break;
+        case '灵魂穿刺':
+            battleState.player.extraCritDamageChance = ascensionSkill.increment(ascensionSkill.level) / 100;
+            battleState.player.extraCritDamageMultiplier = 1.2; // 固定120%
+            break;
+        case '吸血魔刃':
+            battleState.player.bloodSuckPercentage = ascensionSkill.increment(ascensionSkill.level) / 100;
+            break;
+        case '无我之境':
+            battleState.player.invincibilityChance = ascensionSkill.increment(ascensionSkill.level) / 100;
+            break;
     }
 }
+
         
 let poisonSkillActivated = false;
 
@@ -4556,7 +4592,7 @@ function enemyAttack() {
         damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, enemyCritDamage);
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.gif');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717438d9c307b7e9880aeb.gif');
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         if (battleState.enemy.mana < 50) {
             logBattleEvent("敌人的法力值不足！");
@@ -4572,7 +4608,7 @@ function enemyAttack() {
         const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66715129d9c307b7e93f5ed8.gif');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。", 'wheat');
     }
@@ -4584,6 +4620,12 @@ function enemyAttack() {
         setTimeout(() => {
             logDiv.classList.remove('critical-hit');
         }, 300);
+    }
+
+    // 检查无我之境
+    if (ascensionSkill.name === '无我之境' && Math.random() < battleState.player.invincibilityChance) {
+        damage = 0;
+        logBattleEvent("无我之境触发，玩家免疫一切伤害！", 'silver');
     }
 
     // 确保 damage 是有效的数值
@@ -4674,6 +4716,7 @@ function enemyAttack() {
         playerTurn = true;
     }
 }
+
 
         
 function performHeal() {

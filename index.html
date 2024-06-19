@@ -3591,6 +3591,12 @@ document.getElementById('ascension-skill-button').addEventListener('click', () =
 });
 
 document.getElementById('reenable-ascension').addEventListener('click', () => {
+    // 检查第一个飞升技能是否未打开
+    if (!ascensionSkill.name) {
+        alert("你还没有打开第一个飞升技能！");
+        return; // 退出函数
+    }
+
     const secondSkillBox = document.getElementById('second-ascension-skill');
     if (secondSkillBox.style.display === 'none') {
         if (confirm("你可以消耗10个飞升之石为宠物开启第二个飞升之术，确认请继续")) {
@@ -4374,7 +4380,7 @@ function performAttack(type) {
         logBattleEvent(`你施放了 ${selectedSkill.name} 。`, 'gold');
 
         if (type === 'physical') {
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712470d9c307b7e9e44732.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667269e9d9c307b7e915e15a.gif');
         } else if (type === 'magical') {
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
         }
@@ -7749,7 +7755,7 @@ function upgradeWisdomTo() {
             }
         }
     
-        
+        updateJinnangItems();
         document.getElementById("description-box").innerText = "您获得了超绝白金VIP礼包！";
         return;
     }

@@ -5234,6 +5234,7 @@ function updateExpBar() {
 function resetBattleState(playerWon) {
     enemyHealCount = 0; // 重置怪物治疗次数
     updatePetInfo(); // 更新宠物和敌人宠物的属性
+
     if (!playerWon) {
         // 如果玩家没有获胜，则恢复怪物属性到本轮初始状态
         restoreEnemyState();
@@ -5249,12 +5250,21 @@ function resetBattleState(playerWon) {
             }, duration * 1000);
         }
     }
+
     updateUI(); // 更新UI显示
     clearBattleLog(); // 清除战斗日志
+
+    // 检查当前回合数
+    if (battleRounds >= 150) {
+        logBattleEvent("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）");
+    }
+
     logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`); // 记录新一轮战斗开始的事件
+    
     // 存储怪物的初始状态
     storeEnemyInitialState();
 }
+
 
 
 

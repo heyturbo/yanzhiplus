@@ -1289,7 +1289,7 @@
 
 /* 通用弹出面板样式 */
 .mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
     height: 95%;
@@ -1300,7 +1300,7 @@
     padding: 20px;
     border: 1px solid #ffffff;
     z-index: 1000;
-    /* line-height: 30px; */
+    overflow-y: auto;
     font-size: 14px;
     border-radius: 10px;
     display: none;
@@ -1378,7 +1378,7 @@
 }
 
 .shop-grid {
-    display: flex;
+    display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     padding: 5px;
@@ -2049,7 +2049,7 @@
             meiying: {
                 name: '魅影骑士',
                 rank: 'R',
-                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d12.webp',
+                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d3e.gif',
                 skills: [
                   { name: '魅影祝福', rarity: 'B', type: 'N', multiplier: 0, description: '物理攻击上升' },
                   { name: '魅影之吻', rarity: 'B', type: 'PA', multiplier: 1.8, description: '对敌人造成较高的物理伤害，并将敌人的生命力转移给自己。' },
@@ -2078,7 +2078,7 @@
             jinmao: {
                 name: '锦毛灵鼠',
                 rank: 'SR',
-                image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
+                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d2a.gif',
                 skills: [
                   { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
                   { name: '法术牺牲', rarity: 'B', type: 'MA', multiplier: 2, description: '强力法术攻击' },
@@ -3692,10 +3692,10 @@ const ascensionSkills = {
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
-        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
+        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${5 + 1 * level}%的生命值`, baseValue: 5, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 20, increment: level => 20 + 2.5 * (level - 1) },
-        { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${2 + 2 * (level - 1)}%的生命值，每级提升2%`, baseValue: 2, increment: level => 2 + 2 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 12.5, increment: level => 12.5 + 2.5 * (level - 1) },
+        { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
@@ -4424,7 +4424,7 @@ function updateEnemyAttributes() {
 
     if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
     if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 6) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 6);
+    if (enemyPet.physicalAttack > player.physicalAttack * 5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 5);
     if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
     if (enemyPet.magicAttack > player.magicAttack * 4) enemyPet.magicAttack = Math.floor(player.magicAttack * 4);
     if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);

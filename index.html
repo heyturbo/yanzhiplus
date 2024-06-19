@@ -3589,6 +3589,7 @@ document.getElementById('ascension-skill-button').addEventListener('click', () =
         updateAscensionDisplay(); // 打开时更新显示
     }
 });
+let reenableAscension = false;
 
 document.getElementById('reenable-ascension').addEventListener('click', () => {
     // 检查第一个飞升技能是否未打开
@@ -3598,11 +3599,12 @@ document.getElementById('reenable-ascension').addEventListener('click', () => {
     }
 
     const secondSkillBox = document.getElementById('second-ascension-skill');
-    if (secondSkillBox.style.display === 'none') {
+    if (secondSkillBox.style.display === 'none' || !reenableAscension) {
         if (confirm("你可以消耗10个飞升之石为宠物开启第二个飞升之术，确认请继续")) {
             if (useItem('ascensionStone', 10)) {
                 secondSkillBox.style.display = 'block';
                 refreshSecondAscensionSkill();
+                reenableAscension = true;
             } else {
                 alert('您的飞升之石不足！');
             }
@@ -3677,6 +3679,7 @@ function updateAscensionDisplay() {
     document.getElementById('ascension-icon').src = 'https://pic.imgdb.cn/item/666aa7b6d9c307b7e9495e97.png'; // 设置图标URL
     document.getElementById('ascension-name').innerText = ascensionSkill.name;
     document.getElementById('ascension-level').innerText = '等级: ' + ascensionSkill.level;
+    document.getElementById('ascension-effect').innerText = ''; // 重置描述为空
     const skill = ascensionSkills.combat.find(skill => skill.name === ascensionSkill.name) || ascensionSkills.attribute.find(skill => skill.name === ascensionSkill.name) || ascensionSkills.settlement.find(skill => skill.name === ascensionSkill.name);
     if (skill) {
         document.getElementById('ascension-effect').innerText = skill.effect(ascensionSkill.level);
@@ -7049,7 +7052,7 @@ function getRandomRareItem() {
                 ssSkills.push({
                     name: `${pet.name}·${skill.name}`,
                     url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
-                    price: getRandomInt(2688, 5988)
+                    price: getRandomInt(12688, 25988)
                 });
             }
         });
@@ -7063,7 +7066,7 @@ function getRandomRareItem() {
                 sSkills.push({
                     name: `${pet.name}·${skill.name}`,
                     url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                    price: getRandomInt(1288, 2988)
+                    price: getRandomInt(6288, 12988)
                 });
             }
         });
@@ -7335,6 +7338,7 @@ function resetPet() {
     poisonSkillActivated = false; //施毒之术关闭
     spiritLevel = 1;
     spiritMultiplier = 1.00;
+    reenableAscension = false;//第二个飞升之术关闭
     bonusAttributes = {
     endurance: 0,
     intelligence: 0,
@@ -7346,7 +7350,12 @@ function resetPet() {
     name: '',
     level: 1,
     effect: ''
-    };
+    };//第一个飞升技能为空
+    secondAscensionSkill = {
+    name: '',
+    level: 1,
+    effect: ''
+    };//第二个飞升技能为空
     ascensionAttributes = {
     health: 0,
     mana: 0,
@@ -7357,7 +7366,11 @@ function resetPet() {
     speed: 0
     };
     document.body.style.backgroundImage = "";
-
+    // 隐藏第二飞升技能面板
+    const secondSkillBox = document.getElementById('second-ascension-skill');
+    secondSkillBox.style.display = 'none';
+    // 重置第一个飞升技能的显示
+    updateAscensionDisplay();
 
     // 重置基础属性为初始值，调用calculateAttribute
     baseAttributes = {
@@ -8188,7 +8201,7 @@ function updateQualityCard() {
             color = 'purple';
             break;
         case '完美':
-            color = 'gold';
+            color = 'orange';
             break;
         case '超凡':
             color = 'red';

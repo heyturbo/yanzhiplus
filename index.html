@@ -3550,14 +3550,14 @@ const ascensionSkills = {
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
-        { name: '魔龙之力', effect: level => `每10秒恢复最大生命值${0 + 2 * level}%的生命值`, baseValue: 0, increment: level => 2 * level },
+        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '白夜索命', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加50%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
         { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 20, increment: level => 20 + 2.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${23 + 3 * (level - 1)}%的生命值`, baseValue: 20, increment: level => 20 + 3 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 3 * level}%`, baseValue: 20, increment: level => 3 * level },
+        { name: '铜墙铁壁', effect: level => `减少承受伤害的${25 + 2.5 * level}%`, baseValue: 20, increment: level => 2.5 * level },
         { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率同时施放两次法术伤害`, baseValue: 60, increment: level => 2 * level },
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${5 + 0.1 * level}秒`, baseValue: 5, increment: level => 0.1 * level }
     ],
@@ -4171,8 +4171,8 @@ function initializeEnemyPet() {
         mana: 336,
         physicalAttack: 68,
         physicalDefense: 49,
-        magicAttack: 59,
-        magicDefense: 49,
+        magicAttack: 64,
+        magicDefense: 42,
         speed: 208,
         silenced: false,
         stunned: false
@@ -4282,7 +4282,7 @@ function updateEnemyAttributes() {
 
     if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
     if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 3) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 3);
+    if (enemyPet.physicalAttack > player.physicalAttack * 4) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 4);
     if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
     if (enemyPet.magicAttack > player.magicAttack * 2.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 2.5);
     if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);

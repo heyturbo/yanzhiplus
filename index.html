@@ -4597,13 +4597,8 @@ function applyMagicAttackEffects() {
 
 // 应用双技能的战斗增益效果
 function applyAscensionEffects() {
-    // 清除之前的增益效果
     resetBattleStateEffects();
-
-    // 应用第一个飞升技能的战斗增益
     applySingleAscensionEffect(ascensionSkill);
-
-    // 应用第二个飞升技能的战斗增益
     if (secondAscensionSkill.name) {
         applySingleAscensionEffect(secondAscensionSkill);
     }
@@ -4618,6 +4613,13 @@ function resetBattleStateEffects() {
     battleState.player.extraCritDamageChance = 0;
     battleState.player.extraCritDamageMultiplier = 0;
     battleState.player.whiteNightThreshold = 0;
+    battleState.player.damageReductionPercentage = 0; // 重置减伤比例变量
+    battleState.player.goldBonus = 0;
+    battleState.player.noGoldPenalty = false;
+    battleState.player.goldCompensation = 0;
+    battleState.player.protectionDuration = 0;
+    battleState.player.survivalChance = 0;
+    battleState.player.expBonus = 0;
 }
 
 function applySingleAscensionEffect(skill) {
@@ -4647,7 +4649,7 @@ function applySingleAscensionEffect(skill) {
             battleState.player.invincibilityChance = skill.increment(skill.level) / 100;
             break;
         case '铜墙铁壁':
-            battleState.player.reflectPercentage = skill.increment(skill.level);
+            battleState.player.damageReductionPercentage += skill.baseValue + skill.increment(skill.level);
             break;
         case '法术精通':
             battleState.player.spellMasteryChance = skill.baseValue + skill.increment(skill.level);
@@ -4668,7 +4670,7 @@ function applySingleAscensionEffect(skill) {
         case '举一反三':
             battleState.player.expBonus = skill.increment(skill.level);
             break;
-        // 添加其他技能的战斗增益逻辑...
+        // 其他技能的战斗增益逻辑...
     }
 }
 
@@ -4872,8 +4874,9 @@ function enemyAttack() {
         console.error("Damage is NaN, setting to 0.");
     }
 
-    if (ascensionSkill.name === '铜墙铁壁' || secondAscensionSkill.name === '铜墙铁壁') {
-        const damageReduction = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+    // 计算减伤比例
+    const damageReduction = battleState.player.damageReductionPercentage / 100;
+    if (damageReduction > 0) {
         const reducedDamage = Math.floor(damage * damageReduction);
         damage = Math.floor(damage * (1 - damageReduction));
         logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'orange');
@@ -4921,8 +4924,10 @@ function enemyAttack() {
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6671326ad9c307b7e9ffea12.gif');
     }
 
+    // 处理向死而生技能
     if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
-        const manaCostPercentage = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+        let skill = ascensionSkill.name === '向死而生' ? ascensionSkill : secondAscensionSkill;
+        const manaCostPercentage = skill.baseValue + skill.increment(skill.level);
         const manaCost = Math.floor(maxMana * (manaCostPercentage / 100));
         if (battleAttributes.mana >= manaCost) {
             battleAttributes.health = 1;
@@ -4983,7 +4988,7 @@ function performHeal() {
 
     // 检查仙气护体效果
     let divineProtectionChance = 0.05; // 默认概率5%
-    let divineProtectionDuration = 5; // 默认持续时间5秒
+    let divineProtectionDuration = 3; // 默认持续时间5秒
 
     // 检查天降甘霖增益
     if (ascensionSkill.name === '天降甘霖' || secondAscensionSkill.name === '天降甘霖') {
@@ -5034,8 +5039,15 @@ function showNextBattlePrompt(playerWon) {
         reward = Math.max(reward, 288); // 确保最低奖励为 288
 
         if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
-            reward += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level));
-            logBattleEvent(`财源滚滚触发，额外增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子。`, 'gold');
+            let extraReward = 0;
+            if (ascensionSkill.name === '财源滚滚') {
+                extraReward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            }
+            if (secondAscensionSkill.name === '财源滚滚') {
+                extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+            }
+            reward += extraReward;
+            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 金子。`, 'gold');
         }
 
         goldAmount += reward;
@@ -5049,8 +5061,15 @@ function showNextBattlePrompt(playerWon) {
         let penalty = 388 * battleRounds;
         if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
             penalty = 0;
-            goldAmount += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level));
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)} 金子的安慰金。`, 'gold');
+            let compensation = 0;
+            if (ascensionSkill.name === '金牌调解') {
+                compensation += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            }
+            if (secondAscensionSkill.name === '金牌调解') {
+                compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+            }
+            goldAmount += compensation;
+            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 金子的安慰金。`, 'gold');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
@@ -5061,6 +5080,7 @@ function showNextBattlePrompt(playerWon) {
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
 }
+
 
 
 function resetBuffState(playerWon) {
@@ -5082,13 +5102,15 @@ function resetBuffState(playerWon) {
 function gainExp() {
     let expMultiplier = battleState.player.expMultiplier || 1;
     if (ascensionSkill.name === '举一反三' || secondAscensionSkill.name === '举一反三') {
+        let extraExpMultiplier = 0;
         if (ascensionSkill.name === '举一反三') {
-            expMultiplier += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
+            extraExpMultiplier += (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         }
         if (secondAscensionSkill.name === '举一反三') {
-            expMultiplier += (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) / 100;
+            extraExpMultiplier += (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) / 100;
         }
-        logBattleEvent(`举一反三触发，经验值增加了 ${ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)}%。`);
+        expMultiplier += extraExpMultiplier;
+        logBattleEvent(`举一反三触发，经验值增加了 ${extraExpMultiplier * 100}%。`);
     }
 
     const gainedExp = Math.floor((maxExp * 0.18 + (12 * battleRounds) * 0.3) * expMultiplier);
@@ -5113,6 +5135,7 @@ function gainExp() {
 
 
 
+
 function updateExpBar() {
     document.getElementById("exp-bar").innerText = `${currentExp} / ${maxExp}`;
 }
@@ -5126,11 +5149,12 @@ function resetBattleState(playerWon) {
         // 检查焉知非福状态
         if (ascensionSkill.name === '焉知非福' || secondAscensionSkill.name === '焉知非福') {
             battleState.player.divineProtection = true;
-            const duration = ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+            const duration = (ascensionSkill.name === '焉知非福' ? (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) : 0) +
+                             (secondAscensionSkill.name === '焉知非福' ? (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) : 0);
             logBattleEvent(`焉知非福触发，战斗获得持续 ${duration} 秒的仙气护体。`);
             setTimeout(() => {
                 battleState.player.divineProtection = false;
-                logBattleEvent("仙气护体效果消失。");
+                logBattleEvent("焉知非福带来的仙气护体效果消失。");
             }, duration * 1000);
         }
     }
@@ -5140,6 +5164,7 @@ function resetBattleState(playerWon) {
     // 存储怪物的初始状态
     storeEnemyInitialState();
 }
+
 
 
 function storeEnemyInitialState() {

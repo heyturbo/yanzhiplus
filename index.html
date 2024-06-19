@@ -1764,7 +1764,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>无尽の怪(物理)</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>挑战150轮</h2><div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
@@ -4167,11 +4167,11 @@ function updatePetInfo() {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 678,
+        health: 378,
         mana: 336,
         physicalAttack: 68,
         physicalDefense: 49,
-        magicAttack: 45,
+        magicAttack: 59,
         magicDefense: 49,
         speed: 208,
         silenced: false,
@@ -4190,7 +4190,7 @@ function initializeEnemyPet() {
 
 function updateEnemyAttributes() {
     const player = battleAttributes;
-    
+
     // 定义增强幅度范围
     const enhanceFactors = {
         health: [1.04, 1.08],
@@ -4202,20 +4202,76 @@ function updateEnemyAttributes() {
         speed: [1.01, 1.04]
     };
 
+    // 波动增强逻辑
+    const waveEnhanceFactors = {
+        health: [1.05, 1.10],
+        mana: [1.03, 1.06],
+        physicalAttack: [1.04, 1.08],
+        physicalDefense: [1.02, 1.06],
+        magicAttack: [1.02, 1.06],
+        magicDefense: [1.02, 1.06],
+        speed: [1.02, 1.05]
+    };
+
+    // 随机事件逻辑
+    const randomEventFactors = {
+        health: [0.95, 1.15],
+        mana: [0.95, 1.15],
+        physicalAttack: [0.95, 1.15],
+        physicalDefense: [0.95, 1.15],
+        magicAttack: [0.95, 1.15],
+        magicDefense: [0.95, 1.15],
+        speed: [0.95, 1.15]
+    };
+
+    // 获取增强幅度逻辑
+    function getEnhanceFactors() {
+        if (battleRounds % 10 === 0) {
+            return waveEnhanceFactors; // 每10回合一次大的增强
+        } else if (Math.random() < 0.1) {
+            return randomEventFactors; // 10%的概率触发随机事件
+        } else if (battleRounds <= 20) {
+            return {
+                health: [1.06, 1.12],
+                mana: [1.03, 1.08],
+                physicalAttack: [1.05, 1.10],
+                physicalDefense: [1.02, 1.07],
+                magicAttack: [1.02, 1.07],
+                magicDefense: [1.02, 1.07],
+                speed: [1.03, 1.06]
+            };
+        } else if (battleRounds <= 100) {
+            return enhanceFactors; // 默认增强幅度
+        } else {
+            return {
+                health: [1.02, 1.05],
+                mana: [1.01, 1.03],
+                physicalAttack: [1.02, 1.05],
+                physicalDefense: [1.005, 1.03],
+                magicAttack: [1.005, 1.03],
+                magicDefense: [1.005, 1.03],
+                speed: [1.005, 1.02]
+            };
+        }
+    }
+
     // 随机增强函数
     function enhanceAttribute(attribute, range) {
         const factor = Math.random() * (range[1] - range[0]) + range[0];
         return Math.floor(attribute * factor);
     }
 
+    // 获取当前回合数的增强幅度
+    const currentEnhanceFactors = getEnhanceFactors();
+
     // 增强敌人属性
-    enemyPet.health = enhanceAttribute(enemyPet.health, enhanceFactors.health);
-    enemyPet.mana = enhanceAttribute(enemyPet.mana, enhanceFactors.mana);
-    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, enhanceFactors.physicalAttack);
-    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, enhanceFactors.physicalDefense);
-    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, enhanceFactors.magicAttack);
-    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, enhanceFactors.magicDefense);
-    enemyPet.speed = enhanceAttribute(enemyPet.speed, enhanceFactors.speed);
+    enemyPet.health = enhanceAttribute(enemyPet.health, currentEnhanceFactors.health);
+    enemyPet.mana = enhanceAttribute(enemyPet.mana, currentEnhanceFactors.mana);
+    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, currentEnhanceFactors.physicalAttack);
+    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, currentEnhanceFactors.physicalDefense);
+    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, currentEnhanceFactors.magicAttack);
+    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, currentEnhanceFactors.magicDefense);
+    enemyPet.speed = enhanceAttribute(enemyPet.speed, currentEnhanceFactors.speed);
 
     // 更新最大值并确保受到玩家属性的约束
     enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
@@ -4228,7 +4284,7 @@ function updateEnemyAttributes() {
     if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
     if (enemyPet.physicalAttack > player.physicalAttack * 3) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 3);
     if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
-    if (enemyPet.magicAttack > player.magicAttack * 2) enemyPet.magicAttack = Math.floor(player.magicAttack * 2);
+    if (enemyPet.magicAttack > player.magicAttack * 2.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 2.5);
     if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
     if (enemyPet.speed > player.speed * 1.2) enemyPet.speed = Math.floor(player.speed * 1.2);
 

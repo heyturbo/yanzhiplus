@@ -1764,7 +1764,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>挑战150轮</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>挑战150轮心魔</h2><div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
@@ -3551,13 +3551,13 @@ const ascensionSkills = {
     ],
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
-        { name: '白夜索命', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加50%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
+        { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
         { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 20, increment: level => 20 + 2.5 * (level - 1) },
-        { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${23 + 3 * (level - 1)}%的生命值`, baseValue: 20, increment: level => 20 + 3 * (level - 1) },
+        { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${2 + 2 * (level - 1)}%的生命值，每级提升2%`, baseValue: 2, increment: level => 2 + 2 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${25 + 2.5 * level}%`, baseValue: 20, increment: level => 2.5 * level },
+        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 2.5 * level}%`, baseValue: 20, increment: level => 2.5 * level },
         { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率同时施放两次法术伤害`, baseValue: 60, increment: level => 2 * level },
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${5 + 0.1 * level}秒`, baseValue: 5, increment: level => 0.1 * level }
     ],
@@ -4282,7 +4282,7 @@ function updateEnemyAttributes() {
 
     if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
     if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 4) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 4);
+    if (enemyPet.physicalAttack > player.physicalAttack * 4.5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 4.5);
     if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
     if (enemyPet.magicAttack > player.magicAttack * 2.5) enemyPet.magicAttack = Math.floor(player.magicAttack * 2.5);
     if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
@@ -4443,7 +4443,6 @@ function performAttack(type) {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
         showNextBattlePrompt(false);
         return;
     }
@@ -4493,9 +4492,9 @@ function performAttack(type) {
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
         damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier || 0) - effectiveDefense));
 
-        if ((ascensionSkill.name === '白夜索命' || secondAscensionSkill.name === '白夜索命') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
-            damage = Math.floor(damage * 1.5); // 增加50%伤害
-            logBattleEvent("白夜索命触发，伤害增加50%！", 'gold');
+        if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
+            damage = Math.floor(damage * 1.6); // 增加60%伤害
+            logBattleEvent("斩龙一式触发，伤害增加50%！", 'gold');
         }
 
         damage = calculateDamage(damage, isCritical, playerCritDamage);
@@ -4555,7 +4554,6 @@ function performAttack(type) {
     }
 
     if (battleState.enemy.health <= 0) {
-        logBattleEvent("您赢得了此次战斗，点击进入下一轮战斗！");
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
@@ -4726,7 +4724,7 @@ function applySingleAscensionEffect(skill) {
             battleState.player.divineProtectionChance = 0.5; // 固定概率50%
             battleState.player.divineProtectionDuration = 5 + skill.increment(skill.level);
             break;
-        case '白夜索命':
+        case '斩龙一式':
             battleState.player.whiteNightThreshold = skill.increment(skill.level) / 100;
             break;
         case '灵魂穿刺':
@@ -4780,17 +4778,22 @@ function performPoison() {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
         showNextBattlePrompt(false);
         return;
     }
-
+    
+    if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    }
+    
     if (!poisonSkillActivated) {
         if (useItem('poisonSkillBook')) {
             poisonSkillActivated = true;
-            alert("你使用了施毒之术，现在可以对敌人施毒了。", 'purple');
+            logBattleEvent("你使用了施毒之术，现在可以对敌人施毒了。", 'purple');
         } else {
-            alert("你还没有获得施毒之术，请尝试通过武神宝箱获取！", 'red');
+            logBattleEvent("你还没有获得施毒之术，请尝试通过武神宝箱获取！", 'red');
             return;
         }
     }
@@ -4838,7 +4841,7 @@ function performPoison() {
             logBattleEvent("敌人的中毒效果消失了。");
         }, 3000); // 中毒持续3秒
     }
-
+    
     playerTurn = false; // 轮到敌人回合
     setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
     applyAscensionEffects();
@@ -4857,11 +4860,16 @@ function performDefense() {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重置本轮战斗！");
         showNextBattlePrompt(false);
         return;
     }
-
+    
+    if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    }
+    
     // 遍历技能区域并获取所有类型为 'PD' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
@@ -4917,7 +4925,7 @@ function enemyAttack() {
         logBattleEvent("敌人被恐吓，无法暴击。", 'wheat');
     }
 
-    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
+    const attackType = Math.random() < 0.7 ? 'physical' : 'magical';
 
     if (attackType === 'physical') {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -5035,7 +5043,6 @@ function enemyAttack() {
     }
 
     if (battleAttributes.health <= 0) {
-        logBattleEvent("您已经输掉此次战斗，请再接再厉，点击重新战斗！");
         showNextBattlePrompt(false);
     } else {
         updateUI();
@@ -5048,7 +5055,13 @@ function performHeal() {
         alert("请先从属性面板获取属性。");
         return;
     }
-
+    
+    if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    }
+    
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -5138,11 +5151,12 @@ function showNextBattlePrompt(playerWon) {
                 extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             reward += extraReward;
-            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 金子。`, 'gold');
+            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 金子。`, 'pink');
         }
 
         goldAmount += reward;
-        alert(`您赢得了此次战斗，金子+${reward}！点击进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`);
+        logBattleEvent(`您赢得了此次战斗，金子+${reward}！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png');
 
         battleRounds++;
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -5160,12 +5174,13 @@ function showNextBattlePrompt(playerWon) {
                 compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             goldAmount += compensation;
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 金子的安慰金。`, 'gold');
+            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 金子的安慰金。`, 'pink');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
 
-        alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击进入下一轮战斗！`);
+        alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击任意按钮重置战斗！`);
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp');
         document.getElementById("gold-amount").innerText = goldAmount;
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
@@ -5192,6 +5207,8 @@ function resetBuffState(playerWon) {
 
 function gainExp() {
     let expMultiplier = battleState.player.expMultiplier || 1;
+
+    // 检查并应用举一反三技能的经验值加成
     if (ascensionSkill.name === '举一反三' || secondAscensionSkill.name === '举一反三') {
         let extraExpMultiplier = 0;
         if (ascensionSkill.name === '举一反三') {
@@ -5201,30 +5218,36 @@ function gainExp() {
             extraExpMultiplier += (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) / 100;
         }
         expMultiplier += extraExpMultiplier;
-        logBattleEvent(`举一反三触发，经验值增加了 ${extraExpMultiplier * 100}%。`);
+        logBattleEvent(`举一反三触发，经验值增加了 ${extraExpMultiplier * 100}%。`, "pink");
     }
 
-    const gainedExp = Math.floor((maxExp * 0.18 + (12 * battleRounds) * 0.3) * expMultiplier);
+    // 计算非线性经验值增长
+    const gainedExp = Math.floor((maxExp * 0.15 + Math.pow(battleRounds, 1.1) * 0.25) * expMultiplier);
     currentExp += gainedExp;
 
+    // 检查并处理经验值溢出
     if (currentExp >= maxExp) {
-        currentExp = 0;
-        maxExp = Math.floor(maxExp * 1.4);
+        currentExp -= maxExp; // 经验值归零，并保存多余的经验值
+        maxExp = Math.floor(maxExp * 1.35); // 调整升级所需经验值的增长系数
 
         if (petLevel >= 200) {
-            alert("宠物已达到最高等级，经验转化为普通经验书！");
+            logBattleEvent("宠物已达到最高等级，经验转化为普通经验书！", "pink");
             addItemToJinnang('normalExperienceBook');
             updateJinnangItems();
         } else {
-            alert("恭喜您升级了！");
+            logBattleEvent("恭喜您升级了！", "pink");
             increasePetLevel(1); // 提升宠物一级
         }
     }
 
-    updateExpBar();
+    // 随机事件触发额外经验值奖励
+    if (Math.random() < 0.05) { // 5%的概率触发额外奖励
+        const bonusExp = Math.floor(maxExp * 0.10);
+        currentExp += bonusExp;
+    }
+
+    updateExpBar(); // 更新经验条显示
 }
-
-
 
 
 function updateExpBar() {
@@ -5243,29 +5266,27 @@ function resetBattleState(playerWon) {
             battleState.player.divineProtection = true;
             const duration = (ascensionSkill.name === '焉知非福' ? (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) : 0) +
                              (secondAscensionSkill.name === '焉知非福' ? (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) : 0);
-            logBattleEvent(`焉知非福触发，战斗获得持续 ${duration} 秒的仙气护体。`);
+            logBattleEvent(`焉知非福触发，战斗获得持续 ${duration} 秒的仙气护体。`, "aqua");
             setTimeout(() => {
                 battleState.player.divineProtection = false;
-                logBattleEvent("焉知非福带来的仙气护体效果消失。");
+                logBattleEvent("焉知非福带来的仙气护体效果消失。", "aqua");
             }, duration * 1000);
         }
     }
 
     updateUI(); // 更新UI显示
-    clearBattleLog(); // 清除战斗日志
+    
 
     // 检查当前回合数
     if (battleRounds >= 150) {
-        logBattleEvent("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）");
+        logBattleEvent("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）", "pink");
     }
 
-    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`); // 记录新一轮战斗开始的事件
+    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink"); // 记录新一轮战斗开始的事件
     
     // 存储怪物的初始状态
     storeEnemyInitialState();
 }
-
-
 
 
 function storeEnemyInitialState() {
@@ -5287,7 +5308,7 @@ function clearBattleLog() {
 }
 
 function enemyHeal() {
-    if (enemyHealCount >= 3) {
+    if (enemyHealCount >= 5) {
         logBattleEvent("敌人尝试使用治疗术，但被我方打断了！");
         return;
     }

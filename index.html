@@ -1292,8 +1292,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    height: 85%;
-    width: 80%;
+    height: 95%;
+    width: 85%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.8);
     color: #fff;
@@ -1322,7 +1322,7 @@
 }
 
 .summon-area {
-    height: 200px;
+    height: 300px;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -1330,13 +1330,15 @@
     padding: 10px;
     background-color: rgb(0 0 0);
     margin-bottom: 20px;
+    margin-top: 20px;
     border-radius: 10px;
+    flex-direction: column;
 }
 
 .summon-area
     img {
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 95%;
+    max-height: 95%;
 }
 
 .stamp-quantity {
@@ -1348,6 +1350,7 @@
 .summon-button-area {
     display: flex;
     justify-content: space-between;
+    margin: 40px 0px 0px 0px;
 }
 
 .summon-button {
@@ -1375,7 +1378,7 @@
 }
 
 .shop-grid {
-    display: grid;
+    display: flex;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px;
     padding: 5px;
@@ -1406,66 +1409,69 @@
     border-color: white;
 }
         .container {
-            text-align: center;
-            padding: 0px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin: 30px 0px 0px 0px;
-        }
-        .container p {
+    text-align: center;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin: 30px 0px 0px 0px;
+    }
+        .container
+    p {
             margin: 10px 0;
-            font-size: 1.2em;
-            font-weight: bold;
+    font-size: 1.2em;
+    font-weight: bold;
         }
-        .container p::before, .container p::after {
+        .container
+    p::before, .container p::after {
             content: "*";
-            margin: 0 5px;
+    margin: 0 5px;
         }
             /* 添加必要的样式，并加上唯一标识 petArms 前缀 */
         .petArms-window {
-            position: fixed;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 10px;
-            border-radius: 10px;
-            z-index: 1000;
-            width: 80%;
-            height: 80%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            overflow-y: auto;
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 10px;
+    position: fixed;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 80%;
+    height: 80%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 10px;
         }
 
         .petArms-red-text {
-            color: red;
+    color: red;
         }
 
         .petArms-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 10px;
+    border-radius: 5px;
         }
 
-        .petArms-item img {
+        .petArms-item
+    img {
             width: 45px;
-            height: 45px;
+    height: 45px;
         }
 
         .petArms-close-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
         }
         .locked {
-            background-color: gray;
-            color: white;
+    background-color: gray;
+    color: white;
         }
    </style>
 </head>
@@ -1889,10 +1895,10 @@
     </div>
     <div class="container">
         <p>每次召唤需要消耗一张召唤灵符</p>
-        <p>灵符可在本商店购买,亦可通过至尊宝箱获得</p>
-        <p>宠物分R,SR,和SSR,获取难度依次递增</p>
+        <p>灵符可在本商店购买，亦可通过至尊宝箱获得</p>
+        <p>宠物分R,SR,和SSR，获取难度依次递增</p>
         <p>印花可通过兑换召唤所得宠物获得</p>
-        <p>除兑换外,完成任务也能获得印花</p>
+        <p>除兑换外，完成任务也能获得印花</p>
         <p>印花是珍贵货币，需要合理分配和使用</p>
     </div>
 </div>
@@ -1904,8 +1910,8 @@
         <!-- 商店物品列表 -->
     </div>
     <div class="pet-shop-actions">
-        <button id="buySummonCharmButton" class="pet-shop-button">购买灵符</button>
-        <div class="stamp-quantity">当前印花: <span id="currentStampCount">1000</span></div>
+        <button id="buySummonCharmButton" class="pet-shop-button">购买灵符（当前印花: <span id="currentStampCount">1000</span>）</button>
+
     </div>
 </div>
     <div class="bottom-bar">
@@ -1965,10 +1971,10 @@
                   { name: '全面进化', rarity: 'B', type: 'N', multiplier: 0, description: '敏捷、耐力强壮增加' },
                   { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
                   { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '物理和法术闪避上升' },
-                  { name: '高级强壮（17悟）', rarity: 'S', type: 'N', multiplier: 0, description: '血量和耐力增加' },
-                  { name: '冥想（18悟）', rarity: 'S', type: 'N', multiplier: 0, description: '每回合法力值恢复' },
-                  { name: '睚眦必报（19悟）', rarity: 'S', type: 'PP', multiplier: 2, description: '极小的怨仇也要报复！任何惹怒比格的敌人都将受到z中毒伤害。' },
-                  { name: '狂吼（20悟）', rarity: 'S', type: 'PA', multiplier: 2.5, description: '比格仰天狂吼，声波对敌方6个目标造成巨大伤害，并有几率对目标造成破甲状态，破甲的几率及效果同召唤者力量有关。' },
+                  { name: '高级强壮', rarity: 'S', type: 'N', multiplier: 0, description: '血量和耐力增加' },
+                  { name: '冥想', rarity: 'S', type: 'N', multiplier: 0, description: '每回合法力值恢复' },
+                  { name: '睚眦必报', rarity: 'S', type: 'PP', multiplier: 2, description: '极小的怨仇也要报复！任何惹怒比格的敌人都将受到z中毒伤害。' },
+                  { name: '狂吼', rarity: 'S', type: 'PA', multiplier: 2.5, description: '比格仰天狂吼，声波对敌方6个目标造成巨大伤害，并有几率对目标造成破甲状态，破甲的几率及效果同召唤者力量有关。' },
                   { name: '太平要术', rarity: 'SS', type: 'PH', multiplier: 2.5, description: '比格施展太平要术，对己方4个单位（十字）恢复大量生命值。' },
                   { name: '拳击', rarity: 'SS', type: 'PA', multiplier: 3, description: '比格蓄力后对敌人发起致命一击，对敌方单体目标造成大量物伤害，若敌方宠物倒地有几率将敌方宠物击飞出场。' }
                 ],
@@ -1980,6 +1986,122 @@
                     faith: { current: 2700, min: 2700, max: 4300 },
                     agility: { current: 1800, min: 1800, max: 3200 },
                     intelligence: { current: 1800, min: 1800, max: 3200 },
+                    mutated: false
+                },
+            },
+            zhuque: {
+                name: '朱雀雏鸟',
+                rank: 'R',
+                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d5d.gif',
+                skills: [
+                  { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '生命力上升' },
+                  { name: '烈焰祝福', rarity: 'B', type: 'N', multiplier: 0, description: '法术攻击上升' },
+                  { name: '法力灼烧', rarity: 'B', type: 'MA', multiplier: 1.5, description: '单体法术攻击同时消耗目标法力和生命值' },
+                  { name: '焰灵护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '浴火重生', rarity: 'B', type: 'PH', multiplier: 1.4, description: '死亡后自动复活' },
+                  { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.4, description: '生命上限上升' },
+                  { name: '火焰甲胄', rarity: 'A', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
+                  { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
+                  { name: '火焰环绕', rarity: 'S', type: 'PP', multiplier: 1.8, description: '为友军增加一个可以对物理攻击进行反伤状态' },
+                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 1.8, description: '对敌方全体造成法术伤害并附带灼烧效果' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 1800, min: 1800, max: 3200 },
+                    strength: { current: 1800, min: 1800, max: 3200 },
+                    faith: { current: 3150, min: 3150, max: 4850 },
+                    agility: { current: 3600, min: 3600, max: 5400 },
+                    intelligence: { current: 5850, min: 5850, max: 8150 },
+                    mutated: false
+                },
+            },
+            gangtie: {
+                name: '魔铁机关人',
+                rank: 'R',
+                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d12.webp',
+                skills: [
+                  { name: '绝对防御', rarity: 'B', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
+                  { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.3, description: '法术防御上升' },
+                  { name: '致命喷射', rarity: 'B', type: 'PA', multiplier: 1.6, description: '对目标及其周围共6个目标造成物理伤害' },
+                  { name: '野性冲撞', rarity: 'B', type: 'PA', multiplier: 1.5, description: '单体攻击有几率令目标晕眩' },
+                  { name: '灵力充盈', rarity: 'B', type: 'PH', multiplier: 1.2, description: '速度上升' },
+                  { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2, description: '对十字范围造成物理伤害并有几率附带混乱效果' },
+                  { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 0, description: '物理攻击上升' },
+                  { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '生命上限上升' },
+                  { name: '钢筋铁骨', rarity: 'A', type: 'PD', multiplier: 1.5, description: '强壮上升，耐力上升，速度上升' },
+                  { name: '长寿', rarity: 'A', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '战斗狂热', rarity: 'S', type: 'N', multiplier: 0, description: '物理爆击上升' },
+                  { name: '刀刃旋风', rarity: 'S', type: 'PA', multiplier: 2.2, description: '对敌方全体造成物理伤害并有几率附带流血效果' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 4950, min: 4950, max: 7050 },
+                    strength: { current: 4950, min: 4950, max: 7050 },
+                    faith: { current: 1800, min: 1800, max: 3200 },
+                    agility: { current: 2700, min: 2700, max: 4300 },
+                    intelligence: { current: 1800, min: 1800, max: 3200 },
+                    mutated: false
+                },
+            },
+            meiying: {
+                name: '魅影骑士',
+                rank: 'R',
+                image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d12.webp',
+                skills: [
+                  { name: '魅影祝福', rarity: 'B', type: 'N', multiplier: 0, description: '物理攻击上升' },
+                  { name: '魅影之吻', rarity: 'B', type: 'PA', multiplier: 1.8, description: '对敌人造成较高的物理伤害，并将敌人的生命力转移给自己。' },
+                  { name: '魅影护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.3, description: '生命上限上升' },
+                  { name: '魅影甲胄', rarity: 'A', type: 'PD', multiplier: 1.3, description: '物理防御上升' },
+                  { name: '迅捷之鳞', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
+                  { name: '嗜血魔爆', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
+                  { name: '魅影之怒', rarity: 'S', type: 'PA', multiplier: 2.4, description: '对敌方全体造成物理伤害并有几率附带眩晕2回合效果' },
+                  { name: '高级援护', rarity: 'S', type: 'N', multiplier: 0, description: '帮目标队友承担伤害' },
+                  { name: '冥想', rarity: 'S', type: 'N', multiplier: 0, description: '每回合法力值恢复' },
+                  { name: '黑暗魅影', rarity: 'S', type: 'N', multiplier: 0, description: '耐力上升，敏捷上升' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 3600, min: 3600, max: 5400 },
+                    strength: { current: 3600, min: 3600, max: 5400 },
+                    faith: { current: 900, min: 900, max: 2100 },
+                    agility: { current: 6300, min: 6300, max: 8700 },
+                    intelligence: { current: 2250, min: 2250, max: 3750 },
+                    mutated: false
+                },
+            },
+            jinmao: {
+                name: '锦毛灵鼠',
+                rank: 'SR',
+                image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
+                skills: [
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                  { name: '法术牺牲', rarity: 'B', type: 'MA', multiplier: 2, description: '强力法术攻击' },
+                  { name: '魔性毛皮', rarity: 'B', type: 'PD', multiplier: 1.1, description: '法术防御上升' },
+                  { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '耐力上升、敏捷上升、强壮上升' },
+                  { name: '神出鬼没', rarity: 'A', type: 'N', multiplier: 0, description: '灵鼠夜间行动时可大幅提升双闪' },
+                  { name: '冥想（17悟）', rarity: 'A', type: 'N', multiplier: 0, description: '每回合法力值恢复' },
+                  { name: '智慧守护（18悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
+                  { name: '死亡凝视（19悟）', rarity: 'S', type: 'PP', multiplier: 2, description: '灵鼠被凝视时可大幅提升毒性伤害。' },
+                  { name: '急中生智（20悟）', rarity: 'SS', type: 'N', multiplier: 0, description: '当灵鼠受到伤害时，会恢复一定比例的法力值，回复法力值的比例同技能等级有关' },
+                  { name: '投鼠忌器', rarity: 'SS', type: 'PP', multiplier: 2.5, description: '灵鼠释放灵气笼罩全身，即使强大的敌人也会有所顾忌。击中灵鼠者会被虚弱，虚弱持续回合同技能等级有关' },
+                  { name: '趁虚而入', rarity: 'SS', type: 'MA', multiplier: 2.2, description: '灵鼠善于找寻时机针对敌人的弱点发起攻击，对敌方6单位目标造成大量法术伤害。当敌方身上有虚弱效果时伤害加倍' },
+                  { name: '万籁俱寂', rarity: 'SS', type: 'MA', multiplier: 2.4, description: '灵鼠将积蓄灵气全然外放笼罩全场，让一切施法的敌人归于寂静。对敌方全体目标造成法术伤害，有几率使敌方无法使用任何技能。' },
+                  { name: '子虚乌有', rarity: 'SS', type: 'PD', multiplier: 3, description: '灵鼠可迅速将自己和己方任意一个单位遁入虚无，虚无状态下不受任何攻击，自身使用技能、物品等将自动解除虚无状态。' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 2700, min: 2700, max: 4300 },
+                    strength: { current: 2700, min: 2700, max: 4300 },
+                    faith: { current: 4500, min: 4500, max: 6500 },
+                    agility: { current: 7200, min: 7200, max: 9800 },
+                    intelligence: { current: 3600, min: 3600, max: 5400 },
                     mutated: false
                 },
             },
@@ -2025,14 +2147,14 @@
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
                     { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
                     { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
-                    { name: '元素力量（宽容）（17悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，减免受到群体攻击的伤害。' },
-                    { name: '神威之怒（18悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
+                    { name: '元素力量（宽容）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，减免受到群体攻击的伤害。' },
+                    { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
                     { name: '法力吸取（物理）', rarity: 'A', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击。' },
-                    { name: '离子护盾（19悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被离子护盾包围。' },
+                    { name: '离子护盾', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被离子护盾包围。' },
                     { name: '刮痧刃（17式）', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，战神阿毛引以为傲的刀法，给予敌方沉痛打击。' },
                     { name: '追日', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升。' },
-                    { name: '刮痧刃（奥义）（天奇徽章：1000）', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，' },
-                    { name: '誓死守护（20悟）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
+                    { name: '刮痧刃（奥义）', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使敌人无法躲藏（必中）！对敌方造成大量物理伤害，' },
+                    { name: '誓死守护', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
                 ],
                 qualities: {
                     endurance: { current: 4500, min: 4500, max: 6500 },
@@ -2085,10 +2207,10 @@
                     { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，生命值上升' },
                     { name: '美腿术', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，速度上升' },
                     { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升' },
-                    { name: '智慧守护（17悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法力值抵消一部分受到的伤害' },
-                    { name: '全面进化（18悟）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，敏捷、耐力强壮增加' },
-                    { name: '腾蛇突袭（19悟）', rarity: 'S', type: 'MA', multiplier: 2, description: '主动技能，腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害。' },
-                    { name: '火焰反噬（20悟）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，腾蛇可以借助火之灵的力量将火焰精华加诸于己方，增加护盾强效。' },
+                    { name: '智慧守护', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法力值抵消一部分受到的伤害' },
+                    { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，敏捷、耐力强壮增加' },
+                    { name: '腾蛇突袭', rarity: 'S', type: 'MA', multiplier: 2, description: '主动技能，腾蛇对敌人进行突袭，对敌方单体目标造成大量法术伤害。' },
+                    { name: '火焰反噬', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，腾蛇可以借助火之灵的力量将火焰精华加诸于己方，增加护盾强效。' },
                     { name: '高级冥想', rarity: 'SS', type: 'PH', multiplier: 1.5, description: '主动技能，通过冥想，恢复自身大量血量。' },
                     { name: '红莲业火', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，腾蛇施放红莲业火对敌方报复，对敌方全体目标造成巨大法术伤害。' },
                     { name: '幽冥剧毒', rarity: 'SS', type: 'PP', multiplier: 3.5, description: '主动技能，腾蛇施放幽冥剧毒，对敌方单体目标造成烈性毒药伤害。' }
@@ -2327,10 +2449,10 @@
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
                     { name: '法力吸取（物理）', type: 'PA', multiplier: 1.5, rarity: 'B', description: '主动技能，单体物理攻击并吸取法力值' },
                     { name: '龙息乱', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，目标十字范围造成法术伤害并附加随机状态' },
-                    { name: '全面进化（17悟）', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
-                    { name: '黄金战甲（18悟）', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
-                    { name: '智慧守护（19悟）', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
-                    { name: '龙族后裔（充沛）（20悟）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
+                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
+                    { name: '黄金战甲', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
+                    { name: '智慧守护', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
+                    { name: '龙族后裔（充沛）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
                     { name: '万寿无疆', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，寿命无穷无尽，接近永生。每回合回复寿命' },
                     { name: '闻风丧胆', rarity: 'SS', type: 'PP', multiplier: 3, description: '主动技能，对敌方单体施加毒性状态，处在惶恐状态的敌人行动时会减少大量生命值。施法者物理攻击越高减少数值越大。' },
                     { name: '有恃无恐', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，以自身物理攻击为引对敌方全体造成大量物理伤害' },
@@ -2385,6 +2507,26 @@ const biographies = {
         "1️⃣————该宠物无传记",
         "2️⃣————说了没有传记",
         "3️⃣————小金牛最开心的事情就是把小鸡撞得人仰马翻"
+    ],
+    jinmao: [
+        "1️⃣————在魔法学院的年度盛会上，一只手持绿色光剑的胖老鼠引起了众人的注意。它自称锦毛灵鼠，展示了其独特的“灵波流转之术”。据传，当晚一位年轻的魔法学徒在展示自己的火焰魔法时因掌控不当，火焰失控险些酿成大祸。紧急关头，锦毛灵鼠挺身而出，挥舞光剑，以灵波流转之术迅速吸收并化解了狂暴的火焰。观众们目瞪口呆，纷纷为其精湛的技艺鼓掌称赞。此事之后，锦毛灵鼠成为魔法学院的座上宾，甚至有贵族愿以重金聘请它作为魔法顾问。这只胖老鼠不仅赢得了众多魔法师的尊崇，还被视为魔法研究领域的传奇。",
+        "2️⃣————一次，黑暗森林中出现了一种神秘的瘴气，侵蚀了周边的村庄。村民们束手无策，纷纷向各地求援。闻讯后，锦毛灵鼠毅然前往。它手持绿色光剑，穿梭于瘴气弥漫的森林中，施展灵波流转之术，将瘴气逐一净化。村民们惊叹于它的勇气和智慧，纷纷为其助威。最终，经过数日的努力，锦毛灵鼠成功驱散了所有瘴气，恢复了森林的宁静与村庄的安全。为表感谢，村民们在村口树立了一座锦毛灵鼠的雕像，世代供奉。此事不仅让锦毛灵鼠名声大噪，也让更多人了解到它过人的智识和无私的精神。",
+        "3️⃣————一位醉心研究魔法的贵族在一次实验中不慎召唤出一头强大的恶魔，城堡顿时陷入恐慌。正当恶魔肆虐之际，锦毛灵鼠受邀前来解围。它手持绿色光剑，冷静面对恶魔的威胁。利用灵波流转之术，锦毛灵鼠迅速布下法阵，将恶魔的力量封锁在一个光圈内。经过一番激烈的对抗，最终成功将恶魔驱逐回异界。贵族对锦毛灵鼠感激不尽，设宴款待，并授予其“魔法守护者”的称号。此后，锦毛灵鼠成为贵族圈子里的传奇人物，许多贵族纷纷前来拜访，寻求它的帮助和指导。锦毛灵鼠凭借其智慧和勇气，不仅赢得了无数尊崇，还书写了新的魔法传奇。"
+    ],
+    meiying: [
+        "1️⃣————在遥远的夜之森，传说中住着一位名为魅影骑士的吸血蝙蝠。某夜，一支商队途经夜之森，忽然遭遇一群凶猛的狼群袭击。就在商队绝望之际，一道黑影从天而降，化作魅影骑士。它展翅高飞，利用超凡的速度和力量，迅速击退狼群。商队成员目瞪口呆，未及道谢，魅影骑士已消失在夜色中。几天后，商队平安抵达城镇，将这段奇遇广为传颂。人们纷纷传言，魅影骑士不仅是夜之森的守护者，更是所有迷途者的守护神。自此，途经夜之森的旅人们总会在夜晚点燃一盏灯，表达对魅影骑士的敬意和感激。",
+        "2️⃣————一座古老的城堡，废弃已久，被认为是魅影骑士的隐居之地。某天，一群盗墓者潜入城堡，妄图盗取传说中的宝藏。正当他们在地下墓室中寻找宝物时，阴冷的空气中传来一阵低沉的声音：“擅闯者，速速离去！”盗墓者不以为然，继续挖掘。忽然，魅影骑士从阴影中现身，双眼闪烁红光，翼展如同黑暗中的利刃。盗墓者惊恐万分，慌乱中四散逃跑，无一人敢再踏入城堡一步。事后，当地居民发现，盗墓者们口中念念有词，皆称见到了魅影骑士的真容。此后，这座城堡被更加严格地保护起来，成为无人敢侵犯的神秘禁地。",
+        "3️⃣————某个风雨交加的夜晚，一个小村庄遭受了前所未有的灾难：洪水泛滥，村民们四处逃命。就在水位不断上涨之际，一只巨大的吸血蝙蝠飞临村庄，化作魅影骑士。它用强劲的翅膀创造气流，将村民们一一送到安全的高地。随后，它飞向山谷，利用自身的力量引导洪水改道，保护了村庄免于毁灭。天亮后，雨过天晴，村民们纷纷跪地感恩，传颂魅影骑士的恩德。此后，每逢雨季，村民们总会在村口树立起一尊小小的蝙蝠雕像，祈求魅影骑士的庇佑。这段传闻也让魅影骑士的英勇事迹在更广的范围内流传开来，成为人们心中不朽的传奇。"
+    ],
+    gangtie: [
+        "1️⃣————托尼·斯塔克刚成为钢铁侠不久，便决定测试新设计的装甲Mark III。这一天，他接到一通紧急求助电话：一座高楼起火，顶层有数十名被困居民。托尼立即穿上装甲，飞速赶往现场。他飞到顶层，使用装甲内置的灭火装置控制火势，再逐一把被困者送到地面安全区。就在最后一名被困者获救时，楼顶突然塌陷，托尼被困在燃烧的废墟中。凭借钢铁装甲的强大防护，他成功脱险。事后，托尼感慨：装甲不仅是战斗工具，更是拯救生命的利器。从那天起，他更加坚定了以钢铁侠身份保护无辜的信念。",
+        "2️⃣————一次，托尼·斯塔克在公司举办了一场盛大的慈善晚宴，目的是为世界各地的贫困儿童筹集善款。晚宴上，托尼以幽默风趣的演讲赢得了满堂喝彩。然而，晚宴进行到一半时，突然传来一阵爆炸声。恐怖分子闯入会场，意图劫持富豪们索取赎金。托尼迅速反应，启动了隐藏在会场中的微型钢铁装甲。装甲瞬间覆盖全身，他化身钢铁侠，与恐怖分子展开激烈交战。最终，他成功制伏了所有敌人，确保了会场的安全。晚宴在惊心动魄中继续进行，托尼的英勇表现不仅赢得了现场来宾的赞誉，更激发了他们慷慨解囊，慈善晚宴筹得的善款创下了历史新高。",
+        "3️⃣————有一次，托尼·斯塔克决定带彼得·帕克（蜘蛛侠）一起进行一场特别训练。他们飞到一座废弃的工业区，托尼设计了一系列复杂的训练项目，包括高空飞行、精准射击和紧急救援等。训练过程中，彼得在一次高空跳跃中失误，险些摔落。关键时刻，托尼迅速飞过去，将彼得稳稳接住。彼得惊魂未定，托尼却笑着说：“别担心，伙计，失败是成功的必经之路。”这次训练不仅提升了彼得的技能，也让他更加明白团队合作的重要性。托尼在回程时对彼得说：“记住，不管多么强大，我们都需要依靠彼此的支持。”这次经历让两人的师徒情谊更加深厚，也为日后并肩作战打下了坚实的基础。"
+    ],
+    zhuque: [
+        "1️⃣————很久以前，南方有一片炽热的火焰之地，那里栖息着神鸟朱雀。朱雀全身羽毛如火，翅膀展开时，天空仿佛被点燃。某年干旱，百姓苦不堪言，朱雀看到人们的苦难，决定为他们带来雨水。它飞向天际，与雷神搏斗，最终以自身火羽为祭，换来了甘霖。雨水降临，万物复苏，但朱雀因耗尽力量，化为灰烬。然而在灰烬中，一颗炽热的蛋孵化，新的朱雀诞生，继续守护这片土地。人们感激朱雀的牺牲，年年祭祀，以期盼它的再生。",
+        "2️⃣————在远古时期，朱雀被任命为南方守护神，与青龙、白虎、玄武共同维护天地秩序。某日，邪神妄图破坏四方平衡，朱雀与其展开激战。邪神幻化成无数恶鸟，意图吞噬朱雀。朱雀展翅高飞，以烈焰形成火环，将恶鸟焚烧殆尽。然而邪神趁机偷袭，朱雀身受重伤。它忍痛飞回南方圣山，吸收日月精华，浴火重生。重生后的朱雀力量倍增，重返战场，与青龙等神兽合力，最终将邪神封印。自此，南方恢复宁静，朱雀继续守护这片土地。",
+        "3️⃣————传说在南方灵山之巅，有一座朱雀庙，供奉着朱雀的神像。每年初春，庙会期间，人们聚集在此，祈求平安和丰收。据说，某年一位虔诚的少女在庙前祈祷，希望能治愈母亲的重病。朱雀被她的孝心感动，化作一只普通的红鸟，飞到她家中。红鸟啄破自己的羽毛，滴出一滴滴火红的血液，落入母亲的药汤中。母亲饮下后，病情迅速好转。少女发现红鸟已化为灰烬，她将灰烬埋在庙前，翌年春天，朱雀庙前开满了火红的花朵，象征着朱雀的再生与祝福。"
     ],
     bige: [
         "1️⃣————比格在一个寂静的夜晚悄悄离开了泰拳道馆。他穿过曼谷的街道，经过熙熙攘攘的市场和霓虹闪烁的酒吧，最终来到了一个小巷，这里是他儿时最喜欢的地方。这条巷子里有一家小店，店主是个和蔼的老太太，总是给他免费花生吃。比格推开门，鼻尖立即闻到了熟悉的花生香气，仿佛回到了无忧无虑的童年。老太太微笑着递过一包花生：“我知道你会来。”比格接过花生，眼中闪过一丝温柔。她的儿子曾是他在擂台上唯一的朋友，但在一次比赛中不幸身亡。每当比格感到困惑或疲惫时，都会来到这里，怀念那段纯粹的友情。老太太轻轻拍了拍他的手：“你是个好孩子，他在天上一定为你骄傲。”比格点了点头，心中那块柔软的地方再次被触动。离开时，他在巷口停下，回头望了一眼那温暖的小店，暗暗发誓要守护这片宁静。",

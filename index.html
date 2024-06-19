@@ -1124,8 +1124,8 @@
             top: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.8);
-            padding: 10px;
-            width: 88%;
+            padding: 20px;
+            width: 80%;
             border: 2px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 1000;
@@ -1292,7 +1292,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    height: 95%;
+    height: 70%;
     width: 85%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.8);
@@ -1858,7 +1858,7 @@
                 </div>
             </div>
             <div class="battle-system-log">
-                <h2>战斗记录</h2>
+                <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
@@ -1895,10 +1895,6 @@
     </div>
     <div class="container">
         <p>每次召唤需要消耗一张召唤灵符</p>
-        <p>灵符可在本商店购买，亦可通过至尊宝箱获得</p>
-        <p>宠物分R,SR,和SSR，获取难度依次递增</p>
-        <p>印花可通过兑换召唤所得宠物获得</p>
-        <p>除兑换外，完成任务也能获得印花</p>
         <p>印花是珍贵货币，需要合理分配和使用</p>
     </div>
 </div>
@@ -1922,7 +1918,7 @@
             <div>宠物名称: <span id="pet-name">小金牛</span></div>
             <div>当前悟性: <span id="current-wisdom">0</span></div>
             <div>洗练次数: <span id="train-count">0</span></div>
-            <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">100000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
@@ -4249,6 +4245,7 @@ function toggleFightingDrawer() {
         drawer.style.display = "none";
         stopBattle();
     }
+    document.getElementById('battleRounds').innerText = battleRounds;
 }
 
 function updatePetInfo() {
@@ -4492,6 +4489,7 @@ function updateUI() {
             
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
+    document.getElementById('battleRounds').innerText = battleRounds;
 }
 
 function getPlayerStatus() {
@@ -7139,7 +7137,7 @@ function useGoldenRebornPill() {
     updateSkillScore();
 }
  
-let goldAmount = 50000; // 初始金子数量
+let goldAmount = 100000; // 初始金子数量
 document.getElementById("gold-amount").innerText = goldAmount;
 
 function toggleShop() {
@@ -7208,14 +7206,14 @@ function refreshShop(auto = false) {
                     allSSSkills.push({
                         name: `${pet.name}·${skill.name}`,
                         url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
-                        price: getRandomInt(2688, 5988)
+                        price: getRandomInt(21688, 35988)
                     });
                 }
                 if (skill.rarity === 'S') {
                     allSSkills.push({
                         name: `${pet.name}·${skill.name}`,
                         url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                        price: getRandomInt(1288, 2988)
+                        price: getRandomInt(11288, 21988)
                     });
                 }
             });
@@ -7307,6 +7305,7 @@ function getRandomCommonItem() {
         { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) },
         { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: getRandomInt(188, 388) },
         { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: getRandomInt(388, 688) },
+        { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: getRandomInt(3688, 4688) },
         { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: getRandomInt(388, 788) }
     ];
 
@@ -7341,7 +7340,7 @@ function getRandomRareItem() {
                 ssSkills.push({
                     name: `${pet.name}·${skill.name}`,
                     url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
-                    price: getRandomInt(12688, 25988)
+                    price: getRandomInt(21688, 35988)
                 });
             }
         });
@@ -7355,7 +7354,7 @@ function getRandomRareItem() {
                 sSkills.push({
                     name: `${pet.name}·${skill.name}`,
                     url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                    price: getRandomInt(6288, 12988)
+                    price: getRandomInt(11288, 21988)
                 });
             }
         });
@@ -7442,6 +7441,11 @@ function buyItem() {
                     addItemToJinnang('spiritAwakenStone');
                 }
                 break;
+            case '天地灵气':
+                for (let i = 0; i < itemQuantity; i++) {
+                    addItemToJinnang('earthlyEnergy');
+                }
+                break;
             case '还童金丹':
                 goldenRebornPill += itemQuantity;
                 break;
@@ -7517,6 +7521,9 @@ function buyItem() {
                     break;
                 case '精灵觉醒石':
                     addItemToJinnang('spiritAwakenStone'); // 更新锦囊
+                    break;
+                case '天地灵气':
+                    addItemToJinnang('earthlyEnergy'); // 更新锦囊
                     break;
                 case '还童金丹':
                     goldenRebornPill++;
@@ -7822,7 +7829,7 @@ function trainSkills() {
     } else if (currentWisdom < 20) {
         skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
     } else {
-        skillNum = Math.max(5, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+        skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
     }
 
     const selectedSkills = [];
@@ -8062,6 +8069,20 @@ function upgradeWisdomTo() {
         return;
     }
 
+    if (target === "我爱金珉奎") {
+        const petSelect = document.getElementById('pet-select');
+        const key = "jinmin";
+        const pet = pets[key];
+        if (!Array.from(petSelect.options).some(option => option.value === key)) {
+            const option = document.createElement('option');
+            option.value = key;
+            option.text = pet.name;
+            petSelect.appendChild(option);
+        }
+        alert(`你用你的爱召唤了${pet.name} (${pet.rank})！`);
+        return;
+    }
+    
     if (target === "88888") {
         goldAmount += 999999;
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -8080,6 +8101,7 @@ function upgradeWisdomTo() {
     if (!isNaN(targetInt) && targetInt >= 1 && targetInt <= (awakened ? 25 : 20)) {
         const initialWisdom = currentWisdom;
         let usedPills = 0;
+        let usedTejiPills = 0;
 
         while (currentWisdom < targetInt && (highGradePill > 0 || (awakened && currentWisdom >= 20 && tejiWisdomPillItem))) {
             let successRate;
@@ -8108,32 +8130,29 @@ function upgradeWisdomTo() {
                     }
                 }
             } else if (awakened && currentWisdom >= 20) {
-                const tejiWisdomPillItem = jinnangItems.find(i => i.name === 'tejiWisdomPill');
-                if (!tejiWisdomPillItem || tejiWisdomPillItem.quantity < 1) {
-                    alert("您的悟性丹已耗尽！");
+                if (!useItem('tejiWisdomPill')) {
+                    alert("您的特级悟性丹已耗尽！");
                     break;
                 }
-
-                tejiWisdomPillItem.quantity--;
-                updateJinnangItems();
-
+                usedTejiPills++;
+                
                 if (currentWisdom == 20) successRate = 0.85;
                 else if (currentWisdom == 21) successRate = 0.65;
                 else if (currentWisdom == 22) successRate = 0.45;
                 else if (currentWisdom == 23) successRate = 0.25;
                 else successRate = 0.05;
-
+    
                 if (Math.random() < successRate) {
                     currentWisdom = Math.min(currentWisdom + 1, 25);
                 } else {
                     currentWisdom = Math.max(20, currentWisdom - 2);
                 }
             }
-
+    
             document.getElementById("current-wisdom").innerText = currentWisdom;
         }
 
-        document.getElementById("description-box").innerText = `您消耗了${usedPills}颗悟性丹，将悟性提升至${currentWisdom}`;
+        document.getElementById("description-box").innerText = `您消耗了${usedPills}颗悟性丹和${usedTejiPills}颗特级悟性丹，将悟性提升至${currentWisdom}`;
         updateAttributePanel(); // 更新属性面板
     } else {
         alert(`请输入1到${awakened ? 25 : 20}之间的整数！`);
@@ -8711,11 +8730,11 @@ function rebornPet() {
     currentPet.qualities.growthRate = growthRate;
 
     const qualities = currentPet.qualities;
-    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max * 0.85);
-    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max * 0.85);
-    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max * 0.85);
-    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max * 0.85);
-    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max * 0.85);
+    qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max * 0.9);
+    qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max * 0.9);
+    qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max * 0.9);
+    qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max * 0.9);
+    qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max * 0.9);
 
     updateQualityCard();
     updateSkillScore();
@@ -8807,7 +8826,7 @@ function enhanceQuality() {
 
     // 遍历每个维度，生成一个在指定范围内的新资质值。
     dimensions.forEach(dim => {
-        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max * 0.92);
+        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max * 0.95);
     });
 
     // 如果宠物的资质未发生变异，
@@ -8815,7 +8834,7 @@ function enhanceQuality() {
         // 遍历每个维度，如果随机数小于0.1，将该维度的资质值设为最大值，并添加到maxedDimensions数组。
         dimensions.forEach(dim => {
             if (Math.random() < 0.01) {
-                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max) * 0.92);
+                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max) * 0.95);
                 maxedDimensions.push(dim);
             }
         });

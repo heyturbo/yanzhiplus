@@ -1553,6 +1553,7 @@
                     <div>成长率: <span id="quality-growth-rate">100%</span></div>
                     <div>变异: <span id="quality-mutated">未变异</span></div>
                     <div>进化等级: <span id="evolution-level">0</span></div>
+                    <div>当前悟性: <span id="current-wisdom">0</span></div>
                 </div>
             </div>
             <div class="progress-bar">
@@ -1644,9 +1645,9 @@
             </div>
             <div class="button-grid">
                 <button onclick="trainAttributes()">金子培养</button>
-                <button onclick="absorbExperience()">普通修炼</button>
-                <button onclick="absorbAdvancedExperience()">高级修炼</button>
-                <button onclick="upgradeWisdom()">提升悟性</button>
+                <button onclick="absorbExperience()">提升一级</button>
+                <button onclick="absorbAdvancedExperience()">提升三级</button>
+                <button onclick="upgradeWisdom()">提高悟性</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">神级领悟</button>
                 <button onclick="ascend()">飞升突破</button>
@@ -1697,7 +1698,7 @@
                 <div>至尊宝箱</div>
             </div>
             </div>
-            <div id="treasure-description" class="treasure-description-box"></div>
+            <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div id="treasure-reward" class="reward-box"></div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">自动取出</button>
@@ -1770,7 +1771,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>挑战150轮心魔</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>挑战150轮</h2><div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
@@ -1916,8 +1917,8 @@
         </div>
         <div class="info">
             <div>宠物名称: <span id="pet-name">小金牛</span></div>
-            <div>当前悟性: <span id="current-wisdom">0</span></div>
-            <div>洗练次数: <span id="train-count">0</span></div>
+            <div>养宠称号: <span id="personal-honor">初来乍到</span></div>
+            <div>游戏时长: <span id="game-timer">00:00</span></div>
             <div>剩余金子: <span id="gold-amount">100000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>    
@@ -1930,17 +1931,17 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif',
                 skills: [
-                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 1.6, description: '主动技能，小金牛使出浑身解数朝敌人进行致命一击。' },
+                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '主动技能，小金牛使出浑身解数朝敌人进行致命一击。' },
                     { name: '冥想', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，每回合法力值恢复' },
                     { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
                     { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物可获得一定的耐力提升。' },
                     { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
                     { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '被动技能，小金牛的防御能力得到了微量提升。' },
                     { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '得到生命祝福的小金牛治疗能力得到了提升。' },
-                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 2.2, description: '主动技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
+                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '主动技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害' },
+                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 3, description: '主动技能，对目标造成法术伤害' },
                     { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' }
                 ],
@@ -1948,10 +1949,10 @@
                     tier: '普通',
                     growthRate: 100,
                     endurance: { current: 1100, min: 1100, max: 2200 },
-                    strength: { current: 1150, min: 1150, max: 2250 },
+                    strength: { current: 200, min: 200, max: 1150 },
                     faith: { current: 1150, min: 1150, max: 2250 },
                     agility: { current: 1100, min: 1100, max: 2200 },
-                    intelligence: { current: 1150, min: 1150, max: 2250 },
+                    intelligence: { current: 100, min: 100, max: 1100 },
                     mutated: false
                 },
             },
@@ -2683,7 +2684,7 @@ function simulateLoading() {
 window.addEventListener('load', () => {
     simulateLoading();
 });
-        
+
 if (window.GestureEvent || (navigator.maxTouchPoints > 0)) {
     let lastTouchEnd = 0;
 
@@ -2928,6 +2929,7 @@ function petCollection() {
 
     updateCollectionBonus();
     updateAttributePanel();
+    updateTitle();
 }
 
 function updateCollectionBonus() {
@@ -3756,16 +3758,16 @@ const ascensionSkills = {
         { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
-        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${5 + 1 * level}%的生命值`, baseValue: 5, increment: level => 1 * level },
+        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${12.5 + 2.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 12.5, increment: level => 12.5 + 2.5 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${20 + 2.5 * level}%`, baseValue: 20, increment: level => 2.5 * level },
+        { name: '铜墙铁壁', effect: level => `减少承受伤害的${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
         { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率同时施放两次法术伤害`, baseValue: 60, increment: level => 2 * level },
-        { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${5 + 0.1 * level}秒`, baseValue: 5, increment: level => 0.1 * level }
+        { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
     settlement: [
         { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
@@ -4715,24 +4717,7 @@ function calculateSkillLevelAndMultiplier(skill) {
     return { skillLevel, skillMultiplier };
 }
 
-function performAttack(type) {
-    if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
-        return;
-    }
-
-    if (!battleState || !battleState.enemy) {
-        console.error("战斗状态未初始化");
-        return;
-    }
-
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false);
-        return;
-    }
-
-    let damage;
-    let isCritical = checkCriticalHit(playerCritRate);
+function selectSkillAndCalculateMultiplier(type) {
     let selectedSkills = [];
     let skillMultiplier = 1;
     let skillLevel = 1;
@@ -4759,9 +4744,7 @@ function performAttack(type) {
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
         isSkillUsed = true;
-
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
-
         if (type === 'physical') {
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667269e9d9c307b7e915e15a.gif');
         } else if (type === 'magical') {
@@ -4777,45 +4760,61 @@ function performAttack(type) {
         }
     }
 
-    if (type === 'physical' || battleState.enemy.silenced) {
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
+    return { skillMultiplier, isSkillUsed };
+}
 
-        if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
-            damage = Math.floor(damage * 1.6); // 增加60%伤害
-            logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
-        }
+function performPhysicalAttack(skillMultiplier, isSkillUsed) {
+    let damage;
+    let isCritical = checkCriticalHit(playerCritRate);
+    const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+    const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
+    damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
-        damage = calculateDamage(damage, isCritical, playerCritDamage);
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
-
-        applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
-    } else if (type === 'magical') {
-        if (battleAttributes.mana < 50) {
-            logBattleEvent("您的法力值不足！");
-            performAttack('physical');
-            return;
-        }
-
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
-        damage = calculateDamage(damage, isCritical, playerCritDamage);
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-
-        const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
-        battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
-        logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-
-        applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
-
-        if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
-            Math.random() * 100 < (battleState.player.spellMasteryChance)) {
-            performIndependentMagicAttack();
-        }
+    if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
+        damage = Math.floor(damage * 1.6); // 增加60%伤害
+        logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
     }
+
+    damage = calculateDamage(damage, isCritical, playerCritDamage);
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+    logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+
+    applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
+
+    return damage;
+}
+
+function performMagicalAttack(skillMultiplier, isSkillUsed) {
+    let damage;
+    let isCritical = checkCriticalHit(playerCritRate);
+
+    if (battleAttributes.mana < 50) {
+        logBattleEvent("您的法力值不足！");
+        return { damage: 0, retryPhysical: true };
+    }
+
+    const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
+    damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
+    damage = calculateDamage(damage, isCritical, playerCritDamage);
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+
+    const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
+    battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
+    logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+
+    applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
+
+    if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
+        Math.random() * 100 < (battleState.player.spellMasteryChance)) {
+        performIndependentMagicAttack();
+    }
+
+    return { damage, retryPhysical: false };
+}
+
+function handleCriticalAndDrunken(damage) {
+    let isCritical = checkCriticalHit(playerCritRate);
 
     if ((ascensionSkill.name === '灵魂穿刺' || secondAscensionSkill.name === '灵魂穿刺') && isCritical && Math.random() < battleState.player.extraCritDamageChance) {
         const extraDamage = Math.floor(battleAttributes.physicalAttack * battleState.player.extraCritDamageMultiplier);
@@ -4832,16 +4831,49 @@ function performAttack(type) {
         }, 300);
     }
 
-    if (battleState.enemy.sleeping && type !== 'heal') {
-        battleState.enemy.sleeping = false;
-        logBattleEvent("敌人从沉睡中醒来。");
-    }
-
     // 处理醉酒效果
     if (battleState.player.drunken && damage > 0) {
         const drunkenDamage = Math.floor(damage * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
         logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FFOO88');
+    }
+}
+
+function performAttack(type) {
+    if (!attributesFetched) {
+        alert("请先从属性面板获取属性。");
+        return;
+    }
+
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
+
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+        return;
+    }
+
+    const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(type);
+    let damageResult;
+
+    if (type === 'physical' || battleState.enemy.silenced) {
+        damageResult = performPhysicalAttack(skillMultiplier, isSkillUsed);
+    } else if (type === 'magical') {
+        const result = performMagicalAttack(skillMultiplier, isSkillUsed);
+        if (result.retryPhysical) {
+            performAttack('physical');
+            return;
+        }
+        damageResult = result.damage;
+    }
+
+    handleCriticalAndDrunken(damageResult);
+
+    if (battleState.enemy.sleeping && type !== 'heal') {
+        battleState.enemy.sleeping = false;
+        logBattleEvent("敌人从沉睡中醒来。");
     }
 
     if (battleState.enemy.health <= 0) {
@@ -4855,6 +4887,7 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
+        
 
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
@@ -4997,7 +5030,6 @@ function applyMagicAttackEffects(damage, multiplier) {
     const burntChance = Math.random();
     if (burntChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
         battleState.enemy.burnt = true;
-        logBattleEvent("敌人被灼烧，每次行动会扣除生命值。", 'red');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52c4.gif');
         setTimeout(() => {
             battleState.enemy.burnt = false;
@@ -5250,9 +5282,9 @@ function enemyAttack() {
 
     const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
     if (attackType === 'physical') {
-        damage = performPhysicalAttack(isCritical);
+        damage = performEnemyPhysicalAttack(isCritical);
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
-        damage = performMagicalAttack(isCritical);
+        damage = performEnemyMagicalAttack(isCritical);
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。", 'wheat');
     }
@@ -5295,7 +5327,7 @@ function handleStunned() {
     return false;
 }
 //敌人使用物理攻击
-function performPhysicalAttack(isCritical) {
+function performEnemyPhysicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
@@ -5305,7 +5337,7 @@ function performPhysicalAttack(isCritical) {
     return damage;
 }
 //敌人使用法术攻击
-function performMagicalAttack(isCritical) {
+function performEnemyMagicalAttack(isCritical) {
     if (battleState.enemy.mana < 50) {
         logBattleEvent("敌人的法力值不足！");
         enemyAttack('physical');
@@ -5597,6 +5629,7 @@ function showNextBattlePrompt(playerWon) {
         document.getElementById("gold-amount").innerText = goldAmount;
         updateEnemyAttributes(); // 仅在玩家获胜时更新敌人属性
         gainExp(); // 获取经验
+        updateTitle();
     } else {
         let penalty = 388 * battleRounds;
         if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
@@ -6178,15 +6211,14 @@ let rebornPill = 20;
 let bingpoRebornPill = 5;
 let qualityPill = 20;
 let currentWisdom = 0;
-let trainCount = 0;
 let skillScore = 0;
 let petWisdom = 0; 
         
 const descriptions = [
     "请特别注意，更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
+    "当你每达到一个里程碑，你的称号都会有所提升，直到最终成为“魔兽之王”！",
     "宠物技能描述参照官方定义，在本模拟器中并不适用所描述的效果。作为补偿，每个被动技能会提供一定程度的战斗属性加成。",
     "宠物的资质可以用“资质重生丹”洗练到更高的程度",
-    "本游戏尽量还原养宠机制，但概率和具体玩法会有所不同，请勿视为参考",
     "二级属性会随着悟性的提高得到百分比的增长",
     "合理的分配金子培养机会可以让你的宠物评分得到最大化！",
     "5爆400？极品宠物需要更多的耐心和更专业的培养方式，当然，对金子的消耗也会更大",
@@ -6197,8 +6229,7 @@ const descriptions = [
     "宠物变异时，资质会得到明显的提升，甚至超出原有的资质上限！",
     "目前共有三种还童丹，每种还童丹的功能各不同，详情可见“玩法”说明",
     "稀有道具只能通过宝箱开启获得。开启宝箱时，有概率同时出现1~3个奖品",
-    "宠物评分由多个维度组成，请你同时兼顾技能质量、资质水平和宠物等级！",
-    "如果你需要删除某个技能，你可以长按该技能确认删除（如果是PC端，你需要右键确认）"
+    "如果你需要删除某个技能，你可以点击该技能确认删除（但直接购买的技能无法删除）"
 ];        
 
 function updateDescriptionBox() {
@@ -6360,6 +6391,7 @@ function increasePetLevel(levels) {
     updatePetLevel();
     updateAttributePanel();
     updateRemainingPointsDisplay();
+    updateTitle();
 
     console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
 }
@@ -8112,8 +8144,6 @@ function trainSkills() {
 
     transmutationPill--;
     document.getElementById("transmutation-pill").innerText = transmutationPill;
-    trainCount++;
-    document.getElementById("train-count").innerText = trainCount;
 
     let skillNum;
     if (currentWisdom < 13) {
@@ -8305,7 +8335,7 @@ function updateSkillScore(selectedSkills = []) {
 
     // 更新任务列表以反映新的宠物评分
     updateTaskList();
-    console.log(`当前宠物评分: ${totalScore}`);
+    updateTitle();
 }
 
 
@@ -9225,6 +9255,95 @@ document.addEventListener('DOMContentLoaded', () => {
     updateQualityCard();
     updatePetLevel();
 });
+
+// 在页面加载时启动计时器
+document.addEventListener('DOMContentLoaded', (event) => {
+    startGameTimer();
+    updateTitle();
+});
+
+function startGameTimer() {
+    let startTime = Date.now(); // 获取当前时间戳
+    const timerElement = document.getElementById('game-timer');
+
+    function updateTimer() {
+        let elapsedTime = Date.now() - startTime; // 计算已过去的时间
+        let minutes = Math.floor(elapsedTime / 60000); // 计算分钟
+        let seconds = Math.floor((elapsedTime % 60000) / 1000); // 计算秒
+
+        // 格式化时间为 mm:ss
+        let formattedTime = `${padZero(minutes)}:${padZero(seconds)}`;
+        timerElement.innerText = formattedTime;
+    }
+
+    // 每秒更新一次计时器
+    setInterval(updateTimer, 1000);
+}
+
+// 在个位数前补零
+function padZero(num) {
+    return num < 10 ? '0' + num : num;
+}
+
+// 称号数组，从低到高排列
+const titles = [
+    "初来乍到", "懵懵懂懂", "初窥门径", "小有所成", "渐入佳境",
+    "如鱼得水", "游刃有余", "青云直上", "名扬四海", "独占鳌头",
+    "炙手可热", "举世无双", "威震八方", "震古烁今", "登峰造极",
+    "傲视群雄", "龙腾四海", "王者归来", "至尊无上", "魔兽之王"
+];
+
+function updateTitle() {
+    let currentTitleIndex = 0;
+
+    // 条件1：宠物等级
+    if (petLevel >= 80) currentTitleIndex = 4;
+    else if (petLevel >= 60) currentTitleIndex = 3;
+    else if (petLevel >= 40) currentTitleIndex = 2;
+    else if (petLevel >= 20) currentTitleIndex = 1;
+
+    // 条件2：金子数量
+    if (currentTitleIndex >= 4) {
+        if (goldAmount >= 200000) currentTitleIndex = 8;
+        else if (goldAmount >= 150000) currentTitleIndex = 7;
+        else if (goldAmount >= 100000) currentTitleIndex = 6;
+        else if (goldAmount >= 50000) currentTitleIndex = 5;
+    }
+
+    // 条件3：技能分数
+    if (currentTitleIndex >= 8) {
+        if (skillScore >= 2600000) currentTitleIndex = 12;
+        else if (skillScore >= 2400000) currentTitleIndex = 11;
+        else if (skillScore >= 2200000) currentTitleIndex = 10;
+        else if (skillScore >= 2000000) currentTitleIndex = 9;
+    }
+
+    // 条件4：战斗回合数
+    if (currentTitleIndex >= 12) {
+        if (battleRounds >= 115) currentTitleIndex = 16;
+        else if (battleRounds >= 110) currentTitleIndex = 15;
+        else if (battleRounds >= 105) currentTitleIndex = 14;
+        else if (battleRounds >= 100) currentTitleIndex = 13;
+    }
+
+    // 条件5：收集宠物数量
+    if (currentTitleIndex >= 16) {
+        if (collectedPetCount >= 12) currentTitleIndex = 19;
+        else if (collectedPetCount >= 8) currentTitleIndex = 18;
+        else if (collectedPetCount >= 4) currentTitleIndex = 17;
+    }
+
+    // 条件6：宠物智慧
+    if (currentTitleIndex >= 19 && petWisdom == 25) {
+        currentTitleIndex = 20;
+    }
+
+    // 更新页面上的称号
+    const titleElement = document.getElementById('personal-honor');
+    titleElement.innerText = titles[currentTitleIndex];
+}
+
+        
     </script>
 </body>
 </html>

@@ -4552,6 +4552,7 @@ function updateUI() {
             
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
+    document.getElementById('battleRounds').innerText = battleRounds;
 }
 
 
@@ -5502,7 +5503,7 @@ function resetBattleState(playerWon) {
 
     // 检查当前回合数
     if (battleRounds >= 150) {
-        logBattleEvent("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）", "pink");
+        alert("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）");
     }
 
     logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink"); // 记录新一轮战斗开始的事件

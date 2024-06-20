@@ -4254,6 +4254,37 @@ function updatePetInfo() {
         return;
     }
 
+    const skillsArea = document.getElementById("skills-area");
+    let skillAttributes = {
+        health: 0,
+        mana: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        speed: 0,
+
+    };
+
+    if (skillsArea && currentPet.skills) {
+        const nSkills = Array.from(skillsArea.children).map(skillDiv => {
+            const skillName = skillDiv.innerText.split(' ')[0];
+            return currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
+        }).filter(skill => skill !== null);
+
+        const nSkillCount = nSkills.length;
+        skillAttributes = {
+            health: nSkillCount * 2000,
+            mana: nSkillCount * 500,
+            physicalAttack: nSkillCount * 728,
+            physicalDefense: nSkillCount * 364,
+            magicAttack: nSkillCount * 678,
+            magicDefense: nSkillCount * 339,
+            speed: nSkillCount * 211,
+
+        };
+    }
+
     const currentAttributes = calculateCurrentAttributes();
     const totalAttributes = {
         endurance: currentAttributes.endurance,
@@ -4269,26 +4300,26 @@ function updatePetInfo() {
     if (!battleState) {
         battleState = {
             player: {
-                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health,
-                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana,
-                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack,
-                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense,
-                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack,
-                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed,
-                intelligence: totalAttributes.intelligence
+                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health,
+                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana,
+                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense,
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed,
+
             },
             enemy: { ...enemyPet }
         };
     } else {
-        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health;
-        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana;
-        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack;
-        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense;
-        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack;
-        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense;
-        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed;
-        battleState.player.intelligence = totalAttributes.intelligence;
+        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health;
+        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed;
+
     }
 
     battleAttributes = { ...battleState.player }; // 设置战斗属性
@@ -4303,6 +4334,7 @@ function updatePetInfo() {
     updateUI();
     attributesFetched = true;
 }
+
 
 function initializeEnemyPet() {
     enemyPet = {
@@ -4438,6 +4470,35 @@ function refreshBattleAttributes() {
         return;
     }
 
+    const skillsArea = document.getElementById("skills-area");
+    let skillAttributes = {
+        health: 0,
+        mana: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        speed: 0,
+    };
+
+    if (skillsArea && currentPet.skills) {
+        const nSkills = Array.from(skillsArea.children).map(skillDiv => {
+            const skillName = skillDiv.innerText.split(' ')[0];
+            return currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
+        }).filter(skill => skill !== null);
+
+        const nSkillCount = nSkills.length;
+        skillAttributes = {
+            health: nSkillCount * 2000,
+            mana: nSkillCount * 500,
+            physicalAttack: nSkillCount * 728,
+            physicalDefense: nSkillCount * 364,
+            magicAttack: nSkillCount * 678,
+            magicDefense: nSkillCount * 339,
+            speed: nSkillCount * 211,
+        };
+    }
+
     const currentAttributes = calculateCurrentAttributes();
     const totalAttributes = {
         endurance: currentAttributes.endurance,
@@ -4451,26 +4512,58 @@ function refreshBattleAttributes() {
     const spiritAttributes = getCurrentSpiritAttributes();
 
     battleAttributes = {
-        health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health,
-        mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana,
-        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack,
-        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense,
-        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack,
-        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense,
-        speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed
+        health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health,
+        mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana,
+        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack,
+        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense,
+        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack,
+        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense,
+        speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed,
+        intelligence: totalAttributes.intelligence + skillAttributes.intelligence
     }; // 刷新战斗属性
 
     updateUI();
 }
 
+
 function updateUI() {
-    document.getElementById("your-pet-health").innerText = battleAttributes.health;
-    document.getElementById("your-pet-mana").innerText = battleAttributes.mana;
-    document.getElementById("your-pet-physical-attack").innerText = battleAttributes.physicalAttack;
-    document.getElementById("your-pet-physical-defense").innerText = battleAttributes.physicalDefense;
-    document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack;
-    document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense;
-    document.getElementById("your-pet-speed").innerText = battleAttributes.speed;
+    const skillsArea = document.getElementById("skills-area");
+    let skillAttributes = {
+        health: 0,
+        mana: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        speed: 0,
+    };
+
+    if (skillsArea && currentPet.skills) {
+        const nSkills = Array.from(skillsArea.children).map(skillDiv => {
+            const skillName = skillDiv.innerText.split(' ')[0];
+            return currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
+        }).filter(skill => skill !== null);
+
+        const nSkillCount = nSkills.length;
+        skillAttributes = {
+            health: nSkillCount * 2000,
+            mana: nSkillCount * 500,
+            physicalAttack: nSkillCount * 728,
+            physicalDefense: nSkillCount * 364,
+            magicAttack: nSkillCount * 678,
+            magicDefense: nSkillCount * 339,
+            speed: nSkillCount * 211,
+        };
+    }
+
+    // 加上 skillAttributes
+    document.getElementById("your-pet-health").innerText = battleAttributes.health + skillAttributes.health;
+    document.getElementById("your-pet-mana").innerText = battleAttributes.mana + skillAttributes.mana;
+    document.getElementById("your-pet-physical-attack").innerText = battleAttributes.physicalAttack + skillAttributes.physicalAttack;
+    document.getElementById("your-pet-physical-defense").innerText = battleAttributes.physicalDefense + skillAttributes.physicalDefense;
+    document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack + skillAttributes.magicAttack;
+    document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense + skillAttributes.magicDefense;
+    document.getElementById("your-pet-speed").innerText = battleAttributes.speed + skillAttributes.speed;
 
     document.getElementById("enemy-pet-health").innerText = battleState.enemy.health;
     document.getElementById("enemy-pet-mana").innerText = battleState.enemy.mana;
@@ -4479,18 +4572,19 @@ function updateUI() {
     document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
     document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
     document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
-            
+
     // 更新暴击率和暴击伤害
     document.getElementById("player-crit-rate").innerText = Math.round(playerCritRate * 100) + '%';
     document.getElementById("player-crit-damage").innerText = Math.round(playerCritDamage * 100) + '%';
     document.getElementById("enemy-crit-rate").innerText = Math.round(enemyCritRate * 100) + '%';
     document.getElementById("enemy-crit-damage").innerText = Math.round(enemyCritDamage * 100) + '%';
+
     // 更新状态显示
-            
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
     document.getElementById('battleRounds').innerText = battleRounds;
 }
+
 
 function getPlayerStatus() {
     let status = [];
@@ -4570,7 +4664,19 @@ function getSkillByType(type) {
     return skills.length > 0 ? skills[Math.floor(Math.random() * skills.length)] : null;
 }
         
-// 更新 performAttack 函数，确保战斗效果生效
+function calculateSkillLevelAndMultiplier(skill) {
+    // 初始技能等级为1级，上限为20级
+    let skillLevel = 1;
+
+    // 每10级宠物等级增加1级技能等级
+    skillLevel = Math.min(20, Math.floor(petLevel / 10) + 1);
+
+    // 计算技能加成
+    const skillMultiplier = skill.multiplier * (1 + 0.1 * (skillLevel - 1));
+
+    return { skillLevel, skillMultiplier };
+}
+
 function performAttack(type) {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
@@ -4591,6 +4697,7 @@ function performAttack(type) {
     let isCritical = checkCriticalHit(playerCritRate);
     let selectedSkills = [];
     let skillMultiplier = 1;
+    let skillLevel = 1;
 
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
@@ -4609,8 +4716,11 @@ function performAttack(type) {
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
-        skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} 。`, 'gold');
+        const result = calculateSkillLevelAndMultiplier(selectedSkill);
+        skillLevel = result.skillLevel;
+        skillMultiplier = result.skillMultiplier;
+
+        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
 
         if (type === 'physical') {
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667269e9d9c307b7e915e15a.gif');
@@ -4630,7 +4740,7 @@ function performAttack(type) {
     if (type === 'physical' || battleState.enemy.silenced) {
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
         if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
             damage = Math.floor(damage * 1.6); // 增加60%伤害
@@ -4657,7 +4767,7 @@ function performAttack(type) {
 
         const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
         const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier || 0) - effectiveDefense));
+        damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
@@ -4938,7 +5048,6 @@ function performPoison() {
         }
     }
 
-    // 遍历技能区域并获取所有类型为 'PP' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -4947,11 +5056,16 @@ function performPoison() {
         .filter(skill => skill);
 
     let skillMultiplier = 1;
+    let skillLevel = 1;
+
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
-        skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} ，毒性大大加强。`, 'purple');
+        const result = calculateSkillLevelAndMultiplier(selectedSkill);
+        skillLevel = result.skillLevel;
+        skillMultiplier = result.skillMultiplier;
+
+        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级 ，毒性大大加强。`, 'purple');
     }
 
     const manaCost = Math.floor(maxMana * 0.2);
@@ -5831,10 +5945,10 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V10.2</p>
-                            <p>- 使用万化灵丹洗练出主动技能时，可以在战斗中释放了；</p>
-                            <p>- 战斗系统优化；</p>
-                            <p>- 特别说明：由于目前被动技能没有设置判断逻辑，因此为了更好地体现技能效果，可以考虑只保留主动技能（点击技能可删除）；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V10.3</p>
+                            <p>- 战斗系统进一步优化；</p>
+                            <p>- 增加技能等级，技能等级随宠物等级提升而提升，并增强其效果；</p>
+                            <p>- 被动技能可以按固定值为宠物提供战斗增益了；</p>
                             <p>- 修复了某些bug；</p>
                             <p>- 优化部分函数逻辑；</p>
                             <p>- 优化部分显示效果；</p>
@@ -5889,6 +6003,7 @@ let petWisdom = 0;
         
 const descriptions = [
     "请特别注意，更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
+    "宠物技能描述参照官方定义，在本模拟器中并不适用所描述的效果。作为补偿，每个被动技能会提供一定程度的战斗属性加成。",
     "宠物的资质可以用“资质重生丹”洗练到更高的程度",
     "本游戏尽量还原养宠机制，但概率和具体玩法会有所不同，请勿视为参考",
     "二级属性会随着悟性的提高得到百分比的增长",

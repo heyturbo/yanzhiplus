@@ -4223,7 +4223,7 @@ function showEffect(effectId, imageUrl) {
     setTimeout(() => {
         effect.classList.remove('show-effect');
         effect.style.backgroundImage = ''; // 移除背景图，避免残留
-    }, 400); // 显示0.4秒
+    }, 500); // 显示0.5秒
 }
 
 
@@ -4274,8 +4274,8 @@ function updatePetInfo() {
 
         const nSkillCount = nSkills.length;
         skillAttributes = {
-            health: nSkillCount * 2000,
-            mana: nSkillCount * 500,
+            health: nSkillCount * 2168,
+            mana: nSkillCount * 531,
             physicalAttack: nSkillCount * 728,
             physicalDefense: nSkillCount * 364,
             magicAttack: nSkillCount * 678,
@@ -4328,7 +4328,7 @@ function updatePetInfo() {
     maxMana = battleAttributes.mana; // 设置独立的最大值变量
 
     // 确保 enemyMaxHealth 和 enemyMaxMana 受到玩家属性的约束
-    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 25);
+    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 30);
     enemyMaxMana = Math.min(enemyMaxMana, maxMana * 10);
 
     updateUI();
@@ -4419,9 +4419,9 @@ function updateEnemyAttributes() {
                 mana: [1.01, 1.03],
                 physicalAttack: [1.02, 1.05],
                 physicalDefense: [1.005, 1.03],
-                magicAttack: [1.005, 1.03],
-                magicDefense: [1.005, 1.03],
-                speed: [1.005, 1.02]
+                magicAttack: [1.05, 1.03],
+                magicDefense: [1.05, 1.03],
+                speed: [1.05, 1.02]
             };
         }
     }
@@ -4448,7 +4448,7 @@ function updateEnemyAttributes() {
     enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
     enemyMaxMana = Math.floor(enemyMaxMana * 1.035);
 
-    if (enemyMaxHealth > player.maxHealth * 25) enemyMaxHealth = Math.floor(player.maxHealth * 25);
+    if (enemyMaxHealth > player.maxHealth * 30) enemyMaxHealth = Math.floor(player.maxHealth * 30);
     if (enemyMaxMana > player.maxMana * 10) enemyMaxMana = Math.floor(player.maxMana * 10);
 
     if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
@@ -4558,11 +4558,13 @@ function updateUI() {
 
 function getPlayerStatus() {
     let status = [];
-    if (battleState.player.silenced) status.push("沉默");
-    if (battleState.player.reflecting) status.push("反弹");
     if (battleState.player.divineProtection) status.push("仙气护体");
+    if (battleState.player.drunken) status.push("醉酒");
+    if (battleState.player.healingBan) status.push("禁疗");
+    if (battleState.player.soulCapture) status.push("摄魂");
     return status.join(", ");
 }
+
 
 function getEnemyStatus() {
     let status = [];
@@ -4571,8 +4573,12 @@ function getEnemyStatus() {
     if (battleState.enemy.stunned) status.push("眩晕");
     if (battleState.enemy.sleeping) status.push("沉睡");
     if (battleState.enemy.intimidated) status.push("恐吓");
+    if (battleState.enemy.dazed) status.push("混乱");
+    if (battleState.enemy.burnt) status.push("灼烧");
+    // Exorcise doesn't need a status as it's an immediate effect, not a lasting status.
     return status.join(", ");
 }
+
 
 function logBattleEvent(event, color = 'white') {
     const logDiv = document.getElementById("log");
@@ -4633,17 +4639,11 @@ function getSkillByType(type) {
 
     return skills.length > 0 ? skills[Math.floor(Math.random() * skills.length)] : null;
 }
-        
+
 function calculateSkillLevelAndMultiplier(skill) {
-    // 初始技能等级为1级，上限为20级
     let skillLevel = 1;
-
-    // 每10级宠物等级增加1级技能等级
     skillLevel = Math.min(20, Math.floor(petLevel / 10) + 1);
-
-    // 计算技能加成
     const skillMultiplier = skill.multiplier * (1 + 0.1 * (skillLevel - 1));
-
     return { skillLevel, skillMultiplier };
 }
 
@@ -4668,6 +4668,7 @@ function performAttack(type) {
     let selectedSkills = [];
     let skillMultiplier = 1;
     let skillLevel = 1;
+    let isSkillUsed = false;
 
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
@@ -4689,6 +4690,7 @@ function performAttack(type) {
         const result = calculateSkillLevelAndMultiplier(selectedSkill);
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
+        isSkillUsed = true;
 
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
 
@@ -4714,20 +4716,14 @@ function performAttack(type) {
 
         if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
             damage = Math.floor(damage * 1.6); // 增加60%伤害
-            logBattleEvent("斩龙一式触发，伤害增加50%！", 'gold');
+            logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
         }
 
         damage = calculateDamage(damage, isCritical, playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
 
-        if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
-            const healAmount = Math.floor(damage * battleState.player.bloodSuckPercentage);
-            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-            logBattleEvent(`吸血魔刃触发，吸收了 ${healAmount} 点生命值。`, 'red');
-        }
-
-        applyPhysicalAttackEffects();
+        applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
     } else if (type === 'magical') {
         if (battleAttributes.mana < 50) {
             logBattleEvent("您的法力值不足！");
@@ -4745,7 +4741,7 @@ function performAttack(type) {
         battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
 
-        applyMagicAttackEffects();
+        applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
 
         if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
             Math.random() * 100 < (battleState.player.spellMasteryChance)) {
@@ -4773,6 +4769,13 @@ function performAttack(type) {
         logBattleEvent("敌人从沉睡中醒来。");
     }
 
+    // 处理醉酒效果
+    if (battleState.player.drunken && damage > 0) {
+        const drunkenDamage = Math.floor(damage * 0.1);
+        battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
+        logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FFOO88');
+    }
+
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
@@ -4780,13 +4783,11 @@ function performAttack(type) {
     }
 
     playerTurn = false;
-    setTimeout(enemyAttack, 300);
+    setTimeout(enemyAttack, 500);
     updateUI();
     applyAscensionEffects();
 }
 
-
-// 更新 performIndependentMagicAttack 函数，确保战斗效果生效
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
@@ -4801,26 +4802,36 @@ function performIndependentMagicAttack() {
         .filter(skill => skill);
 
     let skillMultiplier = 1;
+    let skillLevel = 1;
 
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
-        skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`触发法术精通，你再次施放了 ${selectedSkill.name} 。`, 'wheat');
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
+        const result = calculateSkillLevelAndMultiplier(selectedSkill);
+        skillLevel = result.skillLevel;
+        skillMultiplier = result.skillMultiplier;
+        logBattleEvent(`触发法术精通，你再次施放了 ${selectedSkill.name} ${skillLevel}级。`, 'wheat');
     } else {
         logBattleEvent("触发法术精通，但没有可用的法术攻击技能，使用普通法术攻击。");
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-    let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier || 0) - effectiveDefense));
+    let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
     logBattleEvent(`你造成了 ${damage} 点伤害。`, 'wheat');
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
-    applyMagicAttackEffects();
+    applyMagicAttackEffects(damage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
+
+    // 处理醉酒效果
+    if (battleState.player.drunken && damage > 0) {
+        const drunkenDamage = Math.floor(damage * 0.1);
+        battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
+        logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
+    }
 
     if (isCritical) {
         logBattleEvent("你发动了暴击，造成了额外伤害！", 'red');
@@ -4832,18 +4843,18 @@ function performIndependentMagicAttack() {
     }
 }
 
-
-function applyPhysicalAttackEffects() {
+function applyPhysicalAttackEffects(multiplier) {
     const effects = ['armorBreak', 'intimidate'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < 0.05) { // 5%的概率触发效果
+    if (effectChance < (0.05 * multiplier)) { // 触发概率受 multiplier 影响
         switch (effect) {
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
                 battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
                 logBattleEvent(`敌人的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'white');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52b4.gif');
                 setTimeout(() => {
                     battleState.enemy.physicalDefense += armorBreakValue;
                     logBattleEvent("敌人的破甲状态消失。");
@@ -4858,18 +4869,17 @@ function applyPhysicalAttackEffects() {
     }
 }
 
-function applyMagicAttackEffects() {
-    const effects = ['silence', 'stun', 'slow'];
-    // 如果需要启用呆滞效果，可以将其添加到数组中
-    // const effects = ['silence', 'stun', 'slow', 'daze'];
+function applyMagicAttackEffects(damage, multiplier) {
+    const effects = ['silence', 'stun', 'slow', 'daze', 'exorcise', 'burnt'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < 0.1) { // 10%的概率触发效果
+    if (effectChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
         switch (effect) {
             case 'silence':
                 battleState.enemy.silenced = true; // 敌人沉默
                 logBattleEvent("敌人被沉默，无法使用法术攻击。", 'wheat');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
                 setTimeout(() => {
                     battleState.enemy.silenced = false;
                     logBattleEvent("敌人的沉默状态消失。");
@@ -4878,6 +4888,7 @@ function applyMagicAttackEffects() {
             case 'stun':
                 battleState.enemy.stunned = true; // 敌人眩晕
                 logBattleEvent("敌人被眩晕，无法行动。", 'wheat');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
                 setTimeout(() => {
                     battleState.enemy.stunned = false;
                     logBattleEvent("敌人的眩晕状态消失。");
@@ -4886,21 +4897,44 @@ function applyMagicAttackEffects() {
             case 'slow':
                 const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
                 battleState.enemy.speed -= slowAmount; // 速度降低
-                logBattleEvent(`敌人的速度降低了 ${slowAmount} 点。`, 'wheat');
+                logBattleEvent(`敌人被减速，速度降低了 ${slowAmount} 点。`, 'wheat');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
                 setTimeout(() => {
                     battleState.enemy.speed += slowAmount;
                     logBattleEvent("敌人的迟缓状态消失。");
                 }, 10000); // 迟缓持续10秒
                 break;
             case 'daze':
-                battleState.enemy.dazed = true; // 敌人呆滞
-                logBattleEvent("敌人被呆滞，可能会攻击自己。");
+                battleState.enemy.dazed = true; // 敌人混乱
+                logBattleEvent("敌人被混乱，可能会攻击自己。", '#FF00FF');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
                 setTimeout(() => {
                     battleState.enemy.dazed = false;
-                    logBattleEvent("敌人的呆滞状态消失。");
-                }, 10000); // 呆滞持续10秒
+                    logBattleEvent("敌人的混乱状态消失。");
+                }, 5000); // 混乱持续5秒
                 break;
         }
+    }
+
+    // 新增 exorcise 效果
+    const exorciseChance = Math.random();
+    if (exorciseChance < (0.1 * multiplier) && damage > 0) { // 触发概率受 multiplier 影响
+        const manaLoss = Math.floor(damage * 0.5);
+        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
+        logBattleEvent(`法力灼烧！敌人失去了 ${manaLoss} 点法力值。`, '#00BBFF');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
+    }
+
+    // 新增 burnt 效果
+    const burntChance = Math.random();
+    if (burntChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
+        battleState.enemy.burnt = true;
+        logBattleEvent("敌人被灼烧，每次行动会扣除生命值。", 'red');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52c4.gif');
+        setTimeout(() => {
+            battleState.enemy.burnt = false;
+            logBattleEvent("敌人的灼烧状态消失。");
+        }, 10000); // 灼烧持续10秒
     }
 }
 
@@ -5054,7 +5088,7 @@ function performPoison() {
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
         poisonChance = 0.7;
-        logBattleEvent("使用了毒粉，毒性加强了。", 'purple');
+        logBattleEvent("使用了毒粉，中毒概率增加至70%。", 'purple');
     }
 
     if (Math.random() < poisonChance) {
@@ -5067,7 +5101,7 @@ function performPoison() {
     }
     
     playerTurn = false; // 轮到敌人回合
-    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
+    setTimeout(enemyAttack, 500); // 延迟0.5秒后敌人回合
     applyAscensionEffects();
     updateUI();
 }
@@ -5120,7 +5154,7 @@ function performDefense() {
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
 
     playerTurn = false; // 轮到敌人回合
-    setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人回合
+    setTimeout(enemyAttack, 500); // 延迟0.5秒后敌人回合
 
     applyAscensionEffects();
 
@@ -5135,11 +5169,8 @@ function enemyAttack() {
         return;
     }
 
-    if (battleState.enemy.stunned) {
-        logBattleEvent("敌人眩晕，无法行动。", 'wheat');
-        playerTurn = true;
-        return;
-    }
+    if (handleDazed()) return;
+    if (handleStunned()) return;
 
     let damage;
     let isCritical = checkCriticalHit(enemyCritRate);
@@ -5149,35 +5180,141 @@ function enemyAttack() {
         logBattleEvent("敌人被恐吓，无法暴击。", 'wheat');
     }
 
-    const attackType = Math.random() < 0.7 ? 'physical' : 'magical';
-
+    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
     if (attackType === 'physical') {
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
-        damage = calculateDamage(damage, isCritical, enemyCritDamage);
-        logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66728e8dd9c307b7e956a4e4.gif');
+        damage = performPhysicalAttack(isCritical);
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
-        if (battleState.enemy.mana < 50) {
-            logBattleEvent("敌人的法力值不足！");
-            enemyAttack('physical');
-            return;
-        }
-
-        const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-        const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
-        damage = Math.max(0, Math.floor((battleState.enemy.magicAttack * 0.8 || 0) - effectiveDefense));
-        damage = calculateDamage(damage, isCritical, enemyCritDamage);
-
-        const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 50;
-        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
-        logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
+        damage = performMagicalAttack(isCritical);
     } else {
         logBattleEvent("敌人被沉默，无法进行法术攻击。", 'wheat');
     }
 
+    handleBurnt();
+    handleCriticalHit(isCritical);
+    handleDamageReduction(damage);
+    handleReflectAndHeal(damage);
+    handleResurrection(damage);
+    handlePoison();
+
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+    } else {
+        updateUI();
+        playerTurn = true;
+    }
+}
+
+function handleDazed() {
+    if (battleState.enemy.dazed) {
+        logBattleEvent("敌人混乱，可能会攻击自己。", 'wheat');
+        if (Math.random() < 0.5) {
+            const selfDamage = battleState.enemy.physicalAttack;
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
+            logBattleEvent(`敌人攻击了自己，造成了 ${selfDamage} 点伤害。`, 'wheat');
+            playerTurn = true;
+            return true;
+        }
+    }
+    return false;
+}
+
+function handleStunned() {
+    if (battleState.enemy.stunned) {
+        logBattleEvent("敌人眩晕，无法行动。", 'wheat');
+        playerTurn = true;
+        return true;
+    }
+    return false;
+}
+//敌人使用物理攻击
+function performPhysicalAttack(isCritical) {
+    const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+    let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
+    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
+    damage = calculateDamage(damage, isCritical, enemyCritDamage);
+    logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66728e8dd9c307b7e956a4e4.gif');
+    return damage;
+}
+//敌人使用法术攻击
+function performMagicalAttack(isCritical) {
+    if (battleState.enemy.mana < 50) {
+        logBattleEvent("敌人的法力值不足！");
+        enemyAttack('physical');
+        return 0;
+    }
+
+    const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
+    const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
+    let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack * 0.8 || 0) - effectiveDefense));
+    damage = calculateDamage(damage, isCritical, enemyCritDamage);
+
+    const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
+    battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
+    logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
+
+    // 应用敌人法术效果
+    applyEnemyMagicEffects(damage);
+
+    return damage;
+}
+
+function applyEnemyMagicEffects(damage) {
+    const effects = ['drunken', 'healingBan', 'soulCapture'];
+    effects.forEach(effect => {
+        const effectChance = Math.random();
+        switch (effect) {
+            case 'drunken':
+                if (effectChance < 0.2) { // 20%的概率触发醉酒效果
+                    battleState.player.drunken = true;
+                    logBattleEvent("你受到了醉酒效果，每次攻击都会受到额外伤害。", '#FF0088');
+                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    setTimeout(() => {
+                        battleState.player.drunken = false;
+                        logBattleEvent("你的醉酒效果消失了。");
+                    }, 10000); // 醉酒效果持续10秒
+                }
+                break;
+            case 'healingBan':
+                if (effectChance < 0.1) { // 20%的概率触发禁疗效果
+                    battleState.player.healingBan = true;
+                    logBattleEvent("你受到了禁疗效果，无法恢复生命值。", 'purple');
+                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    setTimeout(() => {
+                        battleState.player.healingBan = false;
+                        logBattleEvent("你的禁疗效果消失了。");
+                    }, 5000); // 禁疗效果持续5秒
+                }
+                break;
+            case 'soulCapture':
+                if (effectChance < 0.1) { // 20%的概率触发摄魂效果
+                    battleState.player.soulCapture = true;
+                    battleAttributes.physicalAttack *= 0.5;
+                    battleAttributes.magicAttack *= 0.5;
+                    logBattleEvent("你受到了摄魂效果，攻击力大幅下降。", 'purple');
+                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    setTimeout(() => {
+                        battleState.player.soulCapture = false;
+                        battleAttributes.physicalAttack *= 2;
+                        battleAttributes.magicAttack *= 2;
+                        logBattleEvent("你的摄魂效果消失了。");
+                    }, 5000); // 摄魂效果持续5秒
+                }
+                break;
+        }
+    });
+}
+
+function handleBurnt() {
+    if (battleState.enemy.burnt) {
+        const burntDamage = 1288 * battleRounds;
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
+        logBattleEvent(`灼烧效果生效，敌人受到了 ${burntDamage} 点伤害。`, 'red');
+    }
+}
+
+function handleCriticalHit(isCritical) {
     if (isCritical) {
         logBattleEvent("敌人发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
@@ -5186,7 +5323,9 @@ function enemyAttack() {
             logDiv.classList.remove('critical-hit');
         }, 300);
     }
+}
 
+function handleDamageReduction(damage) {
     if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
         damage = 0;
         logBattleEvent("无我之境触发，玩家免疫一切伤害！", 'silver');
@@ -5197,7 +5336,6 @@ function enemyAttack() {
         console.error("Damage is NaN, setting to 0.");
     }
 
-    // 计算减伤比例
     const damageReduction = battleState.player.damageReductionPercentage / 100;
     if (damageReduction > 0) {
         const reducedDamage = Math.floor(damage * damageReduction);
@@ -5214,7 +5352,9 @@ function enemyAttack() {
     }
 
     battleAttributes.health = Math.max(0, battleAttributes.health - damage);
+}
 
+function handleReflectAndHeal(damage) {
     if (ascensionSkill.name === '以牙还牙' || secondAscensionSkill.name === '以牙还牙') {
         const reflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const reflectDamage = Math.floor(damage * reflectPercentage);
@@ -5246,8 +5386,9 @@ function enemyAttack() {
         logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6671326ad9c307b7e9ffea12.gif');
     }
+}
 
-    // 处理向死而生技能
+function handleResurrection(damage) {
     if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
         let skill = ascensionSkill.name === '向死而生' ? ascensionSkill : secondAscensionSkill;
         const manaCostPercentage = skill.baseValue + skill.increment(skill.level);
@@ -5259,20 +5400,16 @@ function enemyAttack() {
             updateUI();
         }
     }
+}
 
+function handlePoison() {
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
         logBattleEvent(`敌人中毒，失去了 ${poisonDamage} 点生命值。`, 'purple');
     }
-
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false);
-    } else {
-        updateUI();
-        playerTurn = true;
-    }
 }
+
         
 function performHeal() {
     if (!attributesFetched) {
@@ -5307,7 +5444,12 @@ function performHeal() {
         return;
     }
 
-    const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8) * skillMultiplier);
+    // 如果玩家处于禁疗状态，治疗量变为0
+    let healAmount = 0;
+    if (!battleState.player.healingBan) {
+        healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8) * skillMultiplier);
+    }
+
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
@@ -5336,20 +5478,21 @@ function performHeal() {
     updateUI();
 }
 
+
 function startBattle() {
     if (!attributesFetched) {
         alert("请先从属性面板获取属性。");
         return;
     }
 
-    logBattleEvent("战斗开始！");
+    logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。施放技能附加的战斗效果也做了简化，将从所有效果中随机选择。");
     
     
     playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
     updateUI();
 
     if (!playerTurn) {
-        setTimeout(enemyAttack, 300); // 延迟0.3秒后敌人先攻
+        setTimeout(enemyAttack, 500); // 延迟0.5秒后敌人先攻
     }
 }
 

@@ -4527,43 +4527,13 @@ function refreshBattleAttributes() {
 
 
 function updateUI() {
-    const skillsArea = document.getElementById("skills-area");
-    let skillAttributes = {
-        health: 0,
-        mana: 0,
-        physicalAttack: 0,
-        physicalDefense: 0,
-        magicAttack: 0,
-        magicDefense: 0,
-        speed: 0,
-    };
-
-    if (skillsArea && currentPet.skills) {
-        const nSkills = Array.from(skillsArea.children).map(skillDiv => {
-            const skillName = skillDiv.innerText.split(' ')[0];
-            return currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
-        }).filter(skill => skill !== null);
-
-        const nSkillCount = nSkills.length;
-        skillAttributes = {
-            health: nSkillCount * 2000,
-            mana: nSkillCount * 500,
-            physicalAttack: nSkillCount * 728,
-            physicalDefense: nSkillCount * 364,
-            magicAttack: nSkillCount * 678,
-            magicDefense: nSkillCount * 339,
-            speed: nSkillCount * 211,
-        };
-    }
-
-    // 加上 skillAttributes
-    document.getElementById("your-pet-health").innerText = battleAttributes.health + skillAttributes.health;
-    document.getElementById("your-pet-mana").innerText = battleAttributes.mana + skillAttributes.mana;
-    document.getElementById("your-pet-physical-attack").innerText = battleAttributes.physicalAttack + skillAttributes.physicalAttack;
-    document.getElementById("your-pet-physical-defense").innerText = battleAttributes.physicalDefense + skillAttributes.physicalDefense;
-    document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack + skillAttributes.magicAttack;
-    document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense + skillAttributes.magicDefense;
-    document.getElementById("your-pet-speed").innerText = battleAttributes.speed + skillAttributes.speed;
+    document.getElementById("your-pet-health").innerText = battleAttributes.health;
+    document.getElementById("your-pet-mana").innerText = battleAttributes.mana;
+    document.getElementById("your-pet-physical-attack").innerText = battleAttributes.physicalAttack;
+    document.getElementById("your-pet-physical-defense").innerText = battleAttributes.physicalDefense;
+    document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack;
+    document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense;
+    document.getElementById("your-pet-speed").innerText = battleAttributes.speed;
 
     document.getElementById("enemy-pet-health").innerText = battleState.enemy.health;
     document.getElementById("enemy-pet-mana").innerText = battleState.enemy.mana;
@@ -4572,17 +4542,16 @@ function updateUI() {
     document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
     document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
     document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
-
+            
     // 更新暴击率和暴击伤害
-    document.getElementById("player-crit-rate").innerText = Math.round(playerCritRate * 100) + '%';
-    document.getElementById("player-crit-damage").innerText = Math.round(playerCritDamage * 100) + '%';
-    document.getElementById("enemy-crit-rate").innerText = Math.round(enemyCritRate * 100) + '%';
-    document.getElementById("enemy-crit-damage").innerText = Math.round(enemyCritDamage * 100) + '%';
-
+    document.getElementById("player-crit-rate").innerText = (playerCritRate * 100).toFixed(2) + '%';
+    document.getElementById("player-crit-damage").innerText = (playerCritDamage * 100).toFixed(2) + '%';
+    document.getElementById("enemy-crit-rate").innerText = (enemyCritRate * 100).toFixed(2) + '%';
+    document.getElementById("enemy-crit-damage").innerText = (enemyCritDamage * 100).toFixed(2) + '%';
     // 更新状态显示
+            
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
-    document.getElementById('battleRounds').innerText = battleRounds;
 }
 
 

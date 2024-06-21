@@ -6308,6 +6308,7 @@ function evolvePet() {
         updateQualityCard();
         updateRemainingPointsDisplay();
         updateSkillScore();
+        updateTitle();
     } else {
         // 如果进化失败，减少用户的所需道具数量，并提示用户进化失败。
         item.quantity--;
@@ -7151,6 +7152,7 @@ function forgeArm(key, infoDiv) {
     infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
     document.getElementById("gold-amount").innerText = goldAmount;
     updateSkillScore();
+    updateTitle();
     updateAttributePanel();
 }
 
@@ -7367,6 +7369,7 @@ function updatePetLevel() {
     document.getElementById('pet-level').innerText = petLevel;
     updateAttributePanel();
     updateSkillScore();
+    updateTitle();
 }
 
 function updatePetWisdom() {
@@ -7454,6 +7457,7 @@ function useGoldenRebornPill() {
     }
     updateSkillsArea(newSkills);
     updateSkillScore(newSkills);
+    updateTitle();
     
     petLevel = 1;
     currentWisdom = 0;
@@ -7820,6 +7824,7 @@ function buyItem() {
                         return { name, rarity: rarity.replace(")", "") };
                     });
                 updateSkillScore(currentSkills);
+                updateTitle();
             }
         } else {
             switch (itemName) {
@@ -8198,6 +8203,7 @@ function trainSkills() {
 
     updateSkillsArea(selectedSkills);
     updateSkillScore(selectedSkills);
+    updateTitle();
 }
 
 function getRandomSkillNum(probabilities) {
@@ -8964,6 +8970,7 @@ function useBingpoRebornPill() {
 
     updateQualityCard();
     updateSkillScore();
+    updateTitle();
 
     // 更新技能
     const skillNum = getRandomInt(0, 3);
@@ -9090,6 +9097,7 @@ function rebornPet() {
     updatePetLevel();
     updatePetWisdom();
     updateAttributePanel();
+    updateTitle();
 }
 
 function trainQuality() {
@@ -9184,6 +9192,7 @@ function enhanceQuality() {
     // 更新资质卡片和技能分数。
     updateQualityCard();
     updateSkillScore();
+    updateTitle();
 }
 
 let miraculousPill = 1; // 初始化灵异金丹数量
@@ -9225,6 +9234,7 @@ function mutatePet() {
 
     updateQualityCard();
     updateSkillScore();
+    updateTitle();
 }
 
 function getRandomInt(min, max) {

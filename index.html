@@ -2889,10 +2889,16 @@ function petCollection() {
             collectedPetCount++;
             statusDiv.innerText = '已收录';
             collectButton.disabled = true;
-
-            // 判断是否是当前宠物，如果是则跳转至默认的第一个选项
+            
+            // 判断是否是当前宠物，如果是则随机跳转至一个已有的选项
             if (petSelect.value === petKey) {
-                petSelect.value = petSelect.options[0].value;
+                let newOption;
+                do {
+                    const randomIndex = Math.floor(Math.random() * petSelect.options.length);
+                    newOption = petSelect.options[randomIndex].value;
+                } while (newOption === petKey);
+        
+                petSelect.value = newOption;
                 changePet(); // 更新宠物信息
             }
 
@@ -2928,6 +2934,7 @@ function petCollection() {
     collectionPanel.appendChild(bonusInfoDiv);
 
     updateCollectionBonus();
+    updateSkillScore();
     updateAttributePanel();
     updateTitle();
 }
@@ -2951,7 +2958,7 @@ function isPetOwned(petKey) {
 }
 
         
-let stamps = 1000; // 初始印花数量
+let stamps = 5000; // 初始印花数量
 let summonCharmPaper = 5; // 初始召唤灵符数量
 let summonedPet = null;
 let currentPetKey = 'xiaojin';
@@ -2959,8 +2966,6 @@ let currentPet = pets[currentPetKey]; // 初始化当前宠物
 
 function changePet() {
     const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
-    console.log('Selected Pet Key:', selectedPetKey);
-    console.log('Pets Array:', pets);
 
     if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
 
@@ -4983,7 +4988,6 @@ function applyMagicAttackEffects(damage, multiplier) {
                 showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
                 setTimeout(() => {
                     battleState.enemy.silenced = false;
-                    logBattleEvent("敌人的沉默状态消失。");
                 }, 3000); // 沉默持续3秒
                 break;
             case 'stun':
@@ -4992,7 +4996,6 @@ function applyMagicAttackEffects(damage, multiplier) {
                 showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
                 setTimeout(() => {
                     battleState.enemy.stunned = false;
-                    logBattleEvent("敌人的眩晕状态消失。");
                 }, 3000); // 眩晕持续3秒
                 break;
             case 'slow':
@@ -5011,7 +5014,6 @@ function applyMagicAttackEffects(damage, multiplier) {
                 showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
                 setTimeout(() => {
                     battleState.enemy.dazed = false;
-                    logBattleEvent("敌人的混乱状态消失。");
                 }, 5000); // 混乱持续5秒
                 break;
         }
@@ -5033,7 +5035,6 @@ function applyMagicAttackEffects(damage, multiplier) {
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52c4.gif');
         setTimeout(() => {
             battleState.enemy.burnt = false;
-            logBattleEvent("敌人的灼烧状态消失。");
         }, 10000); // 灼烧持续10秒
     }
 }
@@ -5339,7 +5340,7 @@ function performEnemyPhysicalAttack(isCritical) {
 //敌人使用法术攻击
 function performEnemyMagicalAttack(isCritical) {
     if (battleState.enemy.mana < 50) {
-        logBattleEvent("敌人的法力值不足！");
+        logBattleEvent("敌人想使用法术技能，但法力值不足！");
         enemyAttack('physical');
         return 0;
     }
@@ -5360,45 +5361,54 @@ function performEnemyMagicalAttack(isCritical) {
     return damage;
 }
 
+const effectCooldowns = {
+    drunken: false,
+    healingBan: false,
+    soulCapture: false
+};
+
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture'];
     effects.forEach(effect => {
         const effectChance = Math.random();
         switch (effect) {
             case 'drunken':
-                if (effectChance < 0.2) { // 20%的概率触发醉酒效果
+                if (effectChance < 0.2 && !effectCooldowns.drunken) { // 20%的概率触发醉酒效果
                     battleState.player.drunken = true;
                     logBattleEvent("你受到了醉酒效果，每次攻击都会受到额外伤害。", '#FF0088');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    effectCooldowns.drunken = true;
                     setTimeout(() => {
                         battleState.player.drunken = false;
-                        logBattleEvent("你的醉酒效果消失了。");
+                        effectCooldowns.drunken = false;
                     }, 10000); // 醉酒效果持续10秒
                 }
                 break;
             case 'healingBan':
-                if (effectChance < 0.1) { // 20%的概率触发禁疗效果
+                if (effectChance < 0.1 && !effectCooldowns.healingBan) { // 10%的概率触发禁疗效果
                     battleState.player.healingBan = true;
                     logBattleEvent("你受到了禁疗效果，无法恢复生命值。", 'purple');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    effectCooldowns.healingBan = true;
                     setTimeout(() => {
                         battleState.player.healingBan = false;
-                        logBattleEvent("你的禁疗效果消失了。");
+                        effectCooldowns.healingBan = false;
                     }, 5000); // 禁疗效果持续5秒
                 }
                 break;
             case 'soulCapture':
-                if (effectChance < 0.1) { // 20%的概率触发摄魂效果
+                if (effectChance < 0.1 && !effectCooldowns.soulCapture) { // 10%的概率触发摄魂效果
                     battleState.player.soulCapture = true;
                     battleAttributes.physicalAttack *= 0.5;
                     battleAttributes.magicAttack *= 0.5;
                     logBattleEvent("你受到了摄魂效果，攻击力大幅下降。", 'purple');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    effectCooldowns.soulCapture = true;
                     setTimeout(() => {
                         battleState.player.soulCapture = false;
                         battleAttributes.physicalAttack *= 2;
                         battleAttributes.magicAttack *= 2;
-                        logBattleEvent("你的摄魂效果消失了。");
+                        effectCooldowns.soulCapture = false;
                     }, 5000); // 摄魂效果持续5秒
                 }
                 break;

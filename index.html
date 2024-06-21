@@ -967,13 +967,15 @@
             top: 0;
             height: 100%;
             width: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: url('https://pic.imgdb.cn/item/667536a1d9c307b7e9cc1b53.jpg') no-repeat center center;
+            background-size: cover;
             color: white;
             box-shadow: -3px 0 5px rgba(0,0,0,0.2);
             z-index: 1000;
             overflow-y: auto;
             padding: 0px 0px 0px 0px;
         }
+
         
         .battle-system-drawer-toggle {
             font-size: 24px;
@@ -1005,15 +1007,16 @@
             line-height: 14px;
             font-size: 14px;
             flex: 1;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgb(0 0 0 / 40%);
             border-radius: 8px;
+            line-height: 12px;
         }
         
         .battle-system-log {
             border: 1px solid #ccc;
             padding: 10px;
             margin-bottom: 0px;
-            height: 30%;
+            height: 28%;
             overflow-y: auto;
             font-size: 12px;
             line-height: 14px;
@@ -1292,7 +1295,7 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    height: 70%;
+    height: 50%;
     width: 85%;
     transform: translate(-50%, -50%);
     background-color: rgba(0, 0, 0, 0.8);
@@ -1322,7 +1325,7 @@
 }
 
 .summon-area {
-    height: 300px;
+    height: 240px;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -1473,6 +1476,24 @@
     background-color: gray;
     color: white;
         }
+    .info-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ccc;
+    padding: 5px;
+    margin-bottom: 10px;
+}
+
+.avatar {
+    width: 25px;
+    height: 25px;
+    margin-right: 10px;
+}
+
+.info-text {
+    flex-grow: 1;
+}
    </style>
 </head>
 <body>
@@ -1753,7 +1774,7 @@
         <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
-                    <h2>当前宠物</h2><div id="player-status" class="status-display"></div>
+                    <h2>出战宠 <span id="your-pet-level">1</span>级</h2><div id="player-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
@@ -1771,7 +1792,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>挑战150轮</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>深渊巨魔 <span id="enemy-level">1</span>级</h2><div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
@@ -1901,7 +1922,7 @@
 </div>
 
 <div id="petShop" class="pet-shop-popup-panel" style="display:none;">
-    <h3>宠物商店</h3>
+    <h3>宠物商店（可下划）</h3>
     <button id="closePetShop" class="pet-shop-close-button">关闭</button>
     <div id="shopItems" class="shop-grid">
         <!-- 商店物品列表 -->
@@ -2222,7 +2243,7 @@
             },
             jinmin: {
                 name: '金珉奎',
-                rank: 'SR',
+                rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/666af8afd9c307b7e90e4638.gif',
                 skills: [
                     { name: '唯爱结城（防御）', rarity: 'SS', type: 'PD', multiplier: 1, description: '主动技能，如果此生只能爱一人，她的姓，必须是结城。' },
@@ -2727,6 +2748,7 @@ function preloadImages(imageUrls) {
 
 // 调用函数预加载图片
 const imageUrls = [
+    "https://pic.imgdb.cn/item/667536a1d9c307b7e9cc1b53.jpg",
     "https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png",
     "https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif",
@@ -2792,7 +2814,7 @@ function showMessage(message, type = 'info') {
 document.addEventListener('DOMContentLoaded', () => {
     updateStampCount();
 });
-
+      
 //宠物图鉴功能
 let collectedPetCount = 0; // 全局变量，用于存储已收录宠物的数量
 let collectedPets = [];
@@ -4433,7 +4455,7 @@ function initializeEnemyPet() {
 
     storeEnemyInitialState(); // 存储初始状态
 }
-
+let enemyLevel;
 function updateEnemyAttributes() {
     const player = battleAttributes;
 
@@ -4532,10 +4554,13 @@ function updateEnemyAttributes() {
     if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
     if (enemyPet.magicAttack > player.magicAttack * 4) enemyPet.magicAttack = Math.floor(player.magicAttack * 4);
     if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
-    if (enemyPet.speed > player.speed * 1.2) enemyPet.speed = Math.floor(player.speed * 1.2);
+    if (enemyPet.speed > player.speed * 1) enemyPet.speed = 108340;
 
     // 更新战斗状态
     battleState.enemy = { ...enemyPet };
+    // 更新敌人等级显示
+    enemyLevel = battleRounds;
+    document.getElementById('enemy-level').innerText = enemyLevel;
 }
 
 
@@ -4564,8 +4589,8 @@ function refreshBattleAttributes() {
 
         const nSkillCount = nSkills.length;
         skillAttributes = {
-            health: nSkillCount * 2000,
-            mana: nSkillCount * 500,
+            health: nSkillCount * 2109,
+            mana: nSkillCount * 533,
             physicalAttack: nSkillCount * 728,
             physicalDefense: nSkillCount * 364,
             magicAttack: nSkillCount * 678,
@@ -5588,6 +5613,8 @@ function performHeal() {
     updateUI();
 }
 
+// 将 firstStartBattle 定义为全局变量
+let firstStartBattle = false;
 
 function startBattle() {
     if (!attributesFetched) {
@@ -5595,9 +5622,12 @@ function startBattle() {
         return;
     }
 
-    logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。施放技能附加的战斗效果也做了简化，将从所有效果中随机选择。");
-    
-    
+    // 检查全局变量 firstStartBattle 的状态
+    if (!firstStartBattle) {
+        logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。施放技能附加的战斗效果也做了简化，将从所有效果中随机选择。");
+        firstStartBattle = true;
+    }
+
     playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
     updateUI();
 
@@ -6479,9 +6509,7 @@ function ascend() {
     alert("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
 }
 
-function updatePetLevel() {
-    document.getElementById('pet-level').innerText = petLevel;
-}
+
 
 let selectedTreasure = null;
 let rewards = []; // 定义全局变量来存储奖品
@@ -7125,7 +7153,7 @@ function forgeArm(key, infoDiv) {
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
     let newValue;
     let rand = Math.random();
-        if (rand < 0.98) {
+        if (rand < 0.9) {
         newValue = Math.floor(100 + Math.random() * 0.3 * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
             attribute === "magicAttack" ? 38999 :
@@ -7310,8 +7338,8 @@ function updateSecondaryAttributes(currentAttributes, currentWisdom) {
 }
 
 
-let trainingCosts = [200, 2000, 10000, 24000]; // 定义每次金子培养所需的金子数量
-let trainingMultipliers = [1.1, 1.08, 1.06, 1.01]; // 定义每次金子培养的属性提升倍数
+let trainingCosts = [2000, 6000, 50000, 100000]; // 定义每次金子培养所需的金子数量
+let trainingMultipliers = [1.1, 1.08, 1.06, 1.02]; // 定义每次金子培养的属性提升倍数
 let trainingCount = 0; // 初始化已经使用的金子培养次数
 
 function calculateAvailableTrainingCount(petLevel) {
@@ -7377,6 +7405,7 @@ function trainAttributes() {
 
 function updatePetLevel() {
     document.getElementById('pet-level').innerText = petLevel;
+    document.getElementById('your-pet-level').innerText = petLevel;
     updateAttributePanel();
     updateSkillScore();
     updateTitle();
@@ -7647,7 +7676,7 @@ function getRandomCommonItem() {
         { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) },
         { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: getRandomInt(188, 388) },
         { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: getRandomInt(388, 688) },
-        { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: getRandomInt(3688, 4688) },
+        { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: getRandomInt(2688, 4688) },
         { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: getRandomInt(388, 788) }
     ];
 
@@ -8308,7 +8337,7 @@ function updateSkillScore(selectedSkills = []) {
     const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
     // 计算技能评分
-    let skillScore = 0;
+    let skillsScore = 0;
     let aSkillCount = 0;
     let sSkillCount = 0;
     let ssSkillCount = 0;
@@ -8316,29 +8345,29 @@ function updateSkillScore(selectedSkills = []) {
     selectedSkills.forEach(skill => {
         switch (skill.rarity) {
             case 'B':
-                skillScore += 200;
+                skillsScore += 200;
                 break;
             case 'A':
-                skillScore += 1000;
+                skillsScore += 1000;
                 aSkillCount++;
                 break;
             case 'S':
-                skillScore += 6000;
+                skillsScore += 6000;
                 sSkillCount++;
                 break;
             case 'SS':
-                skillScore += 10000;
+                skillsScore += 10000;
                 ssSkillCount++;
                 break;
         }
     });
 
-    if (aSkillCount > 1) skillScore += 1000;
-    if (sSkillCount > 1) skillScore += 10000;
-    if (ssSkillCount > 1) skillScore += 50000;
+    if (aSkillCount > 1) skillsScore += 1000;
+    if (sSkillCount > 1) skillsScore += 10000;
+    if (ssSkillCount > 1) skillsScore += 50000;
 
     // 计算总评分
-    const totalScore = qualityScore + attributeScore + skillScore + secondaryAttributeScore;
+    const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore;
     // 获取具有 ID "skill-score" 的元素
     const skillScoreElement = document.getElementById("skill-score");
     // 设置该元素的文本内容为 totalScore
@@ -8348,6 +8377,7 @@ function updateSkillScore(selectedSkills = []) {
 
     // 更新全局 skillScore 变量
     window.skillScore = totalScore; // 确保 skillScore 是全局变量
+    window.petScore = totalScore; // 确保 petScore 是全局变量
 
     // 更新任务列表以反映新的宠物评分
     updateTaskList();
@@ -8377,38 +8407,36 @@ function upgradeWisdomTo() {
         document.getElementById("transmutation-pill").innerText = transmutationPill;
         document.getElementById("reborn-pill").innerText = rebornPill;
 
-        const itemsToIncrease = [
-            'normalExperienceBook',
-            'advancedExperienceBook',
-            'ascensionStone',
-            'supremeWisdomPill',
-            'awakenPill', // 醒悟丹
-            'coagulateStone', // 凝魄石
-            'seperateStone', // 离魂石
-            'tejiWisdomPill',
-            'radiantSoul',
-            'spiritRefreshStone',
-            'spiritAwakenStone',
-            'heartStone', //心鉴之石
-            'earthlyEnergy', //天地灵气
-            'shakingSoul',
-            'summonCharmPaper', //召唤灵符
-            'poisonSkillBook', //施毒之术
-            'poisonPowder', //毒粉
-            'glowingSoul',
-            'activeSoul',
-            'jumpingSoul'
-        ];
-    
-        for (const item of itemsToIncrease) {
-            for (let i = 0; i < 999; i++) {
-                addItemToJinnang(item);
-            }
-        }
-    
-        updateJinnangItems();
-        document.getElementById("description-box").innerText = "您获得了超绝白金VIP礼包！";
-        return;
+    const itemsToIncrease = [
+        'normalExperienceBook',
+        'advancedExperienceBook',
+        'ascensionStone',
+        'supremeWisdomPill',
+        'awakenPill', // 醒悟丹
+        'coagulateStone', // 凝魄石
+        'seperateStone', // 离魂石
+        'tejiWisdomPill',
+        'radiantSoul',
+        'spiritRefreshStone',
+        'spiritAwakenStone',
+        'heartStone', //心鉴之石
+        'earthlyEnergy', //天地灵气
+        'shakingSoul',
+        'summonCharmPaper', //召唤灵符
+        'poisonSkillBook', //施毒之术
+        'poisonPowder', //毒粉
+        'glowingSoul',
+        'activeSoul',
+        'jumpingSoul'
+    ];
+
+    for (const item of itemsToIncrease) {
+        addItemToJinnang(item, 9999);
+    }
+
+    updateJinnangItems();
+    document.getElementById("description-box").innerText = "您获得了超绝白金VIP礼包！";
+    return;
     }
 
     if (target === "我爱金珉奎") {
@@ -8759,7 +8787,7 @@ function hallucinatePet() {
     if (!hallucinated) {
         const coagulateStoneItem = jinnangItems.find(i => i.name === 'coagulateStone');
         if (!coagulateStoneItem || coagulateStoneItem.quantity < 1) {
-            alert("您的凝魄石不足！");
+            alert("您的凝魄石不足！凝魄石可通过至尊宝箱获取。");
             return;
         }
 
@@ -9175,7 +9203,7 @@ function enhanceQuality() {
 
     // 如果宠物的资质未发生变异，
     if (!currentPet.qualities.mutated) {
-        // 遍历每个维度，如果随机数小于0.1，将该维度的资质值设为最大值，并添加到maxedDimensions数组。
+        // 遍历每个维度，如果随机数小于0.01，将该维度的资质值设为最大值，并添加到maxedDimensions数组。
         dimensions.forEach(dim => {
             if (Math.random() < 0.01) {
                 newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max) * 0.95);
@@ -9310,9 +9338,10 @@ const titles = [
     "初来乍到", "懵懵懂懂", "初窥门径", "小有所成", "渐入佳境",
     "如鱼得水", "游刃有余", "青云直上", "名扬四海", "独占鳌头",
     "炙手可热", "举世无双", "威震八方", "震古烁今", "登峰造极",
-    "傲视群雄", "龙腾四海", "王者归来", "至尊无上", "魔兽之王"
+    "傲视群雄", "龙腾四海", "王者归来", "至尊无上", "魔兽之王",
+    "神"
 ];
-
+let petScore;
 function updateTitle() {
     let currentTitleIndex = 0;
 
@@ -9332,10 +9361,10 @@ function updateTitle() {
 
     // 条件3：技能分数
     if (currentTitleIndex >= 8) {
-        if (skillScore >= 2600000) currentTitleIndex = 12;
-        else if (skillScore >= 2400000) currentTitleIndex = 11;
-        else if (skillScore >= 2200000) currentTitleIndex = 10;
-        else if (skillScore >= 2000000) currentTitleIndex = 9;
+        if (window.petScore >= 2600000) currentTitleIndex = 12;
+        else if (window.petScore >= 2400000) currentTitleIndex = 11;
+        else if (window.petScore >= 2200000) currentTitleIndex = 10;
+        else if (window.petScore >= 2000000) currentTitleIndex = 9;
     }
 
     // 条件4：战斗回合数
@@ -9362,7 +9391,6 @@ function updateTitle() {
     const titleElement = document.getElementById('personal-honor');
     titleElement.innerText = titles[currentTitleIndex];
 }
-
         
     </script>
 </body>

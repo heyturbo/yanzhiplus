@@ -1014,15 +1014,28 @@
         
         .battle-system-log {
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 5px;
             margin-bottom: 0px;
             height: 28%;
-            overflow-y: auto;
+            overflow-y: clip;
             font-size: 12px;
-            line-height: 14px;
             background: rgb(0 0 0 / 40%);
             border-radius: 8px;
-            width: 94%;
+            width: 97%;
+        }
+                /* 直接针对日志内容的样式 */
+        #log {
+            display: block;
+            unicode-bidi: isolate;
+            overflow-y: auto;
+            max-height: 75%;
+            line-height: 20px;
+        }
+
+        /* 日志条目的样式 */
+        #log p {
+            margin: 0;
+            padding: 2px 0;
         }
         
         .battle-system-actions {
@@ -1810,16 +1823,16 @@
             <!-- 战斗精灵弹出界面 -->
             <div id="battle-spirit-modal" style="display: none;">
                 <div>
-                    <h2>战斗精灵（已觉醒）</h2>
+                    <h2>🧚‍♀️战斗精灵（已觉醒）</h2>
                     <div id="message-container" style="display: none;"></div>
                     <p>等级: <span id="spirit-level">1</span></p>
                     <p>增幅: <span id="spirit-multiplier">100%</span>（1%~415%）</p>
-                    <p>生命值增加: <span id="spirit-health">0</span></p>
-                    <p>法力值增加: <span id="spirit-mana">0</span></p>
-                    <p>物理攻击增加: <span id="spirit-physical-attack">0</span></p>
-                    <p>物理防御增加: <span id="spirit-physical-defense">0</span></p>
-                    <p>法术攻击增加: <span id="spirit-magic-attack">0</span></p>
-                    <p>法术防御增加: <span id="spirit-magic-defense">0</span></p>
+                    <p>HP增加: <span id="spirit-health">0</span></p>
+                    <p>MP增加: <span id="spirit-mana">0</span></p>
+                    <p>物攻增加: <span id="spirit-physical-attack">0</span></p>
+                    <p>物防增加: <span id="spirit-physical-defense">0</span></p>
+                    <p>法攻增加: <span id="spirit-magic-attack">0</span></p>
+                    <p>法防增加: <span id="spirit-magic-defense">0</span></p>
                     <p>速度增加: <span id="spirit-speed">0</span></p>
                     <button id="level-up-spirit">精灵升级</button>
                     <button id="enhance-spirit">增幅洗练</button>
@@ -4675,6 +4688,7 @@ function getEnemyStatus() {
     if (battleState.enemy.intimidated) status.push("恐吓");
     if (battleState.enemy.dazed) status.push("混乱");
     if (battleState.enemy.burnt) status.push("灼烧");
+    if (battleState.enemy.slow) status.push("迟缓");
     // Exorcise doesn't need a status as it's an immediate effect, not a lasting status.
     return status.join(", ");
 }
@@ -4701,27 +4715,19 @@ function logBattleEvent(event, color = 'white') {
         newEvent.style.color = color; // 设置文字颜色
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 7 条，则删除最早的条目
+        // 检查日志条目数，如果超过 24 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 7) {
+        while (logs.length > 23) {
             logDiv.removeChild(logs[0]);
         }
 
-        // 尝试强制滚动到最底部
+        // 设置滚动条自动滚动到底部
         logDiv.scrollTop = logDiv.scrollHeight;
-        setTimeout(() => {
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }, 0);
-        setTimeout(() => {
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }, 50);
-        setTimeout(() => {
-            logDiv.scrollTop = logDiv.scrollHeight;
-        }, 100);
     } else {
         console.error("logDiv not found");
     }
 }
+
 
 // 定义初始暴击率和暴击伤害
 let playerCritRate = 0.1; // 10%
@@ -4820,7 +4826,13 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-    logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+
+    // 根据是否暴击来记录日志
+    if (isCritical) {
+        logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
+    } else {
+        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+    }
 
     applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
 
@@ -4844,7 +4856,13 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
-    logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+
+    // 根据是否暴击来记录日志
+    if (isCritical) {
+        logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值！`, 'red');
+    } else {
+        logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+    }
 
     applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
 
@@ -4856,6 +4874,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     return { damage, retryPhysical: false };
 }
 
+
 function handleCriticalAndDrunken(damage) {
     let isCritical = checkCriticalHit(playerCritRate);
 
@@ -4866,7 +4885,6 @@ function handleCriticalAndDrunken(damage) {
     }
 
     if (isCritical) {
-        logBattleEvent("你发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
         logDiv.classList.add('critical-hit');
         setTimeout(() => {
@@ -4914,11 +4932,6 @@ function performAttack(type) {
 
     handleCriticalAndDrunken(damageResult);
 
-    if (battleState.enemy.sleeping && type !== 'heal') {
-        battleState.enemy.sleeping = false;
-        logBattleEvent("敌人从沉睡中醒来。");
-    }
-
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
@@ -4965,7 +4978,14 @@ function performIndependentMagicAttack() {
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-    logBattleEvent(`你造成了 ${damage} 点伤害。`, 'wheat');
+
+    // 根据是否暴击来记录日志
+    if (isCritical) {
+        logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点伤害。`, 'red');
+    } else {
+        logBattleEvent(`你造成了 ${damage} 点伤害。`, 'wheat');
+    }
+
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
     applyMagicAttackEffects(damage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
@@ -4978,7 +4998,6 @@ function performIndependentMagicAttack() {
     }
 
     if (isCritical) {
-        logBattleEvent("你发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
         logDiv.classList.add('critical-hit');
         setTimeout(() => {
@@ -5002,7 +5021,6 @@ function applyPhysicalAttackEffects(multiplier) {
                 updateEnemyStatusDisplay();
                 setTimeout(() => {
                     battleState.enemy.physicalDefense += armorBreakValue;
-                    logBattleEvent("敌人的破甲状态消失。");
                     updateEnemyStatusDisplay();
                 }, 10000); // 破甲持续10秒
                 break;
@@ -5050,12 +5068,14 @@ function applyMagicAttackEffects(damage, multiplier) {
             case 'slow':
                 const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
                 battleState.enemy.speed -= slowAmount; // 速度降低
+                battleState.enemy.slow = true;
                 logBattleEvent(`敌人被减速，速度降低了 ${slowAmount} 点。`, 'wheat');
                 showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
                 updateEnemyStatusDisplay();
                 setTimeout(() => {
                     battleState.enemy.speed += slowAmount;
-                    logBattleEvent("敌人的迟缓状态消失。");
+                    logBattleEvent("敌人的迟缓状态消失。", 'wheat');
+                    battleState.enemy.slow = false;
                     updateEnemyStatusDisplay();
                 }, 10000); // 迟缓持续10秒
                 break;
@@ -5535,13 +5555,12 @@ function handleBurnt() {
     if (battleState.enemy.burnt) {
         const burntDamage = 1288 * battleRounds;
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
-        logBattleEvent(`灼烧效果生效，敌人受到了 ${burntDamage} 点伤害。`, 'red');
+        logBattleEvent(`敌人受到了 ${burntDamage} 点灼烧伤害。`, 'red');
     }
 }
 
 function handleCriticalHit(isCritical) {
     if (isCritical) {
-        logBattleEvent("敌人发动了暴击，造成了额外伤害！", 'red');
         const logDiv = document.getElementById('log');
         logDiv.classList.add('critical-hit');
         setTimeout(() => {
@@ -8454,11 +8473,52 @@ function updateSkillScore(selectedSkills = []) {
     updateTitle();
 }
 
-
+let blessGift = false;
 function upgradeWisdomTo() {
     const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后，你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
     if (target === null) return;
+    if (target === "新手大礼包" && !blessGift) {
+        transmutationPill += 200;
+        rebornPill += 300;
+        bingpoRebornPill += 200;
+        goldenRebornPill += 200;
+        miraculousPill += 50;
+        qualityPill += 200;
+        highGradePill += 500;
+        goldAmount += 500000;
+        document.getElementById("gold-amount").innerText = goldAmount;
+        document.getElementById("quality-pill").innerText = qualityPill;
+        document.getElementById("high-grade-pill").innerText = highGradePill;
+        document.getElementById("miraculous-pill").innerText = miraculousPill;
+        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+        document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
+        document.getElementById("transmutation-pill").innerText = transmutationPill;
+        document.getElementById("reborn-pill").innerText = rebornPill;
 
+        const itemsToIncrease = [
+        'coagulateStone', // 凝魄石
+        'seperateStone', // 离魂石
+        'radiantSoul',
+        'heartStone', //心鉴之石
+        'shakingSoul',
+        'summonCharmPaper', //召唤灵符
+        'glowingSoul',
+        'activeSoul',
+        'jumpingSoul'
+    ];
+
+    for (const item of itemsToIncrease) {
+        addItemToJinnang(item, 50);
+    }
+    blessGift = true;
+    updateJinnangItems();
+    document.getElementById("description-box").innerText = "您获得了新手大礼包！（50万金子，悟性丹500，万化灵丹200，还童丹300，还童金丹200，冰魄还童丹200，资质丹200，灵异金丹50。其他奖励已经放入背包。）";
+    return;
+    }
+    if (target === "新手大礼包" && blessGift) {
+        alert("你已经领取过新手礼包了！");
+        return;
+    }
     if (target === "11111") {
         transmutationPill += 999;
         rebornPill += 999;
@@ -9392,6 +9452,11 @@ function startGameTimer() {
         // 格式化时间为 mm:ss
         let formattedTime = `${padZero(minutes)}:${padZero(seconds)}`;
         timerElement.innerText = formattedTime;
+
+        // 在30秒时显示图像框
+        if (Math.floor(elapsedTime / 1000) === 30) {
+            showImageBox();
+        }
     }
 
     // 每秒更新一次计时器
@@ -9402,7 +9467,53 @@ function startGameTimer() {
 function padZero(num) {
     return num < 10 ? '0' + num : num;
 }
+function showImageBox() {
+    const imageBox = document.createElement('div');
+    imageBox.id = 'image-box';
+    imageBox.style.position = 'fixed';
+    imageBox.style.top = '50%';
+    imageBox.style.left = '50%';
+    imageBox.style.transform = 'translate(-50%, -50%) scale(0)'; // 初始大小为0
+    imageBox.style.width = '100%';
+    imageBox.style.height = '80%';
+    imageBox.style.borderRadius = '20px';
+    imageBox.style.background = "url('https://pic.imgdb.cn/item/66757e24d9c307b7e97d6462.png') no-repeat center center";
+    imageBox.style.backgroundSize = 'cover';
+    imageBox.style.zIndex = '2000';
+    imageBox.style.transition = 'transform 0.5s ease-out'; // 添加过渡动画
+    document.body.appendChild(imageBox);
 
+    // 延迟一帧后触发动画
+    requestAnimationFrame(() => {
+        imageBox.style.transform = 'translate(-50%, -50%) scale(1)'; // 最终大小为原始大小
+    });
+
+    let clickCount = 0;
+    let clickHandler = () => {
+        clickCount++;
+        if (clickCount > 2) {
+            hideImageBox(imageBox, clickHandler);
+        }
+    };
+
+    document.addEventListener('click', clickHandler);
+
+    // 20秒后自动隐藏图像框
+    setTimeout(() => {
+        hideImageBox(imageBox, clickHandler);
+    }, 20000);
+}
+
+function hideImageBox(imageBox, clickHandler) {
+    if (imageBox) {
+        imageBox.style.transition = 'transform 0.5s ease-out'; // 添加过渡动画
+        imageBox.style.transform = 'translate(-50%, -50%) scale(0)'; // 缩小到原来的大小
+        setTimeout(() => {
+            imageBox.remove();
+            document.removeEventListener('click', clickHandler);
+        }, 500); // 等待动画结束后移除元素
+    }
+}
 // 称号数组，从低到高排列
 const titles = [
     "初来乍到", "懵懵懂懂", "初窥门径", "小有所成", "渐入佳境",

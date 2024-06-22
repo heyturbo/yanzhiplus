@@ -4387,7 +4387,7 @@ function updatePetInfo() {
             const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
             if (skill) {
                 const skillLevel = skill.level || 1;
-                const levelMultiplier = 1 + 0.05 * (skillLevel - 1); // 每提升一级增加5%
+                const levelMultiplier = 1 + 0.05 * (skillLevel - 1);
                 skillAttributes.health += Math.round(2168 * levelMultiplier);
                 skillAttributes.mana += Math.round(531 * levelMultiplier);
                 skillAttributes.physicalAttack += Math.round(728 * levelMultiplier);
@@ -4434,19 +4434,108 @@ function updatePetInfo() {
         battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed;
     }
 
-    battleAttributes = { ...battleState.player }; // 设置战斗属性
+    battleAttributes = { ...battleState.player };
+    maxHealth = battleAttributes.health;
+    maxMana = battleAttributes.mana;
 
-    maxHealth = battleAttributes.health; // 设置独立的最大值变量
-    maxMana = battleAttributes.mana; // 设置独立的最大值变量
-
-    // 确保 enemyMaxHealth 和 enemyMaxMana 受到玩家属性的约束
-    enemyMaxHealth = Math.min(enemyMaxHealth, maxHealth * 30);
-    enemyMaxMana = Math.min(enemyMaxMana, maxMana * 10);
+    updateEnemyMaxAttributes();
 
     updateUI();
     attributesFetched = true;
 }
 
+function updateEnemyAttributes() {
+    const player = battleAttributes;
+
+    const enhanceFactors = {
+        health: [1.04, 1.08],
+        mana: [1.02, 1.05],
+        physicalAttack: [1.03, 1.07],
+        physicalDefense: [1.01, 1.05],
+        magicAttack: [1.01, 1.05],
+        magicDefense: [1.01, 1.05],
+        speed: [1.01, 1.04]
+    };
+
+    const waveEnhanceFactors = {
+        health: [1.05, 1.10],
+        mana: [1.03, 1.06],
+        physicalAttack: [1.04, 1.08],
+        physicalDefense: [1.02, 1.06],
+        magicAttack: [1.02, 1.06],
+        magicDefense: [1.02, 1.06],
+        speed: [1.02, 1.05]
+    };
+
+    const randomEventFactors = {
+        health: [0.95, 1.15],
+        mana: [0.95, 1.15],
+        physicalAttack: [0.95, 1.15],
+        physicalDefense: [0.95, 1.15],
+        magicAttack: [0.95, 1.15],
+        magicDefense: [0.95, 1.15],
+        speed: [0.95, 1.15]
+    };
+
+    function getEnhanceFactors() {
+        if (battleRounds % 10 === 0) {
+            return waveEnhanceFactors;
+        } else if (Math.random() < 0.1) {
+            return randomEventFactors;
+        } else if (battleRounds <= 20) {
+            return {
+                health: [1.06, 1.12],
+                mana: [1.03, 1.08],
+                physicalAttack: [1.05, 1.10],
+                physicalDefense: [1.02, 1.07],
+                magicAttack: [1.02, 1.07],
+                magicDefense: [1.02, 1.07],
+                speed: [1.03, 1.06]
+            };
+        } else if (battleRounds <= 100) {
+            return enhanceFactors;
+        } else {
+            return {
+                health: [1.02, 1.05],
+                mana: [1.01, 1.03],
+                physicalAttack: [1.02, 1.05],
+                physicalDefense: [1.005, 1.03],
+                magicAttack: [1.05, 1.03],
+                magicDefense: [1.05, 1.03],
+                speed: [1.05, 1.02]
+            };
+        }
+    }
+
+    function enhanceAttribute(attribute, range) {
+        const factor = Math.random() * (range[1] - range[0]) + range[0];
+        return Math.floor(attribute * factor);
+    }
+
+    const currentEnhanceFactors = getEnhanceFactors();
+
+    enemyPet.health = enhanceAttribute(enemyPet.health, currentEnhanceFactors.health);
+    enemyPet.mana = enhanceAttribute(enemyPet.mana, currentEnhanceFactors.mana);
+    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, currentEnhanceFactors.physicalAttack);
+    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, currentEnhanceFactors.physicalDefense);
+    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, currentEnhanceFactors.magicAttack);
+    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, currentEnhanceFactors.magicDefense);
+    enemyPet.speed = enhanceAttribute(enemyPet.speed, currentEnhanceFactors.speed);
+
+    updateEnemyMaxAttributes();
+
+    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
+    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
+    if (enemyPet.physicalAttack > player.physicalAttack * 5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 5);
+    if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
+    if (enemyPet.magicAttack > player.magicAttack * 4) enemyPet.magicAttack = Math.floor(player.magicAttack * 4);
+    if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
+    if (enemyPet.speed > player.speed * 1) enemyPet.speed = Math.floor(player.speed * 1.001);
+
+    battleState.enemy = { ...enemyPet };
+    enemyLevel = battleRounds;
+    document.getElementById('enemy-level').innerText = enemyLevel;
+}
 
 function initializeEnemyPet() {
     enemyPet = {
@@ -4468,115 +4557,25 @@ function initializeEnemyPet() {
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
 
-    storeEnemyInitialState(); // 存储初始状态
+    storeEnemyInitialState();
 }
-let enemyLevel;
-function updateEnemyAttributes() {
+
+function updateEnemyMaxAttributes() {
     const player = battleAttributes;
 
-    // 定义增强幅度范围
-    const enhanceFactors = {
-        health: [1.04, 1.08],
-        mana: [1.02, 1.05],
-        physicalAttack: [1.03, 1.07],
-        physicalDefense: [1.01, 1.05],
-        magicAttack: [1.01, 1.05],
-        magicDefense: [1.01, 1.05],
-        speed: [1.01, 1.04]
-    };
+    // 检查 player.health 和 player.mana 是否是数字，并且不为 NaN
+    if (!isNaN(player.health) && !isNaN(player.mana)) {
+        enemyMaxHealth = Math.min(Math.floor(enemyMaxHealth * 1.05), player.health * 30);
+        enemyMaxMana = Math.min(Math.floor(enemyMaxMana * 1.035), player.mana * 10);
 
-    // 波动增强逻辑
-    const waveEnhanceFactors = {
-        health: [1.05, 1.10],
-        mana: [1.03, 1.06],
-        physicalAttack: [1.04, 1.08],
-        physicalDefense: [1.02, 1.06],
-        magicAttack: [1.02, 1.06],
-        magicDefense: [1.02, 1.06],
-        speed: [1.02, 1.05]
-    };
-
-    // 随机事件逻辑
-    const randomEventFactors = {
-        health: [0.95, 1.15],
-        mana: [0.95, 1.15],
-        physicalAttack: [0.95, 1.15],
-        physicalDefense: [0.95, 1.15],
-        magicAttack: [0.95, 1.15],
-        magicDefense: [0.95, 1.15],
-        speed: [0.95, 1.15]
-    };
-
-    // 获取增强幅度逻辑
-    function getEnhanceFactors() {
-        if (battleRounds % 10 === 0) {
-            return waveEnhanceFactors; // 每10回合一次大的增强
-        } else if (Math.random() < 0.1) {
-            return randomEventFactors; // 10%的概率触发随机事件
-        } else if (battleRounds <= 20) {
-            return {
-                health: [1.06, 1.12],
-                mana: [1.03, 1.08],
-                physicalAttack: [1.05, 1.10],
-                physicalDefense: [1.02, 1.07],
-                magicAttack: [1.02, 1.07],
-                magicDefense: [1.02, 1.07],
-                speed: [1.03, 1.06]
-            };
-        } else if (battleRounds <= 100) {
-            return enhanceFactors; // 默认增强幅度
-        } else {
-            return {
-                health: [1.02, 1.05],
-                mana: [1.01, 1.03],
-                physicalAttack: [1.02, 1.05],
-                physicalDefense: [1.005, 1.03],
-                magicAttack: [1.05, 1.03],
-                magicDefense: [1.05, 1.03],
-                speed: [1.05, 1.02]
-            };
-        }
+    } else {
+        console.error("Invalid player health or mana values");
+        enemyMaxHealth = enemyPet.health;
+        enemyMaxMana = enemyPet.mana;
     }
-
-    // 随机增强函数
-    function enhanceAttribute(attribute, range) {
-        const factor = Math.random() * (range[1] - range[0]) + range[0];
-        return Math.floor(attribute * factor);
-    }
-
-    // 获取当前回合数的增强幅度
-    const currentEnhanceFactors = getEnhanceFactors();
-
-    // 增强敌人属性
-    enemyPet.health = enhanceAttribute(enemyPet.health, currentEnhanceFactors.health);
-    enemyPet.mana = enhanceAttribute(enemyPet.mana, currentEnhanceFactors.mana);
-    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, currentEnhanceFactors.physicalAttack);
-    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, currentEnhanceFactors.physicalDefense);
-    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, currentEnhanceFactors.magicAttack);
-    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, currentEnhanceFactors.magicDefense);
-    enemyPet.speed = enhanceAttribute(enemyPet.speed, currentEnhanceFactors.speed);
-
-    // 更新最大值并确保受到玩家属性的约束
-    enemyMaxHealth = Math.floor(enemyMaxHealth * 1.05);
-    enemyMaxMana = Math.floor(enemyMaxMana * 1.035);
-
-    if (enemyMaxHealth > player.maxHealth * 30) enemyMaxHealth = Math.floor(player.maxHealth * 30);
-    if (enemyMaxMana > player.maxMana * 10) enemyMaxMana = Math.floor(player.maxMana * 10);
-
-    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
-    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 5);
-    if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
-    if (enemyPet.magicAttack > player.magicAttack * 4) enemyPet.magicAttack = Math.floor(player.magicAttack * 4);
-    if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
-    if (enemyPet.speed > player.speed * 1) enemyPet.speed = Math.floor(player.speed * 1.001);
-
-    // 更新战斗状态
-    battleState.enemy = { ...enemyPet };
-    // 更新敌人等级显示
-    enemyLevel = battleRounds;
-    document.getElementById('enemy-level').innerText = enemyLevel;
 }
+
+
 
 
 function refreshBattleAttributes() {
@@ -5065,28 +5064,31 @@ function selectSkillAndCalculateMultiplier(type) {
 
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
-    let damage;
-    let isCritical = checkCriticalHit(playerCritRate);
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
-    damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
+    let damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
+    let isCritical = checkCriticalHit(playerCritRate);
+    damage = calculateDamage(damage, isCritical, playerCritDamage);
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+    logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+
+    // 应用吸血魔刃效果
+    if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
+        const bloodSuckPercentage = (ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).increment((ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).level) / 100;
+        const healAmount = Math.floor(damage * bloodSuckPercentage);
+        battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+        logBattleEvent(`吸血魔刃触发，吸取了 ${healAmount} 点生命值。`, 'red');
+        updateUI();
+    }
+
+    applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
 
     if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
         damage = Math.floor(damage * 1.6); // 增加60%伤害
         logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
     }
 
-    damage = calculateDamage(damage, isCritical, playerCritDamage);
-    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-
-    // 根据是否暴击来记录日志
-    if (isCritical) {
-        logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
-    } else {
-        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
-    }
-
-    applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
+    handleCriticalAndDrunken(damage);
 
     return damage;
 }

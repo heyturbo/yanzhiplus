@@ -1005,9 +1005,8 @@
         
         .battle-system-pet-info, .battle-system-enemy-info {
             border: 1px solid #ccc;
-            padding: 10px;
+            padding: 5px;
             margin-bottom: 0;
-            line-height: 14px;
             font-size: 14px;
             flex: 1;
             background: rgba(0, 0, 0, 0.8);
@@ -1019,7 +1018,7 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            height: 28%;
+            max-height: 30%;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.8);
@@ -1031,7 +1030,7 @@
             display: block;
             unicode-bidi: isolate;
             overflow-y: auto;
-            max-height: 75%;
+            max-height: 70%;
             line-height: 20px;
         }
 
@@ -1044,7 +1043,7 @@
         .battle-system-actions {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            gap: 10px 5px;
             width: 100%;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -1790,7 +1789,7 @@
         <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
-                    <h2>出战宠 <span id="your-pet-level">1</span>级</h2><div id="player-status" class="status-display"></div>
+                    <h2><span id="your-pet-name"></span> lv<span id="your-pet-level">1</span></h2><div id="player-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
@@ -1808,7 +1807,7 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>深渊の魔 <span id="enemy-level">1</span>级</h2><div id="enemy-status" class="status-display"></div>
+                    <h2>深渊の魔 lv<span id="enemy-level">1</span></h2><div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
@@ -1909,7 +1908,7 @@
                 <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
                 <button onclick="levelUpSkill()">升级技能</button>
-                <button onclick="jumpByTenRounds()">增加十轮</button>
+                <button onclick="enemyInfo()">怪物信息</button>
             </div>
             
         </div>
@@ -2819,10 +2818,9 @@ preloadImages(imageUrls);
 let currentInfoBox = null;
 
 function showInfoBox(message, onConfirm, onCancel) {
-    // 如果已经有一个信息框存在，先关闭它
+    // 如果已经有一个信息框存在,先关闭它
     if (currentInfoBox) {
-        document.body.removeChild(currentInfoBox);
-        currentInfoBox = null;
+        closeInfoBox();
     }
 
     // 创建提示框元素
@@ -2840,6 +2838,8 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.zIndex = '9999';
     infoBox.style.textAlign = 'center';
     infoBox.style.fontSize = '14px';
+    infoBox.style.opacity = '0';
+    infoBox.style.transition = 'opacity 0.5s';
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
@@ -2866,11 +2866,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     confirmButton.style.borderRadius = '4px';
     confirmButton.style.cursor = 'pointer';
     confirmButton.addEventListener('click', () => {
-        document.body.removeChild(infoBox);
-        currentInfoBox = null;
-        if (typeof onConfirm === 'function') {
-            onConfirm();
-        }
+        closeInfoBox(onConfirm);
     });
     buttonContainer.appendChild(confirmButton);
 
@@ -2884,11 +2880,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     cancelButton.style.borderRadius = '4px';
     cancelButton.style.cursor = 'pointer';
     cancelButton.addEventListener('click', () => {
-        document.body.removeChild(infoBox);
-        currentInfoBox = null;
-        if (typeof onCancel === 'function') {
-            onCancel();
-        }
+        closeInfoBox(onCancel);
     });
     buttonContainer.appendChild(cancelButton);
 
@@ -2897,6 +2889,24 @@ function showInfoBox(message, onConfirm, onCancel) {
 
     // 将当前信息框设置为新创建的信息框
     currentInfoBox = infoBox;
+
+    // 在下一个动画帧中将提示框的不透明度设置为1,触发淡入效果
+    requestAnimationFrame(() => {
+        infoBox.style.opacity = '1';
+    });
+}
+
+function closeInfoBox(callback) {
+    if (currentInfoBox) {
+        currentInfoBox.style.opacity = '0';
+        currentInfoBox.addEventListener('transitionend', () => {
+            document.body.removeChild(currentInfoBox);
+            currentInfoBox = null;
+            if (typeof callback === 'function') {
+                callback();
+            }
+        }, { once: true });
+    }
 }
 
 // 显示提示信息的函数
@@ -3105,6 +3115,7 @@ function changePet() {
             currentPet = selectedPet; // 将当前宠物设为选择的宠物
 
             document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
+            document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
             document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
             document.getElementById("description-box").innerText = `您将当前宠物更换为:${currentPet.name}`;
             resetPet(); // 重置宠物的数值
@@ -4402,6 +4413,7 @@ window.onload = function() {
     document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
     checkAwakening(); // 检查宠物觉醒状态
     updateExpBar(); // 更新经验条
+    document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
 }
         
 let attributesFetched = false;
@@ -4622,7 +4634,7 @@ function updateEnemyAttributes() {
 function initializeEnemyPet() {
     enemyPet = {
         health: 378,
-        mana: 436,
+        mana: 236,
         physicalAttack: 68,
         physicalDefense: 49,
         magicAttack: 64,
@@ -4645,9 +4657,8 @@ function initializeEnemyPet() {
 function updateEnemyMaxAttributes() {
     const player = battleAttributes;
 
-    if (!isNaN(player.health) && !isNaN(player.mana)) {
+    if (!isNaN(player.health)) {
         enemyMaxHealth = Math.min(enemyMaxHealth, player.health * 30);
-        enemyMaxMana = Math.min(enemyMaxMana, player.mana * 10);
     } else {
         console.error("Invalid player health or mana values");
     }
@@ -4839,6 +4850,131 @@ function logBattleEvent(event, color = 'white') {
         console.error("logDiv not found");
     }
 }
+
+function enemyInfo() {
+    // 创建一个新的div元素作为弹窗的容器
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = 'black';
+    popup.style.color = 'white';
+    popup.style.padding = '20px';
+    popup.style.border = '1px solid white';
+    popup.style.borderRadius = '10px';
+    popup.style.zIndex = '9999';
+    popup.style.width = '80%';
+    popup.style.maxWidth = '600px';
+    popup.style.boxSizing = 'border-box';
+    popup.style.fontSize = '14px';
+
+    // 创建关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.color = 'white';
+    closeButton.style.border = 'none';
+    closeButton.style.cursor = 'pointer';
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(popup);
+    });
+
+    // 创建顶部容器
+    const topContainer = document.createElement('div');
+    topContainer.style.display = 'flex';
+    topContainer.style.alignItems = 'center';
+    topContainer.style.marginBottom = '20px';
+
+    // 创建图片元素
+    const img = document.createElement('img');
+    img.src = 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif';
+    img.style.width = '100px';
+    img.style.height = '100px';
+    img.style.marginRight = '20px';
+
+    // 创建标题和描述容器
+    const titleDescContainer = document.createElement('div');
+
+    // 创建标题元素
+    const title = document.createElement('h2');
+    title.innerText = '深渊巨魔(精英)';
+    title.style.margin = '0';
+    title.style.marginBottom = '10px';
+
+    // 创建描述元素
+    const description = document.createElement('p');
+    description.innerText = '潜藏于三界裂缝，以迷惑人心智、吸收人的恐惧而不断变强的邪祟。';
+    description.style.margin = '0';
+
+    // 将标题和描述添加到容器中
+    titleDescContainer.appendChild(title);
+    titleDescContainer.appendChild(description);
+
+    // 将图片和标题描述容器添加到顶部容器中
+    topContainer.appendChild(img);
+    topContainer.appendChild(titleDescContainer);
+
+    // 创建分割线
+    const separator = document.createElement('hr');
+    separator.style.borderColor = 'white';
+    separator.style.margin = '20px 0';
+
+    // 创建详情容器
+    const detailsContainer = document.createElement('div');
+
+    // 创建详情段落
+    const details = [
+        '深渊巨魔共有两种形态:正常和狂暴',
+        '正常形态下,它会交替使用物理和法术技能攻击敌人。深渊巨魔精通人心操纵之术,若施加于敌人"醉酒"、"摄魂"等效果,战局风险会极大提高。',
+        '每过10轮,深渊巨魔会触发一次狂暴状态。此时它的暴击伤害将大幅提高,且出手必定暴击。玩家需要尤其注意血线的控制。合理搭配飞升技能可以增加通关概率。',
+        '深渊巨魔一共有150轮,通关后可以继续战斗。当深渊巨魔的能力提升到一定程度后将不会再提升。'
+    ];
+
+    details.forEach(detail => {
+        const p = document.createElement('p');
+        p.innerText = detail;
+        p.style.margin = '10px 0';
+        detailsContainer.appendChild(p);
+    });
+
+    // 创建 "跳过十轮" 按钮
+    const jumpButton = document.createElement('button');
+    jumpButton.innerText = '跳过十轮';
+    jumpButton.style.position = 'absolute';
+    jumpButton.style.bottom = '10px';
+    jumpButton.style.right = '10px';
+    jumpButton.style.padding = '5px 10px';
+    jumpButton.style.backgroundColor = '#003670';
+    jumpButton.style.color = 'white';
+    jumpButton.style.border = 'white';
+    jumpButton.style.borderRadius = '5px';
+    jumpButton.style.cursor = 'pointer';
+    jumpButton.addEventListener('click', () => {
+        jumpByTenRounds();
+        document.body.removeChild(popup);
+    });
+
+    // 将所有元素添加到弹窗容器中
+    popup.appendChild(closeButton);
+    popup.appendChild(topContainer);
+    popup.appendChild(separator);
+    popup.appendChild(detailsContainer);
+    popup.appendChild(jumpButton);
+    // 将弹窗容器添加到页面的body中
+    document.body.appendChild(popup);
+
+    // 点击弹窗以外的区域关闭弹窗
+    popup.addEventListener('click', (event) => {
+        if (event.target === popup) {
+            document.body.removeChild(popup);
+        }
+    });
+}
+        
 //跳过十轮函数
 function jumpByTenRounds() {
     const maxSkipRounds = Math.min(100, petLevel + 20);
@@ -5148,7 +5284,12 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-    logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+    // 根据是否暴击来记录日志
+    if (isCritical) {
+        logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
+    } else {
+        logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
+    }
 
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
@@ -5165,8 +5306,6 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         damage = Math.floor(damage * 1.6); // 增加60%伤害
         logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
     }
-
-    handleCriticalAndDrunken(damage);
 
     return damage;
 }
@@ -6256,18 +6395,15 @@ function updateExpBar() {
 }
 
 function resetBattleState(playerWon) {
-    enemyHealCount = 0; // 重置怪物治疗次数
-    updatePetInfo(); // 更新宠物和敌人宠物的属性
-
     if (!playerWon) {
-        // 如果玩家没有获胜，则恢复怪物属性到本轮初始状态
+        // 如果玩家没有获胜,则恢复怪物属性到本轮初始状态
         restoreEnemyState();
         // 检查焉知非福状态
         if (ascensionSkill.name === '焉知非福' || secondAscensionSkill.name === '焉知非福') {
             battleState.player.divineProtection = true;
             const duration = (ascensionSkill.name === '焉知非福' ? (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) : 0) +
                              (secondAscensionSkill.name === '焉知非福' ? (secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level)) : 0);
-            logBattleEvent(`焉知非福触发，战斗获得持续 ${duration} 秒的仙气护体。`, "aqua");
+            logBattleEvent(`焉知非福触发,战斗获得持续 ${duration} 秒的仙气护体。`, "aqua");
             setTimeout(() => {
                 battleState.player.divineProtection = false;
                 logBattleEvent("焉知非福带来的仙气护体效果消失。", "aqua");
@@ -6279,11 +6415,11 @@ function resetBattleState(playerWon) {
 
     // 检查当前回合数
     if (battleRounds >= 150) {
-        logBattleEvent("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！（你也可以继续战斗）");
+        logBattleEvent("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!(你也可以继续战斗)");
     }
 
     // 处理敌人暴走 (rampage) 的逻辑
-    if (battleRounds % 10 === 0) {
+    if (battleRounds > 0 && battleRounds % 10 === 0) {
         enemyCritRate = 1; // 100%
         enemyCritDamage = battleRounds === 150 ? 3 : 2; // 150轮时为300%，其他10的倍数轮为200%
         battleState.enemy.rampaged = true;
@@ -6300,6 +6436,8 @@ function resetBattleState(playerWon) {
     
     // 存储怪物的初始状态
     storeEnemyInitialState();
+    enemyHealCount = 0; // 重置怪物治疗次数
+    updatePetInfo(); // 更新宠物和敌人宠物的属性
 }
 
 function setBackgroundImage(imageUrl) {
@@ -6308,7 +6446,6 @@ function setBackgroundImage(imageUrl) {
         drawer.style.backgroundImage = `url('${imageUrl}')`;
     }
 }
-
 
 function storeEnemyInitialState() {
     enemyInitialState = { ...enemyPet };
@@ -9202,7 +9339,7 @@ function updateRemainingPointsDisplay() {
 
 function increaseBonusAttribute(attribute) {
     if (remainingPoints <= 0) {
-        showInfoBox("您的宠物没有可分配点数了！");
+        showInfoBox("您的宠物没有可分配点数了!");
         return;
     }
 
@@ -9218,26 +9355,30 @@ function increaseBonusAttribute(attribute) {
 
     // 检查连续分配次数是否达到5次
     if (allocationCount[attribute] >= 5) {
-        const confirmMessage = `您已连续分配5次${attribute}，是否将剩余的点数全部分配至该属性？`;
-        if (confirm(confirmMessage)) {
+        const confirmMessage = `您已连续分配5次${attribute},是否将剩余的点数全部分配至该属性?`;
+        showInfoBox(confirmMessage, () => {
             bonusAttributes[attribute] += remainingPoints;
             remainingPoints = 0;
             allocationHistory.push({ attribute, value: remainingPoints });
             allocationCount[attribute] = 0; // 重置计数
-        } else {
+            updateAttributePanel();
+            updateRemainingPointsDisplay();
+            console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+        }, () => {
             allocationCount[attribute] = 0; // 重置计数
             bonusAttributes[attribute] += 1;
             remainingPoints -= 1;
-        }
+            updateAttributePanel();
+            updateRemainingPointsDisplay();
+            console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+        });
     } else {
         bonusAttributes[attribute] += 1;
         remainingPoints -= 1;
+        updateAttributePanel();
+        updateRemainingPointsDisplay();
+        console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
     }
-
-    updateAttributePanel();
-    updateRemainingPointsDisplay();
-
-    console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
 }
 
 // 动态修改额外属性的函数

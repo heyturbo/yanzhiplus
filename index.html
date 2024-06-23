@@ -4514,8 +4514,8 @@ function updateEnemyAttributes() {
 
     const currentEnhanceFactors = getEnhanceFactors();
 
-    enemyPet.health = enhanceAttribute(enemyPet.health, currentEnhanceFactors.health);
-    enemyPet.mana = enhanceAttribute(enemyPet.mana, currentEnhanceFactors.mana);
+    enemyMaxHealth = enhanceAttribute(enemyMaxHealth, currentEnhanceFactors.health);
+    enemyMaxMana = enhanceAttribute(enemyMaxMana, currentEnhanceFactors.mana);
     enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, currentEnhanceFactors.physicalAttack);
     enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, currentEnhanceFactors.physicalDefense);
     enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, currentEnhanceFactors.magicAttack);
@@ -4524,13 +4524,8 @@ function updateEnemyAttributes() {
 
     updateEnemyMaxAttributes();
 
-    if (enemyPet.health > enemyMaxHealth) enemyPet.health = enemyMaxHealth;
-    if (enemyPet.mana > enemyMaxMana) enemyPet.mana = enemyMaxMana;
-    if (enemyPet.physicalAttack > player.physicalAttack * 5) enemyPet.physicalAttack = Math.floor(player.physicalAttack * 5);
-    if (enemyPet.physicalDefense > player.physicalDefense * 0.8) enemyPet.physicalDefense = Math.floor(player.physicalDefense * 0.8);
-    if (enemyPet.magicAttack > player.magicAttack * 4) enemyPet.magicAttack = Math.floor(player.magicAttack * 4);
-    if (enemyPet.magicDefense > player.magicDefense * 0.6) enemyPet.magicDefense = Math.floor(player.magicDefense * 0.6);
-    if (enemyPet.speed > player.speed * 1) enemyPet.speed = Math.floor(player.speed * 1.001);
+    enemyPet.health = enemyMaxHealth;
+    enemyPet.mana = enemyMaxMana;
 
     battleState.enemy = { ...enemyPet };
     enemyLevel = battleRounds;
@@ -4550,12 +4545,12 @@ function initializeEnemyPet() {
         stunned: false
     };
 
+    enemyMaxHealth = enemyPet.health;
+    enemyMaxMana = enemyPet.mana;
+
     if (battleState) {
         battleState.enemy = { ...enemyPet };
     }
-
-    enemyMaxHealth = enemyPet.health;
-    enemyMaxMana = enemyPet.mana;
 
     storeEnemyInitialState();
 }
@@ -4563,18 +4558,13 @@ function initializeEnemyPet() {
 function updateEnemyMaxAttributes() {
     const player = battleAttributes;
 
-    // 检查 player.health 和 player.mana 是否是数字，并且不为 NaN
     if (!isNaN(player.health) && !isNaN(player.mana)) {
-        enemyMaxHealth = Math.min(Math.floor(enemyMaxHealth * 1.05), player.health * 30);
-        enemyMaxMana = Math.min(Math.floor(enemyMaxMana * 1.035), player.mana * 10);
-
+        enemyMaxHealth = Math.min(enemyMaxHealth, player.health * 30);
+        enemyMaxMana = Math.min(enemyMaxMana, player.mana * 10);
     } else {
         console.error("Invalid player health or mana values");
-        enemyMaxHealth = enemyPet.health;
-        enemyMaxMana = enemyPet.mana;
     }
 }
-
 
 
 

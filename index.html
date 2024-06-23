@@ -2816,6 +2816,89 @@ const imageUrls = [
 ];
 preloadImages(imageUrls);
 
+let currentInfoBox = null;
+
+function showInfoBox(message, onConfirm, onCancel) {
+    // 如果已经有一个信息框存在，先关闭它
+    if (currentInfoBox) {
+        document.body.removeChild(currentInfoBox);
+        currentInfoBox = null;
+    }
+
+    // 创建提示框元素
+    const infoBox = document.createElement('div');
+    infoBox.style.position = 'fixed';
+    infoBox.style.top = '50%';
+    infoBox.style.left = '50%';
+    infoBox.style.transform = 'translate(-50%, -50%)';
+    infoBox.style.width = '50%';
+    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    infoBox.style.color = 'white';
+    infoBox.style.border = '1px solid white';
+    infoBox.style.borderRadius = '10px';
+    infoBox.style.padding = '20px';
+    infoBox.style.zIndex = '9999';
+    infoBox.style.textAlign = 'center';
+    infoBox.style.fontSize = '14px';
+
+    // 创建消息文本元素
+    const messageElement = document.createElement('p');
+    messageElement.innerText = message;
+    infoBox.appendChild(messageElement);
+
+    // 创建按钮容器元素
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginTop = '30px';
+    buttonContainer.style.textAlign = 'right';
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.flexDirection = 'row';
+    buttonContainer.style.justifyContent = 'space-around';
+    infoBox.appendChild(buttonContainer);
+
+    // 创建确认按钮
+    const confirmButton = document.createElement('button');
+    confirmButton.innerText = '确认';
+    confirmButton.style.marginLeft = '10px';
+    confirmButton.style.padding = '8px 16px';
+    confirmButton.style.backgroundColor = '#4CAF50';
+    confirmButton.style.color = 'white';
+    confirmButton.style.border = 'none';
+    confirmButton.style.borderRadius = '4px';
+    confirmButton.style.cursor = 'pointer';
+    confirmButton.addEventListener('click', () => {
+        document.body.removeChild(infoBox);
+        currentInfoBox = null;
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
+    });
+    buttonContainer.appendChild(confirmButton);
+
+    // 创建取消按钮
+    const cancelButton = document.createElement('button');
+    cancelButton.innerText = '取消';
+    cancelButton.style.padding = '8px 16px';
+    cancelButton.style.backgroundColor = '#f44336';
+    cancelButton.style.color = 'white';
+    cancelButton.style.border = 'none';
+    cancelButton.style.borderRadius = '4px';
+    cancelButton.style.cursor = 'pointer';
+    cancelButton.addEventListener('click', () => {
+        document.body.removeChild(infoBox);
+        currentInfoBox = null;
+        if (typeof onCancel === 'function') {
+            onCancel();
+        }
+    });
+    buttonContainer.appendChild(cancelButton);
+
+    // 将提示框添加到页面中
+    document.body.appendChild(infoBox);
+
+    // 将当前信息框设置为新创建的信息框
+    currentInfoBox = infoBox;
+}
+
 // 显示提示信息的函数
 function showMessage(message, type = 'info') {
     const messageContainer = document.getElementById('message-container');
@@ -2913,22 +2996,25 @@ function petCollection() {
         collectButton.addEventListener('click', () => {
             const petSelect = document.getElementById('pet-select');
             if (!isPetOwned(petKey)) {
-                alert("你还没有该宠物！");
+                showInfoBox("你还没有该宠物！");
                 return;
             }
-            // 提示用户确认
-            const confirmation = confirm("收录宠物后，宠物会消失，你确定收录吗？");
-            if (!confirmation) return; // 如果用户取消，不进行收录
-
-            if (petSelect.options.length <= 1) {
-                alert("这是您的唯一爱宠了，请好好珍惜它！");
-                return;
-            }
-
-            collectedPets.push(pet.name);
-            collectedPetCount++;
-            statusDiv.innerText = '已收录';
-            collectButton.disabled = true;
+                // 提示用户确认
+                showInfoBox("收录宠物后,宠物会消失,你确定收录吗?", () => {
+                    // 如果用户确认,执行收录逻辑
+                    collectedPets.push(pet.name);
+                    collectedPetCount++;
+                    statusDiv.innerText = '已收录';
+                    collectButton.disabled = true;
+                }, () => {
+                    // 如果用户取消,不进行收录
+                    return;
+                });
+            
+                 if (petSelect.options.length <= 1) {
+                     showInfoBox("这是您的唯一爱宠了，请好好珍惜它！");
+                     return;
+                 }
             
             // 判断是否是当前宠物，如果是则随机跳转至一个已有的选项
             if (petSelect.value === petKey) {
@@ -3010,11 +3096,11 @@ function changePet() {
     if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
 
     // 提示用户确认
-    const confirmation = confirm("更换宠物会导致当前宠物的数据丢失，你确定更换吗？");
-    if (!confirmation) return; // 如果用户取消，不进行更换
-
-    const selectedPet = pets[selectedPetKey];
-    console.log('Selected Pet:', selectedPet);
+    showInfoBox("更换宠物会导致当前宠物的数据丢失，你确定更换吗？", () => {
+        const selectedPet = pets[selectedPetKey];
+        console.log('Selected Pet:', selectedPet);
+        // 继续执行更换宠物的逻辑
+    });
 
     if (selectedPet) { // 检查选中的宠物是否存在
         currentPetKey = selectedPetKey;
@@ -3078,10 +3164,10 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
                     exchangeAmount = 3600;
                     break;
             }
-            alert(`您已经拥有${summonedPet.name}，将其转化为${exchangeAmount}印花！`);
+            showInfoBox(`您已经拥有${summonedPet.name}，将其转化为${exchangeAmount}印花！`);
             stamps += exchangeAmount;
         } else {
-            alert(`您成功领取了${summonedPet.name}！`);
+            showInfoBox(`您成功领取了${summonedPet.name}！`);
             const option = document.createElement('option');
             option.value = petKey;
             option.text = summonedPet.name;
@@ -3120,11 +3206,11 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
                     <img src="${summonedPet.image}" alt="${summonedPet.name}">
                     <div>${summonedPet.name} (${summonedPet.rank})</div>
                 `;
-                alert(`你召唤了${summonedPet.name} (${summonedPet.rank})`);
+                showInfoBox(`你召唤了${summonedPet.name} (${summonedPet.rank})`);
             }, 1000);
         };
     } else {
-        alert('没有召唤灵符！');
+        showInfoBox('没有召唤灵符！');
     }
     updateStampCount(); // 更新印花数量
 });
@@ -3137,7 +3223,7 @@ document.getElementById('claimButton').addEventListener('click', () => {
         const petKey = Object.keys(pets).find(key => pets[key].name === summonedPet.name);
 
         if (Array.from(petSelect.options).some(option => option.value === petKey)) {
-            alert(`您已经拥有${summonedPet.name}，将其转化为相应印花！`);
+            showInfoBox(`您已经拥有${summonedPet.name}，将其转化为相应印花！`);
             switch (summonedPet.rank) {
                 case 'R':
                     stamps += 240;
@@ -3150,7 +3236,7 @@ document.getElementById('claimButton').addEventListener('click', () => {
                     break;
             }
         } else {
-            alert(`您成功领取了${summonedPet.name}！`);
+            showInfoBox(`您成功领取了${summonedPet.name}！`);
             const option = document.createElement('option');
             option.value = petKey;
             option.text = summonedPet.name;
@@ -3160,7 +3246,7 @@ document.getElementById('claimButton').addEventListener('click', () => {
         updateStampCount();
         document.getElementById('summonArea').innerHTML = `<div class="stamp-quantity">印花数量: <span id="stampCount">${stamps}</span></div>`;
     } else {
-        alert('没有宠物可领取！');
+        showInfoBox('没有宠物可领取！');
     }
 });
 
@@ -3180,12 +3266,12 @@ document.getElementById('exchangeButton').addEventListener('click', () => {
                 break;
         }
         stamps += exchangeAmount;
-        alert(`${summonedPet.name}已被兑换为${exchangeAmount}印花`);
+        showInfoBox(`${summonedPet.name}已被兑换为${exchangeAmount}印花`);
         summonedPet = null;
         document.getElementById('summonArea').innerHTML = '';
         updateStampCount();
     } else {
-        alert('没有宠物可兑换！');
+        showInfoBox('没有宠物可兑换！');
     }
 });
 
@@ -3197,10 +3283,10 @@ document.getElementById('buySummonCharmButton').addEventListener('click', () => 
     if (stamps >= 500) {
         stamps -= 500;
         addItemToJinnang('summonCharmPaper');
-        alert('成功购买了一张召唤灵符！');
+        showInfoBox('成功购买了一张召唤灵符！');
         updateStampCount();
     } else {
-        alert('印花数量不足，无法购买召唤灵符。');
+        showInfoBox('印花数量不足，无法购买召唤灵符。');
     }
 });
 
@@ -3235,10 +3321,10 @@ function showPetShop() {
                 <div>价格: ${price}印花</div>
             `;
             petDiv.addEventListener('click', () => {
-                if (window.confirm(`你确定要花费${price}印花购买${pet.name} (${pet.rank})吗？`)) {
+                showInfoBox(`你确定要花费${price}印花购买${pet.name} (${pet.rank})吗?`, () => {
                     if (stamps >= price) {
                         stamps -= price;
-                        alert(`你购买了${pet.name} (${pet.rank})`);
+                        showInfoBox(`你购买了${pet.name} (${pet.rank})`);
                         const petSelect = document.getElementById('pet-select');
                         if (!Array.from(petSelect.options).some(option => option.value === key)) { // 使用键作为选项值
                             const option = document.createElement('option');
@@ -3249,9 +3335,9 @@ function showPetShop() {
                         petDiv.remove(); // 移除已购买的宠物
                         updateStampCount();
                     } else {
-                        alert('印花数量不足！');
+                        showInfoBox('印花数量不足!');
                     }
-                }
+                });
             });
             shopItems.appendChild(petDiv);
         }
@@ -3349,15 +3435,15 @@ function completeTask(taskId) {
     if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
         task.completed = true;
         stamps += task.reward;
-        alert(`任务完成，获得${task.reward}印花！`);
+        showInfoBox(`任务完成，获得${task.reward}印花！`);
     } else if (taskSeries === 'petLevel' && petLevel >= task.target) {
         task.completed = true;
         stamps += task.reward;
-        alert(`任务完成，获得${task.reward}印花！`);
+        showInfoBox(`任务完成，获得${task.reward}印花！`);
     } else if (taskSeries === 'goldAmount' && goldAmount >= task.target) {
         task.completed = true;
         addItemToJinnang('summonCharmPaper', task.reward);
-        alert(`任务完成，获得${task.reward}张召唤灵符！`);
+        showInfoBox(`任务完成，获得${task.reward}张召唤灵符！`);
     } else {
         console.error('任务完成条件未满足');
         return;
@@ -3445,7 +3531,7 @@ let alreadyUseDrug = false;
 
 function useDrug() {
     if (!alreadyUseDrug) {
-        alert("这是你第一次打开药物面板，附送至尊药品礼包一份！");
+        showInfoBox("这是你第一次打开药物面板，附送至尊药品礼包一份！");
         alreadyUseDrug = true; // 修正拼写错误
     }
     document.getElementById('drug-modal').style.display = 'block';
@@ -3498,7 +3584,7 @@ function checkConflictingBuffs(selectedDrug) {
 
 function useSelectedDrug() {
     if (!selectedDrug) {
-        alert("请选择一种药物！");
+        showInfoBox("请选择一种药物！");
         return;
     }
 
@@ -3629,7 +3715,7 @@ function useSelectedDrug() {
 
         updateUI();
     } else {
-        alert("药物不足！", 'red');
+        showInfoBox("药物不足！", 'red');
     }
 }
 
@@ -3871,7 +3957,7 @@ function applySingleAscensionBonus(skill, attributes) {
 
 document.getElementById('ascension-skill-button').addEventListener('click', () => {
     if (!petAscended) {
-        alert('您的宠物未飞升，还没有掌握飞升之术！');
+        showInfoBox('您的宠物未飞升，还没有掌握飞升之术！');
     } else {
         document.getElementById('ascension-skill-modal').style.display = 'block';
         updateAscensionDisplay(); // 打开时更新显示
@@ -3882,7 +3968,7 @@ let reenableAscension = false;
 document.getElementById('reenable-ascension').addEventListener('click', () => {
     // 检查第一个飞升技能是否未打开
     if (!ascensionSkill.name) {
-        alert("你还没有打开第一个飞升技能！");
+        showInfoBox("你还没有打开第一个飞升技能！");
         return; // 退出函数
     }
 
@@ -3894,11 +3980,11 @@ document.getElementById('reenable-ascension').addEventListener('click', () => {
                 refreshSecondAscensionSkill();
                 reenableAscension = true;
             } else {
-                alert('您的飞升之石不足！');
+                showInfoBox('您的飞升之石不足！');
             }
         }
     } else {
-        alert('您已经开启过第二个飞升之术了！');
+        showInfoBox('您已经开启过第二个飞升之术了！');
     }
 });
 
@@ -3922,7 +4008,7 @@ function levelUpSecondAscensionSkill() {
         applyAscensionBonus();
         applyAscensionEffects(); // 确保提升后的技能生效
     } else {
-        alert('飞升之术技能已达最大等级！');
+        showInfoBox('飞升之术技能已达最大等级！');
     }
 }
 
@@ -3944,7 +4030,7 @@ document.getElementById('refresh-second-ascension').addEventListener('click', ()
     if (useItem('heartStone', 1)) {
         refreshSecondAscensionSkill();
     } else {
-        alert('您的心鉴之石不足！');
+        showInfoBox('您的心鉴之石不足！');
     }
 });
 
@@ -3953,7 +4039,7 @@ document.getElementById('level-up-second-ascension').addEventListener('click', (
     if (useItem('earthlyEnergy', 10)) {
         levelUpSecondAscensionSkill();
     } else {
-        alert('每次提升技能需要消耗10个天地灵气，你的天地灵气数量不足！');
+        showInfoBox('每次提升技能需要消耗10个天地灵气，你的天地灵气数量不足！');
     }
 });
         
@@ -3979,19 +4065,19 @@ let ascensionEnabled = false;
 // 监听开启增益按钮点击事件
 document.getElementById('enable-ascension').addEventListener('click', () => {
     if (!ascend) {
-        alert('您的宠物没有飞升，无法开启飞升增益！');
+        showInfoBox('您的宠物没有飞升，无法开启飞升增益！');
         return;
     }
     if (ascensionSkill.name) {
-        alert('您已经开启过增益了，如果需要更换飞升之术，请选择刷新技能！');
+        showInfoBox('您已经开启过增益了，如果需要更换飞升之术，请选择刷新技能！');
     } else {
         if (useItem('heartStone', 1)) {
-            alert('飞升之术增益已启用！');
+            showInfoBox('飞升之术增益已启用！');
             refreshAscensionSkill(); // 随机生成一个飞升之术
             applyAscensionBonus(); // 应用飞升之术增益
             ascensionEnabled = true; // 设置飞升之术已开启
         } else {
-            alert('您的心鉴之石不足！');
+            showInfoBox('您的心鉴之石不足！');
         }
     }
 });
@@ -4003,7 +4089,7 @@ document.getElementById('refresh-ascension').addEventListener('click', () => {
         refreshAscensionSkill(); // 刷新飞升之术技能
         applyAscensionBonus(); // 应用飞升之术增益
     } else {
-        alert('您的心鉴之石不足！');
+        showInfoBox('您的心鉴之石不足！');
     }
 });
 
@@ -4013,14 +4099,14 @@ document.getElementById('level-up-ascension').addEventListener('click', () => {
     if (useItem('earthlyEnergy', 10)) {
         levelUpAscensionSkill(); // 提升飞升之术技能
     } else {
-        alert('每次提升技能需要消耗10个天地灵气，你的天地灵气数量不足！');
+        showInfoBox('每次提升技能需要消耗10个天地灵气，你的天地灵气数量不足！');
     }
 });
 
 // 检查飞升之术是否已启用
 function checkAscensionEnabled() {
     if (!ascensionEnabled) {
-        alert('请先开启飞升之术增益！');
+        showInfoBox('请先开启飞升之术增益！');
         return false;
     }
     return true;
@@ -4057,7 +4143,7 @@ function levelUpAscensionSkill() {
         updateAscensionDisplay();
         applyAscensionBonus(); // 提升技能后重新应用增益
     } else {
-        alert('飞升之术技能已达最大等级！');
+        showInfoBox('飞升之术技能已达最大等级！');
     }
 }
 
@@ -4122,7 +4208,7 @@ function checkAwakening() {
 // 打开战斗精灵界面
 document.getElementById('battle-spirit-button').addEventListener('click', () => {
     if (!awakened) {
-        alert('宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
+        showInfoBox('宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
     } else {
         document.getElementById('battle-spirit-modal').style.display = 'block';
         updateSpiritDisplay(); // 打开时更新显示
@@ -4295,16 +4381,18 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
         // 检查新倍数是否高于3.80
         if (parseFloat(newMultiplier) > 3.80) {
             const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，确定继续吗？";
-            if (!confirm(confirmMessage)) {
-                return;
-            }
+            showInfoBox(confirmMessage, () => {
+                spiritMultiplier = parseFloat(newMultiplier);
+                updateSpiritDisplay(); // 更新显示
+                refreshBattleAttributes(); // 刷新战斗属性
+            });
+        } else {
+            spiritMultiplier = parseFloat(newMultiplier);
+            updateSpiritDisplay(); // 更新显示
+            refreshBattleAttributes(); // 刷新战斗属性
         }
-
-        spiritMultiplier = parseFloat(newMultiplier);
-        updateSpiritDisplay(); // 更新显示
-        refreshBattleAttributes(); // 刷新战斗属性
     } else {
-        alert('您的精灵觉醒石不足！');
+        showInfoBox('您的精灵觉醒石不足！');
     }
 });
 
@@ -4345,7 +4433,7 @@ function showEffect(effectId, imageUrl) {
 
 function toggleFightingDrawer() {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
 
@@ -4930,7 +5018,7 @@ function levelUpSkill() {
     infoButton.style.transition = 'background-color 0.3s';
     infoButton.onmouseover = () => infoButton.style.backgroundColor = '#138496';
     infoButton.onmouseout = () => infoButton.style.backgroundColor = '#17a2b8';
-    infoButton.onclick = () => alert('宠物等级每提升10级，所拥有的技能会自动提升1级。技能的等级很大程度上决定了它们的威力（被动技能会按一定比例增加各项属性值）。每个技能等级上限为20级，当技能等级到10级后，需要在本界面消耗一定经验值来升级技能。');
+    infoButton.onclick = () => showInfoBox('宠物等级每提升10级，所拥有的技能会自动提升1级。技能的等级很大程度上决定了它们的威力（被动技能会按一定比例增加各项属性值）。每个技能等级上限为20级，当技能等级到10级后，需要在本界面消耗一定经验值来升级技能。');
     buttonContainer.appendChild(infoButton);
 
     overlay.appendChild(modal);
@@ -4941,7 +5029,7 @@ function levelUpSkill() {
 function handleLevelUp() {
     const selectedSkillElement = document.querySelector('.selected-skill');
     if (!selectedSkillElement) {
-        alert('请选择一个技能！');
+        showInfoBox('请选择一个技能！');
         return;
     }
 
@@ -4949,17 +5037,17 @@ function handleLevelUp() {
     const skill = currentPet.skills.find(skill => skill.name === skillName);
 
     if (!skill) {
-        alert('未找到该技能！');
+        showInfoBox('未找到该技能！');
         return;
     }
 
     if (skill.level < 10) {
-        alert('该技能现在不需要升级,10级后再来吧！');
+        showInfoBox('该技能现在不需要升级,10级后再来吧！');
         return;
     }
 
     if (skill.level >= 20) {
-        alert('该技能已达到最高等级！');
+        showInfoBox('该技能已达到最高等级！');
         return;
     }
 
@@ -4967,14 +5055,14 @@ function handleLevelUp() {
     const expCost = 1000 + 200 * (nextLevel - 11);
 
     if (currentExp < expCost) {
-        alert(`此次升级需要${expCost}点经验值，你的经验值不足，无法升级！`);
+        showInfoBox(`此次升级需要${expCost}点经验值，你的经验值不足，无法升级！`);
         return;
     }
 
     currentExp -= expCost;
     skill.level = nextLevel;
 
-    alert(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${nextLevel} 级，威力增加了！`);
+    showInfoBox(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${nextLevel} 级，威力增加了！`);
     updateExpBar();
     updateUI();
 }
@@ -5147,7 +5235,7 @@ function handleCriticalAndDrunken(damage) {
 
 function performAttack(type) {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
 
@@ -5445,7 +5533,7 @@ let poisonSkillActivated = false;
 
 function performPoison() {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
 
@@ -5531,7 +5619,7 @@ function performPoison() {
 
 function performDefense() {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
 
@@ -5950,7 +6038,7 @@ function handlePoison() {
         
 function performHeal() {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
     
@@ -6025,7 +6113,7 @@ let firstStartBattle = false;
 
 function startBattle() {
     if (!attributesFetched) {
-        alert("请先从属性面板获取属性。");
+        showInfoBox("请先从属性面板获取属性。");
         return;
     }
 
@@ -6094,7 +6182,7 @@ function showNextBattlePrompt(playerWon) {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
 
-        alert(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击任意按钮重置战斗！`);
+        showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击任意按钮重置战斗！`);
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp');
         document.getElementById("gold-amount").innerText = goldAmount;
     }
@@ -6443,7 +6531,7 @@ function highlightMatchingNumbers(winningNumbers, winningBlueBall) {
 
 document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     if (!canBet) {
-        alert('请等待本次开奖！');
+        showInfoBox('请等待本次开奖！');
         return;
     }
     lotteryBetCount++;
@@ -6453,7 +6541,7 @@ document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
 
 document.getElementById('lotteryIncreaseHundredBet').addEventListener('click', () => {
     if (!canBet) {
-        alert('请等待本次开奖！');
+        showInfoBox('请等待本次开奖！');
         return;
     }
     lotteryBetCount += 100; // 使用正确的语法增加100注
@@ -6463,7 +6551,7 @@ document.getElementById('lotteryIncreaseHundredBet').addEventListener('click', (
 
 document.getElementById('lotteryDecreaseBet').addEventListener('click', () => {
     if (!canBet) {
-        alert('请等待本次开奖！');
+        showInfoBox('请等待本次开奖！');
         return;
     }
     if (lotteryBetCount > 1) {
@@ -6475,12 +6563,12 @@ document.getElementById('lotteryDecreaseBet').addEventListener('click', () => {
 
 document.getElementById('lotteryBetButton').addEventListener('click', () => {
     if (!canBet) {
-        alert('请等待当前开奖结束');
+        showInfoBox('请等待当前开奖结束');
         return;
     }
     if (lotterySelectedNumbers.length === 6) {
         if (lotteryBetCount === 0) {
-            alert('请加注后点击投注按钮进行投注！');
+            showInfoBox('请加注后点击投注按钮进行投注！');
             return;
         }
         if (goldAmount >= lotteryBetAmount) {
@@ -6494,16 +6582,16 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             updateLotteryDisplay();
             hasPlacedBet = true; // 更新投注标志
         } else {
-            alert('余额不足');
+            showInfoBox('余额不足');
         }
     } else {
-        alert('请选择6个数字');
+        showInfoBox('请选择6个数字');
     }
 });
 
 document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
     if (pendingPrize === 0) {
-        alert('当前没有奖金可以领取！');
+        showInfoBox('当前没有奖金可以领取！');
     } else {
         goldAmount += pendingPrize;
         document.getElementById("gold-amount").innerText = goldAmount;
@@ -6550,7 +6638,7 @@ document.addEventListener('DOMContentLoaded', () => {
     autoSelectButton.textContent = '系统选号';
     autoSelectButton.addEventListener('click', () => {
         if (!canBet) {
-            alert('本轮您已经选号，请等待开奖！');
+            showInfoBox('本轮您已经选号，请等待开奖！');
             return;
         }
         lotterySelectedNumbers = [];
@@ -6600,12 +6688,12 @@ function showGuide() {
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
                             <p>欢迎大侠试玩养宠模拟器！当前是V10.3</p>
-                            <p>- 新增智慧守护的减伤判定；</p>
-                            <p>- 增加敌人狂暴状态；</p>
-                            <p>- 优化部分显示效果；</p>
                             <p>- 战斗系统进一步优化；</p>
                             <p>- 增加技能等级，技能等级随宠物等级提升而提升，并增强其效果；</p>
                             <p>- 被动技能可以按固定值为宠物提供战斗增益了；</p>
+                            <p>- 修复了某些bug；</p>
+                            <p>- 优化部分函数逻辑；</p>
+                            <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
@@ -6717,14 +6805,14 @@ function evolvePet() {
         increaseValue = 160;
     } else {
         // 如果进化等级达到上限，提示用户并退出函数。
-        alert("您的宠物已达进化等级上限！");
+        showInfoBox("您的宠物已达进化等级上限！");
         return;
     }
 
     // 检查用户是否有足够的所需道具，如果没有，提示用户并退出函数。
     const item = jinnangItems.find(i => i.name === requiredItem);
     if (item.quantity < 1) {
-        alert(`您的${item.displayName}不足！`);
+        showInfoBox(`您的${item.displayName}不足！`);
         return;
     }
 
@@ -6752,7 +6840,7 @@ function evolvePet() {
     } else {
         // 如果进化失败，减少用户的所需道具数量，并提示用户进化失败。
         item.quantity--;
-        alert("进化失败！");
+        showInfoBox("进化失败！");
         updateJinnangItems();
     }
 }
@@ -6797,7 +6885,7 @@ function useSupremeWisdomPill() {
     }
 
     if (currentWisdom >= 20) {
-        alert("宠物的悟性已经达到20，无法再次提升！");
+        showInfoBox("宠物的悟性已经达到20，无法再次提升！");
         return;
     }
 
@@ -6808,16 +6896,16 @@ function useSupremeWisdomPill() {
         updateJinnangItems();
         updateAttributePanel();
         document.getElementById("current-wisdom").innerText = currentWisdom;
-        alert("您使用了举世无双悟性丹，宠物的悟性已提升至20！");
+        showInfoBox("您使用了举世无双悟性丹，宠物的悟性已提升至20！");
     } else {
-        alert("您没有举世无双悟性丹，无法将宠物瞬间提升到20悟性！");
+        showInfoBox("您没有举世无双悟性丹，无法将宠物瞬间提升到20悟性！");
     }
 }
 
 // Function to increase the pet's level with level cap adjustment
 function increasePetLevel(levels) {
     if (petLevel >= petMaxLevel) {
-        alert("宠物等级已达上限，无法继续升级！");
+        showInfoBox("宠物等级已达上限，无法继续升级！");
         console.log("Level Up Error: Max level reached.");
         return;
     }
@@ -6841,15 +6929,15 @@ function increasePetLevel(levels) {
 function absorbExperience() {
     const item = jinnangItems.find(i => i.name === 'normalExperienceBook');
     if (item.quantity <= 0) {
-        alert("您的普通经验书不够，宠物无法升级！");
+        showInfoBox("您的普通经验书不够，宠物无法升级！");
         return;
     }
     if (petLevel >= petMaxLevel) {
-        alert("宠物等级已达上限，无法继续升级！");
+        showInfoBox("宠物等级已达上限，无法继续升级！");
         return;
     }
     if (petAscended && petLevel >= 180) {
-        alert("强者唯有历经战场的淬炼，潜力才会得到更惊人的激发！");
+        showInfoBox("强者唯有历经战场的淬炼，潜力才会得到更惊人的激发！");
         return;
     }
     item.quantity--;
@@ -6860,15 +6948,15 @@ function absorbExperience() {
 function absorbAdvancedExperience() {
     const item = jinnangItems.find(i => i.name === 'advancedExperienceBook');
     if (item.quantity <= 0) {
-        alert("您的高级经验书不够，宠物无法升级！");
+        showInfoBox("您的高级经验书不够，宠物无法升级！");
         return;
     }
     if (petLevel >= petMaxLevel) {
-        alert("宠物等级已达上限，无法继续升级！");
+        showInfoBox("宠物等级已达上限，无法继续升级！");
         return;
     }
     if (petAscended && petLevel >= 180) {
-        alert("强者只有经过战场的淬炼才会得到更惊人的成长");
+        showInfoBox("强者只有经过战场的淬炼才会得到更惊人的成长");
         return;
     }
     item.quantity--;
@@ -6887,14 +6975,14 @@ function ascend() {
 
     // Check if the pet has already ascended
     if (petAscended) {
-        alert("您的宠物已经飞升！使用道具失败！");
+        showInfoBox("您的宠物已经飞升！使用道具失败！");
         return;
     }
 
     // Check if the pet meets the level and wisdom requirements and if there is an ascension stone in the inventory
     const item = jinnangItems.find(i => i.name === 'ascensionStone');
     if (petLevel < 160 || petWisdom < 24 || item.quantity <= 0) {
-        alert("您的飞升石不够，且宠物飞升必须满足160级和24悟两个条件！(20级悟性之后，需要使用商店所售道具“特级悟性丹”才能继续提升悟性。)");
+        showInfoBox("您的飞升石不够，且宠物飞升必须满足160级和24悟两个条件！(20级悟性之后，需要使用商店所售道具“特级悟性丹”才能继续提升悟性。)");
         return;
     }
 
@@ -6906,7 +6994,7 @@ function ascend() {
     petMaxLevel = 200;
     petAscended = true;
 
-    alert("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
+    showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
 }
 
 
@@ -6953,13 +7041,13 @@ function updateTreasureDescription(type) {
 
 function openTreasure() {
     if (!selectedTreasure) {
-        alert("请先选择一个宝箱！");
+        showInfoBox("请先选择一个宝箱！");
         return;
     }
 
     const cost = getTreasureCost(selectedTreasure);
     if (goldAmount < cost) {
-        alert("金子不足！");
+        showInfoBox("金子不足！");
         return;
     }
 
@@ -7249,17 +7337,17 @@ function sellItem(item) {
     if (quantityToSell !== null) {
         quantityToSell = parseInt(quantityToSell, 10);
         if (isNaN(quantityToSell) || quantityToSell <= 0) {
-            alert('请输入有效的数量');
+            showInfoBox('请输入有效的数量');
             return;
         }
         if (quantityToSell > item.quantity) {
-            alert('您没有足够的道具数量');
+            showInfoBox('您没有足够的道具数量');
             return;
         }
 
         item.quantity -= quantityToSell;
         goldAmount += quantityToSell * item.price; // 使用 item.price 作为单价
-        alert(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}金子`);
+        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}金子`);
 
         updateJinnangItems();
         document.getElementById("gold-amount").innerText = goldAmount; // 更新金币数量显示的函数
@@ -7360,13 +7448,13 @@ function handlePetArmsClick() {
 function openPetArms() {
     if (goldAmount >= 100000) {
         goldAmount -= 100000;
-        alert("你花费10万金子，为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
+        showInfoBox("你花费10万金子，为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
         document.getElementById("gold-amount").innerText = goldAmount;
         armsOpened = true;
         console.log('openPetArms: armsOpened set to true'); // 调试输出
         showPetArmsWindow();
     } else {
-        alert("你的金子不足10万，无法开启武装系统！");
+        showInfoBox("你的金子不足10万，无法开启武装系统！");
     }
 }
 
@@ -7496,7 +7584,7 @@ function unlockArm(index, arm, infoDiv, forgeButton, img) {
     if (isUnlocked(index)) {
         if (!arm.unlocked && goldAmount >= 200000) {
             goldAmount -= 200000;
-            alert("您支付了20万金子，为宠物解锁了一件武装！");
+            showInfoBox("您支付了20万金子，为宠物解锁了一件武装！");
             document.getElementById("gold-amount").innerText = goldAmount;
             arm.unlocked = true; // 更新解锁状态
             img.src = arm.url; // 更新图标
@@ -7507,12 +7595,12 @@ function unlockArm(index, arm, infoDiv, forgeButton, img) {
             forgeButton = infoDiv.nextElementSibling; // 获取新添加的按钮
             forgeButton.addEventListener('click', () => forgeArm(Object.keys(armsAttributes)[index], infoDiv));
         } else if (arm.unlocked) {
-            alert("武装已经解锁！");
+            showInfoBox("武装已经解锁！");
         } else {
-            alert("金子不足，无法解锁！");
+            showInfoBox("金子不足，无法解锁！");
         }
     } else {
-        alert("宠物等级不足，无法解锁！");
+        showInfoBox("宠物等级不足，无法解锁！");
     }
 }
 
@@ -7539,12 +7627,12 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    alert("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
+    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
 function forgeArm(key, infoDiv) {
     if (goldAmount < 200) {
-        alert("金子不足，无法锻造！");
+        showInfoBox("金子不足，无法锻造！");
         return;
     }
 
@@ -7758,7 +7846,7 @@ function trainAttributes() {
 
     // 检查当前培养次数是否达到可用次数
     if (trainingCount >= availableTrainingCount) {
-        alert("当前没有可用培养次数了。只有当宠物等级达到60、120和180时，才能各获得一次培养机会！每次培养会按比例增加宠物的属性值，请合理分配培养机会。");
+        showInfoBox("当前没有可用培养次数了。只有当宠物等级达到60、120和180时，才能各获得一次培养机会！每次培养会按比例增加宠物的属性值，请合理分配培养机会。");
         return; // 退出函数
     }
 
@@ -7766,40 +7854,43 @@ function trainAttributes() {
     const cost = trainingCosts[trainingCount];
 
     // 提示玩家当前花费
-    if (!confirm(`这次金子培养需要${cost}金子，是否继续？`)) {
-        return; // 如果玩家取消，退出函数
-    }
+    showInfoBox(`这次金子培养需要${cost}金子，是否继续？`, function() {
+        // 玩家点击确认按钮，继续执行培养操作
 
-    // 检查金子数量是否足够
-    if (goldAmount < cost) {
-        alert("金子不足！"); // 如果金子不足，提示用户
-        return; // 退出函数
-    }
+        // 检查金子数量是否足够
+        if (goldAmount < cost) {
+            showInfoBox("金子不足！"); // 如果金子不足，提示用户
+            return; // 退出函数
+        }
 
-    // 扣除金子
-    goldAmount -= cost;
-    document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
+        // 扣除金子
+        goldAmount -= cost;
+        document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
 
-    // 获取当前培养的属性提升倍数
-    const multiplier = trainingMultipliers[trainingCount];
+        // 获取当前培养的属性提升倍数
+        const multiplier = trainingMultipliers[trainingCount];
 
-    // 获取当前属性值
-    const currentAttributes = calculateCurrentAttributes();
+        // 获取当前属性值
+        const currentAttributes = calculateCurrentAttributes();
 
-    // 提升bonusAttributes中的值
-    bonusAttributes.endurance += Math.floor(currentAttributes.endurance * (multiplier - 1));
-    bonusAttributes.intelligence += Math.floor(currentAttributes.intelligence * (multiplier - 1));
-    bonusAttributes.strength += Math.floor(currentAttributes.strength * (multiplier - 1));
-    bonusAttributes.agility += Math.floor(currentAttributes.agility * (multiplier - 1));
-    bonusAttributes.faith += Math.floor(currentAttributes.faith * (multiplier - 1));
+        // 提升bonusAttributes中的值
+        bonusAttributes.endurance += Math.floor(currentAttributes.endurance * (multiplier - 1));
+        bonusAttributes.intelligence += Math.floor(currentAttributes.intelligence * (multiplier - 1));
+        bonusAttributes.strength += Math.floor(currentAttributes.strength * (multiplier - 1));
+        bonusAttributes.agility += Math.floor(currentAttributes.agility * (multiplier - 1));
+        bonusAttributes.faith += Math.floor(currentAttributes.faith * (multiplier - 1));
 
-    console.log("Updated Bonus Attributes:", bonusAttributes);
+        console.log("Updated Bonus Attributes:", bonusAttributes);
 
-    // 增加金子培养次数
-    trainingCount++;
+        // 增加金子培养次数
+        trainingCount++;
 
-    // 更新属性面板
-    updateAttributePanel();
+        // 更新属性面板
+        updateAttributePanel();
+    }, function() {
+        // 玩家点击取消按钮，退出函数
+        return;
+    });
 }
 
 
@@ -7859,11 +7950,11 @@ let goldenRebornPill = 5;
 
 function useGoldenRebornPill() {
     if (goldenRebornPill < 1) {
-        alert("您的还童金丹已耗尽！");
+        showInfoBox("您的还童金丹已耗尽！");
         return;
     }
     if (awakened) {
-        alert("您的宠物已经觉醒，无法还童！");
+        showInfoBox("您的宠物已经觉醒，无法还童！");
         return;
     }
     goldenRebornPill--;
@@ -7947,7 +8038,7 @@ let refreshCount = 0; // 全局计数器，记录刷新次数
 
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 100) {
-        alert("您的金子不足，无法刷新！");
+        showInfoBox("您的金子不足，无法刷新！");
         return;
     }
 
@@ -8162,7 +8253,7 @@ function getRandomRareItem() {
 function buyItem() {
     const selectedItem = document.querySelector('.shop-item.selected');
     if (!selectedItem) {
-        alert("请选择一个商品进行购买！");
+        showInfoBox("请选择一个商品进行购买！");
         return;
     }
 
@@ -8170,7 +8261,7 @@ function buyItem() {
     const itemName = selectedItem.dataset.name;
 
     if (goldAmount < price) {
-        alert("金子不够，购买失败！");
+        showInfoBox("金子不够，购买失败！");
         return;
     }
 
@@ -8222,7 +8313,7 @@ function buyItem() {
                 goldenRebornPill += itemQuantity;
                 break;
             default:
-                alert("未知包裹类型，购买失败！");
+                showInfoBox("未知包裹类型，购买失败！");
                 return;
         }
         updateTopBarItems(); // 更新顶部bar道具数量
@@ -8234,17 +8325,17 @@ function buyItem() {
             // 检查技能数量上限
             const skillsArea = document.getElementById('skills-area');
             if (skillsArea.children.length >= 12) {
-                alert("您的宠物已经达到技能上限，无法购买！");
+                showInfoBox("您的宠物已经达到技能上限，无法购买！");
                 return;
             }
 
             if (petName !== currentPet.name) {
-                alert("您的当前宠物不会此技能，购买失败！");
+                showInfoBox("您的当前宠物不会此技能，购买失败！");
                 return;
             }
 
             if (document.getElementById('skills-area').innerText.includes(skillName)) {
-                alert("您的当前宠物已经拥有此技能，购买失败！");
+                showInfoBox("您的当前宠物已经拥有此技能，购买失败！");
                 return;
             }
 
@@ -8302,7 +8393,7 @@ function buyItem() {
                     goldenRebornPill++;
                     break;
                 default:
-                    alert("未知道具类型，购买失败！");
+                    showInfoBox("未知道具类型，购买失败！");
                     return;
             }
             updateTopBarItems();
@@ -8325,7 +8416,7 @@ function sellPet() {
     
     // 检查宠物当前分数是否低于10000分
     if (skillScore < 10000) {
-        alert("宠物当前分数低于10000分，无法出售！"); // 提示分数低于10000分，无法出售
+        showInfoBox("宠物当前分数低于10000分，无法出售！"); // 提示分数低于10000分，无法出售
         return; // 退出函数
     }
 
@@ -8335,7 +8426,7 @@ function sellPet() {
 
     // 检查玩家是否只剩最后一个宠物
     if (petSelect.options.length <= 1) {
-        alert("这是您的唯一爱宠了，请好好珍惜它！");
+        showInfoBox("这是您的唯一爱宠了，请好好珍惜它！");
         return; // 退出函数
     }
 
@@ -8523,7 +8614,7 @@ function upgradeWisdom() {
 
     if (currentWisdom < 20) {
         if (highGradePill < 1) {
-            alert("您的高级悟性丹已耗尽！");
+            showInfoBox("您的高级悟性丹已耗尽！");
             return;
         }
 
@@ -8547,14 +8638,14 @@ function upgradeWisdom() {
         }
     } else {
         if (!awakened) {
-            alert("您的宠物悟性已到上限！");
+            showInfoBox("您的宠物悟性已到上限！");
             return;
         }
 
         const tejiWisdomPillItem = jinnangItems.find(i => i.name === 'tejiWisdomPill');
 
         if (!tejiWisdomPillItem || tejiWisdomPillItem.quantity < 1) {
-            alert("您的特级悟性丹已耗尽！");
+            showInfoBox("您的特级悟性丹已耗尽！");
             return;
         }
 
@@ -8583,7 +8674,7 @@ function upgradeWisdom() {
 
 function trainSkills() {
     if (transmutationPill < 1) {
-        alert("您的道具不够，请刷新后重试！");
+        showInfoBox("您的道具不够，请刷新后重试！");
         return;
     }
 
@@ -8636,9 +8727,10 @@ function trainSkills() {
     }
 
     if (selectedSkills.length >= 8) {
-        if (!confirm("你把技能洗爆了，点击确定查看！")) {
-            return;
-        }
+        showInfoBox("你把技能洗爆了，点击确定查看！", () => {
+            // 继续执行查看技能的逻辑
+        });
+        return;
     }
 
     updateSkillsArea(selectedSkills);
@@ -8824,11 +8916,11 @@ function upgradeWisdomTo() {
     }
     blessGift = true;
     updateJinnangItems();
-    document.getElementById("description-box").innerText = "您获得了新手大礼包！（50万金子，悟性丹500，万化灵丹200，还童丹300，还童金丹200，冰魄还童丹200，资质丹200，灵异金丹50。其他奖励已经放入背包。）";
+    showinfobox("您获得了新手大礼包！（50万金子，悟性丹500，万化灵丹200，还童丹300，还童金丹200，冰魄还童丹200，资质丹200，灵异金丹50。其他奖励已经放入背包。）");
     return;
     }
     if (target === "新手大礼包" && blessGift) {
-        alert("你已经领取过新手礼包了！");
+        showInfoBox("你已经领取过新手礼包了！");
         return;
     }
     if (target === "11111") {
@@ -8877,7 +8969,7 @@ function upgradeWisdomTo() {
     }
 
     updateJinnangItems();
-    document.getElementById("description-box").innerText = "您获得了超绝白金VIP礼包！";
+    showInfoBox("您获得了超绝白金VIP礼包！");
     return;
     }
 
@@ -8891,20 +8983,20 @@ function upgradeWisdomTo() {
             option.text = pet.name;
             petSelect.appendChild(option);
         }
-        alert(`你用你的爱召唤了${pet.name} (${pet.rank})！`);
+        showInfoBox(`你用你的爱召唤了${pet.name} (${pet.rank})！`);
         return;
     }
     
     if (target === "88888") {
         goldAmount += 999999;
         document.getElementById("gold-amount").innerText = goldAmount;
-        document.getElementById("description-box").innerText = "您获得了一大袋金子！";
+        showInfoBox("您获得了一大袋金子！");
         return;
     }
     
     const targetValue = parseInt(target, 10);
     if (isNaN(targetValue) || targetValue < 1 || targetValue > (awakened ? 25 : 20)) {
-        alert(`无效输入，请输入1到${awakened ? 25 : 20}之间的数字`);
+        showInfoBox(`无效输入，请输入1到${awakened ? 25 : 20}之间的数字`);
         return;
     }
 
@@ -8919,7 +9011,7 @@ function upgradeWisdomTo() {
             let successRate;
             if (currentWisdom < 20) {
                 if (highGradePill < 1) {
-                    alert("您的悟性丹已经耗尽！");
+                    showInfoBox("您的悟性丹已经耗尽！");
                     break;
                 }
                 highGradePill--;
@@ -8943,7 +9035,7 @@ function upgradeWisdomTo() {
                 }
             } else if (awakened && currentWisdom >= 20) {
                 if (!useItem('tejiWisdomPill')) {
-                    alert("您的特级悟性丹已耗尽！");
+                    showInfoBox("您的特级悟性丹已耗尽！");
                     break;
                 }
                 usedTejiPills++;
@@ -8964,10 +9056,10 @@ function upgradeWisdomTo() {
             document.getElementById("current-wisdom").innerText = currentWisdom;
         }
 
-        document.getElementById("description-box").innerText = `您消耗了${usedPills}颗悟性丹和${usedTejiPills}颗特级悟性丹，将悟性提升至${currentWisdom}`;
+        showInfoBox(`您消耗了${usedPills}颗悟性丹和${usedTejiPills}颗特级悟性丹，将悟性提升至${currentWisdom}`);
         updateAttributePanel(); // 更新属性面板
     } else {
-        alert(`请输入1到${awakened ? 25 : 20}之间的整数！`);
+        showInfoBox(`请输入1到${awakened ? 25 : 20}之间的整数！`);
     }
 }
 
@@ -9111,7 +9203,7 @@ function updateRemainingPointsDisplay() {
 
 function increaseBonusAttribute(attribute) {
     if (remainingPoints <= 0) {
-        alert("您的宠物没有可分配点数了！");
+        showInfoBox("您的宠物没有可分配点数了！");
         return;
     }
 
@@ -9167,54 +9259,52 @@ function removeBonusAttribute(attribute, value) {
         
 function awakenPet() {
     if (awakened) {
-        alert("您的宠物已经觉醒，无法再次觉醒！");
+        showInfoBox("您的宠物已经觉醒，无法再次觉醒！");
         return;
     }
 
     const awakenPillItem = jinnangItems.find(i => i.name === 'awakenPill');
     if (!awakenPillItem || awakenPillItem.quantity < 1) {
-        alert("必要道具：醒悟丹 数量不足！");
+        showInfoBox("必要道具：醒悟丹 数量不足！");
         return;
     }
 
-    const confirmation = confirm("觉醒需要消耗一个珍贵道具“醒悟丹”。宠物觉醒后成长率、当前属性会得到极大提升，悟性上限开放至25，等级开放至160，同时开启幻化能力。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
-    if (!confirmation) {
-        return;
-    }
+    const confirmationMessage = ("觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后成长率、当前属性会得到极大提升，悟性上限开放至25，等级开放至160，同时开启幻化能力。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
+    showInfoBox(confirmationMessage, () => {
+        const qualities = currentPet.qualities;
+        const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+        const baseLevel = petLevel;
 
-    const qualities = currentPet.qualities;
-    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    const baseLevel = petLevel;
+        const newAttributes = {
+            endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
+            intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
+            strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
+            agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
+            faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
+        };
 
-    const newAttributes = {
-        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
-        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
-        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
-        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
-        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
-    };
+        // 计算bonusAttributes
+        bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
+        bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
+        bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
+        bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
+        bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
 
-    // 计算bonusAttributes
-    bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
-    bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
-    bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
-    bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
-    bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
+        currentPet.qualities.baseLevel = petLevel;
+        currentPet.qualities.tier = '超凡';
+        currentPet.qualities.growthRate = 400 + hallucinationLevel * 5;
 
-    currentPet.qualities.baseLevel = petLevel;
-    currentPet.qualities.tier = '超凡';
-    currentPet.qualities.growthRate = 400 + hallucinationLevel * 5;
+        awakenPillItem.quantity--;
+        updateJinnangItems();
 
-    awakenPillItem.quantity--;
-    updateJinnangItems();
+        petMaxLevel = 160;
+        awakened = true;
 
-    petMaxLevel = 160;
-    awakened = true;
-
-    alert("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
-    updatePetLevel();
-    updateAttributePanel();
-    updateQualityCard();
+        showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
+        updatePetLevel();
+        updateAttributePanel();
+        updateQualityCard();
+    });
 }
 
 let hallucinated = false;
@@ -9222,14 +9312,14 @@ let hallucinationLevel = 0;
 
 function hallucinatePet() {
     if (!awakened) {
-        alert("您的宠物尚未觉醒，无法进行幻化提升！");
+        showInfoBox("您的宠物尚未觉醒，无法进行幻化提升！");
         return;
     }
 
     if (!hallucinated) {
         const coagulateStoneItem = jinnangItems.find(i => i.name === 'coagulateStone');
         if (!coagulateStoneItem || coagulateStoneItem.quantity < 1) {
-            alert("您的凝魄石不足！凝魄石可通过至尊宝箱获取。");
+            showInfoBox("您的凝魄石不足！凝魄石可通过至尊宝箱获取。");
             return;
         }
 
@@ -9239,47 +9329,45 @@ function hallucinatePet() {
         hallucinated = true;
         hallucinationLevel = 0;
 
-        alert("恭喜大侠，您的宠物获得了幻化能力。幻化等级为1级！");
+        showInfoBox("恭喜大侠，您的宠物获得了幻化能力。幻化等级为1级！");
         updateQualityCard();
         updateAttributePanel(); // 确保更新属性面板
         return;
     }
 
     if (hallucinationLevel >= 12) {
-        alert("您的宠物幻化等级已达上限！");
+        showInfoBox("您的宠物幻化等级已达上限！");
         return;
     }
 
-    const confirmHallucination = confirm("每次幻化成功可以提升5%的成长率，悟性越高，成功率越高。幻化需要离魂石，是否继续？");
-    if (!confirmHallucination) {
-        return;
-    }
+    const confirmHallucinationMessage = "每次幻化成功可以提升5%的成长率，悟性越高，成功率越高。幻化需要离魂石，是否继续？";
+    showInfoBox(confirmHallucinationMessage, () => {
+        const seperateStoneItem = jinnangItems.find(i => i.name === 'seperateStone');
+        if (!seperateStoneItem || seperateStoneItem.quantity < 1) {
+            showInfoBox("您的离魂石不足！");
+            return;
+        }
 
-    const seperateStoneItem = jinnangItems.find(i => i.name === 'seperateStone');
-    if (!seperateStoneItem || seperateStoneItem.quantity < 1) {
-        alert("您的离魂石不足！");
-        return;
-    }
+        seperateStoneItem.quantity--;
+        updateJinnangItems();
 
-    seperateStoneItem.quantity--;
-    updateJinnangItems();
+        let successRate;
+        if (currentWisdom < 20) {
+            successRate = 0.2;
+        } else {
+            successRate = 0.2 + (currentWisdom - 19) * 0.1;
+        }
 
-    let successRate;
-    if (currentWisdom < 20) {
-        successRate = 0.2;
-    } else {
-        successRate = 0.2 + (currentWisdom - 19) * 0.1;
-    }
+        if (Math.random() < successRate) {
+            hallucinationLevel++;
+            showInfoBox(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
+        } else {
+            showInfoBox("幻化提升失败！");
+        }
 
-    if (Math.random() < successRate) {
-        hallucinationLevel++;
-        alert(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
-    } else {
-        alert("幻化提升失败！");
-    }
-
-    updateQualityCard();
-    updateAttributePanel(); // 确保更新属性面板
+        updateQualityCard();
+        updateAttributePanel(); // 确保更新属性面板
+    });
 }
 
 // 更新显示函数
@@ -9383,30 +9471,32 @@ function useBingpoRebornPill() {
         return;
     }
     if (awakened) {
-        alert("您的宠物已经觉醒，无法还童！");
+        showInfoBox("您的宠物已经觉醒，无法还童！");
         return;
     }
     if (bingpoRebornPill < 1) {
-        alert("您的冰魄还童丹已耗尽！");
+        showInfoBox("您的冰魄还童丹已耗尽！");
         return;
     }
 
     // 检查并处理变异状态
     if (currentPet.qualities.mutated) {
-        if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
-            return;
-        }
-        // 当宠物失去变异状态时，资质会除以1.1
-        const qualities = currentPet.qualities;
-        qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
-        qualities.strength.current = Math.round(qualities.strength.current / 1.1);
-        qualities.faith.current = Math.round(qualities.faith.current / 1.1);
-        qualities.agility.current = Math.round(qualities.agility.current / 1.1);
-        qualities.intelligence.current = Math.round(qualities.intelligence.current / 1.1);
-
-        currentPet.qualities.mutated = false;
-        // 恢复原背景
-        document.body.style.backgroundImage = "";
+        showInfoBox("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！", () => {
+            // 当宠物失去变异状态时，资质会除以1.1
+            const qualities = currentPet.qualities;
+            qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
+            qualities.strength.current = Math.round(qualities.strength.current / 1.1);
+            qualities.faith.current = Math.round(qualities.faith.current / 1.1);
+            qualities.agility.current = Math.round(qualities.agility.current / 1.1);
+            qualities.intelligence.current = Math.round(qualities.intelligence.current / 1.1);
+    
+            currentPet.qualities.mutated = false;
+            // 恢复原背景
+            document.body.style.backgroundImage = "";
+            updateQualityCard();
+            updateSkillScore();
+        });
+        return;
     }
 
     // 重置宠物的段位和成长率
@@ -9484,30 +9574,32 @@ function rebornPet() {
         return;
     }
     if (awakened) {
-        alert("您的宠物已经觉醒，无法还童！");
+        showInfoBox("您的宠物已经觉醒，无法还童！");
         return;
     }
     
     if (rebornPill < 1) {
-        alert("您的神兽还童丹已耗尽！");
+        showInfoBox("您的神兽还童丹已耗尽！");
         return;
     }
 
     if (currentPet.qualities.mutated) {
-        if (!confirm("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！")) {
-            return;
-        }
-        // 当宠物失去变异状态时，资质会除以1.1
-        const qualities = currentPet.qualities;
-        qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
-        qualities.strength.current = Math.round(qualities.strength.current / 1.1);
-        qualities.faith.current = Math.round(qualities.faith.current / 1.1);
-        qualities.agility.current = Math.round(qualities.agility.current / 1.1);
-        qualities.intelligence.current = Math.round(qualities.intelligence.current / 1.1);
-
-        currentPet.qualities.mutated = false;
-        // 恢复原背景
-        document.body.style.backgroundImage = "";
+        showInfoBox("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！", () => {
+            // 当宠物失去变异状态时，资质会除以1.1
+            const qualities = currentPet.qualities;
+            qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
+            qualities.strength.current = Math.round(qualities.strength.current / 1.1);
+            qualities.faith.current = Math.round(qualities.faith.current / 1.1);
+            qualities.agility.current = Math.round(qualities.agility.current / 1.1);
+            qualities.intelligence.current = Math.round(qualities.intelligence.current / 1.1);
+    
+            currentPet.qualities.mutated = false;
+            // 恢复原背景
+            document.body.style.backgroundImage = "";
+            updateQualityCard();
+            updateSkillScore();
+        });
+        return;
     }
 
     rebornPill--;
@@ -9583,7 +9675,7 @@ function rebornPet() {
 function trainQuality() {
     if (!checkDrawerOpen()) return;
     if (awakened) {
-        alert("您的宠物已经觉醒，无法还童！");
+        showInfoBox("您的宠物已经觉醒，无法还童！");
         return;
     }
     const targetTier = prompt("请选择预期成长（普通，优秀，杰出，卓越，完美）:");
@@ -9621,7 +9713,7 @@ function enhanceQuality() {
 
     // 如果资质重生丹的数量小于1，提示用户并退出函数。
     if (qualityPill < 1) {
-        alert("您的资质重生丹已耗尽！");
+        showInfoBox("您的资质重生丹已耗尽！");
         return;
     }
 
@@ -9681,11 +9773,11 @@ function mutatePet() {
     if (!checkDrawerOpen()) return;
 
     if (miraculousPill < 1) {
-        alert("必要道具：灵异金丹 数量不足！");
+        showInfoBox("必要道具：灵异金丹 数量不足！");
         return;
     }
     if (awakened) {
-        alert("您的宠物已经觉醒，无法使用灵异金丹！");
+        showInfoBox("您的宠物已经觉醒，无法使用灵异金丹！");
         return;
     }
     
@@ -9693,7 +9785,7 @@ function mutatePet() {
     document.getElementById("miraculous-pill").innerText = miraculousPill;
 
     if (currentPet.qualities.mutated) {
-        alert("您的宠物已经变异，无法再次使用灵异金丹！");
+        showInfoBox("您的宠物已经变异，无法再次使用灵异金丹！");
         return;
     }
 

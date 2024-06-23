@@ -2818,9 +2818,10 @@ preloadImages(imageUrls);
 let currentInfoBox = null;
 
 function showInfoBox(message, onConfirm, onCancel) {
-    // 如果已经有一个信息框存在,先关闭它
+    // 如果已经有一个信息框存在，先关闭它
     if (currentInfoBox) {
-        closeInfoBox();
+        document.body.removeChild(currentInfoBox);
+        currentInfoBox = null;
     }
 
     // 创建提示框元素
@@ -2838,8 +2839,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.zIndex = '9999';
     infoBox.style.textAlign = 'center';
     infoBox.style.fontSize = '14px';
-    infoBox.style.opacity = '0';
-    infoBox.style.transition = 'opacity 0.5s';
+
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
@@ -2866,7 +2866,11 @@ function showInfoBox(message, onConfirm, onCancel) {
     confirmButton.style.borderRadius = '4px';
     confirmButton.style.cursor = 'pointer';
     confirmButton.addEventListener('click', () => {
-        closeInfoBox(onConfirm);
+        document.body.removeChild(infoBox);
+        currentInfoBox = null;
+        if (typeof onConfirm === 'function') {
+            onConfirm();
+        }
     });
     buttonContainer.appendChild(confirmButton);
 
@@ -2880,7 +2884,11 @@ function showInfoBox(message, onConfirm, onCancel) {
     cancelButton.style.borderRadius = '4px';
     cancelButton.style.cursor = 'pointer';
     cancelButton.addEventListener('click', () => {
-        closeInfoBox(onCancel);
+        document.body.removeChild(infoBox);
+        currentInfoBox = null;
+        if (typeof onCancel === 'function') {
+            onCancel();
+        }
     });
     buttonContainer.appendChild(cancelButton);
 
@@ -2889,24 +2897,6 @@ function showInfoBox(message, onConfirm, onCancel) {
 
     // 将当前信息框设置为新创建的信息框
     currentInfoBox = infoBox;
-
-    // 在下一个动画帧中将提示框的不透明度设置为1,触发淡入效果
-    requestAnimationFrame(() => {
-        infoBox.style.opacity = '1';
-    });
-}
-
-function closeInfoBox(callback) {
-    if (currentInfoBox) {
-        currentInfoBox.style.opacity = '0';
-        currentInfoBox.addEventListener('transitionend', () => {
-            document.body.removeChild(currentInfoBox);
-            currentInfoBox = null;
-            if (typeof callback === 'function') {
-                callback();
-            }
-        }, { once: true });
-    }
 }
 
 // 显示提示信息的函数

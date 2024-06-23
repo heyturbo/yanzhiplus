@@ -3093,26 +3093,25 @@ let currentPet = pets[currentPetKey]; // 初始化当前宠物
 function changePet() {
     const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
 
-    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物，不进行切换
+    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物,不进行切换
 
     // 提示用户确认
-    showInfoBox("更换宠物会导致当前宠物的数据丢失，你确定更换吗？", () => {
+    showInfoBox("更换宠物会导致当前宠物的数据丢失,你确定更换吗?", () => {
         const selectedPet = pets[selectedPetKey];
         console.log('Selected Pet:', selectedPet);
-        // 继续执行更换宠物的逻辑
+
+        if (selectedPet) { // 检查选中的宠物是否存在
+            currentPetKey = selectedPetKey;
+            currentPet = selectedPet; // 将当前宠物设为选择的宠物
+
+            document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
+            document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
+            document.getElementById("description-box").innerText = `您将当前宠物更换为:${currentPet.name}`;
+            resetPet(); // 重置宠物的数值
+        } else {
+            console.error('无法找到选中的宠物:', selectedPetKey);
+        }
     });
-
-    if (selectedPet) { // 检查选中的宠物是否存在
-        currentPetKey = selectedPetKey;
-        currentPet = selectedPet; // 将当前宠物设为选择的宠物
-
-        document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
-        document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
-        document.getElementById("description-box").innerText = `您将当前宠物更换为：${currentPet.name}`;
-        resetPet(); // 重置宠物的数值
-    } else {
-        console.error('无法找到选中的宠物：', selectedPetKey);
-    }
 }
 
 

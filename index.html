@@ -4564,7 +4564,7 @@ function updateEnemyAttributes() {
     const maxValues = {
         health: 500000000,
         mana: 50000000,
-        physicalAttack: 3000000,
+        physicalAttack: 2400000,
         physicalDefense: 550000,
         magicAttack: 1800000,
         magicDefense: 450000,
@@ -4583,7 +4583,7 @@ function updateEnemyAttributes() {
 
     function calculateAttributeValue(attribute, initialValue) {
         if (battleRounds <= 100) {
-            return initialValue + 0.5 * increasePerRound[attribute];
+            return initialValue + 1 * increasePerRound[attribute];
         } else if (battleRounds <= 130) {
             const initialIncrease = 5 * increasePerRound[attribute];
             const remainingRounds = battleRounds - 100;
@@ -5253,15 +5253,21 @@ function selectSkillAndCalculateMultiplier(type) {
     return { skillMultiplier, isSkillUsed };
 }
 
-
-
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
     let damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
+
+    // 判断是否触发"斩龙一式"
+    if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
+        damage = Math.floor(damage * 1.6); // 增加60%伤害
+        logBattleEvent("斩龙一式触发,伤害增加60%!", 'gold');
+    }
+
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
@@ -5274,16 +5280,11 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         const bloodSuckPercentage = (ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).increment((ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).level) / 100;
         const healAmount = Math.floor(damage * bloodSuckPercentage);
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-        logBattleEvent(`吸血魔刃触发，吸取了 ${healAmount} 点生命值。`, 'red');
+        logBattleEvent(`吸血魔刃触发,吸取了 ${healAmount} 点生命值。`, 'red');
         updateUI();
     }
 
     applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
-
-    if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
-        damage = Math.floor(damage * 1.6); // 增加60%伤害
-        logBattleEvent("斩龙一式触发，伤害增加60%！", 'gold');
-    }
 
     return damage;
 }
@@ -9624,7 +9625,7 @@ function useBingpoRebornPill() {
         return;
     }
     if (awakened) {
-        showInfoBox("您的宠物已经觉醒，无法还童！");
+        showInfoBox("您的宠物已经觉醒,无法还童！");
         return;
     }
     if (bingpoRebornPill < 1) {
@@ -9634,8 +9635,8 @@ function useBingpoRebornPill() {
 
     // 检查并处理变异状态
     if (currentPet.qualities.mutated) {
-        showInfoBox("您的宠物已经变异，再次还童会改变其状态，请谨慎操作！", () => {
-            // 当宠物失去变异状态时，资质会除以1.1
+        showInfoBox("您的宠物已经变异,再次还童会改变其状态,请谨慎操作！", () => {
+            // 当宠物失去变异状态时,资质会除以1.1
             const qualities = currentPet.qualities;
             qualities.endurance.current = Math.round(qualities.endurance.current / 1.1);
             qualities.strength.current = Math.round(qualities.strength.current / 1.1);
@@ -9648,10 +9649,17 @@ function useBingpoRebornPill() {
             document.body.style.backgroundImage = "";
             updateQualityCard();
             updateSkillScore();
-        });
-        return;
-    }
 
+            // 继续执行重置宠物品质、成长率和更新技能等操作
+            resetPetQualitiesAndSkills();
+        });
+    } else {
+        // 如果宠物没有变异,直接执行重置宠物品质、成长率和更新技能等操作
+        resetPetQualitiesAndSkills();
+    }
+}
+
+function resetPetQualitiesAndSkills() {
     // 重置宠物的品质和成长率
     let tier, growthRate;
     const roll = Math.random() * 100;

@@ -1112,7 +1112,12 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-
+#generalEffect {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+        
 #playerEffect {
     left: 50%;
     top: 50%;
@@ -1585,7 +1590,7 @@
             <div class="quality-container">
                 <div class="quality-details">
                     <div>名称: <span id="quality-name">小金牛</span></div>
-                    <div>段位: <span id="quality-tier">普通</span></div>
+                    <div>品质: <span id="quality-tier">普通</span></div>
                     <div>成长率: <span id="quality-growth-rate">100%</span></div>
                     <div>变异: <span id="quality-mutated">未变异</span></div>
                     <div>进化等级: <span id="evolution-level">0</span></div>
@@ -1736,6 +1741,7 @@
             </div>
             <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div id="treasure-reward" class="reward-box"></div>
+            <div id="generalEffect" class="visual-effect"></div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">自动取出</button>
                 <button onclick="collectTreasure()">拿走奖品</button>
@@ -1986,11 +1992,11 @@
                 qualities: {
                     tier: '普通',
                     growthRate: 100,
-                    endurance: { current: 1100, min: 1100, max: 2200 },
-                    strength: { current: 200, min: 200, max: 1150 },
+                    endurance: { current: 3600, min: 3600, max: 7200 },
+                    strength: { current: 3200, min: 3200, max: 5400 },
                     faith: { current: 1150, min: 1150, max: 2250 },
                     agility: { current: 1100, min: 1100, max: 2200 },
-                    intelligence: { current: 100, min: 100, max: 1100 },
+                    intelligence: { current: 2100, min: 2100, max: 4200 },
                     mutated: false
                 },
             },
@@ -2996,47 +3002,70 @@ function petCollection() {
         collectButton.addEventListener('click', () => {
             const petSelect = document.getElementById('pet-select');
             if (!isPetOwned(petKey)) {
-                showInfoBox("你还没有该宠物！");
+                showInfoBox("你还没有该宠物!");
                 return;
             }
-                // 提示用户确认
+
+            if (petSelect.options.length <= 1) {
+                showInfoBox("这是您的唯一爱宠了,请好好珍惜它!");
+                return;
+            }
+
+            // 判断是否是当前宠物,如果是则弹出确认框
+            if (petSelect.value === petKey) {
+                showInfoBox("这是你目前的出战宠物,一旦收录将立即被清空数据,请谨慎操作!是否继续?", () => {
+                    // 用户点击"确认"按钮
+                    let newOption;
+                    do {
+                        const randomIndex = Math.floor(Math.random() * petSelect.options.length);
+                        newOption = petSelect.options[randomIndex].value;
+                    } while (newOption === petKey);
+
+                    petSelect.value = newOption;
+                    changePet(); // 更新宠物信息
+
+                    // 执行收录动作
+                    collectedPets.push(pet.name);
+                    collectedPetCount++;
+                    statusDiv.innerText = '已收录';
+                    collectButton.disabled = true;
+
+                    // 从下拉菜单中移除当前宠物
+                    const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
+                    if (optionToRemove) {
+                        optionToRemove.remove();
+                    }
+
+                    updateCollectionBonus();
+                    const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+                    updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
+                }, () => {
+                    // 用户点击"取消"按钮,不进行收录
+                    return;
+                });
+            } else {
+                // 不是当前宠物,提示用户确认收录
                 showInfoBox("收录宠物后,宠物会消失,你确定收录吗?", () => {
                     // 如果用户确认,执行收录逻辑
                     collectedPets.push(pet.name);
                     collectedPetCount++;
                     statusDiv.innerText = '已收录';
                     collectButton.disabled = true;
+
+                    // 从下拉菜单中移除当前宠物
+                    const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
+                    if (optionToRemove) {
+                        optionToRemove.remove();
+                    }
+
+                    updateCollectionBonus();
+                    const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+                    updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
                 }, () => {
                     // 如果用户取消,不进行收录
                     return;
                 });
-            
-                 if (petSelect.options.length <= 1) {
-                     showInfoBox("这是您的唯一爱宠了，请好好珍惜它！");
-                     return;
-                 }
-            
-            // 判断是否是当前宠物，如果是则随机跳转至一个已有的选项
-            if (petSelect.value === petKey) {
-                let newOption;
-                do {
-                    const randomIndex = Math.floor(Math.random() * petSelect.options.length);
-                    newOption = petSelect.options[randomIndex].value;
-                } while (newOption === petKey);
-        
-                petSelect.value = newOption;
-                changePet(); // 更新宠物信息
             }
-
-            // 从下拉菜单中移除当前宠物
-            const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
-            if (optionToRemove) {
-                optionToRemove.remove();
-            }
-
-            updateCollectionBonus();
-            const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
-            updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
         });
 
         petDiv.appendChild(img);
@@ -4414,7 +4443,7 @@ let battleInterval;
 let battleAttributes; // 用于存储战斗属性的独立容器
 let maxHealth, maxMana; // 独立的最大值变量
 let enemyMaxHealth, enemyMaxMana; // 敌人的最大值变量
-let battleRounds = 0; // 记录玩家胜利的轮次
+let battleRounds = 1; // 记录玩家胜利的轮次
 let currentExp = 0; // 当前经验值
 let maxExp = 208; // 经验值上限
 let enemyHealCount = 0; // 记录怪物治疗次数
@@ -4542,43 +4571,65 @@ function updateEnemyAttributes() {
         speed: 108020
     };
 
-    function calculateEnhanceFactor(attribute) {
-        const baseEnhanceFactor = battleRounds <= 100 ? 1.015 : 1.03;
-        const waveEnhanceFactor = battleRounds % 10 === 0 ? 1.03 : 1;
-        const progressEnhanceFactor = battleRounds <= 140 ? 1 + (battleRounds / 140) * 0.2 : 1.2 + ((battleRounds - 140) / 10) * 0.8;
-        return baseEnhanceFactor * waveEnhanceFactor * progressEnhanceFactor;
+    const increasePerRound = {
+        health: 3000,
+        mana: 1200,
+        physicalAttack: 400,
+        physicalDefense: 240,
+        magicAttack: 300,
+        magicDefense: 220,
+        speed: 300
+    };
+
+    function calculateAttributeValue(attribute, initialValue) {
+        if (battleRounds <= 100) {
+            return initialValue + 0.5 * increasePerRound[attribute];
+        } else if (battleRounds <= 130) {
+            const initialIncrease = 5 * increasePerRound[attribute];
+            const remainingRounds = battleRounds - 100;
+            const maxValueAt130 = maxValues[attribute] * 0.6;
+            const remainingIncrease = maxValueAt130 - (initialValue + initialIncrease);
+            return initialValue + initialIncrease + remainingIncrease * (remainingRounds / 30);
+        } else if (battleRounds <= 140) {
+            const maxValueAt130 = maxValues[attribute] * 0.6;
+            const remainingRounds = battleRounds - 130;
+            const maxValueAt140 = maxValues[attribute] * 0.8;
+            const remainingIncrease = maxValueAt140 - maxValueAt130;
+            return maxValueAt130 + remainingIncrease * (remainingRounds / 10);
+        } else {
+            const maxValueAt140 = maxValues[attribute] * 0.8;
+            const remainingRounds = battleRounds - 140;
+            const remainingIncrease = maxValues[attribute] - maxValueAt140;
+            return maxValueAt140 + remainingIncrease * (remainingRounds / 10);
+        }
     }
 
-    function enhanceAttribute(attribute, enhanceFactor, maxValue) {
-        return Math.min(Math.round(attribute * enhanceFactor), maxValue);
-    }
 
-    enemyPet.health = enhanceAttribute(enemyPet.health, calculateEnhanceFactor('health'), maxValues.health);
-    enemyPet.mana = enhanceAttribute(enemyPet.mana, calculateEnhanceFactor('mana'), maxValues.mana);
-    enemyPet.physicalAttack = enhanceAttribute(enemyPet.physicalAttack, calculateEnhanceFactor('physicalAttack'), maxValues.physicalAttack);
-    enemyPet.physicalDefense = enhanceAttribute(enemyPet.physicalDefense, calculateEnhanceFactor('physicalDefense'), maxValues.physicalDefense);
-    enemyPet.magicAttack = enhanceAttribute(enemyPet.magicAttack, calculateEnhanceFactor('magicAttack'), maxValues.magicAttack);
-    enemyPet.magicDefense = enhanceAttribute(enemyPet.magicDefense, calculateEnhanceFactor('magicDefense'), maxValues.magicDefense);
-    enemyPet.speed = enhanceAttribute(enemyPet.speed, calculateEnhanceFactor('speed'), maxValues.speed);
+        enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
+        enemyPet.mana = Math.round(calculateAttributeValue('mana', enemyPet.mana));
+        enemyPet.physicalAttack = Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack));
+        enemyPet.physicalDefense = Math.round(calculateAttributeValue('physicalDefense', enemyPet.physicalDefense));
+        enemyPet.magicAttack = Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack));
+        enemyPet.magicDefense = Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense));
+        enemyPet.speed = Math.round(calculateAttributeValue('speed', enemyPet.speed));
+
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
 
     battleState.enemy = { ...enemyPet };
     storeEnemyInitialState();
-    enemyLevel = battleRounds;
-    document.getElementById('enemy-level').innerText = enemyLevel;
 }
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 378,
-        mana: 236,
-        physicalAttack: 68,
-        physicalDefense: 49,
-        magicAttack: 64,
-        magicDefense: 42,
-        speed: 208,
+        health: 38,
+        mana: 23,
+        physicalAttack: 8,
+        physicalDefense: 9,
+        magicAttack: 6,
+        magicDefense: 4,
+        speed: 20,
         silenced: false,
         stunned: false
     };
@@ -4711,6 +4762,8 @@ function updateUI() {
     document.getElementById("player-status").innerText = getPlayerStatus();
     document.getElementById("enemy-status").innerText = getEnemyStatus();
     document.getElementById('battleRounds').innerText = battleRounds;
+    enemyLevel = battleRounds;
+    document.getElementById('enemy-level').innerText = enemyLevel;
 }
 
 
@@ -6376,7 +6429,7 @@ function resetBattleState(playerWon) {
         enemyCritRate = 1; // 100%
         enemyCritDamage = battleRounds === 150 ? 3 : 2; // 150轮时为300%，其他10的倍数轮为200%
         battleState.enemy.rampaged = true;
-        setBackgroundImage('https://pic.imgdb.cn/item/6677c02fd9c307b7e966d633.jpg');
+        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
         logBattleEvent("请万分小心，敌人进入狂暴状态，暴击伤害极大增强！", "red");
     } else {
         enemyCritRate = 0.6; // 60%
@@ -6787,15 +6840,15 @@ function showGuide() {
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
                             <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
                             <p>玩法按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
-                            <p>资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由段位、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
+                            <p>资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由品质、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
                             <p>资质内部有多个功能</p>
                             <p>a.普通还童：消耗1颗还童丹重新生成当前宠物的资质和技能，并有极低的概率让宠物变异。</p>
-                            <p>当宠物变异后，宠物的资质会有概率突破上限值，且段位必定为卓越或完美。一般而言，变异的宠物比未变异的宠物更强大。</p>
-                            <p>当宠物变异后，继续使用还童丹将会使当前宠物失去变异状态。如果你对变异宠物的段位和成长率不满意，你可以在资质面板中的“使用还童金丹”按钮，消耗1颗还童金丹对当前宠物执行更新资质的操作，还童金丹不会改变宠物的变异状态。</p>
+                            <p>当宠物变异后，宠物的资质会有概率突破上限值，且品质必定为卓越或完美。一般而言，变异的宠物比未变异的宠物更强大。</p>
+                            <p>当宠物变异后，继续使用还童丹将会使当前宠物失去变异状态。如果你对变异宠物的品质和成长率不满意，你可以在资质面板中的“使用还童金丹”按钮，消耗1颗还童金丹对当前宠物执行更新资质的操作，还童金丹不会改变宠物的变异状态。</p>
                             <p>b. 快速还童：如果你厌倦了手动还童，想交给系统一键提升，你可以按照弹窗指引进行输入。请注意，你也有可能消耗所有还童丹而未能达成预期结果。</p>
                             <p>c. 还童金丹：还童金丹可以在商店购买，当宠物变异后，使用还童金丹可以在不改变变异状态的情况下刷新宠物的成长率。</p>
-                            <p>d. 冰魄还童：冰魄还童丹可以在不改变宠物资质的情况下更新宠物段位和成长率。</p>
-                            <p>e. 刷新资质：消耗1颗资质丹，在不改变段位、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
+                            <p>d. 冰魄还童：冰魄还童丹可以在不改变宠物资质的情况下更新宠物品质和成长率。</p>
+                            <p>e. 刷新资质：消耗1颗资质丹，在不改变品质、成长率和变异状态的情况下，更新宠物的资质值。请注意，更新后的资质值未必比之前更好。</p>
                             <p>f. 变异宠物：消耗1颗稀有道具“灵异金丹”使当前宠物立即变异。</p>
                             <p>变异后的宠物，资质值有机会爆棚：变为未变异状态上限值的1.1倍。灵异金丹会直接在宠物当前未变异的资质值上乘以1.1倍。因此，未变异状态下，宠物资质值越高，使用灵异金丹的收益越大。</p>
                             <p>g. 进化宠物：宠物成功进化后，会随机增加各项资质的当前值。宠物可以最大进化30级，每次进化需要消耗进化之灵，宝箱可以开出不同的进化之灵。颤抖之灵用于1~6级进化，发光之灵用于7~12级进化，活跃之灵用于13~18级进化，跳动之灵用于19~24级进化，闪耀之灵用于25~30级进化。</p>
@@ -7172,6 +7225,7 @@ function openTreasure() {
         rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
     }
     document.getElementById('treasure-reward').innerHTML = rewardHTML;
+    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66793494d9c307b7e9dae0f9.png');
 }
 
 function collectTreasure() {
@@ -7733,18 +7787,18 @@ function forgeArm(key, infoDiv) {
         if (rand < 0.9) {
         newValue = Math.floor(100 + Math.random() * 0.3 * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 38999 :
+            attribute === "magicAttack" ? 58999 :
             attribute === "speed" ? 8899 :
             attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-            43999
+            73999
         ));
     } else {
         newValue = Math.floor(100 + Math.random() * (
             attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 38999 :
+            attribute === "magicAttack" ? 58999 :
             attribute === "speed" ? 8899 :
             attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-            43999
+            73999
         ));
     }
     arm.value = newValue;
@@ -9598,7 +9652,7 @@ function useBingpoRebornPill() {
         return;
     }
 
-    // 重置宠物的段位和成长率
+    // 重置宠物的品质和成长率
     let tier, growthRate;
     const roll = Math.random() * 100;
     if (roll < 50) {
@@ -9957,7 +10011,7 @@ function startGameTimer() {
         timerElement.innerText = formattedTime;
 
         // 在30秒时显示图像框
-        if (Math.floor(elapsedTime / 1000) === 30) {
+        if (Math.floor(elapsedTime / 1000) === 3000) {
             showImageBox();
         }
     }

@@ -202,7 +202,7 @@
         }
 
         #missionButton {
-            background-image: url('https://pic.imgdb.cn/item/666d63b4d9c307b7e9fa76fa.png');
+            background-image: url('https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png');
         }
         
         #summonButton {
@@ -4187,7 +4187,7 @@ const maxSpiritMultiplier = 4.15;
 // 获取精灵提供的基础属性增益
 function getBaseSpiritAttributes() {
     return {
-        health: 38,
+        health: 43,
         mana: 19,
         physicalAttack: 6,
         physicalDefense: 9,
@@ -4505,7 +4505,7 @@ function updatePetInfo() {
             const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
             if (skill) {
                 const skillLevel = skill.level || 1;
-                const levelMultiplier = 1 + 0.05 * (skillLevel - 1);
+                const levelMultiplier = 1 + 0.1 * (skillLevel - 1);
                 skillAttributes.health += Math.round(2168 * levelMultiplier);
                 skillAttributes.mana += Math.round(531 * levelMultiplier);
                 skillAttributes.physicalAttack += Math.round(728 * levelMultiplier);
@@ -5271,6 +5271,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
     } else {
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
     }
@@ -5310,6 +5311,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值！`, 'red');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
     } else {
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
@@ -5344,7 +5346,7 @@ function handleCriticalAndDrunken(damage) {
 
     // 处理醉酒效果
     if (battleState.player.drunken && damage > 0) {
-        const drunkenDamage = Math.floor(damage * 0.1);
+        const drunkenDamage = Math.floor(damage * 0.05);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
         logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FFOO88');
     }
@@ -5433,6 +5435,7 @@ function performIndependentMagicAttack() {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点伤害。`, 'red');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
     } else {
         logBattleEvent(`你造成了 ${damage} 点伤害。`, 'wheat');
     }
@@ -5980,6 +5983,7 @@ function performEnemyPhysicalAttack(isCritical) {
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     if (isCritical) {
         logBattleEvent(`敌人使用物理攻击时发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
     } else {
         logBattleEvent(`敌人进行了物理攻击，造成了 ${damage} 点伤害。`, 'white');
     }
@@ -6004,6 +6008,7 @@ function performEnemyMagicalAttack(isCritical) {
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
         logBattleEvent(`敌人使用法术攻击时发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'wheat');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
     } else {
         logBattleEvent(`敌人进行了法术攻击，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
@@ -6037,7 +6042,7 @@ function applyEnemyMagicEffects(damage) {
                         battleState.player.drunken = false;
                         effectCooldowns.drunken = false;
                         updatePlayerStatusDisplay();
-                    }, 10000); // 醉酒效果持续10秒
+                    }, 5000); // 醉酒效果持续5秒
                 }
                 break;
             case 'healingBan':

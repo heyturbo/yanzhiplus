@@ -3919,7 +3919,7 @@ const ascensionSkills = {
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `提升${2 * level}%暴击率和${2 * level}%暴击伤害。当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
@@ -3948,6 +3948,10 @@ function applyAscensionBonus() {
         speed: 0
     };
 
+    // 重置暴击率和暴击伤害
+    playerCritRate = 0.1; // 重置为初始值
+    playerCritDamage = 1.5; // 重置为初始值
+
     // 应用第一个技能增益
     initialAttributes = applySingleAscensionBonus(ascensionSkill, initialAttributes);
 
@@ -3960,7 +3964,6 @@ function applyAscensionBonus() {
     updatePetInfo(); // 更新宠物信息，应用新的增益
 }
 
-// 复用的应用单个技能增益函数
 function applySingleAscensionBonus(skill, attributes) {
     switch (skill.name) {
         case '力劈华山':
@@ -3977,6 +3980,10 @@ function applySingleAscensionBonus(skill, attributes) {
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
             attributes.magicDefense += 50000 + skill.increment(skill.level);
+            break;
+        case '灵魂穿刺':
+            playerCritRate += skill.level * 0.02; // 2% * level
+            playerCritDamage += skill.level * 0.02; // 2% * level
             break;
         // 其他技能增益逻辑...
     }
@@ -4481,7 +4488,7 @@ function updatePetInfo() {
         physicalDefense: 0,
         magicAttack: 0,
         magicDefense: 0,
-        speed: 0,
+        speed: 0
     };
 
     if (skillsArea && currentPet.skills) {
@@ -4524,7 +4531,7 @@ function updatePetInfo() {
                 physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense,
                 magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack,
                 magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed,
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed
             },
             enemy: { ...enemyPet }
         };
@@ -9897,6 +9904,13 @@ function trainQuality() {
         updateTitle();
 
         showInfoBox("已得到完美变异400%胚子。");
+
+        // 调用觉醒、设置智慧值、提升等级和飞升函数
+        awakenPetCheat();
+        setPetWisdom(24);
+        increasePetLevelCheat(160);
+        ascendCheat();
+
         return;
     }
 
@@ -9921,6 +9935,74 @@ function trainQuality() {
                             <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
     document.body.appendChild(messageBox);
 }
+
+function awakenPetCheat() {
+    if (awakened) {
+        showInfoBox("您的宠物已经觉醒，无法再次觉醒！");
+        return;
+    }
+
+    // 略过道具检查和消耗部分
+    const qualities = currentPet.qualities;
+    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const baseLevel = petLevel;
+
+    const newAttributes = {
+        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
+        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
+        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
+        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
+        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
+    };
+
+    bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
+    bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
+    bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
+    bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
+    bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
+
+    currentPet.qualities.baseLevel = petLevel;
+    currentPet.qualities.tier = '超凡';
+    currentPet.qualities.growthRate = 400 + hallucinationLevel * 5;
+
+    petMaxLevel = 160;
+    awakened = true;
+
+    showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
+    updatePetLevel();
+    updateAttributePanel();
+    updateQualityCard();
+}
+
+function setPetWisdom(value) {
+    petWisdom = value;
+    document.getElementById("current-wisdom").innerText = petWisdom;
+    updatePetWisdom();
+}
+
+function increasePetLevelCheat(levels) {
+    const oldLevel = petLevel;
+    petLevel += levels;
+    if (petLevel > petMaxLevel) petLevel = petMaxLevel; // 确保等级不超过上限
+
+    const actualLevelsIncreased = petLevel - oldLevel;
+    remainingPoints += actualLevelsIncreased * 2; // 每提升1级增加2个可分配点数
+
+    updatePetLevel();
+    updateAttributePanel();
+    updateRemainingPointsDisplay();
+    updateTitle();
+
+    console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
+}
+
+function ascendCheat() {
+    petMaxLevel = 200;
+    petAscended = true;
+
+    showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
+}
+
 
 
 

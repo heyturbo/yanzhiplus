@@ -376,7 +376,6 @@
             height: 10px;
             background-color: #064701;
             text-align: right;
-            padding-right: 5px;
             color: white;
             border-radius: 5px;
         }
@@ -690,7 +689,7 @@
         }
         .jinnang-reward {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 10px 0px;
             justify-content: center;
             margin-top: 5px;
@@ -3920,7 +3919,7 @@ const ascensionSkills = {
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时，有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
@@ -4139,19 +4138,6 @@ function checkAscensionEnabled() {
         return false;
     }
     return true;
-}
-// 合并后的 useItem 函数
-function useItem(itemName, quantity = 1) {
-    const itemIndex = jinnangItems.findIndex(item => item.name === itemName);
-    if (itemIndex !== -1 && jinnangItems[itemIndex].quantity >= quantity) {
-        jinnangItems[itemIndex].quantity -= quantity;
-        if (jinnangItems[itemIndex].quantity < 0) {
-            jinnangItems[itemIndex].quantity = 0;
-        }
-        updateJinnangItems();
-        return true;
-    }
-    return false;
 }
 
 function refreshAscensionSkill() {
@@ -5348,9 +5334,10 @@ function handleCriticalAndDrunken(damage) {
     if (battleState.player.drunken && damage > 0) {
         const drunkenDamage = Math.floor(damage * 0.05);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
-        logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FFOO88');
+        logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
     }
 }
+
 
 function performAttack(type) {
     if (!attributesFetched) {
@@ -7433,6 +7420,20 @@ function addItemToJinnang(itemName, quantity = 1) {
         jinnangItems.push({ name: itemName, quantity: quantity });
     }
     updateJinnangItems();
+}
+
+// 合并后的 useItem 函数
+function useItem(itemName, quantity = 1) {
+    const itemIndex = jinnangItems.findIndex(item => item.name === itemName);
+    if (itemIndex !== -1 && jinnangItems[itemIndex].quantity >= quantity) {
+        jinnangItems[itemIndex].quantity -= quantity;
+        if (jinnangItems[itemIndex].quantity < 0) {
+            jinnangItems[itemIndex].quantity = 0;
+        }
+        updateJinnangItems();
+        return true;
+    }
+    return false;
 }
 
 let currentDescriptionBox = null; // 存储当前显示的描述框
@@ -9733,7 +9734,7 @@ function resetPetQualitiesAndSkills() {
     updateAttributePanel();
 }
         
-function rebornPet() {
+function rebornPet(isCheatMode = false) {
     if (!checkDrawerOpen()) return;
     if (!currentPet || !currentPet.qualities) { // 添加检查
         console.warn("当前宠物未被正确初始化。");
@@ -9744,7 +9745,7 @@ function rebornPet() {
         return;
     }
     
-    if (rebornPill < 1) {
+    if (!isCheatMode && rebornPill < 1) {
         showInfoBox("您的神兽还童丹已耗尽！");
         return;
     }
@@ -9768,8 +9769,10 @@ function rebornPet() {
         return;
     }
 
-    rebornPill--;
-    document.getElementById("reborn-pill").innerText = rebornPill;
+    if (!isCheatMode) {
+        rebornPill--;
+        document.getElementById("reborn-pill").innerText = rebornPill;
+    }
 
     let tier, growthRate;
     const roll = Math.random() * 100;
@@ -9838,6 +9841,7 @@ function rebornPet() {
     updateTitle();
 }
 
+
 function trainQuality() {
     if (!checkDrawerOpen()) return;
     if (awakened) {
@@ -9847,6 +9851,54 @@ function trainQuality() {
     const targetTier = prompt("请选择预期成长（普通，优秀，杰出，卓越，完美）:");
     if (targetTier === null) return;
     const stopOnMutation = confirm("宠物如果发生变异则停止还童？");
+
+    // 检查作弊码
+    if (targetTier === "111") {
+        // 直接设置宠物的属性为完美状态
+        currentPet.qualities.tier = "完美";
+        currentPet.qualities.growthRate = 400;
+        currentPet.qualities.mutated = true;
+
+        // 设置其他相关属性
+        const qualities = currentPet.qualities;
+        qualities.endurance.current = getRandomInt(qualities.endurance.min, qualities.endurance.max * 1.1);
+        qualities.strength.current = getRandomInt(qualities.strength.min, qualities.strength.max * 1.1);
+        qualities.faith.current = getRandomInt(qualities.faith.min, qualities.faith.max * 1.1);
+        qualities.agility.current = getRandomInt(qualities.agility.min, qualities.agility.max * 1.1);
+        qualities.intelligence.current = getRandomInt(qualities.intelligence.min, qualities.intelligence.max * 1.1);
+
+        updateQualityCard();
+
+        // 更新技能
+        const skillNum = getRandomInt(0, 3);
+        const newSkills = [];
+        const bSkills = currentPet.skills.filter(skill => skill.rarity === 'B');
+        for (let i = 0; i < skillNum; i++) {
+            const skill = bSkills[Math.floor(Math.random() * bSkills.length)];
+            if (!newSkills.some(s => s.name === skill.name)) {
+                newSkills.push(skill);
+            }
+        }
+        updateSkillsArea(newSkills);
+        updateSkillScore(newSkills);
+
+        petLevel = 1;
+        currentWisdom = 0;
+        petWisdom = currentWisdom;
+        petAscended = false; // 新增宠物失去飞升的还童规则
+        petMaxLevel = 149;
+
+        document.getElementById("pet-level").innerText = petLevel;
+        document.getElementById("current-wisdom").innerText = currentWisdom;
+
+        updatePetLevel();
+        updatePetWisdom();
+        updateAttributePanel();
+        updateTitle();
+
+        showInfoBox("已得到完美变异400%胚子。");
+        return;
+    }
 
     const initialRebornPill = rebornPill; // 记录初始的还童丹数量
     let achieved = false;
@@ -9869,6 +9921,7 @@ function trainQuality() {
                             <button onclick="document.body.removeChild(this.parentNode)">关闭</button>`;
     document.body.appendChild(messageBox);
 }
+
 
 
 function enhanceQuality() {

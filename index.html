@@ -5349,11 +5349,6 @@ function performAttack(type) {
         return;
     }
 
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false);
-        return;
-    }
-
     const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(type);
     let damageResult;
 
@@ -5372,6 +5367,11 @@ function performAttack(type) {
     handleCriticalAndDrunken(damageResult);
     handleDefenseBonus(); // 处理防御后的增益效果
 
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+        return;
+    }
+    
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
@@ -5923,7 +5923,7 @@ function enemyAttack() {
     }
 
     damage = handleWiseDefense(damage); // 添加这一行
-
+    
     handleBurnt();
     handleCriticalHit(isCritical);
     handleDamageReduction(damage);
@@ -5931,13 +5931,18 @@ function enemyAttack() {
     handleResurrection(damage);
     handlePoison();
     handleManaRecover(); // 在敌人攻击后调用 handleManaRecover 函数
+
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
+    } else if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
     } else {
         updateUI();
         playerTurn = true;
     }
 }
+
 
 function enemyHeal() {
     if (enemyHealCount >= 10) {
@@ -6224,6 +6229,11 @@ function performHeal() {
         return;
     }
 
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+        return;
+    }
+    
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);

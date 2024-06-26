@@ -3254,7 +3254,7 @@ document.getElementById('claimButton').addEventListener('click', () => {
             showInfoBox(`您已经拥有${summonedPet.name}，将其转化为相应印花！`);
             switch (summonedPet.rank) {
                 case 'R':
-                    stamps += 240;
+                    stamps += 300;
                     break;
                 case 'SR':
                     stamps += 600;
@@ -3284,7 +3284,7 @@ document.getElementById('exchangeButton').addEventListener('click', () => {
         let exchangeAmount;
         switch (summonedPet.rank) {
             case 'R':
-                exchangeAmount = 240;
+                exchangeAmount = 300;
                 break;
             case 'SR':
                 exchangeAmount = 600;
@@ -3534,7 +3534,7 @@ document.addEventListener('DOMContentLoaded', () => {
 //以下是药物系统
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后回复至满状态" },
+    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
     "狂暴之魂": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
@@ -3543,7 +3543,7 @@ let drugInventory = {
     "狂暴印记": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
     "武尊秘露": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
     "延寿露": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
-    "天山雪莲": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "回复玩家20%的法力值" },
+    "天山雪莲": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
     "化功散": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内敌人暴击率降低至0%" },
     "闪电蘑菇": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
     "御之灵根": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "10秒内增加玩家999999物理防御和法术防御" },
@@ -3919,7 +3919,7 @@ const ascensionSkills = {
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当敌人生命值在${87 - 3 * (level - 1)}%以上时，对敌人的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `提升${2 * level}%暴击率和${2 * level}%暴击伤害。当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力120%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给敌人附加等同于玩家物理攻击力300%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，敌人所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
@@ -3947,10 +3947,6 @@ function applyAscensionBonus() {
         magicDefense: 0,
         speed: 0
     };
-
-    // 重置暴击率和暴击伤害
-    playerCritRate = 0.1; // 重置为初始值
-    playerCritDamage = 1.5; // 重置为初始值
 
     // 应用第一个技能增益
     initialAttributes = applySingleAscensionBonus(ascensionSkill, initialAttributes);
@@ -3980,10 +3976,6 @@ function applySingleAscensionBonus(skill, attributes) {
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
             attributes.magicDefense += 50000 + skill.increment(skill.level);
-            break;
-        case '灵魂穿刺':
-            playerCritRate += skill.level * 0.02; // 2% * level
-            playerCritDamage += skill.level * 0.02; // 2% * level
             break;
         // 其他技能增益逻辑...
     }
@@ -5378,6 +5370,7 @@ function performAttack(type) {
     }
 
     handleCriticalAndDrunken(damageResult);
+    handleDefenseBonus(); // 处理防御后的增益效果
 
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
@@ -5390,7 +5383,29 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
-        
+
+
+
+function handleDefenseBonus() {
+    if (battleState.player.defenseBonus && battleState.player.defenseBonusCount > 0) {
+        const { critRate, critDamage } = battleState.player.defenseBonus;
+
+        // 应用增益
+        playerCritRate += critRate;
+        playerCritDamage += critDamage;
+
+        logBattleEvent(`你此次攻击额外增加了${critRate * 100}% 暴击率和 ${critDamage * 100}% 暴击伤害。`, 'yellow');
+
+        // 移除增益
+        setTimeout(() => {
+            playerCritRate -= critRate;
+            playerCritDamage -= critDamage;
+            battleState.player.defenseBonusCount = 0; // 重置计数
+            battleState.player.defenseBonus = null; // 重置增益状态
+        }, 0); // 立即在当前攻击回合后移除增益
+    }
+}
+   
 
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
@@ -5608,7 +5623,7 @@ function applySingleAscensionEffect(skill) {
             break;
         case '灵魂穿刺':
             battleState.player.extraCritDamageChance = skill.increment(skill.level) / 100;
-            battleState.player.extraCritDamageMultiplier = 1.2; // 固定120%
+            battleState.player.extraCritDamageMultiplier = 3; // 固定300%
             break;
         case '吸血魔刃':
             battleState.player.bloodSuckPercentage = skill.increment(skill.level) / 100;
@@ -5746,13 +5761,13 @@ function performDefense() {
         showNextBattlePrompt(false);
         return;
     }
-    
+
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
     }
-    
+
     // 遍历技能区域并获取所有类型为 'PD' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
@@ -5762,29 +5777,52 @@ function performDefense() {
         .filter(skill => skill);
 
     let skillMultiplier = 1;
+    let selectedSkillName = '防御';
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
         skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} ，有更坚硬的护盾了。`, 'orange');
+        selectedSkillName = selectedSkill.name;
     }
 
-    let defenseReduction = (Math.random() * (0.99 - 0.8) + 0.5) * skillMultiplier;
+    let defenseReduction = (Math.random() * (0.99 - 0.8) + 0.8) * skillMultiplier;
     if (defenseReduction > 1) {
         defenseReduction = 1; // 将减伤倍数限制为最大100%
     }
     battleState.player.defending = true;
     battleState.player.defenseReduction = defenseReduction;
+    logBattleEvent(`你施放了 ${selectedSkillName} ，有更坚硬的护盾了。`, 'orange');
     logBattleEvent(`你本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
+
+    // 更新防御增益
+    if (!battleState.player.defenseBonusCount) {
+        battleState.player.defenseBonusCount = 0;
+    }
+    if (battleState.player.defenseBonusCount < 5) {
+        battleState.player.defenseBonusCount += 1;
+    }
+    const bonusCritRate = Math.round(battleState.player.defenseBonusCount * 0.06 * 100) / 100; // 每次防御增加6%暴击率
+    const bonusCritDamage = Math.round(battleState.player.defenseBonusCount * 0.09 * 100) / 100; // 每次防御增加9%暴击伤害
+
+    // 更新防御增益状态
+    battleState.player.defenseBonus = {
+        critRate: bonusCritRate,
+        critDamage: bonusCritDamage
+    };
+
+    logBattleEvent(`这是你第 ${battleState.player.defenseBonusCount} 次施放 ${selectedSkillName} ，蓄力了 ${bonusCritRate * 100}% 暴击率和 ${bonusCritDamage * 100}% 暴击伤害的增益。`, 'yellow');
+    updatePlayerStatusDisplay(); // 更新玩家状态显示
 
     playerTurn = false; // 轮到敌人回合
     setTimeout(enemyAttack, 500); // 延迟0.5秒后敌人回合
 
     applyAscensionEffects();
-
     updateUI();
 }
+
+
+
 //应用智慧守护
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -6185,13 +6223,14 @@ function performHeal() {
         showInfoBox("请先从属性面板获取属性。");
         return;
     }
-    
+
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
     }
-    
+
+    // 遍历技能区域并获取所有类型为 'PH' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -6200,14 +6239,19 @@ function performHeal() {
         .filter(skill => skill);
 
     let skillMultiplier = 1;
+    let skillLevel = 1; // 默认技能等级为1
+
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
-        skillMultiplier = selectedSkill.multiplier;
-        logBattleEvent(`你施放了 ${selectedSkill.name} ，治疗效果大大提升。`, 'aqua');
+        const result = calculateSkillLevelAndMultiplier(selectedSkill);
+        skillLevel = result.skillLevel;
+        skillMultiplier = result.skillMultiplier;
+        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级，治疗效果大大提升。`, 'aqua');
     }
 
-    const manaCost = 88 * (battleRounds * 3);
+    // 根据技能等级计算 mana 消耗
+    const manaCost = Math.round(38 * battleRounds * skillLevel * 0.1);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
@@ -6228,6 +6272,12 @@ function performHeal() {
     // 检查仙气护体效果
     let divineProtectionChance = 0.05; // 默认概率5%
     let divineProtectionDuration = 3; // 默认持续时间3秒
+
+    // 如果存在PH技能，增加仙气护体的触发概率和持续时间
+    if (selectedSkills.length > 0) {
+        divineProtectionChance += skillLevel * 0.01; // 每级增加1%
+        divineProtectionDuration += skillLevel * 0.1; // 每级增加0.1秒
+    }
 
     // 检查天降甘霖增益
     if (ascensionSkill.name === '天降甘霖' || secondAscensionSkill.name === '天降甘霖') {

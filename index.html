@@ -202,11 +202,11 @@
         }
 
         #missionButton {
-            background-image: url('https://pic.imgdb.cn/item/6661a2715e6d1bfa05edb3a2.png');
+            background-image: url('https://pic.imgdb.cn/item/667eeb54d9c307b7e94edd35.png');
         }
         
         #summonButton {
-            background-image: url('https://pic.imgdb.cn/item/666d630ed9c307b7e9f96356.webp');
+            background-image: url('https://pic.imgdb.cn/item/667eec26d9c307b7e95150b5.png');
         }
         .core-area .skills {
             display: grid;
@@ -1513,6 +1513,7 @@
 .info-text {
     flex-grow: 1;
 }
+
    </style>
 </head>
 <body>
@@ -1962,7 +1963,7 @@
             <div>宠物名称: <span id="pet-name">小金牛</span></div>
             <div>养宠称号: <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长: <span id="game-timer">00:00</span></div>
-            <div>剩余金子: <span id="gold-amount">100000</span></div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">50000</span>两</div> <!-- 新增剩余金子显示 -->
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
@@ -2951,17 +2952,18 @@ function petCollection() {
 
     // 创建关闭按钮
     const closeButton = document.createElement('button');
-    closeButton.innerText = '关闭';
+    closeButton.innerText = 'X';
     closeButton.style.position = 'absolute';
-    closeButton.style.bottom = '10px';
-    closeButton.style.right = '10px';
-    closeButton.style.borderRadius = '5px';
-    closeButton.style.backgroundColor = 'green';
-    closeButton.style.color = 'white';
-    closeButton.style.fontSize = '12px';
-    closeButton.style.border = '1px solid white';
+    closeButton.style.top = '5px';
+    closeButton.style.right = '5px';
+    closeButton.style.border = 'none';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.color = '#ddd';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
     closeButton.addEventListener('click', () => collectionPanel.remove());
     collectionPanel.appendChild(closeButton);
+
 
     // 创建图鉴内容
     const collectionContent = document.createElement('div');
@@ -2990,26 +2992,38 @@ function petCollection() {
 
         const nameDiv = document.createElement('div');
         nameDiv.innerText = pet.name;
-
+        
         const statusDiv = document.createElement('div');
         statusDiv.innerText = collectedPets.includes(pet.name) ? '已收录' : '未收录';
-
+        
         const collectButton = document.createElement('button');
         collectButton.innerText = '收录';
         collectButton.style.fontSize = '11px';
-        collectButton.disabled = collectedPets.includes(pet.name); // 如果已收录，则禁用按钮
+        collectButton.style.color = 'white'; // 白色字体
+        collectButton.style.backgroundColor = 'green'; // 绿色填充
+        collectButton.style.border = '1px solid white'; // 1px 白色描边
+        collectButton.style.borderRadius = '5px'; // 5px 圆角
+        collectButton.style.cursor = 'pointer'; // 鼠标悬停时显示为指针
+        
+        // 如果已收录，则禁用按钮并设置样式
+        if (collectedPets.includes(pet.name)) {
+            collectButton.style.backgroundColor = 'red'; // 禁用时的背景颜色
+            collectButton.style.cursor = 'not-allowed'; // 禁用时的鼠标样式
+            collectButton.disabled = true;
+        }
+        
         collectButton.addEventListener('click', () => {
             const petSelect = document.getElementById('pet-select');
             if (!isPetOwned(petKey)) {
                 showInfoBox("你还没有该宠物!");
                 return;
             }
-
+        
             if (petSelect.options.length <= 1) {
                 showInfoBox("这是您的唯一爱宠了,请好好珍惜它!");
                 return;
             }
-
+        
             // 判断是否是当前宠物,如果是则弹出确认框
             if (petSelect.value === petKey) {
                 showInfoBox("这是你目前的出战宠物,一旦收录将立即被清空数据,请谨慎操作!是否继续?", () => {
@@ -3019,22 +3033,24 @@ function petCollection() {
                         const randomIndex = Math.floor(Math.random() * petSelect.options.length);
                         newOption = petSelect.options[randomIndex].value;
                     } while (newOption === petKey);
-
+        
                     petSelect.value = newOption;
                     changePet(); // 更新宠物信息
-
+        
                     // 执行收录动作
                     collectedPets.push(pet.name);
                     collectedPetCount++;
                     statusDiv.innerText = '已收录';
+                    collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
+                    collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
                     collectButton.disabled = true;
-
+        
                     // 从下拉菜单中移除当前宠物
                     const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
                     if (optionToRemove) {
                         optionToRemove.remove();
                     }
-
+        
                     updateCollectionBonus();
                     const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
                     updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
@@ -3049,14 +3065,16 @@ function petCollection() {
                     collectedPets.push(pet.name);
                     collectedPetCount++;
                     statusDiv.innerText = '已收录';
+                    collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
+                    collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
                     collectButton.disabled = true;
-
+        
                     // 从下拉菜单中移除当前宠物
                     const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
                     if (optionToRemove) {
                         optionToRemove.remove();
                     }
-
+        
                     updateCollectionBonus();
                     const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
                     updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
@@ -3066,15 +3084,16 @@ function petCollection() {
                 });
             }
         });
-
+        
         petDiv.appendChild(img);
         petDiv.appendChild(nameDiv);
         petDiv.appendChild(statusDiv);
         petDiv.appendChild(collectButton);
         collectionContent.appendChild(petDiv);
-    });
+        });
+        
+        collectionPanel.appendChild(collectionContent);
 
-    collectionPanel.appendChild(collectionContent);
 
     // 创建图鉴加成信息区
     const bonusInfoDiv = document.createElement('div');
@@ -4749,6 +4768,7 @@ function updateUI() {
     document.getElementById('battleRounds').innerText = battleRounds;
     enemyLevel = battleRounds;
     document.getElementById('enemy-level').innerText = enemyLevel;
+    updatePetLevel();
 }
 
 
@@ -4801,9 +4821,9 @@ function logBattleEvent(event, color = 'white') {
         newEvent.style.color = color; // 设置文字颜色
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 24 条，则删除最早的条目
+        // 检查日志条目数，如果超过 36 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 23) {
+        while (logs.length > 36) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -4821,7 +4841,7 @@ function enemyInfo() {
     popup.style.top = '50%';
     popup.style.left = '50%';
     popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.backgroundColor = 'black';
+    popup.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     popup.style.color = 'white';
     popup.style.padding = '20px';
     popup.style.border = '1px solid white';
@@ -4918,15 +4938,32 @@ function enemyInfo() {
     jumpButton.style.cursor = 'pointer';
     jumpButton.addEventListener('click', () => {
         jumpByTenRounds();
+    });
+    
+    // 创建 "自动战斗" 按钮
+    const autoButton = document.createElement('button');
+    autoButton.innerText = '自动战斗';
+    autoButton.style.position = 'absolute';
+    autoButton.style.bottom = '10px';
+    autoButton.style.right = '100px'; // 调整位置，避免重叠
+    autoButton.style.padding = '5px 10px';
+    autoButton.style.backgroundColor = '#003670';
+    autoButton.style.color = 'white';
+    autoButton.style.border = 'white';
+    autoButton.style.borderRadius = '5px';
+    autoButton.style.cursor = 'pointer';
+    autoButton.addEventListener('click', () => {
+        autoBattle();
         document.body.removeChild(popup);
     });
-
+    
     // 将所有元素添加到弹窗容器中
     popup.appendChild(closeButton);
     popup.appendChild(topContainer);
     popup.appendChild(separator);
     popup.appendChild(detailsContainer);
     popup.appendChild(jumpButton);
+    popup.appendChild(autoButton);
     // 将弹窗容器添加到页面的body中
     document.body.appendChild(popup);
 
@@ -4968,7 +5005,61 @@ function jumpByTenRounds() {
     updatePetInfo();
     updateUI();
 }
+//自动战斗函数
+let autoBattleInterval = null; // 定义自动战斗的全局变量
 
+function autoBattle() {
+    // 如果自动战斗已经在进行，停止自动战斗
+    if (autoBattleInterval !== null) {
+        clearInterval(autoBattleInterval);
+        autoBattleInterval = null;
+        logBattleEvent("自动战斗已停止。", 'red');
+        return;
+    }
+
+    logBattleEvent("自动战斗已开始。", 'green');
+
+    autoBattleInterval = setInterval(() => {
+        if (!battleState || !battleState.enemy) {
+            console.error("战斗状态未初始化");
+            clearInterval(autoBattleInterval);
+            autoBattleInterval = null;
+            return;
+        }
+
+        if (battleAttributes.health <= 0) {
+            showNextBattlePrompt(false);
+            clearInterval(autoBattleInterval);
+            autoBattleInterval = null;
+            showInfoBox("自动战斗失败，是否继续执行自动战斗？");
+            return;
+        }
+
+        // 判断玩家生命值是否低于30%
+        if (battleAttributes.health / maxHealth < 0.3) {
+            logBattleEvent("自动战斗：玩家生命值低于30%，执行治疗。", 'pink');
+            performHeal();
+            return;
+        }
+
+        // 判断玩家生命值是否低于50%
+        if (battleAttributes.health / maxHealth < 0.5) {
+            if (Math.random() < 0.5) {
+                logBattleEvent("自动战斗：玩家生命值低于50%，执行防御。", 'pink');
+                performDefense();
+                return;
+            }
+        }
+
+        // 判断玩家的法术攻击力与物理攻击力的比例
+        const attackType = Math.random() < 0.9
+            ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
+            : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
+
+        logBattleEvent(`自动战斗：执行${attackType === 'magical' ? '法术攻击' : '物理攻击'}`, 'pink');
+        performAttack(attackType);
+    }, 300); // 每0.3秒执行一次自动战斗逻辑
+}
 
 // 定义初始暴击率和暴击伤害
 let playerCritRate = 0.1; // 10%
@@ -6948,9 +7039,9 @@ let skillScore = 0;
 let petWisdom = 0; 
         
 const descriptions = [
-    "请特别注意，更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
+    "更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
     "当你每达到一个里程碑，你的称号都会有所提升，直到最终成为“魔兽之王”！",
-    "宠物技能描述参照官方定义，在本模拟器中并不适用所描述的效果。作为补偿，每个被动技能会提供一定程度的战斗属性加成。",
+    "宠物的各项技能效果在本模拟器中进行了简化，尤其是被动技能将只按一定比例增加各项属性值，增量随技能等级提高而提高。",
     "宠物的资质可以用“资质重生丹”洗练到更高的程度",
     "二级属性会随着悟性的提高得到百分比的增长",
     "合理的分配金子培养机会可以让你的宠物评分得到最大化！",
@@ -6962,7 +7053,7 @@ const descriptions = [
     "宠物变异时，资质会得到明显的提升，甚至超出原有的资质上限！",
     "目前共有三种还童丹，每种还童丹的功能各不同，详情可见“玩法”说明",
     "稀有道具只能通过宝箱开启获得。开启宝箱时，有概率同时出现1~3个奖品",
-    "如果你需要删除某个技能，你可以点击该技能确认删除（但直接购买的技能无法删除）"
+    "如果你需要删除某个技能，你可以点击该技能确认删除"
 ];        
 
 function updateDescriptionBox() {
@@ -8219,9 +8310,18 @@ function useGoldenRebornPill() {
     updateSkillScore();
     updatePetWisdom();
 }
- 
 let goldAmount = 50000; // 初始金子数量
-document.getElementById("gold-amount").innerText = goldAmount;
+function updateGoldDisplay(goldAmount) {
+    const goldElement = document.getElementById('gold-amount');
+    goldElement.style.color = 'orange';
+    goldElement.style.fontWeight = 'bold';
+    goldElement.style.webkitTextStroke = '1px gold'; // 添加描边效果
+    goldElement.style.textStroke = '1px gold'; // 兼容性处理
+}
+
+// 初始状态下更新金子显示
+const initialGoldAmount = 50000;
+updateGoldDisplay(initialGoldAmount);
 
 function toggleShop() {
     const drawer = document.getElementById('shop-drawer');
@@ -8564,11 +8664,12 @@ function buyItem() {
                 const skillDiv = document.createElement("div");
                 skillDiv.innerText = `${skill.name} (${skill.rarity})`;
                 skillDiv.onclick = () => {
-                    document.getElementById("description-box").innerText = skill.description;
+                    // 确认是否删除技能并调用 deleteSkill 函数
+                    deleteSkill(skill, skillDiv, document.getElementById("skills-area"));
                 };
                 skillDiv.classList.add(skill.rarity.toLowerCase() + '-skill');
                 document.getElementById("skills-area").appendChild(skillDiv);
-
+            
                 const currentSkills = Array.from(document.querySelectorAll("#skills-area div"))
                     .map(div => {
                         const [name, rarity] = div.innerText.split(" (");
@@ -10341,7 +10442,10 @@ function updateTitle() {
     const titleElement = document.getElementById('personal-honor');
     titleElement.innerText = titles[currentTitleIndex];
 }
-        
+
+// 绑定按钮点击事件自动战斗
+document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
+
     </script>
 </body>
 </html>

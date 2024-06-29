@@ -243,6 +243,7 @@
             justify-content: center;
             padding: 0px 10px;
             margin: 0px 10px;
+            font-size: 16px;
         }
         .bottom-bar .info div {
             margin: 5px 0;
@@ -1706,7 +1707,7 @@
             </div>
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
-                <button onclick="sellPet()">出售宠物</button>
+                <button onclick="sellPet()">宠物市场</button>
                 <div class="shop-timer">
                     <span id="shop-timer">05:00</span>
                     <button onclick="refreshShop()">付费刷新</button>
@@ -1961,9 +1962,9 @@
         </div>
         <div class="info">
             <div>宠物名称: <span id="pet-name">小金牛</span></div>
-            <div>养宠称号: <span id="personal-honor">初来乍到</span></div>
+            <div>玩家称号: <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长: <span id="game-timer">00:00</span></div>
-            <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
+            <div>金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
@@ -2836,19 +2837,23 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.top = '50%';
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
-    infoBox.style.width = '50%';
+    infoBox.style.width = '70%'; // 增加宽度
+    infoBox.style.maxWidth = '600px'; // 限制最大宽度
+    infoBox.style.maxHeight = '60%'; // 限制最大高度
+    infoBox.style.overflowY = 'auto'; // 添加垂直滚动条
     infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     infoBox.style.color = 'white';
     infoBox.style.border = '1px solid white';
     infoBox.style.borderRadius = '10px';
     infoBox.style.padding = '20px';
     infoBox.style.zIndex = '9999';
-    infoBox.style.textAlign = 'center';
     infoBox.style.fontSize = '14px';
-
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
+    messageElement.style.margin = '0';
+    messageElement.style.padding = '0';
+    messageElement.style.wordBreak = 'break-word';
     messageElement.innerText = message;
     infoBox.appendChild(messageElement);
 
@@ -3137,13 +3142,12 @@ let summonedPet = null;
 let currentPetKey = 'xiaojin';
 let currentPet = pets[currentPetKey]; // 初始化当前宠物
 
-function changePet() {
+function changePet(skipConfirmation = false) {
     const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
 
     if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物,不进行切换
 
-    // 提示用户确认
-    showInfoBox("更换宠物会导致当前宠物的数据丢失,你确定更换吗?", () => {
+    const changeSelectedPet = () => {
         const selectedPet = pets[selectedPetKey];
         console.log('Selected Pet:', selectedPet);
 
@@ -3159,7 +3163,14 @@ function changePet() {
         } else {
             console.error('无法找到选中的宠物:', selectedPetKey);
         }
-    });
+    };
+
+    if (skipConfirmation) {
+        changeSelectedPet(); // 直接执行更换宠物的逻辑,不显示确认提示
+    } else {
+        // 提示用户确认
+        showInfoBox("更换宠物会导致当前宠物的数据丢失,你确定更换吗?", changeSelectedPet);
+    }
 }
 
 
@@ -3553,26 +3564,26 @@ document.addEventListener('DOMContentLoaded', () => {
 //以下是药物系统
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
+    "长生泉": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
-    "狂暴之魂": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
-    "神力仙丹": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
-    "延寿露": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
-    "天山雪莲": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
-    "化功散": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内深渊巨魔暴击率降低至0%" },
-    "闪电蘑菇": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
-    "御之灵根": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "10秒内增加玩家999999物理防御和法术防御" },
-    "焚灵之丸": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
-    "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
-    "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
-    "寒天之晶": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000两金子" },
-    "双倍经验药": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验*200%" },
-    "四倍经验药": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验*400%" }
+    "狂暴之魂": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
+    "神力仙丹": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
+    "慧心糖果": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
+    "狂暴印记": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
+    "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
+    "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
+    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内深渊巨魔暴击率降低至0%" },
+    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
+    "御之灵根": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "10秒内增加玩家999999物理防御和法术防御" },
+    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
+    "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
+    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
+    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
+    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验*200%" },
+    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验*400%" }
 };
 let alreadyUseDrug = false;
 
@@ -3687,7 +3698,7 @@ function useSelectedDrug() {
                     logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
                 } else {
                     goldAmount += 2000;
-                    logBattleEvent(`使用幸运金币，获得了2000两金子。`, 'gold');
+                    logBattleEvent(`使用幸运金币，获得了2000文金子。`, 'gold');
                 }
                 updateUI();
                 updateGoldDisplay(goldAmount);
@@ -3787,11 +3798,10 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    const originalCritDamage = playerCritDamage;
                     playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
                     logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续10秒。`, 'gold');
                     return () => {
-                        playerCritDamage = originalCritDamage;
+                        playerCritDamage = playerCritDamage - 0.5;
                         logBattleEvent(`神力仙丹效果消失。`, 'red');
                     };
                 },
@@ -3802,11 +3812,10 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    const originalCritRate = playerCritRate;
-                    playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+                    playerCritRate = Math.min(2.0, playerCritRate + 0.50); // 最大200%
                     logBattleEvent(`使用狂暴印记，暴击率提高50%，持续10秒。`, 'gold');
                     return () => {
-                        playerCritRate = originalCritRate;
+                        playerCritRate = playerCritRate - 0.5;
                         logBattleEvent(`狂暴印记效果消失。`, 'red');
                     };
                 },
@@ -3871,19 +3880,17 @@ function applyBuff(drugName) {
                     () => {
                         const originalPA = battleAttributes.physicalAttack;
                         const originalMA = battleAttributes.magicAttack;
-                        const originalCR = playerCritRate;
-                        const originalCD = playerCritDamage;
                         battleAttributes.health -= Math.floor(maxHealth * 0.2);
                         battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
-                        playerCritRate = Math.min(1.0, playerCritRate + 0.50); // 最大100%
+                        playerCritRate = Math.min(2.0, playerCritRate + 0.50); // 最大200%
                         playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
                         logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`, 'gold');
                         return () => {
                             battleAttributes.physicalAttack = originalPA;
                             battleAttributes.magicAttack = originalMA;
-                            playerCritRate = originalCR;
-                            playerCritDamage = originalCD;
+                            playerCritRate -= 0.5;
+                            playerCritDamage -= 0.5;
                             logBattleEvent(`焚灵之丸效果消失。`, 'red');
                         };
                     },
@@ -3951,7 +3958,7 @@ const ascensionSkills = {
         { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
         { name: '焉知非福', effect: level => `战斗失败后，下一轮获得持续${3 + 1 * level}秒的仙气护体`, baseValue: 3, increment: level => 1 * level },
         { name: '举一反三', effect: level => `战斗胜利时获得的经验值增加${30 + 5 * level}%`, baseValue: 30, increment: level => 5 * level },
-        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}两金子的安慰金`, baseValue: 50, increment: level => 50 * level }
+        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}文金子的安慰金`, baseValue: 50, increment: level => 50 * level }
     ]
 };
 
@@ -4109,24 +4116,61 @@ function updateAscensionDisplay() {
 let ascensionEnabled = false;
 
 // 监听开启增益按钮点击事件
-document.getElementById('enable-ascension').addEventListener('click', () => {
+document.getElementById('enable-ascension').addEventListener('click', handleAscensionButtonClick);
+
+function handleAscensionButtonClick() {
     if (!ascend) {
         showInfoBox('您的宠物没有飞升，无法开启飞升增益！');
         return;
     }
-    if (ascensionSkill.name) {
-        showInfoBox('您已经开启过增益了，如果需要更换飞升之术，请选择刷新技能！');
+
+    if (ascensionEnabled) {
+        // 已开启飞升之术时，按钮变为“技能大全”
+        const ascensionButton = document.getElementById('enable-ascension');
+        ascensionButton.innerText = '技能大全';
+        ascensionButton.style.backgroundColor = 'darkred';
+        ascensionButton.removeEventListener('click', handleAscensionButtonClick);
+        ascensionButton.addEventListener('click', ascensionSkillDescription);
+        ascensionSkillDescription(); // 直接执行技能大全
     } else {
+        // 未开启飞升之术时，执行开启逻辑
         if (useItem('heartStone', 1)) {
             showInfoBox('飞升之术增益已启用！');
             refreshAscensionSkill(); // 随机生成一个飞升之术
             applyAscensionBonus(); // 应用飞升之术增益
             ascensionEnabled = true; // 设置飞升之术已开启
+            
+            // 按钮变为“技能大全”
+            const ascensionButton = document.getElementById('enable-ascension');
+            ascensionButton.innerText = '技能说明';
+            ascensionButton.style.backgroundColor = 'darkred';
+            ascensionButton.removeEventListener('click', handleAscensionButtonClick);
+            ascensionButton.addEventListener('click', ascensionSkillDescription);
         } else {
             showInfoBox('您的心鉴之石不足！');
         }
     }
-});
+}
+
+function ascensionSkillDescription() {
+    let skillDescriptions = [];
+    let skillIndex = 1; // 初始化技能编号
+
+    // 遍历 ascensionSkills 对象
+    for (const category in ascensionSkills) {
+        if (ascensionSkills.hasOwnProperty(category)) {
+            ascensionSkills[category].forEach(skill => {
+                skillDescriptions.push(`${skillIndex}. 技能：${skill.name}，效果：${skill.effect(1)}`); // 假设技能等级为1
+                skillIndex++; // 编号递增
+            });
+        }
+    }
+
+    const skillDescriptionsText = skillDescriptions.join('\n');
+    showInfoBox(skillDescriptionsText);
+}
+
+
 
 // 监听刷新技能按钮点击事件
 document.getElementById('refresh-ascension').addEventListener('click', () => {
@@ -6543,11 +6587,11 @@ function showNextBattlePrompt(playerWon) {
                 extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             reward += extraReward;
-            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 两金子。`, 'pink');
+            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 文金子。`, 'pink');
         }
 
         goldAmount += reward;
-        logBattleEvent(`您赢得了此次战斗，金子+${reward}两！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
+        logBattleEvent(`您赢得了此次战斗，金子+${reward}文！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png');
 
         battleRounds++;
@@ -6567,12 +6611,12 @@ function showNextBattlePrompt(playerWon) {
                 compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             goldAmount += compensation;
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 两金子的安慰金。`, 'pink');
+            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 文金子的安慰金。`, 'pink');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
 
-        showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}两！请再接再厉，点击任意按钮重置战斗！`);
+        showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}文！请再接再厉，点击任意按钮重置战斗！`);
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp');
         updateGoldDisplay(goldAmount);
     }
@@ -6754,26 +6798,26 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
         <p>金子不够花，想要以小博大？</p>
         <ul>
             <li>玩家需选择6个数字，其中前5个数字为红球，第6个数字为蓝球。</li>
-            <li>每注200两金子，最低投注1注。</li>
+            <li>每注200文金子，最低投注1注。</li>
             <li>上次选号区会以红色显示当次中奖的数字。</li>
             <li>倒计时10秒实时开奖，离开彩券界面会暂停计时。</li>
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
             <li>详细中奖规则：</li>
             <ul>
-                <li>5个红球全中且排列顺序一致：5000000两金子</li>
-                <li>5个红球全中：150000两金子</li>
-                <li>4个红球且排列顺序一致：1000000两金子</li>
-                <li>4个红球全中：50000两金子</li>
-                <li>3个红球全中且排列顺序一致：100000两金子</li>
-                <li>3个红球全中：5000两金子</li>
-                <li>2个红球全中且排列顺序一致：10000两金子</li>
-                <li>2个红球全中：500两金子</li>
-                <li>只中1个红球：200两金子</li>
+                <li>5个红球全中且排列顺序一致：5000000文金子</li>
+                <li>5个红球全中：150000文金子</li>
+                <li>4个红球且排列顺序一致：1000000文金子</li>
+                <li>4个红球全中：50000文金子</li>
+                <li>3个红球全中且排列顺序一致：100000文金子</li>
+                <li>3个红球全中：5000文金子</li>
+                <li>2个红球全中且排列顺序一致：10000文金子</li>
+                <li>2个红球全中：500文金子</li>
+                <li>只中1个红球：200文金子</li>
             </ul>
             <li>蓝球规则：</li>
             <ul>
                 <li>如果蓝球一致且红球中奖，当前奖金翻10倍。</li>
-                <li>如果蓝球一致但红球未中奖，奖金为固定1000两金子。</li>
+                <li>如果蓝球一致但红球未中奖，奖金为固定1000文金子。</li>
             </ul>
             <li>本系统只用于游戏货币道具的随机获取，赌博是违法犯罪的行为，请勿铤而走险！</li>
         </ul>
@@ -6816,7 +6860,7 @@ function performLotteryDraw() {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
             pendingPrize += prize;
-            showInfoBox(`恭喜你彩票中得${prize}两金子，请速速领取！`);
+            showInfoBox(`恭喜你彩票中得${prize}文金子，请速速领取！`);
         }
     }
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
@@ -7117,7 +7161,7 @@ function showGuide() {
                             <p>f. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
                             <p>g. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
                             <p>h. 宠物传记：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
-                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100两金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
+                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100文金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
                             <p>商店所出售的道具根据其品质会随机定价，购买后会直接添加至道具栏中。</p>
                             <p>如果你购买的是宠物的天赋技能，你需要判断当前宠物的名称是否和天赋技能的宠物名称一致，其次保证你的当前宠物没有该技能，否则你将不能购买。一旦购买成功，这个技能会直接打在你的宠物技能位里。</p>
                             <p>在本游戏中，宠物的SS技能无法全部通过洗练生成，因此，如果你想要让宠物习得更多强力技能增加评分，你需要在商店里购买并使用天赋道具。</p>
@@ -7416,20 +7460,20 @@ function updateTreasureDescription(type) {
     let description;
     if (type === '经验宝箱') {
         const cost = getTreasureCost('经验宝箱');
-        description = `充满智慧的宝箱，本次开启将花费${cost}两金子。有概率获得宠物升级的经验书和飞升之石。`;
+        description = `充满智慧的宝箱，本次开启将花费${cost}文金子。有概率获得宠物升级的经验书和飞升之石。`;
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150两金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得使宠物变异的灵异金丹！";
+                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得使宠物变异的灵异金丹！";
                 break;
             case '灵魂宝箱':
-                description = "神秘莫测的宝箱，每次开启花费300两金子，您可能获得宠物进化所需的各种灵魂！";
+                description = "神秘莫测的宝箱，每次开启花费300文金子，您可能获得宠物进化所需的各种灵魂！";
                 break;
             case '武神宝箱':
-                description = "上古武神的战利品，每次开启花费800两金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
+                description = "上古武神的战利品，每次开启花费800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '至尊宝箱':
-                description = "价值连城的宝箱，每次开启花费1000两金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐丹等超稀有道具，甚至还有神秘进化法宝等你来拿！";
+                description = "价值连城的宝箱，每次开启花费1000文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐丹等超稀有道具，甚至还有神秘进化法宝等你来拿！";
                 break;
         }
     }
@@ -7764,7 +7808,7 @@ function sellItem(item) {
 
         item.quantity -= quantityToSell;
         goldAmount += quantityToSell * item.price; // 使用 item.price 作为单价
-        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}两金子`);
+        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}文金子`);
 
         updateJinnangItems();
         updateGoldDisplay(goldAmount); // 更新金币数量显示的函数
@@ -7866,13 +7910,13 @@ function handlePetArmsClick() {
 function openPetArms() {
     if (goldAmount >= 100000) {
         goldAmount -= 100000;
-        showInfoBox("你花费10万两金子（100贯），为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
+        showInfoBox("你花费10万文金子（100两），为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
         updateGoldDisplay(goldAmount);
         armsOpened = true;
         console.log('openPetArms: armsOpened set to true'); // 调试输出
         showPetArmsWindow();
     } else {
-        showInfoBox("你的金子不足10万两（100贯），无法开启武装系统！");
+        showInfoBox("你的金子不足10万文（100两），无法开启武装系统！");
     }
 }
 
@@ -8002,7 +8046,7 @@ function unlockArm(index, arm, infoDiv, forgeButton, img) {
     if (isUnlocked(index)) {
         if (!arm.unlocked && goldAmount >= 200000) {
             goldAmount -= 200000;
-            showInfoBox("您支付了20万两金子（200贯），为宠物解锁了一件武装！");
+            showInfoBox("您支付了20万文金子（200两），为宠物解锁了一件武装！");
             updateGoldDisplay(goldAmount);
             arm.unlocked = true; // 更新解锁状态
             img.src = arm.url; // 更新图标
@@ -8047,7 +8091,7 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000两金子（200贯），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800两金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
+    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
 function forgeArm(key, infoDiv) {
@@ -8274,7 +8318,7 @@ function trainAttributes() {
     const cost = trainingCosts[trainingCount];
 
     // 提示玩家当前花费
-    showInfoBox(`这次金子培养需要${cost}两金子，是否继续？`, function() {
+    showInfoBox(`这次金子培养需要${cost}文金子，是否继续？`, function() {
         // 玩家点击确认按钮，继续执行培养操作
 
         // 检查金子数量是否足够
@@ -8424,11 +8468,11 @@ let goldAmount = 50000; // 初始金子数量
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');
 
-    const liang = goldAmount % 1000;
-    const guan = Math.floor(goldAmount / 1000) % 1000;
+    const wen = goldAmount % 1000;
+    const liang = Math.floor(goldAmount / 1000) % 1000;
     const ding = Math.floor(goldAmount / 1000000);
 
-    goldElement.innerText = `${ding}锭${guan}贯${liang}两`;
+    goldElement.innerText = `${ding}锭${liang}两${wen}文`;
     goldElement.style.color = 'orange';
     goldElement.style.fontWeight = 'bold';
     goldElement.style.webkitTextStroke = '1px gold'; // 添加描边效果
@@ -8531,7 +8575,7 @@ function refreshShop(auto = false) {
             itemDiv.classList.add('shop-item');
             itemDiv.dataset.name = item.name;
             itemDiv.dataset.price = item.price;
-            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 两金子</div>`;
+            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 文金子</div>`;
             itemDiv.addEventListener('click', () => {
                 document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
                 itemDiv.classList.add('selected');
@@ -8581,7 +8625,7 @@ function refreshShop(auto = false) {
         itemDiv.classList.add('shop-item');
         itemDiv.dataset.name = item.name;
         itemDiv.dataset.price = item.price;
-        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 两金子</div>`;
+        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 文金子</div>`;
         itemDiv.addEventListener('click', () => {
             document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
             itemDiv.classList.add('selected');
@@ -8847,51 +8891,298 @@ function buyItem() {
 // 初始化商店和倒计时
 document.addEventListener('DOMContentLoaded', initShop);
 
-function sellPet() {
-    const skillScoreElement = document.getElementById("skill-score");
-    const skillScore = parseInt(skillScoreElement.innerText, 10); // 获取宠物的技能分数并转换为整数
-    
-    // 检查宠物当前分数是否低于10000分
-    if (skillScore < 10000) {
-        showInfoBox("宠物当前分数低于10000分，无法出售！"); // 提示分数低于10000分，无法出售
-        return; // 退出函数
+let currentMerchantIndex = 0;
+let currentOffer = null;
+let currentHerbs = 0;
+let starwindMaxMultiplier = 1.8;
+let starwindHaggleCount = 0;
+let guanghanHaggleCount = 0;
+let chaosMerchantHaggleCount = 0;
+
+const merchants = [
+    {
+        name: '朝云富商',
+        description: '立足物产丰盈之朝云国，资本积累硕果颇丰，富甲一方。可惜心气浮躁，容不得生意场上半点不快。',
+        img: 'https://pic.imgdb.cn/item/668029b4d9c307b7e9ef5248.png',
+        getOffer: (skillScore) => {
+            let rating, multiplier;
+            if (skillScore >= 5000000) {
+                rating = '至臻';
+                multiplier = 1.6;
+            } else if (skillScore >= 4000000) {
+                rating = '绝佳';
+                multiplier = 1.4;
+            } else if (skillScore >= 3000000) {
+                rating = '完整';
+                multiplier = 1.2;
+            } else if (skillScore >= 2000000) {
+                rating = '尚可';
+                multiplier = 1.0;
+            } else if (skillScore >= 1000000) {
+                rating = '一般';
+                multiplier = 0.8;
+            } else {
+                rating = '不佳';
+                multiplier = 0.6;
+            }
+            const price = Math.floor((skillScore / 25) * multiplier);
+            return { price, rating };
+        },
+        haggle: (firstOffer) => {
+            const multiplier = Math.random() * (1.2 - 0.8) + 0.8;
+            const newOffer = Math.floor(firstOffer * multiplier);
+            return newOffer;
+        },
+        reset: () => {
+            chaosMerchantHaggleCount = 0;
+        }
+    },
+    {
+        name: '星风游商',
+        description: '来自黄土高地的游商，有道是行者无疆，收集天下奇珍异宝，遇到宝物可不惜一切代价。',
+        img: 'https://pic.imgdb.cn/item/668029b4d9c307b7e9ef522a.png',
+        getOffer: (skillScore) => {
+            const multiplier = Math.random() * (1.8 - 0.4) + 0.4;
+            const price = Math.floor((skillScore / 25) * multiplier);
+            return { price, rating: null };
+        },
+        haggle: (firstOffer) => {
+            starwindMaxMultiplier = Math.max(0.4, starwindMaxMultiplier - 0.1);
+            const multiplier = Math.random() * (starwindMaxMultiplier - 0.4) + 0.4;
+            const newOffer = Math.floor(firstOffer * multiplier);
+            return newOffer;
+        },
+        reset: () => {
+            starwindMaxMultiplier = 1.8;
+            starwindHaggleCount = 0;
+        }
+    },
+    {
+        name: '广寒药商',
+        description: '极北之地亦能生长万物滋养百姓，靠的是千万药商为生灵谋康健。尝得百草，固守一方田间黄金库。',
+        img: 'https://pic.imgdb.cn/item/668029b4d9c307b7e9ef5241.png',
+        getOffer: (skillScore) => {
+            let herbs;
+            if (skillScore >= 3000000) {
+                herbs = 50;
+            } else if (skillScore >= 1500000) {
+                herbs = 30;
+            } else if (skillScore >= 900000) {
+                herbs = 25;
+            } else {
+                herbs = 20;
+            }
+            const price = Math.floor((skillScore / 25) * 0.2);
+            return { price, herbs };
+        },
+        haggle: (currentHerbs, currentOffer) => {
+            if (currentHerbs < 61) {
+                currentHerbs += 1;
+                currentOffer = Math.floor(currentOffer * 0.99);
+            }
+            return { currentHerbs, currentOffer };
+        },
+        reset: () => {
+            guanghanHaggleCount = 0;
+        }
+    }
+];
+
+function switchMerchant() {
+    currentMerchantIndex = (currentMerchantIndex + 1) % merchants.length;
+    displayMerchant();
+}
+
+function displayMerchant() {
+    const merchant = merchants[currentMerchantIndex];
+    const offerData = merchant.getOffer(skillScore);
+    currentOffer = offerData.price;
+    currentHerbs = offerData.herbs || 0;
+
+    const merchantSection = document.getElementById('merchant-section');
+    merchantSection.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="${merchant.img}" style="width: 65px; height: 65px; cursor: pointer;" onclick="switchMerchant()">
+            <div style="margin-left: 10px;">
+                <div style="font-size: 16px; font-weight: bold; color: white;">${merchant.name}</div>
+                <div style="font-size: 14px; color: white;">${merchant.description}</div>
+            </div>
+        </div>
+    `;
+
+    const offerSection = document.getElementById('offer-section');
+    offerSection.innerHTML = `
+        ${merchant.name === '广寒药商' ? `<div style="font-size: 14px; color: white; font-weight: bold;">药商愿意给出金子：${currentOffer}文，草药：${currentHerbs}株，希望驭兽师大人成全。</div>` : `<div style="font-size: 14px; color: white; font-weight:bold;">在场商人看到你的宠物议论纷纷，首轮出价：${currentOffer}文金子，同意即可点击Deal交易。（提示：点击商人头像可更换议价对象）</div>`}
+    `;
+}
+
+// 讨价还价逻辑
+function haggle() {
+    const merchant = merchants[currentMerchantIndex];
+    const offerSection = document.getElementById('offer-section');
+
+    if (merchant.name === '朝云富商') {
+        if (chaosMerchantHaggleCount === 0) {
+            chaosMerchantHaggleCount += 1;
+            const newOffer = merchant.haggle(currentOffer);
+            currentOffer = newOffer;
+            const { rating } = merchant.getOffer(skillScore); // 获取正确的rating值
+            offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">你的宠物在我眼里品相最多算个${rating}，不是什么千古未见的灵兽，没甚么好稀奇的！我再最后给你出价 ${currentOffer} 文金子！</div>`;
+        } else {
+            offerSection.innerHTML = `<div style="font-size: 14px; color: red; font-weight: bold;">老夫没有功夫和你掰扯这牛羊买卖之事！这1文金子和你做个一锤子买卖！</div>`;
+            currentOffer = 1;
+        }
+    } else if (merchant.name === '星风游商') {
+        if (starwindHaggleCount < 14) {
+            starwindHaggleCount += 1;
+            const newOffer = merchant.haggle(currentOffer);
+            currentOffer = newOffer;
+            if (starwindMaxMultiplier <= 0.4) {
+                offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驯兽师，再不成交，天色就晚啦！我只能出到${currentOffer}文金子啦！</div>`;
+            } else {
+                offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驭兽师，你的宠物我是越看越新生欢喜，我愿意出价${currentOffer}文金子，你考虑一下吧！</div>`;
+            }
+        } else {
+            offerSection.innerHTML = `<div style="font-size: 14px; color: red; font-weight: bold;">驯兽师，再不成交，天色就晚啦！我只能出到${currentOffer}文金子啦！</div>`;
+        }
+    } else if (merchant.name === '广寒药商') {
+        if (guanghanHaggleCount < 10) {
+            guanghanHaggleCount += 1;
+            const result = merchant.haggle(currentHerbs, currentOffer);
+            currentHerbs = result.currentHerbs;
+            currentOffer = result.currentOffer;
+            offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驭兽人，我愿意出价金子：${currentOffer}文，和草药：${currentHerbs}株与你交换，你可愿意割爱？</div>`;
+        } else {
+            offerSection.innerHTML = `<div style="font-size: 14px; color: red; font-weight: bold;">驭兽人，因缘际会，若是实在无缘，老夫也只能黯然离开。（德高望重的药商离去后，在场商人都不愿和你交易，你只得到了来自司鬻部退还的1文代售手续费）</div>`;
+            currentOffer = 1;
+            currentHerbs = 1;
+        }
+    }
+}
+
+// 确认交易
+function deal() {
+    const merchant = merchants[currentMerchantIndex];
+    if (merchant.name === '广寒药商') {
+        const drugKeys = Object.keys(drugInventory);
+        for (let i = 0; i < currentHerbs; i++) {
+            const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+            drugInventory[randomDrug].quantity += 1;
+            logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
+        }
+    }
+    const petSelect = document.getElementById("pet-select");
+    const selectedPetKey = petSelect.value;
+    // 从下拉菜单中移除当前宠物
+    const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
+    if (optionToRemove) {
+        optionToRemove.remove();
     }
 
-    // 获取当前宠物的键值
+    // 设置默认选择第一个宠物
+    if (petSelect.options.length > 0) {
+        petSelect.value = petSelect.options[0].value;
+        changePet(true); // 更新宠物信息,跳过确认提示
+    }
+    goldAmount += currentOffer;
+    updateGoldDisplay(goldAmount);
+    resetPet();
+    merchant.reset();
+    closeMerchantModal();
+}
+
+// 显示商人交易界面
+function showMerchantModal() {
+    const merchantModal = document.createElement('div');
+    merchantModal.style.position = 'fixed';
+    merchantModal.style.top = '50%';
+    merchantModal.style.left = '50%';
+    merchantModal.style.transform = 'translate(-50%, -50%)';
+    merchantModal.style.width = '300px';
+    merchantModal.style.height = '400px';
+    merchantModal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    merchantModal.style.borderRadius = '10px';
+    merchantModal.style.padding = '20px';
+    merchantModal.style.zIndex = '9999';
+    merchantModal.style.display = 'flex';
+    merchantModal.style.flexDirection = 'column';
+    merchantModal.style.justifyContent = 'space-between';
+
+    const merchantSection = document.createElement('div');
+    merchantSection.id = 'merchant-section';
+    merchantModal.appendChild(merchantSection);
+
+    const offerSection = document.createElement('div');
+    offerSection.id = 'offer-section';
+    merchantModal.appendChild(offerSection);
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginTop = '60px';
+    buttonContainer.style.textAlign = 'center';
+    buttonContainer.style.display = 'grid';
+    buttonContainer.style.gridTemplateColumns = 'repeat(2, 1fr)';
+
+    const dealButton = document.createElement('button');
+    dealButton.innerText = 'DEAL!';
+    dealButton.style.marginRight = '20px';
+    dealButton.style.padding = '10px 20px';
+    dealButton.style.borderRadius = '10px';
+    dealButton.style.border = '1px solid white';
+    dealButton.style.backgroundColor = 'green';
+    dealButton.style.color = 'white';
+    dealButton.style.cursor = 'pointer';
+    dealButton.addEventListener('click', deal);
+    buttonContainer.appendChild(dealButton);
+
+    const haggleButton = document.createElement('button');
+    haggleButton.innerText = '讨价还价';
+    haggleButton.style.padding = '10px 20px';
+    haggleButton.style.borderRadius = '10px';
+    haggleButton.style.border = '1px solid white';
+    haggleButton.style.backgroundColor = 'orange';
+    haggleButton.style.color = 'white';
+    haggleButton.style.cursor = 'pointer';
+    haggleButton.addEventListener('click', haggle);
+    buttonContainer.appendChild(haggleButton);
+
+    merchantModal.appendChild(buttonContainer);
+
+    document.body.appendChild(merchantModal);
+
+    displayMerchant();
+
+    currentInfoBox = merchantModal;
+}
+
+// 关闭商人交易界面
+function closeMerchantModal() {
+    if (currentInfoBox) {
+        document.body.removeChild(currentInfoBox);
+        currentInfoBox = null;
+    }
+}
+
+// 修改后的 sellPet 函数
+function sellPet() {
+    const skillScoreElement = document.getElementById("skill-score");
+    skillScore = parseInt(skillScoreElement.innerText, 10);
+
+    if (skillScore < 10000) {
+        showInfoBox("宠物当前分数低于10000分，无法出售！");
+        return;
+    }
+
     const petSelect = document.getElementById("pet-select");
     const selectedPetKey = petSelect.value;
 
-    // 检查玩家是否只剩最后一个宠物
     if (petSelect.options.length <= 1) {
         showInfoBox("这是您的唯一爱宠了，请好好珍惜它！");
-        return; // 退出函数
+        return;
     }
 
-    // 计算出售价格
-    const sellPrice = Math.floor(skillScore / 25); // 出售价格为技能分数除以25的整数部分
-
-    // 确认出售
-    if (confirm(`当您出售宠物后，您的宠物将消失。宠物价格与其评分有关，目前您的宠物价值${sellPrice}两金子，请问是否出售？`)) {
-        goldAmount += sellPrice; // 增加用户的金子数量
-        updateGoldDisplay(goldAmount); // 更新显示的金子数量
-
-        // 从下拉菜单中移除当前宠物
-        const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
-        if (optionToRemove) {
-            optionToRemove.remove();
-        }
-
-        // 设置默认选择第一个宠物
-        if (petSelect.options.length > 0) {
-            petSelect.value = petSelect.options[0].value;
-            changePet(); // 更新宠物信息
-        }
-
-        updateQualityCard(); // 更新资质卡片
-        updateAttributePanel(); // 更新属性面板
-        updateTopBarItems(); // 确保顶栏道具数量更新
-        resetPet(); // 重置宠物的数值
-    }
+    showInfoBox("你的宠物会被运送至市场供商人出价，无论结果如何，宠物都会被出售，你做好准备了吗？", () => {
+        showMerchantModal();
+    });
 }
 
 function resetPet() {
@@ -9381,7 +9672,7 @@ function upgradeWisdomTo() {
         }
         blessGift = true;
         updateJinnangItems();
-        showInfoBox("您获得了新手大礼包!(50万两金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
+        showInfoBox("您获得了新手大礼包!(50万文金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
         return;
@@ -9745,7 +10036,7 @@ function awakenPet() {
         return;
     }
 
-    const confirmationMessage = ("觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后成长率、当前属性会得到极大提升，悟性上限开放至25，等级开放至160，同时开启幻化能力。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
+    const confirmationMessage = ("觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后等级会有所回退，但成长率、属性值、成长和悟性上限会得到大幅提升。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
     showInfoBox(confirmationMessage, () => {
         const qualities = currentPet.qualities;
         const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
@@ -9774,6 +10065,9 @@ function awakenPet() {
         updateJinnangItems();
 
         petMaxLevel = 160;
+        const reducedLevel = Math.floor(petLevel * 0.9);
+        const maxReduction = 9;
+        petLevel = Math.max(petLevel - maxReduction, reducedLevel);
         awakened = true;
 
         showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
@@ -9782,6 +10076,7 @@ function awakenPet() {
         updateQualityCard();
     });
 }
+
 
 let hallucinated = false;
 let hallucinationLevel = 0;

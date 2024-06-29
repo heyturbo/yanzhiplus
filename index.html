@@ -1914,7 +1914,7 @@
                 <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
                 <button onclick="levelUpSkill()">升级技能</button>
-                <button onclick="enemyInfo()">怪物信息</button>
+                <button onclick="enemyInfo()">托管战斗</button>
             </div>
             
         </div>
@@ -2998,7 +2998,7 @@ function petCollection() {
         
         const collectButton = document.createElement('button');
         collectButton.innerText = '收录';
-        collectButton.style.fontSize = '11px';
+        collectButton.style.fontSize = '10px';
         collectButton.style.color = 'white'; // 白色字体
         collectButton.style.backgroundColor = 'green'; // 绿色填充
         collectButton.style.border = '1px solid white'; // 1px 白色描边
@@ -9259,6 +9259,8 @@ function upgradeWisdomTo() {
         qualityPill += 999;
         highGradePill += 9999;
         goldAmount += 999999;
+        stamps = 5000000;
+        updateStampCount();
         document.getElementById("gold-amount").innerText = goldAmount;
         document.getElementById("quality-pill").innerText = qualityPill;
         document.getElementById("high-grade-pill").innerText = highGradePill;
@@ -10054,7 +10056,7 @@ function trainQuality() {
         updateSkillScore(newSkills);
 
         petLevel = 1;
-        currentWisdom = 0;
+        currentWisdom = 24;
         petWisdom = currentWisdom;
         petAscended = false; // 新增宠物失去飞升的还童规则
         petMaxLevel = 149;

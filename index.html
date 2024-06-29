@@ -969,7 +969,7 @@
             top: 0;
             height: 100%;
             width: 100%;
-            background: url('https://pic.imgdb.cn/item/667536a1d9c307b7e9cc1b53.jpg') no-repeat center center;
+            background: url('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif') no-repeat center center;
             background-size: cover;
             color: white;
             box-shadow: -3px 0 5px rgba(0,0,0,0.2);
@@ -1963,7 +1963,7 @@
             <div>宠物名称: <span id="pet-name">小金牛</span></div>
             <div>养宠称号: <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长: <span id="game-timer">00:00</span></div>
-            <div>剩余金子: <span id="gold-amount">50000</span>两</div> <!-- 新增剩余金子显示 -->
+            <div>剩余金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
@@ -2771,7 +2771,7 @@ function preloadImages(imageUrls) {
 
 // 调用函数预加载图片
 const imageUrls = [
-    "https://pic.imgdb.cn/item/667536a1d9c307b7e9cc1b53.jpg",
+    "https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif",
     "https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png",
     "https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif",
@@ -3570,7 +3570,7 @@ let drugInventory = {
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
     "寒天之晶": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000金子" },
+    "幸运金币": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000两金子" },
     "双倍经验药": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验*200%" },
     "四倍经验药": { quantity: 2, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验*400%" }
 };
@@ -3687,10 +3687,10 @@ function useSelectedDrug() {
                     logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
                 } else {
                     goldAmount += 2000;
-                    logBattleEvent(`使用幸运金币，获得了2000金子。`, 'gold');
+                    logBattleEvent(`使用幸运金币，获得了2000两金子。`, 'gold');
                 }
                 updateUI();
-                document.getElementById("gold-amount").innerText = goldAmount;
+                updateGoldDisplay(goldAmount);
                 break;
             case "双倍经验药":
                 applyTimedBuff(
@@ -3951,7 +3951,7 @@ const ascensionSkills = {
         { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
         { name: '焉知非福', effect: level => `战斗失败后，下一轮获得持续${3 + 1 * level}秒的仙气护体`, baseValue: 3, increment: level => 1 * level },
         { name: '举一反三', effect: level => `战斗胜利时获得的经验值增加${30 + 5 * level}%`, baseValue: 30, increment: level => 5 * level },
-        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}金子的安慰金`, baseValue: 50, increment: level => 50 * level }
+        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}两金子的安慰金`, baseValue: 50, increment: level => 50 * level }
     ]
 };
 
@@ -4780,6 +4780,8 @@ function getPlayerStatus() {
     if (battleState.player.drunken) status.push("醉酒");
     if (battleState.player.healingBan) status.push("禁疗");
     if (battleState.player.soulCapture) status.push("摄魂");
+    if (battleState.player.blindfold) status.push("失明");
+    if (battleState.player.spellSlow) status.push("法术迟钝");
     return status.join(", ");
 }
 
@@ -4787,11 +4789,13 @@ function getPlayerStatus() {
 function getEnemyStatus() {
     let status = [];
     if (battleState.enemy.rampaged) status.push("狂暴");
+    if (battleState.enemy.armorBreak) status.push("破甲");
     if (battleState.enemy.silenced) status.push("沉默");
     if (battleState.enemy.poisoned) status.push("中毒");
     if (battleState.enemy.stunned) status.push("眩晕");
     if (battleState.enemy.sleeping) status.push("沉睡");
     if (battleState.enemy.intimidated) status.push("恐吓");
+    if (battleState.enemy.benumbed) status.push("麻痹");
     if (battleState.enemy.dazed) status.push("混乱");
     if (battleState.enemy.burnt) status.push("灼烧");
     if (battleState.enemy.slow) status.push("迟缓");
@@ -5330,6 +5334,12 @@ function selectSkillAndCalculateMultiplier(type) {
 }
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
+    // 检查玩家是否处于失明状态
+    if (battleState.player.blindfold) {
+        logBattleEvent("处于短暂失明，你空大了。", 'yellow');
+        return 0; // 物理攻击无法造成伤害
+    }
+
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
     let damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
@@ -5366,11 +5376,18 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     return damage;
 }
 
+
 function performMagicalAttack(skillMultiplier, isSkillUsed) {
     let damage;
     let isCritical = checkCriticalHit(playerCritRate);
 
-    if (battleAttributes.mana < 50) {
+    // 检查玩家是否处于法术迟钝状态
+    let manaCostMultiplier = 1;
+    if (battleState.player.spellSlow) {
+        manaCostMultiplier = 100;
+    }
+
+    if (battleAttributes.mana < 50 * manaCostMultiplier) {
         logBattleEvent("您的法力值不足！");
         return { damage: 0, retryPhysical: true };
     }
@@ -5381,7 +5398,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     damage = calculateDamage(damage, isCritical, playerCritDamage);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
-    const manaCost = Math.floor(Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2;
+    const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     // 根据是否暴击来记录日志
@@ -5401,6 +5418,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     return { damage, retryPhysical: false };
 }
+
 
 
 function handleCriticalAndDrunken(damage) {
@@ -5517,6 +5535,13 @@ function performIndependentMagicAttack() {
         logBattleEvent("触发法术精通，但没有可用的法术攻击技能，使用普通法术攻击。");
     }
 
+    // 检查玩家是否处于法术迟钝状态
+    let manaCostMultiplier = 1;
+    if (battleState.player.spellSlow) {
+        manaCostMultiplier = 100;
+        logBattleEvent("深渊巨魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
+    }
+
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
     let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
@@ -5552,21 +5577,24 @@ function performIndependentMagicAttack() {
     }
 }
 
+
 function applyPhysicalAttackEffects(multiplier) {
-    const effects = ['armorBreak', 'intimidate'];
+    const effects = ['armorBreak', 'intimidate', 'benumb'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < (0.05 * multiplier)) { // 触发概率受 multiplier 影响
+    if (effectChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
         switch (effect) {
             case 'armorBreak':
                 const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
                 battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
+                battleState.enemy.armorBreak = true;
                 logBattleEvent(`深渊巨魔的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'white');
                 showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52b4.gif');
                 updateEnemyStatusDisplay();
                 setTimeout(() => {
                     battleState.enemy.physicalDefense += armorBreakValue;
+                    battleState.enemy.armorBreak = false;
                     updateEnemyStatusDisplay();
                 }, 10000); // 破甲持续10秒
                 break;
@@ -5579,9 +5607,38 @@ function applyPhysicalAttackEffects(multiplier) {
                     updateEnemyStatusDisplay();
                 }, 5000); // 恐吓持续5秒
                 break;
+            case 'benumb':
+                if (!battleState.enemy.benumbed) {
+                    battleState.enemy.benumbed = true;
+                    battleState.enemy.originalMaxHealth = enemyMaxHealth;
+                    battleState.enemy.benumbStack = 0; // 初始化麻痹叠加计数
+                }
+                const benumbValue = Math.floor(battleState.enemy.originalMaxHealth * 0.03 * (1 + multiplier));
+                enemyMaxHealth -= benumbValue;
+                battleState.enemy.benumbStack += benumbValue; // 累积麻痹效果
+                if (battleState.enemy.health > enemyMaxHealth) {
+                    battleState.enemy.health = enemyMaxHealth;
+                }
+                logBattleEvent(`深渊巨魔被麻痹，最大生命值减少了 ${benumbValue} 点。`, 'lightblue');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fb054d9c307b7e926ec17.gif');
+                updateEnemyStatusDisplay();
+                setTimeout(() => {
+                    if (battleState.enemy.originalMaxHealth) {
+                        battleState.enemy.benumbStack -= benumbValue; // 减少当前叠加效果
+                        if (battleState.enemy.benumbStack <= 0) {
+                            enemyMaxHealth = battleState.enemy.originalMaxHealth;
+                            battleState.enemy.benumbed = false;
+                        } else {
+                            enemyMaxHealth = battleState.enemy.originalMaxHealth - battleState.enemy.benumbStack;
+                        }
+                    }
+                    updateEnemyStatusDisplay();
+                }, 8000); // 麻痹持续8秒
+                break;
         }
     }
 }
+
 
 
 function applyMagicAttackEffects(damage, multiplier) {
@@ -5651,7 +5708,7 @@ function applyMagicAttackEffects(damage, multiplier) {
     const burntChance = Math.random();
     if (burntChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
         battleState.enemy.burnt = true;
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52c4.gif');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fa3ecd9c307b7e91737c0.gif');
         updateEnemyStatusDisplay();
         setTimeout(() => {
             battleState.enemy.burnt = false;
@@ -6037,14 +6094,13 @@ function enemyAttack() {
     }
 }
 
-
 function enemyHeal() {
     if (enemyHealCount >= 10) {
         logBattleEvent("深渊巨魔尝试使用治疗术，但被我方打断了！");
         return;
     }
 
-    const manaCost = 28 * battleRounds;
+    const manaCost = 288 * battleRounds;
 
     // 检查深渊巨魔的法力值是否足够
     if (battleState.enemy.mana < manaCost) {
@@ -6110,7 +6166,7 @@ function handleStunned() {
 function performEnemyPhysicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
-    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack || 0) - effectiveDefense));
+    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
@@ -6132,7 +6188,7 @@ function performEnemyMagicalAttack(isCritical) {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
-    let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack * 0.8 || 0) - effectiveDefense));
+    let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
@@ -6154,16 +6210,18 @@ function performEnemyMagicalAttack(isCritical) {
 const effectCooldowns = {
     drunken: false,
     healingBan: false,
-    soulCapture: false
+    soulCapture: false,
+    blindfold: false,
+    spellSlow: false
 };
 
 function applyEnemyMagicEffects(damage) {
-    const effects = ['drunken', 'healingBan', 'soulCapture'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold','spellSlow'];
     effects.forEach(effect => {
         const effectChance = Math.random();
         switch (effect) {
             case 'drunken':
-                if (effectChance < 0.2 && !effectCooldowns.drunken) { // 20%的概率触发醉酒效果
+                if (effectChance < 0.1 && !effectCooldowns.drunken) { // 10%的概率触发醉酒效果
                     battleState.player.drunken = true;
                     logBattleEvent("你受到了醉酒效果，每次攻击都会受到额外伤害。", '#FF0088');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
@@ -6208,10 +6266,36 @@ function applyEnemyMagicEffects(damage) {
                     }, 5000); // 摄魂效果持续5秒
                 }
                 break;
+            case 'spellSlow':
+                if (effectChance < 0.1 && !effectCooldowns.spellSlow) { // 10%的概率触发法术迟钝效果
+                    battleState.player.spellSlow = true;
+                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    effectCooldowns.spellSlow = true;
+                    updatePlayerStatusDisplay();
+                    setTimeout(() => {
+                        battleState.player.spellSlow = false;
+                        effectCooldowns.spellSlow = false;
+                        updatePlayerStatusDisplay();
+                    }, 5000); // 法术迟钝效果持续5秒
+                }
+                break;
+            case 'blindfold':
+                if (effectChance < 0.1 && !effectCooldowns.blindfold) { // 10%的概率触发失明效果
+                    battleState.player.blindfold = true;
+                    logBattleEvent("你被附加了失明，施放物理技能时将无法对敌人造成伤害！", 'yellow');
+                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+                    effectCooldowns.blindfold = true;
+                    updatePlayerStatusDisplay();
+                    setTimeout(() => {
+                        battleState.player.blindfold = false;
+                        effectCooldowns.blindfold = false;
+                        updatePlayerStatusDisplay();
+                    }, 5000); // 失明效果持续5秒
+                }
+                break;
         }
     });
 }
-
 
 function handleBurnt() {
     if (battleState.enemy.burnt) {
@@ -6334,6 +6418,13 @@ function performHeal() {
         return;
     }
 
+    // 检查玩家是否处于法术迟钝状态
+    let manaCostMultiplier = 1;
+    if (battleState.player.spellSlow) {
+        manaCostMultiplier = 100;
+        logBattleEvent("深渊巨魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
+    }
+
     // 遍历技能区域并获取所有类型为 'PH' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
@@ -6355,7 +6446,7 @@ function performHeal() {
     }
 
     // 根据技能等级计算 mana 消耗
-    const manaCost = Math.round(38 * battleRounds * skillLevel * 0.1);
+    const manaCost = Math.round(38 * battleRounds * skillLevel * 0.1) * manaCostMultiplier;
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
@@ -6406,6 +6497,7 @@ function performHeal() {
 }
 
 
+
 // 将 firstStartBattle 定义为全局变量
 let firstStartBattle = false;
 
@@ -6451,15 +6543,15 @@ function showNextBattlePrompt(playerWon) {
                 extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             reward += extraReward;
-            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 金子。`, 'pink');
+            logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 两金子。`, 'pink');
         }
 
         goldAmount += reward;
-        logBattleEvent(`您赢得了此次战斗，金子+${reward}！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
+        logBattleEvent(`您赢得了此次战斗，金子+${reward}两！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png');
 
         battleRounds++;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
         updateEnemyAttributes(); // 仅在玩家获胜时更新深渊巨魔属性
         gainExp(); // 获取经验
         updateTitle();
@@ -6475,14 +6567,14 @@ function showNextBattlePrompt(playerWon) {
                 compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             goldAmount += compensation;
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 金子的安慰金。`, 'pink');
+            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 两金子的安慰金。`, 'pink');
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
 
-        showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}！请再接再厉，点击任意按钮重置战斗！`);
+        showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}两！请再接再厉，点击任意按钮重置战斗！`);
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp');
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
@@ -6574,14 +6666,14 @@ function resetBattleState(playerWon) {
     updateUI(); // 更新UI显示
 
     // 检查当前回合数
-    if (battleRounds >= 150) {
-        logBattleEvent("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!(你也可以继续战斗)");
+    if (battleRounds >= 151) {
+        showInfoBox("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!继续战斗会进入无尽挑战模式。");
     }
 
     // 处理深渊巨魔暴走 (rampage) 的逻辑
     if (battleRounds > 0 && battleRounds % 10 === 0) {
         enemyCritRate = 1; // 100%
-        enemyCritDamage = battleRounds === 150 ? 3 : 2; // 150轮时为300%，其他10的倍数轮为200%
+        enemyCritDamage = battleRounds === 150 ? 3.5 : 2.2; // 150轮时为300%，其他10的倍数轮为200%
         battleState.enemy.rampaged = true;
         setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
         logBattleEvent("请万分小心，深渊巨魔进入狂暴状态，暴击伤害极大增强！", "red");
@@ -6589,7 +6681,15 @@ function resetBattleState(playerWon) {
         enemyCritRate = 0.6; // 60%
         enemyCritDamage = 1.8; // 180%
         battleState.enemy.rampaged = false;
-        setBackgroundImage('https://pic.imgdb.cn/item/667536a1d9c307b7e9cc1b53.jpg');
+        setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
+    }
+
+    // 重置敌人的麻痹状态
+    if (battleState.enemy.benumbed) {
+        enemyMaxHealth = battleState.enemy.originalMaxHealth || enemyMaxHealth; // 如果 originalMaxHealth 丢失，则使用当前 maxHealth
+        battleState.enemy.benumbed = false;
+        battleState.enemy.benumbStack = 0;
+        battleState.enemy.originalMaxHealth = undefined;
     }
 
     logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink"); // 记录新一轮战斗开始的事件
@@ -6599,6 +6699,7 @@ function resetBattleState(playerWon) {
     enemyHealCount = 0; // 重置怪物治疗次数
     updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
 }
+
 
 function setBackgroundImage(imageUrl) {
     const drawer = document.querySelector('.battle-system-drawer');
@@ -6653,26 +6754,26 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
         <p>金子不够花，想要以小博大？</p>
         <ul>
             <li>玩家需选择6个数字，其中前5个数字为红球，第6个数字为蓝球。</li>
-            <li>每注200金子，最低投注1注。</li>
+            <li>每注200两金子，最低投注1注。</li>
             <li>上次选号区会以红色显示当次中奖的数字。</li>
             <li>倒计时10秒实时开奖，离开彩券界面会暂停计时。</li>
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
             <li>详细中奖规则：</li>
             <ul>
-                <li>5个红球全中且排列顺序一致：5000000金子</li>
-                <li>5个红球全中：150000金子</li>
-                <li>4个红球且排列顺序一致：1000000金子</li>
-                <li>4个红球全中：50000金子</li>
-                <li>3个红球全中且排列顺序一致：100000金子</li>
-                <li>3个红球全中：5000金子</li>
-                <li>2个红球全中且排列顺序一致：10000金子</li>
-                <li>2个红球全中：500金子</li>
-                <li>只中1个红球：200金子</li>
+                <li>5个红球全中且排列顺序一致：5000000两金子</li>
+                <li>5个红球全中：150000两金子</li>
+                <li>4个红球且排列顺序一致：1000000两金子</li>
+                <li>4个红球全中：50000两金子</li>
+                <li>3个红球全中且排列顺序一致：100000两金子</li>
+                <li>3个红球全中：5000两金子</li>
+                <li>2个红球全中且排列顺序一致：10000两金子</li>
+                <li>2个红球全中：500两金子</li>
+                <li>只中1个红球：200两金子</li>
             </ul>
             <li>蓝球规则：</li>
             <ul>
                 <li>如果蓝球一致且红球中奖，当前奖金翻10倍。</li>
-                <li>如果蓝球一致但红球未中奖，奖金为固定1000金子。</li>
+                <li>如果蓝球一致但红球未中奖，奖金为固定1000两金子。</li>
             </ul>
             <li>本系统只用于游戏货币道具的随机获取，赌博是违法犯罪的行为，请勿铤而走险！</li>
         </ul>
@@ -6715,7 +6816,7 @@ function performLotteryDraw() {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
             pendingPrize += prize;
-            updateDescriptionBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
+            showInfoBox(`恭喜你彩票中得${prize}两金子，请速速领取！`);
         }
     }
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
@@ -6870,7 +6971,7 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
         if (goldAmount >= lotteryBetAmount) {
             goldAmount -= lotteryBetAmount;
             lastSelectedNumbers = [...lotterySelectedNumbers];
-            document.getElementById("gold-amount").innerText = goldAmount;
+            updateGoldDisplay(goldAmount);
             canBet = false; // Disable further bets until next draw
 
             document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
@@ -6890,7 +6991,7 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
         showInfoBox('当前没有奖金可以领取！');
     } else {
         goldAmount += pendingPrize;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
         pendingPrize = 0;
         document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
         updateLotteryDisplay();
@@ -7016,7 +7117,7 @@ function showGuide() {
                             <p>f. 神级领悟：玩家可以通过宝箱获得稀有道具“举世无双悟性丹”，使用后立即让宠物悟性提升至20。</p>
                             <p>g. 飞升突破：当玩家的宠物到达160级，20悟性，且宝库中存在一颗飞升之石，可以让宠物飞升突破当前等级上限至180级。</p>
                             <p>h. 宠物传记：查看当前宠物的传记，每个宠物共有三个传记，需要评分达到各自规定值才能解锁查看。</p>
-                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费50金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
+                            <p>商店按钮：弹出商店面板。商店每隔5分钟会随机刷新一次货物，大侠也可以花费100两金子手动刷新。付费刷新有更大的概率出现稀有道具和更多货品。</p>
                             <p>商店所出售的道具根据其品质会随机定价，购买后会直接添加至道具栏中。</p>
                             <p>如果你购买的是宠物的天赋技能，你需要判断当前宠物的名称是否和天赋技能的宠物名称一致，其次保证你的当前宠物没有该技能，否则你将不能购买。一旦购买成功，这个技能会直接打在你的宠物技能位里。</p>
                             <p>在本游戏中，宠物的SS技能无法全部通过洗练生成，因此，如果你想要让宠物习得更多强力技能增加评分，你需要在商店里购买并使用天赋道具。</p>
@@ -7315,20 +7416,20 @@ function updateTreasureDescription(type) {
     let description;
     if (type === '经验宝箱') {
         const cost = getTreasureCost('经验宝箱');
-        description = `充满智慧的宝箱，本次开启将花费${cost}金子。有概率获得宠物升级的经验书和飞升之石。`;
+        description = `充满智慧的宝箱，本次开启将花费${cost}两金子。有概率获得宠物升级的经验书和飞升之石。`;
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得使宠物变异的灵异金丹！";
+                description = "充满奇异道具的宝箱，每次开启花费150两金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得使宠物变异的灵异金丹！";
                 break;
             case '灵魂宝箱':
-                description = "神秘莫测的宝箱，每次开启花费300金子，您可能获得宠物进化所需的各种灵魂！";
+                description = "神秘莫测的宝箱，每次开启花费300两金子，您可能获得宠物进化所需的各种灵魂！";
                 break;
             case '武神宝箱':
-                description = "上古武神的战利品，每次开启花费800金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
+                description = "上古武神的战利品，每次开启花费800两金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '至尊宝箱':
-                description = "价值连城的宝箱，每次开启花费1000金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石等超稀有道具，甚至还有神秘进化法宝等你来拿！";
+                description = "价值连城的宝箱，每次开启花费1000两金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐丹等超稀有道具，甚至还有神秘进化法宝等你来拿！";
                 break;
         }
     }
@@ -7355,7 +7456,7 @@ function openTreasure() {
     }
 
     goldAmount -= cost;
-    document.getElementById("gold-amount").innerText = goldAmount;
+    updateGoldDisplay(goldAmount);
 
     // 根据概率随机生成 1~3 个奖品
     let rewardCount;
@@ -7446,6 +7547,9 @@ function collectTreasure() {
             case '天地灵气':
                 addItemToJinnang('earthlyEnergy');
                 break;
+            case '仙人醍醐丹':
+                addItemToJinnang('ultraSkillBoomer');
+                break;
             default:
                 addItemToTopBar(reward);
                 break;
@@ -7523,7 +7627,8 @@ function getRandomReward(type) {
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 10 },
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 25 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 5 },
-            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 20 }
+            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 19 },
+            { name: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 1 }
         ]
     };
     return selectReward(rewards[type]);
@@ -7561,7 +7666,8 @@ let jinnangItems = [
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', price: 50, quantity: 0, description: '用于宠物1~6进化' },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
-    { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' }
+    { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
+    { name: 'ultraSkillBoomer', displayName: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 1, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -7658,10 +7764,10 @@ function sellItem(item) {
 
         item.quantity -= quantityToSell;
         goldAmount += quantityToSell * item.price; // 使用 item.price 作为单价
-        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}金子`);
+        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${quantityToSell * item.price}两金子`);
 
         updateJinnangItems();
-        document.getElementById("gold-amount").innerText = goldAmount; // 更新金币数量显示的函数
+        updateGoldDisplay(goldAmount); // 更新金币数量显示的函数
     }
 }
 
@@ -7737,7 +7843,8 @@ let armsAttributes = {
     fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" },
     fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png" },
     claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png" },
-    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png" }
+    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png" },
+    husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png" }
 };
 
 let armsOpened = false;
@@ -7759,13 +7866,13 @@ function handlePetArmsClick() {
 function openPetArms() {
     if (goldAmount >= 100000) {
         goldAmount -= 100000;
-        showInfoBox("你花费10万金子，为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
-        document.getElementById("gold-amount").innerText = goldAmount;
+        showInfoBox("你花费10万两金子（100贯），为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
+        updateGoldDisplay(goldAmount);
         armsOpened = true;
         console.log('openPetArms: armsOpened set to true'); // 调试输出
         showPetArmsWindow();
     } else {
-        showInfoBox("你的金子不足10万，无法开启武装系统！");
+        showInfoBox("你的金子不足10万两（100贯），无法开启武装系统！");
     }
 }
 
@@ -7786,7 +7893,7 @@ function showPetArmsWindow() {
     newArmsWindow.style.left = '50%';
     newArmsWindow.style.transform = 'translate(-50%, -50%)';
     newArmsWindow.style.width = '80%';
-    newArmsWindow.style.height = '80%';
+    newArmsWindow.style.height = '70%';
     newArmsWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     newArmsWindow.style.borderRadius = '10px';
     newArmsWindow.style.zIndex = '1000';
@@ -7895,8 +8002,8 @@ function unlockArm(index, arm, infoDiv, forgeButton, img) {
     if (isUnlocked(index)) {
         if (!arm.unlocked && goldAmount >= 200000) {
             goldAmount -= 200000;
-            showInfoBox("您支付了20万金子，为宠物解锁了一件武装！");
-            document.getElementById("gold-amount").innerText = goldAmount;
+            showInfoBox("您支付了20万两金子（200贯），为宠物解锁了一件武装！");
+            updateGoldDisplay(goldAmount);
             arm.unlocked = true; // 更新解锁状态
             img.src = arm.url; // 更新图标
             infoDiv.innerHTML = `<div>${arm.type}</div><div>增益: 0</div>`;
@@ -7920,10 +8027,12 @@ function isUnlocked(index) {
         case 1:
             return petLevel >= 60;
         case 2:
-            return petLevel >= 120;
+            return petLevel >= 100;
         case 3:
-            return petLevel >= 180;
+            return petLevel >= 160;
         case 4:
+            return petLevel >= 180;
+        case 5:
             return petLevel >= 200;
         default:
             return false;
@@ -7938,16 +8047,16 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000金子，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费200金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
+    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000两金子（200贯），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800两金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
 function forgeArm(key, infoDiv) {
-    if (goldAmount < 200) {
+    if (goldAmount < 800) {
         showInfoBox("金子不足，无法锻造！");
         return;
     }
 
-    goldAmount -= 200;
+    goldAmount -= 800;
     const arm = armsAttributes[key];
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
     let newValue;
@@ -7987,7 +8096,7 @@ function forgeArm(key, infoDiv) {
     arm.forgedInfo = `增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
 
     infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
-    document.getElementById("gold-amount").innerText = goldAmount;
+    updateGoldDisplay(goldAmount);
     updateSkillScore();
     updateTitle();
     updateAttributePanel();
@@ -8165,7 +8274,7 @@ function trainAttributes() {
     const cost = trainingCosts[trainingCount];
 
     // 提示玩家当前花费
-    showInfoBox(`这次金子培养需要${cost}金子，是否继续？`, function() {
+    showInfoBox(`这次金子培养需要${cost}两金子，是否继续？`, function() {
         // 玩家点击确认按钮，继续执行培养操作
 
         // 检查金子数量是否足够
@@ -8176,7 +8285,7 @@ function trainAttributes() {
 
         // 扣除金子
         goldAmount -= cost;
-        document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
+        updateGoldDisplay(goldAmount); // 更新显示的金子数量
 
         // 获取当前培养的属性提升倍数
         const multiplier = trainingMultipliers[trainingCount];
@@ -8311,17 +8420,24 @@ function useGoldenRebornPill() {
     updatePetWisdom();
 }
 let goldAmount = 50000; // 初始金子数量
+
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');
+
+    const liang = goldAmount % 1000;
+    const guan = Math.floor(goldAmount / 1000) % 1000;
+    const ding = Math.floor(goldAmount / 1000000);
+
+    goldElement.innerText = `${ding}锭${guan}贯${liang}两`;
     goldElement.style.color = 'orange';
     goldElement.style.fontWeight = 'bold';
     goldElement.style.webkitTextStroke = '1px gold'; // 添加描边效果
     goldElement.style.textStroke = '1px gold'; // 兼容性处理
 }
 
+
 // 初始状态下更新金子显示
-const initialGoldAmount = 50000;
-updateGoldDisplay(initialGoldAmount);
+updateGoldDisplay(goldAmount);
 
 function toggleShop() {
     const drawer = document.getElementById('shop-drawer');
@@ -8364,7 +8480,7 @@ function refreshShop(auto = false) {
 
     if (!auto) {
         goldAmount -= 100;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
     }
 
     const shopItems = document.getElementById('shop-items');
@@ -8415,7 +8531,7 @@ function refreshShop(auto = false) {
             itemDiv.classList.add('shop-item');
             itemDiv.dataset.name = item.name;
             itemDiv.dataset.price = item.price;
-            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 金子</div>`;
+            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 两金子</div>`;
             itemDiv.addEventListener('click', () => {
                 document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
                 itemDiv.classList.add('selected');
@@ -8465,7 +8581,7 @@ function refreshShop(auto = false) {
         itemDiv.classList.add('shop-item');
         itemDiv.dataset.name = item.name;
         itemDiv.dataset.price = item.price;
-        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 金子</div>`;
+        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${item.price} 两金子</div>`;
         itemDiv.addEventListener('click', () => {
             document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
             itemDiv.classList.add('selected');
@@ -8724,7 +8840,7 @@ function buyItem() {
 
     // 扣除金子并更新显示
     goldAmount -= price;
-    document.getElementById("gold-amount").innerText = goldAmount;
+    updateGoldDisplay(goldAmount);
     selectedItem.remove();
 }
 
@@ -8755,9 +8871,9 @@ function sellPet() {
     const sellPrice = Math.floor(skillScore / 25); // 出售价格为技能分数除以25的整数部分
 
     // 确认出售
-    if (confirm(`当您出售宠物后，您的宠物将消失。宠物价格与其评分有关，目前您的宠物价值${sellPrice}金子，请问是否出售？`)) {
+    if (confirm(`当您出售宠物后，您的宠物将消失。宠物价格与其评分有关，目前您的宠物价值${sellPrice}两金子，请问是否出售？`)) {
         goldAmount += sellPrice; // 增加用户的金子数量
-        document.getElementById("gold-amount").innerText = goldAmount; // 更新显示的金子数量
+        updateGoldDisplay(goldAmount); // 更新显示的金子数量
 
         // 从下拉菜单中移除当前宠物
         const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
@@ -8994,71 +9110,97 @@ function upgradeWisdom() {
 
 
 function trainSkills() {
-    if (transmutationPill < 1) {
-        showInfoBox("您的道具不够，请刷新后重试！");
-        return;
-    }
+const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
 
-    transmutationPill--;
-    document.getElementById("transmutation-pill").innerText = transmutationPill;
+if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
+    showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", () => {
+        if (useItem('ultraSkillBoomer', 1)) {
+            const maxSkills = Math.min(12, currentPet.skills.length);
+            const skillNum = Math.floor(Math.random() * (3)) + 10; // 10到12个技能
+            const selectedSkills = [];
 
-    let skillNum;
-    if (currentWisdom < 13) {
-        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
-    } else if (currentWisdom < 17) {
-        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
-    } else if (currentWisdom < 19) {
-        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
-    } else if (currentWisdom < 20) {
-        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
-    } else {
-        skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
-    }
-
-    const selectedSkills = [];
-    for (let i = 0; i < skillNum; i++) {
-        let skill;
-        do {
-            const rarityRoll = Math.random() * 100;
-            if (currentWisdom < 7) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-            } else if (currentWisdom < 13) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-            } else if (currentWisdom < 17) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-            } else if (currentWisdom < 20) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-            } else {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+            while (selectedSkills.length < skillNum) {
+                const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
+                if (!selectedSkills.includes(randomSkill)) {
+                    selectedSkills.push(randomSkill);
+                }
             }
-        } while (!skill || selectedSkills.includes(skill));
-        selectedSkills.push(skill);
-    }
 
-    if (selectedSkills.length >= 8) {
-        showInfoBox("你把技能洗爆了,点击确定查看!", () => {
             updateSkillsArea(selectedSkills);
             updateSkillScore(selectedSkills);
             updateTitle();
-        });
-        return;
-    }
+            showInfoBox("菩提树下仙人点化，你的爱宠如醍醐灌顶！");
+        }
+    }, () => {
+        // 取消使用仙人醍醐丹时执行transmutationPill逻辑
+        if (transmutationPill < 1) {
+            showInfoBox("您的道具不够，请刷新后重试！");
+            return;
+        }
 
-    updateSkillsArea(selectedSkills);
-    updateSkillScore(selectedSkills);
-    updateTitle();
+        transmutationPill--;
+        document.getElementById("transmutation-pill").innerText = transmutationPill;
+
+        let skillNum;
+        if (currentWisdom < 13) {
+            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
+        } else if (currentWisdom < 17) {
+            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+        } else if (currentWisdom < 19) {
+            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
+        } else if (currentWisdom < 20) {
+            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
+        } else {
+            skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+        }
+
+        const selectedSkills = [];
+        for (let i = 0; i < skillNum; i++) {
+            let skill;
+            do {
+                const rarityRoll = Math.random() * 100;
+                if (currentWisdom < 7) {
+                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                    else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                } else if (currentWisdom < 13) {
+                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                    else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                } else if (currentWisdom < 17) {
+                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                } else if (currentWisdom < 20) {
+                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                } else {
+                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+                }
+            } while (!skill || selectedSkills.includes(skill));
+            selectedSkills.push(skill);
+        }
+
+        if (selectedSkills.length >= 8) {
+            showInfoBox("你把技能洗爆了,点击确定查看!", () => {
+                updateSkillsArea(selectedSkills);
+                updateSkillScore(selectedSkills);
+                updateTitle();
+            });
+            return;
+        }
+
+        updateSkillsArea(selectedSkills);
+        updateSkillScore(selectedSkills);
+        updateTitle();
+    });
+    return;
+    }
 }
 
 function getRandomSkillNum(probabilities) {
@@ -9213,7 +9355,7 @@ function upgradeWisdomTo() {
         qualityPill += 200;
         highGradePill += 500;
         goldAmount += 500000;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
         document.getElementById("high-grade-pill").innerText = highGradePill;
         document.getElementById("miraculous-pill").innerText = miraculousPill;
@@ -9239,7 +9381,7 @@ function upgradeWisdomTo() {
         }
         blessGift = true;
         updateJinnangItems();
-        showInfoBox("您获得了新手大礼包!(50万金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
+        showInfoBox("您获得了新手大礼包!(50万两金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
         return;
@@ -9261,7 +9403,7 @@ function upgradeWisdomTo() {
         goldAmount += 999999;
         stamps = 5000000;
         updateStampCount();
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
         document.getElementById("high-grade-pill").innerText = highGradePill;
         document.getElementById("miraculous-pill").innerText = miraculousPill;
@@ -9290,6 +9432,7 @@ function upgradeWisdomTo() {
         'poisonPowder', //毒粉
         'glowingSoul',
         'activeSoul',
+        'ultraSkillBoomer', //超级万化灵丹
         'jumpingSoul'
     ];
 
@@ -9318,7 +9461,7 @@ function upgradeWisdomTo() {
     
     if (target === "88888") {
         goldAmount += 999999;
-        document.getElementById("gold-amount").innerText = goldAmount;
+        updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;
     }

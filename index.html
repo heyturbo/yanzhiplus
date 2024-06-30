@@ -511,7 +511,11 @@
             background-color: #e0e0e0;
             border-radius: 5px;
             overflow: hidden;
+            display: flex;
             margin-bottom: 0px;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
         }
         .attribute-info .progress-bar div {
             height: 20px;
@@ -534,16 +538,16 @@
             display: flex;
             gap: 0px; /* 调整每个条目之间的间距 */
             flex-direction: column-reverse;
-            align-items: flex-start;
-            justify-content: space-evenly;
+            align-items: stretch;
+            justify-content: space-between;
         }
         .secondary-attributes {
             display: flex;
             flex-direction: column;
-            gap: 5px; /* 调整每个条目之间的间距 */
-            align-items: flex-start;
+             /* 调整每个条目之间的间距 */
+            align-items: stretch;
             flex-wrap: wrap;
-            justify-content: space-evenly;
+            justify-content: space-between;
         }
         .image-frame {
             display: flex;
@@ -1657,6 +1661,9 @@
                         信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
                     </div>
                     <div id="remaining-points-display">剩余点数: 0</div>
+                    <div>飞升状态: <span id="ascension-status">未飞升</span></div>
+                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>
+                    <div>幻化等级: <span id="hallucination-level">0</span></div>
                     <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
                 <div class="image-frame">
@@ -1689,9 +1696,9 @@
                 <button onclick="trainAttributes()">金子培养</button>
                 <button onclick="absorbExperience()">提升一级</button>
                 <button onclick="absorbAdvancedExperience()">提升三级</button>
-                <button onclick="upgradeWisdom()">提高悟性</button>
+                <button onclick="upgradeWisdom()">提升悟性</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
-                <button onclick="useSupremeWisdomPill()">神级领悟</button>
+                <button onclick="useSupremeWisdomPill()">超级提悟</button>
                 <button onclick="ascend()">飞升突破</button>
                 <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
@@ -1740,9 +1747,9 @@
                 <div>至尊宝箱</div>
             </div>
             </div>
-            <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div id="treasure-reward" class="reward-box"></div>
             <div id="generalEffect" class="visual-effect"></div>
+            <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">自动取出</button>
                 <button onclick="collectTreasure()">拿走奖品</button>
@@ -1910,7 +1917,7 @@
                 <button onclick="performAttack('magical')">法术攻击</button>
                 <button onclick="performHeal()">治疗之术</button>
                 <button onclick="performPoison()">施毒之法</button>
-                <button onclick="performDefense()">护体格挡</button>
+                <button onclick="performDefense()">格挡蓄力</button>
                 <button onclick="useDrug()">使用药物</button>
                 <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
@@ -7108,7 +7115,6 @@ function updateDescriptionBox(message) {
     const descriptionBox = document.getElementById("description-box");
     descriptionBox.innerText = message;
 }
-
         
 function showGuide() {
     const messageBox = document.createElement('div');
@@ -7174,10 +7180,10 @@ function showGuide() {
     document.body.appendChild(messageBox);
 }
 
-let highGradePill = 100;
+let highGradePill = 50;
 let transmutationPill = 20;
 let rebornPill = 20;
-let bingpoRebornPill = 5;
+let bingpoRebornPill = 10;
 let qualityPill = 20;
 let currentWisdom = 0;
 let skillScore = 0;
@@ -7409,6 +7415,17 @@ let petLevel = 1;
 let petMaxLevel = 149;
 let petAscended = false;
         
+function updateAscensionStatus() {
+    const ascensionStatusElement = document.getElementById('ascension-status');
+    if (petAscended) {
+        ascensionStatusElement.innerText = '已飞升';
+        ascensionStatusElement.style.color = 'blue';
+    } else {
+        ascensionStatusElement.innerText = '未飞升';
+        ascensionStatusElement.style.color = ''; // 恢复默认颜色
+    }
+}
+
 function ascend() {
     // Retrieve the current pet level and wisdom from the attribute panel
     let petLevel = parseInt(document.getElementById('pet-level').innerText);
@@ -7422,7 +7439,7 @@ function ascend() {
 
     // Check if the pet meets the level and wisdom requirements and if there is an ascension stone in the inventory
     const item = jinnangItems.find(i => i.name === 'ascensionStone');
-    if (petLevel < 160 || petWisdom < 24 || item.quantity <= 0) {
+    if (petLevel < 160 || petWisdom < 24 || !item || item.quantity <= 0) {
         showInfoBox("您的飞升石不够，且宠物飞升必须满足160级和24悟两个条件！(20级悟性之后，需要使用商店所售道具“特级悟性丹”才能继续提升悟性。)");
         return;
     }
@@ -7434,11 +7451,10 @@ function ascend() {
     // Update pet's max level and ascension status
     petMaxLevel = 200;
     petAscended = true;
+    updateAscensionStatus();
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
 }
-
-
 
 let selectedTreasure = null;
 let rewards = []; // 定义全局变量来存储奖品
@@ -8290,8 +8306,8 @@ function updateSecondaryAttributes(currentAttributes, currentWisdom) {
 }
 
 
-let trainingCosts = [2000, 6000, 50000, 100000]; // 定义每次金子培养所需的金子数量
-let trainingMultipliers = [1.1, 1.08, 1.06, 1.02]; // 定义每次金子培养的属性提升倍数
+let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
+let trainingMultipliers = [1.1, 1.08, 1.06, 1.04, 1.02]; // 定义每次金子培养的属性提升倍数
 let trainingCount = 0; // 初始化已经使用的金子培养次数
 
 function calculateAvailableTrainingCount(petLevel) {
@@ -8301,6 +8317,7 @@ function calculateAvailableTrainingCount(petLevel) {
     if (petLevel >= 60) count++; // 宠物等级大于等于60时增加一次
     if (petLevel >= 120) count++; // 宠物等级大于等于120时增加一次
     if (petLevel >= 180) count++; // 宠物等级大于等于180时增加一次
+    if (petLevel >= 200) count++; // 宠物等级大于等于180时增加一次
     return count;
 }
 
@@ -8310,7 +8327,7 @@ function trainAttributes() {
 
     // 检查当前培养次数是否达到可用次数
     if (trainingCount >= availableTrainingCount) {
-        showInfoBox("当前没有可用培养次数了。只有当宠物等级达到60、120和180时，才能各获得一次培养机会！每次培养会按比例增加宠物的属性值，请合理分配培养机会。");
+        showInfoBox("当前没有可用培养次数了。只有当宠物等级达到60、120、180和200级时，才能各获得一次培养机会！每次培养会按比例增加宠物的属性值，请合理分配培养机会。");
         return; // 退出函数
     }
 
@@ -8410,7 +8427,7 @@ function showBiography() {
     document.body.appendChild(messageBox);
 }
 
-let goldenRebornPill = 5;
+let goldenRebornPill = 10;
 
 function useGoldenRebornPill() {
     if (goldenRebornPill < 1) {
@@ -8463,7 +8480,7 @@ function useGoldenRebornPill() {
     updateSkillScore();
     updatePetWisdom();
 }
-let goldAmount = 50000; // 初始金子数量
+let goldAmount = 120000; // 初始金子数量
 
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');
@@ -8635,8 +8652,6 @@ function refreshShop(auto = false) {
 
     if (auto) startShopTimer();
 }
-
-
 
 function getRandomCommonItem() {
     const commonItems = [
@@ -9293,11 +9308,11 @@ function resetPet() {
     speed: 0
     };
     document.body.style.backgroundImage = "";
+    document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
+
     // 隐藏第二飞升技能面板
     const secondSkillBox = document.getElementById('second-ascension-skill');
     secondSkillBox.style.display = 'none';
-    // 重置第一个飞升技能的显示
-    updateAscensionDisplay();
 
     // 重置基础属性为初始值，调用calculateAttribute
     baseAttributes = {
@@ -9343,6 +9358,9 @@ function resetPet() {
     updateQualityCard();
     updateAttributePanel();
     updateTopBarItems();
+    updateAscensionStatus();
+    updateAscensionDisplay();
+    updateAwakenStatus();
 }
 
 function setInnerText(id, value) {
@@ -9457,7 +9475,7 @@ if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
             updateSkillsArea(selectedSkills);
             updateSkillScore(selectedSkills);
             updateTitle();
-            showInfoBox("菩提树下仙人点化，你的爱宠如醍醐灌顶！");
+            showInfoBox("你的爱宠如醍醐灌顶般得到仙人点化！");
         }
     }, () => {
         // 取消使用仙人醍醐丹时执行transmutationPill逻辑
@@ -10019,7 +10037,7 @@ function increaseBonusAttribute(attribute) {
 
     // 检查连续分配次数是否达到5次
     if (allocationCount[attribute] >= 5) {
-        const confirmMessage = `您已连续分配5次${attribute},是否将剩余的点数全部分配至该属性?`;
+        const confirmMessage = `您已连续分配5次这项属性，是否将剩余的点数全部分配至该属性?`;
         showInfoBox(confirmMessage, () => {
             bonusAttributes[attribute] += remainingPoints;
             remainingPoints = 0;
@@ -10061,6 +10079,17 @@ function removeBonusAttribute(attribute, value) {
     }
 }
         
+function updateAwakenStatus() {
+    const awakenStatusElement = document.getElementById("awaken-status");
+    if (awakened) {
+        awakenStatusElement.innerText = '已觉醒';
+        awakenStatusElement.style.color = 'blue';
+    } else {
+        awakenStatusElement.innerText = '未觉醒';
+        awakenStatusElement.style.color = ''; // 恢复默认颜色
+    }
+}
+
 function awakenPet() {
     if (awakened) {
         showInfoBox("您的宠物已经觉醒，无法再次觉醒！");
@@ -10069,11 +10098,11 @@ function awakenPet() {
 
     const awakenPillItem = jinnangItems.find(i => i.name === 'awakenPill');
     if (!awakenPillItem || awakenPillItem.quantity < 1) {
-        showInfoBox("必要道具：醒悟丹 数量不足！");
+        showInfoBox("必要道具：醒悟丹的数量不足！");
         return;
     }
 
-    const confirmationMessage = ("觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后等级会有所回退，但成长率、属性值、成长和悟性上限会得到大幅提升。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！");
+    const confirmationMessage = "觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后等级会有所回退，但成长率、属性值、成长和悟性上限会得到大幅提升。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！";
     showInfoBox(confirmationMessage, () => {
         const qualities = currentPet.qualities;
         const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
@@ -10102,10 +10131,11 @@ function awakenPet() {
         updateJinnangItems();
 
         petMaxLevel = 160;
-        const reducedLevel = Math.floor(petLevel * 0.9);
+        const reducedLevel = Math.round(petLevel * 0.9);
         const maxReduction = 9;
         petLevel = Math.max(petLevel - maxReduction, reducedLevel);
         awakened = true;
+        updateAwakenStatus();
 
         showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
         updatePetLevel();
@@ -10168,6 +10198,7 @@ function hallucinatePet() {
 
         if (Math.random() < successRate) {
             hallucinationLevel++;
+            document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
             showInfoBox(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
         } else {
             showInfoBox("幻化提升失败！");
@@ -10538,6 +10569,7 @@ function trainQuality() {
 
         document.getElementById("pet-level").innerText = petLevel;
         document.getElementById("current-wisdom").innerText = currentWisdom;
+        document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
 
         updatePetLevel();
         updatePetWisdom();
@@ -10551,6 +10583,8 @@ function trainQuality() {
         setPetWisdom(24);
         increasePetLevelCheat(160);
         ascendCheat();
+        updateAwakenStatus();
+        updateAscensionStatus();
 
         return;
     }

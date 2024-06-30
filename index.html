@@ -5083,14 +5083,7 @@ function autoBattle() {
             showNextBattlePrompt(false);
             clearInterval(autoBattleInterval);
             autoBattleInterval = null;
-            showInfoBox("自动战斗失败，是否继续执行自动战斗？");
-            return;
-        }
-
-        // 判断玩家生命值是否低于30%
-        if (battleAttributes.health / maxHealth < 0.3) {
-            logBattleEvent("自动战斗：玩家生命值低于30%，执行治疗。", 'pink');
-            performHeal();
+            showInfoBox("自动战斗失败，已经停止自动战斗！");
             return;
         }
 
@@ -5099,16 +5092,25 @@ function autoBattle() {
             if (Math.random() < 0.5) {
                 logBattleEvent("自动战斗：玩家生命值低于50%，执行防御。", 'pink');
                 performDefense();
-                return;
+            } else {
+                logBattleEvent("自动战斗：玩家生命值低于50%，执行治疗。", 'pink');
+                performHeal();
             }
+            return;
         }
 
-        // 判断玩家的法术攻击力与物理攻击力的比例
-        const attackType = Math.random() < 0.9
-            ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
-            : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
+        // 判断玩家的法术攻击力与物理攻击力的比例以及blindfold状态
+        let attackType;
+        if (battleState.player.blindfold) {
+            attackType = 'magic';
+            logBattleEvent("自动战斗：玩家处于失明状态，执行法术攻击。", 'pink');
+        } else {
+            attackType = Math.random() < 0.95
+                ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
+                : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
+            logBattleEvent(`自动战斗：执行${attackType === 'magical' ? '法术攻击' : '物理攻击'}`, 'pink');
+        }
 
-        logBattleEvent(`自动战斗：执行${attackType === 'magical' ? '法术攻击' : '物理攻击'}`, 'pink');
         performAttack(attackType);
     }, 300); // 每0.3秒执行一次自动战斗逻辑
 }
@@ -7416,7 +7418,7 @@ function updateAscensionStatus() {
     const ascensionStatusElement = document.getElementById('ascension-status');
     if (petAscended) {
         ascensionStatusElement.innerText = '已飞升';
-        ascensionStatusElement.style.color = 'blue';
+        ascensionStatusElement.style.color = 'red';
     } else {
         ascensionStatusElement.innerText = '未飞升';
         ascensionStatusElement.style.color = ''; // 恢复默认颜色
@@ -10080,7 +10082,7 @@ function updateAwakenStatus() {
     const awakenStatusElement = document.getElementById("awaken-status");
     if (awakened) {
         awakenStatusElement.innerText = '已觉醒';
-        awakenStatusElement.style.color = 'blue';
+        awakenStatusElement.style.color = 'red';
     } else {
         awakenStatusElement.innerText = '未觉醒';
         awakenStatusElement.style.color = ''; // 恢复默认颜色

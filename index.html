@@ -8668,7 +8668,8 @@ function getRandomCommonItem() {
 function getRandomRareItem() {
     // 定义初始稀有物品数组
     const rareItems = [
-        { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(1288, 2988) }
+        { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(1288, 2988) },
+        { name: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: getRandomInt(46788, 89238) }
     ];
 
     // 定义空数组用于存储SS级技能和S级技能
@@ -8789,6 +8790,11 @@ function buyItem() {
                     addItemToJinnang('earthlyEnergy');
                 }
                 break;
+            case '仙人醍醐丹':
+                for (let i = 0; i < itemQuantity; i++) {
+                    addItemToJinnang('ultraSkillBoomer');
+                }
+                break;
             case '还童金丹':
                 goldenRebornPill += itemQuantity;
                 break;
@@ -8869,6 +8875,9 @@ function buyItem() {
                     break;
                 case '天地灵气':
                     addItemToJinnang('earthlyEnergy'); // 更新锦囊
+                    break;
+                case '仙人醍醐丹':
+                    addItemToJinnang('ultraSkillBoomer'); // 更新锦囊
                     break;
                 case '还童金丹':
                     goldenRebornPill++;

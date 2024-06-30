@@ -8898,6 +8898,10 @@ let starwindMaxMultiplier = 1.8;
 let starwindHaggleCount = 0;
 let guanghanHaggleCount = 0;
 let chaosMerchantHaggleCount = 0;
+let hasDealed = false;
+
+// 定义商人状态缓存
+const merchantStates = {};
 
 const merchants = [
     {
@@ -8989,15 +8993,42 @@ const merchants = [
 ];
 
 function switchMerchant() {
+    const currentMerchant = merchants[currentMerchantIndex];
+    // 保存当前商人的状态
+    merchantStates[currentMerchant.name] = {
+        currentOffer,
+        currentHerbs,
+        starwindMaxMultiplier,
+        starwindHaggleCount,
+        guanghanHaggleCount,
+        chaosMerchantHaggleCount
+    };
+
     currentMerchantIndex = (currentMerchantIndex + 1) % merchants.length;
     displayMerchant();
 }
 
 function displayMerchant() {
     const merchant = merchants[currentMerchantIndex];
-    const offerData = merchant.getOffer(skillScore);
-    currentOffer = offerData.price;
-    currentHerbs = offerData.herbs || 0;
+    // 恢复当前商人的状态
+    if (hasDealed) {
+        const offerData = merchant.getOffer(skillScore);
+        currentOffer = offerData.price;
+        currentHerbs = offerData.herbs || 0;
+        hasDealed = false;
+    } else if (merchantStates[merchant.name]) {
+        const state = merchantStates[merchant.name];
+        currentOffer = state.currentOffer;
+        currentHerbs = state.currentHerbs;
+        starwindMaxMultiplier = state.starwindMaxMultiplier;
+        starwindHaggleCount = state.starwindHaggleCount;
+        guanghanHaggleCount = state.guanghanHaggleCount;
+        chaosMerchantHaggleCount = state.chaosMerchantHaggleCount;
+    } else {
+        const offerData = merchant.getOffer(skillScore);
+        currentOffer = offerData.price;
+        currentHerbs = offerData.herbs || 0;
+    }
 
     const merchantSection = document.getElementById('merchant-section');
     merchantSection.innerHTML = `
@@ -9012,11 +9043,10 @@ function displayMerchant() {
 
     const offerSection = document.getElementById('offer-section');
     offerSection.innerHTML = `
-        ${merchant.name === '广寒药商' ? `<div style="font-size: 14px; color: white; font-weight: bold;">药商愿意给出金子：${currentOffer}文，草药：${currentHerbs}株，希望驭兽师大人成全。</div>` : `<div style="font-size: 14px; color: white; font-weight:bold;">在场商人看到你的宠物议论纷纷，首轮出价：${currentOffer}文金子，同意即可点击Deal交易。（提示：点击商人头像可更换议价对象）</div>`}
+        ${merchant.name === '广寒药商' ? `<div style="font-size: 14px; color: white; font-weight: bold;">药商愿意给出金子：${currentOffer}文，草药：${currentHerbs}株，希望驭兽师大人成全。</div>` : `<div style="font-size: 14px; color: white; font-weight:bold;">在场商人看到你的宠物议论纷纷，其中你所询问的一位商人出价：${currentOffer}文金子，同意即可点击Deal交易。（提示：点击商人头像可更换议价对象）</div>`}
     `;
 }
 
-// 讨价还价逻辑
 function haggle() {
     const merchant = merchants[currentMerchantIndex];
     const offerSection = document.getElementById('offer-section');
@@ -9033,15 +9063,11 @@ function haggle() {
             currentOffer = 1;
         }
     } else if (merchant.name === '星风游商') {
-        if (starwindHaggleCount < 14) {
+        if (starwindHaggleCount < 15) {
             starwindHaggleCount += 1;
             const newOffer = merchant.haggle(currentOffer);
             currentOffer = newOffer;
-            if (starwindMaxMultiplier <= 0.4) {
-                offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驯兽师，再不成交，天色就晚啦！我只能出到${currentOffer}文金子啦！</div>`;
-            } else {
-                offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驭兽师，你的宠物我是越看越新生欢喜，我愿意出价${currentOffer}文金子，你考虑一下吧！</div>`;
-            }
+            offerSection.innerHTML = `<div style="font-size: 14px; color: white; font-weight: bold;">驭兽师，你的宠物我是越看越新生欢喜，你既有意割爱，我便愿意再出价${currentOffer}文金子，你考虑一下吧！</div>`;
         } else {
             offerSection.innerHTML = `<div style="font-size: 14px; color: red; font-weight: bold;">驯兽师，再不成交，天色就晚啦！我只能出到${currentOffer}文金子啦！</div>`;
         }
@@ -9060,7 +9086,6 @@ function haggle() {
     }
 }
 
-// 确认交易
 function deal() {
     const merchant = merchants[currentMerchantIndex];
     if (merchant.name === '广寒药商') {
@@ -9086,10 +9111,12 @@ function deal() {
     }
     goldAmount += currentOffer;
     updateGoldDisplay(goldAmount);
-    resetPet();
-    merchant.reset();
+    // 重置所有商人的状态
+    merchants.forEach(merchant => merchant.reset());
+    hasDealed = true;
     closeMerchantModal();
 }
+
 
 // 显示商人交易界面
 function showMerchantModal() {

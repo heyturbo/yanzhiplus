@@ -3819,7 +3819,7 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    playerCritRate = Math.min(2.0, playerCritRate + 0.50); // 最大200%
+                    playerCritRate = Math.min(3.0, playerCritRate + 0.50); // 最大300%
                     logBattleEvent(`使用狂暴印记，暴击率提高50%，持续10秒。`, 'gold');
                     return () => {
                         playerCritRate = playerCritRate - 0.5;
@@ -3890,7 +3890,7 @@ function applyBuff(drugName) {
                         battleAttributes.health -= Math.floor(maxHealth * 0.2);
                         battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
-                        playerCritRate = Math.min(2.0, playerCritRate + 0.50); // 最大200%
+                        playerCritRate = Math.min(3.0, playerCritRate + 0.50); // 最大300%
                         playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
                         logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`, 'gold');
                         return () => {
@@ -4048,7 +4048,6 @@ document.getElementById('reenable-ascension').addEventListener('click', () => {
     }
 });
 
-
 function refreshSecondAscensionSkill() {
     let newSkill;
     do {
@@ -4167,7 +4166,7 @@ function ascensionSkillDescription() {
     for (const category in ascensionSkills) {
         if (ascensionSkills.hasOwnProperty(category)) {
             ascensionSkills[category].forEach(skill => {
-                skillDescriptions.push(`${skillIndex}. 技能：${skill.name}，效果：${skill.effect(1)}`); // 假设技能等级为1
+                skillDescriptions.push(`${skillIndex}. ${skill.name}：${skill.effect(1)}`); // 假设技能等级为1
                 skillIndex++; // 编号递增
             });
         }
@@ -4176,8 +4175,6 @@ function ascensionSkillDescription() {
     const skillDescriptionsText = skillDescriptions.join('\n');
     showInfoBox(skillDescriptionsText);
 }
-
-
 
 // 监听刷新技能按钮点击事件
 document.getElementById('refresh-ascension').addEventListener('click', () => {

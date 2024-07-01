@@ -3180,7 +3180,6 @@ function changePet(skipConfirmation = false) {
     }
 }
 
-
 function showSummonPanel() {
     const summonPanel = document.getElementById('summonPanel');
     summonPanel.style.display = 'block';
@@ -3952,7 +3951,7 @@ const ascensionSkills = {
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当深渊巨魔生命值在${87 - 3 * (level - 1)}%以上时，对深渊巨魔的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给深渊巨魔附加等同于玩家物理攻击力300%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给深渊巨魔附加等同于玩家物理攻击力1000%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，深渊巨魔所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
@@ -5813,7 +5812,7 @@ function applySingleAscensionEffect(skill) {
             break;
         case '灵魂穿刺':
             battleState.player.extraCritDamageChance = skill.increment(skill.level) / 100;
-            battleState.player.extraCritDamageMultiplier = 3; // 固定300%
+            battleState.player.extraCritDamageMultiplier = 10; // 固定300%
             break;
         case '吸血魔刃':
             battleState.player.bloodSuckPercentage = skill.increment(skill.level) / 100;
@@ -5865,13 +5864,13 @@ function performPoison() {
         showNextBattlePrompt(false);
         return;
     }
-    
+
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
     }
-    
+
     if (!poisonSkillActivated) {
         if (useItem('poisonSkillBook')) {
             poisonSkillActivated = true;
@@ -5910,7 +5909,7 @@ function performPoison() {
 
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
-    const poisonDamage = Math.floor(battleAttributes.physicalAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
+    const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对深渊巨魔造成了 ${poisonDamage} 点中毒伤害，消耗了 ${manaCost} 点法力值。`, '#C10066');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
@@ -5922,18 +5921,22 @@ function performPoison() {
     }
 
     if (Math.random() < poisonChance) {
-        battleState.enemy.poisoned = true; // 30% 或 70% 概率中毒
+        applyPoisonEffect();
         logBattleEvent("深渊巨魔被施加了中毒效果，每次行动会扣除生命值。", '#C10066');
-        setTimeout(() => {
-            battleState.enemy.poisoned = false;
-            logBattleEvent("深渊巨魔的中毒效果消失了。");
-        }, 3000); // 中毒持续3秒
     }
     
-    playerTurn = false; // 轮到深渊巨魔回合
-    setTimeout(enemyAttack, 500); // 延迟0.5秒后深渊巨魔回合
+    playerTurn = false;
+    setTimeout(enemyAttack, 500);
     applyAscensionEffects();
     updateUI();
+}
+
+function applyPoisonEffect() {
+    battleState.enemy.poisoned = true;
+    setTimeout(() => {
+        battleState.enemy.poisoned = false;
+        logBattleEvent("深渊巨魔的中毒效果消失了。");
+    }, 3000);
 }
 
 function performDefense() {

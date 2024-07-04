@@ -1807,8 +1807,8 @@
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <p>生命值: <span id="your-pet-health"></span>/<span id="your-pet-max-health"></span></p>
-                    <p>法力值: <span id="your-pet-mana"></span>/<span id="your-pet-max-mana"></span></p>
+                    <p>生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></p>
+                    <p>法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></p>
                     <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="your-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
@@ -1825,8 +1825,8 @@
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <p>生命值: <span id="enemy-pet-health"></span>/<span id="enemy-max-health"></span></p>
-                    <p>法力值: <span id="enemy-pet-mana"></span>/<span id="enemy-max-mana"></span></p>
+                    <p>生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></p>
+                    <p>法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></p>
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
@@ -4510,8 +4510,6 @@ function showEffect(effectId, imageUrl) {
     }, 500); // 显示0.5秒
 }
 
-
-
 function toggleFightingDrawer() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -4654,8 +4652,6 @@ function updateEnemyAttributes() {
             return maxValueAt140 + remainingIncrease * (remainingRounds / 10);
         }
     }
-
-
         enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
         enemyPet.mana = Math.round(calculateAttributeValue('mana', enemyPet.mana));
         enemyPet.physicalAttack = Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack));
@@ -4663,7 +4659,6 @@ function updateEnemyAttributes() {
         enemyPet.magicAttack = Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack));
         enemyPet.magicDefense = Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense));
         enemyPet.speed = Math.round(calculateAttributeValue('speed', enemyPet.speed));
-
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
@@ -4680,9 +4675,7 @@ function initializeEnemyPet() {
         physicalDefense: 9,
         magicAttack: 6,
         magicDefense: 4,
-        speed: 20,
-        silenced: false,
-        stunned: false
+        speed: 20
     };
 
     enemyMaxHealth = enemyPet.health;
@@ -4756,7 +4749,6 @@ function refreshBattleAttributes() {
     updateUI();
 }
 
-
 function updateUI() {
     // 更新玩家的生命值和法力值
     const yourPetHealthElement = document.getElementById("your-pet-health");
@@ -4816,10 +4808,38 @@ function updateUI() {
     enemyLevel = battleRounds;
     document.getElementById('enemy-level').innerText = enemyLevel;
     updatePetLevel();
+    updateHealthAndManaDisplay();
 }
 
+function updateHealthAndManaDisplay() {
+    updateDisplay('your-pet-health', 'your-pet-max-health', '#cc0000', 20, '#cc0000');
+    updateDisplay('your-pet-mana', 'your-pet-max-mana', '#0066ff', 10, '#0066ff');
+    updateDisplay('enemy-pet-health', 'enemy-max-health', '#cc0000', 20, '#cc0000');
+    updateDisplay('enemy-pet-mana', 'enemy-max-mana', '#0066ff', 10, '#0066ff');
+}
 
+function updateDisplay(currentId, maxId, color, warningThreshold, warningColor) {
+    const currentElement = document.getElementById(currentId);
+    const maxElement = document.getElementById(maxId);
 
+    const currentValue = parseInt(currentElement.innerText);
+    const maxValue = parseInt(maxElement.innerText);
+
+    const percentage = (currentValue / maxValue) * 100;
+
+    currentElement.innerHTML = `
+        <div style="width: 100%; background-color: #888; border-radius: 5px; overflow: hidden; position: relative;">
+            <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background-color: ${color}; text-align: center; color: white; font-weight: bold; transition: width 0.5s ease-in-out;">
+                <span style="text-stroke: 1px black;">${currentValue}/${maxValue}</span>
+            </div>
+            ${percentage < warningThreshold ? `
+                <div id="${currentId}-warning" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 1px solid ${warningColor}; border-radius: 5px; animation: warning-blink 1s infinite;"></div>
+            ` : ''}
+        </div>
+    `;
+
+    maxElement.style.display = 'none';
+}
 
 function getPlayerStatus() {
     let status = [];
@@ -4831,7 +4851,6 @@ function getPlayerStatus() {
     if (battleState.player.spellSlow) status.push("法术迟钝");
     return status.join(", ");
 }
-
 
 function getEnemyStatus() {
     let status = [];
@@ -5024,8 +5043,7 @@ function enemyInfo() {
             document.body.removeChild(popup);
         }
     });
-}
-        
+}        
 //跳过十轮函数
 function jumpByTenRounds() {
     const maxSkipRounds = Math.min(100, petLevel + 20);
@@ -5058,7 +5076,6 @@ function jumpByTenRounds() {
 }
 //自动战斗函数
 let autoBattleInterval = null; // 定义自动战斗的全局变量
-
 function autoBattle() {
     // 如果自动战斗已经在进行，停止自动战斗
     if (autoBattleInterval !== null) {
@@ -5113,7 +5130,6 @@ function autoBattle() {
         performAttack(attackType);
     }, 300); // 每0.3秒执行一次自动战斗逻辑
 }
-
 // 定义初始暴击率和暴击伤害
 let playerCritRate = 0.1; // 10%
 let playerCritDamage = 1.5; // 150%
@@ -5267,7 +5283,6 @@ function levelUpSkill() {
     document.body.appendChild(overlay);
 }
 
-
 function handleLevelUp() {
     const selectedSkillElement = document.querySelector('.selected-skill');
     if (!selectedSkillElement) {
@@ -5308,6 +5323,7 @@ function handleLevelUp() {
     updateExpBar();
     updateUI();
 }
+
 function getSkillByType(type) {
     const skillsArea = document.getElementById("skills-area");
     if (!skillsArea) {
@@ -5334,7 +5350,6 @@ function calculateSkillLevelAndMultiplier(skill) {
     const skillMultiplier = skill.multiplier * (1 + 0.1 * (skillLevel - 1));
     return { skillLevel, skillMultiplier };
 }
-
 
 function selectSkillAndCalculateMultiplier(type) {
     let selectedSkills = [];
@@ -5425,7 +5440,6 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     return damage;
 }
 
-
 function performMagicalAttack(skillMultiplier, isSkillUsed) {
     let damage;
     let isCritical = checkCriticalHit(playerCritRate);
@@ -5467,8 +5481,6 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     return { damage, retryPhysical: false };
 }
-
-
 
 function handleCriticalAndDrunken(damage) {
     let isCritical = checkCriticalHit(playerCritRate);
@@ -5541,7 +5553,6 @@ function performAttack(type) {
     applyAscensionEffects();
 }
 
-
 function applyDefenseBonus() {
     if (battleState.player.defenseBonus) {
         const { critRate, critDamage } = battleState.player.defenseBonus;
@@ -5555,7 +5566,6 @@ function applyDefenseBonus() {
         battleState.player.defenseBonus = null; // 重置增益状态
     }
 }
-
 
 function performIndependentMagicAttack() {
     if (!battleState || !battleState.enemy) {
@@ -5626,7 +5636,6 @@ function performIndependentMagicAttack() {
     }
 }
 
-
 function applyPhysicalAttackEffects(multiplier) {
     const effects = ['armorBreak', 'intimidate', 'benumb'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
@@ -5687,8 +5696,6 @@ function applyPhysicalAttackEffects(multiplier) {
         }
     }
 }
-
-
 
 function applyMagicAttackEffects(damage, multiplier) {
     const effects = ['silence', 'stun', 'slow', 'daze', 'exorcise', 'burnt'];
@@ -5765,8 +5772,6 @@ function applyMagicAttackEffects(damage, multiplier) {
         }, 10000); // 灼烧持续10秒
     }
 }
-
-
 // 应用双技能的战斗增益效果
 function applyAscensionEffects() {
     resetBattleStateEffects();
@@ -5846,7 +5851,6 @@ function applySingleAscensionEffect(skill) {
     }
 }
 
-        
 let poisonSkillActivated = false;
 
 function performPoison() {
@@ -6025,8 +6029,6 @@ function performDefense() {
     applyAscensionEffects();
     updateUI();
 }
-
-
 //应用智慧守护
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -6088,7 +6090,6 @@ function handleManaRecover() {
         logBattleEvent(`${hlSkill.name} ${skillLevel}级生效，恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
     }
 }
-        
 // 更新 enemyAttack 函数，确保战斗效果生效
 function enemyAttack() {
     if (!battleState || !battleAttributes || !battleState.enemy) {
@@ -6189,8 +6190,7 @@ function enemyHeal() {
     updateUI();
     handleManaRecover();
 }
-
-        
+  
 function handleDazed() {
     if (battleState.enemy.dazed) {
         logBattleEvent("深渊巨魔混乱，可能会攻击自己。", 'wheat');
@@ -6230,7 +6230,6 @@ function performEnemyPhysicalAttack(isCritical) {
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66728e8dd9c307b7e956a4e4.gif');
     return damage;
 }
-
 //深渊巨魔使用法术攻击
 function performEnemyMagicalAttack(isCritical) {
     if (battleState.enemy.mana < 50) {
@@ -6452,8 +6451,7 @@ function handlePoison() {
         logBattleEvent(`深渊巨魔中毒，失去了 ${poisonDamage} 点生命值。`, '#C10066');
     }
 }
-
-        
+     
 function performHeal() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -6548,12 +6546,8 @@ function performHeal() {
     applyAscensionEffects();
     updateUI();
 }
-
-
-
 // 将 firstStartBattle 定义为全局变量
 let firstStartBattle = false;
-
 function startBattle() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -6694,7 +6688,6 @@ function gainExp() {
     updateExpBar(); // 更新经验条显示
 }
 
-
 function updateExpBar() {
     document.getElementById("exp-bar").innerText = `${currentExp} / ${maxExp}`;
 }
@@ -6752,7 +6745,6 @@ function resetBattleState(playerWon) {
     enemyHealCount = 0; // 重置怪物治疗次数
     updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
 }
-
 
 function setBackgroundImage(imageUrl) {
     const drawer = document.querySelector('.battle-system-drawer');
@@ -7729,7 +7721,7 @@ let jinnangItems = [
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
-    { name: 'ultraSkillBoomer', displayName: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 1, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
+    { name: 'ultraSkillBoomer', displayName: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -9458,29 +9450,30 @@ function upgradeWisdom() {
 
 
 function trainSkills() {
-const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
+    const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
 
-if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
-    showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", () => {
-        if (useItem('ultraSkillBoomer', 1)) {
-            const maxSkills = Math.min(12, currentPet.skills.length);
-            const skillNum = Math.floor(Math.random() * (3)) + 10; // 10到12个技能
-            const selectedSkills = [];
+    if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
+        showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", () => {
+            if (useItem('ultraSkillBoomer', 1)) {
+                const maxSkills = Math.min(12, currentPet.skills.length);
+                const skillNum = Math.floor(Math.random() * 3) + 10; // 10到12个技能
+                const selectedSkills = [];
 
-            while (selectedSkills.length < skillNum) {
-                const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
-                if (!selectedSkills.includes(randomSkill)) {
-                    selectedSkills.push(randomSkill);
+                while (selectedSkills.length < skillNum) {
+                    const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
+                    if (!selectedSkills.includes(randomSkill)) {
+                        selectedSkills.push(randomSkill);
+                    }
                 }
-            }
 
-            updateSkillsArea(selectedSkills);
-            updateSkillScore(selectedSkills);
-            updateTitle();
-            showInfoBox("你的爱宠如醍醐灌顶般得到仙人点化！");
-        }
-    }, () => {
-        // 取消使用仙人醍醐丹时执行transmutationPill逻辑
+                updateSkillsArea(selectedSkills);
+                updateSkillScore(selectedSkills);
+                updateTitle();
+                showInfoBox("你的爱宠如醍醐灌顶般得到仙人点化！");
+            }
+        });
+    } else {
+        // 当背包没有ultraSkillBoomer时执行transmutationPill逻辑
         if (transmutationPill < 1) {
             showInfoBox("您的道具不够，请刷新后重试！");
             return;
@@ -9546,10 +9539,9 @@ if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
         updateSkillsArea(selectedSkills);
         updateSkillScore(selectedSkills);
         updateTitle();
-    });
-    return;
     }
 }
+
 
 function getRandomSkillNum(probabilities) {
     const total = probabilities.reduce((sum, prob) => sum + prob, 0);
@@ -10958,7 +10950,16 @@ function updateTitle() {
 
 // 绑定按钮点击事件自动战斗
 document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
-
+// 添加警示闪烁的关键帧动画
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes warning-blink {
+        0% { box-shadow: 0 0 5px ${warningColor}; }
+        50% { box-shadow: none; }
+        100% { box-shadow: 0 0 5px ${warningColor}; }
+    }
+`;
+document.head.appendChild(style);
     </script>
 </body>
 </html>

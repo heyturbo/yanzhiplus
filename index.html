@@ -3126,14 +3126,23 @@ function petCollection() {
 
 function updateCollectionBonus() {
     const bonusInfoDiv = document.getElementById('bonusInfo');
-    const hpBonus = Math.floor(collectedPetCount * 0.05 * 100);
-    const mpBonus = Math.floor(collectedPetCount * 0.04 * 100);
+    const hpBonus = Math.round(collectedPetCount * 0.05 * 100);
+    const mpBonus = Math.round(collectedPetCount * 0.04 * 100);
+    const physicalAttackBonus = Math.round(collectedPetCount * 0.012 * 100);
+    const magicalAttackBonus = Math.round(collectedPetCount * 0.01 * 100);
+    const physicalDefenseBonus = Math.round(collectedPetCount * 0.035 * 100);
+    const magicalDefenseBonus = Math.round(collectedPetCount * 0.035 * 100);
+    const speedBonus = Math.round(collectedPetCount * 0.001 * 100);
 
     bonusInfoDiv.innerHTML = `
-        <div>图鉴加成</div>
         <div>收录宠物数量: ${collectedPetCount}</div>
         <div>HP 加成: +${hpBonus}%</div>
         <div>MP 加成: +${mpBonus}%</div>
+        <div>物攻 加成: +${physicalAttackBonus}%</div>
+        <div>法攻 加成: +${magicalAttackBonus}%</div>
+        <div>物防 加成: +${physicalDefenseBonus}%</div>
+        <div>法防 加成: +${magicalDefenseBonus}%</div>
+        <div>速度 加成: +${speedBonus}%</div>
     `;
 }
 
@@ -8215,12 +8224,23 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
         magicDefense: Math.floor((currentAttributes.endurance * 2.2 + currentAttributes.intelligence * 0 + currentAttributes.strength * 0 + currentAttributes.agility * 0 + currentAttributes.faith * 0) * multiplier),
         speed: Math.floor((currentAttributes.endurance * 0.2 + currentAttributes.intelligence * 0.1 + currentAttributes.strength * 0.2 + currentAttributes.agility * 2 + currentAttributes.faith * 0.2) * multiplier)
     };
-
+    
     // 图鉴加成
-    const collectionBonusMultiplier = 1 + collectedPetCount * 0.05;
-
-    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * collectionBonusMultiplier);
-    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * collectionBonusMultiplier);
+    const hpBonus = 1 + collectedPetCount * 0.05;
+    const mpBonus = 1 + collectedPetCount * 0.04;
+    const physicalAttackBonus = 1 + collectedPetCount * 0.012;
+    const magicalAttackBonus = 1 + collectedPetCount * 0.01;
+    const physicalDefenseBonus = 1 + collectedPetCount * 0.035;
+    const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
+    const speedBonus = 1 + collectedPetCount * 0.001;
+    
+    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus);
+    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus);
+    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus);
+    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus);
+    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus);
+    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus);
+    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus);
 
     // 累加武装增益值
     Object.keys(armsAttributes).forEach(key => {

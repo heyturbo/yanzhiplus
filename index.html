@@ -1848,10 +1848,10 @@
                     <p>法攻增加: <span id="spirit-magic-attack">0</span></p>
                     <p>法防增加: <span id="spirit-magic-defense">0</span></p>
                     <p>速度增加: <span id="spirit-speed">0</span></p>
-                    <button id="level-up-spirit">精灵升级</button>
+                    <button id="level-up-spirit">升级精灵</button>
                     <button id="enhance-spirit">增幅洗练</button>
-                    <button id="auto-level-up-spirit">一键升级</button>
-                    <button id="close-spirit-modal">关闭面板</button>
+                    <button id="auto-level-up-spirit">一键速升</button>
+                    <button id="close-spirit-modal">关闭面板</button>                    
                 </div>
             </div>            
             <!-- 飞升之术面板 -->
@@ -3163,7 +3163,7 @@ function changePet(skipConfirmation = false) {
 
     const changeSelectedPet = () => {
         const selectedPet = pets[selectedPetKey];
-        console.log('Selected Pet:', selectedPet);
+        //console.log('Selected Pet:', selectedPet);
 
         if (selectedPet) { // 检查选中的宠物是否存在
             currentPetKey = selectedPetKey;
@@ -3427,8 +3427,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const petSelect = document.getElementById('pet-select');
     const options = Array.from(petSelect.options).map(option => option.value);
     const keys = Object.keys(pets);
-    console.log('Options in select:', options);
-    console.log('Keys in pets:', keys);
+    //console.log('Options in select:', options);
+    //console.log('Keys in pets:', keys);
 
     keys.forEach(key => {
         if (!options.includes(key)) {
@@ -3501,7 +3501,7 @@ function completeTask(taskId) {
         return;
     }
 
-    console.log(`完成任务: ${taskId}, 任务系列: ${taskSeries}`);
+    //console.log(`完成任务: ${taskId}, 任务系列: ${taskSeries}`);
 
     if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
         task.completed = true;
@@ -4867,6 +4867,7 @@ function getPlayerStatus() {
 function getEnemyStatus() {
     let status = [];
     if (battleState.enemy.rampaged) status.push("狂暴");
+    if (battleState.enemy.revived) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
     if (battleState.enemy.silenced) status.push("沉默");
     if (battleState.enemy.poisoned) status.push("中毒");
@@ -6102,6 +6103,7 @@ function handleManaRecover() {
         logBattleEvent(`${hlSkill.name} ${skillLevel}级生效，恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
     }
 }
+
 // 更新 enemyAttack 函数，确保战斗效果生效
 function enemyAttack() {
     if (!battleState || !battleAttributes || !battleState.enemy) {
@@ -6109,16 +6111,17 @@ function enemyAttack() {
         return;
     }
 
+    handleRampaged();
+
     if (handleDazed()) return;
     if (handleStunned()) return;
 
-    // 深渊巨魔治疗逻辑
     const enemyHealthPercentage = battleState.enemy.health / enemyMaxHealth;
     const healProbability = enemyHealthPercentage < 0.3 ? 0.7 : 0.1;
 
     if (Math.random() < healProbability) {
         enemyHeal();
-        return; // 治疗后结束深渊巨魔回合
+        return;
     }
 
     let damage;
@@ -6139,7 +6142,7 @@ function enemyAttack() {
         return;
     }
 
-    damage = handleWiseDefense(damage); // 添加这一行
+    damage = handleWiseDefense(damage);
     
     handleBurnt();
     handleCriticalHit(isCritical);
@@ -6147,7 +6150,7 @@ function enemyAttack() {
     handleReflectAndHeal(damage);
     handleResurrection(damage);
     handlePoison();
-    handleManaRecover(); // 在深渊巨魔攻击后调用 handleManaRecover 函数
+    handleManaRecover();
 
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
@@ -6159,6 +6162,47 @@ function enemyAttack() {
         playerTurn = true;
     }
 }
+
+function handleRampaged() {
+    console.log(`handleRampaged called. battleRounds: ${battleRounds}, enemy health: ${battleState.enemy.health}, enemyMaxHealth: ${enemyMaxHealth}`);
+
+    if (battleRounds > 0 && battleRounds % 10 === 0) {
+        enemyCritRate = 1;
+        enemyCritDamage = battleRounds === 150 ? 3.5 : 2.2;
+        battleState.enemy.rampaged = true;
+        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
+        console.log('Enemy is rampaged.');
+
+        if (!battleState.enemy.revivalCount) {
+            battleState.enemy.revivalCount = 0;
+        }
+
+        // 检查并处理敌人复活机制
+        if (battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
+            battleState.enemy.revivalCount += 1;
+            logBattleEvent("深渊巨魔的生命力正在复苏，请在3秒内击杀它，否则它将复活！", "red");
+            battleState.enemy.revived = true;
+            console.log(`Revival triggered. revivalCount: ${battleState.enemy.revivalCount}`);
+
+            setTimeout(() => {
+                if (battleState.enemy.health < enemyMaxHealth) {
+                    battleState.enemy.health = enemyMaxHealth;
+                    logBattleEvent("深渊巨魔复生成功，生命值恢复到100%！", "red");
+                    battleState.enemy.revived = false;
+                    updateUI();
+                    console.log('Enemy revived to full health.');
+                }
+            }, 3000);
+        }
+    } else {
+        enemyCritRate = 0.6;
+        enemyCritDamage = 1.8;
+        battleState.enemy.rampaged = false;
+        setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
+        console.log('Enemy is not rampaged.');
+    }
+}
+
 
 function enemyHeal() {
     if (enemyHealCount >= 10) {
@@ -6280,7 +6324,7 @@ const effectCooldowns = {
 };
 
 function applyEnemyMagicEffects(damage) {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold','spellSlow'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
     effects.forEach(effect => {
         const effectChance = Math.random();
         switch (effect) {
@@ -6360,6 +6404,16 @@ function applyEnemyMagicEffects(damage) {
         }
     });
 }
+
+function clearEnemyEffect() {
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
+    effects.forEach(effect => {
+        battleState.player[effect] = false;
+        effectCooldowns[effect] = false;
+    });
+    updatePlayerStatusDisplay();
+}
+
 
 function handleBurnt() {
     if (battleState.enemy.burnt) {
@@ -6637,6 +6691,7 @@ function showNextBattlePrompt(playerWon) {
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
+    clearEnemyEffect();
 }
 
 function resetBuffState(playerWon) {
@@ -6706,9 +6761,7 @@ function updateExpBar() {
 
 function resetBattleState(playerWon) {
     if (!playerWon) {
-        // 如果玩家没有获胜,则恢复怪物属性到本轮初始状态
         restoreEnemyState();
-        // 检查焉知非福状态
         if (ascensionSkill.name === '焉知非福' || secondAscensionSkill.name === '焉知非福') {
             battleState.player.divineProtection = true;
             const duration = (ascensionSkill.name === '焉知非福' ? (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) : 0) +
@@ -6721,42 +6774,26 @@ function resetBattleState(playerWon) {
         }
     }
 
-    updateUI(); // 更新UI显示
+    updateUI();
 
-    // 检查当前回合数
-    if (battleRounds >= 151) {
+    if (battleRounds === 151) {
         showInfoBox("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!继续战斗会进入无尽挑战模式。");
     }
 
-    // 处理深渊巨魔暴走 (rampage) 的逻辑
-    if (battleRounds > 0 && battleRounds % 10 === 0) {
-        enemyCritRate = 1; // 100%
-        enemyCritDamage = battleRounds === 150 ? 3.5 : 2.2; // 150轮时为300%，其他10的倍数轮为200%
-        battleState.enemy.rampaged = true;
-        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
-        logBattleEvent("请万分小心，深渊巨魔进入狂暴状态，暴击伤害极大增强！", "red");
-    } else {
-        enemyCritRate = 0.6; // 60%
-        enemyCritDamage = 1.8; // 180%
-        battleState.enemy.rampaged = false;
-        setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
-    }
-
-    // 重置敌人的麻痹状态
     if (battleState.enemy.benumbed) {
-        enemyMaxHealth = battleState.enemy.originalMaxHealth || enemyMaxHealth; // 如果 originalMaxHealth 丢失，则使用当前 maxHealth
+        enemyMaxHealth = battleState.enemy.originalMaxHealth || enemyMaxHealth;
         battleState.enemy.benumbed = false;
         battleState.enemy.benumbStack = 0;
         battleState.enemy.originalMaxHealth = undefined;
     }
 
-    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink"); // 记录新一轮战斗开始的事件
-    
-    // 存储怪物的初始状态
+    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink");
+
     storeEnemyInitialState();
-    enemyHealCount = 0; // 重置怪物治疗次数
-    updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
+    enemyHealCount = 0;
+    updatePetInfo();
 }
+
 
 function setBackgroundImage(imageUrl) {
     const drawer = document.querySelector('.battle-system-drawer');
@@ -7324,7 +7361,7 @@ function increaseRandomQuality(increaseValue) {
 
     // 如果没有任何资质值被增加，说明所有资质都已达最大值
     if (!addedValue) {
-        console.log("所有资质已达最大值，进化不会带来任何资质值的提升");
+        //console.log("所有资质已达最大值，进化不会带来任何资质值的提升");
     }
 
     // 更新资质卡片
@@ -7359,7 +7396,7 @@ function useSupremeWisdomPill() {
 function increasePetLevel(levels) {
     if (petLevel >= petMaxLevel) {
         showInfoBox("宠物等级已达上限，无法继续升级！");
-        console.log("Level Up Error: Max level reached.");
+        //console.log("Level Up Error: Max level reached.");
         return;
     }
 
@@ -7375,7 +7412,7 @@ function increasePetLevel(levels) {
     updateRemainingPointsDisplay();
     updateTitle();
 
-    console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
+    //console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
 }
         
 // Function to handle normal experience absorption
@@ -7916,11 +7953,11 @@ let armsAttributes = {
 let armsOpened = false;
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOMContentLoaded: armsOpened:', armsOpened); // 调试输出
+    //console.log('DOMContentLoaded: armsOpened:', armsOpened); // 调试输出
 });
 
 function handlePetArmsClick() {
-    console.log('petArms clicked: armsOpened:', armsOpened); // 调试输出
+    //console.log('petArms clicked: armsOpened:', armsOpened); // 调试输出
 
     if (!armsOpened) {
         openPetArms();
@@ -7935,7 +7972,7 @@ function openPetArms() {
         showInfoBox("你花费10万文金子（100两），为宠物开启了灵兽武装，现在有更强的能力提升方式了！");
         updateGoldDisplay(goldAmount);
         armsOpened = true;
-        console.log('openPetArms: armsOpened set to true'); // 调试输出
+        //console.log('openPetArms: armsOpened set to true'); // 调试输出
         showPetArmsWindow();
     } else {
         showInfoBox("你的金子不足10万文（100两），无法开启武装系统！");
@@ -7943,7 +7980,7 @@ function openPetArms() {
 }
 
 function showPetArmsWindow() {
-    console.log('showPetArmsWindow: armsOpened:', armsOpened); // 调试输出
+    //console.log('showPetArmsWindow: armsOpened:', armsOpened); // 调试输出
 
     // 清空之前的窗口内容
     const existingArmsWindow = document.getElementById('petArmsWindow');
@@ -8176,7 +8213,7 @@ function lockArms() {
         }
     });
     armsOpened = false;
-    console.log('All arms are now locked.');
+    //console.log('All arms are now locked.');
 }
 
 function removeArmsAttributes() {
@@ -8186,7 +8223,7 @@ function removeArmsAttributes() {
         armsAttributes[key].attribute = null;
         armsAttributes[key].forgedInfo = null;
     });
-    console.log('All arms attributes have been reset to zero.');
+    //console.log('All arms attributes have been reset to zero.');
 }
 
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
@@ -8378,7 +8415,7 @@ function trainAttributes() {
         bonusAttributes.agility += Math.floor(currentAttributes.agility * (multiplier - 1));
         bonusAttributes.faith += Math.floor(currentAttributes.faith * (multiplier - 1));
 
-        console.log("Updated Bonus Attributes:", bonusAttributes);
+        //console.log("Updated Bonus Attributes:", bonusAttributes);
 
         // 增加金子培养次数
         trainingCount++;
@@ -9472,12 +9509,12 @@ function upgradeWisdom() {
     updateAttributePanel(); // 更新属性面板
 }
 
-
 function trainSkills() {
     const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
 
     if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
-        showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", () => {
+        showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
+        () => {
             if (useItem('ultraSkillBoomer', 1)) {
                 const maxSkills = Math.min(12, currentPet.skills.length);
                 const skillNum = Math.floor(Math.random() * 3) + 10; // 10到12个技能
@@ -9494,78 +9531,86 @@ function trainSkills() {
                 updateSkillScore(selectedSkills);
                 updateTitle();
                 showInfoBox("你的爱宠如醍醐灌顶般得到仙人点化！");
+            } else {
+                executeTransmutationPillLogic();
             }
+        }, 
+        () => {
+            executeTransmutationPillLogic();
         });
     } else {
         // 当背包没有ultraSkillBoomer时执行transmutationPill逻辑
-        if (transmutationPill < 1) {
-            showInfoBox("您的道具不够，请刷新后重试！");
-            return;
-        }
-
-        transmutationPill--;
-        document.getElementById("transmutation-pill").innerText = transmutationPill;
-
-        let skillNum;
-        if (currentWisdom < 13) {
-            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
-        } else if (currentWisdom < 17) {
-            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
-        } else if (currentWisdom < 19) {
-            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
-        } else if (currentWisdom < 20) {
-            skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
-        } else {
-            skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
-        }
-
-        const selectedSkills = [];
-        for (let i = 0; i < skillNum; i++) {
-            let skill;
-            do {
-                const rarityRoll = Math.random() * 100;
-                if (currentWisdom < 7) {
-                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                    else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                } else if (currentWisdom < 13) {
-                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                    else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                } else if (currentWisdom < 17) {
-                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                } else if (currentWisdom < 20) {
-                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                } else {
-                    if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                    else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                    else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                    else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-                }
-            } while (!skill || selectedSkills.includes(skill));
-            selectedSkills.push(skill);
-        }
-
-        if (selectedSkills.length >= 8) {
-            showInfoBox("你把技能洗爆了,点击确定查看!", () => {
-                updateSkillsArea(selectedSkills);
-                updateSkillScore(selectedSkills);
-                updateTitle();
-            });
-            return;
-        }
-
-        updateSkillsArea(selectedSkills);
-        updateSkillScore(selectedSkills);
-        updateTitle();
+        executeTransmutationPillLogic();
     }
 }
 
+function executeTransmutationPillLogic() {
+    if (transmutationPill < 1) {
+        showInfoBox("您的道具不够，请刷新后重试！");
+        return;
+    }
+
+    transmutationPill--;
+    document.getElementById("transmutation-pill").innerText = transmutationPill;
+
+    let skillNum;
+    if (currentWisdom < 13) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 5);
+    } else if (currentWisdom < 17) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 6);
+    } else if (currentWisdom < 19) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 7);
+    } else if (currentWisdom < 20) {
+        skillNum = Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02]), 8);
+    } else {
+        skillNum = Math.max(3, getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]));
+    }
+
+    const selectedSkills = [];
+    for (let i = 0; i < skillNum; i++) {
+        let skill;
+        do {
+            const rarityRoll = Math.random() * 100;
+            if (currentWisdom < 7) {
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+            } else if (currentWisdom < 13) {
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+            } else if (currentWisdom < 17) {
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+            } else if (currentWisdom < 20) {
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+            } else {
+                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
+                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
+                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
+                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
+            }
+        } while (!skill || selectedSkills.includes(skill));
+        selectedSkills.push(skill);
+    }
+
+    if (selectedSkills.length >= 8) {
+        showInfoBox("你把技能洗爆了,点击确定查看!", () => {
+            updateSkillsArea(selectedSkills);
+            updateSkillScore(selectedSkills);
+            updateTitle();
+        });
+        return;
+    }
+
+    updateSkillsArea(selectedSkills);
+    updateSkillScore(selectedSkills);
+    updateTitle();
+}
 
 function getRandomSkillNum(probabilities) {
     const total = probabilities.reduce((sum, prob) => sum + prob, 0);
@@ -9958,7 +10003,7 @@ function updateAttributePanel() {
         faith: currentAttributes.faith
     };
 
-    console.log("Total Attributes:", totalAttributes);
+    //console.log("Total Attributes:", totalAttributes);
 
     document.getElementById("attribute-tier").innerText = qualities.tier;
     document.getElementById("attribute-growth-rate").innerText = growthRateDisplay;
@@ -10003,8 +10048,8 @@ function calculateGrowthRateDisplayAndValue(qualities) {
         growthRateDisplay = `${Math.round(growthRate * 100)}%`;
     }
 
-    console.log("Growth Rate:", growthRate);
-    console.log("Growth Rate Display:", growthRateDisplay);
+    //console.log("Growth Rate:", growthRate);
+    //console.log("Growth Rate Display:", growthRateDisplay);
 
     return { growthRateDisplay, growthRate };
 }
@@ -10022,8 +10067,8 @@ function calculateCurrentAttributes() {
         faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.faith
     };
 
-    console.log("Current Attributes:", attributes);
-    console.log("Bonus Attributes:", bonusAttributes);
+    //console.log("Current Attributes:", attributes);
+    //console.log("Bonus Attributes:", bonusAttributes);
 
     return attributes;
 }
@@ -10034,7 +10079,6 @@ const allocationCount = {}; // 用于记录每个属性的连续分配次数
 
 function updateRemainingPointsDisplay() {
     document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
-    console.log(`Remaining Points Display Updated: ${remainingPoints}`);
 }
 
 function increaseBonusAttribute(attribute) {
@@ -10063,21 +10107,21 @@ function increaseBonusAttribute(attribute) {
             allocationCount[attribute] = 0; // 重置计数
             updateAttributePanel();
             updateRemainingPointsDisplay();
-            console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
         }, () => {
             allocationCount[attribute] = 0; // 重置计数
             bonusAttributes[attribute] += 1;
             remainingPoints -= 1;
             updateAttributePanel();
             updateRemainingPointsDisplay();
-            console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
         });
     } else {
         bonusAttributes[attribute] += 1;
         remainingPoints -= 1;
         updateAttributePanel();
         updateRemainingPointsDisplay();
-        console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+        //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
     }
 }
 
@@ -10686,7 +10730,7 @@ function increasePetLevelCheat(levels) {
     updateRemainingPointsDisplay();
     updateTitle();
 
-    console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
+    //console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
 }
 
 function ascendCheat() {

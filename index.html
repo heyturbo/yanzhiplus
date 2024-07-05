@@ -1518,7 +1518,6 @@
 .info-text {
     flex-grow: 1;
 }
-
    </style>
 </head>
 <body>
@@ -1541,7 +1540,6 @@
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
                 <button id="fightingButton" onclick="toggleFightingDrawer()">战斗</button>
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
-
             </div>
         </div>
         <div class="skills" id="skills-area"></div>
@@ -4131,6 +4129,20 @@ let ascensionEnabled = false;
 
 // 监听开启增益按钮点击事件
 document.getElementById('enable-ascension').addEventListener('click', handleAscensionButtonClick);
+function updateAscensionButton() {
+    const ascensionButton = document.getElementById('enable-ascension');
+    if (ascensionEnabled) {
+        ascensionButton.innerText = '技能说明';
+        ascensionButton.style.backgroundColor = 'darkred';
+        ascensionButton.removeEventListener('click', handleAscensionButtonClick);
+        ascensionButton.addEventListener('click', ascensionSkillDescription);
+    } else {
+        ascensionButton.innerText = '开启增益';
+        ascensionButton.style.backgroundColor = '';
+        ascensionButton.removeEventListener('click', ascensionSkillDescription);
+        ascensionButton.addEventListener('click', handleAscensionButtonClick);
+    }
+}
 
 function handleAscensionButtonClick() {
     if (!ascend) {
@@ -4140,11 +4152,6 @@ function handleAscensionButtonClick() {
 
     if (ascensionEnabled) {
         // 已开启飞升之术时，按钮变为“技能大全”
-        const ascensionButton = document.getElementById('enable-ascension');
-        ascensionButton.innerText = '技能大全';
-        ascensionButton.style.backgroundColor = 'darkred';
-        ascensionButton.removeEventListener('click', handleAscensionButtonClick);
-        ascensionButton.addEventListener('click', ascensionSkillDescription);
         ascensionSkillDescription(); // 直接执行技能大全
     } else {
         // 未开启飞升之术时，执行开启逻辑
@@ -4153,18 +4160,14 @@ function handleAscensionButtonClick() {
             refreshAscensionSkill(); // 随机生成一个飞升之术
             applyAscensionBonus(); // 应用飞升之术增益
             ascensionEnabled = true; // 设置飞升之术已开启
-            
-            // 按钮变为“技能大全”
-            const ascensionButton = document.getElementById('enable-ascension');
-            ascensionButton.innerText = '技能说明';
-            ascensionButton.style.backgroundColor = 'darkred';
-            ascensionButton.removeEventListener('click', handleAscensionButtonClick);
-            ascensionButton.addEventListener('click', ascensionSkillDescription);
         } else {
             showInfoBox('您的心鉴之石不足！');
         }
     }
+
+    updateAscensionButton(); // 更新按钮状态
 }
+
 
 function ascensionSkillDescription() {
     let skillDescriptions = [];
@@ -9375,6 +9378,7 @@ function resetPet() {
     updateAscensionStatus();
     updateAscensionDisplay();
     updateAwakenStatus();
+    updateAscensionButton();
 }
 
 function setInnerText(id, value) {
@@ -10980,6 +10984,7 @@ style.innerHTML = `
     }
 `;
 document.head.appendChild(style);
+
     </script>
 </body>
 </html>

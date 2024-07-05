@@ -1692,12 +1692,12 @@
             </div>
             <div class="button-grid">
                 <button onclick="trainAttributes()">金子培养</button>
-                <button onclick="absorbExperience()">提升一级</button>
-                <button onclick="absorbAdvancedExperience()">提升三级</button>
+                <button onclick="absorbExperience()">吸收经验</button>
                 <button onclick="upgradeWisdom()">提升悟性</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">超级提悟</button>
                 <button onclick="ascend()">飞升突破</button>
+                <button onclick="transformPet()">宠物转职</button>
                 <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
                 <button onclick="showBiography()">解锁传记</button>
@@ -2047,7 +2047,7 @@
                   { name: '焰灵护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
                   { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
                   { name: '浴火重生', rarity: 'B', type: 'PH', multiplier: 1.4, description: '死亡后自动复活' },
-                  { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.4, description: '生命上限上升' },
+                  { name: '智慧祷言', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '火焰甲胄', rarity: 'A', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
                   { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
                   { name: '火焰环绕', rarity: 'S', type: 'PP', multiplier: 1.8, description: '为友军增加一个可以对物理攻击进行反伤状态' },
@@ -2073,7 +2073,7 @@
                   { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.3, description: '法术防御上升' },
                   { name: '致命喷射', rarity: 'B', type: 'PA', multiplier: 1.6, description: '对目标及其周围共6个目标造成物理伤害' },
                   { name: '野性冲撞', rarity: 'B', type: 'PA', multiplier: 1.5, description: '单体攻击有几率令目标晕眩' },
-                  { name: '灵力充盈', rarity: 'B', type: 'PH', multiplier: 1.2, description: '速度上升' },
+                  { name: '灵力充盈', rarity: 'B', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2, description: '对十字范围造成物理伤害并有几率附带混乱效果' },
                   { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 0, description: '物理攻击上升' },
                   { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '生命上限上升' },
@@ -2159,7 +2159,7 @@
                 skills: [
                   { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 0, description: '法术防御上升' },
                   { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '耐力上升' },
-                  { name: '天生灵性', rarity: 'A', type: 'N', multiplier: 0, description: '法力值上限上升' },
+                  { name: '天生灵性', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '嗜血狂暴', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
                   { name: '撕咬', rarity: 'A', type: 'PA', multiplier: 1.3, description: '对目标造成物理伤害' },
                   { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 0, description: '物理攻击上升' },
@@ -2281,7 +2281,7 @@
                     { name: '隐瞒身份（防御）', rarity: 'B', type: 'PD', multiplier: 1.2, description: '主动技能，他隐藏了自己的明星身份，只为在她面前做个普通人，享受片刻的平凡。' },
                     { name: '温柔一面（治疗）', rarity: 'S', type: 'PH', multiplier: 2, description: '主动技能，她在后台看到了他温柔的一面，这让她对他有了新的认识。' },
                     { name: '共同依赖（防御）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，在偏远小镇的日子里，他们面对未知的危险，渐渐彼此依赖。' },
-                    { name: '发现真心（治疗）', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
+                    { name: '发现真心（回蓝）', rarity: 'A', type: 'HL', multiplier: 0.2, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
                     { name: '日记重现（治疗）', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，一本旧日记让她找回了失去的记忆，重新记起了他们之间的点点滴滴。' },
                     { name: '心灵触动（法攻）', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
                     { name: '保护她（物攻）', rarity: 'S', type: 'PA', multiplier: 2.5, description: '主动技能，他在关键时刻挺身而出，保护她免受伤害，展现了真正的男子汉气概。' },
@@ -3595,8 +3595,8 @@ let drugInventory = {
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
-    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验*200%" },
-    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验*400%" }
+    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验增加两倍" },
+    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验增加四倍" }
 };
 let alreadyUseDrug = false;
 
@@ -4623,30 +4623,30 @@ function updatePetInfo() {
 
 function updateEnemyAttributes() {
     const maxValues = {
-        health: 500000000,
-        mana: 50000000,
-        physicalAttack: 2400000,
+        health: 800000000,
+        mana: 200000000,
+        physicalAttack: 2800000,
         physicalDefense: 550000,
-        magicAttack: 1800000,
+        magicAttack: 2200000,
         magicDefense: 450000,
         speed: 108020
     };
 
     const increasePerRound = {
-        health: 3000,
-        mana: 1200,
-        physicalAttack: 400,
-        physicalDefense: 240,
-        magicAttack: 300,
-        magicDefense: 220,
-        speed: 300
+        health: 6000,
+        mana: 3200,
+        physicalAttack: 700,
+        physicalDefense: 620,
+        magicAttack: 650,
+        magicDefense: 610,
+        speed: 150
     };
 
     function calculateAttributeValue(attribute, initialValue) {
         if (battleRounds <= 100) {
-            return initialValue + 1 * increasePerRound[attribute];
+            return initialValue + 2 * increasePerRound[attribute];
         } else if (battleRounds <= 130) {
-            const initialIncrease = 5 * increasePerRound[attribute];
+            const initialIncrease = 8 * increasePerRound[attribute];
             const remainingRounds = battleRounds - 100;
             const maxValueAt130 = maxValues[attribute] * 0.6;
             const remainingIncrease = maxValueAt130 - (initialValue + initialIncrease);
@@ -5276,6 +5276,25 @@ function levelUpSkill() {
     };
     buttonContainer.appendChild(levelUpButton);
 
+    const bulkLevelUpButton = document.createElement('button');
+    bulkLevelUpButton.innerText = '全部升级';
+    bulkLevelUpButton.style.padding = '10px 20px';
+    bulkLevelUpButton.style.margin = '5px';
+    bulkLevelUpButton.style.borderRadius = '8px';
+    bulkLevelUpButton.style.border = 'none';
+    bulkLevelUpButton.style.backgroundColor = '#ffc107';
+    bulkLevelUpButton.style.color = 'white';
+    bulkLevelUpButton.style.cursor = 'pointer';
+    bulkLevelUpButton.style.fontSize = '12px';
+    bulkLevelUpButton.style.transition = 'background-color 0.3s';
+    bulkLevelUpButton.onmouseover = () => bulkLevelUpButton.style.backgroundColor = '#e0a800';
+    bulkLevelUpButton.onmouseout = () => bulkLevelUpButton.style.backgroundColor = '#ffc107';
+    bulkLevelUpButton.onclick = () => {
+        handleBulkLevelUp();
+        populateSkills(); // 升级后刷新技能数据
+    };
+    buttonContainer.appendChild(bulkLevelUpButton);
+
     const infoButton = document.createElement('button');
     infoButton.innerText = '升级说明';
     infoButton.style.padding = '10px 20px';
@@ -5333,6 +5352,27 @@ function handleLevelUp() {
     skill.level = nextLevel;
 
     showInfoBox(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${nextLevel} 级，威力增加了！`);
+    updateExpBar();
+    updateUI();
+}
+
+function handleBulkLevelUp() {
+    const skillMessages = [];
+    currentPet.skills.forEach(skill => {
+        while (skill.level >= 10 && skill.level < 20 && currentExp >= (1000 + 200 * (skill.level - 10))) {
+            const expCost = 1000 + 200 * (skill.level - 10);
+            currentExp -= expCost;
+            skill.level += 1;
+            skillMessages.push(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${skill.level} 级，威力增加了！`);
+        }
+    });
+
+    if (skillMessages.length === 0) {
+        showInfoBox('没有技能需要升级或经验不足！');
+    } else {
+        showInfoBox(skillMessages.join('\n'));
+    }
+
     updateExpBar();
     updateUI();
 }
@@ -6180,7 +6220,7 @@ function handleRampaged() {
         // 检查并处理敌人复活机制
         if (battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
             battleState.enemy.revivalCount += 1;
-            logBattleEvent("深渊巨魔的生命力正在复苏，请在3秒内击杀它，否则它将复活！", "red");
+            logBattleEvent("深渊巨魔的生命力正在复苏，请在2秒内击杀它，否则它将复活！", "red");
             battleState.enemy.revived = true;
             console.log(`Revival triggered. revivalCount: ${battleState.enemy.revivalCount}`);
 
@@ -6192,7 +6232,7 @@ function handleRampaged() {
                     updateUI();
                     console.log('Enemy revived to full health.');
                 }
-            }, 3000);
+            }, 2000);
         }
     } else {
         enemyCritRate = 0.6;
@@ -6727,12 +6767,12 @@ function gainExp() {
     }
 
     // 计算非线性经验值增长
-    const gainedExp = Math.floor((maxExp * 0.15 + Math.pow(battleRounds, 1.1) * 0.25) * expMultiplier);
+    const gainedExp = Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.55 * battleRounds) * expMultiplier);
     let totalGainedExp = currentExp + gainedExp;
 
     while (totalGainedExp >= maxExp) {
         totalGainedExp -= maxExp; // 保存多余的经验值
-        maxExp = Math.floor(maxExp * 1.65); // 调整升级所需经验值的增长系数
+        maxExp = Math.floor(maxExp * 2.15); // 调整升级所需经验值的增长系数
 
         if (petLevel >= 200) {
             logBattleEvent("宠物已达到最高等级，经验转化为普通经验书！", "pink");
@@ -7392,11 +7432,9 @@ function useSupremeWisdomPill() {
     }
 }
 
-// Function to increase the pet's level with level cap adjustment
 function increasePetLevel(levels) {
     if (petLevel >= petMaxLevel) {
         showInfoBox("宠物等级已达上限，无法继续升级！");
-        //console.log("Level Up Error: Max level reached.");
         return;
     }
 
@@ -7411,17 +7449,22 @@ function increasePetLevel(levels) {
     updateAttributePanel();
     updateRemainingPointsDisplay();
     updateTitle();
-
-    //console.log(`Pet Level Increased: Pet Level = ${petLevel}, Remaining Points = ${remainingPoints}`);
 }
-        
-// Function to handle normal experience absorption
+
 function absorbExperience() {
-    const item = jinnangItems.find(i => i.name === 'normalExperienceBook');
-    if (item.quantity <= 0) {
-        showInfoBox("您的普通经验书不够，宠物无法升级！");
-        return;
+    const advancedItem = jinnangItems.find(i => i.name === 'advancedExperienceBook');
+    const normalItem = jinnangItems.find(i => i.name === 'normalExperienceBook');
+
+    if (advancedItem && advancedItem.quantity > 0) {
+        useExperienceBook(advancedItem, 3);
+    } else if (normalItem && normalItem.quantity > 0) {
+        useExperienceBook(normalItem, 1);
+    } else {
+        showInfoBox("您的经验书不足，无法吸收经验！");
     }
+}
+
+function useExperienceBook(item, levelIncrease) {
     if (petLevel >= petMaxLevel) {
         showInfoBox("宠物等级已达上限，无法继续升级！");
         return;
@@ -7430,28 +7473,10 @@ function absorbExperience() {
         showInfoBox("强者唯有历经战场的淬炼，潜力才会得到更惊人的激发！");
         return;
     }
-    item.quantity--;
-    updateJinnangItems();
-    increasePetLevel(1);
-}
 
-function absorbAdvancedExperience() {
-    const item = jinnangItems.find(i => i.name === 'advancedExperienceBook');
-    if (item.quantity <= 0) {
-        showInfoBox("您的高级经验书不够，宠物无法升级！");
-        return;
-    }
-    if (petLevel >= petMaxLevel) {
-        showInfoBox("宠物等级已达上限，无法继续升级！");
-        return;
-    }
-    if (petAscended && petLevel >= 180) {
-        showInfoBox("强者只有经过战场的淬炼才会得到更惊人的成长");
-        return;
-    }
     item.quantity--;
     updateJinnangItems();
-    increasePetLevel(3);
+    increasePetLevel(levelIncrease);
 }
 
 let petLevel = 1;
@@ -7523,7 +7548,7 @@ function updateTreasureDescription(type) {
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得使宠物变异的灵异金丹！";
+                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得开启宠物转职的关键道具！";
                 break;
             case '灵魂宝箱':
                 description = "神秘莫测的宝箱，每次开启花费300文金子，您可能获得宠物进化所需的各种灵魂！";
@@ -7604,6 +7629,12 @@ function collectTreasure() {
                 break;
             case '举世无双悟性丹':
                 addItemToJinnang('supremeWisdomPill');
+                break;
+            case '无限宝石':
+                addItemToJinnang('infiniteGem');
+                break;
+            case '若愚水':
+                addItemToJinnang('ignoranceWater');
                 break;
             case '闪耀之灵':
                 addItemToJinnang('radiantSoul');
@@ -7703,9 +7734,11 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '奇馈宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 35 },
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 30 },
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 30 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 30 },
+            { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 2 },
+            { name: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 3 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 5 }
         ],
         '灵魂宝箱': [
@@ -7765,6 +7798,8 @@ let jinnangItems = [
     { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', price: 1500, quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药' },
     { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', price: 50, quantity: 0, description: '配合毒粉，可使施毒成功率大大提升' },
     { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: 30, quantity: 0, description: '荟萃日月之精华，提升飞升之术等级的必需之物' },
+    { name: 'infiniteGem', displayName: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', price: 2000, quantity: 0, description: '宇宙间最玄妙的宝石，宠物使用后可受到更高阶的指引' },
+    { name: 'ignoranceWater', displayName: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', price: 500, quantity: 0, description: '用于宠物25~30进化' },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', price: 50, quantity: 0, description: '用于宠物1~6进化' },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
@@ -8226,6 +8261,13 @@ function removeArmsAttributes() {
     //console.log('All arms attributes have been reset to zero.');
 }
 
+let currentSpecialization = null;
+let specializations = {
+    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.15, upgradeCost: 200 },
+    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200 },
+    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200 }
+};
+        
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     let multiplier;
     if (currentWisdom <= 12) {
@@ -8251,6 +8293,19 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
                 break;
             default:
                 multiplier = 1;
+        }
+    }
+
+    // 应用专精乘数逻辑
+    if (currentSpecialization) {
+        const spec = specializations[currentSpecialization];
+        const increment = spec.baseMultiplier + spec.levelIncrement * spec.level;
+        if (spec.attributes) {
+            spec.attributes.forEach(attr => {
+                currentAttributes[attr] *= (1 + increment);
+            });
+        } else {
+            currentAttributes[spec.attribute] *= (1 + increment);
         }
     }
 
@@ -8293,7 +8348,8 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     return baseSecondaryAttributes;
 }
 
-function updateSecondaryAttributes(currentAttributes, currentWisdom) {
+function updateSecondaryAttributes() {
+    const currentAttributes = calculateCurrentAttributes();
     const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
 
     let wisdomBonus;
@@ -8359,6 +8415,209 @@ function updateSecondaryAttributes(currentAttributes, currentWisdom) {
     speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
 }
 
+function transformPet() {
+    if (petLevel < 160 || !petAscended) {
+        showInfoBox("转职功能在飞升之后开启。宠物飞升后，你可以选择宠物成长的专攻方向，让它们掌握某类属性的专精修炼方法，获得更显著的属性增长。");
+        return;
+    }
+
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+    overlay.style.display = 'flex';
+    overlay.style.justifyContent = 'center';
+    overlay.style.alignItems = 'center';
+    overlay.style.zIndex = '1000';
+
+    const modal = document.createElement('div');
+    modal.style.width = '85%';
+    modal.style.height = '75%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    modal.style.color = 'white';
+    modal.style.border = '1px solid #ddd';
+    modal.style.borderRadius = '10px';
+    modal.style.padding = '20px';
+    modal.style.overflowY = 'auto';
+    modal.style.position = 'relative';
+
+    const title = document.createElement('h2');
+    title.innerText = '宠物转职';
+    title.style.textAlign = 'center';
+    modal.appendChild(title);
+
+    const closeButton = document.createElement('span');
+    closeButton.innerText = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontSize = '24px';
+    closeButton.style.color = 'white';
+    closeButton.onclick = () => document.body.removeChild(overlay);
+    modal.appendChild(closeButton);
+
+    const specializationsDiv = document.createElement('div');
+    specializationsDiv.style.display = 'flex';
+    specializationsDiv.style.flexDirection = 'column';
+    specializationsDiv.style.gap = '10px';
+
+    Object.keys(specializations).forEach(key => {
+        const spec = specializations[key];
+        const specDiv = document.createElement('div');
+        specDiv.style.border = '1px solid white';
+        specDiv.style.borderRadius = '10px';
+        specDiv.style.padding = '10px';
+        specDiv.style.textAlign = 'center';
+
+        const specTitle = document.createElement('h3');
+        specTitle.innerText = `专精：${key} Lv${spec.level}`;
+        specTitle.id = `${key}-title`;
+        specDiv.appendChild(specTitle);
+
+        const specDescription = document.createElement('p');
+        specDescription.innerText = getSpecDescription(key);
+        specDiv.appendChild(specDescription);
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.style.display = 'flex';
+        buttonsDiv.style.flexDirection = 'row';
+        buttonsDiv.style.gap = '5px';
+        buttonsDiv.style.justifyContent = 'space-evenly';
+
+        const openButton = document.createElement('button');
+        openButton.innerText = '开启';
+        openButton.style.fontSize = '14px';
+        openButton.style.cursor = 'pointer';
+        openButton.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
+        openButton.style.color = currentSpecialization === key ? 'white' : 'black';
+        openButton.style.borderColor = 'white';
+        openButton.style.borderRadius = '5px';
+        openButton.onclick = () => {
+            if (currentSpecialization === key) {
+                showInfoBox("你已经开启过本专精了！");
+                refreshSpecializationUI();
+            } else if (currentSpecialization) {
+                showInfoBox("请先关闭当前专精后再开启其他专精！");
+                refreshSpecializationUI();
+            } else {
+                if (useItem('infiniteGem', 1)) {
+                    handleSpecializationChange(key);
+                    showInfoBox(`在无限宝石的指引下，你的宠物选择了${key}专精！`);
+                    refreshSpecializationUI();
+                } else {
+                    showInfoBox("您还没有无限宝石，此道具可通过开启奇馈宝箱概率获得。");
+                }
+            }
+        };
+        buttonsDiv.appendChild(openButton);
+
+        const closeButton = document.createElement('button');
+        closeButton.innerText = '关闭';
+        closeButton.style.fontSize = '14px';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.borderColor = 'white';
+        closeButton.style.borderRadius = '5px';
+        closeButton.onclick = () => {
+            if (currentSpecialization !== key) {
+                showInfoBox("本专精尚未启用！");
+                refreshSpecializationUI();
+            } else {
+                if (useItem('ignoranceWater', 1)) {
+                    handleSpecializationChange(null);
+                    showInfoBox("若愚水使你的宠物忘记了历年所学，返璞归真");
+                    refreshSpecializationUI();
+                } else {
+                    showInfoBox("您还没有若愚水，此道具可通过开启奇馈宝箱概率获得。");
+                }
+            }
+        };
+        buttonsDiv.appendChild(closeButton);
+
+        const upgradeButton = document.createElement('button');
+        upgradeButton.innerText = '升级';
+        upgradeButton.style.fontSize = '14px';
+        upgradeButton.style.cursor = 'pointer';
+        upgradeButton.style.borderColor = 'white';
+        upgradeButton.style.borderRadius = '5px';
+        upgradeButton.onclick = () => {
+            if (currentSpecialization !== key) {
+                showInfoBox("未开启此专精！");
+                refreshSpecializationUI();
+            } else {
+                const upgradeCost = spec.upgradeCost + spec.level * 200;
+                if (goldAmount >= upgradeCost) {
+                    goldAmount -= upgradeCost;
+                    spec.level++;
+                    updateGoldDisplay(goldAmount);
+                    showInfoBox(`你花费了${upgradeCost}文金子，将${key}已升级至Lv${spec.level}！（若需要连续升级可无视本提示框）`);
+                    refreshSpecializationUI();
+                } else {
+                    showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
+                }
+            }
+        };
+        buttonsDiv.appendChild(upgradeButton);
+
+        specDiv.appendChild(buttonsDiv);
+        specializationsDiv.appendChild(specDiv);
+    });
+
+    modal.appendChild(specializationsDiv);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+}
+
+function refreshSpecializationUI() {
+    Object.keys(specializations).forEach(key => {
+        const spec = specializations[key];
+        document.getElementById(`${key}-title`).innerText = `专精：${key} Lv${spec.level}`;
+        const buttons = document.querySelectorAll(`#${key}-buttons button`);
+        buttons.forEach(button => {
+            if (button.innerText === '开启') {
+                button.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
+                button.style.color = currentSpecialization === key ? 'white' : 'black';
+            }
+        });
+    });
+}
+
+function getSpecDescription(key) {
+    switch (key) {
+        case '最强大脑':
+            return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击）。';
+        case '猎杀时刻':
+            return '宠物的强壮和敏捷属性会按更高的比例增加对应二级属性。（物理攻击、速度）';
+        case '深海泰坦':
+            return '宠物的耐力和信仰属性会大幅增加对应的二级属性。（生命值、物理防御、法术防御）';
+    }
+}
+
+function handleSpecializationChange(newSpec) {
+    currentSpecialization = newSpec;
+    applySpecialization();
+}
+
+function handleSpecializationUpgrade(key) {
+    const spec = specializations[key];
+    const upgradeCost = spec.upgradeCost + spec.level * 200;
+    if (goldAmount >= upgradeCost) {
+        goldAmount -= upgradeCost;
+        spec.level++;
+        updateGoldDisplay(goldAmount);
+    } else {
+        showInfoBox(`升级所需金子不足，需要${upgradeCost}金子。`);
+    }
+    applySpecialization();
+}
+
+function applySpecialization() {
+    updateSecondaryAttributes();
+    updateAttributePanel();
+}
 
 let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
 let trainingMultipliers = [1.1, 1.08, 1.06, 1.04, 1.02]; // 定义每次金子培养的属性提升倍数
@@ -9307,6 +9566,7 @@ function resetPet() {
     // 初始化等级和其他基础属性
     initializeEnemyPet();
     updatePetInfo();
+    currentSpecialization = null;
     petLevel = 1;
     evolutionLevel = 0;
     growthRate = 1;
@@ -9733,6 +9993,8 @@ function updateSkillScore(selectedSkills = []) {
     if (sSkillCount > 1) skillsScore += 10000;
     if (ssSkillCount > 1) skillsScore += 50000;
 
+
+
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore;
     // 获取具有 ID "skill-score" 的元素
@@ -9839,6 +10101,8 @@ function upgradeWisdomTo() {
         'summonCharmPaper', //召唤灵符
         'poisonSkillBook', //施毒之术
         'poisonPowder', //毒粉
+        'infiniteGem', //无限宝石
+        'ignoranceWater', //若愚水
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹

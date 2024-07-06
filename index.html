@@ -388,8 +388,8 @@
             background-color: #fff;
             box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
             border-radius: 10px 10px 0 0;
-            transform: translateY(100%);
             transition: transform 0.3s;
+            transform: translateY(100%);
         }
         .shop-drawer.open {
             transform: translateY(0);
@@ -493,8 +493,8 @@
             background-color: #fff;
             box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
             border-radius: 10px 10px 0 0;
-            transform: translateY(100%);
             transition: transform 0.3s;
+            transform: translateY(100%);
         }
         .attribute-drawer.open {
             transform: translateY(0);
@@ -758,7 +758,6 @@
             border-radius: 10px 10px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s;
-            /* z-index: 0; */
             max-height: 90%;
             overflow-y: auto;
         }
@@ -1069,6 +1068,34 @@
         .battle-system-actions button:hover {
             background-color: #064701;
         }
+        #drug-system-actions {
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid #ffffff;
+            width: 100%;
+            background-color: #0a8c00;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        #drug-system-actions button {
+            padding: 5px;
+            cursor: pointer;
+            border: 1px solid #ffffff;
+            width: 100%;
+            background-color: #0a8c00;
+            color: #ffffff;
+            font-size: 14px;
+            text-align: center;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        
+        #drug-system-actions button:hover {
+            background-color: #064701;
+        }
         #visualEffectsContainer {
             position: relative;
             width: 95%;
@@ -1271,7 +1298,11 @@
     align-items: center;
     padding: 20px;
     border: 1px solid #888;
+    display: flex;
     width: 80%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
 }
 
 .drug-modal .use-button,
@@ -1282,9 +1313,9 @@
     padding: 1px 10px; /* 内边距 */
     text-align: center; /* 文字居中 */
     text-decoration: none; /* 无下划线 */
-    display: inline-flex; /* 行内块元素 */
+    display: flex; /* 行内块元素 */
     font-size: 16px; /* 字体大小 */
-    margin: 0px 40px 0px 40px; /* 外边距 */
+     /* 外边距 */
     cursor: pointer; /* 鼠标指针 */
     border-radius: 10px; /* 圆角边框 */
     border-color: white;
@@ -1309,9 +1340,10 @@
 }
 
 .drug-modal .drug-description {
-    margin-top: 50px;
-    margin-bottom: 20px;
-    font-size: 14px;
+    margin: 10px;
+    padding: 20px;
+    font-size: 16px;
+    width: 100%;
 }
 
 /* 通用弹出面板样式 */
@@ -1621,7 +1653,7 @@
                 <div id="intelligence-bar" style="width: 50%"></div>
             </div>
                 <div class="button-grid">
-                    <button onclick="trainSkills()">洗练技能</button>
+                    
                     <button onclick="rebornPet()">普通还童</button>
                     <button onclick="trainQuality()">一键还童</button>
                     <button onclick="useGoldenRebornPill()">还童金丹</button>
@@ -1631,6 +1663,7 @@
                     <button onclick="evolvePet()">进化宠物</button>
                     <button onclick="awakenPet()">觉醒宠物</button>
                     <button onclick="hallucinatePet()">幻化提升</button> 
+                    <button onclick="jumpToAttribute()">查看属性</button>
                 </div>
             <div id="message-box" class="message-box">
                 <span id="message-text"></span>
@@ -1670,7 +1703,7 @@
                 </div>
                 <div class="secondary-attributes">
                     <div class="progress-bar">
-                        宠物等级: <span id="pet-level">1</span>
+                        等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
                     </div>
                     <div class="progress-bar">
                         品质: <span id="attribute-tier"></span>
@@ -1679,7 +1712,7 @@
                         成长率: <span id="attribute-growth-rate"></span>
                     </div>
                     <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span>
+                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                     </div>
                     <div>HP: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                     <div>MP: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
@@ -1692,8 +1725,7 @@
             </div>
             <div class="button-grid">
                 <button onclick="trainAttributes()">金子培养</button>
-                <button onclick="absorbExperience()">吸收经验</button>
-                <button onclick="upgradeWisdom()">提升悟性</button>
+                <button onclick="trainSkills()">洗练技能</button>
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">超级提悟</button>
                 <button onclick="ascend()">飞升突破</button>
@@ -1701,6 +1733,7 @@
                 <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
                 <button onclick="showBiography()">解锁传记</button>
+                <button onclick="jumpToQuality()">查看资质</button>
             </div>
         </div>
     </div>
@@ -1918,7 +1951,7 @@
                 <button onclick="performDefense()">格挡蓄力</button>
                 <button onclick="useDrug()">使用药物</button>
                 <button id="battle-spirit-button">战斗精灵</button>
-                <button id="ascension-skill-button" class="ascension-button">飞升之术</button><!-- 飞升之术按钮 -->
+                <button id="ascension-skill-button" class="ascension-button">飞升之术</button>
                 <button onclick="levelUpSkill()">升级技能</button>
                 <button onclick="enemyInfo()">托管战斗</button>
             </div>
@@ -1981,17 +2014,17 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif',
                 skills: [
-                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '主动技能，小金牛使出浑身解数朝深渊巨魔进行致命一击。' },
-                    { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
+                    { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '物理攻击技能，小金牛使出浑身解数朝深渊巨魔进行致命一击。' },
+                    { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合恢复一定量的法力值' },
                     { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
                     { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物可获得一定的耐力提升。' },
                     { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
-                    { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '被动技能，小金牛的防御能力得到了微量提升。' },
-                    { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '得到生命祝福的小金牛治疗能力得到了提升。' },
-                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '主动技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
+                    { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '防御技能，小金牛的防御能力得到了微量提升。' },
+                    { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '治疗技能，得到生命祝福的小金牛治疗能力得到了提升。' },
+                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '物理攻击技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 3, description: '主动技能，对目标造成法术伤害' },
+                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 3, description: '法术攻击技能，对目标造成法术伤害' },
                     { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' }
                 ],
@@ -3455,18 +3488,18 @@ document.getElementById('closeMissionPanel').addEventListener('click', () => {
 //任务函数
 let tasks = {
     skillScore: [
-        { id: 1, description: '宠物评分达到100万', completed: false, target: 1000000, reward: 200 },
-        { id: 2, description: '宠物评分达到200万', completed: false, target: 2000000, reward: 600 },
-        { id: 3, description: '宠物评分达到300万', completed: false, target: 3000000, reward: 1200 },
-        { id: 4, description: '宠物评分达到400万', completed: false, target: 4000000, reward: 2000 },
-        { id: 5, description: '宠物评分达到500万', completed: false, target: 5000000, reward: 3000 }
+        { id: 1, description: '宠物评分达到100万', completed: false, target: 2000000, reward: 400 },
+        { id: 2, description: '宠物评分达到200万', completed: false, target: 4000000, reward: 1000 },
+        { id: 3, description: '宠物评分达到300万', completed: false, target: 5000000, reward: 1500 },
+        { id: 4, description: '宠物评分达到400万', completed: false, target: 6000000, reward: 2000 },
+        { id: 5, description: '宠物评分达到500万', completed: false, target: 10000000, reward: 3600 }
     ],
     petLevel: [
         { id: 6, description: '宠物等级达到60', completed: false, target: 60, reward: 50 },
         { id: 7, description: '宠物等级达到100', completed: false, target: 100, reward: 100 },
         { id: 8, description: '宠物等级达到149', completed: false, target: 149, reward: 200 },
         { id: 9, description: '宠物等级达到180', completed: false, target: 180, reward: 400 },
-        { id: 10, description: '宠物等级达到200', completed: false, target: 200, reward: 750 }
+        { id: 10, description: '宠物等级达到200', completed: false, target: 200, reward: 1000 }
     ],
     goldAmount: [
         { id: 11, description: '金子数量达到100000', completed: false, target: 100000, reward: 1 },
@@ -3589,7 +3622,7 @@ let drugInventory = {
     "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
     "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内深渊巨魔暴击率降低至0%" },
     "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
-    "御之灵根": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "10秒内增加玩家999999物理防御和法术防御" },
+    "灵木根": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "恢复10%生命值并有几率清除玩家的异常状态" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
@@ -3749,7 +3782,7 @@ function useSelectedDrug() {
             case "狂暴印记":
             case "化功散":
             case "闪电蘑菇":
-            case "御之灵根":
+            case "灵木根":
             case "焚灵之丸":
                 if (!activeBuffs[selectedDrug]) {
                     applyBuff(selectedDrug);
@@ -3868,23 +3901,20 @@ function applyBuff(drugName) {
                 10000
             );
             break;
-        case "御之灵根":
-            applyTimedBuff(
-                drugName,
-                () => {
-                    const originalPhysicalDefense = battleAttributes.physicalDefense;
-                    const originalMagicDefense = battleAttributes.magicDefense;
-                    battleAttributes.physicalDefense += 999999;
-                    battleAttributes.magicDefense += 999999;
-                    logBattleEvent(`使用御之灵根，增加999999物理防御和法术防御，持续10秒。`, 'gold');
-                    return () => {
-                        battleAttributes.physicalDefense = originalPhysicalDefense;
-                        battleAttributes.magicDefense = originalMagicDefense;
-                        logBattleEvent(`御之灵根效果消失。`, 'red');
-                    };
-                },
-                10000
-            );
+        case "灵木根":
+            // 恢复10%生命值
+            const healthRestored = Math.floor(maxHealth * 0.1);
+            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRestored);
+            logBattleEvent(`使用灵木根，恢复了 ${healthRestored} 点生命值。`, 'gold');
+        
+            // 80% 几率清除玩家的异常状态
+            if (Math.random() < 0.8) {
+                clearEnemyEffect();
+                logBattleEvent('灵木根生效，清除了异常状态。', 'gold');
+            } else {
+                logBattleEvent('灵木根生效，但未能清除异常状态。', 'red');
+            }
+        
             break;
         case "焚灵之丸":
             if (battleAttributes.health >= maxHealth * 0.2) {
@@ -4250,11 +4280,11 @@ const maxSpiritMultiplier = 4.15;
 // 获取精灵提供的基础属性增益
 function getBaseSpiritAttributes() {
     return {
-        health: 43,
+        health: 41,
         mana: 19,
         physicalAttack: 6,
         physicalDefense: 9,
-        magicAttack: 6,
+        magicAttack: 5.8,
         magicDefense: 9,
         speed: 1
     };
@@ -4300,7 +4330,7 @@ function checkAwakening() {
 // 打开战斗精灵界面
 document.getElementById('battle-spirit-button').addEventListener('click', () => {
     if (!awakened) {
-        showInfoBox('宠物会得到战斗精灵的赐福，提升各项能力值。但宠物只有在觉醒后才能真正掌握战斗精灵的使用和培养！');
+        showInfoBox('宠物在觉醒后可以开启战斗精灵。经过精心培养的精灵不仅可以大幅增加你的战斗能力，还可以带来额外的胜场奖励。等级越高，获得奖励的概率越高。');
     } else {
         document.getElementById('battle-spirit-modal').style.display = 'block';
         updateSpiritDisplay(); // 打开时更新显示
@@ -5433,6 +5463,8 @@ function selectSkillAndCalculateMultiplier(type) {
         isSkillUsed = true;
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
         if (type === 'physical') {
+            const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds);
+            battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667269e9d9c307b7e915e15a.gif');
         } else if (type === 'magical') {
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
@@ -5500,7 +5532,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
-        manaCostMultiplier = 100;
+        manaCostMultiplier = 500;
     }
 
     if (battleAttributes.mana < 50 * manaCostMultiplier) {
@@ -5614,7 +5646,7 @@ function applyDefenseBonus() {
         playerCritRate -= critRate;
         playerCritDamage -= critDamage;
 
-        logBattleEvent(`你的防御增益效果已结束：${critRate * 100}% 暴击率和 ${critDamage * 100}% 暴击伤害。`, 'yellow');
+        logBattleEvent(`你的防御增益效果已结束：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
         battleState.player.defenseBonusCount = 0; // 重置计数
         battleState.player.defenseBonus = null; // 重置增益状态
     }
@@ -5650,7 +5682,7 @@ function performIndependentMagicAttack() {
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
-        manaCostMultiplier = 100;
+        manaCostMultiplier = 500;
         logBattleEvent("深渊巨魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
     }
 
@@ -6554,7 +6586,7 @@ function handlePoison() {
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`深渊巨魔中毒，失去了 ${poisonDamage} 点生命值。`, '#C10066');
+        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
     }
 }
      
@@ -6578,7 +6610,7 @@ function performHeal() {
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
-        manaCostMultiplier = 100;
+        manaCostMultiplier = 500;
         logBattleEvent("深渊巨魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
     }
 
@@ -6644,7 +6676,7 @@ function performHeal() {
         setTimeout(() => {
             battleState.player.divineProtection = false;
             updatePlayerStatusDisplay();
-        }, divineProtectionDuration * 1000); // 仙气护体持续指定时间
+        }, divineProtectionDuration * 3000); // 仙气护体持续指定时间
     }
 
     playerTurn = false; // 轮到深渊巨魔回合
@@ -6652,6 +6684,7 @@ function performHeal() {
     applyAscensionEffects();
     updateUI();
 }
+
 // 将 firstStartBattle 定义为全局变量
 let firstStartBattle = false;
 function startBattle() {
@@ -6741,12 +6774,42 @@ function resetBuffState(playerWon) {
         updateUI();
     }
     
-    if (playerWon && Math.random() < 0.8) {
-        const drugKeys = Object.keys(drugInventory);
-        const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
-        drugInventory[randomDrug].quantity += 1;
-        logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
-        updateDrugGrid();
+    if (playerWon) {
+        // 基础获取药物的概率
+        let baseProbability = 0.8 + (spiritLevel * 0.002); // 每增加1级，概率增加0.2%
+
+        // 确保基础概率不会超过100%
+        if (baseProbability > 1) {
+            baseProbability = 1;
+        }
+
+        // 根据基础概率获取药物
+        if (Math.random() < baseProbability) {
+            const drugKeys = Object.keys(drugInventory);
+            const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+            drugInventory[randomDrug].quantity += 1;
+            logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
+            updateDrugGrid();
+        }
+
+        // spiritLevel在81到100之间时，额外获取药物的概率
+        if (spiritLevel >= 81) {
+            let extraProbability = (spiritLevel - 80) * 0.05; // 每提升1级，额外概率增加5%
+
+            // 确保额外概率不会超过100%
+            if (extraProbability > 1) {
+                extraProbability = 1;
+            }
+
+            // 根据额外概率获取额外药物
+            if (Math.random() < extraProbability) {
+                const drugKeys = Object.keys(drugInventory);
+                const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+                drugInventory[randomDrug].quantity += 1;
+                logBattleEvent(`战斗精灵的赐福，你额外获得了 ${randomDrug} x1`, 'pink');
+                updateDrugGrid();
+            }
+        }
     }
 }
 
@@ -7966,6 +8029,18 @@ function addItemToTopBar(item) {
     updateTopBarItems();
 }
 
+function jumpToQuality() {
+    toggleAttributeDrawer();
+    const drawer = document.getElementById('quality-drawer');
+    if (!drawer.classList.contains('open')) {
+        toggleDrawer();
+    }
+    return true;
+}
+function jumpToAttribute() {
+    toggleAttributeDrawer();
+}
+
 function toggleAttributeDrawer() {
     const drawer = document.getElementById('attribute-drawer');
     const info = document.getElementById('attribute-info');
@@ -8263,9 +8338,9 @@ function removeArmsAttributes() {
 
 let currentSpecialization = null;
 let specializations = {
-    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69ee.png' },
-    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69e3.png' },
-    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69c9.png' }
+    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
@@ -8506,7 +8581,7 @@ function transformPet() {
         buttonsDiv.style.gap = '20px 0px';
 
         const openButton = document.createElement('button');
-        openButton.innerText = currentSpecialization === key ? '已开启' : '开启';
+        openButton.innerText = currentSpecialization === key ? '已开' : '开启';
         openButton.style.fontSize = '14px';
         openButton.style.cursor = 'pointer';
         openButton.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
@@ -8529,6 +8604,7 @@ function transformPet() {
                     showInfoBox("您还没有无限宝石，此道具可通过开启奇馈宝箱概率获得。");
                 }
             }
+            refreshSpecializationUI();
         };
         buttonsDiv.appendChild(openButton);
 
@@ -8551,6 +8627,7 @@ function transformPet() {
                     showInfoBox("您还没有若愚水，此道具可通过开启奇馈宝箱概率获得。");
                 }
             }
+            refreshSpecializationUI();
         };
         buttonsDiv.appendChild(closeButton);
 
@@ -8575,12 +8652,13 @@ function transformPet() {
                     goldAmount -= upgradeCost;
                     spec.level++;
                     updateGoldDisplay(goldAmount);
-                    showInfoBox(`专精${key}已升级至Lv${spec.level}！`);
+                    showInfoBox(`你花费了${upgradeCost}文金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
                     refreshSpecializationUI();
                 } else {
-                    showInfoBox(`升级所需金子不足，需要${upgradeCost}金子。`);
+                    showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
                 }
             }
+            refreshSpecializationUI();
         };
         buttonsDiv.appendChild(upgradeButton);
 
@@ -8599,13 +8677,14 @@ function refreshSpecializationUI() {
         document.getElementById(`${key}-title`).innerText = `专精：${key} Lv${spec.level}`;
         const buttons = document.querySelectorAll(`#${key}-buttons button`);
         buttons.forEach(button => {
-            if (button.innerText === '开启' || button.innerText === '已开启') {
-                button.innerText = currentSpecialization === key ? '已开启' : '开启';
+            if (button.innerText === '开启' || button.innerText === '已开') {
+                button.innerText = currentSpecialization === key ? '已开' : '开启';
                 button.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
                 button.style.color = currentSpecialization === key ? 'white' : 'black';
             }
         });
     });
+    updateAttributePanel();
 }
 
 function getSpecDescription(key) {
@@ -8622,6 +8701,7 @@ function getSpecDescription(key) {
 function handleSpecializationChange(newSpec) {
     currentSpecialization = newSpec;
     applySpecialization();
+    refreshSpecializationUI();
 }
 
 function handleSpecializationUpgrade(key) {
@@ -8635,11 +8715,13 @@ function handleSpecializationUpgrade(key) {
         showInfoBox(`升级所需金子不足，需要${upgradeCost}金子。`);
     }
     applySpecialization();
+    refreshSpecializationUI();
 }
 
 function applySpecialization() {
     updateSecondaryAttributes();
     updateAttributePanel();
+    refreshSpecializationUI();
 }
 
 let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
@@ -8816,7 +8898,7 @@ function useGoldenRebornPill() {
     updateSkillScore();
     updatePetWisdom();
 }
-let goldAmount = 120000; // 初始金子数量
+let goldAmount = 500000; // 初始金子数量
 
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');

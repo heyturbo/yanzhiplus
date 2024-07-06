@@ -6767,12 +6767,12 @@ function gainExp() {
     }
 
     // 计算非线性经验值增长
-    const gainedExp = Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.55 * battleRounds) * expMultiplier);
+    const gainedExp = Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier);
     let totalGainedExp = currentExp + gainedExp;
 
     while (totalGainedExp >= maxExp) {
         totalGainedExp -= maxExp; // 保存多余的经验值
-        maxExp = Math.floor(maxExp * 2.15); // 调整升级所需经验值的增长系数
+        maxExp = Math.floor(maxExp * 1.85); // 调整升级所需经验值的增长系数
 
         if (petLevel >= 200) {
             logBattleEvent("宠物已达到最高等级，经验转化为普通经验书！", "pink");
@@ -7469,7 +7469,7 @@ function useExperienceBook(item, levelIncrease) {
         showInfoBox("宠物等级已达上限，无法继续升级！");
         return;
     }
-    if (petAscended && petLevel >= 180) {
+    if (petAscended && petLevel >= 190) {
         showInfoBox("强者唯有历经战场的淬炼，潜力才会得到更惊人的激发！");
         return;
     }
@@ -8185,7 +8185,7 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续四个武装栏需要通过解锁开启。\n3. 当宠物等级达到60、120、180和200时，分别可以解锁后续四个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
+    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 初始状态下只有第一个武装栏开放，后续武装栏需要通过解锁开启。\n3. 当宠物等级达到一定等级后，可以分别解锁后续五个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
 function forgeArm(key, infoDiv) {
@@ -8263,9 +8263,9 @@ function removeArmsAttributes() {
 
 let currentSpecialization = null;
 let specializations = {
-    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.15, upgradeCost: 200 },
-    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200 },
-    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200 }
+    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69ee.png' },
+    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69e3.png' },
+    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688bf76d9c307b7e96b69c9.png' }
 };
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
@@ -8469,27 +8469,44 @@ function transformPet() {
         const spec = specializations[key];
         const specDiv = document.createElement('div');
         specDiv.style.border = '1px solid white';
-        specDiv.style.borderRadius = '10px';
+        specDiv.style.borderRadius = '5px';
         specDiv.style.padding = '10px';
-        specDiv.style.textAlign = 'center';
+        specDiv.style.display = 'flex';
+        specDiv.style.flexDirection = 'row';
+        specDiv.style.flexWrap = 'nowrap';
+        specDiv.style.alignItems = 'center';
+
+        const specIcon = document.createElement('img');
+        specIcon.src = spec.url;
+        specIcon.style.width = '50px';
+        specIcon.style.height = '50px';
+        specIcon.style.marginRight = '15px';
+        specDiv.appendChild(specIcon);
+
+        const specInfoDiv = document.createElement('div');
+        specInfoDiv.style.textAlign = 'left';
+        specInfoDiv.style.flexGrow = '1';
+        specInfoDiv.style.fontSize = '14px';
 
         const specTitle = document.createElement('h3');
         specTitle.innerText = `专精：${key} Lv${spec.level}`;
         specTitle.id = `${key}-title`;
-        specDiv.appendChild(specTitle);
+        specInfoDiv.appendChild(specTitle);
 
         const specDescription = document.createElement('p');
         specDescription.innerText = getSpecDescription(key);
-        specDiv.appendChild(specDescription);
+        specInfoDiv.appendChild(specDescription);
+
+        specDiv.appendChild(specInfoDiv);
 
         const buttonsDiv = document.createElement('div');
         buttonsDiv.style.display = 'flex';
-        buttonsDiv.style.flexDirection = 'row';
-        buttonsDiv.style.gap = '5px';
-        buttonsDiv.style.justifyContent = 'space-evenly';
+        buttonsDiv.style.flexDirection = 'row-reverse';
+        buttonsDiv.style.flexWrap = 'wrap';
+        buttonsDiv.style.gap = '20px 0px';
 
         const openButton = document.createElement('button');
-        openButton.innerText = '开启';
+        openButton.innerText = currentSpecialization === key ? '已开启' : '开启';
         openButton.style.fontSize = '14px';
         openButton.style.cursor = 'pointer';
         openButton.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
@@ -8548,15 +8565,20 @@ function transformPet() {
                 showInfoBox("未开启此专精！");
                 refreshSpecializationUI();
             } else {
-                const upgradeCost = spec.upgradeCost + spec.level * 200;
+                if (spec.level >= 120) {
+                    showInfoBox("专精等级已达上限！");
+                    refreshSpecializationUI();
+                    return;
+                }
+                let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? (spec.level - 100) * 20000 : spec.level * 200);
                 if (goldAmount >= upgradeCost) {
                     goldAmount -= upgradeCost;
                     spec.level++;
                     updateGoldDisplay(goldAmount);
-                    showInfoBox(`你花费了${upgradeCost}文金子，将${key}已升级至Lv${spec.level}！（若需要连续升级可无视本提示框）`);
+                    showInfoBox(`专精${key}已升级至Lv${spec.level}！`);
                     refreshSpecializationUI();
                 } else {
-                    showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
+                    showInfoBox(`升级所需金子不足，需要${upgradeCost}金子。`);
                 }
             }
         };
@@ -8577,7 +8599,8 @@ function refreshSpecializationUI() {
         document.getElementById(`${key}-title`).innerText = `专精：${key} Lv${spec.level}`;
         const buttons = document.querySelectorAll(`#${key}-buttons button`);
         buttons.forEach(button => {
-            if (button.innerText === '开启') {
+            if (button.innerText === '开启' || button.innerText === '已开启') {
+                button.innerText = currentSpecialization === key ? '已开启' : '开启';
                 button.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
                 button.style.color = currentSpecialization === key ? 'white' : 'black';
             }
@@ -8588,7 +8611,7 @@ function refreshSpecializationUI() {
 function getSpecDescription(key) {
     switch (key) {
         case '最强大脑':
-            return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击）。';
+            return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击、法力值）。';
         case '猎杀时刻':
             return '宠物的强壮和敏捷属性会按更高的比例增加对应二级属性。（物理攻击、速度）';
         case '深海泰坦':
@@ -8603,7 +8626,7 @@ function handleSpecializationChange(newSpec) {
 
 function handleSpecializationUpgrade(key) {
     const spec = specializations[key];
-    const upgradeCost = spec.upgradeCost + spec.level * 200;
+    let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? (spec.level - 100) * 20000 : spec.level * 200);
     if (goldAmount >= upgradeCost) {
         goldAmount -= upgradeCost;
         spec.level++;

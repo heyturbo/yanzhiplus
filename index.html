@@ -5722,7 +5722,7 @@ function performIndependentMagicAttack() {
 }
 
 function applyPhysicalAttackEffects(multiplier) {
-    const effects = ['armorBreak', 'intimidate', 'benumb'];
+    const effects = ['armorBreak', 'stun', 'intimidate', 'benumb'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
@@ -5740,6 +5740,16 @@ function applyPhysicalAttackEffects(multiplier) {
                     battleState.enemy.armorBreak = false;
                     updateEnemyStatusDisplay();
                 }, 10000); // 破甲持续10秒
+                break;
+            case 'stun':
+                battleState.enemy.stunned = true; // 深渊巨魔眩晕
+                logBattleEvent("深渊巨魔被眩晕，无法行动。", 'wheat');
+                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
+                updateEnemyStatusDisplay();
+                setTimeout(() => {
+                    battleState.enemy.stunned = false;
+                    updateEnemyStatusDisplay();
+                }, 3000); // 眩晕持续3秒
                 break;
             case 'intimidate':
                 battleState.enemy.intimidated = true; // 深渊巨魔恐吓状态
@@ -5783,7 +5793,7 @@ function applyPhysicalAttackEffects(multiplier) {
 }
 
 function applyMagicAttackEffects(damage, multiplier) {
-    const effects = ['silence', 'stun', 'slow', 'daze', 'exorcise', 'burnt'];
+    const effects = ['silence', 'slow', 'daze', 'exorcise', 'burnt'];
     const effect = effects[Math.floor(Math.random() * effects.length)];
     const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
@@ -5798,16 +5808,6 @@ function applyMagicAttackEffects(damage, multiplier) {
                     battleState.enemy.silenced = false;
                     updateEnemyStatusDisplay();
                 }, 3000); // 沉默持续3秒
-                break;
-            case 'stun':
-                battleState.enemy.stunned = true; // 深渊巨魔眩晕
-                logBattleEvent("深渊巨魔被眩晕，无法行动。", 'wheat');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.stunned = false;
-                    updateEnemyStatusDisplay();
-                }, 3000); // 眩晕持续3秒
                 break;
             case 'slow':
                 const slowAmount = Math.floor(battleState.enemy.speed * 0.25);

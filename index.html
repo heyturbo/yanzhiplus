@@ -538,7 +538,6 @@
             display: flex;
             gap: 0px; /* 调整每个条目之间的间距 */
             flex-direction: column-reverse;
-            align-items: stretch;
             justify-content: space-between;
         }
         .secondary-attributes {
@@ -1653,7 +1652,6 @@
                 <div id="intelligence-bar" style="width: 50%"></div>
             </div>
                 <div class="button-grid">
-                    
                     <button onclick="rebornPet()">普通还童</button>
                     <button onclick="trainQuality()">一键还童</button>
                     <button onclick="useGoldenRebornPill()">还童金丹</button>
@@ -1691,10 +1689,13 @@
                     <div class="progress-bar">
                         信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
                     </div>
+                    <div class="progress-bar">
+                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                    </div>
                     <div id="remaining-points-display">剩余点数: 0</div>
                     <div>飞升状态: <span id="ascension-status">未飞升</span></div>
                     <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>
-                    <div>幻化等级: <span id="hallucination-level">0</span></div>
+                    
                     <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
                 <div class="image-frame">
@@ -1712,7 +1713,7 @@
                         成长率: <span id="attribute-growth-rate"></span>
                     </div>
                     <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                        幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
                     </div>
                     <div>HP: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                     <div>MP: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
@@ -5559,9 +5560,10 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值！`, 'red');
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     } else {
         logBattleEvent(`你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     }
 
     applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
@@ -7595,6 +7597,7 @@ function ascend() {
     updateAscensionStatus();
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
+    updateImageFrame(customImageUrls.ascend, 5000);
 }
 
 let selectedTreasure = null;
@@ -7630,7 +7633,7 @@ function updateTreasureDescription(type) {
                 description = "上古武神的战利品，每次开启花费800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '至尊宝箱':
-                description = "价值连城的宝箱，每次开启花费1000文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐丹等超稀有道具，甚至还有神秘进化法宝等你来拿！";
+                description = "价值连城的宝箱，每次开启花费1000文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具，甚至还有神秘进化法宝等你来拿！";
                 break;
         }
     }
@@ -7754,7 +7757,7 @@ function collectTreasure() {
             case '天地灵气':
                 addItemToJinnang('earthlyEnergy');
                 break;
-            case '仙人醍醐丹':
+            case '仙人醍醐':
                 addItemToJinnang('ultraSkillBoomer');
                 break;
             default:
@@ -7837,7 +7840,7 @@ function getRandomReward(type) {
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 25 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 5 },
             { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 19 },
-            { name: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 1 }
+            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 1 }
         ]
     };
     return selectReward(rewards[type]);
@@ -7878,7 +7881,7 @@ let jinnangItems = [
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
-    { name: 'ultraSkillBoomer', displayName: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
+    { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -8348,7 +8351,7 @@ function removeArmsAttributes() {
 
 let currentSpecialization = null;
 let specializations = {
-    最强大脑: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
     猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
     深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
@@ -8699,7 +8702,7 @@ function refreshSpecializationUI() {
 
 function getSpecDescription(key) {
     switch (key) {
-        case '最强大脑':
+        case '慧光辉耀':
             return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击、法力值）。';
         case '猎杀时刻':
             return '宠物的强壮和敏捷属性会按更高的比例增加对应二级属性。（物理攻击、速度）';
@@ -8716,7 +8719,7 @@ function handleSpecializationChange(newSpec) {
 
 function handleSpecializationUpgrade(key) {
     const spec = specializations[key];
-    let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? (spec.level - 100) * 20000 : spec.level * 200);
+    let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? spec.level * 20000 : spec.level * 200);
     if (goldAmount >= upgradeCost) {
         goldAmount -= upgradeCost;
         spec.level++;
@@ -8735,7 +8738,7 @@ function applySpecialization() {
 }
 
 let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
-let trainingMultipliers = [1.1, 1.08, 1.06, 1.04, 1.02]; // 定义每次金子培养的属性提升倍数
+let trainingMultipliers = [1.1, 1.04, 1.03, 1.02, 1.01]; // 定义每次金子培养的属性提升倍数
 let trainingCount = 0; // 初始化已经使用的金子培养次数
 
 function calculateAvailableTrainingCount(petLevel) {
@@ -9112,7 +9115,7 @@ function getRandomRareItem() {
     // 定义初始稀有物品数组
     const rareItems = [
         { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(1288, 2988) },
-        { name: '仙人醍醐丹', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: getRandomInt(46788, 89238) }
+        { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: getRandomInt(46788, 89238) }
     ];
 
     // 定义空数组用于存储SS级技能和S级技能
@@ -9233,7 +9236,7 @@ function buyItem() {
                     addItemToJinnang('earthlyEnergy');
                 }
                 break;
-            case '仙人醍醐丹':
+            case '仙人醍醐':
                 for (let i = 0; i < itemQuantity; i++) {
                     addItemToJinnang('ultraSkillBoomer');
                 }
@@ -9319,7 +9322,7 @@ function buyItem() {
                 case '天地灵气':
                     addItemToJinnang('earthlyEnergy'); // 更新锦囊
                     break;
-                case '仙人醍醐丹':
+                case '仙人醍醐':
                     addItemToJinnang('ultraSkillBoomer'); // 更新锦囊
                     break;
                 case '还童金丹':
@@ -9680,6 +9683,7 @@ function resetPet() {
 
     // 初始化等级和其他基础属性
     initializeEnemyPet();
+    defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
     updatePetInfo();
     currentSpecialization = null;
     petLevel = 1;
@@ -9888,7 +9892,7 @@ function trainSkills() {
     const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
 
     if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
-        showInfoBox("你拥有极为珍贵的仙人醍醐丹，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
+        showInfoBox("你拥有极为珍贵的仙人醍醐，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
         () => {
             if (useItem('ultraSkillBoomer', 1)) {
                 const maxSkills = Math.min(12, currentPet.skills.length);
@@ -10579,6 +10583,7 @@ function awakenPet() {
         updateAwakenStatus();
 
         showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
+        updateImageFrame(customImageUrls.awaken);
         updatePetLevel();
         updateAttributePanel();
         updateQualityCard();
@@ -10641,6 +10646,7 @@ function hallucinatePet() {
             hallucinationLevel++;
             document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
             showInfoBox(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
+            updateImageFrame(customImageUrls.hallucinate, 2000);
         } else {
             showInfoBox("幻化提升失败！");
         }
@@ -10648,6 +10654,10 @@ function hallucinatePet() {
         updateQualityCard();
         updateAttributePanel(); // 确保更新属性面板
     });
+}
+
+function fastHallucinatePet() {
+    hallucinatePet();
 }
 
 // 更新显示函数
@@ -11282,6 +11292,39 @@ function startGameTimer() {
 
     // 每秒更新一次计时器
     setInterval(updateTimer, 1000);
+}
+
+// 确保此数组名称在项目中是唯一的，避免冲突
+const customImageUrls = {
+    ascend: "https://pic.imgdb.cn/item/668a3179d9c307b7e9c63fb9.gif",
+    hallucinate: "https://pic.imgdb.cn/item/668a317ad9c307b7e9c63fcf.gif",
+    awaken: "https://pic.imgdb.cn/item/668a3613d9c307b7e9cc9530.webp"
+};
+
+let defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
+let imageFrameTimeout;
+
+function updateImageFrame(url, duration) {
+    const imageFrame = document.querySelector(".image-frame img");
+
+    if (!imageFrame) {
+        console.error("Image frame element not found.");
+        return;
+    }
+
+    // Update the image source
+    imageFrame.src = url;
+
+    // If duration is specified, set a timeout to revert to the default image
+    if (duration && duration > 0) {
+        if (imageFrameTimeout) {
+            clearTimeout(imageFrameTimeout);
+        }
+        imageFrameTimeout = setTimeout(() => {
+            imageFrame.src = defaultImageUrl;
+        }, duration);
+    }
+    updateAttributePanel();
 }
 
 // 在个位数前补零

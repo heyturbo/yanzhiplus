@@ -441,7 +441,7 @@
             background-color: #074b02;
         }
         .quality-info button {
-            padding: 2px 10px;
+            /* padding: 2px 10px; */
             margin: 5px;
             /* height: 66%; */
             background-color: #088c01;
@@ -449,7 +449,7 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 12px;
         }
         .shop-bar button:active {
             background-color: #064701;
@@ -585,7 +585,6 @@
             display: flex;
              /* 使两个子容器分布在容器的两边 */
             gap: 2px; /* 调整两列之间的间距 */
-            flex-direction: column;
         }
         
         .quality-details {
@@ -595,8 +594,9 @@
             padding: 0px 0px 10px 0px;
             gap: 5px 0px; /* 调整每个条目之间的间距 */
             font-size: 14px;
-            justify-content: space-between;
+            justify-content: space-around;
             flex-wrap: wrap;
+            align-items: flex-start;
         }
         .image-frame img {
             max-width: 100%;
@@ -1626,7 +1626,7 @@
                     <div>名称: <span id="quality-name">小金牛</span></div>
                     <div>品质: <span id="quality-tier">普通</span></div>
                     <div>成长率: <span id="quality-growth-rate">100%</span></div>
-                    <div>变异: <span id="quality-mutated">未变异</span></div>
+                    <div>变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
                     <div>进化等级: <span id="evolution-level">0</span></div>
                     <div>当前悟性: <span id="current-wisdom">0</span></div>
                 </div>
@@ -1690,12 +1690,11 @@
                         信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
                     </div>
                     <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">＋</button>
                     </div>
                     <div id="remaining-points-display">剩余点数: 0</div>
                     <div>飞升状态: <span id="ascension-status">未飞升</span></div>
-                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>
-                    
+                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>                    
                     <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
                 <div class="image-frame">
@@ -3611,19 +3610,19 @@ document.addEventListener('DOMContentLoaded', () => {
 //以下是药物系统
 let selectedDrug = null;
 let drugInventory = {
-    "长生泉": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
+    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
     "狂暴之魂": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
-    "神力仙丹": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
+    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
     "慧心糖果": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
+    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
     "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
     "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
     "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
     "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内深渊巨魔暴击率降低至0%" },
     "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
-    "灵木根": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "恢复10%生命值并有几率清除玩家的异常状态" },
+    "灵木根": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "恢复10%生命值并有几率清除玩家的异常状态" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
@@ -5119,9 +5118,9 @@ function jumpByTenRounds() {
     updateUI();
 }
 //自动战斗函数
-let autoBattleInterval = null; // 定义自动战斗的全局变量
+let autoBattleInterval = null;
+
 function autoBattle() {
-    // 如果自动战斗已经在进行，停止自动战斗
     if (autoBattleInterval !== null) {
         clearInterval(autoBattleInterval);
         autoBattleInterval = null;
@@ -5147,7 +5146,6 @@ function autoBattle() {
             return;
         }
 
-        // 判断玩家生命值是否低于50%
         if (battleAttributes.health / maxHealth < 0.5) {
             if (Math.random() < 0.5) {
                 logBattleEvent("自动战斗：玩家生命值低于50%，执行防御。", 'pink');
@@ -5159,7 +5157,34 @@ function autoBattle() {
             return;
         }
 
-        // 判断玩家的法术攻击力与物理攻击力的比例以及blindfold状态
+        const debuffStates = [
+            battleState.player.drunken,
+            battleState.player.healingBan,
+            battleState.player.soulCapture,
+            battleState.player.blindfold,
+            battleState.player.spellSlow
+        ];
+        const activeDebuffs = debuffStates.filter(Boolean).length;
+
+        if (activeDebuffs >= 2) {
+            const selectedDrug = "灵木根";
+            const drug = drugInventory[selectedDrug];
+            if (drug && drug.quantity > 0) {
+                selectDrug(selectedDrug);
+                useSelectedDrug();
+                logBattleEvent("自动战斗：玩家状态异常，使用药物'灵木根'。", 'pink');
+                return;
+            }
+        }
+
+        if (battleState.player.poisonSkillActivated && battleAttributes.mana / maxMana >= 0.4) {
+            if (Math.random() < 0.2) {
+                performPoison();
+                logBattleEvent("自动战斗：释放中毒技能。", 'pink');
+                return;
+            }
+        }
+
         let attackType;
         if (battleState.player.blindfold) {
             attackType = 'magic';
@@ -5172,8 +5197,10 @@ function autoBattle() {
         }
 
         performAttack(attackType);
-    }, 300); // 每0.3秒执行一次自动战斗逻辑
+    }, 300);
 }
+
+
 // 定义初始暴击率和暴击伤害
 let playerCritRate = 0.1; // 10%
 let playerCritDamage = 1.5; // 150%
@@ -7624,7 +7651,7 @@ function updateTreasureDescription(type) {
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得神兽还童丹、还童金丹和资质重生丹，甚至还能获得开启宠物转职的关键道具！";
+                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得各种用于培养宠物资质、重塑技能的道具，甚至还能获得开启宠物转职的关键道具！";
                 break;
             case '灵魂宝箱':
                 description = "神秘莫测的宝箱，每次开启花费300文金子，您可能获得宠物进化所需的各种灵魂！";
@@ -7633,7 +7660,7 @@ function updateTreasureDescription(type) {
                 description = "上古武神的战利品，每次开启花费800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '至尊宝箱':
-                description = "价值连城的宝箱，每次开启花费1000文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具，甚至还有神秘进化法宝等你来拿！";
+                description = "价值连城的宝箱，每次开启花费1000文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
                 break;
         }
     }
@@ -7760,6 +7787,9 @@ function collectTreasure() {
             case '仙人醍醐':
                 addItemToJinnang('ultraSkillBoomer');
                 break;
+            case '灵异秘卷':
+                addItemToJinnang('mutationScroll');
+                break;
             default:
                 addItemToTopBar(reward);
                 break;
@@ -7813,15 +7843,17 @@ function getRandomReward(type) {
             { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 30 },
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 30 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 30 },
-            { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 2 },
-            { name: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 3 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 5 }
+            { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
+            { name: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 7 },
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/668ad3d8d9c307b7e9be7361.png', chance: 1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
             { name: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', chance: 30 },
-            { name: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', chance: 30 },
-            { name: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', chance: 10 }
+            { name: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', chance: 20 },
+            { name: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', chance: 10 },
+            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 10 }
         ],
         '武神宝箱': [
             { name: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', chance: 10 },
@@ -7835,12 +7867,11 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 5 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 20 },
             { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 10 },
-            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 5 },
+            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 10 },
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 10 },
-            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 25 },
-            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 5 },
-            { name: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', chance: 19 },
-            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 1 }
+            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 33 },
+            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 10 },           
+            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 2 }
         ]
     };
     return selectReward(rewards[type]);
@@ -7882,6 +7913,7 @@ let jinnangItems = [
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
+    { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/668ad3d8d9c307b7e9be7361.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -8351,9 +8383,9 @@ function removeArmsAttributes() {
 
 let currentSpecialization = null;
 let specializations = {
-    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.12, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
-    猎杀时刻: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
-    深海泰坦: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, upgradeCost: 200, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.1, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
@@ -8660,7 +8692,7 @@ function transformPet() {
                     refreshSpecializationUI();
                     return;
                 }
-                let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? (spec.level - 100) * 20000 : spec.level * 200);
+                let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200);
                 if (goldAmount >= upgradeCost) {
                     goldAmount -= upgradeCost;
                     spec.level++;
@@ -8704,9 +8736,9 @@ function getSpecDescription(key) {
     switch (key) {
         case '慧光辉耀':
             return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击、法力值）。';
-        case '猎杀时刻':
+        case '神魔之力':
             return '宠物的强壮和敏捷属性会按更高的比例增加对应二级属性。（物理攻击、速度）';
-        case '深海泰坦':
+        case '坚韧之心':
             return '宠物的耐力和信仰属性会大幅增加对应的二级属性。（生命值、物理防御、法术防御）';
     }
 }
@@ -8719,7 +8751,7 @@ function handleSpecializationChange(newSpec) {
 
 function handleSpecializationUpgrade(key) {
     const spec = specializations[key];
-    let upgradeCost = spec.upgradeCost + (spec.level >= 100 ? spec.level * 20000 : spec.level * 200);
+    let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200);
     if (goldAmount >= upgradeCost) {
         goldAmount -= upgradeCost;
         spec.level++;
@@ -10225,6 +10257,7 @@ function upgradeWisdomTo() {
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹
+        'mutationScroll', //灵异秘卷
         'jumpingSoul'
     ];
 
@@ -10252,7 +10285,7 @@ function upgradeWisdomTo() {
     }
     
     if (target === "88888") {
-        goldAmount += 999999;
+        goldAmount += 9999999;
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;
@@ -11236,6 +11269,40 @@ function mutatePet() {
     updateTitle();
 }
 
+function useMutationScroll() {
+    // 检查是否有“灵异秘卷”
+    if (!useItem("mutationScroll")) {
+        showInfoBox("灵异秘卷只能通过奇馈宝箱获得，传说中习得灵异秘卷中的神兽之道的宠物，资质和成长率会获得质的跃迁！");
+        return;
+    }
+
+    // 设置宠物品质
+    currentPet.qualities.tier = '完美';
+    currentPet.qualities.growthRate = 400;
+    currentPet.qualities.mutated = true;
+
+    // 更新宠物属性
+    const qualities = currentPet.qualities;
+    qualities.endurance.current = Math.round(qualities.endurance.current * 1.1);
+    qualities.strength.current = Math.round(qualities.strength.current * 1.1);
+    qualities.faith.current = Math.round(qualities.faith.current * 1.1);
+    qualities.agility.current = Math.round(qualities.agility.current * 1.1);
+    qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
+
+    // 设置背景为变异背景
+    document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+    document.body.style.backgroundRepeat = "repeat";
+
+    // 更新UI
+    updateQualityCard();
+    updateSkillScore();
+    updateTitle();
+    showInfoBox("在上古卷轴的教导下，你的宠物实现蜕变");
+}
+
+// Example usage:
+// useMutationScroll(); // 调用此函数消耗一个“灵异秘卷”并执行特别的变异规则
+        
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }

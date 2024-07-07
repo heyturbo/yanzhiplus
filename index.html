@@ -1292,7 +1292,7 @@
 }
 
 .drug-modal .modal-content {
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgb(0 0 0 / 60%);
     margin: 5% auto;
     font-size: 14px;
     align-items: center;
@@ -3796,7 +3796,7 @@ function useSelectedDrug() {
                 logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`, 'gold');
                 break;
             case "慧心糖果":
-                playerCritDamage = Math.min(5.0, playerCritDamage + 0.10); // 最大500%
+                playerCritDamage = Math.min(10.0, playerCritDamage + 0.10); // 最大1000%
                 logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`, 'gold');
                 break;
             case "延寿露":
@@ -3844,7 +3844,7 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+                    playerCritDamage = Math.min(10.0, playerCritDamage + 0.50); // 最大1000%
                     logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续10秒。`, 'gold');
                     return () => {
                         playerCritDamage = playerCritDamage - 0.5;
@@ -3858,7 +3858,7 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    playerCritRate = Math.min(3.0, playerCritRate + 0.50); // 最大300%
+                    playerCritRate = Math.min(10.0, playerCritRate + 0.50); // 最大1000%
                     logBattleEvent(`使用狂暴印记，暴击率提高50%，持续10秒。`, 'gold');
                     return () => {
                         playerCritRate = playerCritRate - 0.5;
@@ -3926,8 +3926,8 @@ function applyBuff(drugName) {
                         battleAttributes.health -= Math.floor(maxHealth * 0.2);
                         battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
-                        playerCritRate = Math.min(3.0, playerCritRate + 0.50); // 最大300%
-                        playerCritDamage = Math.min(5.0, playerCritDamage + 0.50); // 最大500%
+                        playerCritRate = Math.min(10.0, playerCritRate + 0.50); // 最大1000%
+                        playerCritDamage = Math.min(10.0, playerCritDamage + 0.50); // 最大1000%
                         logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`, 'gold');
                         return () => {
                             battleAttributes.physicalAttack = originalPA;
@@ -5501,6 +5501,9 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
+        if (battleState.enemy.revived) {
+            damage = Math.floor(0.1 * damage);
+        }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
     // 根据是否暴击来记录日志
@@ -5544,7 +5547,11 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
     damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, playerCritDamage);
+        if (battleState.enemy.revived) {
+            damage = Math.floor(0.1 * damage);
+        }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+
 
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
@@ -5691,7 +5698,11 @@ function performIndependentMagicAttack() {
     let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
     damage = calculateDamage(damage, isCritical, playerCritDamage);
+        if (battleState.enemy.revived) {
+            damage = Math.floor(0.1 * damage);
+        }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+    
 
     // 根据是否暴击来记录日志
     if (isCritical) {
@@ -5902,7 +5913,7 @@ function applySingleAscensionEffect(skill) {
             break;
         case '灵魂穿刺':
             battleState.player.extraCritDamageChance = skill.increment(skill.level) / 100;
-            battleState.player.extraCritDamageMultiplier = 10; // 固定300%
+            battleState.player.extraCritDamageMultiplier = 10; // 固定1000%
             break;
         case '吸血魔刃':
             battleState.player.bloodSuckPercentage = skill.increment(skill.level) / 100;
@@ -6274,7 +6285,6 @@ function handleRampaged() {
         console.log('Enemy is not rampaged.');
     }
 }
-
 
 function enemyHeal() {
     if (enemyHealCount >= 10) {

@@ -11270,9 +11270,15 @@ function mutatePet() {
 }
 
 function useMutationScroll() {
+    // 检查宠物是否已经变异
+    if (currentPet.qualities.mutated) {
+        showInfoBox("你的宠物已经变异，将无法重复使用！");
+        return;
+    }
+
     // 检查是否有“灵异秘卷”
     if (!useItem("mutationScroll")) {
-        showInfoBox("灵异秘卷只能通过奇馈宝箱获得，传说中习得灵异秘卷中的神兽之道的宠物，资质和成长率会获得质的跃迁！");
+        showInfoBox("灵异秘卷只能通过奇馈宝箱获得，传说中习得灵异秘卷中关于神兽之道的宠物，资质和成长率会获得质的跃迁！");
         return;
     }
 

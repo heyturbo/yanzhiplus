@@ -1936,6 +1936,7 @@
                         本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效！
                     </div>
                     <button class="use-button" onclick="useSelectedDrug()">使用</button>
+                    <button class="use-button" onclick="mergeDrug()">合成</button>
                     <button class="close-button" onclick="closeDrugModal()">关闭</button>
                 </div>
             </div>
@@ -3623,30 +3624,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 //以下是药物系统
 let selectedDrug = null;
-let drugInventory = {
-    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", description: "长生不老之泉，饮用后恢复至满状态" },
-    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", description: "恢复玩家2000点法力值" },
-    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", description: "恢复玩家3000点生命值" },
-    "狂暴之魂": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", description: "永久提高10%暴击率" },
-    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", description: "10秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", description: "永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", description: "10秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", description: "10s内增加150%物理攻击力。" },
-    "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", description: "恢复玩家20%的生命值" },
-    "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", description: "恢复玩家20%的法力值" },
-    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", description: "10秒内深渊巨魔暴击率降低至0%" },
-    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", description: "10秒内增加玩家20000速度和20000法术攻击力" },
-    "灵木根": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", description: "恢复10%生命值并有几率清除玩家的异常状态" },
-    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", description: "消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
-    "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", description: "恢复玩家50000生命值" },
-    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", description: "恢复玩家50000法力值" },
-    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", description: "使用后10秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", description: "使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
-    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", description: "使用后60秒内战斗获胜所得经验增加两倍" },
-    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", description: "使用后60秒内战斗获胜所得经验增加四倍" }
-};
 let alreadyUseDrug = false;
+let drugInventory = {
+    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后恢复至满状态" },
+    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，恢复玩家2000点法力值" },
+    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", tier: 3, description: "绿色品阶，恢复玩家3000点生命值" },
+    "狂暴之魂": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高10%暴击率" },
+    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，10秒内暴击伤害提高50%" },
+    "慧心糖果": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高10%暴击伤害" },
+    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，10秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，10s内增加150%物理攻击力。" },
+    "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 2, description: "蓝色品阶，恢复玩家20%的生命值" },
+    "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 2, description: "蓝色品阶，恢复玩家20%的法力值" },
+    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，10秒内深渊巨魔暴击率降低至0%" },
+    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 2, description: "蓝色品阶，10秒内增加玩家20000速度和20000法术攻击力" },
+    "灵木根": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
+    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 0, description: "橙色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
+    "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，恢复玩家50000生命值" },
+    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，恢复玩家50000法力值" },
+    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
+    "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
+    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" }
+};
 
+// 药物系统函数
 function useDrug() {
     if (!alreadyUseDrug) {
         showInfoBox("这是你第一次打开药物面板，附送至尊药品礼包一份！");
@@ -3656,13 +3658,77 @@ function useDrug() {
     updateDrugGrid();
 }
 
+function mergeDrug() {
+    if (!selectedDrug) {
+        showInfoBox("请先选中要合成的药物。");
+        return;
+    }
+
+    const selectedDrugDetails = drugInventory[selectedDrug];
+    const selectedDrugTier = selectedDrugDetails.tier;
+
+    if (selectedDrugTier === 0) {
+        const requiredQuantity = 2;
+        if (selectedDrugDetails.quantity < requiredQuantity) {
+            showInfoBox("你至少需要2个同类药品才能进行合成！");
+            return;
+        }
+
+        // 减少低级药物数量
+        selectedDrugDetails.quantity -= requiredQuantity;
+
+        // 执行tier0药物的特殊合成逻辑
+        const probability = Math.random();
+        let message = '';
+
+        if (probability < 0.1) {
+            message = `你使用2个${selectedDrug}但没有成功合成任何药物`;
+        } else if (probability < 0.2) {
+            drugInventory[selectedDrug].quantity += 1;
+            message = `你使用2个${selectedDrug}成功炼制出了1个${selectedDrug}`;
+        } else if (probability < 0.5) {
+            const tier1Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 1);
+            for (let i = 0; i < 3; i++) {
+                const newDrug = tier1Drugs[Math.floor(Math.random() * tier1Drugs.length)];
+                drugInventory[newDrug].quantity += 1;
+                message = `你使用2个${selectedDrug}成功炼制出了3个${newDrug}`;
+            }
+        } else {
+            drugInventory[selectedDrug].quantity += 2;
+            message = `你使用2个${selectedDrug}成功炼制出了1个${selectedDrug}并获得额外1个随机${selectedDrug}`;
+        }
+
+        showInfoBox(message);
+    } else {
+        const requiredQuantity = 3;
+        if (selectedDrugDetails.quantity < requiredQuantity) {
+            showInfoBox("你至少需要3个同类药品才能进行合成！");
+            return;
+        }
+
+        // 减少低级药物数量
+        selectedDrugDetails.quantity -= requiredQuantity;
+
+        // 随机选择高级药物
+        const nextTier = selectedDrugTier - 1;
+        const nextTierDrugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === nextTier);
+        const newDrug = nextTierDrugs[Math.floor(Math.random() * nextTierDrugs.length)];
+
+        // 增加高级药物数量
+        drugInventory[newDrug].quantity += 1;
+
+        showInfoBox(`你使用3个${selectedDrug}成功炼制出了1个${newDrug}`);
+    }
+
+    updateDrugGrid();
+}
 
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
     document.getElementById('drug-description').innerText = '本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效';
 }
-
+        
 function updateDrugGrid() {
     const drugGrid = document.getElementById('drug-grid');
     drugGrid.innerHTML = '';
@@ -3672,10 +3738,19 @@ function updateDrugGrid() {
             drugItem.className = 'drug-item';
             drugItem.innerHTML = `
                 <img src="${drugInventory[drug].url}" alt="${drug}" width="45" height="45">
-                <div>${drug} x<span>${drugInventory[drug].quantity}</span></div>
+                <div>${drug} <span>${drugInventory[drug].quantity}</span>个</div>
             `;
             drugItem.onclick = () => selectDrug(drug);
             drugGrid.appendChild(drugItem);
+        }
+    }
+
+    // 更新选中药物的视觉效果
+    if (selectedDrug) {
+        const selectedDrugItem = Array.from(drugGrid.getElementsByClassName('drug-item'))
+            .find(item => item.querySelector('div').innerText.startsWith(selectedDrug));
+        if (selectedDrugItem) {
+            selectedDrugItem.style.border = '2px solid yellow'; // 视觉提示
         }
     }
 }
@@ -3683,6 +3758,7 @@ function updateDrugGrid() {
 function selectDrug(drugName) {
     selectedDrug = drugName;
     document.getElementById('drug-description').innerText = drugInventory[drugName].description;
+    updateDrugGrid();
 }
 
 let activeBuffs = {};
@@ -5212,13 +5288,6 @@ function autoBattle() {
 
         performAttack(attackType);
     }, 300);
-}
-// 新增的战斗轮次检查函数
-function checkBattleRounds() {
-    if (battleRounds === 100) {
-        addItemToJinnang('magicPetAmulet', 1);
-        showInfoBox('恭喜你战胜了第100轮深渊巨魔，获得了1个灵兽符文！');
-    }
 }
 
 // 定义初始暴击率和暴击伤害
@@ -6834,22 +6903,25 @@ function resetBuffState(playerWon) {
     }
     
     if (playerWon) {
-        // 基础获取药物的概率
-        let baseProbability = 0.8 + (spiritLevel * 0.002); // 每增加1级，概率增加0.2%
-
-        // 确保基础概率不会超过100%
-        if (baseProbability > 1) {
-            baseProbability = 1;
+        // 获取药物概率
+        const drugProbability = Math.random();
+        let drugTier;
+        
+        if (drugProbability < 0.1) {
+            drugTier = 0;
+        } else if (drugProbability < 0.25) {
+            drugTier = 1;
+        } else if (drugProbability < 0.5) {
+            drugTier = 2;
+        } else {
+            drugTier = 3;
         }
 
-        // 根据基础概率获取药物
-        if (Math.random() < baseProbability) {
-            const drugKeys = Object.keys(drugInventory);
-            const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
-            drugInventory[randomDrug].quantity += 1;
-            logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
-            updateDrugGrid();
-        }
+        const drugKeys = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === drugTier);
+        const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+        drugInventory[randomDrug].quantity += 1;
+        logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
+        updateDrugGrid();
 
         // spiritLevel在81到100之间时，额外获取药物的概率
         if (spiritLevel >= 81) {
@@ -6935,8 +7007,11 @@ function resetBattleState(playerWon) {
             }, duration * 1000);
         }
     }
-
-    updateUI();
+    
+    if (battleRounds === 101) {
+        addItemToJinnang('magicPetAmulet', 1);
+        showInfoBox('恭喜你战胜了第100轮深渊巨魔，获得了1个灵兽符文！');
+    }
 
     if (battleRounds === 151) {
         showInfoBox("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!继续战斗会进入无尽挑战模式。");
@@ -6950,7 +7025,8 @@ function resetBattleState(playerWon) {
     }
 
     logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink");
-
+    
+    updateUI();
     storeEnemyInitialState();
     enemyHealCount = 0;
     updatePetInfo();

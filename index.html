@@ -1729,7 +1729,7 @@
                 <button onclick="upgradeWisdomTo()">一键提悟</button>
                 <button onclick="useSupremeWisdomPill()">超级提悟</button>
                 <button onclick="ascend()">飞升突破</button>
-                <button onclick="transformPet()">宠物转职</button>
+                <button onclick="transformPet()">属性专精</button>
                 <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                 <button onclick="petCollection()">宠物图鉴</button>
                 <button onclick="showBiography()">解锁传记</button>
@@ -3007,7 +3007,6 @@ function petCollection() {
     closeButton.addEventListener('click', () => collectionPanel.remove());
     collectionPanel.appendChild(closeButton);
 
-
     // 创建图鉴内容
     const collectionContent = document.createElement('div');
     collectionContent.id = 'collectionContent';
@@ -3054,89 +3053,41 @@ function petCollection() {
             collectButton.style.cursor = 'not-allowed'; // 禁用时的鼠标样式
             collectButton.disabled = true;
         }
-        
+
         collectButton.addEventListener('click', () => {
             const petSelect = document.getElementById('pet-select');
-            if (!isPetOwned(petKey)) {
-                showInfoBox("你还没有该宠物!");
-                return;
-            }
-        
-            if (petSelect.options.length <= 1) {
-                showInfoBox("这是您的唯一爱宠了,请好好珍惜它!");
-                return;
-            }
-        
-            // 判断是否是当前宠物,如果是则弹出确认框
-            if (petSelect.value === petKey) {
-                showInfoBox("这是你目前的出战宠物,一旦收录将立即被清空数据,请谨慎操作!是否继续?", () => {
-                    // 用户点击"确认"按钮
-                    let newOption;
-                    do {
-                        const randomIndex = Math.floor(Math.random() * petSelect.options.length);
-                        newOption = petSelect.options[randomIndex].value;
-                    } while (newOption === petKey);
-        
-                    petSelect.value = newOption;
-                    changePet(); // 更新宠物信息
-        
-                    // 执行收录动作
-                    collectedPets.push(pet.name);
-                    collectedPetCount++;
-                    statusDiv.innerText = '已收录';
-                    collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
-                    collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
-                    collectButton.disabled = true;
-        
-                    // 从下拉菜单中移除当前宠物
-                    const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
-                    if (optionToRemove) {
-                        optionToRemove.remove();
+            const magicPetAmuletOwned = jinnangItems.some(item => item.name === 'magicPetAmulet' && item.quantity > 0);
+
+            if (magicPetAmuletOwned) {
+                showInfoBox("您拥有珍贵道具灵兽符文，使用后可以直接开启此图鉴位，你需要使用吗？", () => {
+                    if (useItem('magicPetAmulet')) {
+                        collectedPets.push(pet.name);
+                        collectedPetCount++;
+                        statusDiv.innerText = '已收录';
+                        collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
+                        collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
+                        collectButton.disabled = true;
+                        updateCollectionBonus();
+                        const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+                        updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
                     }
-        
-                    updateCollectionBonus();
-                    const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
-                    updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
                 }, () => {
-                    // 用户点击"取消"按钮,不进行收录
-                    return;
+                    // 用户取消使用灵兽符文，继续原有逻辑
+                    handleCollectButtonClick(petKey, pet, petSelect, statusDiv, collectButton);
                 });
             } else {
-                // 不是当前宠物,提示用户确认收录
-                showInfoBox("收录宠物后,宠物会消失,你确定收录吗?", () => {
-                    // 如果用户确认,执行收录逻辑
-                    collectedPets.push(pet.name);
-                    collectedPetCount++;
-                    statusDiv.innerText = '已收录';
-                    collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
-                    collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
-                    collectButton.disabled = true;
-        
-                    // 从下拉菜单中移除当前宠物
-                    const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
-                    if (optionToRemove) {
-                        optionToRemove.remove();
-                    }
-        
-                    updateCollectionBonus();
-                    const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
-                    updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
-                }, () => {
-                    // 如果用户取消,不进行收录
-                    return;
-                });
+                handleCollectButtonClick(petKey, pet, petSelect, statusDiv, collectButton);
             }
         });
-        
+
         petDiv.appendChild(img);
         petDiv.appendChild(nameDiv);
         petDiv.appendChild(statusDiv);
         petDiv.appendChild(collectButton);
         collectionContent.appendChild(petDiv);
-        });
-        
-        collectionPanel.appendChild(collectionContent);
+    });
 
+    collectionPanel.appendChild(collectionContent);
 
     // 创建图鉴加成信息区
     const bonusInfoDiv = document.createElement('div');
@@ -3153,6 +3104,69 @@ function petCollection() {
     updateSkillScore();
     updateAttributePanel();
     updateTitle();
+}
+
+function handleCollectButtonClick(petKey, pet, petSelect, statusDiv, collectButton) {
+    if (!isPetOwned(petKey)) {
+        showInfoBox("你还没有该宠物!");
+        return;
+    }
+
+    if (petSelect.options.length <= 1) {
+        showInfoBox("这是您的唯一爱宠了,请好好珍惜它!");
+        return;
+    }
+
+    if (petSelect.value === petKey) {
+        showInfoBox("⚠️⚠️⚠️这是你目前的出战宠物，一旦收录将立即被清空数据，请谨慎操作！是否继续？", () => {
+            let newOption;
+            do {
+                const randomIndex = Math.floor(Math.random() * petSelect.options.length);
+                newOption = petSelect.options[randomIndex].value;
+            } while (newOption === petKey);
+
+            petSelect.value = newOption;
+            changePet(); // 更新宠物信息
+
+            collectedPets.push(pet.name);
+            collectedPetCount++;
+            statusDiv.innerText = '已收录';
+            collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
+            collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
+            collectButton.disabled = true;
+
+            const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
+            updateCollectionBonus();
+            const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+            updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
+        }, () => {
+            return;
+        });
+    } else {
+        showInfoBox("收录宠物后,宠物会消失,你确定收录吗?", () => {
+            collectedPets.push(pet.name);
+            collectedPetCount++;
+            statusDiv.innerText = '已收录';
+            collectButton.style.backgroundColor = 'red'; // 更新禁用时的背景颜色
+            collectButton.style.cursor = 'not-allowed'; // 更新禁用时的鼠标样式
+            collectButton.disabled = true;
+
+            const optionToRemove = petSelect.querySelector(`option[value="${petKey}"]`);
+            if (optionToRemove) {
+                optionToRemove.remove();
+            }
+
+            updateCollectionBonus();
+            const currentAttributes = calculateCurrentAttributes(); // 重新计算当前属性
+            updateSecondaryAttributes(currentAttributes, currentWisdom); // 更新二级属性
+        }, () => {
+            return;
+        });
+    }
 }
 
 function updateCollectionBonus() {
@@ -5199,7 +5213,13 @@ function autoBattle() {
         performAttack(attackType);
     }, 300);
 }
-
+// 新增的战斗轮次检查函数
+function checkBattleRounds() {
+    if (battleRounds === 100) {
+        addItemToJinnang('magicPetAmulet', 1);
+        showInfoBox('恭喜你战胜了第100轮深渊巨魔，获得了1个灵兽符文！');
+    }
+}
 
 // 定义初始暴击率和暴击伤害
 let playerCritRate = 0.1; // 10%
@@ -7651,7 +7671,7 @@ function updateTreasureDescription(type) {
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得各种用于培养宠物资质、重塑技能的道具，甚至还能获得开启宠物转职的关键道具！";
+                description = "充满奇异道具的宝箱，每次开启花费150文金子，您可能获得各种用于培养宠物资质、重塑技能的道具，甚至还能获得开启属性专精的关键道具！";
                 break;
             case '灵魂宝箱':
                 description = "神秘莫测的宝箱，每次开启花费300文金子，您可能获得宠物进化所需的各种灵魂！";
@@ -7736,7 +7756,7 @@ function collectTreasure() {
             case '无限宝石':
                 addItemToJinnang('infiniteGem');
                 break;
-            case '若愚水':
+            case '清心酿':
                 addItemToJinnang('ignoranceWater');
                 break;
             case '闪耀之灵':
@@ -7844,7 +7864,7 @@ function getRandomReward(type) {
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 30 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 30 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
-            { name: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
+            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 7 },
             { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/668ad3d8d9c307b7e9be7361.png', chance: 1 }
         ],
@@ -7905,8 +7925,9 @@ let jinnangItems = [
     { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', price: 1500, quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药' },
     { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', price: 50, quantity: 0, description: '配合毒粉，可使施毒成功率大大提升' },
     { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: 30, quantity: 0, description: '荟萃日月之精华，提升飞升之术等级的必需之物' },
+    { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/66967473d9c307b7e932f48d.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
     { name: 'infiniteGem', displayName: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', price: 2000, quantity: 0, description: '宇宙间最玄妙的宝石，宠物使用后可受到更高阶的指引' },
-    { name: 'ignoranceWater', displayName: '若愚水', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
+    { name: 'ignoranceWater', displayName: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', price: 500, quantity: 0, description: '用于宠物25~30进化' },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', price: 50, quantity: 0, description: '用于宠物1~6进化' },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
@@ -8565,7 +8586,7 @@ function transformPet() {
     modal.style.position = 'relative';
 
     const title = document.createElement('h2');
-    title.innerText = '宠物转职';
+    title.innerText = '属性专精';
     title.style.textAlign = 'center';
     modal.appendChild(title);
 
@@ -8638,13 +8659,23 @@ function transformPet() {
                 showInfoBox("你已经开启过本专精了！");
                 refreshSpecializationUI();
             } else if (currentSpecialization) {
-                showInfoBox("请先关闭当前专精后再开启其他专精！");
+                showInfoBox("你只能同时开启一个专精，请先关闭当前专精后再开启其他专精！");
                 refreshSpecializationUI();
             } else {
                 if (useItem('infiniteGem', 1)) {
                     handleSpecializationChange(key);
                     showInfoBox(`在无限宝石的指引下，你的宠物选择了${key}专精！`);
                     refreshSpecializationUI();
+                    // 找到当前的 overlay 元素
+                    const overlay = document.querySelector('div[style*="position: fixed"]');
+                    
+                    // 如果找到了 overlay 元素，移除它
+                    if (overlay) {
+                        document.body.removeChild(overlay);
+                    } else {
+                        console.log("没有找到 overlay 元素");
+                    }
+                    transformPet();
                 } else {
                     showInfoBox("您还没有无限宝石，此道具可通过开启奇馈宝箱概率获得。");
                 }
@@ -8666,10 +8697,20 @@ function transformPet() {
             } else {
                 if (useItem('ignoranceWater', 1)) {
                     handleSpecializationChange(null);
-                    showInfoBox("若愚水使你的宠物忘记了历年所学，返璞归真");
+                    showInfoBox("清心酿使你的宠物忘记了历年所学，返璞归真");
+                    // 找到当前的 overlay 元素
+                    const overlay = document.querySelector('div[style*="position: fixed"]');
+                    
+                    // 如果找到了 overlay 元素，移除它
+                    if (overlay) {
+                        document.body.removeChild(overlay);
+                    } else {
+                        console.log("没有找到 overlay 元素");
+                    }
+                    transformPet();
                     refreshSpecializationUI();
                 } else {
-                    showInfoBox("您还没有若愚水，此道具可通过开启奇馈宝箱概率获得。");
+                    showInfoBox("您还没有清心酿，此道具可通过开启奇馈宝箱概率获得。");
                 }
             }
             refreshSpecializationUI();
@@ -10253,7 +10294,7 @@ function upgradeWisdomTo() {
         'poisonSkillBook', //施毒之术
         'poisonPowder', //毒粉
         'infiniteGem', //无限宝石
-        'ignoranceWater', //若愚水
+        'ignoranceWater', //清心酿
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹

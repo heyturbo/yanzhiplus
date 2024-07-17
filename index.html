@@ -639,10 +639,10 @@
         .treasure-bar {
             display: flex;
             justify-content: space-around;
-            align-items: center;
         }
         .reward-box {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
             background-color: #f1f0f0;
             border-radius: 10px;
             text-align: center;
@@ -650,6 +650,10 @@
             justify-content: center;
             margin: 5px;
             padding: 5px;
+        }
+        .reward-box img {
+            width: 45px;
+            height: 45px;
         }
         .treasure-action {
             display: flex;
@@ -1746,6 +1750,7 @@
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
                 <button onclick="sellPet()">宠物市场</button>
+                <button onclick="blessGift()">新手礼包</button>
                 <div class="shop-timer">
                     <span id="shop-timer">05:00</span>
                     <button onclick="refreshShop()">付费刷新</button>
@@ -1783,6 +1788,7 @@
             <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">自动取出</button>
+                <button onclick="openTenthTreasure()">开启十次</button>
                 <button onclick="collectTreasure()">拿走奖品</button>
             </div>
         </div>
@@ -3688,14 +3694,16 @@ function mergeDrug() {
             message = `你使用2个${selectedDrug}成功炼制出了1个${selectedDrug}`;
         } else if (probability < 0.5) {
             const tier1Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 1);
+            const newDrugs = [];
             for (let i = 0; i < 3; i++) {
                 const newDrug = tier1Drugs[Math.floor(Math.random() * tier1Drugs.length)];
                 drugInventory[newDrug].quantity += 1;
-                message = `你使用2个${selectedDrug}成功炼制出了3个${newDrug}`;
+                newDrugs.push(newDrug);
             }
+            message = `你使用2个${selectedDrug}成功炼制出了${newDrugs.join(', ')}`;
         } else {
             drugInventory[selectedDrug].quantity += 2;
-            message = `你使用2个${selectedDrug}成功炼制出了1个${selectedDrug}并获得额外1个随机${selectedDrug}`;
+            message = `你使用2个${selectedDrug}成功炼制出了2个${selectedDrug}`;
         }
 
         showInfoBox(message);
@@ -3750,7 +3758,7 @@ function updateDrugGrid() {
         const selectedDrugItem = Array.from(drugGrid.getElementsByClassName('drug-item'))
             .find(item => item.querySelector('div').innerText.startsWith(selectedDrug));
         if (selectedDrugItem) {
-            selectedDrugItem.style.border = '2px solid yellow'; // 视觉提示
+            selectedDrugItem.style.border = '2px solid white'; // 视觉提示
         }
     }
 }
@@ -4070,21 +4078,21 @@ let ascensionAttributes = {
 };
 const ascensionSkills = {
     attribute: [
-        { name: '力劈华山', effect: level => `提供${4000 + 1000 + level * 4000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 4000 },
-        { name: '慈悲心怀', effect: level => `提供${50000 + 5000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 5000 * level },
-        { name: '势如破竹', effect: level => `提供${20000 + 180 + 50 * level}点速度和${34000 + 180 + 160 * level}点法术攻击力`, baseValue: 34000, increment: level => 180 + 160 * level },
-        { name: '固若金汤', effect: level => `提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
+        { name: '力劈华山', effect: level => `额外提供${4000 + 1000 + level * 4000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 4000 },
+        { name: '慈悲心怀', effect: level => `额外提供${50000 + 5000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 5000 * level },
+        { name: '势如破竹', effect: level => `额外提供${20000 + 180 + 50 * level}点速度和${34000 + 180 + 160 * level}点法术攻击力`, baseValue: 34000, increment: level => 180 + 160 * level },
+        { name: '固若金汤', effect: level => `额外提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
     ],
     combat: [
-        { name: '魔龙之力', effect: level => `每回合恢复最大生命值${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
+        { name: '魔龙之力', effect: level => `每回合恢复${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
         { name: '斩龙一式', effect: level => `当深渊巨魔生命值在${87 - 3 * (level - 1)}%以上时，对深渊巨魔的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
         { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给深渊巨魔附加等同于玩家物理攻击力1000%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
-        { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害，深渊巨魔所有伤害为0。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
+        { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${15 + 2 * level}%~${30 + 2 * level}%`, baseValue: 15, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `减少承受伤害的${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
-        { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率同时施放两次法术伤害`, baseValue: 60, increment: level => 2 * level },
+        { name: '铜墙铁壁', effect: level => `承受伤害降低${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
+        { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率再次施放一次法术伤害`, baseValue: 60, increment: level => 2 * level },
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
     settlement: [
@@ -5024,9 +5032,9 @@ function logBattleEvent(event, color = 'white') {
         newEvent.style.color = color; // 设置文字颜色
         logDiv.appendChild(newEvent);
 
-        // 检查日志条目数，如果超过 36 条，则删除最早的条目
+        // 检查日志条目数，如果超过 100 条，则删除最早的条目
         const logs = logDiv.getElementsByTagName("p");
-        while (logs.length > 36) {
+        while (logs.length > 100) {
             logDiv.removeChild(logs[0]);
         }
 
@@ -5114,10 +5122,10 @@ function enemyInfo() {
 
     // 创建详情段落
     const details = [
-        '深渊巨魔共有两种形态:正常和狂暴',
-        '正常形态下,它会交替使用物理和法术技能攻击深渊巨魔。深渊巨魔精通人心操纵之术,若施加于深渊巨魔"醉酒"、"摄魂"等效果,战局风险会极大提高。',
-        '每过10轮,深渊巨魔会触发一次狂暴状态。此时它的暴击伤害将大幅提高,且出手必定暴击。玩家需要尤其注意血线的控制。合理搭配飞升技能可以增加通关概率。',
-        '深渊巨魔一共有150轮,通关后可以继续战斗。当深渊巨魔的能力提升到一定程度后将不会再提升。'
+        '深渊巨魔共有两种形态：正常和狂暴',
+        '正常形态下，它会交替使用物理和法术技能攻击深渊巨魔。深渊巨魔精通人心操纵之术,若玩家被施加"醉酒"、"摄魂"等效果，战局风险会极大提高。',
+        '每过10轮，深渊巨魔会触发一次狂暴状态。此时它的暴击能力会加强。狂暴状态下，深渊巨魔生命低于20%时将在2秒内拥有霸体且触发一次复活，因此玩家需要尤其注意血线的控制。',
+        '深渊巨魔一共有150轮，通关后可以进入无尽模式继续挑战。'
     ];
 
     details.forEach(detail => {
@@ -5179,10 +5187,10 @@ function enemyInfo() {
 }        
 //跳过十轮函数
 function jumpByTenRounds() {
-    const maxSkipRounds = Math.min(100, petLevel + 20);
+    const maxSkipRounds = Math.min(99, petLevel + 20);
 
     if (battleRounds >= maxSkipRounds) {
-        logBattleEvent(`你已经到达当前阶段最大可跳过的等级（不超过自身等级20级）`, 'red');
+        logBattleEvent(`当前无法再继续跳过！`, 'red');
         return;
     }
 
@@ -5506,8 +5514,8 @@ function handleLevelUp() {
 function handleBulkLevelUp() {
     const skillMessages = [];
     currentPet.skills.forEach(skill => {
-        while (skill.level >= 10 && skill.level < 20 && currentExp >= (1000 + 200 * (skill.level - 10))) {
-            const expCost = 1000 + 200 * (skill.level - 10);
+        while (skill.level >= 10 && skill.level < 20 && currentExp >= (1200 + 200 * (skill.level - 10))) {
+            const expCost = 1200 + 200 * (skill.level - 10);
             currentExp -= expCost;
             skill.level += 1;
             skillMessages.push(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${skill.level} 级，威力增加了！`);
@@ -6617,7 +6625,7 @@ function clearEnemyEffect() {
 
 function handleBurnt() {
     if (battleState.enemy.burnt) {
-        const burntDamage = 1288 * battleRounds;
+        const burntDamage = 12888 * battleRounds;
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
         logBattleEvent(`深渊巨魔受到了 ${burntDamage} 点灼烧伤害。`, 'red');
     }
@@ -7724,7 +7732,6 @@ function ascend() {
 }
 
 let selectedTreasure = null;
-let rewards = []; // 定义全局变量来存储奖品
 let experienceTreasureOpenCount = 0; // 定义经验宝箱打开次数的全局变量
 
 function toggleTreasureDrawer() {
@@ -7763,52 +7770,7 @@ function updateTreasureDescription(type) {
     document.getElementById('treasure-description').innerText = description;
 }
 
-function openTreasure() {
-    if (!selectedTreasure) {
-        showInfoBox("请先选择一个宝箱！");
-        return;
-    }
-
-    const cost = getTreasureCost(selectedTreasure);
-    if (goldAmount < cost) {
-        showInfoBox("金子不足！");
-        return;
-    }
-
-    // 自动收集上次未取出的奖品
-    collectTreasure();
-
-    if (selectedTreasure === '经验宝箱') {
-        experienceTreasureOpenCount++; // 增加经验宝箱开启次数
-    }
-
-    goldAmount -= cost;
-    updateGoldDisplay(goldAmount);
-
-    // 根据概率随机生成 1~3 个奖品
-    let rewardCount;
-    const random = Math.random() * 100;
-    if (random < 95) {
-        rewardCount = 1;
-    } else if (random < 99) {
-        rewardCount = 2;
-    } else {
-        rewardCount = 3;
-    }
-
-    rewards = [];
-    for (let i = 0; i < rewardCount; i++) {
-        rewards.push(getRandomReward(selectedTreasure));
-    }
-
-    // 更新页面显示多个奖品
-    let rewardHTML = '';
-    for (const reward of rewards) {
-        rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
-    }
-    document.getElementById('treasure-reward').innerHTML = rewardHTML;
-    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66793494d9c307b7e9dae0f9.png');
-}
+let rewards = []; // 确保 rewards 在全局作用域内
 
 function collectTreasure() {
     if (rewards.length === 0) {
@@ -7901,6 +7863,65 @@ function collectTreasure() {
     }
 }
 
+// 修改 openTreasure 函数，使其兼容开启十次的逻辑
+function openTreasure(times = 1) {
+    if (!selectedTreasure) {
+        showInfoBox("请先选择一个宝箱！");
+        return;
+    }
+
+    const cost = getTreasureCost(selectedTreasure) * times;
+    if (goldAmount < cost) {
+        showInfoBox("金子不足！");
+        return;
+    }
+
+    // 自动收集上次未取出的奖品
+    collectTreasure();
+
+    if (selectedTreasure === '经验宝箱') {
+        experienceTreasureOpenCount += times; // 增加经验宝箱开启次数
+    }
+
+    goldAmount -= cost;
+    updateGoldDisplay(goldAmount);
+
+    let totalRewards = [];
+    for (let t = 0; t < times; t++) {
+        // 根据概率随机生成 1~3 个奖品
+        let rewardCount;
+        const random = Math.random() * 100;
+        if (random < 95) {
+            rewardCount = 1;
+        } else if (random < 99) {
+            rewardCount = 2;
+        } else {
+            rewardCount = 3;
+        }
+
+        let rewards = [];
+        for (let i = 0; i < rewardCount; i++) {
+            rewards.push(getRandomReward(selectedTreasure));
+        }
+
+        totalRewards = totalRewards.concat(rewards);
+    }
+
+    rewards = totalRewards; // 更新全局 rewards
+
+    // 更新页面显示多个奖品
+    let rewardHTML = '';
+    for (const reward of totalRewards) {
+        rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
+    }
+    document.getElementById('treasure-reward').innerHTML = rewardHTML;
+    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66793494d9c307b7e9dae0f9.png');
+}
+
+function openTenthTreasure() {
+    openTreasure(10);
+}
+
 function getTreasureCost(type) {
     if (type === '经验宝箱') {
         if (experienceTreasureOpenCount < 20) {
@@ -7942,7 +7963,7 @@ function getRandomReward(type) {
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
             { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 7 },
-            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/668ad3d8d9c307b7e9be7361.png', chance: 1 }
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -8001,7 +8022,7 @@ let jinnangItems = [
     { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', price: 1500, quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药' },
     { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', price: 50, quantity: 0, description: '配合毒粉，可使施毒成功率大大提升' },
     { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: 30, quantity: 0, description: '荟萃日月之精华，提升飞升之术等级的必需之物' },
-    { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/66967473d9c307b7e932f48d.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
+    { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/669754f1d9c307b7e9bfec8f.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
     { name: 'infiniteGem', displayName: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', price: 2000, quantity: 0, description: '宇宙间最玄妙的宝石，宠物使用后可受到更高阶的指引' },
     { name: 'ignoranceWater', displayName: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', price: 500, quantity: 0, description: '用于宠物25~30进化' },
@@ -8010,7 +8031,7 @@ let jinnangItems = [
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
-    { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/668ad3d8d9c307b7e9be7361.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
+    { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -8975,11 +8996,11 @@ function showBiography() {
     const skillScore = parseInt(document.getElementById("skill-score").innerText, 10);
 
     let message;
-    if (skillScore < 200000) {
-        message = "您的宠物评分过低，请提升到200000后再试！（宠物传记共有3段，当评分到达200000、1000000、3000000时会各自解锁）";
-    } else if (skillScore < 1000000) {
+    if (skillScore < 2000000) {
+        message = "您的宠物评分过低，请提升到2000000后再试！（宠物传记共有3段，当评分到达2000000、5000000、10000000时会各自解锁）";
+    } else if (skillScore < 5000000) {
         message = biography[0];
-    } else if (skillScore < 3000000) {
+    } else if (skillScore < 10000000) {
         message = biography[0] + "<br>" + biography[1];
     } else {
         message = biography[0] + "<br>" + biography[1] + "<br>" + biography[2];
@@ -9075,7 +9096,6 @@ function updateGoldDisplay(goldAmount) {
     goldElement.style.webkitTextStroke = '1px gold'; // 添加描边效果
     goldElement.style.textStroke = '1px gold'; // 兼容性处理
 }
-
 
 // 初始状态下更新金子显示
 updateGoldDisplay(goldAmount);
@@ -10281,11 +10301,10 @@ function updateSkillScore(selectedSkills = []) {
     updateTitle();
 }
 
-let blessGift = false;
-function upgradeWisdomTo() {
-    const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后,你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
-    if (target === null) return;
-    if (target === "新手大礼包" && !blessGift) {
+let blessGiftClaimed = false;
+
+function blessGift() {
+    if (!blessGiftClaimed) {
         transmutationPill += 200;
         rebornPill += 300;
         bingpoRebornPill += 200;
@@ -10307,9 +10326,9 @@ function upgradeWisdomTo() {
             'coagulateStone', // 凝魄石
             'seperateStone', // 离魂石
             'radiantSoul',
-            'heartStone', //心鉴之石
+            'heartStone', // 心鉴之石
             'shakingSoul',
-            'summonCharmPaper', //召唤灵符
+            'summonCharmPaper', // 召唤灵符
             'glowingSoul',
             'activeSoul',
             'jumpingSoul'
@@ -10318,19 +10337,22 @@ function upgradeWisdomTo() {
         for (const item of itemsToIncrease) {
             addItemToJinnang(item, 50);
         }
-        blessGift = true;
+        blessGiftClaimed = true;
         updateJinnangItems();
         showInfoBox("您获得了新手大礼包!(50万文金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
-        return;
-    }
-    if (target === "新手大礼包" && blessGift) {
+    } else {
         showInfoBox("你已经领取过新手礼包了!", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
-        return;
     }
+}
+
+function upgradeWisdomTo() {
+    const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后,你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
+    if (target === null) return;
+
     if (target === "11111") {
         transmutationPill += 999;
         rebornPill += 999;
@@ -11279,9 +11301,6 @@ function ascendCheat() {
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
 }
 
-
-
-
 function enhanceQuality() {
     if (!currentPet || !currentPet.qualities) { // 添加检查
         console.warn("当前宠物未被正确初始化。");
@@ -11630,6 +11649,12 @@ function updateTitle() {
 
 // 绑定按钮点击事件自动战斗
 document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
+// 绑定 blessGift 按钮的点击事件
+document.getElementById("bless-gift-button").addEventListener("click", blessGift);
+
+// 绑定“开启十次”按钮的点击事件
+document.getElementById("open-tenth-treasure-button").addEventListener("click", openTenthTreasure);
+
 // 添加警示闪烁的关键帧动画
 const style = document.createElement('style');
 style.innerHTML = `

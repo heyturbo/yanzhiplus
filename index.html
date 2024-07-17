@@ -2323,21 +2323,21 @@
                     { name: '共同依赖（防御）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，在偏远小镇的日子里，他们面对未知的危险，渐渐彼此依赖。' },
                     { name: '发现真心（回蓝）', rarity: 'A', type: 'HL', multiplier: 0.2, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
                     { name: '日记重现（治疗）', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，一本旧日记让她找回了失去的记忆，重新记起了他们之间的点点滴滴。' },
-                    { name: '心灵触动（法攻）', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
+                    { name: '心灵触动（物攻）', rarity: 'SS', type: 'PA', multiplier: 2.8, description: '主动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
                     { name: '保护她（物攻）', rarity: 'S', type: 'PA', multiplier: 2.5, description: '主动技能，他在关键时刻挺身而出，保护她免受伤害，展现了真正的男子汉气概。' },
                     { name: '继父威胁（施毒）', rarity: 'B', type: 'PP', multiplier: 0.5, description: '主动技能，继父的威胁不断升级，他挺身而出，保护她不受伤害。' },
                     { name: '记忆恢复（治疗）', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，在危机中，她的记忆终于完全恢复，找回了曾经的甜蜜时光。' },
                     { name: '法律制裁（施毒）', rarity: 'B', type: 'PP', multiplier: 1.2, description: '主动技能，他揭穿了继父的阴谋，让继父受到应有的法律制裁。' },
                     { name: '重返工作（治疗）', rarity: 'A', type: 'PH', multiplier: 1, description: '主动技能，她重返《Fantasy!》杂志，继续她的事业，与他一起迎接未来的挑战。' },
                     { name: '幸福结局（法攻）', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，经历了无数波折，他们最终找到了真正的幸福，成为彼此生命中最重要的存在。' },
-                    { name: '守护夏奈（防御）', rarity: 'SS', type: 'PD', multiplier: 1.2, description: '主动技能，如果此生只能守护一人，她的名，必须是夏奈。' }
+                    { name: '守护夏奈（守护）', rarity: 'SH', type: 'PD', multiplier: 1.2, description: '主动技能，如果此生只能守护一人，她的名，必须是夏奈。' }
                 ],
                 qualities: {
                     endurance: { current: 4500, min: 4500, max: 6500 },
-                    strength: { current: 6750, min: 6750, max: 13400 },
+                    strength: { current: 7750, min: 7750, max: 13400 },
                     faith: { current: 1800, min: 1800, max: 3200 },
                     agility: { current: 4950, min: 4950, max: 7050 },
-                    intelligence: { current: 3750, min: 3750, max: 10400 },
+                    intelligence: { current: 6750, min: 6750, max: 10400 },
                     mutated: false
                 }
             },
@@ -11408,7 +11408,7 @@ function mutatePet() {
 function useMutationScroll() {
     // 检查宠物是否已经变异
     if (currentPet.qualities.mutated) {
-        showInfoBox("你的宠物已经变异，将无法重复使用！");
+        showInfoBox("你的宠物已经变异，无法重复使用！");
         return;
     }
 

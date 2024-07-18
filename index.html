@@ -1916,7 +1916,7 @@
                     <!-- 第二个飞升技能面板，默认隐藏 -->
                     <div id="second-ascension-skill" class="ascension-second-skill" style="display: none;">
                         <div class="ascension-header">
-                            <img id="second-ascension-icon" src="https://via.placeholder.com/75" alt="Ascension Skill Icon" class="ascension-icon">
+                            <img id="second-ascension-icon" src="https://pic.imgdb.cn/item/66726727d9c307b7e9118748.png" alt="Ascension Skill Icon" class="ascension-icon">
                             <div class="ascension-info">
                                 <p id="second-ascension-name" class="ascension-name">飞升之术名字</p>
                                 <p id="second-ascension-level" class="ascension-level">等级: 1</p>
@@ -1943,6 +1943,7 @@
                     </div>
                     <button class="use-button" onclick="useSelectedDrug()">使用</button>
                     <button class="use-button" onclick="mergeDrug()">合成</button>
+                    <button class="use-button" onclick="collectDrug()">采集</button>
                     <button class="close-button" onclick="closeDrugModal()">关闭</button>
                 </div>
             </div>
@@ -3651,7 +3652,11 @@ let drugInventory = {
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
-    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" }
+    "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
+    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药物" },
+    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png", tier: 3, description: "绿色品阶，收集3个可以合成1个蓝色品阶的药物" },
+    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png", tier: 2, description: "蓝色品阶，收集3个可以合成1个紫色品阶的药物" },
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药物" }
 };
 
 // 药物系统函数
@@ -3737,6 +3742,57 @@ function mergeDrug() {
     updateDrugGrid();
 }
 
+let collectCost = 500; // 初始采集花费
+
+function collectDrug() {
+    if (goldAmount < collectCost) {
+        showInfoBox("金子不足，无法进行采集！");
+        return;
+    }
+
+    // 扣除金子并更新显示
+    goldAmount -= collectCost;
+    updateGoldDisplay(goldAmount);
+
+    // 递增下次采集的花费
+    collectCost += 100;
+
+    // 确定采集的药材
+    const random = Math.random() * 100;
+    let collectedDrug;
+    if (random < 50) {
+        collectedDrug = '普通药材';
+        drugInventory['普通药材'].quantity += 1;
+    } else if (random < 80) {
+        collectedDrug = '上等药材';
+        drugInventory['上等药材'].quantity += 1;
+    } else if (random < 95) {
+        collectedDrug = '极品药材';
+        drugInventory['极品药材'].quantity += 1;
+    } else {
+        collectedDrug = '珍贵药材';
+        drugInventory['珍贵药材'].quantity += 1;
+    }
+
+    // 触发奖励事件
+    const rewardRandom = Math.random() * 100;
+    let multiplier = 1;
+    if (rewardRandom < 1) {
+        multiplier = 3;
+    } else if (rewardRandom < 3) {
+        multiplier = 2;
+    }
+
+    if (multiplier > 1) {
+        drugInventory[collectedDrug].quantity += (multiplier - 1);
+        document.getElementById('drug-description').innerText = `你花费${collectCost - 100}金子，采集到了${multiplier}个${collectedDrug}！`;
+    } else {
+        document.getElementById('drug-description').innerText = `你花费${collectCost - 100}金子，采集到了1个${collectedDrug}！`;
+    }
+
+    updateDrugGrid(); // 更新药物显示
+}
+        
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
@@ -3793,6 +3849,13 @@ function checkConflictingBuffs(selectedDrug) {
 function useSelectedDrug() {
     if (!selectedDrug) {
         showInfoBox("请选择一种药物！");
+        return;
+    }
+
+    // 检查所选择的药物是否为不可直接使用的药材
+    const nonUsableDrugs = ["普通药材", "上等药材", "极品药材", "珍贵药材"];
+    if (nonUsableDrugs.includes(selectedDrug)) {
+        showInfoBox("你不能直接使用尚未炼制的药材！");
         return;
     }
 

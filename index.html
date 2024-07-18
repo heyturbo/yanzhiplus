@@ -3691,7 +3691,7 @@ function mergeDrug() {
             message = `你使用2个${selectedDrug}但没有成功合成任何药物`;
         } else if (probability < 0.2) {
             drugInventory[selectedDrug].quantity += 1;
-            message = `你使用2个${selectedDrug}成功炼制出了1个${selectedDrug}`;
+            message = `你使用2个${selectedDrug}进行炼制，但只得到了1个${selectedDrug}`;
         } else if (probability < 0.5) {
             const tier1Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 1);
             const newDrugs = [];
@@ -3900,7 +3900,7 @@ function useSelectedDrug() {
                 logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`, 'gold');
                 break;
             case "慧心糖果":
-                playerCritDamage = Math.min(10.0, playerCritDamage + 0.10); // 最大1000%
+                playerCritDamage = Math.min(30.0, playerCritDamage + 0.10); // 最大3000%
                 logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`, 'gold');
                 break;
             case "延寿露":
@@ -3948,7 +3948,7 @@ function applyBuff(drugName) {
             applyTimedBuff(
                 drugName,
                 () => {
-                    playerCritDamage = Math.min(10.0, playerCritDamage + 0.50); // 最大1000%
+                    playerCritDamage = Math.min(30.0, playerCritDamage + 0.50); // 最大3000%
                     logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续10秒。`, 'gold');
                     return () => {
                         playerCritDamage = playerCritDamage - 0.5;
@@ -4031,7 +4031,7 @@ function applyBuff(drugName) {
                         battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
                         playerCritRate = Math.min(10.0, playerCritRate + 0.50); // 最大1000%
-                        playerCritDamage = Math.min(10.0, playerCritDamage + 0.50); // 最大1000%
+                        playerCritDamage = Math.min(30.0, playerCritDamage + 0.50); // 最大3000%
                         logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`, 'gold');
                         return () => {
                             battleAttributes.physicalAttack = originalPA;
@@ -4084,10 +4084,10 @@ let ascensionAttributes = {
 };
 const ascensionSkills = {
     attribute: [
-        { name: '力劈华山', effect: level => `额外提供${4000 + 1000 + level * 4000}点物理攻击力`, baseValue: 4000, increment: level => 1000 + level * 4000 },
-        { name: '慈悲心怀', effect: level => `额外提供${50000 + 5000 * level}点生命值和${50000 + 2000 * level}点法力值`, baseValue: 50000, increment: level => 5000 * level },
-        { name: '势如破竹', effect: level => `额外提供${20000 + 180 + 50 * level}点速度和${34000 + 180 + 160 * level}点法术攻击力`, baseValue: 34000, increment: level => 180 + 160 * level },
-        { name: '固若金汤', effect: level => `额外提供${50000 + 300 * level + 900}点物理防御和${50000 + 300 * level + 900}点法术防御`, baseValue: 50000, increment: level => 300 * level + 900 }
+        { name: '力劈华山', effect: level => `额外提供${50000 + level * 3500}点物理攻击力`, baseValue: 50000, increment: level => level * 3500 },
+        { name: '慈悲心怀', effect: level => `额外提供${500000 + level * 20000}点生命值和${200000 + level * 20000}点法力值`, baseValue: 500000, increment: level => 20000 * level },
+        { name: '势如破竹', effect: level => `额外提供${20000 + 3000 * level}点速度和${40000 + 3000 * level}点法术攻击力`, baseValue: 20000, increment: level => 3000 * level },
+        { name: '固若金汤', effect: level => `额外提供${100000 + 20000 * level}点物理防御和${100000 + 20000 * level}点法术防御`, baseValue: 100000, increment: level => 20000 * level }
     ],
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
@@ -4102,7 +4102,7 @@ const ascensionSkills = {
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
     settlement: [
-        { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${100 + 100 + 100 * level}`, baseValue: 100, increment: level => 100 + 100 * level },
+        { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${1000 + 250 * level}文`, baseValue: 1000, increment: level => 250 * level },
         { name: '焉知非福', effect: level => `战斗失败后，下一轮获得持续${3 + 1 * level}秒的仙气护体`, baseValue: 3, increment: level => 1 * level },
         { name: '举一反三', effect: level => `战斗胜利时获得的经验值增加${30 + 5 * level}%`, baseValue: 30, increment: level => 5 * level },
         { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}文金子的安慰金`, baseValue: 50, increment: level => 50 * level }
@@ -4140,15 +4140,15 @@ function applySingleAscensionBonus(skill, attributes) {
             break;
         case '慈悲心怀':
             attributes.health += skill.baseValue + skill.increment(skill.level);
-            attributes.mana += 50000 + skill.increment(skill.level);
+            attributes.mana += 200000 + skill.increment(skill.level);
             break;
         case '势如破竹':
             attributes.speed += skill.baseValue + skill.increment(skill.level);
-            attributes.magicAttack += 34000 + skill.increment(skill.level);
+            attributes.magicAttack += 40000 + skill.increment(skill.level);
             break;
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
-            attributes.magicDefense += 50000 + skill.increment(skill.level);
+            attributes.magicDefense += 100000 + skill.increment(skill.level);
             break;
         // 其他技能增益逻辑...
     }
@@ -7625,23 +7625,30 @@ function useSupremeWisdomPill() {
         console.warn("当前宠物未被正确初始化。");
         return;
     }
-
+    
+    const item = jinnangItems.find(i => i.name === 'supremeWisdomPill');
+    if (!item || item.quantity <= 0) {
+        showInfoBox("您没有举世无双悟性丹，无法将宠物瞬间提升到20悟性！");
+        return;
+    }
+    
     if (currentWisdom >= 20) {
         showInfoBox("宠物的悟性已经达到20，无法再次提升！");
         return;
     }
 
-    const item = jinnangItems.find(i => i.name === 'supremeWisdomPill');
-    if (item.quantity > 0) {
-        item.quantity--;
-        currentWisdom = 20;
-        updateJinnangItems();
-        updateAttributePanel();
-        document.getElementById("current-wisdom").innerText = currentWisdom;
-        showInfoBox("您使用了举世无双悟性丹，宠物的悟性已提升至20！");
-    } else {
-        showInfoBox("您没有举世无双悟性丹，无法将宠物瞬间提升到20悟性！");
+    if (currentWisdom < 19) {
+        showInfoBox("举世无双悟性丹是专用于19悟到20悟的关键突破道具，不适用于低于此悟性阶段的宠物");
+        return;
     }
+
+    // 消耗道具并更新宠物悟性
+    item.quantity--;
+    currentWisdom = 20; // 更新宠物的悟性
+    updateJinnangItems();
+    updateAttributePanel();
+    document.getElementById("current-wisdom").innerText = currentWisdom;
+    showInfoBox("您使用了举世无双悟性丹，宠物的悟性已提升至20！");
 }
 
 function increasePetLevel(levels) {
@@ -8022,7 +8029,7 @@ let jinnangItems = [
     { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', price: 300, quantity: 0, description: '开启宠物幻化的必要道具' },
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
-    { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', price: 200, quantity: 0, description: '举世无双，灵石点智，一举提升悟性到20' },
+    { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', price: 200, quantity: 0, description: '举世无双，灵石点智，宠物悟性到19的关键阶段时可以一举提升至20' },
     { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 5, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: 50, quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: 80, quantity: 0, description: '刷新精灵的增幅百分比' },
@@ -8282,7 +8289,33 @@ function sellTopBarItem(item) {
             return;
         }
 
-        item.quantity -= quantityToSell;
+        // 更新全局变量
+        switch (item.id) {
+            case 'high-grade-pill':
+                highGradePill -= quantityToSell;
+                break;
+            case 'transmutation-pill':
+                transmutationPill -= quantityToSell;
+                break;
+            case 'reborn-pill':
+                rebornPill -= quantityToSell;
+                break;
+            case 'quality-pill':
+                qualityPill -= quantityToSell;
+                break;
+            case 'miraculous-pill':
+                miraculousPill -= quantityToSell;
+                break;
+            case 'bingpo-reborn-pill':
+                bingpoRebornPill -= quantityToSell;
+                break;
+            case 'golden-reborn-pill':
+                goldenRebornPill -= quantityToSell;
+                break;
+            default:
+                return;
+        }
+
         goldAmount += quantityToSell * item.price; // 使用 item.price 作为单价
         showInfoBox(`成功出售${quantityToSell}个道具，获得${quantityToSell * item.price}文金子`);
 
@@ -9047,7 +9080,7 @@ function calculateAvailableTrainingCount(petLevel) {
     if (petLevel >= 60) count++; // 宠物等级大于等于60时增加一次
     if (petLevel >= 120) count++; // 宠物等级大于等于120时增加一次
     if (petLevel >= 180) count++; // 宠物等级大于等于180时增加一次
-    if (petLevel >= 200) count++; // 宠物等级大于等于180时增加一次
+    if (petLevel >= 200) count++; // 宠物等级大于等于200时增加一次
     return count;
 }
 
@@ -9358,7 +9391,7 @@ function refreshShop(auto = false) {
         } else {
             item = getRandomCommonItem();
             if (item.name.includes('包裹')) {
-                if (commonBundleCount >= 3) {
+                if (commonBundleCount >= 5) {
                     i--; // 重试生成
                     continue;
                 } else {

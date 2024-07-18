@@ -3700,10 +3700,16 @@ function mergeDrug() {
                 drugInventory[newDrug].quantity += 1;
                 newDrugs.push(newDrug);
             }
-            message = `你使用2个${selectedDrug}成功炼制出了${newDrugs.join(', ')}`;
+            message = `你使用2个${selectedDrug}成功炼制出了3个随机紫色品阶药物：${newDrugs.join(', ')}`;
         } else {
-            drugInventory[selectedDrug].quantity += 2;
-            message = `你使用2个${selectedDrug}成功炼制出了2个${selectedDrug}`;
+            const tier0Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 0);
+            const newDrugs = [];
+            for (let i = 0; i < 2; i++) {
+                const newDrug = tier0Drugs[Math.floor(Math.random() * tier0Drugs.length)];
+                drugInventory[newDrug].quantity += 1;
+                newDrugs.push(newDrug);
+            }
+            message = `你使用2个${selectedDrug}成功炼制出了2个随机橙色品阶药物：${newDrugs.join(', ')}`;
         }
 
         showInfoBox(message);
@@ -7957,12 +7963,14 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '奇馈宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 30 },
-            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 30 },
-            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 30 },
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 24 },
+            { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 23 },
+            { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', chance: 10 },
+            { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 10 },
+            { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
+            { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
             { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 7 },
             { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 1 }
         ],
         '灵魂宝箱': [
@@ -8159,13 +8167,128 @@ function updateJinnangItems() {
 
 // 更新顶栏道具数量
 function updateTopBarItems() {
-    document.getElementById("high-grade-pill").innerText = highGradePill;
-    document.getElementById("transmutation-pill").innerText = transmutationPill;
-    document.getElementById("reborn-pill").innerText = rebornPill;
-    document.getElementById("quality-pill").innerText = qualityPill;
-    document.getElementById("miraculous-pill").innerText = miraculousPill;
-    document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
-    document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
+    const topBarItems = {
+        'high-grade-pill': highGradePill,
+        'transmutation-pill': transmutationPill,
+        'reborn-pill': rebornPill,
+        'quality-pill': qualityPill,
+        'miraculous-pill': miraculousPill,
+        'bingpo-reborn-pill': bingpoRebornPill,
+        'golden-reborn-pill': goldenRebornPill,
+    };
+
+    for (const [id, quantity] of Object.entries(topBarItems)) {
+        const itemDiv = document.getElementById(id);
+        itemDiv.innerText = quantity;
+        itemDiv.onclick = () => showTopBarItemDescription(getTopBarItemDescription(id), itemDiv, { id, quantity, price: getTopBarItemPrice(id) });
+    }
+}
+
+function getTopBarItemDescription(itemId) {
+    switch (itemId) {
+        case 'high-grade-pill':
+            return '用于提升宠物1~20悟性，悟性越高失败率越高，需要谨慎使用。';
+        case 'transmutation-pill':
+            return '重置当前宠物所掌握的技能。';
+        case 'reborn-pill':
+            return '重置当前宠物的资质、成长率、技能和悟性，等级恢复至1级，变异状态重新生成。';
+        case 'quality-pill':
+            return '重新生成宠物的当前资质。';
+        case 'miraculous-pill':
+            return '可以直接让宠物变异的神奇丹药。';
+        case 'bingpo-reborn-pill':
+            return '重置当前宠物的资质、成长率、技能和悟性，等级恢复至1级，但不改变变异状态。';
+        case 'golden-reborn-pill':
+            return '重置当前宠物的变异状态、技能和悟性，等级恢复至1级，但不改变资质、成长率。';
+        default:
+            return '未知道具';
+    }
+}
+
+function getTopBarItemPrice(itemId) {
+    switch (itemId) {
+        case 'high-grade-pill':
+            return 20;
+        case 'transmutation-pill':
+            return 30;
+        case 'reborn-pill':
+            return 30;
+        case 'quality-pill':
+            return 50;
+        case 'miraculous-pill':
+            return 500;
+        case 'bingpo-reborn-pill':
+            return 80;
+        case 'golden-reborn-pill':
+            return 60;
+        default:
+            return 0;
+    }
+}
+
+function showTopBarItemDescription(description, itemDiv, item) {
+    // 如果当前有描述框，移除它
+    if (currentDescriptionBox) {
+        currentDescriptionBox.remove();
+        currentDescriptionBox = null;
+    }
+
+    let descriptionBox = document.createElement('div');
+    descriptionBox.className = 'description-box';
+    descriptionBox.style.position = 'fixed';
+    descriptionBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    descriptionBox.style.color = 'white';
+    descriptionBox.style.padding = '10px';
+    descriptionBox.style.borderRadius = '5px';
+    descriptionBox.style.zIndex = '1000';
+    descriptionBox.style.width = '300px';
+    descriptionBox.style.maxWidth = '80%';
+    descriptionBox.style.top = '50%';
+    descriptionBox.style.left = '50%';
+    descriptionBox.style.transform = 'translate(-50%, -50%)';
+    descriptionBox.style.wordWrap = 'break-word';
+    descriptionBox.style.textAlign = 'center';
+    descriptionBox.innerHTML = `<p>${description}</p>`;
+
+    let sellButton = document.createElement('button');
+    sellButton.innerText = '出售道具';
+    sellButton.style.marginTop = '10px';
+    sellButton.addEventListener('click', () => sellTopBarItem(item));
+    descriptionBox.appendChild(sellButton);
+
+    document.body.appendChild(descriptionBox);
+    currentDescriptionBox = descriptionBox;
+
+    // 设置3秒后自动关闭
+    setTimeout(() => {
+        if (descriptionBox) {
+            descriptionBox.remove();
+            currentDescriptionBox = null;
+        }
+    }, 3000);
+}
+
+// 出售道具函数
+function sellTopBarItem(item) {
+    let quantityToSell = prompt('请输入要出售的数量:');
+    if (quantityToSell !== null) {
+        quantityToSell = parseInt(quantityToSell, 10);
+        if (isNaN(quantityToSell) || quantityToSell <= 0) {
+            showInfoBox('请输入有效的数量');
+            return;
+        }
+        if (quantityToSell > item.quantity) {
+            showInfoBox('您没有足够的道具数量');
+            return;
+        }
+
+        item.quantity -= quantityToSell;
+        goldAmount += quantityToSell * item.price; // 使用 item.price 作为单价
+        showInfoBox(`成功出售${quantityToSell}个道具，获得${quantityToSell * item.price}文金子`);
+
+        updateTopBarItems();
+        updateGoldDisplay(goldAmount); // 更新金币数量显示的函数
+    }
 }
 
 function addItemToTopBar(item) {
@@ -8184,6 +8307,12 @@ function addItemToTopBar(item) {
             break;
         case '高级悟性丹':
             highGradePill++;
+            break;
+        case '冰魄还童丹':
+            bingpoRebornPill++;
+            break;
+        case '万化灵丹':
+            transmutationPill++;
             break;
         default:
             // 未知道具

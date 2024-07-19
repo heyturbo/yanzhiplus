@@ -1948,7 +1948,7 @@
                 </div>
             </div>
             <div class="battle-system-log">
-                <h2>战斗记录（第<span id="battleRounds"></span>轮）<button class="use-button" onclick="divinedWeapon()">神装赋能</button></h2>
+                <h2>战斗记录（第<span id="battleRounds"></span>轮）<button class="use-button" onclick="divinedWeapon()">神器赋能</button></h2>
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
@@ -3650,7 +3650,7 @@ let drugInventory = {
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 3, description: "绿色品阶，恢复玩家50000生命值" },
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 3, description: "绿色品阶，恢复玩家50000法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 100, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药品" },
@@ -5935,7 +5935,7 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
-//神装系统
+//神器系统
 class DivineWeaponManager {
     constructor() {
         this.lostBook = { active: false, level: 1, effects: [] };
@@ -5949,7 +5949,7 @@ class DivineWeaponManager {
         }
 
         this.divineWeaponUI = document.createElement('div');
-        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9999;';
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
         
         this.divineWeaponUI.innerHTML = `
             <div style="text-align: right;">
@@ -5960,7 +5960,7 @@ class DivineWeaponManager {
                     <img src="https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
                         <h3 style="margin: 0;">遗失的洛书 (Lv${this.lostBook.level})</h3>
-                        <p style="margin: 0;">${this.lostBook.effects.length > 0 ? this.lostBook.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为物理技能附加效果，升级神装可提升触发概率'}</p>
+                        <p style="margin: 0;">${this.lostBook.effects.length > 0 ? this.lostBook.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为物理技能附加效果，升级神器可提升触发概率'}</p>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-around; margin-top: 10px;">
@@ -5974,7 +5974,7 @@ class DivineWeaponManager {
                     <img src="https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
                         <h3 style="margin: 0;">残页的河图 (Lv${this.fragmentedMap.level})</h3>
-                        <p style="margin: 0;">${this.fragmentedMap.effects.length > 0 ? this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为法术技能附加效果，升级神装可提升触发概率'}</p>
+                        <p style="margin: 0;">${this.fragmentedMap.effects.length > 0 ? this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为法术技能附加效果，升级神器可提升触发概率'}</p>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-around; margin-top: 10px;">
@@ -5996,8 +5996,13 @@ class DivineWeaponManager {
     }
 
     activateDivineWeapon(type) {
+        if (this[type].active) {
+            showInfoBox("你已经开启此神器了，无法重复开启！");
+            return;
+        }
+        
         if (currentExp < 1000) {
-            showInfoBox("经验不足1000，无法开启神装。");
+            showInfoBox("经验不足1000，无法开启神器。");
             return;
         }
     
@@ -6011,7 +6016,7 @@ class DivineWeaponManager {
     
     refreshDivineWeapon(type) {
         if (!this[type].active) {
-            showInfoBox("开启神装后才能执行刷新！");
+            showInfoBox("开启神器后才能执行刷新！");
             return;
         }
     
@@ -6036,17 +6041,17 @@ class DivineWeaponManager {
     
     upgradeDivineWeapon(type) {
         if (!this[type].active) {
-            showInfoBox("开启神装后才能执行升级！");
+            showInfoBox("开启神器后才能执行升级！");
             return;
         }
     
         if (currentExp < 1000) {
-            showInfoBox("经验不足1000，无法升级神装。");
+            showInfoBox("经验不足1000，无法升级神器。");
             return;
         }
     
         if (this[type].level >= 100) {
-            showInfoBox("神装等级已达到上限。");
+            showInfoBox("神器等级已达到上限。");
             return;
         }
     
@@ -6066,8 +6071,12 @@ class DivineWeaponManager {
 }
 
 const divineWeaponManager = new DivineWeaponManager();
-
+let divinedWeaponStatus = false;
 function divinedWeapon() {
+    if (!divinedWeaponStatus) {
+        showInfoBox("神器系统需要消耗大量经验值。使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。");
+        divinedWeaponStatus = true;
+    }
     divineWeaponManager.openDivineWeaponUI();
 }
 
@@ -10782,6 +10791,7 @@ function upgradeWisdomTo() {
         'poisonPowder', //毒粉
         'infiniteGem', //无限宝石
         'ignoranceWater', //清心酿
+        'magicPetAmulet', //灵兽符文
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹

@@ -3645,7 +3645,7 @@ let drugInventory = {
     "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 2, description: "蓝色品阶，恢复玩家20%的法力值" },
     "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，10秒内深渊巨魔暴击率降低至0%" },
     "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 2, description: "蓝色品阶，10秒内增加玩家20000速度和20000法术攻击力" },
-    "沉香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
+    "沉檀凝香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 0, description: "橙色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 3, description: "绿色品阶，恢复玩家50000生命值" },
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 3, description: "绿色品阶，恢复玩家50000法力值" },
@@ -3656,7 +3656,8 @@ let drugInventory = {
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药品" },
     "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，收集3个可以合成1个蓝色品阶的药品" },
     "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，收集3个可以合成1个紫色品阶的药品" },
-    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药品" }
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药品" },
+    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，收集2个可以炼制出随机药品" }
 };
 
 // 药品系统函数
@@ -3717,7 +3718,7 @@ function mergeDrug() {
             message = `你使用2个${selectedDrug}成功炼制出了2个随机橙色品阶药品：${newDrugs.join(', ')}`;
         }
 
-        showInfoBox(message);
+        document.getElementById('drug-description').innerText = message;
     } else {
         const requiredQuantity = 3;
         if (selectedDrugDetails.quantity < requiredQuantity) {
@@ -3736,13 +3737,13 @@ function mergeDrug() {
         // 增加高级药品数量
         drugInventory[newDrug].quantity += 1;
 
-        showInfoBox(`你使用3个${selectedDrug}成功炼制出了1个${newDrug}`);
+        document.getElementById('drug-description').innerText = `你使用3个${selectedDrug}成功炼制出了1个${newDrug}`;
     }
 
     updateDrugGrid();
 }
 
-let collectCost = 500; // 初始采集花费
+let collectCost = 100; // 初始采集花费
 
 function collectDrug() {
     if (goldAmount < collectCost) {
@@ -3769,9 +3770,13 @@ function collectDrug() {
     } else if (random < 95) {
         collectedDrug = '极品药材';
         drugInventory['极品药材'].quantity += 1;
-    } else {
+    } else if (random < 98) {
         collectedDrug = '珍贵药材';
         drugInventory['珍贵药材'].quantity += 1;
+    } else {
+        collectedDrug = '完美药材';
+        drugInventory['完美药材'].quantity += 1;
+        
     }
 
     // 触发奖励事件
@@ -3853,7 +3858,7 @@ function useSelectedDrug() {
     }
 
     // 检查所选择的药品是否为不可直接使用的药材
-    const nonUsableDrugs = ["普通药材", "上等药材", "极品药材", "珍贵药材"];
+    const nonUsableDrugs = ["普通药材", "上等药材", "极品药材", "珍贵药材","完美药材"];
     if (nonUsableDrugs.includes(selectedDrug)) {
         showInfoBox("你不能直接使用尚未炼制的药材！");
         return;
@@ -3949,7 +3954,7 @@ function useSelectedDrug() {
             case "狂暴印记":
             case "化功散":
             case "闪电蘑菇":
-            case "沉香":
+            case "沉檀凝香":
             case "焚灵之丸":
                 if (!activeBuffs[selectedDrug]) {
                     applyBuff(selectedDrug);
@@ -4068,18 +4073,18 @@ function applyBuff(drugName) {
                 10000
             );
             break;
-        case "沉香":
+        case "沉檀凝香":
             // 恢复10%生命值
             const healthRestored = Math.floor(maxHealth * 0.1);
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRestored);
-            logBattleEvent(`使用沉香，恢复了 ${healthRestored} 点生命值。`, 'gold');
+            logBattleEvent(`使用沉檀凝香，恢复了 ${healthRestored} 点生命值。`, 'gold');
         
             // 80% 几率清除玩家的异常状态
             if (Math.random() < 0.8) {
                 clearEnemyEffect();
-                logBattleEvent('沉香生效，清除了异常状态。', 'gold');
+                logBattleEvent('沉檀凝香生效，清除了异常状态。', 'gold');
             } else {
-                logBattleEvent('沉香生效，但未能清除异常状态。', 'red');
+                logBattleEvent('沉檀凝香生效，但未能清除异常状态。', 'red');
             }
         
             break;
@@ -5334,12 +5339,12 @@ function autoBattle() {
         const activeDebuffs = debuffStates.filter(Boolean).length;
 
         if (activeDebuffs >= 2) {
-            const selectedDrug = "沉香";
+            const selectedDrug = "沉檀凝香";
             const drug = drugInventory[selectedDrug];
             if (drug && drug.quantity > 0) {
                 selectDrug(selectedDrug);
                 useSelectedDrug();
-                logBattleEvent("自动战斗：玩家状态异常，使用药品'沉香'。", 'pink');
+                logBattleEvent("自动战斗：玩家状态异常，使用药品'沉檀凝香'。", 'pink');
                 return;
             }
         }
@@ -6045,7 +6050,7 @@ function applyMagicAttackEffects(damage, multiplier) {
     // 新增 exorcise 效果
     const exorciseChance = Math.random();
     if (exorciseChance < (0.1 * multiplier) && damage > 0) { // 触发概率受 multiplier 影响
-        const manaLoss = Math.floor(damage * 0.9);
+        const manaLoss = Math.floor(damage * 0.6);
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
         logBattleEvent(`法力灼烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
@@ -9224,7 +9229,6 @@ function trainAttributes() {
     });
 }
 
-
 function updatePetLevel() {
     document.getElementById('pet-level').innerText = petLevel;
     document.getElementById('your-pet-level').innerText = petLevel;
@@ -9278,7 +9282,6 @@ function showBiography() {
 }
 
 let goldenRebornPill = 10;
-
 function useGoldenRebornPill() {
     if (goldenRebornPill < 1) {
         showInfoBox("您的还童金丹已耗尽！");
@@ -9330,8 +9333,8 @@ function useGoldenRebornPill() {
     updateSkillScore();
     updatePetWisdom();
 }
-let goldAmount = 500000; // 初始金子数量
 
+let goldAmount = 500000; // 初始金子数量
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');
 
@@ -9348,7 +9351,6 @@ function updateGoldDisplay(goldAmount) {
 
 // 初始状态下更新金子显示
 updateGoldDisplay(goldAmount);
-
 function toggleShop() {
     const drawer = document.getElementById('shop-drawer');
     const info = document.getElementById('shop-info');
@@ -9381,7 +9383,6 @@ function startShopTimer() {
 // 页面加载完成后初始化商店
 
 let refreshCount = 0; // 全局计数器，记录刷新次数
-
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 100) {
         showInfoBox("您的金子不足，无法刷新！");

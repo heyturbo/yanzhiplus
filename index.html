@@ -1948,7 +1948,7 @@
                 </div>
             </div>
             <div class="battle-system-log">
-                <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
+                <h2>战斗记录（第<span id="battleRounds"></span>轮）<button class="use-button" onclick="divinedWeapon()">神装赋能</button></h2>
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
@@ -3650,7 +3650,7 @@ let drugInventory = {
     "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 3, description: "绿色品阶，恢复玩家50000生命值" },
     "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 3, description: "绿色品阶，恢复玩家50000法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
+    "幸运金币": { quantity: 100, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药品" },
@@ -3911,22 +3911,26 @@ function useSelectedDrug() {
                 );
                 break;
             case "幸运金币":
-                if (Math.random() < 0.3) {
+                if (Math.random() < 0.1) {
                     battleState.enemy.health = 1;
                     logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
+                } else if (Math.random() < 0.8) {
+                    currentExp += 10000;
+                    logBattleEvent(`使用幸运金币，获得了10000点经验值。`, 'gold');
                 } else {
-                    goldAmount += 2000;
-                    logBattleEvent(`使用幸运金币，获得了2000文金子。`, 'gold');
+                    goldAmount += 20000;
+                    logBattleEvent(`使用幸运金币，获得了20000文金子。`, 'gold');
                 }
                 updateUI();
                 updateGoldDisplay(goldAmount);
+                updateExpBar();
                 break;
             case "双倍经验药":
                 applyTimedBuff(
                     selectedDrug,
                     () => {
                         battleState.player.expMultiplier = 2;
-                        logBattleEvent(`使用双倍经验药，60秒内战斗获胜所得经验*200%。`, 'gold');
+                        logBattleEvent(`使用双倍经验药，60秒内战斗获胜所得经验变成两倍。`, 'gold');
                         return () => {
                             battleState.player.expMultiplier = 1;
                             logBattleEvent(`双倍经验药效果消失。`, 'red');
@@ -3940,7 +3944,7 @@ function useSelectedDrug() {
                     selectedDrug,
                     () => {
                         battleState.player.expMultiplier = 4;
-                        logBattleEvent(`使用四倍经验药，60秒内战斗获胜所得经验*400%。`, 'gold');
+                        logBattleEvent(`使用四倍经验药，60秒内战斗获胜所得经验变成四倍。`, 'gold');
                         return () => {
                             battleState.player.expMultiplier = 1;
                             logBattleEvent(`四倍经验药效果消失。`, 'red');
@@ -5931,143 +5935,278 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
+//神装系统
+class DivineWeaponManager {
+    constructor() {
+        this.lostBook = { active: false, level: 1, effects: [] };
+        this.fragmentedMap = { active: false, level: 1, effects: [] };
+        this.divineWeaponUI = null;
+    }
 
-function applyPhysicalAttackEffects(multiplier) {
-    const effects = ['armorBreak', 'stun', 'intimidate', 'benumb'];
-    const effect = effects[Math.floor(Math.random() * effects.length)];
-    const effectChance = Math.random(); // 生成一个0到1之间的随机数
-
-    if (effectChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
-        switch (effect) {
-            case 'armorBreak':
-                const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
-                battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
-                battleState.enemy.armorBreak = true;
-                logBattleEvent(`深渊巨魔的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'white');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52b4.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.physicalDefense += armorBreakValue;
-                    battleState.enemy.armorBreak = false;
-                    updateEnemyStatusDisplay();
-                }, 10000); // 破甲持续10秒
-                break;
-            case 'stun':
-                battleState.enemy.stunned = true; // 深渊巨魔眩晕
-                logBattleEvent("深渊巨魔被眩晕，无法行动。", 'wheat');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.stunned = false;
-                    updateEnemyStatusDisplay();
-                }, 3000); // 眩晕持续3秒
-                break;
-            case 'intimidate':
-                battleState.enemy.intimidated = true; // 深渊巨魔恐吓状态
-                logBattleEvent("深渊巨魔被恐吓，无法暴击。", 'white');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.intimidated = false;
-                    updateEnemyStatusDisplay();
-                }, 5000); // 恐吓持续5秒
-                break;
-            case 'benumb':
-                if (!battleState.enemy.benumbed) {
-                    battleState.enemy.benumbed = true;
-                    battleState.enemy.originalMaxHealth = enemyMaxHealth;
-                    battleState.enemy.benumbStack = 0; // 初始化麻痹叠加计数
-                }
-                const benumbValue = Math.floor(battleState.enemy.originalMaxHealth * 0.03 * (1 + multiplier));
-                enemyMaxHealth -= benumbValue;
-                battleState.enemy.benumbStack += benumbValue; // 累积麻痹效果
-                if (battleState.enemy.health > enemyMaxHealth) {
-                    battleState.enemy.health = enemyMaxHealth;
-                }
-                logBattleEvent(`深渊巨魔被麻痹，最大生命值减少了 ${benumbValue} 点。`, 'lightblue');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fb054d9c307b7e926ec17.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    if (battleState.enemy.originalMaxHealth) {
-                        battleState.enemy.benumbStack -= benumbValue; // 减少当前叠加效果
-                        if (battleState.enemy.benumbStack <= 0) {
-                            enemyMaxHealth = battleState.enemy.originalMaxHealth;
-                            battleState.enemy.benumbed = false;
-                        } else {
-                            enemyMaxHealth = battleState.enemy.originalMaxHealth - battleState.enemy.benumbStack;
-                        }
-                    }
-                    updateEnemyStatusDisplay();
-                }, 8000); // 麻痹持续8秒
-                break;
+    openDivineWeaponUI() {
+        if (this.divineWeaponUI) {
+            this.divineWeaponUI.remove();
         }
+
+        this.divineWeaponUI = document.createElement('div');
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9999;';
+        
+        this.divineWeaponUI.innerHTML = `
+            <div style="text-align: right;">
+                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center;">
+                    <img src="https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <div>
+                        <h3 style="margin: 0;">遗失的洛书 (Lv${this.lostBook.level})</h3>
+                        <p style="margin: 0;">${this.lostBook.effects.length > 0 ? this.lostBook.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为物理技能附加效果，升级神装可提升触发概率'}</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                </div>
+            </div>
+            <div>
+                <div style="display: flex; align-items: center;">
+                    <img src="https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <div>
+                        <h3 style="margin: 0;">残页的河图 (Lv${this.fragmentedMap.level})</h3>
+                        <p style="margin: 0;">${this.fragmentedMap.effects.length > 0 ? this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为法术技能附加效果，升级神装可提升触发概率'}</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(this.divineWeaponUI);
+    }
+
+    closeDivineWeaponUI() {
+        if (this.divineWeaponUI) {
+            this.divineWeaponUI.remove();
+            this.divineWeaponUI = null;
+        }
+    }
+
+    activateDivineWeapon(type) {
+        if (currentExp < 1000) {
+            showInfoBox("经验不足1000，无法开启神装。");
+            return;
+        }
+    
+        currentExp -= 1000;
+        updateExpBar();
+    
+        this[type].active = true;
+        this[type].effects = [this.getRandomEffect(type)];
+        this.openDivineWeaponUI(); // 刷新界面显示
+    }
+    
+    refreshDivineWeapon(type) {
+        if (!this[type].active) {
+            showInfoBox("开启神装后才能执行刷新！");
+            return;
+        }
+    
+        if (currentExp < 1000) {
+            showInfoBox("经验不足1000，无法刷新效果。");
+            return;
+        }
+    
+        currentExp -= 1000;
+        updateExpBar();
+    
+        const chance = Math.random();
+        if (chance < 0.05) {
+            this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
+        } else if (chance < 0.20) {
+            this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+        } else {
+            this[type].effects = [this.getRandomEffect(type)];
+        }
+        this.openDivineWeaponUI(); // 刷新界面显示
+    }
+    
+    upgradeDivineWeapon(type) {
+        if (!this[type].active) {
+            showInfoBox("开启神装后才能执行升级！");
+            return;
+        }
+    
+        if (currentExp < 1000) {
+            showInfoBox("经验不足1000，无法升级神装。");
+            return;
+        }
+    
+        if (this[type].level >= 100) {
+            showInfoBox("神装等级已达到上限。");
+            return;
+        }
+    
+        currentExp -= 1000;
+        updateExpBar();
+        this[type].level += 1;
+        this.openDivineWeaponUI(); // 刷新界面显示
+    }
+    getRandomEffect(type) {
+        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹'] : ['沉默', '减速', '混乱', '法力燃烧', '灼烧'];
+        return effects[Math.floor(Math.random() * effects.length)];
+    }
+
+    getEffectChineseName(effect) {
+        return effect; // 汉字已经直接使用，无需转换
     }
 }
 
-function applyMagicAttackEffects(damage, multiplier) {
-    const effects = ['silence', 'slow', 'daze', 'exorcise', 'burnt'];
+const divineWeaponManager = new DivineWeaponManager();
+
+function divinedWeapon() {
+    divineWeaponManager.openDivineWeaponUI();
+}
+
+// 更新物理和法术技能效果的函数
+function applyPhysicalAttackEffects() {
+    if (!divineWeaponManager.lostBook.active) return;
+
+    const effects = divineWeaponManager.lostBook.effects;
     const effect = effects[Math.floor(Math.random() * effects.length)];
-    const effectChance = Math.random(); // 生成一个0到1之间的随机数
 
-    if (effectChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
-        switch (effect) {
-            case 'silence':
-                battleState.enemy.silenced = true; // 深渊巨魔沉默
-                logBattleEvent("深渊巨魔被沉默，无法使用法术攻击。", 'wheat');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.silenced = false;
-                    updateEnemyStatusDisplay();
-                }, 3000); // 沉默持续3秒
-                break;
-            case 'slow':
-                const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
-                battleState.enemy.speed -= slowAmount; // 速度降低
-                battleState.enemy.slow = true;
-                logBattleEvent(`深渊巨魔被减速，速度降低了 ${slowAmount} 点。`, 'wheat');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.speed += slowAmount;
-                    logBattleEvent("深渊巨魔的迟缓状态消失。", 'wheat');
-                    battleState.enemy.slow = false;
-                    updateEnemyStatusDisplay();
-                }, 10000); // 迟缓持续10秒
-                break;
-            case 'daze':
-                battleState.enemy.dazed = true; // 深渊巨魔混乱
-                logBattleEvent("深渊巨魔被混乱，可能会攻击自己。", '#FF00FF');
-                showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
-                updateEnemyStatusDisplay();
-                setTimeout(() => {
-                    battleState.enemy.dazed = false;
-                    updateEnemyStatusDisplay();
-                }, 5000); // 混乱持续5秒
-                break;
-        }
-    }
+    const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.lostBook.level - 1) * 0.006);
+    if (Math.random() > triggerProbability) return; // 没有触发效果
 
-    // 新增 exorcise 效果
-    const exorciseChance = Math.random();
-    if (exorciseChance < (0.1 * multiplier) && damage > 0) { // 触发概率受 multiplier 影响
-        const manaLoss = Math.floor(damage * 0.6);
-        battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
-        logBattleEvent(`法力灼烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
-    }
-
-    // 新增 burnt 效果
-    const burntChance = Math.random();
-    if (burntChance < (0.1 * multiplier)) { // 触发概率受 multiplier 影响
-        battleState.enemy.burnt = true;
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fa3ecd9c307b7e91737c0.gif');
-        updateEnemyStatusDisplay();
-        setTimeout(() => {
-            battleState.enemy.burnt = false;
+    switch (effect) {
+        case '破甲':
+            const armorBreakValue = Math.floor(battleAttributes.physicalAttack * (Math.random() * (0.24 - 0.12) + 0.12));
+            battleState.enemy.physicalDefense -= armorBreakValue; // 破甲
+            battleState.enemy.armorBreak = true;
+            logBattleEvent(`深渊巨魔的护甲被破坏，物理防御减少了 ${armorBreakValue} 点。`, 'white');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c52b4.gif');
             updateEnemyStatusDisplay();
-        }, 10000); // 灼烧持续10秒
+            setTimeout(() => {
+                battleState.enemy.physicalDefense += armorBreakValue;
+                battleState.enemy.armorBreak = false;
+                updateEnemyStatusDisplay();
+            }, 10000); // 破甲持续10秒
+            break;
+        case '眩晕':
+            battleState.enemy.stunned = true; // 深渊巨魔眩晕
+            logBattleEvent("深渊巨魔被眩晕，无法行动。", 'wheat');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b160.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.stunned = false;
+                updateEnemyStatusDisplay();
+            }, 1000); // 眩晕持续1秒
+            break;
+        case '恐吓':
+            battleState.enemy.intimidated = true; // 深渊巨魔恐吓状态
+            logBattleEvent("深渊巨魔被恐吓，无法暴击。", 'white');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.intimidated = false;
+                updateEnemyStatusDisplay();
+            }, 5000); // 恐吓持续5秒
+            break;
+        case '麻痹':
+            if (!battleState.enemy.benumbed) {
+                battleState.enemy.benumbed = true;
+                battleState.enemy.originalMaxHealth = enemyMaxHealth;
+                battleState.enemy.benumbStack = 0; // 初始化麻痹叠加计数
+            }
+            const benumbValue = Math.floor(battleState.enemy.originalMaxHealth * 0.03);
+            enemyMaxHealth -= benumbValue;
+            battleState.enemy.benumbStack += benumbValue; // 累积麻痹效果
+            if (battleState.enemy.health > enemyMaxHealth) {
+                battleState.enemy.health = enemyMaxHealth;
+            }
+            logBattleEvent(`深渊巨魔被麻痹，最大生命值减少了 ${benumbValue} 点。`, 'lightblue');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fb054d9c307b7e926ec17.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                if (battleState.enemy.originalMaxHealth) {
+                    battleState.enemy.benumbStack -= benumbValue; // 减少当前叠加效果
+                    if (battleState.enemy.benumbStack <= 0) {
+                        enemyMaxHealth = battleState.enemy.originalMaxHealth;
+                        battleState.enemy.benumbed = false;
+                    } else {
+                        enemyMaxHealth = battleState.enemy.originalMaxHealth - battleState.enemy.benumbStack;
+                    }
+                }
+                updateEnemyStatusDisplay();
+            }, 8000); // 麻痹持续8秒
+            break;
     }
 }
+
+function applyMagicAttackEffects(damage) {
+    if (!divineWeaponManager.fragmentedMap.active) return;
+
+    const effects = divineWeaponManager.fragmentedMap.effects;
+    const effect = effects[Math.floor(Math.random() * effects.length)];
+
+    const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.fragmentedMap.level - 1) * 0.006);
+    if (Math.random() > triggerProbability) return; // 没有触发效果
+
+    switch (effect) {
+        case '沉默':
+            battleState.enemy.silenced = true; // 深渊巨魔沉默
+            logBattleEvent("深渊巨魔被沉默，无法使用法术攻击。", 'wheat');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.silenced = false;
+                updateEnemyStatusDisplay();
+            }, 3000); // 沉默持续3秒
+            break;
+        case '减速':
+            const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
+            battleState.enemy.speed -= slowAmount; // 速度降低
+            battleState.enemy.slow = true;
+            logBattleEvent(`深渊巨魔被减速，速度降低了 ${slowAmount} 点。`, 'wheat');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.speed += slowAmount;
+                logBattleEvent("深渊巨魔的迟缓状态消失。", 'wheat');
+                battleState.enemy.slow = false;
+                updateEnemyStatusDisplay();
+            }, 10000); // 迟缓持续10秒
+            break;
+        case '混乱':
+            battleState.enemy.dazed = true; // 深渊巨魔混乱
+            logBattleEvent("深渊巨魔被混乱，可能会攻击自己。", '#FF00FF');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.dazed = false;
+                updateEnemyStatusDisplay();
+            }, 5000); // 混乱持续5秒
+            break;
+        case '法力燃烧':
+            const manaLoss = Math.floor(damage * 0.6);
+            battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
+            logBattleEvent(`法力燃烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
+            break;
+        case '灼烧':
+            battleState.enemy.burnt = true;
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fa3ecd9c307b7e91737c0.gif');
+            updateEnemyStatusDisplay();
+            setTimeout(() => {
+                battleState.enemy.burnt = false;
+                updateEnemyStatusDisplay();
+            }, 10000); // 灼烧持续10秒
+            break;
+    }
+}
+
 // 应用双技能的战斗增益效果
 function applyAscensionEffects() {
     resetBattleStateEffects();
@@ -6905,7 +7044,7 @@ function startBattle() {
 
     // 检查全局变量 firstStartBattle 的状态
     if (!firstStartBattle) {
-        logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。施放技能附加的战斗效果也做了简化，将从所有效果中随机选择。");
+        logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。");
         firstStartBattle = true;
     }
 

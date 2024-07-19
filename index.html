@@ -1932,11 +1932,11 @@
                     </div>
                 </div>
             </div>
-            <!-- 使用药物面板 -->
+            <!-- 使用药品面板 -->
             <div id="drug-modal" class="drug-modal modal">
                 <div class="modal-content">
                     <div class="drug-grid" id="drug-grid">
-                        <!-- 药物项会通过JavaScript动态生成 -->
+                        <!-- 药品项会通过JavaScript动态生成 -->
                     </div>
                     <div class="drug-description" id="drug-description">
                         本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效！
@@ -1957,7 +1957,7 @@
                 <button onclick="performHeal()">治疗之术</button>
                 <button onclick="performPoison()">施毒之法</button>
                 <button onclick="performDefense()">格挡蓄力</button>
-                <button onclick="useDrug()">使用药物</button>
+                <button onclick="useDrug()">使用药品</button>
                 <button id="battle-spirit-button">战斗精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升之术</button>
                 <button onclick="levelUpSkill()">升级技能</button>
@@ -3629,7 +3629,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStampCount();
 });
 
-//以下是药物系统
+//以下是药品系统
 let selectedDrug = null;
 let alreadyUseDrug = false;
 let drugInventory = {
@@ -3653,16 +3653,16 @@ let drugInventory = {
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有30%概率让怪物血量变为1，70%概率获得2000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
-    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药物" },
-    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，收集3个可以合成1个蓝色品阶的药物" },
-    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，收集3个可以合成1个紫色品阶的药物" },
-    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药物" }
+    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药品" },
+    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，收集3个可以合成1个蓝色品阶的药品" },
+    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，收集3个可以合成1个紫色品阶的药品" },
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药品" }
 };
 
-// 药物系统函数
+// 药品系统函数
 function useDrug() {
     if (!alreadyUseDrug) {
-        showInfoBox("这是你第一次打开药物面板，附送至尊药品礼包一份！");
+        showInfoBox("这是你第一次打开药品面板，附送至尊药品礼包一份！");
         alreadyUseDrug = true; // 修正拼写错误
     }
     document.getElementById('drug-modal').style.display = 'block';
@@ -3671,7 +3671,7 @@ function useDrug() {
 
 function mergeDrug() {
     if (!selectedDrug) {
-        showInfoBox("请先选中要合成的药物。");
+        showInfoBox("请先选中要合成的药品。");
         return;
     }
 
@@ -3685,15 +3685,15 @@ function mergeDrug() {
             return;
         }
 
-        // 减少低级药物数量
+        // 减少低级药品数量
         selectedDrugDetails.quantity -= requiredQuantity;
 
-        // 执行tier0药物的特殊合成逻辑
+        // 执行tier0药品的特殊合成逻辑
         const probability = Math.random();
         let message = '';
 
         if (probability < 0.1) {
-            message = `你使用2个${selectedDrug}但没有成功合成任何药物`;
+            message = `你使用2个${selectedDrug}但没有成功合成任何药品`;
         } else if (probability < 0.2) {
             drugInventory[selectedDrug].quantity += 1;
             message = `你使用2个${selectedDrug}进行炼制，但只得到了1个${selectedDrug}`;
@@ -3705,7 +3705,7 @@ function mergeDrug() {
                 drugInventory[newDrug].quantity += 1;
                 newDrugs.push(newDrug);
             }
-            message = `你使用2个${selectedDrug}成功炼制出了3个随机紫色品阶药物：${newDrugs.join(', ')}`;
+            message = `你使用2个${selectedDrug}成功炼制出了3个随机紫色品阶药品：${newDrugs.join(', ')}`;
         } else {
             const tier0Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 0);
             const newDrugs = [];
@@ -3714,7 +3714,7 @@ function mergeDrug() {
                 drugInventory[newDrug].quantity += 1;
                 newDrugs.push(newDrug);
             }
-            message = `你使用2个${selectedDrug}成功炼制出了2个随机橙色品阶药物：${newDrugs.join(', ')}`;
+            message = `你使用2个${selectedDrug}成功炼制出了2个随机橙色品阶药品：${newDrugs.join(', ')}`;
         }
 
         showInfoBox(message);
@@ -3725,15 +3725,15 @@ function mergeDrug() {
             return;
         }
 
-        // 减少低级药物数量
+        // 减少低级药品数量
         selectedDrugDetails.quantity -= requiredQuantity;
 
-        // 随机选择高级药物
+        // 随机选择高级药品
         const nextTier = selectedDrugTier - 1;
         const nextTierDrugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === nextTier);
         const newDrug = nextTierDrugs[Math.floor(Math.random() * nextTierDrugs.length)];
 
-        // 增加高级药物数量
+        // 增加高级药品数量
         drugInventory[newDrug].quantity += 1;
 
         showInfoBox(`你使用3个${selectedDrug}成功炼制出了1个${newDrug}`);
@@ -3790,13 +3790,13 @@ function collectDrug() {
         document.getElementById('drug-description').innerText = `你花费${collectCost - 100}金子打点进山凭证，采集到了1个${collectedDrug}！`;
     }
 
-    updateDrugGrid(); // 更新药物显示
+    updateDrugGrid(); // 更新药品显示
 }
         
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
-    document.getElementById('drug-description').innerText = '选中药物后可直接使用，低品阶药物可合成更高品阶的药物。采集会花费金子，采集所得的原始药材只能用于合成。战斗精灵成长后，每次战斗胜利会有额外的掉落奖励。';
+    document.getElementById('drug-description').innerText = '选中药品后可直接使用，低品阶药品可合成更高品阶的药品。采集会花费金子，采集所得的原始药材只能用于合成。战斗精灵成长后，每次战斗胜利会有额外的掉落奖励。';
 }
         
 function updateDrugGrid() {
@@ -3815,7 +3815,7 @@ function updateDrugGrid() {
         }
     }
 
-    // 更新选中药物的视觉效果
+    // 更新选中药品的视觉效果
     if (selectedDrug) {
         const selectedDrugItem = Array.from(drugGrid.getElementsByClassName('drug-item'))
             .find(item => item.querySelector('div').innerText.startsWith(selectedDrug));
@@ -3848,11 +3848,11 @@ function checkConflictingBuffs(selectedDrug) {
 
 function useSelectedDrug() {
     if (!selectedDrug) {
-        showInfoBox("请选择一种药物！");
+        showInfoBox("请选择一种药品！");
         return;
     }
 
-    // 检查所选择的药物是否为不可直接使用的药材
+    // 检查所选择的药品是否为不可直接使用的药材
     const nonUsableDrugs = ["普通药材", "上等药材", "极品药材", "珍贵药材"];
     if (nonUsableDrugs.includes(selectedDrug)) {
         showInfoBox("你不能直接使用尚未炼制的药材！");
@@ -3986,7 +3986,7 @@ function useSelectedDrug() {
 
         updateUI();
     } else {
-        showInfoBox("药物不足！", 'red');
+        showInfoBox("药品不足！", 'red');
     }
 }
 
@@ -5339,7 +5339,7 @@ function autoBattle() {
             if (drug && drug.quantity > 0) {
                 selectDrug(selectedDrug);
                 useSelectedDrug();
-                logBattleEvent("自动战斗：玩家状态异常，使用药物'沉香'。", 'pink');
+                logBattleEvent("自动战斗：玩家状态异常，使用药品'沉香'。", 'pink');
                 return;
             }
         }
@@ -6045,7 +6045,7 @@ function applyMagicAttackEffects(damage, multiplier) {
     // 新增 exorcise 效果
     const exorciseChance = Math.random();
     if (exorciseChance < (0.1 * multiplier) && damage > 0) { // 触发概率受 multiplier 影响
-        const manaLoss = Math.floor(damage * 0.2);
+        const manaLoss = Math.floor(damage * 0.9);
         battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
         logBattleEvent(`法力灼烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
@@ -6975,12 +6975,12 @@ function showNextBattlePrompt(playerWon) {
 function resetBuffState(playerWon) {
     if (battleState.player.usingBuff) {
         battleState.player.usingBuff = false;
-        logBattleEvent(`即时性药物效果已被重置。`, 'red');
+        logBattleEvent(`即时性药品效果已被重置。`, 'red');
         updateUI();
     }
 
     if (playerWon) {
-        // 获取药物概率
+        // 获取药品概率
         const drugProbability = Math.random();
         let drugTier;
 
@@ -7000,8 +7000,8 @@ function resetBuffState(playerWon) {
         logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
         updateDrugGrid();
 
-        // battleRounds 大于等于 100 时额外掉落药物
-        if (battleRounds >= 140) {
+        // battleRounds 大于等于 130 时额外掉落药品
+        if (battleRounds >= 130) {
             for (let i = 0; i < 2; i++) {
                 const extraDrugProbability = Math.random();
                 let extraDrugTier;
@@ -7024,7 +7024,7 @@ function resetBuffState(playerWon) {
             updateDrugGrid();
         }
 
-        // spiritLevel 在 81 到 100 之间时，额外获取药物的概率
+        // spiritLevel 在 81 到 100 之间时，额外获取药品的概率
         if (spiritLevel >= 81) {
             let extraProbability = (spiritLevel - 80) * 0.05; // 每提升1级，额外概率增加5%
 
@@ -7033,7 +7033,7 @@ function resetBuffState(playerWon) {
                 extraProbability = 1;
             }
 
-            // 根据额外概率获取额外药物
+            // 根据额外概率获取额外药品
             if (Math.random() < extraProbability) {
                 const extraDrugKeys = Object.keys(drugInventory);
                 const extraRandomDrug = extraDrugKeys[Math.floor(Math.random() * extraDrugKeys.length)];

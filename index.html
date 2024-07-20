@@ -5979,6 +5979,20 @@ openDivineWeaponUI() {
     this.divineWeaponUI = document.createElement('div');
     this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
     
+    const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
+    const lostBookDescription = this.lostBook.active 
+        ? this.lostBook.effects.length > 0 
+            ? `当前有${Math.round(this.lostBook.level * 0.6 + 1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
+            : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
+        : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的物理技能在施放时能够附加更加强力的效果</p><p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
+
+    const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
+    const fragmentedMapDescription = this.fragmentedMap.active 
+        ? this.fragmentedMap.effects.length > 0 
+            ? `当前有${Math.round(this.fragmentedMap.level * 0.6 + 1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
+            : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
+        : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的法术技能在施放时能够附加更加强力的效果</p><p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
+
     this.divineWeaponUI.innerHTML = `
         <div style="text-align: right;">
             <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
@@ -5987,12 +6001,8 @@ openDivineWeaponUI() {
             <div style="display: flex; align-items: center;">
                 <img src="${this.lostBook.active ? 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                 <div>
-                    <h3 style="margin: 0;">神品·遗失的洛书 (Lv${this.lostBook.level})</h3>
-                    <p style="margin: 0;">
-                      ${this.lostBook.effects.length > 0 
-                        ? `当前有${Math.round(this.lostBook.level * 0.6 + 1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
-                        : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'}
-                    </p>
+                    <h3 style="margin: 0;">${lostBookTitle}</h3>
+                    <p style="margin: 0;">${lostBookDescription}</p>
                 </div>
             </div>
             <div style="display: flex; justify-content: space-around; margin-top: 10px;">
@@ -6005,12 +6015,8 @@ openDivineWeaponUI() {
             <div style="display: flex; align-items: center;">
                 <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                 <div>
-                    <h3 style="margin: 0;">神品·残页的河图 (Lv${this.fragmentedMap.level})</h3>
-                    <p style="margin: 0;">
-                    ${this.fragmentedMap.effects.length > 0 
-                     ? `当前有${Math.round(this.fragmentedMap.level * 0.6 + 1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
-                     : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'}
-                    </p>
+                    <h3 style="margin: 0;">${fragmentedMapTitle}</h3>
+                    <p style="margin: 0;">${fragmentedMapDescription}</p>
                 </div>
             </div>
             <div style="display: flex; justify-content: space-around; margin-top: 10px;">

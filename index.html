@@ -5075,6 +5075,7 @@ function getEnemyStatus() {
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (battleState.enemy.revived) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
+    if (battleState.enemy.pierced) status.push("穿透");
     if (battleState.enemy.silenced) status.push("沉默");
     if (battleState.enemy.poisoned) status.push("中毒");
     if (battleState.enemy.stunned) status.push("眩晕");
@@ -5960,7 +5961,11 @@ class DivineWeaponManager {
                     <img src="https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
                         <h3 style="margin: 0;">神品·遗失的洛书 (Lv${this.lostBook.level})</h3>
-                        <p style="margin: 0;">${this.lostBook.effects.length > 0 ? this.lostBook.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为物理技能附加效果，升级神器可提升触发概率'}</p>
+                        <p style="margin: 0;">
+                          ${this.lostBook.effects.length > 0 
+                            ? `当前有${this.lostBook.level * 0.6 + 1}%概率触发` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
+                            : '开启后可以为物理技能附加效果，升级神器可提升触发概率'}
+                        </p>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-around; margin-top: 10px;">
@@ -5974,7 +5979,11 @@ class DivineWeaponManager {
                     <img src="https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
                         <h3 style="margin: 0;">神品·残页的河图 (Lv${this.fragmentedMap.level})</h3>
-                        <p style="margin: 0;">${this.fragmentedMap.effects.length > 0 ? this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') : '开启后可以为法术技能附加效果，升级神器可提升触发概率'}</p>
+                        <p style="margin: 0;">
+                        ${this.fragmentedMap.effects.length > 0 
+                         ? `当前有${this.fragmentedMap.level * 0.6 + 1}%概率触发` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
+                         : '开启后可以为法术技能附加效果，升级神器可提升触发概率'}
+                        </p>
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-around; margin-top: 10px;">
@@ -6000,20 +6009,32 @@ class DivineWeaponManager {
             showInfoBox("你已经开启此神器了，无法重复开启！");
             return;
         }
-        
-        if (currentExp < 1000) {
-            showInfoBox("经验不足1000，无法开启神器。");
+    
+        // 优先使用道具开启
+        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
+        if (useItem(itemName)) {
+            this[type].active = true;
+            this[type].effects = [this.getRandomEffect(type)];
+            showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已通过成功开启！`);
+            this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
     
-        currentExp -= 1000;
+        // 使用经验开启
+        if (currentExp < 100000) {
+            showInfoBox("经验不足100000，无法开启神器。");
+            return;
+        }
+    
+        currentExp -= 100000;
         updateExpBar();
     
         this[type].active = true;
         this[type].effects = [this.getRandomEffect(type)];
+        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已成功开启！`);
         this.openDivineWeaponUI(); // 刷新界面显示
     }
-    
+
     refreshDivineWeapon(type) {
         if (!this[type].active) {
             showInfoBox("开启神器后才能执行刷新！");
@@ -6061,7 +6082,7 @@ class DivineWeaponManager {
         this.openDivineWeaponUI(); // 刷新界面显示
     }
     getRandomEffect(type) {
-        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹'] : ['沉默', '减速', '混乱', '法力燃烧', '灼烧'];
+        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹', '穿透'] : ['沉默', '减速', '混乱', '法力燃烧', '灼烧'];
         return effects[Math.floor(Math.random() * effects.length)];
     }
 
@@ -6080,7 +6101,6 @@ function divinedWeapon() {
     divineWeaponManager.openDivineWeaponUI();
 }
 
-// 更新物理和法术技能效果的函数
 function applyPhysicalAttackEffects() {
     if (!divineWeaponManager.lostBook.active) return;
 
@@ -6122,6 +6142,33 @@ function applyPhysicalAttackEffects() {
                 battleState.enemy.intimidated = false;
                 updateEnemyStatusDisplay();
             }, 5000); // 恐吓持续5秒
+            break;
+        case '穿透':
+            battleState.enemy.pierced = true;
+            logBattleEvent("深渊巨魔被施加穿透效果。", '#ADFF2F');
+            showEffect('playerEffect', 'https://example.com/pierce-effect.gif');
+            updateEnemyStatusDisplay();
+            const pierceDuration = 10000;
+
+            let totalPierceDamage = 0; // 存储穿透伤害的总和
+
+            const extraDamage = Math.floor(battleAttributes.physicalAttack * 3);
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
+            totalPierceDamage += extraDamage; // 累积穿透伤害
+            logBattleEvent(`穿透效果！额外造成 ${extraDamage} 点伤害。`, '#ADFF2F');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/669b98ced9c307b7e971cfc7.gif');
+
+            setTimeout(() => {
+                battleState.enemy.pierced = false;
+                logBattleEvent("穿透效果消失。", '#ADFF2F');
+                updateEnemyStatusDisplay();
+
+                // 计算并应用“刀剑的余波”伤害
+                const aftershockDamage = Math.floor(totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
+                battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
+                logBattleEvent(`敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
+                showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
+            }, pierceDuration);
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -8089,6 +8136,12 @@ function collectTreasure() {
             case '毒粉':
                 addItemToJinnang('poisonPowder');
                 break;
+            case '遗失的洛书·密钥':
+                addItemToJinnang('lostBook');
+                break;
+            case '残页的河图·灵匙':
+                addItemToJinnang('fragmentedMap');
+                break;
             case '心鉴之石':
                 addItemToJinnang('heartStone');
                 break;
@@ -8232,7 +8285,9 @@ function getRandomReward(type) {
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 9 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 8.8 },
+            { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 0.1 },
+            { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 0.1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 50 }
         ],
         '至尊宝箱': [
@@ -8287,6 +8342,8 @@ let jinnangItems = [
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
+    { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
+    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键道具' }
 ];
 
 // 切换锦囊抽屉的显示状态

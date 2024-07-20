@@ -5936,6 +5936,7 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
+
 //神器系统
 class DivineWeaponManager {
     constructor() {
@@ -5944,58 +5945,58 @@ class DivineWeaponManager {
         this.divineWeaponUI = null;
     }
 
-    openDivineWeaponUI() {
-        if (this.divineWeaponUI) {
-            this.divineWeaponUI.remove();
-        }
-
-        this.divineWeaponUI = document.createElement('div');
-        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
-        
-        this.divineWeaponUI.innerHTML = `
-            <div style="text-align: right;">
-                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
-            </div>
-            <div style="margin-bottom: 20px;">
-                <div style="display: flex; align-items: center;">
-                    <img src="https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
-                    <div>
-                        <h3 style="margin: 0;">神品·遗失的洛书 (Lv${this.lostBook.level})</h3>
-                        <p style="margin: 0;">
-                          ${this.lostBook.effects.length > 0 
-                            ? `当前有${this.lostBook.level * 0.6 + 1}%概率触发` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
-                            : '开启后可以为物理技能附加效果，升级神器可提升触发概率'}
-                        </p>
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
-                </div>
-            </div>
-            <div>
-                <div style="display: flex; align-items: center;">
-                    <img src="https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
-                    <div>
-                        <h3 style="margin: 0;">神品·残页的河图 (Lv${this.fragmentedMap.level})</h3>
-                        <p style="margin: 0;">
-                        ${this.fragmentedMap.effects.length > 0 
-                         ? `当前有${this.fragmentedMap.level * 0.6 + 1}%概率触发` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
-                         : '开启后可以为法术技能附加效果，升级神器可提升触发概率'}
-                        </p>
-                    </div>
-                </div>
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
-                </div>
-            </div>
-        `;
-
-        document.body.appendChild(this.divineWeaponUI);
+openDivineWeaponUI() {
+    if (this.divineWeaponUI) {
+        this.divineWeaponUI.remove();
     }
+
+    this.divineWeaponUI = document.createElement('div');
+    this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
+    
+    this.divineWeaponUI.innerHTML = `
+        <div style="text-align: right;">
+            <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+        </div>
+        <div style="margin-bottom: 20px;">
+            <div style="display: flex; align-items: center;">
+                <img src="${this.lostBook.active ? 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                <div>
+                    <h3 style="margin: 0;">神品·遗失的洛书 (Lv${this.lostBook.level})</h3>
+                    <p style="margin: 0;">
+                      ${this.lostBook.effects.length > 0 
+                        ? `当前有${Math.round(this.lostBook.level * 0.6 + 1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
+                        : '<p>开启后可以为物理技能附加效果如下：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'}
+                    </p>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+            </div>
+        </div>
+        <div>
+            <div style="display: flex; align-items: center;">
+                <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                <div>
+                    <h3 style="margin: 0;">神品·残页的河图 (Lv${this.fragmentedMap.level})</h3>
+                    <p style="margin: 0;">
+                    ${this.fragmentedMap.effects.length > 0 
+                     ? `当前有${Math.round(this.fragmentedMap.level * 0.6 + 1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
+                     : '<p>开启后可以为法术技能附加效果如下：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'}
+                    </p>
+                </div>
+            </div>
+            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(this.divineWeaponUI);
+}
 
     closeDivineWeaponUI() {
         if (this.divineWeaponUI) {
@@ -6021,12 +6022,12 @@ class DivineWeaponManager {
         }
     
         // 使用经验开启
-        if (currentExp < 100000) {
-            showInfoBox("经验不足100000，无法开启神器。");
+        if (currentExp < 200000) {
+            showInfoBox("经验不足200000或缺少钥匙，无法开启神器。神器钥匙可以通过武神宝箱小概率获得。（如果你拥有钥匙，将会自动使用）");
             return;
         }
     
-        currentExp -= 100000;
+        currentExp -= 200000;
         updateExpBar();
     
         this[type].active = true;
@@ -6041,12 +6042,29 @@ class DivineWeaponManager {
             return;
         }
     
-        if (currentExp < 1000) {
-            showInfoBox("经验不足1000，无法刷新效果。");
+        // 优先使用道具刷新
+        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
+        if (useItem(itemName)) {
+            const chance = Math.random();
+            if (chance < 0.05) {
+                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
+            } else if (chance < 0.20) {
+                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+            } else {
+                this[type].effects = [this.getRandomEffect(type)];
+            }
+            showInfoBox(`消耗一个${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}，重置了已有效果。`);
+            this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
     
-        currentExp -= 1000;
+        // 使用经验刷新
+        if (currentExp < 10000) {
+            showInfoBox("经验不足10000或没有对应钥匙，无法刷新效果。（如果你拥有钥匙，将会优先自动使用钥匙刷新）");
+            return;
+        }
+    
+        currentExp -= 10000;
         updateExpBar();
     
         const chance = Math.random();
@@ -6057,6 +6075,7 @@ class DivineWeaponManager {
         } else {
             this[type].effects = [this.getRandomEffect(type)];
         }
+        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已通过经验刷新。`);
         this.openDivineWeaponUI(); // 刷新界面显示
     }
     
@@ -6066,8 +6085,21 @@ class DivineWeaponManager {
             return;
         }
     
-        if (currentExp < 1000) {
-            showInfoBox("经验不足1000，无法升级神器。");
+        // 优先使用道具升级
+        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
+        if (useItem(itemName)) {
+            if (this[type].level >= 100) {
+                showInfoBox("神器等级已达到上限。");
+                return;
+            }
+            this[type].level += 1;
+            this.openDivineWeaponUI(); // 刷新界面显示
+            return;
+        }
+    
+        // 使用经验升级
+        if (currentExp < 2000) {
+            showInfoBox("经验不足2000或缺少对应钥匙，无法升级神器。（如果你拥有钥匙，将会优先自动使用钥匙升级）");
             return;
         }
     
@@ -6076,13 +6108,14 @@ class DivineWeaponManager {
             return;
         }
     
-        currentExp -= 1000;
+        currentExp -= 2000;
         updateExpBar();
         this[type].level += 1;
         this.openDivineWeaponUI(); // 刷新界面显示
     }
+
     getRandomEffect(type) {
-        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹', '穿透'] : ['沉默', '减速', '混乱', '法力燃烧', '灼烧'];
+        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹', '穿透'] : ['沉默', '迟缓', '混乱', '法力燃烧', '灼烧'];
         return effects[Math.floor(Math.random() * effects.length)];
     }
 
@@ -6155,18 +6188,19 @@ function applyPhysicalAttackEffects() {
             const extraDamage = Math.floor(battleAttributes.physicalAttack * 3);
             battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
             totalPierceDamage += extraDamage; // 累积穿透伤害
-            logBattleEvent(`穿透效果！额外造成 ${extraDamage} 点伤害。`, '#ADFF2F');
+            logBattleEvent(`本次攻击额外给敌人造成 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
+            updateUI();
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/669b98ced9c307b7e971cfc7.gif');
 
             setTimeout(() => {
                 battleState.enemy.pierced = false;
-                logBattleEvent("穿透效果消失。", '#ADFF2F');
                 updateEnemyStatusDisplay();
 
                 // 计算并应用“刀剑的余波”伤害
                 const aftershockDamage = Math.floor(totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
-                logBattleEvent(`敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
+                logBattleEvent(`穿透刀剑之余波！敌人承受了 ${aftershockDamage} 点收尾伤害。`, '#ADFF2F');
+                updateUI();
                 showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
             }, pierceDuration);
             break;
@@ -6221,11 +6255,11 @@ function applyMagicAttackEffects(damage) {
                 updateEnemyStatusDisplay();
             }, 3000); // 沉默持续3秒
             break;
-        case '减速':
+        case '迟缓':
             const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
             battleState.enemy.speed -= slowAmount; // 速度降低
             battleState.enemy.slow = true;
-            logBattleEvent(`深渊巨魔被减速，速度降低了 ${slowAmount} 点。`, 'wheat');
+            logBattleEvent(`深渊巨魔被迟缓，速度降低了 ${slowAmount} 点。`, 'wheat');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
@@ -6891,6 +6925,15 @@ function clearEnemyEffect() {
     updatePlayerStatusDisplay();
 }
 
+function clearPlayerEffect() {
+    const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
+    effects.forEach(effect => {
+        battleState.enemy[effect] = false;
+        effectCooldowns[effect] = false;
+    });
+    updateEnemyStatusDisplay();
+}
+
 
 function handleBurnt() {
     if (battleState.enemy.burnt) {
@@ -7170,6 +7213,7 @@ function showNextBattlePrompt(playerWon) {
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
     clearEnemyEffect();
+    clearPlayerEffect();
 }
 
 function resetBuffState(playerWon) {
@@ -8270,8 +8314,8 @@ function getRandomReward(type) {
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
-            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1 },
-            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 1 }
+            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.9 },
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -10849,6 +10893,8 @@ function upgradeWisdomTo() {
         'infiniteGem', //无限宝石
         'ignoranceWater', //清心酿
         'magicPetAmulet', //灵兽符文
+        'lostBook', //遗失的洛书
+        'fragmentedMap', //残页的河图
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹

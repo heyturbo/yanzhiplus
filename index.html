@@ -5367,7 +5367,7 @@ function autoBattle() {
             attackType = 'magic';
             logBattleEvent("自动战斗：玩家处于失明状态，执行法术攻击。", 'pink');
         } else {
-            attackType = Math.random() < 0.95
+            attackType = Math.random() < 0.99
                 ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
                 : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
             logBattleEvent(`自动战斗：执行${attackType === 'magical' ? '法术攻击' : '物理攻击'}`, 'pink');
@@ -5728,6 +5728,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
+    handlePierced(); // 处理穿透效果
 
     return damage;
 }
@@ -5770,6 +5771,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
+    handlePierced(); // 处理穿透效果
 
     if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
         Math.random() * 100 < (battleState.player.spellMasteryChance)) {
@@ -5779,6 +5781,28 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     return { damage, retryPhysical: false };
 }
 
+const pierceDamageContainer = {
+    totalPierceDamage: 0
+};
+
+// 处理穿透效果
+function handlePierced() {
+    if (!battleState.enemy.pierced) return;
+
+    const extraDamage = Math.floor(battleAttributes.physicalAttack * 5);
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
+    logBattleEvent(`本次攻击额外给敌人造成 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
+    pierceDamageContainer.totalPierceDamage += extraDamage; // 累积穿透伤害
+    updateUI();
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/669b98ced9c307b7e971cfc7.gif');
+
+    if (battleState.enemy.health <= 0) {
+    updateEnemyAttributes();
+    showNextBattlePrompt(true);
+    return;
+    }
+}
+        
 function handleCriticalAndDrunken(damage) {
     let isCritical = checkCriticalHit(playerCritRate);
 
@@ -5920,6 +5944,8 @@ function performIndependentMagicAttack() {
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
     applyMagicAttackEffects(damage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
+    handlePierced(); // 处理穿透效果
+    
 
     // 处理醉酒效果
     if (battleState.player.drunken && damage > 0) {
@@ -5965,7 +5991,7 @@ openDivineWeaponUI() {
                     <p style="margin: 0;">
                       ${this.lostBook.effects.length > 0 
                         ? `当前有${Math.round(this.lostBook.level * 0.6 + 1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
-                        : '<p>开启后可以为物理技能附加效果如下：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'}
+                        : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'}
                     </p>
                 </div>
             </div>
@@ -5983,7 +6009,7 @@ openDivineWeaponUI() {
                     <p style="margin: 0;">
                     ${this.fragmentedMap.effects.length > 0 
                      ? `当前有${Math.round(this.fragmentedMap.level * 0.6 + 1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
-                     : '<p>开启后可以为法术技能附加效果如下：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'}
+                     : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'}
                     </p>
                 </div>
             </div>
@@ -6085,13 +6111,20 @@ openDivineWeaponUI() {
             return;
         }
     
-        // 优先使用道具升级
+        if (this[type].level >= 165) {
+            showInfoBox("神器等级已达到上限。");
+            return;
+        }
+    
         const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
-        if (useItem(itemName)) {
-            if (this[type].level >= 100) {
-                showInfoBox("神器等级已达到上限。");
+    
+        // 优先使用道具升级
+        if (this[type].level >= 100 || useItem(itemName)) {
+            if (this[type].level >= 100 && !useItem(itemName)) {
+                showInfoBox("神器已超过100级，只能使用道具升级，且你没有足够的道具。");
                 return;
             }
+            
             this[type].level += 1;
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
@@ -6099,12 +6132,7 @@ openDivineWeaponUI() {
     
         // 使用经验升级
         if (currentExp < 2000) {
-            showInfoBox("经验不足2000或缺少对应钥匙，无法升级神器。（如果你拥有钥匙，将会优先自动使用钥匙升级）");
-            return;
-        }
-    
-        if (this[type].level >= 100) {
-            showInfoBox("神器等级已达到上限。");
+            showInfoBox("经验不足2000或缺少对应道具，无法升级神器。（如果你拥有道具，将会优先自动使用道具升级）");
             return;
         }
     
@@ -6134,6 +6162,7 @@ function divinedWeapon() {
     divineWeaponManager.openDivineWeaponUI();
 }
 
+// 应用物理攻击效果的函数
 function applyPhysicalAttackEffects() {
     if (!divineWeaponManager.lostBook.active) return;
 
@@ -6177,32 +6206,34 @@ function applyPhysicalAttackEffects() {
             }, 5000); // 恐吓持续5秒
             break;
         case '穿透':
+            if (battleState.enemy.pierced) {
+                logBattleEvent("穿透效果仍在持续，无法叠加。", '#ADFF2F');
+                return;
+            }
+    
             battleState.enemy.pierced = true;
+            pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
             logBattleEvent("深渊巨魔被施加穿透效果。", '#ADFF2F');
             showEffect('playerEffect', 'https://example.com/pierce-effect.gif');
             updateEnemyStatusDisplay();
-            const pierceDuration = 10000;
-
-            let totalPierceDamage = 0; // 存储穿透伤害的总和
-
-            const extraDamage = Math.floor(battleAttributes.physicalAttack * 3);
-            battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
-            totalPierceDamage += extraDamage; // 累积穿透伤害
-            logBattleEvent(`本次攻击额外给敌人造成 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
-            updateUI();
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/669b98ced9c307b7e971cfc7.gif');
-
+    
+            // 在穿透效果结束后计算并应用“刀剑的余波”伤害
             setTimeout(() => {
-                battleState.enemy.pierced = false;
-                updateEnemyStatusDisplay();
-
-                // 计算并应用“刀剑的余波”伤害
-                const aftershockDamage = Math.floor(totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
+                battleState.enemy.pierced = false; // 清除穿透状态
+                const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
-                logBattleEvent(`穿透刀剑之余波！敌人承受了 ${aftershockDamage} 点收尾伤害。`, '#ADFF2F');
+                logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透收尾伤害。`, '#ADFF2F');
+                pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
                 updateUI();
                 showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
-            }, pierceDuration);
+                
+                if (battleState.enemy.health <= 0) {
+                updateEnemyAttributes();
+                showNextBattlePrompt(true);
+                return;
+                }
+                updateEnemyStatusDisplay();
+            }, 10000); // 穿透效果持续10秒
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -6441,6 +6472,7 @@ function performPoison() {
     const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对深渊巨魔造成了 ${poisonDamage} 点中毒伤害，消耗了 ${manaCost} 点法力值。`, '#C10066');
+    handlePierced(); // 处理穿透效果
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
 
     let poisonChance = 0.3;
@@ -6940,6 +6972,11 @@ function handleBurnt() {
         const burntDamage = 12888 * battleRounds;
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
         logBattleEvent(`深渊巨魔受到了 ${burntDamage} 点灼烧伤害。`, 'red');
+    if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+        }
     }
 }
 
@@ -10860,7 +10897,7 @@ function upgradeWisdomTo() {
         miraculousPill += 999;
         qualityPill += 999;
         highGradePill += 9999;
-        goldAmount += 999999;
+        goldAmount += 99999999;
         stamps = 5000000;
         updateStampCount();
         updateGoldDisplay(goldAmount);

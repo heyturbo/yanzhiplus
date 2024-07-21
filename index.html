@@ -5975,34 +5975,34 @@ class DivineWeaponManager {
         }
 
         this.divineWeaponUI = document.createElement('div');
-        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid #F5F5F5; width: 85%; padding: 20px; color: white; z-index: 9990;';
         
         const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
         const lostBookDescription = this.lostBook.active 
             ? this.lostBook.effects.length > 0 
-                ? `当前有${(this.lostBook.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
+                ? `使用物理技能时，有${(this.lostBook.level * 0.6 + 1).toFixed(1)}%概率触发以下技能效果：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
-            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
+            : '<p>炽热明亮的金樽，开启后可获得亲近刀剑的法宝，为物理技能概率附加效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
     
         const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
         const fragmentedMapDescription = this.fragmentedMap.active 
             ? this.fragmentedMap.effects.length > 0 
-                ? `当前有${(this.fragmentedMap.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
+                ? `使用法术技能时，有${(this.fragmentedMap.level * 0.6 + 1).toFixed(1)}%概率触发以下技能效果：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
-            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
+            : '<p>闪烁星光的宝盒，开启后可获得亲近法术的神器，为法术技能概率附加效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
         
         const nirvanaGemTitle = this.nirvanaGem.active ? `神品·定空的灵石 (Lv${this.nirvanaGem.level})` : '被封锁的上古神器（庇护）';
         const nirvanaGemDescription = this.nirvanaGem.active 
             ? this.nirvanaGem.effects.length > 0 
-                ? `每秒有${(this.nirvanaGem.level * 0.2 + 1).toFixed(1)}%概率驱散：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
+                ? `每秒有${(this.nirvanaGem.level * 0.4 + 1).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽</p>'
-            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后每秒有一定概率驱散敌人的减益效果。</p>';
+            : '<p>流光溢彩的锦囊，开启后可获得驱退异常的护符。每秒有一定概率驱散敌人的减益效果，成功概率与等级有关。</p>';
 
         this.divineWeaponUI.innerHTML = `
             <div style="text-align: right;">
                 <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
             </div>
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
                 <div style="display: flex; align-items: center;">
                     <img src="${this.lostBook.active ? 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
@@ -6010,13 +6010,13 @@ class DivineWeaponManager {
                         <p style="margin: 0;">${lostBookDescription}</p>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
                 <div style="display: flex; align-items: center;">
                     <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
@@ -6024,13 +6024,13 @@ class DivineWeaponManager {
                         <p style="margin: 0;">${fragmentedMapDescription}</p>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div>
+            <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
                 <div style="display: flex; align-items: center;">
                     <img src="${this.nirvanaGem.active ? 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="定空的灵石" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
@@ -6038,11 +6038,14 @@ class DivineWeaponManager {
                         <p style="margin: 0;">${nirvanaGemDescription}</p>
                     </div>
                 </div>
-                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
+            </div>
+            <div style="text-align: right;">
+                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;"></button>
             </div>
         `;
 
@@ -6105,12 +6108,12 @@ class DivineWeaponManager {
             return;
         }
     
-        if (currentExp < 10000) {
-            showInfoBox("经验不足10000或没有对应钥匙，无法刷新效果。（如果你拥有钥匙，将会优先自动使用钥匙刷新）");
+        if (currentExp < 100000) {
+            showInfoBox("经验不足100000或没有对应钥匙，无法刷新效果。（如果你拥有钥匙，将会优先自动使用钥匙刷新）");
             return;
         }
     
-        currentExp -= 10000;
+        currentExp -= 100000;
         updateExpBar();
     
         const chance = Math.random();
@@ -6149,12 +6152,12 @@ class DivineWeaponManager {
             return;
         }
 
-        if (currentExp < 2000) {
+        if (currentExp < 3000) {
             showInfoBox("经验不足2000或缺少对应「钥匙」，无法升级神器。");
             return;
         }
 
-        currentExp -= 2000;
+        currentExp -= 3000;
         updateExpBar();
         this[type].level += 1;
         this.openDivineWeaponUI(); // 刷新界面显示
@@ -6200,7 +6203,7 @@ class DivineWeaponManager {
     applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
     
-        const triggerProbability = Math.min(1, 0.01 + (this.nirvanaGem.level - 1) * 0.002);
+        const triggerProbability = Math.min(1, 0.01 + (this.nirvanaGem.level - 1) * 0.004);
         if (Math.random() > triggerProbability) return; // 没有触发效果
     
         const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
@@ -6230,7 +6233,7 @@ const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
 function divinedWeapon() {
     if (!divinedWeaponStatus) {
-        showInfoBox("神器系统需要消耗大量经验值。使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。");
+        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。神器的开启和使用需要消耗大量经验值或特定的「钥匙」。");
         divinedWeaponStatus = true;
     }
     divineWeaponManager.openDivineWeaponUI();
@@ -8681,9 +8684,9 @@ let jinnangItems = [
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
-    { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
-    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
-    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
+    { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14046.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
+    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e1403e.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
+    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14027.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
     { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可以免费开启一次十连任意宝箱' },
     { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可以免费投注一次1000注以内的彩券' },
 ];
@@ -11133,8 +11136,8 @@ function blessGift() {
         for (const item of itemsToIncrease) {
             addItemToJinnang(item, 50);
         }
-        addItemToJinnang('treasureMap', 20);
-        addItemToJinnang('casinoCoverLetter', 20);
+        addItemToJinnang('treasureMap', 10);
+        addItemToJinnang('casinoCoverLetter', 10);
         addItemToJinnang('summonCharmPaper', 20);
         blessGiftClaimed = true;
         updateJinnangItems();

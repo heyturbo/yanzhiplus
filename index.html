@@ -5063,6 +5063,9 @@ function getPlayerStatus() {
     let status = [];
     if (battleState.player.divineProtection) status.push("仙气护体");
     if (battleState.player.drunken) status.push("醉酒");
+    if (battleState.player.torn) status.push("撕裂");
+    if (battleState.player.suppressed) status.push("压制");
+    if (battleState.player.taunt) status.push("嘲讽");
     if (battleState.player.healingBan) status.push("禁疗");
     if (battleState.player.soulCapture) status.push("摄魂");
     if (battleState.player.blindfold) status.push("失明");
@@ -5737,6 +5740,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     let damage;
     let isCritical = checkCriticalHit(playerCritRate);
 
+
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
@@ -5971,64 +5975,67 @@ class DivineWeaponManager {
         this.divineWeaponUI = null;
     }
 
-openDivineWeaponUI() {
-    if (this.divineWeaponUI) {
-        this.divineWeaponUI.remove();
-    }
-
-    this.divineWeaponUI = document.createElement('div');
-    this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
+    openDivineWeaponUI() {
+        if (this.divineWeaponUI) {
+            this.divineWeaponUI.remove();
+        }
     
-    const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
-    const lostBookDescription = this.lostBook.active 
-        ? this.lostBook.effects.length > 0 
-            ? `当前有${Math.round(this.lostBook.level * 0.6 + 1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
-            : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
-        : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的物理技能在施放时能够附加更加强力的效果</p><p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
-
-    const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
-    const fragmentedMapDescription = this.fragmentedMap.active 
-        ? this.fragmentedMap.effects.length > 0 
-            ? `当前有${Math.round(this.fragmentedMap.level * 0.6 + 1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
-            : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
-        : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的法术技能在施放时能够附加更加强力的效果</p><p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
-
-    this.divineWeaponUI.innerHTML = `
-        <div style="text-align: right;">
-            <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
-        </div>
-        <div style="margin-bottom: 20px;">
-            <div style="display: flex; align-items: center;">
-                <img src="${this.lostBook.active ? 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
-                <div>
-                    <h3 style="margin: 0;">${lostBookTitle}</h3>
-                    <p style="margin: 0;">${lostBookDescription}</p>
+        this.divineWeaponUI = document.createElement('div');
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
+        
+        const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
+        const lostBookDescription = this.lostBook.active 
+            ? this.lostBook.effects.length > 0 
+                ? `当前有${(this.lostBook.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
+                : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
+            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的物理技能在施放时能够附加更加强力的效果</p><p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
+    
+        const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
+        const fragmentedMapDescription = this.fragmentedMap.active 
+            ? this.fragmentedMap.effects.length > 0 
+                ? `当前有${(this.fragmentedMap.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
+                : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
+            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的法术技能在施放时能够附加更加强力的效果</p><p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
+    
+        this.divineWeaponUI.innerHTML = `
+            <div style="text-align: right;">
+                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
+            </div>
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; align-items: center;">
+                    <img src="${this.lostBook.active ? 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="遗失的洛书" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <div>
+                        <h3 style="margin: 0;">${lostBookTitle}</h3>
+                        <p style="margin: 0;">${lostBookDescription}</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
-            </div>
-        </div>
-        <div>
-            <div style="display: flex; align-items: center;">
-                <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
-                <div>
-                    <h3 style="margin: 0;">${fragmentedMapTitle}</h3>
-                    <p style="margin: 0;">${fragmentedMapDescription}</p>
+            <div>
+                <div style="display: flex; align-items: center;">
+                    <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <div>
+                        <h3 style="margin: 0;">${fragmentedMapTitle}</h3>
+                        <p style="margin: 0;">${fragmentedMapDescription}</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div style="display: flex; justify-content: space-around; margin-top: 10px;">
-                <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
-                <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
-                <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+            <div style="text-align: right;">
+                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;"></button>
             </div>
-        </div>
-    `;
-
-    document.body.appendChild(this.divineWeaponUI);
-}
+        `;
+    
+        document.body.appendChild(this.divineWeaponUI);
+    }
 
     closeDivineWeaponUI() {
         if (this.divineWeaponUI) {
@@ -6085,7 +6092,6 @@ openDivineWeaponUI() {
             } else {
                 this[type].effects = [this.getRandomEffect(type)];
             }
-            showInfoBox(`消耗一个${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}，重置了已有效果。`);
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
@@ -6833,6 +6839,8 @@ function performEnemyPhysicalAttack(isCritical) {
         logBattleEvent(`深渊巨魔施放黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
     }
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66728e8dd9c307b7e956a4e4.gif');
+
+    applyEnemyPhysicalEffects(damage);
     return damage;
 }
 //深渊巨魔使用法术攻击
@@ -6869,9 +6877,143 @@ const effectCooldowns = {
     healingBan: false,
     soulCapture: false,
     blindfold: false,
-    spellSlow: false
+    spellSlow: false,
+    torn: false,
+    suppressed: false,
+    taunt: false,
 };
 
+function applyEnemyPhysicalEffects(damage) {
+    const effects = ['torn', 'suppressed', 'taunt'];
+    effects.forEach(effect => {
+        const effectChance = Math.random();
+        switch (effect) {
+            case 'torn':
+                if (effectChance < 0.2 && !effectCooldowns.torn) {
+                    handleTorn();
+                }
+                break;
+            case 'suppressed':
+                if (effectChance < 0.3 && !effectCooldowns.suppressed) {
+                    handleSuppressed();
+                }
+                break;
+            case 'taunt':
+                if (effectChance < 0.1 && !effectCooldowns.taunt) {
+                    handleTaunt();
+                }
+                break;
+        }
+    });
+}
+
+function handleTorn() {
+    battleState.player.torn = true;
+    logBattleEvent("身中深渊巨魔充满毒性的撕裂伤害，正在持续失血", '#FF4500');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
+    effectCooldowns.torn = true;
+    updatePlayerStatusDisplay();
+    const tornInterval = setInterval(() => {
+        if (!battleState.player.torn) {
+            clearInterval(tornInterval);
+            return;
+        }
+        const tornDamage = Math.floor(battleState.enemy.physicalAttack * 0.1);
+        battleAttributes.health = Math.max(0, battleAttributes.health - tornDamage);
+        logBattleEvent(`撕裂效果触发，受到 ${tornDamage} 点伤害。`, '#FF4500');
+        updateUI();
+        updatePlayerStatusDisplay();
+    }, 500);
+
+    setTimeout(() => {
+        battleState.player.torn = false;
+        effectCooldowns.torn = false;
+        clearInterval(tornInterval);
+        updatePlayerStatusDisplay();
+    }, 5000); // 撕裂效果持续5秒
+}
+
+function handleSuppressed() {
+    battleState.player.suppressed = true;
+    logBattleEvent("你受到了压制效果，必须在3秒内进行有效操作。", '#FF4500');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
+    effectCooldowns.suppressed = true;
+    updatePlayerStatusDisplay();
+
+    const originalPerformPhysicalAttack = performPhysicalAttack;
+    const originalPerformMagicalAttack = performMagicalAttack;
+    const originalPerformHeal = performHeal;
+    const originalPerformPoison = performPoison;
+    const originalPerformDefense = performDefense;
+
+    let actionPerformed = false;
+
+    const wrappedAction = (originalFunction) => {
+        return function(...args) {
+            actionPerformed = true;
+            return originalFunction.apply(this, args);
+        };
+    };
+
+    performPhysicalAttack = wrappedAction(performPhysicalAttack);
+    performMagicalAttack = wrappedAction(performMagicalAttack);
+    performHeal = wrappedAction(performHeal);
+    performPoison = wrappedAction(performPoison);
+    performDefense = wrappedAction(performDefense);
+
+    setTimeout(() => {
+        battleState.player.suppressed = false;
+        effectCooldowns.suppressed = false;
+        if (!actionPerformed) {
+            battleAttributes.health = 1;
+            logBattleEvent("你的无动于衷助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
+            updateUI();
+        }
+        performPhysicalAttack = originalPerformPhysicalAttack;
+        performMagicalAttack = originalPerformMagicalAttack;
+        performHeal = originalPerformHeal;
+        performPoison = originalPerformPoison;
+        performDefense = originalPerformDefense;
+        updatePlayerStatusDisplay();
+    }, 3000); // 压制效果持续3秒
+}
+
+function handleTaunt() {
+    battleState.player.taunt = true;
+    logBattleEvent("深渊巨魔极尽冷嘲热讽之攻势，你未能压抑心中怒火，嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
+    effectCooldowns.taunt = true;
+    updatePlayerStatusDisplay();
+
+    const originalPerformMagicalAttack = performMagicalAttack;
+    const originalPerformHeal = performHeal;
+    const originalPerformPoison = performPoison;
+    const originalPerformDefense = performDefense;
+
+    const tauntWrappedAction = (type) => {
+        return function(...args) {
+            return performAttack('physical');
+        };
+    };
+
+    performMagicalAttack = tauntWrappedAction('physical');
+    performHeal = tauntWrappedAction('physical');
+    performPoison = tauntWrappedAction('physical');
+    performDefense = tauntWrappedAction('physical');
+    updateUI();
+
+    setTimeout(() => {
+        battleState.player.taunt = false;
+        effectCooldowns.taunt = false;
+        performMagicalAttack = originalPerformMagicalAttack;
+        performHeal = originalPerformHeal;
+        performPoison = originalPerformPoison;
+        performDefense = originalPerformDefense;
+        updatePlayerStatusDisplay();
+    }, 6000); // 嘲讽效果持续6秒
+}
+        
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
     effects.forEach(effect => {
@@ -6955,7 +7097,7 @@ function applyEnemyMagicEffects(damage) {
 }
 
 function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt',];
     effects.forEach(effect => {
         battleState.player[effect] = false;
         effectCooldowns[effect] = false;

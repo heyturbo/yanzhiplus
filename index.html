@@ -5967,11 +5967,11 @@ function performIndependentMagicAttack() {
     }
 }
 
-//神器系统
 class DivineWeaponManager {
     constructor() {
         this.lostBook = { active: false, level: 1, effects: [] };
         this.fragmentedMap = { active: false, level: 1, effects: [] };
+        this.nirvanaGem = { active: false, level: 1, effects: [] };
         this.divineWeaponUI = null;
     }
 
@@ -5979,7 +5979,7 @@ class DivineWeaponManager {
         if (this.divineWeaponUI) {
             this.divineWeaponUI.remove();
         }
-    
+
         this.divineWeaponUI = document.createElement('div');
         this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid white; width: 80%; padding: 20px; color: white; z-index: 9990;';
         
@@ -5988,15 +5988,22 @@ class DivineWeaponManager {
             ? this.lostBook.effects.length > 0 
                 ? `当前有${(this.lostBook.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
-            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的物理技能在施放时能够附加更加强力的效果</p><p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
+            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
     
         const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
         const fragmentedMapDescription = this.fragmentedMap.active 
             ? this.fragmentedMap.effects.length > 0 
                 ? `当前有${(this.fragmentedMap.level * 0.6 + 1).toFixed(1)}%概率触发：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
-            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器。解锁后，你的法术技能在施放时能够附加更加强力的效果</p><p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
-    
+            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
+        
+        const nirvanaGemTitle = this.nirvanaGem.active ? `神品·定空的灵石 (Lv${this.nirvanaGem.level})` : '被封锁的上古神器（庇护）';
+        const nirvanaGemDescription = this.nirvanaGem.active 
+            ? this.nirvanaGem.effects.length > 0 
+                ? `每秒有${(this.nirvanaGem.level * 0.2 + 1).toFixed(1)}%概率驱散：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
+                : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽</p>'
+            : '<p>你需要20万经验值或一个特殊道具（武神宝箱可获得）来解锁此神器，解锁后每秒有一定概率驱散敌人的减益效果。</p>';
+
         this.divineWeaponUI.innerHTML = `
             <div style="text-align: right;">
                 <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
@@ -6015,7 +6022,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div>
+            <div style="margin-bottom: 20px;">
                 <div style="display: flex; align-items: center;">
                     <img src="${this.fragmentedMap.active ? 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="残页的河图" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
@@ -6029,11 +6036,22 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
                 </div>
             </div>
-            <div style="text-align: right;">
-                <button onclick="divineWeaponManager.closeDivineWeaponUI()" style="background: transparent; border: none; color: white; font-size: 20px; cursor: pointer;"></button>
+            <div>
+                <div style="display: flex; align-items: center;">
+                    <img src="${this.nirvanaGem.active ? 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="定空的灵石" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <div>
+                        <h3 style="margin: 0;">${nirvanaGemTitle}</h3>
+                        <p style="margin: 0;">${nirvanaGemDescription}</p>
+                    </div>
+                </div>
+                <div style="display: flex; justify-content: space-around; margin-top: 10px;">
+                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; border: 1px solid white; border-radius: 5px;">升级</button>
+                </div>
             </div>
         `;
-    
+
         document.body.appendChild(this.divineWeaponUI);
     }
 
@@ -6049,29 +6067,27 @@ class DivineWeaponManager {
             showInfoBox("你已经开启此神器了，无法重复开启！");
             return;
         }
-    
-        // 优先使用道具开启
-        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
+
+        const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
         if (useItem(itemName)) {
             this[type].active = true;
             this[type].effects = [this.getRandomEffect(type)];
-            showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已通过成功开启！`);
+            showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已通过成功开启！`);
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
-    
-        // 使用经验开启
+
         if (currentExp < 200000) {
             showInfoBox("经验不足200000或缺少钥匙，无法开启神器。神器钥匙可以通过武神宝箱小概率获得。（如果你拥有钥匙，将会自动使用）");
             return;
         }
-    
+
         currentExp -= 200000;
         updateExpBar();
-    
+
         this[type].active = true;
         this[type].effects = [this.getRandomEffect(type)];
-        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已成功开启！`);
+        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已成功开启！`);
         this.openDivineWeaponUI(); // 刷新界面显示
     }
 
@@ -6081,8 +6097,7 @@ class DivineWeaponManager {
             return;
         }
     
-        // 优先使用道具刷新
-        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
+        const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
         if (useItem(itemName)) {
             const chance = Math.random();
             if (chance < 0.05) {
@@ -6096,7 +6111,6 @@ class DivineWeaponManager {
             return;
         }
     
-        // 使用经验刷新
         if (currentExp < 10000) {
             showInfoBox("经验不足10000或没有对应钥匙，无法刷新效果。（如果你拥有钥匙，将会优先自动使用钥匙刷新）");
             return;
@@ -6113,7 +6127,7 @@ class DivineWeaponManager {
         } else {
             this[type].effects = [this.getRandomEffect(type)];
         }
-        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : '残页的河图'}已通过经验刷新。`);
+        showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已通过经验刷新。`);
         this.openDivineWeaponUI(); // 刷新界面显示
     }
     
@@ -6122,15 +6136,14 @@ class DivineWeaponManager {
             showInfoBox("开启神器后才能执行升级！");
             return;
         }
-    
+
         if (this[type].level >= 165) {
             showInfoBox("神器等级已达到上限。");
             return;
         }
-    
-        const itemName = type === 'lostBook' ? 'lostBook' : 'fragmentedMap';
-    
-        // 优先使用道具升级
+
+        const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
+
         if (this[type].level >= 100 || useItem(itemName)) {
             if (this[type].level >= 100 && !useItem(itemName)) {
                 showInfoBox("神器已超过100级，只能使用道具升级，且你没有足够的道具。");
@@ -6141,13 +6154,12 @@ class DivineWeaponManager {
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
-    
-        // 使用经验升级
+
         if (currentExp < 2000) {
             showInfoBox("经验不足2000或缺少对应道具，无法升级神器。（如果你拥有道具，将会优先自动使用道具升级）");
             return;
         }
-    
+
         currentExp -= 2000;
         updateExpBar();
         this[type].level += 1;
@@ -6155,12 +6167,60 @@ class DivineWeaponManager {
     }
 
     getRandomEffect(type) {
-        const effects = type === 'lostBook' ? ['破甲', '眩晕', '恐吓', '麻痹', '穿透'] : ['沉默', '迟缓', '混乱', '法力燃烧', '灼烧'];
-        return effects[Math.floor(Math.random() * effects.length)];
+        if (type === 'lostBook') {
+            const effects = ['破甲', '眩晕', '恐吓', '麻痹', '穿透'];
+            return effects[Math.floor(Math.random() * effects.length)];
+        } else if (type === 'fragmentedMap') {
+            const effects = ['沉默', '迟缓', '混乱', '法力燃烧', '灼烧'];
+            return effects[Math.floor(Math.random() * effects.length)];
+        } else if (type === 'nirvanaGem') {
+            const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+            return effects[Math.floor(Math.random() * effects.length)];
+        }
     }
 
     getEffectChineseName(effect) {
-        return effect; // 汉字已经直接使用，无需转换
+        const effectMap = {
+            '破甲': '破甲',
+            '眩晕': '眩晕',
+            '恐吓': '恐吓',
+            '麻痹': '麻痹',
+            '穿透': '穿透',
+            '沉默': '沉默',
+            '迟缓': '迟缓',
+            '混乱': '混乱',
+            '法力燃烧': '法力燃烧',
+            '灼烧': '灼烧',
+            'drunken': '醉酒',
+            'healingBan': '禁疗',
+            'soulCapture': '摄魂',
+            'blindfold': '失明',
+            'spellSlow': '法术迟钝',
+            'torn': '撕裂',
+            'suppressed': '压制',
+            'taunt': '嘲讽'
+        };
+        return effectMap[effect] || effect;
+    }
+
+    applyNirvanaGemEffects() {
+        if (!this.nirvanaGem.active) return;
+
+        const triggerProbability = Math.min(1, 0.01 + (this.nirvanaGem.level - 1) * 0.002);
+        if (Math.random() > triggerProbability) return; // 没有触发效果
+
+        const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+        const activeDebuffs = debuffs.filter(debuff => battleState.player[debuff]);
+        const applicableDebuffs = this.nirvanaGem.effects.filter(effect => debuffs.includes(effect));
+        
+        const debuffsToRemove = activeDebuffs.filter(debuff => applicableDebuffs.includes(debuff));
+        
+        if (debuffsToRemove.length > 0) {
+            const debuffToRemove = debuffsToRemove[Math.floor(Math.random() * debuffsToRemove.length)];
+            battleState.player[debuffToRemove] = false;
+            logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#FF6347');
+            updatePlayerStatusDisplay();
+        }
     }
 }
 
@@ -6173,6 +6233,12 @@ function divinedWeapon() {
     }
     divineWeaponManager.openDivineWeaponUI();
 }
+
+// 在战斗循环中调用以定期检查定空的灵石效果
+setInterval(() => {
+    divineWeaponManager.applyNirvanaGemEffects();
+}, 1000);
+
 
 // 应用物理攻击效果的函数
 function applyPhysicalAttackEffects() {
@@ -8371,6 +8437,9 @@ function collectTreasure() {
             case '残页的河图·灵匙':
                 addItemToJinnang('fragmentedMap');
                 break;
+            case '定空的灵石·图章':
+                addItemToJinnang('nirvanaGem');
+                break;
             case '心鉴之石':
                 addItemToJinnang('heartStone');
                 break;
@@ -8514,8 +8583,9 @@ function getRandomReward(type) {
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 8.8 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 8.7 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 0.1 },
+            { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', chance: 0.1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 0.1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 50 }
         ],
@@ -8572,7 +8642,8 @@ let jinnangItems = [
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
     { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
-    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键道具' }
+    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键道具' },
+    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键道具' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -11080,6 +11151,7 @@ function upgradeWisdomTo() {
         'magicPetAmulet', //灵兽符文
         'lostBook', //遗失的洛书
         'fragmentedMap', //残页的河图
+        'nirvanaGem', //定空的灵石
         'glowingSoul',
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹

@@ -3776,6 +3776,8 @@ function collectDrug() {
     } else {
         collectedDrug = '完美药材';
         drugInventory['完美药材'].quantity += 1;
+        addItemToJinnang('treasureMap', 1);
+        showInfoBox("功夫不负有心人，你意外获得一份藏宝图！")
         
     }
 
@@ -3843,7 +3845,7 @@ function checkConflictingBuffs(selectedDrug) {
     if (conflictingDrugs.includes(selectedDrug)) {
         for (const drug of conflictingDrugs) {
             if (activeBuffs[drug]) {
-                logBattleEvent("已有同系效果发挥作用了", 'red');
+                showInfoBox("已有同系效果发挥作用了");
                 return true;
             }
         }
@@ -3865,7 +3867,7 @@ function useSelectedDrug() {
     }
 
     if (activeBuffs[selectedDrug]) {
-        logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。`, 'red');
+        showInfoBox(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
         return;
     }
 
@@ -3877,7 +3879,6 @@ function useSelectedDrug() {
     if (drug.quantity > 0) {
         drug.quantity -= 1;
         updateDrugGrid();
-        logBattleEvent(`${selectedDrug} 已使用。`, 'gold');
 
         switch (selectedDrug) {
             case "长生泉":
@@ -3963,7 +3964,7 @@ function useSelectedDrug() {
                 if (!activeBuffs[selectedDrug]) {
                     applyBuff(selectedDrug);
                 } else {
-                    logBattleEvent(`${selectedDrug}效果尚在持续中，无法叠加使用。`, 'red');
+                    showInfoBox(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
                     return;  // 提前返回，防止数量减少
                 }
                 break;
@@ -4116,7 +4117,7 @@ function applyBuff(drugName) {
                     10000
                 );
             } else {
-                logBattleEvent("焚灵之丸效果无法触发，生命值不足20%。", 'red');
+                showInfoBox("焚灵之丸效果无法触发，生命值不足20%。");
             }
             break;
     }
@@ -5272,7 +5273,7 @@ function jumpByTenRounds() {
     const maxSkipRounds = Math.min(99, petLevel + 20);
 
     if (battleRounds >= maxSkipRounds) {
-        logBattleEvent(`当前无法再继续跳过！`, 'red');
+        showInfoBox(`当前是第${battleRounds}轮，无法再继续跳过！`);
         return;
     }
 
@@ -5328,10 +5329,8 @@ function autoBattle() {
 
         if (battleAttributes.health / maxHealth < 0.5) {
             if (Math.random() < 0.5) {
-                logBattleEvent("自动战斗：玩家生命值低于50%，执行防御。", 'pink');
                 performDefense();
             } else {
-                logBattleEvent("自动战斗：玩家生命值低于50%，执行治疗。", 'pink');
                 performHeal();
             }
             return;
@@ -5352,7 +5351,6 @@ function autoBattle() {
             if (drug && drug.quantity > 0) {
                 selectDrug(selectedDrug);
                 useSelectedDrug();
-                logBattleEvent("自动战斗：玩家状态异常，使用药品'沉檀凝香'。", 'pink');
                 return;
             }
         }
@@ -5360,7 +5358,6 @@ function autoBattle() {
         if (battleState.player.poisonSkillActivated) {
             if (Math.random() < 0.2) {
                 performPoison();
-                logBattleEvent("自动战斗：释放中毒技能。", 'pink');
                 return;
             }
         }
@@ -5368,12 +5365,10 @@ function autoBattle() {
         let attackType;
         if (battleState.player.blindfold) {
             attackType = 'magic';
-            logBattleEvent("自动战斗：玩家处于失明状态，执行法术攻击。", 'pink');
         } else {
             attackType = Math.random() < 0.99
                 ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
                 : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
-            logBattleEvent(`自动战斗：执行${attackType === 'magical' ? '法术攻击' : '物理攻击'}`, 'pink');
         }
 
         performAttack(attackType);
@@ -5692,7 +5687,7 @@ function selectSkillAndCalculateMultiplier(type) {
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 检查玩家是否处于失明状态
     if (battleState.player.blindfold) {
-        logBattleEvent("处于短暂失明，你空大了。", 'yellow');
+        logBattleEvent("处于短暂失明，敌人闪避了你的物理攻击。", 'yellow');
         return 0; // 物理攻击无法造成伤害
     }
 
@@ -5703,7 +5698,6 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 判断是否触发"斩龙一式"
     if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
         damage = Math.floor(damage * 1.6); // 增加60%伤害
-        logBattleEvent("斩龙一式触发,伤害增加60%!", 'gold');
     }
 
     let isCritical = checkCriticalHit(playerCritRate);
@@ -5886,7 +5880,7 @@ function applyDefenseBonus() {
         playerCritRate -= critRate;
         playerCritDamage -= critDamage;
 
-        logBattleEvent(`你的防御增益效果已结束：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
+        logBattleEvent(`你的蓄力增益效果已应用：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
         battleState.player.defenseBonusCount = 0; // 重置计数
         battleState.player.defenseBonus = null; // 重置增益状态
     }
@@ -6072,13 +6066,13 @@ class DivineWeaponManager {
         if (useItem(itemName)) {
             this[type].active = true;
             this[type].effects = [this.getRandomEffect(type)];
-            showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已通过成功开启！`);
+            showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已成功开启！`);
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
 
         if (currentExp < 200000) {
-            showInfoBox("经验不足200000或缺少钥匙，无法开启神器。神器钥匙可以通过武神宝箱小概率获得。（如果你拥有钥匙，将会自动使用）");
+            showInfoBox("经验不足200000或缺少对应的「钥匙」。神器的「钥匙」可以通过武神宝箱小概率获得。");
             return;
         }
 
@@ -6146,7 +6140,7 @@ class DivineWeaponManager {
 
         if (this[type].level >= 100 || useItem(itemName)) {
             if (this[type].level >= 100 && !useItem(itemName)) {
-                showInfoBox("神器已超过100级，只能使用道具升级，且你没有足够的道具。");
+                showInfoBox("神器100级后，只能使用「钥匙」升级，你可以通过开启武神宝箱获取「钥匙」。");
                 return;
             }
             
@@ -6156,7 +6150,7 @@ class DivineWeaponManager {
         }
 
         if (currentExp < 2000) {
-            showInfoBox("经验不足2000或缺少对应道具，无法升级神器。（如果你拥有道具，将会优先自动使用道具升级）");
+            showInfoBox("经验不足2000或缺少对应「钥匙」，无法升级神器。");
             return;
         }
 
@@ -6205,21 +6199,29 @@ class DivineWeaponManager {
 
     applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
-
+    
         const triggerProbability = Math.min(1, 0.01 + (this.nirvanaGem.level - 1) * 0.002);
         if (Math.random() > triggerProbability) return; // 没有触发效果
-
+    
         const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
         const activeDebuffs = debuffs.filter(debuff => battleState.player[debuff]);
         const applicableDebuffs = this.nirvanaGem.effects.filter(effect => debuffs.includes(effect));
-        
+    
         const debuffsToRemove = activeDebuffs.filter(debuff => applicableDebuffs.includes(debuff));
-        
+    
         if (debuffsToRemove.length > 0) {
             const debuffToRemove = debuffsToRemove[Math.floor(Math.random() * debuffsToRemove.length)];
             battleState.player[debuffToRemove] = false;
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#FF6347');
             updatePlayerStatusDisplay();
+    
+            if (debuffToRemove === 'taunt') {
+                // 恢复原始动作函数
+                performMagicalAttack = originalPerformMagicalAttack;
+                performHeal = originalPerformHeal;
+                performPoison = originalPerformPoison;
+                performDefense = originalPerformDefense;
+            }
         }
     }
 }
@@ -6285,13 +6287,12 @@ function applyPhysicalAttackEffects() {
             break;
         case '穿透':
             if (battleState.enemy.pierced) {
-                logBattleEvent("穿透效果仍在持续，无法叠加。", '#ADFF2F');
                 return;
             }
     
             battleState.enemy.pierced = true;
             pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
-            logBattleEvent("深渊巨魔被施加穿透效果。", '#ADFF2F');
+            logBattleEvent("深渊巨魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予深渊巨魔致命的余波伤害。", '#ADFF2F');
             showEffect('playerEffect', 'https://example.com/pierce-effect.gif');
             updateEnemyStatusDisplay();
     
@@ -6373,7 +6374,6 @@ function applyMagicAttackEffects(damage) {
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 battleState.enemy.speed += slowAmount;
-                logBattleEvent("深渊巨魔的迟缓状态消失。", 'wheat');
                 battleState.enemy.slow = false;
                 updateEnemyStatusDisplay();
             }, 10000); // 迟缓持续10秒
@@ -6556,12 +6556,10 @@ function performPoison() {
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
         poisonChance = 0.7;
-        logBattleEvent("使用了毒粉，中毒概率增加至70%。", '#C10066');
     }
 
     if (Math.random() < poisonChance) {
         applyPoisonEffect();
-        logBattleEvent("深渊巨魔被施加了中毒效果，每次行动会扣除生命值。", '#C10066');
     }
     
     playerTurn = false;
@@ -6623,8 +6621,7 @@ function performDefense() {
     }
     battleState.player.defending = true;
     battleState.player.defenseReduction = defenseReduction;
-    logBattleEvent(`你施放了 ${selectedSkillName}。`, 'orange');
-    logBattleEvent(`你本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
+    logBattleEvent(`你施放了 ${selectedSkillName}，本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
 
     // 更新防御增益计数
@@ -6827,7 +6824,6 @@ function handleRampaged() {
 
 function enemyHeal() {
     if (enemyHealCount >= 10) {
-        logBattleEvent("深渊巨魔尝试使用治疗术，但被我方打断了！");
         return;
     }
 
@@ -6835,7 +6831,6 @@ function enemyHeal() {
 
     // 检查深渊巨魔的法力值是否足够
     if (battleState.enemy.mana < manaCost) {
-        logBattleEvent("深渊巨魔的法力值不足，无法施放治疗术，被迫进行物理攻击。", 'wheat');
         performEnemyPhysicalAttack(false);
         return;
     }
@@ -6870,11 +6865,10 @@ function enemyHeal() {
   
 function handleDazed() {
     if (battleState.enemy.dazed) {
-        logBattleEvent("深渊巨魔混乱，可能会攻击自己。", 'wheat');
         if (Math.random() < 0.5) {
             const selfDamage = battleState.enemy.physicalAttack;
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
-            logBattleEvent(`深渊巨魔攻击了自己，造成了 ${selfDamage} 点伤害。`, 'wheat');
+            logBattleEvent(`混乱状态下，深渊巨魔攻击了自己，造成了 ${selfDamage} 点伤害。`, 'wheat');
             playerTurn = true;
             return true;
         }
@@ -6912,7 +6906,6 @@ function performEnemyPhysicalAttack(isCritical) {
 //深渊巨魔使用法术攻击
 function performEnemyMagicalAttack(isCritical) {
     if (battleState.enemy.mana < 50) {
-        logBattleEvent("深渊巨魔想使用法术技能，但法力值不足！");
         enemyAttack('physical');
         return 0;
     }
@@ -7161,15 +7154,24 @@ function applyEnemyMagicEffects(damage) {
         }
     });
 }
+const originalPerformMagicalAttack = performMagicalAttack;
+const originalPerformHeal = performHeal;
+const originalPerformPoison = performPoison;
+const originalPerformDefense = performDefense;
 
 function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt',];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
     effects.forEach(effect => {
         battleState.player[effect] = false;
         effectCooldowns[effect] = false;
     });
+    performMagicalAttack = originalPerformMagicalAttack;
+    performHeal = originalPerformHeal;
+    performPoison = originalPerformPoison;
+    performDefense = originalPerformDefense;
     updatePlayerStatusDisplay();
 }
+
 
 function clearPlayerEffect() {
     const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
@@ -7624,6 +7626,7 @@ function resetBattleState(playerWon) {
     
     updateUI();
     storeEnemyInitialState();
+    clearEnemyEffect();
     enemyHealCount = 0;
     updatePetInfo();
 }
@@ -7896,18 +7899,36 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             showInfoBox('请加注后点击投注按钮进行投注！');
             return;
         }
-        if (goldAmount >= lotteryBetAmount) {
-            goldAmount -= lotteryBetAmount;
+
+        // 检查是否拥有casinoCoverLetter道具
+        const casinoCoverLetterItem = jinnangItems.find(i => i.name === 'casinoCoverLetter');
+        const hasCasinoCoverLetter = casinoCoverLetterItem && casinoCoverLetterItem.quantity > 0;
+
+        if (hasCasinoCoverLetter && lotteryBetCount <= 1000) {
+            // 使用casinoCoverLetter进行投注
+            useItem('casinoCoverLetter', 1);
             lastSelectedNumbers = [...lotterySelectedNumbers];
-            updateGoldDisplay(goldAmount);
-            canBet = false; // Disable further bets until next draw
+            canBet = false; // 禁止在下一次开奖之前再次投注
 
             document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
             
             updateLotteryDisplay();
             hasPlacedBet = true; // 更新投注标志
         } else {
-            showInfoBox('余额不足');
+            // 正常逻辑扣除金子进行投注
+            if (goldAmount >= lotteryBetAmount) {
+                goldAmount -= lotteryBetAmount;
+                updateGoldDisplay(goldAmount);
+                lastSelectedNumbers = [...lotterySelectedNumbers];
+                canBet = false; // 禁止在下一次开奖之前再次投注
+
+                document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
+                
+                updateLotteryDisplay();
+                hasPlacedBet = true; // 更新投注标志
+            } else {
+                showInfoBox('余额不足');
+            }
         }
     } else {
         showInfoBox('请选择6个数字');
@@ -8324,6 +8345,7 @@ function ascend() {
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
     updateImageFrame(customImageUrls.ascend, 5000);
+    
 }
 
 let selectedTreasure = null;
@@ -8474,10 +8496,31 @@ function openTreasure(times = 1) {
         return;
     }
 
-    const cost = getTreasureCost(selectedTreasure) * times;
-    if (goldAmount < cost) {
-        showInfoBox("金子不足！");
-        return;
+    if (times === 10) {
+        const treasureMapItem = jinnangItems.find(i => i.name === 'treasureMap');
+        if (treasureMapItem && treasureMapItem.quantity > 0) {
+            // 使用一个藏宝图
+            useItem('treasureMap', 1);
+            showEffect('generalEffect', 'https://pic.imgdb.cn/item/669ced96d9c307b7e9b1ea4d.gif');
+        } else {
+            const cost = getTreasureCost(selectedTreasure) * times;
+            if (goldAmount < cost) {
+                showInfoBox("金子不足！");
+                return;
+            }
+
+            goldAmount -= cost;
+            updateGoldDisplay(goldAmount);
+        }
+    } else {
+        const cost = getTreasureCost(selectedTreasure) * times;
+        if (goldAmount < cost) {
+            showInfoBox("金子不足！");
+            return;
+        }
+
+        goldAmount -= cost;
+        updateGoldDisplay(goldAmount);
     }
 
     // 自动收集上次未取出的奖品
@@ -8486,9 +8529,6 @@ function openTreasure(times = 1) {
     if (selectedTreasure === '经验宝箱') {
         experienceTreasureOpenCount += times; // 增加经验宝箱开启次数
     }
-
-    goldAmount -= cost;
-    updateGoldDisplay(goldAmount);
 
     let totalRewards = [];
     for (let t = 0; t < times; t++) {
@@ -8568,8 +8608,8 @@ function getRandomReward(type) {
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
-            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.9 },
-            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 }
+            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.5 },
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.5 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -8583,10 +8623,10 @@ function getRandomReward(type) {
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 8.7 },
-            { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 0.1 },
-            { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', chance: 0.1 },
-            { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 0.1 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 6 },
+            { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
+            { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', chance: 1 },
+            { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 50 }
         ],
         '至尊宝箱': [
@@ -8642,8 +8682,10 @@ let jinnangItems = [
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
     { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
-    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键道具' },
-    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键道具' },
+    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
+    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
+    { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可以免费开启一次十连任意宝箱' },
+    { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可以免费投注一次1000注以内的彩券' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -11083,7 +11125,6 @@ function blessGift() {
             'radiantSoul',
             'heartStone', // 心鉴之石
             'shakingSoul',
-            'summonCharmPaper', // 召唤灵符
             'glowingSoul',
             'activeSoul',
             'jumpingSoul'
@@ -11092,9 +11133,12 @@ function blessGift() {
         for (const item of itemsToIncrease) {
             addItemToJinnang(item, 50);
         }
+        addItemToJinnang('treasureMap', 20);
+        addItemToJinnang('casinoCoverLetter', 20);
+        addItemToJinnang('summonCharmPaper', 20);
         blessGiftClaimed = true;
         updateJinnangItems();
-        showInfoBox("您获得了新手大礼包!(50万文金子,悟性丹500,万化灵丹200,还童丹300,还童金丹200,冰魄还童丹200,资质丹200,灵异金丹50。其他奖励已经放入背包。)", null, () => {
+        showInfoBox("您获得了500两金子和新手大礼包!请检查你的背包！", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
     } else {
@@ -11116,7 +11160,7 @@ function upgradeWisdomTo() {
         miraculousPill += 999;
         qualityPill += 999;
         highGradePill += 9999;
-        goldAmount += 99999999;
+        goldAmount += 9999999;
         stamps = 5000000;
         updateStampCount();
         updateGoldDisplay(goldAmount);
@@ -11156,11 +11200,13 @@ function upgradeWisdomTo() {
         'activeSoul',
         'ultraSkillBoomer', //超级万化灵丹
         'mutationScroll', //灵异秘卷
+        'treasureMap', //藏宝图
+        'casinoCoverLetter', //赌场介绍信
         'jumpingSoul'
     ];
 
     for (const item of itemsToIncrease) {
-        addItemToJinnang(item, 9999);
+        addItemToJinnang(item, 999);
     }
 
     updateJinnangItems();
@@ -11578,6 +11624,7 @@ function hallucinatePet() {
             document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
             showInfoBox(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
             updateImageFrame(customImageUrls.hallucinate, 2000);
+            
         } else {
             showInfoBox("幻化提升失败！");
         }

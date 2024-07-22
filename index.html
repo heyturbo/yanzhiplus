@@ -999,7 +999,7 @@
             flex-direction: column;
             padding: 10px;
             width: 100%;
-            justify-content: space-around;
+            justify-content: space-between;
         }
         
         .battle-system-info-wrapper {
@@ -1015,19 +1015,24 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 10px;
-            font-size: 12px;
+            font-size: 14px;
             flex: 1;
+            display: flex;
             background: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             line-height: 12px;
-            height: 100%;
+            min-height50%: 5;
+            min-height: 50%;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            gap: 5px;
         }
         
         .battle-system-log {
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            max-height: 30%;
+            max-height: 35%;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.8);
@@ -1174,9 +1179,9 @@
 
         .status-display {
             font-size: 14px;
-            margin-bottom: 10px;
-            color: #4caf50;
+            color: #ff0000;
             font-weight: bold;
+            margin: 1px 0px;
         }
         #battle-spirit-modal {
             position: fixed;
@@ -1847,13 +1852,13 @@
                     <div style="display: flex; justify-content: center;">
                         <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 100px; height: 100px; border: 1px groove black;">
                     </div>
-                    <h3><div id="player-status" class="status-display"></div></h3>
-                    <p>生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></p>
+                    <div>生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
+                    <div>法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
+                    <div id="player-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <p>法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></p>
-                    <div style="height: 30%;overflow-y: scroll;">
+                    <div style="line-height: 0px;overflow-y: scroll;display: flex;flex-direction: column;flex-wrap: nowrap;">
                     <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="your-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
@@ -1865,19 +1870,20 @@
                     <p>经验值:<span id="exp-bar">0 / 208</span></p>
                     </div>
                     </div>
+                    <h3></h3>
                 </div>
                 <div class="battle-system-enemy-info">
                     <h2>深渊巨魔 lv<span id="enemy-level">1</span></h2>
                     <div style="display: flex;justify-content: center;">
                     <img src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" ,alt="深渊巨魔" style="width: 100px;height: 100px;border: 1px groove black;">
                     </div>
-                    <h3><div id="enemy-status" class="status-display"></div></h3>
-                    <p>生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></p>
+                    <div>生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></div>
+                    <div>法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></div>
+                    <div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <p>法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></p>
-                    <div style="height: 30%;overflow-y: scroll;">
+                    <div style="line-height: 0px;overflow-y: scroll;display: flex;flex-direction: column;flex-wrap: nowrap;">
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
@@ -1886,6 +1892,7 @@
                     <p>暴击: <span id="enemy-crit-rate"></span></p>
                     <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
                     </div>
+                    <h3></h3>
                 </div>
             </div>
             <!-- 战斗精灵弹出界面 -->

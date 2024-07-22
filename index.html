@@ -6006,7 +6006,7 @@ class DivineWeaponManager {
         const nirvanaGemDescription = this.nirvanaGem.active 
             ? this.nirvanaGem.effects.length > 0 
                 ? `每秒有${(this.nirvanaGem.level * 0.3 + 0.5).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
-                : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽</p>'
+                : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽、封印</p>'
             : '<p>流光溢彩的锦囊，开启后每秒有一定概率驱散敌人的减益效果，成功概率与等级有关。</p>';
 
         this.divineWeaponUI.innerHTML = `
@@ -6998,12 +6998,12 @@ function applyEnemyPhysicalEffects(damage) {
                 }
                 break;
             case 'taunt':
-                if (effectChance < 0.1 && !effectCooldowns.taunt) {
+                if (effectChance < 0.1 && !battleState.player.taunt) {
                     handleTaunt();
                 }
                 break;
             case 'seal':
-                if (effectChance < 0.2 && !effectCooldowns.seal) {
+                if (effectChance < 0.2 && !battleState.player.seal) {
                     handleSeal();
                 }
                 break;
@@ -7028,7 +7028,7 @@ function handleSeal() {
 
     logBattleEvent("远古魔神的低吟充满离散心智的声量，令你短暂被封印了飞升技能带来的战斗增益。", 'white');
 
-    // 假设封印效果持续10秒
+    // 假设封印效果持续2秒
     setTimeout(() => {
         battleState.player.seal = false;
         ascensionSkill.name = originalAscensionSkill;
@@ -7036,7 +7036,7 @@ function handleSeal() {
         updateAscensionDisplay();
         updateSecondAscensionDisplay();
         updateUI();
-    }, 10000);
+    }, 2000);
 }
 
 function handleTorn() {

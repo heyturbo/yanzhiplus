@@ -999,25 +999,27 @@
             flex-direction: column;
             padding: 10px;
             width: 100%;
+            justify-content: space-around;
         }
         
         .battle-system-info-wrapper {
             display: flex;
             gap: 10px;
             width: 100%;
+            height: 55%;
             flex-direction: row;
-            justify-content: space-between;
         }
         
         .battle-system-pet-info, .battle-system-enemy-info {
             border: 1px solid #ccc;
             padding: 5px;
-            margin-bottom: 0;
+            margin-bottom: 10px;
             font-size: 14px;
             flex: 1;
             background: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             line-height: 12px;
+            height: 95%;
         }
         
         .battle-system-log {
@@ -1036,7 +1038,7 @@
             display: block;
             unicode-bidi: isolate;
             overflow-y: auto;
-            max-height: 70%;
+            max-height: 60%;
             line-height: 20px;
         }
 
@@ -1049,7 +1051,7 @@
         .battle-system-actions {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 10px 5px;
+            gap: 20px 5px;
             width: 100%;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -1131,8 +1133,8 @@
 #visualEffectsContainer {
     position: relative;
     width: 100%;
-    height: 0%;
     pointer-events: none; /* 确保特效不影响页面其他交互 */
+    height: 0%;
 }
 
 .visual-effect {
@@ -1171,8 +1173,8 @@
 
         .status-display {
             font-size: 14px;
-            margin-top: 0px;
-            color: red;
+            margin-bottom: 10px;
+            color: #4caf50;
             font-weight: bold;
         }
         #battle-spirit-modal {
@@ -1840,12 +1842,17 @@
         <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
-                    <h2><span id="your-pet-name"></span> lv<span id="your-pet-level">1</span></h2><div id="player-status" class="status-display"></div>
+                    <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
+                    <div style="display: flex; justify-content: center;">
+                        <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 100px; height: 100px; border: 1px groove black;">
+                    </div>
+                    <h3><div id="player-status" class="status-display"></div></h3>
+                    <p>生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></p>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <p>生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></p>
                     <p>法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></p>
+                    <div style="height: 40%;overflow-y: scroll;">
                     <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="your-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
@@ -1856,14 +1863,20 @@
                     <div id="exp-bar-container">
                     <p>经验值:<span id="exp-bar">0 / 208</span></p>
                     </div>
+                    </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>深渊の魔 lv<span id="enemy-level">1</span></h2><div id="enemy-status" class="status-display"></div>
+                    <h2>深渊巨魔 lv<span id="enemy-level">1</span></h2>
+                    <div style="display: flex;justify-content: center;">
+                    <img src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" ,alt="深渊巨魔" style="width: 100px;height: 100px;border: 1px groove black;">
+                    </div>
+                    <h3><div id="enemy-status" class="status-display"></div></h3>
+                    <p>生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></p>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <p>生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></p>
                     <p>法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></p>
+                    <div style="height: 40%;overflow-y: scroll;">
                     <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
                     <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
                     <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
@@ -1871,6 +1884,7 @@
                     <p>速度: <span id="enemy-pet-speed"></span></p>
                     <p>暴击: <span id="enemy-crit-rate"></span></p>
                     <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
+                    </div>
                 </div>
             </div>
             <!-- 战斗精灵弹出界面 -->
@@ -3227,6 +3241,7 @@ function changePet(skipConfirmation = false) {
             document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
             document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
             document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
+            document.getElementById("your-pet-image").src = currentPet.image;
             document.getElementById("description-box").innerText = `您将当前宠物更换为:${currentPet.name}`;
             resetPet(); // 重置宠物的数值
         } else {
@@ -7017,7 +7032,7 @@ function handleSeal() {
         secondAscensionSkill.name = originalSecondAscensionSkill;
         updateAscensionDisplay();
         updateSecondAscensionDisplay();
-        uopdateUI();
+        updateUI();
     }, 10000);
 }
 

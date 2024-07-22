@@ -5351,6 +5351,9 @@ function autoBattle() {
             battleState.player.healingBan,
             battleState.player.soulCapture,
             battleState.player.blindfold,
+            battleState.player.seal,
+            battleState.player.torn,
+            battleState.player.taunt,
             battleState.player.spellSlow
         ];
         const activeDebuffs = debuffStates.filter(Boolean).length;
@@ -5365,24 +5368,24 @@ function autoBattle() {
             }
         }
 
-        if (battleState.player.poisonSkillActivated) {
-            if (Math.random() < 0.2) {
-                performPoison();
-                return;
+        if (battleState.player.blindfold) {
+            performAttack('magical');
+        } else {
+            if (Math.random() < 0.99) {
+                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
+                    performAttack('magical');
+                } else {
+                    performAttack('physical');
+                }
+            } else {
+                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
+                    performAttack('physical');
+                } else {
+                    performAttack('magical');
+                }
             }
         }
-
-        let attackType;
-        if (battleState.player.blindfold) {
-            attackType = 'magic';
-        } else {
-            attackType = Math.random() < 0.99
-                ? (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'magical' : 'physical')
-                : (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack ? 'physical' : 'magical');
-        }
-
-        performAttack(attackType);
-    }, 300);
+    }, 400);
 }
 
 // 定义初始暴击率和暴击伤害

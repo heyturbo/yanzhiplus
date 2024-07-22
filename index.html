@@ -1869,9 +1869,9 @@
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
-                    <h2>深渊巨魔 lv<span id="enemy-level">1</span></h2>
+                    <h2><span id="enemy-name">深渊巨魔</span> lv<span id="enemy-level">1</span></h2>
                     <div style="display: flex;justify-content: center;">
-                    <img src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" ,alt="深渊巨魔" style="width: 80px;height: 80px;border: 1px groove black;">
+                    <img id="enemy-image" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="深渊巨魔" style="width: 80px;height: 80px;border: 1px groove black;">
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></div>
                     <div style="margin-bottom: 5px">法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></div>
@@ -2074,12 +2074,13 @@
                   { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '攻击增加' },
                   { name: '战斗韧性', rarity: 'B', type: 'N', multiplier: 0, description: '耐力及防御增加' },
                   { name: '全面进化', rarity: 'B', type: 'N', multiplier: 0, description: '敏捷、耐力强壮增加' },
+                  { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '用法力抵挡部分伤害' },
                   { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
                   { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '物理和法术闪避上升' },
                   { name: '高级强壮', rarity: 'S', type: 'N', multiplier: 0, description: '血量和耐力增加' },
                   { name: '冥想', rarity: 'S', type: 'HL', multiplier: 0.01, description: '每回合法力值恢复' },
                   { name: '睚眦必报', rarity: 'S', type: 'PP', multiplier: 2, description: '极小的怨仇也要报复！任何惹怒比格的深渊巨魔都将受到z中毒伤害。' },
-                  { name: '狂吼', rarity: 'S', type: 'PA', multiplier: 2.5, description: '比格仰天狂吼，声波对敌方6个目标造成巨大伤害，并有几率对目标造成破甲状态，破甲的几率及效果同召唤者力量有关。' },
+                  { name: '狂吼', rarity: 'S', type: 'PA', multiplier: 2.8, description: '比格仰天狂吼，声波对敌方6个目标造成巨大伤害，并有几率对目标造成破甲状态，破甲的几率及效果同召唤者力量有关。' },
                   { name: '太平要术', rarity: 'SS', type: 'PH', multiplier: 2.5, description: '比格施展太平要术，对己方4个单位（十字）恢复大量生命值。' },
                   { name: '拳击', rarity: 'SS', type: 'PA', multiplier: 3, description: '比格蓄力后对深渊巨魔发起致命一击，对敌方单体目标造成大量物伤害，若敌方宠物倒地有几率将敌方宠物击飞出场。' }
                 ],
@@ -2109,7 +2110,7 @@
                   { name: '火焰甲胄', rarity: 'A', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
                   { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
                   { name: '火焰环绕', rarity: 'S', type: 'PP', multiplier: 1.8, description: '为友军增加一个可以对物理攻击进行反伤状态' },
-                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 1.8, description: '对敌方全体造成法术伤害并附带灼烧效果' }
+                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2.8, description: '对敌方全体造成法术伤害并附带灼烧效果' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2773,6 +2774,23 @@ const biographies = {
     ]
 };
 
+const enemyImages = [
+    { status: 'default', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
+    { status: 'rampaged', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' }
+];
+
+function changeEnemyImage() {
+    let enemyImage;
+    if (!battleState.enemy.rampaged) {
+        enemyImage = enemyImages.find(image => image.status === 'default');
+    } else {
+        enemyImage = enemyImages.find(image => image.status === 'rampaged');
+    }
+    if (enemyImage) {
+        document.getElementById("enemy-image").src = enemyImage.url;
+    }
+}
+        
 // 模拟加载进度
 function simulateLoading() {
     let progress = 0;
@@ -2836,6 +2854,7 @@ function preloadImages(imageUrls) {
 // 调用函数预加载图片
 const imageUrls = [
     "https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif",
+    "https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif",
     "https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png",
     "https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png",
     "https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif",
@@ -4966,13 +4985,13 @@ function updateEnemyAttributes() {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 38,
-        mana: 23,
-        physicalAttack: 8,
-        physicalDefense: 9,
-        magicAttack: 6,
-        magicDefense: 4,
-        speed: 20
+        health: 18,
+        mana: 13,
+        physicalAttack: 2,
+        physicalDefense: 1,
+        magicAttack: 2,
+        magicDefense: 3,
+        speed: 6
     };
 
     enemyMaxHealth = enemyPet.health;
@@ -6256,7 +6275,7 @@ class DivineWeaponManager {
         return effectMap[effect] || effect;
     }
 
-        applyNirvanaGemEffects() {
+    applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
 
         const triggerProbability = Math.min(1, 0.005 + (this.nirvanaGem.level - 1) * 0.003);
@@ -6290,10 +6309,12 @@ class DivineWeaponManager {
                     break;
                 case 'suppressed':
                     // 清除压制效果，恢复原始函数
-                    performAttack = originalPerformAttack;
+                    performPhysicalAttack = originalPerformPhysicalAttack;
+                    performMagicalAttack = originalPerformMagicalAttack;
                     performHeal = originalPerformHeal;
                     performPoison = originalPerformPoison;
                     performDefense = originalPerformDefense;
+                    effectCooldowns.suppressed = false;
                     break;
                 case 'taunt':
                     // 清除嘲讽效果，恢复原始函数
@@ -6301,6 +6322,7 @@ class DivineWeaponManager {
                     performHeal = originalPerformHeal;
                     performPoison = originalPerformPoison;
                     performDefense = originalPerformDefense;
+                    effectCooldowns.taunt = false;
                     break;
                 case 'seal':
                     ascensionSkill.name = battleState.player.originalAscensionSkill;
@@ -6317,7 +6339,7 @@ class DivineWeaponManager {
             updateUI();
         }
     }
-    }
+}
 
 const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
@@ -6882,7 +6904,9 @@ function handleRampaged() {
         enemyCritRate = 1;
         enemyCritDamage = battleRounds === 150 ? 3.5 : 2.2;
         battleState.enemy.rampaged = true;
+        changeEnemyImage();
         setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
+        document.getElementById("enemy-name").innerText = '量子狂暴体'; 
         console.log('Enemy is rampaged.');
 
         if (!battleState.enemy.revivalCount) {
@@ -6910,6 +6934,8 @@ function handleRampaged() {
         enemyCritRate = 0.6;
         enemyCritDamage = 1.8;
         battleState.enemy.rampaged = false;
+        changeEnemyImage();
+        document.getElementById("enemy-name").innerText = '深渊巨魔'; 
         setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
         console.log('Enemy is not rampaged.');
     }
@@ -7027,7 +7053,7 @@ function performEnemyMagicalAttack(isCritical) {
 }
 
 function applyEnemyPhysicalEffects(damage) {
-    const effects = ['torn', 'suppressed', 'taunt', 'seal'];
+    const effects = ['torn', 'suppressed', 'seal'];//暂时关闭嘲讽
 
     effects.forEach(effect => {
         const effectChance = Math.random();
@@ -7129,12 +7155,15 @@ function handleTorn() {
 }
 
 function handleSuppressed() {
+    if (battleState.player.suppressed) {
+        return;
+    }
+
     battleState.player.suppressed = true;
     logBattleEvent("你受到了压制效果，必须在3秒内进行有效操作。", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.suppressed = true;
     updatePlayerStatusDisplay();
-
 
     let actionPerformed = false;
 
@@ -7145,7 +7174,8 @@ function handleSuppressed() {
         };
     };
 
-    performAttack = wrappedAction(performAttack);
+    performPhysicalAttack = wrappedAction(performPhysicalAttack);
+    performMagicalAttack = wrappedAction(performMagicalAttack);
     performHeal = wrappedAction(performHeal);
     performPoison = wrappedAction(performPoison);
     performDefense = wrappedAction(performDefense);
@@ -7159,7 +7189,8 @@ function handleSuppressed() {
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
             updateUI();
         }
-        performAttack = originalPerformAttack;
+        performPhysicalAttack = originalPerformPhysicalAttack;
+        performMagicalAttack = originalPerformMagicalAttack;
         performHeal = originalPerformHeal;
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
@@ -7179,14 +7210,9 @@ function handleTaunt() {
     effectCooldowns.taunt = true;
     updatePlayerStatusDisplay();
 
-    const originalPerformAttack = performAttack;
-    const originalPerformHeal = performHeal;
-    const originalPerformPoison = performPoison;
-    const originalPerformDefense = performDefense;
-
     const tauntWrappedAction = () => performAttack('physical');
 
-    performAttack = tauntWrappedAction;
+    performMagicalAttack = tauntWrappedAction;
     performHeal = tauntWrappedAction;
     performPoison = tauntWrappedAction;
     performDefense = tauntWrappedAction;
@@ -7195,7 +7221,7 @@ function handleTaunt() {
     setTimeout(() => {
         battleState.player.taunt = false;
         effectCooldowns.taunt = false;
-        performAttack = originalPerformAttack;
+        performMagicalAttack = originalPerformMagicalAttack;
         performHeal = originalPerformHeal;
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
@@ -7273,10 +7299,12 @@ function applyEnemyMagicEffects(damage) {
 }
 
 // 全局解控
-const originalPerformAttack = performAttack;
-const originalPerformHeal = performHeal;
-const originalPerformPoison = performPoison;
-const originalPerformDefense = performDefense;
+let originalPerformAttack = performAttack;
+let originalPerformPhysicalAttack = performPhysicalAttack;
+let originalPerformMagicalAttack = performMagicalAttack;
+let originalPerformHeal = performHeal;
+let originalPerformPoison = performPoison;
+let originalPerformDefense = performDefense;
 
 const effectCooldowns = {
     drunken: false,
@@ -7289,7 +7317,6 @@ const effectCooldowns = {
     taunt: false,
     seal: false,
 };
-
         
 function clearEnemyEffect() {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
@@ -7319,14 +7346,15 @@ function clearEnemyEffect() {
                     break;
                 case 'suppressed':
                     // 清除压制效果，恢复原始函数
-                    performAttack = originalPerformAttack;
+                    performPhysicalAttack = originalPerformPhysicalAttack;
+                    performMagicalAttack = originalPerformMagicalAttack;
                     performHeal = originalPerformHeal;
                     performPoison = originalPerformPoison;
                     performDefense = originalPerformDefense;
                     break;
                 case 'taunt':
                     // 清除嘲讽效果，恢复原始函数
-                    performAttack = originalPerformAttack;
+                    performMagicalAttack = originalPerformMagicalAttack;
                     performHeal = originalPerformHeal;
                     performPoison = originalPerformPoison;
                     performDefense = originalPerformDefense;
@@ -7676,7 +7704,7 @@ function resetBuffState(playerWon) {
         updateDrugGrid();
 
         // battleRounds 大于等于 130 时额外掉落药品
-        if (battleRounds >= 130) {
+        if (battleRounds >= 100) {
             for (let i = 0; i < 2; i++) {
                 const extraDrugProbability = Math.random();
                 let extraDrugTier;
@@ -7806,6 +7834,7 @@ function resetBattleState(playerWon) {
     storeEnemyInitialState();
     clearEnemyEffect();
     enemyHealCount = 0;
+    changeEnemyImage();
     updatePetInfo();
 }
 

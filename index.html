@@ -5058,6 +5058,7 @@ function getPlayerStatus() {
     if (battleState.player.torn) status.push("撕裂");
     if (battleState.player.suppressed) status.push("压制");
     if (battleState.player.taunt) status.push("嘲讽");
+    if (battleState.player.seal) status.push("封印");
     if (battleState.player.healingBan) status.push("禁疗");
     if (battleState.player.soulCapture) status.push("摄魂");
     if (battleState.player.blindfold) status.push("失明");
@@ -5986,7 +5987,7 @@ class DivineWeaponManager {
         const nirvanaGemTitle = this.nirvanaGem.active ? `神品·定空的灵石 (Lv${this.nirvanaGem.level})` : '被封锁的上古神器（庇护）';
         const nirvanaGemDescription = this.nirvanaGem.active 
             ? this.nirvanaGem.effects.length > 0 
-                ? `每秒有${(this.nirvanaGem.level * 0.3 + 0.8).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
+                ? `每秒有${(this.nirvanaGem.level * 0.3 + 0.5).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽</p>'
             : '<p>流光溢彩的锦囊，开启后每秒有一定概率驱散敌人的减益效果，成功概率与等级有关。</p>';
 
@@ -6176,7 +6177,7 @@ class DivineWeaponManager {
             const effects = ['沉默', '迟缓', '混乱', '法力燃烧', '灼烧'];
             return effects[Math.floor(Math.random() * effects.length)];
         } else if (type === 'nirvanaGem') {
-            const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+            const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
             return effects[Math.floor(Math.random() * effects.length)];
         }
     }
@@ -6200,7 +6201,8 @@ class DivineWeaponManager {
             'spellSlow': '法术迟钝',
             'torn': '撕裂',
             'suppressed': '压制',
-            'taunt': '嘲讽'
+            'taunt': '嘲讽',
+            'seal': '封印'
         };
         return effectMap[effect] || effect;
     }
@@ -6208,10 +6210,10 @@ class DivineWeaponManager {
     applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
     
-        const triggerProbability = Math.min(1, 0.008 + (this.nirvanaGem.level - 1) * 0.003);
+        const triggerProbability = Math.min(1, 0.005 + (this.nirvanaGem.level - 1) * 0.003);
         if (Math.random() > triggerProbability) return; // 没有触发效果
     
-        const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+        const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
         const activeDebuffs = debuffs.filter(debuff => battleState.player[debuff]);
         const applicableDebuffs = this.nirvanaGem.effects.filter(effect => debuffs.includes(effect));
     
@@ -6227,8 +6229,9 @@ class DivineWeaponManager {
                 performHeal = originalPerformHeal;
                 performPoison = originalPerformPoison;
                 performDefense = originalPerformDefense;
+                battleState.player.taunt = false;
             }
-            
+    
             if (debuffToRemove === 'soulCapture') {
                 // 恢复原始动作函数
                 battleState.player.soulCapture = false;
@@ -6238,13 +6241,13 @@ class DivineWeaponManager {
                 updateUI();
                 updatePlayerStatusDisplay();
             }
-            
+    
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
             updatePlayerStatusDisplay();
             updateUI();
+            }
         }
     }
-}
 
 const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
@@ -6954,9 +6957,17 @@ function performEnemyMagicalAttack(isCritical) {
 }
 
 function applyEnemyPhysicalEffects(damage) {
-    const effects = ['torn', 'suppressed', 'taunt'];
+    const effects = ['torn', 'suppressed', 'taunt', 'seal'];
+
     effects.forEach(effect => {
         const effectChance = Math.random();
+
+        // 前置判断，检查当前状态是否已经存在
+        if (battleState.player[effect]) {
+            console.log(`玩家已经处于 ${effect} 状态，无法叠加。`);
+            return;
+        }
+
         switch (effect) {
             case 'torn':
                 if (effectChance < 0.2 && !effectCooldowns.torn) {
@@ -6973,8 +6984,41 @@ function applyEnemyPhysicalEffects(damage) {
                     handleTaunt();
                 }
                 break;
+            case 'seal':
+                if (effectChance < 0.2 && !effectCooldowns.seal) {
+                    handleSeal();
+                }
+                break;
         }
     });
+}
+
+function handleSeal() {
+    if (battleState.player.seal) {
+        return;
+    }
+
+    battleState.player.seal = true;
+    const originalAscensionSkill = ascensionSkill.name;
+    const originalSecondAscensionSkill = secondAscensionSkill.name;
+
+    ascensionSkill.name = "被封印的技能";
+    secondAscensionSkill.name = "被封印的技能";
+    updateAscensionDisplay();
+    updateSecondAscensionDisplay();
+
+
+    logBattleEvent("远古魔神的低吟充满离散心智的声量，令你短暂被封印了飞升技能带来的战斗增益。", 'white');
+
+    // 假设封印效果持续10秒
+    setTimeout(() => {
+        battleState.player.seal = false;
+        ascensionSkill.name = originalAscensionSkill;
+        secondAscensionSkill.name = originalSecondAscensionSkill;
+        updateAscensionDisplay();
+        updateSecondAscensionDisplay();
+        uopdateUI();
+    }, 10000);
 }
 
 function handleTorn() {
@@ -7055,6 +7099,11 @@ function handleSuppressed() {
 }
 
 function handleTaunt() {
+    if (battleState.player.taunt) {
+        logBattleEvent("你已经被嘲讽，不能使用其他技能。", '#FF4500');
+        return;
+    }
+
     battleState.player.taunt = true;
     logBattleEvent("深渊巨魔极尽嬉笑怒骂之攻势，你未能压抑心中怒火，嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
@@ -7066,16 +7115,12 @@ function handleTaunt() {
     const originalPerformPoison = performPoison;
     const originalPerformDefense = performDefense;
 
-    const tauntWrappedAction = (type) => {
-        return function(...args) {
-            return performAttack('physical');
-        };
-    };
+    const tauntWrappedAction = () => performAttack('physical');
 
-    performMagicalAttack = tauntWrappedAction('physical');
-    performHeal = tauntWrappedAction('physical');
-    performPoison = tauntWrappedAction('physical');
-    performDefense = tauntWrappedAction('physical');
+    performMagicalAttack = tauntWrappedAction;
+    performHeal = tauntWrappedAction;
+    performPoison = tauntWrappedAction;
+    performDefense = tauntWrappedAction;
     updateUI();
 
     setTimeout(() => {
@@ -7088,6 +7133,7 @@ function handleTaunt() {
         updatePlayerStatusDisplay();
     }, 5000); // 嘲讽效果持续5秒
 }
+
         
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
@@ -7185,10 +7231,11 @@ const effectCooldowns = {
     torn: false,
     suppressed: false,
     taunt: false,
+    seal:false,
 };
         
 function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
     let tauntCleared = false;
 
     effects.forEach(effect => {
@@ -8070,12 +8117,12 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V10.3</p>
-                            <p>- 战斗系统进一步优化；</p>
-                            <p>- 增加技能等级，技能等级随宠物等级提升而提升，并增强其效果；</p>
-                            <p>- 被动技能可以按固定值为宠物提供战斗增益了；</p>
-                            <p>- 修复了某些bug；</p>
-                            <p>- 优化部分函数逻辑；</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V16</p>
+                            <p>- 优化、加强神器系统；</p>
+                            <p>- 增加大量技能效果，可通过神器开启；</p>
+                            <p>- 调整某些战斗时会发生的bug；</p>
+                            <p>- 优化新手礼包内容，可在商店界面直接领取；</p>
+                            <p>- 优化首页道具显示，现在可以点击数字贩卖了；</p>
                             <p>- 优化部分显示效果；</p>
                             <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
                             <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
@@ -8702,7 +8749,7 @@ let jinnangItems = [
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
     { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', price: 200, quantity: 0, description: '举世无双，灵石点智，宠物悟性到19的关键阶段时可以一举提升至20' },
-    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 5, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
+    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 0, description: '神奇的符咒，可以召唤出你喜欢的宠物' },
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: 50, quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: 80, quantity: 0, description: '刷新精灵的增幅百分比' },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', price: 150, quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },

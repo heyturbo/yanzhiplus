@@ -3633,31 +3633,31 @@ document.addEventListener('DOMContentLoaded', () => {
 let selectedDrug = null;
 let alreadyUseDrug = false;
 let drugInventory = {
-    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后恢复至满状态" },
+    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后永久增加20000生命值，且恢复至满状态" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，恢复玩家2000点法力值" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", tier: 3, description: "绿色品阶，恢复玩家3000点生命值" },
-    "狂暴之魂": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高10%暴击率" },
-    "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，10秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 1, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，10秒内暴击率提高50%" },
+    "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高10%暴击率" },
+    "神力仙丹": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，10秒内暴击伤害提高50%" },
+    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高10%暴击伤害" },
+    "狂暴印记": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，10秒内暴击率提高50%" },
     "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，10s内增加150%物理攻击力。" },
-    "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 2, description: "蓝色品阶，恢复玩家20%的生命值" },
-    "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 2, description: "蓝色品阶，恢复玩家20%的法力值" },
+    "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },
+    "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 3, description: "绿色品阶，恢复玩家20%的法力值" },
     "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，10秒内深渊巨魔暴击率降低至0%" },
     "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 2, description: "蓝色品阶，10秒内增加玩家20000速度和20000法术攻击力" },
     "沉檀凝香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 0, description: "橙色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
-    "冰莲絮": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 3, description: "绿色品阶，恢复玩家50000生命值" },
-    "晗灵果": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 3, description: "绿色品阶，恢复玩家50000法力值" },
+    "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
+    "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
-    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，收集3个可以合成1个绿色品阶的药品" },
-    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，收集3个可以合成1个蓝色品阶的药品" },
-    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，收集3个可以合成1个紫色品阶的药品" },
-    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，收集3个可以合成1个橙色品阶的药品" },
-    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，收集2个可以炼制出随机药品" }
+    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，永久增加100点速度，收集3个可以合成1个绿色品阶的药品" },
+    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，永久增加300点物理攻击力，收集3个可以合成1个蓝色品阶的药品" },
+    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，永久增加3000点物理防御力，收集3个可以合成1个紫色品阶的药品" },
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，永久增加8000点法术防御力，收集3个可以合成1个橙色品阶的药品" },
+    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，永久增加4000点法术攻击力，收集2个可以炼制出随机药品" }
 };
 
 // 药品系统函数
@@ -3853,16 +3853,66 @@ function checkConflictingBuffs(selectedDrug) {
     return false;
 }
 
-function useSelectedDrug() {
-    if (!selectedDrug) {
-        showInfoBox("请选择一种药品！");
+let drugBonus = {
+    health: 0,
+    mana: 0,
+    physicalAttack: 0,
+    physicalDefense: 0,
+    magicAttack: 0,
+    magicDefense: 0,
+    speed: 0
+};
+
+function applyDrugBonus(type, bonus) {
+    if (!battleState || !battleState.player) {
+        console.error("Battle state or player state is not initialized");
         return;
     }
 
-    // 检查所选择的药品是否为不可直接使用的药材
-    const nonUsableDrugs = ["普通药材", "上等药材", "极品药材", "珍贵药材","完美药材"];
-    if (nonUsableDrugs.includes(selectedDrug)) {
-        showInfoBox("你不能直接使用尚未炼制的药材！");
+    // 更新 drugBonus 对象
+    if (drugBonus.hasOwnProperty(type)) {
+        drugBonus[type] += bonus;
+    } else {
+        console.error("Invalid drug type");
+        return;
+    }
+
+    // 更新玩家属性
+    if (battleState.player.hasOwnProperty(type)) {
+        battleState.player[type] += bonus;
+    } else {
+        console.error("Invalid player attribute type");
+    }
+
+    // 更新最大生命值和法力值
+    if (type === 'health') {
+        maxHealth = battleState.player.health;
+    } else if (type === 'mana') {
+        maxMana = battleState.player.mana;
+    }
+
+    // 检查类型并调用 updatePetInfo() 函数
+    if (['physicalAttack', 'physicalDefense', 'magicAttack', 'magicDefense', 'speed'].includes(type)) {
+        updatePetInfo();
+    }
+
+    const typeMap = {
+        health: '生命值',
+        mana: '法力值',
+        physicalAttack: '物理攻击力',
+        physicalDefense: '物理防御力',
+        magicAttack: '法术攻击力',
+        magicDefense: '法术防御力',
+        speed: '速度'
+    };
+
+    logBattleEvent(`永久增加了 ${bonus} 点${typeMap[type]}。`, 'gold');
+    updateUI();
+}
+
+function useSelectedDrug() {
+    if (!selectedDrug) {
+        showInfoBox("请选择一种药品！");
         return;
     }
 
@@ -3882,7 +3932,8 @@ function useSelectedDrug() {
 
         switch (selectedDrug) {
             case "长生泉":
-                refreshBattleAttributes();
+                applyDrugBonus("health", 20000);
+                updatePetInfo();
                 logBattleEvent(`使用长生泉，你如获新生。`, 'gold');
                 break;
             case "三花丸":
@@ -3984,13 +4035,26 @@ function useSelectedDrug() {
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + Math.floor(maxMana * 0.2));
                 logBattleEvent(`使用天山雪莲，恢复了 ${Math.floor(maxMana * 0.2)} 点法力值。`, 'gold');
                 break;
+            case "普通药材":
+                applyDrugBonus("speed", 100);
+                break;
+            case "上等药材":
+                applyDrugBonus("physicalAttack", 300);
+                break;
+            case "极品药材":
+                applyDrugBonus("physicalDefense", 3000);
+                break;
+            case "珍贵药材":
+                applyDrugBonus("magicDefense", 8000);
+                break;
+            case "完美药材":
+                applyDrugBonus("magicAttack", 4000);
+                break;
             case "冰莲絮":
-                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 50000);
-                logBattleEvent(`使用冰莲絮，恢复了 50000 点生命值。`, 'gold');
+                applyDrugBonus("health", 5000);
                 break;
             case "晗灵果":
-                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 50000);
-                logBattleEvent(`使用晗灵果，恢复了 50000 点法力值。`, 'gold');
+                applyDrugBonus("mana", 5000);
                 break;
         }
 
@@ -4571,7 +4635,7 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
         if (randomChance < successChance) {
             spiritLevel += 1;
             updateSpiritDisplay(); // 更新显示
-            refreshBattleAttributes(); // 刷新战斗属性
+            updatePetInfo(); // 刷新战斗属性
         } else {
             if (failPenalty > 0) {
                 spiritLevel = Math.max(minLevelForCurrentRange, spiritLevel - failPenalty);
@@ -4580,7 +4644,7 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
                 showMessage('洗练失败！', 'error');
             }
             updateSpiritDisplay(); // 更新显示
-            refreshBattleAttributes(); // 刷新战斗属性
+            updatePetInfo(); // 刷新战斗属性
         }
     } else {
         showMessage('您的精灵精炼石不足！', 'error');
@@ -4644,13 +4708,13 @@ document.getElementById('level-up-spirit').addEventListener('click', () => {
                 if (randomChance < successChance) {
                     spiritLevel += 1;
                     updateSpiritDisplay();
-                    refreshBattleAttributes(); // 刷新战斗属性
+                    updatePetInfo(); // 刷新战斗属性
                 } else {
                     if (failPenalty > 0) {
                         spiritLevel = Math.max(minLevelForCurrentRange, spiritLevel - failPenalty);
                     }
                     updateSpiritDisplay();
-                    refreshBattleAttributes(); // 刷新战斗属性
+                    updatePetInfo(); // 刷新战斗属性
                 }
             }
 
@@ -4683,27 +4747,17 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
             showInfoBox(confirmMessage, () => {
                 spiritMultiplier = parseFloat(newMultiplier);
                 updateSpiritDisplay(); // 更新显示
-                refreshBattleAttributes(); // 刷新战斗属性
+                updatePetInfo(); // 刷新战斗属性
             });
         } else {
             spiritMultiplier = parseFloat(newMultiplier);
             updateSpiritDisplay(); // 更新显示
-            refreshBattleAttributes(); // 刷新战斗属性
+            updatePetInfo(); // 刷新战斗属性
         }
     } else {
         showInfoBox('您的精灵觉醒石不足！');
     }
 });
-
-// 初始化检查觉醒状态
-window.onload = function() {
-    initializeEnemyPet(); // 初始化深渊巨魔宠物
-    updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
-    document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
-    checkAwakening(); // 检查宠物觉醒状态
-    updateExpBar(); // 更新经验条
-    document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
-}
         
 let attributesFetched = false;
 let battleState;
@@ -4800,24 +4854,24 @@ function updatePetInfo() {
     if (!battleState) {
         battleState = {
             player: {
-                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health,
-                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana,
-                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack,
-                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense,
-                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack,
-                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed
+                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus.health,
+                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus.mana,
+                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense,
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed
             },
             enemy: { ...enemyPet }
         };
     } else {
-        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health;
-        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana;
-        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack;
-        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense;
-        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack;
-        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense;
-        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed;
+        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus.health;
+        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus.physicalDefense;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed;
     }
 
     battleAttributes = { ...battleState.player };
@@ -4903,69 +4957,6 @@ function initializeEnemyPet() {
     if (battleState) {
         battleState.enemy = { ...enemyPet };
     }    
-}
-
-function refreshBattleAttributes() {
-    if (!currentPet) {
-        console.error("currentPet is not initialized");
-        return;
-    }
-
-    const skillsArea = document.getElementById("skills-area");
-    let skillAttributes = {
-        health: 0,
-        mana: 0,
-        physicalAttack: 0,
-        physicalDefense: 0,
-        magicAttack: 0,
-        magicDefense: 0,
-        speed: 0,
-    };
-
-    if (skillsArea && currentPet.skills) {
-        const nSkills = Array.from(skillsArea.children).map(skillDiv => {
-            const skillName = skillDiv.innerText.split(' ')[0];
-            return currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
-        }).filter(skill => skill !== null);
-
-        const nSkillCount = nSkills.length;
-        skillAttributes = {
-            health: nSkillCount * 2109,
-            mana: nSkillCount * 533,
-            physicalAttack: nSkillCount * 728,
-            physicalDefense: nSkillCount * 364,
-            magicAttack: nSkillCount * 678,
-            magicDefense: nSkillCount * 339,
-            speed: nSkillCount * 211,
-        };
-    }
-
-    const currentAttributes = calculateCurrentAttributes();
-    const totalAttributes = {
-        endurance: currentAttributes.endurance,
-        intelligence: currentAttributes.intelligence,
-        strength: currentAttributes.strength,
-        agility: currentAttributes.agility,
-        faith: currentAttributes.faith
-    };
-
-    const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
-    const spiritAttributes = getCurrentSpiritAttributes();
-
-    battleAttributes = {
-        health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health,
-        mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana,
-        physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack,
-        physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense,
-        magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack,
-        magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense,
-        speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed,
-        intelligence: totalAttributes.intelligence + skillAttributes.intelligence
-    }; // 刷新战斗属性
-    
-    maxHealth = battleAttributes.health;
-    maxMana = battleAttributes.mana;
-    updateUI();
 }
 
 function updateUI() {
@@ -5961,6 +5952,7 @@ function performIndependentMagicAttack() {
     }
 }
 
+//神器系统
 class DivineWeaponManager {
     constructor() {
         this.lostBook = { active: false, level: 1, effects: [] };
@@ -5982,21 +5974,21 @@ class DivineWeaponManager {
             ? this.lostBook.effects.length > 0 
                 ? `使用物理技能时，有${(this.lostBook.level * 0.6 + 1).toFixed(1)}%概率触发以下技能效果：` + this.lostBook.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为物理技能附加如下效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>'
-            : '<p>炽热明亮的金樽，开启后可获得亲近刀剑的法宝，为物理技能概率附加效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
+            : '<p>炽热明亮的金樽，开启后可为物理技能概率附加效果：</p><p>破甲、恐吓、眩晕、穿透、麻痹</p>';
     
         const fragmentedMapTitle = this.fragmentedMap.active ? `神品·残页的河图 (Lv${this.fragmentedMap.level})` : '被封锁的上古神器（法术）';
         const fragmentedMapDescription = this.fragmentedMap.active 
             ? this.fragmentedMap.effects.length > 0 
                 ? `使用法术技能时，有${(this.fragmentedMap.level * 0.6 + 1).toFixed(1)}%概率触发以下技能效果：` + this.fragmentedMap.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能为法术技能附加如下效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>'
-            : '<p>闪烁星光的宝盒，开启后可获得亲近法术的神器，为法术技能概率附加效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
+            : '<p>闪烁星光的宝盒，开启后可为法术技能概率附加效果：</p><p>迟缓、沉默、混乱、灼烧、法力燃烧</p>';
         
         const nirvanaGemTitle = this.nirvanaGem.active ? `神品·定空的灵石 (Lv${this.nirvanaGem.level})` : '被封锁的上古神器（庇护）';
         const nirvanaGemDescription = this.nirvanaGem.active 
             ? this.nirvanaGem.effects.length > 0 
-                ? `每秒有${(this.nirvanaGem.level * 0.4 + 1).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
+                ? `每秒有${(this.nirvanaGem.level * 0.3 + 0.8).toFixed(1)}%概率驱散以下减益效果：` + this.nirvanaGem.effects.map(this.getEffectChineseName).join(', ') 
                 : '<p>开启后可能解除如下减益效果：</p><p>醉酒、禁疗、摄魂、失明、法术迟钝、撕裂、压制、嘲讽</p>'
-            : '<p>流光溢彩的锦囊，开启后可获得驱退异常的护符。每秒有一定概率驱散敌人的减益效果，成功概率与等级有关。</p>';
+            : '<p>流光溢彩的锦囊，开启后每秒有一定概率驱散敌人的减益效果，成功概率与等级有关。</p>';
 
         this.divineWeaponUI.innerHTML = `
             <div style="text-align: right;">
@@ -6014,6 +6006,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
                     <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
                 </div>
             </div>
             <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -6028,6 +6021,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
                     <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
                 </div>
             </div>
             <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -6042,6 +6036,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
                     <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -6133,14 +6128,14 @@ class DivineWeaponManager {
             showInfoBox("开启神器后才能执行升级！");
             return;
         }
-
+    
         if (this[type].level >= 165) {
             showInfoBox("神器等级已达到上限。");
             return;
         }
-
+    
         const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
-
+    
         if (this[type].level >= 100 || useItem(itemName)) {
             if (this[type].level >= 100 && !useItem(itemName)) {
                 showInfoBox("神器100级后，只能使用「钥匙」升级，你可以通过开启武神宝箱获取「钥匙」。");
@@ -6151,16 +6146,26 @@ class DivineWeaponManager {
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
         }
-
+    
         if (currentExp < 3000) {
-            showInfoBox("经验不足2000或缺少对应「钥匙」，无法升级神器。");
+            showInfoBox("经验不足3000或缺少对应「钥匙」，无法升级神器。");
             return;
         }
-
+    
         currentExp -= 3000;
         updateExpBar();
         this[type].level += 1;
         this.openDivineWeaponUI(); // 刷新界面显示
+    }
+    
+    upgradeMaxDivineWeapon(type) {
+        while (this[type].level < 165) {
+            const previousLevel = this[type].level;
+            this.upgradeDivineWeapon(type);
+            if (this[type].level === previousLevel) {
+                break; // If the level didn't change, exit the loop
+            }
+        }
     }
 
     getRandomEffect(type) {
@@ -6203,7 +6208,7 @@ class DivineWeaponManager {
     applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
     
-        const triggerProbability = Math.min(1, 0.01 + (this.nirvanaGem.level - 1) * 0.004);
+        const triggerProbability = Math.min(1, 0.008 + (this.nirvanaGem.level - 1) * 0.003);
         if (Math.random() > triggerProbability) return; // 没有触发效果
     
         const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
@@ -6215,8 +6220,6 @@ class DivineWeaponManager {
         if (debuffsToRemove.length > 0) {
             const debuffToRemove = debuffsToRemove[Math.floor(Math.random() * debuffsToRemove.length)];
             battleState.player[debuffToRemove] = false;
-            logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#FF6347');
-            updatePlayerStatusDisplay();
     
             if (debuffToRemove === 'taunt') {
                 // 恢复原始动作函数
@@ -6225,6 +6228,20 @@ class DivineWeaponManager {
                 performPoison = originalPerformPoison;
                 performDefense = originalPerformDefense;
             }
+            
+            if (debuffToRemove === 'soulCapture') {
+                // 恢复原始动作函数
+                battleState.player.soulCapture = false;
+                battleAttributes.physicalAttack *= 2;
+                battleAttributes.magicAttack *= 2;
+                effectCooldowns.soulCapture = false;
+                updateUI();
+                updatePlayerStatusDisplay();
+            }
+            
+            logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
+            updatePlayerStatusDisplay();
+            updateUI();
         }
     }
 }
@@ -6889,6 +6906,7 @@ function handleStunned() {
     return false;
     handleManaRecover();
 }
+
 //深渊巨魔使用物理攻击
 function performEnemyPhysicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -6906,6 +6924,7 @@ function performEnemyPhysicalAttack(isCritical) {
     applyEnemyPhysicalEffects(damage);
     return damage;
 }
+
 //深渊巨魔使用法术攻击
 function performEnemyMagicalAttack(isCritical) {
     if (battleState.enemy.mana < 50) {
@@ -6934,17 +6953,6 @@ function performEnemyMagicalAttack(isCritical) {
     return damage;
 }
 
-const effectCooldowns = {
-    drunken: false,
-    healingBan: false,
-    soulCapture: false,
-    blindfold: false,
-    spellSlow: false,
-    torn: false,
-    suppressed: false,
-    taunt: false,
-};
-
 function applyEnemyPhysicalEffects(damage) {
     const effects = ['torn', 'suppressed', 'taunt'];
     effects.forEach(effect => {
@@ -6971,7 +6979,6 @@ function applyEnemyPhysicalEffects(damage) {
 
 function handleTorn() {
     battleState.player.torn = true;
-    logBattleEvent("身中深渊巨魔充满毒性的撕裂伤害，正在持续失血", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.torn = true;
     updatePlayerStatusDisplay();
@@ -6982,9 +6989,15 @@ function handleTorn() {
         }
         const tornDamage = Math.floor(battleState.enemy.physicalAttack * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - tornDamage);
-        logBattleEvent(`撕裂效果触发，受到 ${tornDamage} 点伤害。`, '#FF4500');
+        logBattleEvent(`身中深渊巨魔充满毒性的撕裂伤害，正在持续失血，受到 ${tornDamage} 点伤害。`, 'red');
         updateUI();
         updatePlayerStatusDisplay();
+        
+        if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+        }
     }, 500);
 
     setTimeout(() => {
@@ -6992,7 +7005,7 @@ function handleTorn() {
         effectCooldowns.torn = false;
         clearInterval(tornInterval);
         updatePlayerStatusDisplay();
-    }, 5000); // 撕裂效果持续5秒
+    }, 10000); // 撕裂效果持续10秒
 }
 
 function handleSuppressed() {
@@ -7043,7 +7056,7 @@ function handleSuppressed() {
 
 function handleTaunt() {
     battleState.player.taunt = true;
-    logBattleEvent("深渊巨魔极尽冷嘲热讽之攻势，你未能压抑心中怒火，嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
+    logBattleEvent("深渊巨魔极尽嬉笑怒骂之攻势，你未能压抑心中怒火，嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.taunt = true;
     updatePlayerStatusDisplay();
@@ -7073,7 +7086,7 @@ function handleTaunt() {
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
         updatePlayerStatusDisplay();
-    }, 6000); // 嘲讽效果持续6秒
+    }, 5000); // 嘲讽效果持续5秒
 }
         
 function applyEnemyMagicEffects(damage) {
@@ -7123,6 +7136,7 @@ function applyEnemyMagicEffects(damage) {
                         battleAttributes.physicalAttack *= 2;
                         battleAttributes.magicAttack *= 2;
                         effectCooldowns.soulCapture = false;
+                        updateUI();
                         updatePlayerStatusDisplay();
                     }, 5000); // 摄魂效果持续5秒
                 }
@@ -7162,19 +7176,40 @@ const originalPerformHeal = performHeal;
 const originalPerformPoison = performPoison;
 const originalPerformDefense = performDefense;
 
+const effectCooldowns = {
+    drunken: false,
+    healingBan: false,
+    soulCapture: false,
+    blindfold: false,
+    spellSlow: false,
+    torn: false,
+    suppressed: false,
+    taunt: false,
+};
+        
 function clearEnemyEffect() {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt'];
+    let tauntCleared = false;
+
     effects.forEach(effect => {
-        battleState.player[effect] = false;
-        effectCooldowns[effect] = false;
+        if (battleState.player[effect]) {
+            battleState.player[effect] = false;
+            effectCooldowns[effect] = false;
+            if (effect === 'taunt') {
+                tauntCleared = true;
+            }
+        }
     });
-    performMagicalAttack = originalPerformMagicalAttack;
-    performHeal = originalPerformHeal;
-    performPoison = originalPerformPoison;
-    performDefense = originalPerformDefense;
+
+    if (tauntCleared) {
+        performMagicalAttack = originalPerformMagicalAttack;
+        performHeal = originalPerformHeal;
+        performPoison = originalPerformPoison;
+        performDefense = originalPerformDefense;
+    }
+
     updatePlayerStatusDisplay();
 }
-
 
 function clearPlayerEffect() {
     const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
@@ -10709,6 +10744,16 @@ function resetPet() {
     magicDefense: 0,
     speed: 0
     };
+    //药品增幅buff清空
+    drugBonus = {
+    health: 0,
+    mana: 0,
+    physicalAttack: 0,
+    physicalDefense: 0,
+    magicAttack: 0,
+    magicDefense: 0,
+    speed: 0
+    };
     document.body.style.backgroundImage = "";
     document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
 
@@ -12389,6 +12434,16 @@ function showImageBox() {
     }, 20000); // 修改为20秒
 }
 
+// 初始化检查觉醒状态
+window.onload = function() {
+    initializeEnemyPet(); // 初始化深渊巨魔宠物
+    updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
+    document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
+    checkAwakening(); // 检查宠物觉醒状态
+    updateExpBar(); // 更新经验条
+    document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
+}
+        
 function hideImageBox(imageBox, clickHandler) {
     imageBox.style.transform = 'translate(-50%, -50%) scale(0)'; // 缩小图片框
     setTimeout(() => {

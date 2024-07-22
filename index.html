@@ -4353,6 +4353,7 @@ function refreshSecondAscensionSkill() {
     updateSecondAscensionDisplay();
     applyAscensionBonus();
     applyAscensionEffects();
+    updatePetInfo();
 }
 
 function levelUpSecondAscensionSkill() {
@@ -4516,6 +4517,7 @@ function refreshAscensionSkill() {
     updateAscensionDisplay();
     applyAscensionBonus();
     applyAscensionEffects();
+    updatePetInfo();
 }
 
 function levelUpAscensionSkill() {
@@ -4878,7 +4880,9 @@ function updatePetInfo() {
                 physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus.physicalDefense,
                 magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack,
                 magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed,
+                originalAscensionSkill: ascensionSkill.name,
+                originalSecondAscensionSkill: secondAscensionSkill.name
             },
             enemy: { ...enemyPet }
         };
@@ -4890,6 +4894,8 @@ function updatePetInfo() {
         battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack;
         battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense;
         battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed;
+        originalAscensionSkill: ascensionSkill.name;
+        originalSecondAscensionSkill: secondAscensionSkill.name;
     }
 
     battleAttributes = { ...battleState.player };
@@ -5385,7 +5391,7 @@ function autoBattle() {
                 }
             }
         }
-    }, 400);
+    }, 300);
 }
 
 // 定义初始暴击率和暴击伤害
@@ -5795,7 +5801,25 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 const pierceDamageContainer = {
     totalPierceDamage: 0
 };
-
+            
+function handleSoulCapture() {
+    battleState.player.soulCapture = true;
+    battleAttributes.physicalAttack *= 0.5;
+    battleAttributes.magicAttack *= 0.5;
+    logBattleEvent("你受到了摄魂效果，攻击力大幅下降。", '#B94FFF');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
+    effectCooldowns.soulCapture = true;
+    updatePlayerStatusDisplay();
+    setTimeout(() => {
+        battleState.player.soulCapture = false;
+        battleAttributes.physicalAttack *= 2;
+        battleAttributes.magicAttack *= 2;
+        effectCooldowns.soulCapture = false;
+        updateUI();
+        updatePlayerStatusDisplay();
+    }, 5000); // 摄魂效果持续5秒
+}
+            
 // 处理穿透效果
 function handlePierced() {
     if (!battleState.enemy.pierced) return;
@@ -5831,7 +5855,11 @@ function handleCriticalAndDrunken(damage) {
         }, 300);
     }
 
-    // 处理醉酒效果
+    // 调用处理醉酒状态的函数
+    handleDrunken(damage);
+}
+
+function handleDrunken(damage) {
     if (battleState.player.drunken && damage > 0) {
         const drunkenDamage = Math.floor(damage * 0.05);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
@@ -6228,46 +6256,67 @@ class DivineWeaponManager {
         return effectMap[effect] || effect;
     }
 
-    applyNirvanaGemEffects() {
+        applyNirvanaGemEffects() {
         if (!this.nirvanaGem.active) return;
-    
+
         const triggerProbability = Math.min(1, 0.005 + (this.nirvanaGem.level - 1) * 0.003);
         if (Math.random() > triggerProbability) return; // 没有触发效果
-    
+
         const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
         const activeDebuffs = debuffs.filter(debuff => battleState.player[debuff]);
         const applicableDebuffs = this.nirvanaGem.effects.filter(effect => debuffs.includes(effect));
-    
+
         const debuffsToRemove = activeDebuffs.filter(debuff => applicableDebuffs.includes(debuff));
-    
+
         if (debuffsToRemove.length > 0) {
             const debuffToRemove = debuffsToRemove[Math.floor(Math.random() * debuffsToRemove.length)];
             battleState.player[debuffToRemove] = false;
-    
-            if (debuffToRemove === 'taunt') {
-                // 恢复原始动作函数
-                performMagicalAttack = originalPerformMagicalAttack;
-                performHeal = originalPerformHeal;
-                performPoison = originalPerformPoison;
-                performDefense = originalPerformDefense;
-                battleState.player.taunt = false;
+
+            switch (debuffToRemove) {
+                case 'drunken':
+                    break;
+                case 'healingBan':
+                    break;
+                case 'soulCapture':
+                    battleAttributes.physicalAttack *= 2;
+                    battleAttributes.magicAttack *= 2;
+                    effectCooldowns.soulCapture = false;
+                    updateUI();
+                    updatePlayerStatusDisplay();
+                    break;
+                case 'torn':
+                    clearInterval(battleState.player.tornInterval);
+                    effectCooldowns.torn = false;
+                    break;
+                case 'suppressed':
+                    // 清除压制效果，恢复原始函数
+                    performAttack = originalPerformAttack;
+                    performHeal = originalPerformHeal;
+                    performPoison = originalPerformPoison;
+                    performDefense = originalPerformDefense;
+                    break;
+                case 'taunt':
+                    // 清除嘲讽效果，恢复原始函数
+                    performAttack = originalPerformAttack;
+                    performHeal = originalPerformHeal;
+                    performPoison = originalPerformPoison;
+                    performDefense = originalPerformDefense;
+                    break;
+                case 'seal':
+                    ascensionSkill.name = battleState.player.originalAscensionSkill;
+                    secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
+                    updateAscensionDisplay();
+                    updateSecondAscensionDisplay();
+                    effectCooldowns.seal = false;
+                    updateUI();
+                    break;
             }
-    
-            if (debuffToRemove === 'soulCapture') {
-                // 恢复原始动作函数
-                battleState.player.soulCapture = false;
-                battleAttributes.physicalAttack *= 2;
-                battleAttributes.magicAttack *= 2;
-                effectCooldowns.soulCapture = false;
-                updateUI();
-                updatePlayerStatusDisplay();
-            }
-    
+
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
             updatePlayerStatusDisplay();
             updateUI();
-            }
         }
+    }
     }
 
 const divineWeaponManager = new DivineWeaponManager();
@@ -6991,12 +7040,12 @@ function applyEnemyPhysicalEffects(damage) {
 
         switch (effect) {
             case 'torn':
-                if (effectChance < 0.2 && !effectCooldowns.torn) {
+                if (effectChance < 0.1 && !effectCooldowns.torn) {
                     handleTorn();
                 }
                 break;
             case 'suppressed':
-                if (effectChance < 0.3 && !effectCooldowns.suppressed) {
+                if (effectChance < 0.1 && !effectCooldowns.suppressed) {
                     handleSuppressed();
                 }
                 break;
@@ -7006,7 +7055,7 @@ function applyEnemyPhysicalEffects(damage) {
                 }
                 break;
             case 'seal':
-                if (effectChance < 0.2 && !battleState.player.seal) {
+                if (effectChance < 0.1 && !battleState.player.seal) {
                     handleSeal();
                 }
                 break;
@@ -7020,26 +7069,32 @@ function handleSeal() {
     }
 
     battleState.player.seal = true;
-    const originalAscensionSkill = ascensionSkill.name;
-    const originalSecondAscensionSkill = secondAscensionSkill.name;
 
+    // 保存原始技能名称
+    battleState.player.originalAscensionSkill = ascensionSkill.name;
+    battleState.player.originalSecondAscensionSkill = secondAscensionSkill.name;
+
+    // 设置封印技能名称
     ascensionSkill.name = "被封印的技能";
     secondAscensionSkill.name = "被封印的技能";
     updateAscensionDisplay();
     updateSecondAscensionDisplay();
 
+    logBattleEvent("远古魔神的低吟充满离散心智的声量，令你短暂被封印了飞升技能带来的战斗增益。", 'aqua');
 
-    logBattleEvent("远古魔神的低吟充满离散心智的声量，令你短暂被封印了飞升技能带来的战斗增益。", 'white');
-
-    // 假设封印效果持续2秒
+    // 封印效果持续时间
     setTimeout(() => {
         battleState.player.seal = false;
-        ascensionSkill.name = originalAscensionSkill;
-        secondAscensionSkill.name = originalSecondAscensionSkill;
+
+        // 恢复原始技能名称
+        ascensionSkill.name = battleState.player.originalAscensionSkill;
+        secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
+        
+        logBattleEvent("封印解除，飞升技能可以发挥作用了。", 'aqua');
         updateAscensionDisplay();
         updateSecondAscensionDisplay();
         updateUI();
-    }, 2000);
+    }, 10000);
 }
 
 function handleTorn() {
@@ -7080,11 +7135,6 @@ function handleSuppressed() {
     effectCooldowns.suppressed = true;
     updatePlayerStatusDisplay();
 
-    const originalPerformPhysicalAttack = performPhysicalAttack;
-    const originalPerformMagicalAttack = performMagicalAttack;
-    const originalPerformHeal = performHeal;
-    const originalPerformPoison = performPoison;
-    const originalPerformDefense = performDefense;
 
     let actionPerformed = false;
 
@@ -7095,8 +7145,7 @@ function handleSuppressed() {
         };
     };
 
-    performPhysicalAttack = wrappedAction(performPhysicalAttack);
-    performMagicalAttack = wrappedAction(performMagicalAttack);
+    performAttack = wrappedAction(performAttack);
     performHeal = wrappedAction(performHeal);
     performPoison = wrappedAction(performPoison);
     performDefense = wrappedAction(performDefense);
@@ -7110,8 +7159,7 @@ function handleSuppressed() {
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
             updateUI();
         }
-        performPhysicalAttack = originalPerformPhysicalAttack;
-        performMagicalAttack = originalPerformMagicalAttack;
+        performAttack = originalPerformAttack;
         performHeal = originalPerformHeal;
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
@@ -7131,14 +7179,14 @@ function handleTaunt() {
     effectCooldowns.taunt = true;
     updatePlayerStatusDisplay();
 
-    const originalPerformMagicalAttack = performMagicalAttack;
+    const originalPerformAttack = performAttack;
     const originalPerformHeal = performHeal;
     const originalPerformPoison = performPoison;
     const originalPerformDefense = performDefense;
 
     const tauntWrappedAction = () => performAttack('physical');
 
-    performMagicalAttack = tauntWrappedAction;
+    performAttack = tauntWrappedAction;
     performHeal = tauntWrappedAction;
     performPoison = tauntWrappedAction;
     performDefense = tauntWrappedAction;
@@ -7147,14 +7195,13 @@ function handleTaunt() {
     setTimeout(() => {
         battleState.player.taunt = false;
         effectCooldowns.taunt = false;
-        performMagicalAttack = originalPerformMagicalAttack;
+        performAttack = originalPerformAttack;
         performHeal = originalPerformHeal;
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
         updatePlayerStatusDisplay();
     }, 5000); // 嘲讽效果持续5秒
 }
-
         
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
@@ -7191,21 +7238,7 @@ function applyEnemyMagicEffects(damage) {
                 break;
             case 'soulCapture':
                 if (effectChance < 0.1 && !effectCooldowns.soulCapture) { // 10%的概率触发摄魂效果
-                    battleState.player.soulCapture = true;
-                    battleAttributes.physicalAttack *= 0.5;
-                    battleAttributes.magicAttack *= 0.5;
-                    logBattleEvent("你受到了摄魂效果，攻击力大幅下降。", '#B94FFF');
-                    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
-                    effectCooldowns.soulCapture = true;
-                    updatePlayerStatusDisplay();
-                    setTimeout(() => {
-                        battleState.player.soulCapture = false;
-                        battleAttributes.physicalAttack *= 2;
-                        battleAttributes.magicAttack *= 2;
-                        effectCooldowns.soulCapture = false;
-                        updateUI();
-                        updatePlayerStatusDisplay();
-                    }, 5000); // 摄魂效果持续5秒
+                    handleSoulCapture();
                 }
                 break;
             case 'spellSlow':
@@ -7238,7 +7271,9 @@ function applyEnemyMagicEffects(damage) {
         }
     });
 }
-const originalPerformMagicalAttack = performMagicalAttack;
+
+// 全局解控
+const originalPerformAttack = performAttack;
 const originalPerformHeal = performHeal;
 const originalPerformPoison = performPoison;
 const originalPerformDefense = performDefense;
@@ -7252,29 +7287,61 @@ const effectCooldowns = {
     torn: false,
     suppressed: false,
     taunt: false,
-    seal:false,
+    seal: false,
 };
+
         
 function clearEnemyEffect() {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
-    let tauntCleared = false;
 
     effects.forEach(effect => {
         if (battleState.player[effect]) {
             battleState.player[effect] = false;
             effectCooldowns[effect] = false;
-            if (effect === 'taunt') {
-                tauntCleared = true;
+
+            switch (effect) {
+                case 'drunken':
+                    // 清除醉酒效果，直接设置状态为false即可
+                    break;
+                case 'healingBan':
+                    // 清除禁疗效果，直接设置状态为false即可
+                    break;
+                case 'soulCapture':
+                    // 清除摄魂效果，恢复攻击力
+                    battleAttributes.physicalAttack *= 2;
+                    battleAttributes.magicAttack *= 2;
+                    updateUI();
+                    updatePlayerStatusDisplay();
+                    break;
+                case 'torn':
+                    // 清除撕裂效果，停止持续伤害
+                    clearInterval(battleState.player.tornInterval);
+                    break;
+                case 'suppressed':
+                    // 清除压制效果，恢复原始函数
+                    performAttack = originalPerformAttack;
+                    performHeal = originalPerformHeal;
+                    performPoison = originalPerformPoison;
+                    performDefense = originalPerformDefense;
+                    break;
+                case 'taunt':
+                    // 清除嘲讽效果，恢复原始函数
+                    performAttack = originalPerformAttack;
+                    performHeal = originalPerformHeal;
+                    performPoison = originalPerformPoison;
+                    performDefense = originalPerformDefense;
+                    break;
+                case 'seal':
+                    // 清除封印效果，恢复原始技能名称
+                    ascensionSkill.name = battleState.player.originalAscensionSkill;
+                    secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
+                    updateAscensionDisplay();
+                    updateSecondAscensionDisplay();
+                    updateUI();
+                    break;
             }
         }
     });
-
-    if (tauntCleared) {
-        performMagicalAttack = originalPerformMagicalAttack;
-        performHeal = originalPerformHeal;
-        performPoison = originalPerformPoison;
-        performDefense = originalPerformDefense;
-    }
 
     updatePlayerStatusDisplay();
 }
@@ -7448,11 +7515,8 @@ function performHeal() {
         return;
     }
 
-    // 如果玩家处于禁疗状态，治疗量变为0
-    let healAmount = 0;
-    if (!battleState.player.healingBan) {
-        healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8) * skillMultiplier);
-    }
+    // 调用处理禁疗状态的函数
+    const healAmount = handleHealingBan(skillMultiplier);
 
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
@@ -7490,6 +7554,14 @@ function performHeal() {
     enemyAttack();
     applyAscensionEffects();
     updateUI();
+}
+
+function handleHealingBan(skillMultiplier) {
+    if (battleState.player.healingBan) {
+        return 0;
+    }
+
+    return Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (1.2 - 0.8) + 0.8) * skillMultiplier);
 }
 
 // 将 firstStartBattle 定义为全局变量
@@ -12581,6 +12653,7 @@ function updateTitle() {
 
 // 绑定按钮点击事件自动战斗
 document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
+
 // 绑定 blessGift 按钮的点击事件
 document.getElementById("bless-gift-button").addEventListener("click", blessGift);
 

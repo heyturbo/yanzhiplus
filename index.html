@@ -6161,12 +6161,44 @@ class DivineWeaponManager {
         const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
         if (useItem(itemName)) {
             const chance = Math.random();
-            if (chance < 0.05) {
-                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
-            } else if (chance < 0.20) {
-                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+            if (type === 'nirvanaGem') {
+                if (chance < 0.05) {
+                    this[type].effects = [
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type)
+                    ];
+                } else if (chance < 0.15) {
+                    this[type].effects = [
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type)
+                    ];
+                } else if (chance < 0.30) {
+                    this[type].effects = [
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type)
+                    ];
+                } else if (chance < 0.60) {
+                    this[type].effects = [
+                        this.getRandomEffect(type),
+                        this.getRandomEffect(type)
+                    ];
+                } else {
+                    this[type].effects = [this.getRandomEffect(type)];
+                }
             } else {
-                this[type].effects = [this.getRandomEffect(type)];
+                if (chance < 0.05) {
+                    this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
+                } else if (chance < 0.20) {
+                    this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+                } else {
+                    this[type].effects = [this.getRandomEffect(type)];
+                }
             }
             this.openDivineWeaponUI(); // 刷新界面显示
             return;
@@ -6181,12 +6213,44 @@ class DivineWeaponManager {
         updateExpBar();
     
         const chance = Math.random();
-        if (chance < 0.05) {
-            this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
-        } else if (chance < 0.20) {
-            this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+        if (type === 'nirvanaGem') {
+            if (chance < 0.05) {
+                this[type].effects = [
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type)
+                ];
+            } else if (chance < 0.15) {
+                this[type].effects = [
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type)
+                ];
+            } else if (chance < 0.30) {
+                this[type].effects = [
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type)
+                ];
+            } else if (chance < 0.60) {
+                this[type].effects = [
+                    this.getRandomEffect(type),
+                    this.getRandomEffect(type)
+                ];
+            } else {
+                this[type].effects = [this.getRandomEffect(type)];
+            }
         } else {
-            this[type].effects = [this.getRandomEffect(type)];
+            if (chance < 0.05) {
+                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type), this.getRandomEffect(type)];
+            } else if (chance < 0.20) {
+                this[type].effects = [this.getRandomEffect(type), this.getRandomEffect(type)];
+            } else {
+                this[type].effects = [this.getRandomEffect(type)];
+            }
         }
         showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已通过经验刷新。`);
         this.openDivineWeaponUI(); // 刷新界面显示
@@ -7053,8 +7117,8 @@ function performEnemyMagicalAttack(isCritical) {
 }
 
 function applyEnemyPhysicalEffects(damage) {
-    const effects = ['torn', 'suppressed', 'seal'];//暂时关闭嘲讽
-
+    const effects = ['torn', 'suppressed', 'taunt', 'seal'];
+    
     effects.forEach(effect => {
         const effectChance = Math.random();
 

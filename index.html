@@ -935,8 +935,8 @@
         }
         /* lottery.css */
         .modal {
-            display: none;
             position: fixed;
+            display: none;
             z-index: 1000;
             left: 0;
             top: 0;
@@ -1029,7 +1029,7 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            max-height: 35%;
+            max-height: 30%;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.8);
@@ -1053,8 +1053,8 @@
         
         .battle-system-actions {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px 5px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px 10px;
             width: 100%;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -1311,6 +1311,7 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-around;
+    gap: 10px;
 }
 
 .drug-modal .use-button,
@@ -1318,8 +1319,10 @@
     background-color: #088c01; /* 绿色背景 */
      /* 无边框 */
     color: #fff; /* 白色文字 */
-    padding: 1px 10px; /* 内边距 */
+    padding: 2px 10px; /* 内边距 */
     text-align: center; /* 文字居中 */
+    margin-top: 10px;
+    margin-bottom: 10px;
     text-decoration: none; /* 无下划线 */
     display: flex; /* 行内块元素 */
     font-size: 16px; /* 字体大小 */
@@ -1331,7 +1334,7 @@
 
 .drug-modal .use-button:hover,
 .drug-modal .close-button:hover {
-    background-color: #45a049; /* 深绿色背景 */
+    background-color: #064701; /* 深绿色背景 */
 }
 
 .drug-modal .drug-grid {
@@ -1952,33 +1955,35 @@
             <!-- 使用药品面板 -->
             <div id="drug-modal" class="drug-modal modal">
                 <div class="modal-content">
+                    <button class="use-button" onclick="useSelectedDrug()">使用</button>
+                    <button class="use-button" onclick="mergeDrug()">合成</button>
+                    <button class="use-button" onclick="collectDrug()">采集</button>
+                    <button class="close-button" onclick="closeDrugModal()">关闭</button>
                     <div class="drug-grid" id="drug-grid">
                         <!-- 药品项会通过JavaScript动态生成 -->
                     </div>
                     <div class="drug-description" id="drug-description">
                         本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效！
                     </div>
-                    <button class="use-button" onclick="useSelectedDrug()">使用</button>
-                    <button class="use-button" onclick="mergeDrug()">合成</button>
-                    <button class="use-button" onclick="collectDrug()">采集</button>
-                    <button class="close-button" onclick="closeDrugModal()">关闭</button>
                 </div>
             </div>
             <div class="battle-system-log">
-                <h2>战斗记录（第<span id="battleRounds"></span>轮）<button class="use-button" onclick="divinedWeapon()">神器赋能</button></h2>
+                <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
-                <button onclick="performAttack('physical')">物理攻击</button>
-                <button onclick="performAttack('magical')">法术攻击</button>
-                <button onclick="performHeal()">治疗之术</button>
-                <button onclick="performPoison()">施毒之法</button>
-                <button onclick="performDefense()">格挡蓄力</button>
-                <button onclick="useDrug()">使用药品</button>
-                <button id="battle-spirit-button">战斗精灵</button>
-                <button id="ascension-skill-button" class="ascension-button">飞升之术</button>
-                <button onclick="levelUpSkill()">升级技能</button>
-                <button onclick="enemyInfo()">托管战斗</button>
+                <button onclick="performAttack('physical')">物攻</button>
+                <button onclick="performAttack('magical')">法攻</button>
+                <button onclick="performHeal()">治疗</button>
+                <button onclick="performPoison()">施毒</button>
+                <button onclick="performDefense()">格挡</button>
+                <button onclick="useDrug()">药品</button>
+                <button id="battle-spirit-button">精灵</button>
+                <button id="ascension-skill-button" class="ascension-button">飞升</button>
+                <button onclick="divinedWeapon()">神器</button>
+                <button onclick="levelUpSkill()">技能</button>
+                <button onclick="enemyInfo()">托管</button>
+                <button onclick="clearBattleLog()">清屏</button>
             </div>
             
         </div>
@@ -5354,14 +5359,16 @@ function autoBattle() {
             return;
         }
 
-        if (battleAttributes.health <= 0) {
-            showNextBattlePrompt(false);
+        // 检查玩家是否赢得战斗
+        if (battleState.playerWon === false) {
             clearInterval(autoBattleInterval);
             autoBattleInterval = null;
-            showInfoBox("自动战斗失败，已经停止自动战斗！");
+            logBattleEvent("本轮失败，终止自动战斗。", 'red');
+            showNextBattlePrompt(false); // 玩家失败，传递失败状态
             return;
         }
 
+        // 根据玩家生命值和状态进行行动
         if (battleAttributes.health / maxHealth < 0.5) {
             if (Math.random() < 0.5) {
                 performDefense();
@@ -5444,15 +5451,18 @@ function levelUpSkill() {
     // 创建弹出界面
     const modal = document.createElement('div');
     modal.style.width = '85%';
-    modal.style.height = '75%';
-    modal.style.backgroundColor = '#ffffff30';
+    modal.style.height = '60%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
     modal.style.color = 'white';
     modal.style.border = '1px solid #ddd';
     modal.style.borderRadius = '10px';
     modal.style.padding = '20px';
-    modal.style.overflowY = 'auto';
+    modal.style.overflowY = 'scroll';
     modal.style.position = 'relative';
-
+    modal.style.display = 'flex';
+    modal.style.flexDirection = 'column';
+    modal.style.justifyContent = 'space-between';
+    
     // 创建标题和关闭按钮
     const title = document.createElement('h2');
     title.innerText = '升级技能';
@@ -5473,7 +5483,7 @@ function levelUpSkill() {
     // 创建技能显示区
     const skillsGrid = document.createElement('div');
     skillsGrid.style.display = 'grid';
-    skillsGrid.style.marginTop = '60px';
+    skillsGrid.style.marginBottom = '60px';
     skillsGrid.style.color = 'black';
     skillsGrid.style.fontSize = '12px';
     skillsGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
@@ -6036,7 +6046,7 @@ class DivineWeaponManager {
         }
 
         this.divineWeaponUI = document.createElement('div');
-        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid #F5F5F5; width: 85%; padding: 20px; color: white; z-index: 9990;';
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid #F5F5F5; width: 90%; padding: 10px; color: white; z-index: 9990;';
         
         const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
         const lostBookDescription = this.lostBook.active 
@@ -6480,7 +6490,7 @@ function applyPhysicalAttackEffects() {
                 battleState.enemy.pierced = false; // 清除穿透状态
                 const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
-                logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透收尾伤害。`, '#ADFF2F');
+                logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
                 pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
                 updateUI();
                 showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
@@ -6491,7 +6501,7 @@ function applyPhysicalAttackEffects() {
                 return;
                 }
                 updateEnemyStatusDisplay();
-            }, 10000); // 穿透效果持续10秒
+            }, 5000); // 穿透效果持续5秒
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -6752,7 +6762,7 @@ function applyPoisonEffect() {
     setTimeout(() => {
         battleState.enemy.poisoned = false;
         logBattleEvent("深渊巨魔的中毒效果消失了。");
-    }, 3000);
+    }, 5000);
 }
 
 function performDefense() {
@@ -7290,7 +7300,7 @@ function handleTaunt() {
         performPoison = originalPerformPoison;
         performDefense = originalPerformDefense;
         updatePlayerStatusDisplay();
-    }, 5000); // 嘲讽效果持续5秒
+    }, 2000); // 嘲讽效果持续2秒
 }
         
 function applyEnemyMagicEffects(damage) {
@@ -7684,6 +7694,8 @@ function stopBattle() {
 }
 
 function showNextBattlePrompt(playerWon) {
+    battleState.playerWon = playerWon; // 设置 battleState 中的 playerWon 属性
+
     if (playerWon) {
         const minRewardMultiplier = 0.35;
         const maxRewardMultiplier = 1.75;
@@ -7697,7 +7709,7 @@ function showNextBattlePrompt(playerWon) {
                 extraReward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             }
             if (secondAscensionSkill.name === '财源滚滚') {
-                extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+                extraReward +=第二AscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             reward += extraReward;
             logBattleEvent(`财源滚滚触发，额外增加了 ${extraReward} 文金子。`, 'pink');
@@ -7721,7 +7733,7 @@ function showNextBattlePrompt(playerWon) {
                 compensation += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             }
             if (secondAscensionSkill.name === '金牌调解') {
-                compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+                compensation += ascensionSkill.baseValue + ascensionSkill.increment(secondAscensionSkill.level);
             }
             goldAmount += compensation;
             logBattleEvent(`金牌调解触发，未扣除金子并获得 ${compensation} 文金子的安慰金。`, 'pink');
@@ -7767,7 +7779,7 @@ function resetBuffState(playerWon) {
         logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
         updateDrugGrid();
 
-        // battleRounds 大于等于 130 时额外掉落药品
+        // battleRounds 大于等于 100 时额外掉落药品
         if (battleRounds >= 100) {
             for (let i = 0; i < 2; i++) {
                 const extraDrugProbability = Math.random();
@@ -7882,7 +7894,7 @@ function resetBattleState(playerWon) {
     }
 
     if (battleRounds === 151) {
-        showInfoBox("你已经成功挑战150轮!你的爱宠经受住了魔王的考验,恭喜你!继续战斗会进入无尽挑战模式。");
+        showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }
 
     if (battleState.enemy.benumbed) {
@@ -9813,7 +9825,7 @@ function transformPet() {
         buttonsDiv.style.display = 'flex';
         buttonsDiv.style.flexDirection = 'row-reverse';
         buttonsDiv.style.flexWrap = 'wrap';
-        buttonsDiv.style.gap = '20px 0px';
+        buttonsDiv.style.gap = '10px 0px';
 
         const openButton = document.createElement('button');
         openButton.innerText = currentSpecialization === key ? '已开' : '开启';
@@ -9897,25 +9909,27 @@ function transformPet() {
                 showInfoBox("未开启此专精！");
                 refreshSpecializationUI();
             } else {
-                if (spec.level >= 120) {
-                    showInfoBox("专精等级已达上限！");
-                    refreshSpecializationUI();
-                    return;
-                }
-                let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200);
-                if (goldAmount >= upgradeCost) {
-                    goldAmount -= upgradeCost;
-                    spec.level++;
-                    updateGoldDisplay(goldAmount);
-                    showInfoBox(`你花费了${upgradeCost}文金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
-                    refreshSpecializationUI();
-                } else {
-                    showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
-                }
+                upgradeSpecialization(key);
             }
-            refreshSpecializationUI();
         };
         buttonsDiv.appendChild(upgradeButton);
+
+        // 添加升满按钮
+        const upgradeToMaxButton = document.createElement('button');
+        upgradeToMaxButton.innerText = '升满';
+        upgradeToMaxButton.style.fontSize = '14px';
+        upgradeToMaxButton.style.cursor = 'pointer';
+        upgradeToMaxButton.style.borderColor = 'white';
+        upgradeToMaxButton.style.borderRadius = '5px';
+        upgradeToMaxButton.onclick = () => {
+            if (currentSpecialization !== key) {
+                showInfoBox("未开启此专精！");
+                refreshSpecializationUI();
+            } else {
+                upgradeToMax(key);
+            }
+        };
+        buttonsDiv.appendChild(upgradeToMaxButton);
 
         specDiv.appendChild(buttonsDiv);
         specializationsDiv.appendChild(specDiv);
@@ -9959,20 +9973,47 @@ function handleSpecializationChange(newSpec) {
     refreshSpecializationUI();
 }
 
-function handleSpecializationUpgrade(key) {
+function upgradeSpecialization(key) {
     const spec = specializations[key];
+    if (spec.level >= 120) {
+        showInfoBox("专精等级已达上限！");
+        return;
+    }
     let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200);
     if (goldAmount >= upgradeCost) {
         goldAmount -= upgradeCost;
         spec.level++;
         updateGoldDisplay(goldAmount);
+        showInfoBox(`你花费了${upgradeCost}文金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
     } else {
-        showInfoBox(`升级所需金子不足，需要${upgradeCost}金子。`);
+        showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
     }
-    applySpecialization();
     refreshSpecializationUI();
 }
 
+function upgradeToMax(key) {
+    const spec = specializations[key];
+    let totalCost = 0;
+    let tempLevel = spec.level;
+    let projectedGold = goldAmount;
+
+    // 计算玩家当前金币能升级到的最大等级以及所需总费用
+    while (tempLevel < 120 && projectedGold >= (tempLevel >= 100 ? (tempLevel - 99) * 20000 : tempLevel * 200 + 200)) {
+        let upgradeCost = (tempLevel >= 100 ? (tempLevel - 99) * 20000 : tempLevel * 200 + 200);
+        totalCost += upgradeCost;
+        projectedGold -= upgradeCost;
+        tempLevel++;
+    }
+
+    // 提示玩家确认
+    showInfoBox(`确定花费${totalCost}文金子将${key}升级到Lv${tempLevel}吗？`, () => {
+        while (spec.level < 120 && goldAmount >= (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200)) {
+            upgradeSpecialization(key);
+        }
+        refreshSpecializationUI();
+    });
+}
+        
 function applySpecialization() {
     updateSecondaryAttributes();
     updateAttributePanel();

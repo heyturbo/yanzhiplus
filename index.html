@@ -241,7 +241,6 @@
             justify-content: space-between;
             margin-right: 20px;
             font-size: 16px;
-            align-items: stretch;
             gap: 5px;
         }
         .bottom-bar .info div {
@@ -2028,12 +2027,14 @@
             <img id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
         </div>
         <div class="info">
-            <div>宠物名: <span id="pet-name">小金牛</span></div>
-            <div>称号: <span id="personal-honor">初来乍到</span></div>
+            <div>宠物名称: <span id="pet-name">小金牛</span></div>
+            <div>玩家称号: <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长: <span id="game-timer">00:00</span></div>
             <div>金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
-            <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: white;" onclick="saveGameState()">游戏存档</button>
-            <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: white;" onclick="loadGameState()">读取存档</button>
+            <div id="loadContainer" style="display:flex; justify-content: space-between; width: 100%;">
+                <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px;" onclick="saveGameState()">存档</button>
+                <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px;" onclick="loadGameState()">读档</button>
+            </div>
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
@@ -9452,12 +9453,12 @@ function showPetArmsWindow() {
     newArmsWindow.style.justifyContent = 'space-around';
     newArmsWindow.style.alignItems = 'stretch';
     newArmsWindow.style.transform = 'translate(-50%, -50%)';
-    newArmsWindow.style.width = '90%';
-    newArmsWindow.style.height = '60%';
+    newArmsWindow.style.width = '85%';
+    newArmsWindow.style.maxHeight = '80%';
     newArmsWindow.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     newArmsWindow.style.borderRadius = '10px';
     newArmsWindow.style.zIndex = '1000';
-    newArmsWindow.style.padding = '10px';
+    newArmsWindow.style.padding = '20px';
     newArmsWindow.style.overflowY = 'auto';
     newArmsWindow.style.color = 'white'; // 设置字体颜色为白色
     document.body.appendChild(newArmsWindow);
@@ -9496,6 +9497,8 @@ function showPetArmsWindow() {
     armsContent.style.display = 'flex';
     armsContent.style.flexDirection = 'column';
     armsContent.style.gap = '10px';
+    armsContent.style.width = '100%';
+    armsContent.style.marginBottom = '20px';
 
     const attributeMap = {
         physicalAttack: '物攻',
@@ -11127,7 +11130,9 @@ function resetPet() {
     defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
     updatePetInfo();
     currentSpecialization = null;
+    
     petLevel = 1;
+    divinedWeaponStatus = false;
     evolutionLevel = 0;
     growthRate = 1;
     remainingPoints = 0;
@@ -13000,7 +13005,9 @@ function saveGameState() {
         hallucinated: hallucinated,
         hallucinationLevel: hallucinationLevel,
         experienceTreasureOpenCount: experienceTreasureOpenCount,
-        armsOpened: armsOpened,
+        armsOpened: armsOpened, // 保存武装解锁情况
+        armsAttributes: JSON.stringify(armsAttributes), // 保存武装属性情况
+        tasks: JSON.stringify(tasks), //保存任务情况
         battleRounds: battleRounds,
         currentExp: currentExp,
         maxExp: maxExp,
@@ -13032,6 +13039,11 @@ function saveGameState() {
         enemyMaxHealth: enemyMaxHealth,
         enemyMaxMana: enemyMaxMana,
         enemyInitialState: enemyInitialState, // 保存敌人的初始状态
+        divinedWeaponStatus: divinedWeaponStatus, //保存神器提示
+        drugInventory: JSON.stringify(drugInventory), // 保存药物系统
+        alreadyUseDrug: alreadyUseDrug, //使用药物提示
+        collectCost: collectCost, //采集药物成本
+        experienceTreasureOpenCount: experienceTreasureOpenCount, //经验宝箱成本
         gameItems: gameItems // 保存道具数据
     };
 
@@ -13143,7 +13155,9 @@ function loadGameState() {
         hallucinated = savedState.hallucinated;
         hallucinationLevel = savedState.hallucinationLevel;
         experienceTreasureOpenCount = savedState.experienceTreasureOpenCount;
-        armsOpened = savedState.armsOpened;
+        armsOpened = savedState.armsOpened; // 恢复武装解锁情况
+        armsAttributes = JSON.parse(savedState.armsAttributes); // 恢复武装属性情况
+        tasks = JSON.parse(savedState.tasks); // 恢复任务系统情况
         battleRounds = savedState.battleRounds;
         currentExp = savedState.currentExp;
         maxExp = savedState.maxExp;
@@ -13180,6 +13194,11 @@ function loadGameState() {
         enemyMaxHealth = savedState.enemyMaxHealth;
         enemyMaxMana = savedState.enemyMaxMana;
         enemyInitialState = savedState.enemyInitialState; // 加载敌人的初始状态
+        divinedWeaponStatus = savedState.divinedWeaponStatus;
+        alreadyUseDrug= savedState.alreadyUseDrug; //使用药物提示
+        drugInventory = JSON.parse(savedState.drugInventory); // 恢复药物系统
+        collectCost= savedState.collectCost; //采集药物成本
+        experienceTreasureOpenCount= savedState.experienceTreasureOpenCount; //经验宝箱成本
 
         
         if (savedState.specializations) {

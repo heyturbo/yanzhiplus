@@ -265,7 +265,6 @@
         }
         .pet-selector {
             width: 90%;
-            height: 90%;
             margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 95%);
@@ -274,12 +273,28 @@
             text-align: center;
         }
         .pet-selector select {
-            width: 100%;
             padding: 0px;
             font-size: 16px;
             border-radius: 5px;
             background-color: #ffffff75;
             border: 1px solid #ccc;
+            width: 100%;
+        }
+        .battle-pet-selector {
+            padding: 5px;
+            background-color: rgba(0,0,0,0.1);
+            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            border-radius: 10px;
+            text-align: center;
+            color: white;
+        }
+        .battle-pet-selector select {
+            font-size: 16px;
+            color: #ffffff;
+            border-radius: 5px;
+            background-color: #ffffff75;
+            border: 1px solid #ccc;
+            width: 100%;
         }
         .pet-image {
             display: flex;
@@ -1052,7 +1067,7 @@
         .battle-system-actions {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 15px 10px;
+            gap: 10px 10px;
             width: 100%;
             flex-direction: row;
             flex-wrap: nowrap;
@@ -1965,6 +1980,7 @@
                     </div>
                 </div>
             </div>
+            <div class="battle-pet-selector"><select id="battle-pet-select" onchange="changeBattlePet()"><option value="xiaojin"></option></select></div>
             <div class="battle-system-log">
                 <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
@@ -1982,8 +1998,7 @@
                 <button onclick="levelUpSkill()">技能</button>
                 <button onclick="enemyInfo()">托管</button>
                 <button onclick="clearBattleLog()">清屏</button>
-            </div>
-            
+            </div>            
         </div>
     </div>
 <div id="missionPanel" class="mission-popup-panel" style="display:none;">
@@ -3275,21 +3290,159 @@ let summonedPet = null;
 let currentPetKey = 'xiaojin';
 let currentPet = pets[currentPetKey]; // 初始化当前宠物
 
-function changePet(skipConfirmation = false) {
-    const selectedPetKey = document.getElementById("pet-select").value; // 获取选择的宠物键
+// 存储当前宠物的数据
+function storeCurrentPetData() {
+    if (currentPet && currentPet.name) {
+        const skillsArea = document.getElementById("skills-area");
+        const existingSkills = Array.from(skillsArea.children).map(skillDiv => {
+            const [name, rarity] = skillDiv.innerText.split(' (');
+            return {
+                name: name,
+                rarity: rarity.slice(0, -1) // 去掉最后一个字符 ')'
+            };
+        });
+        const petData = {
+            currentPet: JSON.stringify(currentPet),
+            petLevel: petLevel,
+            evolutionLevel: evolutionLevel,
+            remainingPoints: remainingPoints,
+            trainingCount: trainingCount,
+            currentWisdom: currentWisdom,
+            petAscended: petAscended,
+            petMaxLevel: petMaxLevel,
+            petWisdom: petWisdom,
+            awakened: awakened,
+            hallucinated: hallucinated,
+            hallucinationLevel: hallucinationLevel,
+            experienceTreasureOpenCount: experienceTreasureOpenCount,
+            armsOpened: armsOpened,
+            armsAttributes: JSON.stringify(armsAttributes),
+            drugInventory: JSON.stringify(drugInventory),
+            currentExp: currentExp,
+            maxExp: maxExp,
+            playerCritRate: playerCritRate,
+            playerCritDamage: playerCritDamage,
+            enemyCritRate: enemyCritRate,
+            enemyCritDamage: enemyCritDamage,
+            ascensionEnabled: ascensionEnabled,
+            poisonSkillActivated: poisonSkillActivated,
+            spiritLevel: spiritLevel,
+            spiritMultiplier: spiritMultiplier,
+            reenableAscension: reenableAscension,
+            bonusAttributes: bonusAttributes,
+            ascensionSkill: ascensionSkill ? getSkillFromName(ascensionSkill.name, ascensionSkill.level) : null,
+            secondAscensionSkill: secondAscensionSkill ? getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level) : null,
+            ascensionAttributes: ascensionAttributes,
+            drugBonus: drugBonus,
+            baseAttributes: baseAttributes,
+            skillScore: skillScore,
+            existingSkills: existingSkills, // 存储技能数据
+        };
+        localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
+    }
+}
 
-    if (currentPetKey === selectedPetKey) return; // 如果选择的宠物是当前宠物,不进行切换
+// 恢复指定宠物的数据
+function restorePetData(petName) {
+    const savedPetData = JSON.parse(localStorage.getItem(`petData_${petName}`));
+    if (savedPetData) {
+        currentPet = JSON.parse(savedPetData.currentPet);
+        petLevel = savedPetData.petLevel;
+        evolutionLevel = savedPetData.evolutionLevel;
+        remainingPoints = savedPetData.remainingPoints;
+        trainingCount = savedPetData.trainingCount;
+        currentWisdom = savedPetData.currentWisdom;
+        petAscended = savedPetData.petAscended;
+        petMaxLevel = savedPetData.petMaxLevel;
+        petWisdom = savedPetData.petWisdom;
+        awakened = savedPetData.awakened;
+        hallucinated = savedPetData.hallucinated;
+        hallucinationLevel = savedPetData.hallucinationLevel;
+        experienceTreasureOpenCount = savedPetData.experienceTreasureOpenCount;
+        armsOpened = savedPetData.armsOpened;
+        armsAttributes = JSON.parse(savedPetData.armsAttributes);
+        drugInventory = JSON.parse(savedPetData.drugInventory);
+        currentExp = savedPetData.currentExp;
+        maxExp = savedPetData.maxExp;
+        playerCritRate = savedPetData.playerCritRate;
+        playerCritDamage = savedPetData.playerCritDamage;
+        enemyCritRate = savedPetData.enemyCritRate;
+        enemyCritDamage = savedPetData.enemyCritDamage;
+        ascensionEnabled = savedPetData.ascensionEnabled;
+        poisonSkillActivated = savedPetData.poisonSkillActivated;
+        spiritLevel = savedPetData.spiritLevel;
+        spiritMultiplier = savedPetData.spiritMultiplier;
+        reenableAscension = savedPetData.reenableAscension;
+        bonusAttributes = savedPetData.bonusAttributes;
+        ascensionSkill = savedPetData.ascensionSkill ? getSkillFromName(savedPetData.ascensionSkill.name, savedPetData.ascensionSkill.level) : null;
+        secondAscensionSkill = savedPetData.secondAscensionSkill ? getSkillFromName(savedPetData.secondAscensionSkill.name, savedPetData.secondAscensionSkill.level) : null;
+        ascensionAttributes = savedPetData.ascensionAttributes;
+        drugBonus = savedPetData.drugBonus;
+        baseAttributes = savedPetData.baseAttributes;
+        skillScore = savedPetData.skillScore;
+        
+        if (savedPetData.specializations) {
+            specializations = savedPetData.specializations;
+        }
+        if (savedPetData.currentSpecialization !== undefined) {
+            currentSpecialization = savedPetData.currentSpecialization;
+        }
+        if (savedPetData.collectedPets) {
+            collectedPets = savedPetData.collectedPets;
+        }
+        if (savedPetData.collectedPetCount !== undefined) {
+            collectedPetCount = savedPetData.collectedPetCount;
+        }
+        if (savedPetData.divineWeapons) {
+            divineWeaponManager.setWeaponData(savedPetData.divineWeapons);
+        }
+        if (savedPetData.existingSkills) {
+            const skillsArea = document.getElementById("skills-area");
+            skillsArea.innerHTML = ''; // 清空当前技能
+            savedPetData.existingSkills.forEach(skill => {
+                const skillDiv = document.createElement('div');
+                skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+                skillDiv.onclick = () => {
+                    deleteSkill(skill, skillDiv, skillsArea);
+                };
+                if (skill.rarity === 'S') {
+                    skillDiv.classList.add('s-skill');
+                } else if (skill.rarity === 'SS') {
+                    skillDiv.classList.add('ss-skill');
+                }
+                skillsArea.appendChild(skillDiv);
+            });
+        }
+        if (savedPetData.secondAscensionSkill && savedPetData.reenableAscension) {
+            const secondSkillBox = document.getElementById('second-ascension-skill');
+            secondSkillBox.style.display = 'block';
+            updateSecondAscensionDisplay();
+        }
+    }
+}
+
+// 修改changePet函数
+function changePet(skipConfirmation = false) {
+    // 获取 pet-select 下拉列表的选定值
+    const petSelectValue = document.getElementById("pet-select").value;
+
+    // 确定当前选择的宠物键
+    const selectedPetKey = petSelectValue;
+
+    // 检查选择的宠物是否是当前宠物
+    if (currentPetKey === selectedPetKey) return;
 
     const changeSelectedPet = () => {
         const selectedPet = pets[selectedPetKey];
-        //console.log('Selected Pet:', selectedPet);
-
-        if (selectedPet) { // 检查选中的宠物是否存在
+        if (selectedPet) {
+            storeCurrentPetData(); // 存储当前宠物数据
             currentPetKey = selectedPetKey;
             currentPet = selectedPet; // 将当前宠物设为选择的宠物
+            resetPet();
+            restorePetData(currentPet.name); // 恢复新宠物的数据
             updatePetDisplay();
+            updateDisplayContent();
             document.getElementById("description-box").innerText = `您将当前宠物更换为:${currentPet.name}`;
-            resetPet(); // 重置宠物的数值
         } else {
             console.error('无法找到选中的宠物:', selectedPetKey);
         }
@@ -3299,10 +3452,45 @@ function changePet(skipConfirmation = false) {
         changeSelectedPet(); // 直接执行更换宠物的逻辑,不显示确认提示
     } else {
         // 提示用户确认
-        showInfoBox("更换宠物会导致当前宠物的数据丢失,你确定更换吗?", changeSelectedPet);
+        showInfoBox("切换宠物可能导致某些不可预知的数据丢失或混乱，请知悉", changeSelectedPet);
     }
 }
 
+// 修改changeBattlePet函数
+function changeBattlePet(skipConfirmation = false) {
+    // 获取 battle-pet-select 下拉列表的选定值
+    const battlePetSelectValue = document.getElementById("battle-pet-select").value;
+
+    // 确定当前选择的宠物键
+    const selectedPetKey = battlePetSelectValue;
+
+    // 检查选择的宠物是否是当前宠物
+    if (currentPetKey === selectedPetKey) return;
+
+    const changeSelectedPet = () => {
+        const selectedPet = pets[selectedPetKey];
+        if (selectedPet) {
+            storeCurrentPetData(); // 存储当前宠物数据
+            currentPetKey = selectedPetKey;
+            currentPet = selectedPet; // 将当前宠物设为选择的宠物
+            resetPet();
+            restorePetData(currentPet.name); // 恢复新宠物的数据
+            updatePetDisplay();
+            updateDisplayContent();
+            document.getElementById("description-box").innerText = `您将当前宠物更换为:${currentPet.name}`;
+        } else {
+            console.error('无法找到选中的宠物:', selectedPetKey);
+        }
+    };
+
+    if (skipConfirmation) {
+        changeSelectedPet(); // 直接执行更换宠物的逻辑,不显示确认提示
+    } else {
+        // 提示用户确认
+        showInfoBox("切换宠物可能导致某些不可预知的数据丢失或混乱，请知悉", changeSelectedPet);
+    }
+}
+        
 function updatePetDisplay() {
     document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
@@ -3519,13 +3707,17 @@ function showPetShop() {
                     if (stamps >= price) {
                         stamps -= price;
                         showInfoBox(`你购买了${pet.name} (${pet.rank})`);
+                        
                         const petSelect = document.getElementById('pet-select');
+                        
+                        // 检查并添加宠物到 petSelect
                         if (!Array.from(petSelect.options).some(option => option.value === key)) { // 使用键作为选项值
                             const option = document.createElement('option');
                             option.value = key;
                             option.text = pet.name;
                             petSelect.appendChild(option);
                         }
+                        
                         petDiv.remove(); // 移除已购买的宠物
                         updateStampCount();
                     } else {
@@ -3544,6 +3736,21 @@ document.getElementById('closePetShop').addEventListener('click', () => {
     document.getElementById('petShop').style.display = 'none';
 });
 
+function syncBattlePetSelect() {
+    const petSelect = document.getElementById('pet-select');
+    const battlePetSelect = document.getElementById('battle-pet-select');
+
+    // 清空 battlePetSelect 中的所有选项
+    battlePetSelect.innerHTML = '';
+
+    // 将 petSelect 中的所有选项复制到 battlePetSelect
+    Array.from(petSelect.options).forEach(option => {
+        const newOption = document.createElement('option');
+        newOption.value = option.value;
+        newOption.text = option.text;
+        battlePetSelect.appendChild(newOption);
+    });
+}
 
 // 测试用例：确保 pets 数组和下拉列表匹配
 document.addEventListener('DOMContentLoaded', () => {
@@ -4960,6 +5167,7 @@ function toggleFightingDrawer() {
         stopBattle();
     }
     document.getElementById('battleRounds').innerText = battleRounds;
+    syncBattlePetSelect();
 }
 
 function updatePetInfo() {
@@ -8461,7 +8669,7 @@ let skillScore = 0;
 let petWisdom = 0; 
         
 const descriptions = [
-    "更换宠物会导致此前的分数复位，如果你没有想好先培养谁，请决定后再尝试！",
+    "切换宠物可能会不可预知地丢失部分数据，目前正在修复",
     "当你每达到一个里程碑，你的称号都会有所提升，直到最终成为“魔兽之王”！",
     "宠物的各项技能效果在本模拟器中进行了简化，尤其是被动技能将只按一定比例增加各项属性值，增量随技能等级提高而提高。",
     "宠物的资质可以用“资质重生丹”洗练到更高的程度",
@@ -11001,19 +11209,19 @@ function deal() {
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
     if (optionToRemove) {
         optionToRemove.remove();
+        resetPet();
     }
 
     // 设置默认选择第一个宠物
     if (petSelect.options.length > 0) {
         petSelect.value = petSelect.options[0].value;
         changePet(true); // 更新宠物信息,跳过确认提示
-    }
+    }updateDisplayContent()
     goldAmount += currentOffer;
     updateGoldDisplay(goldAmount);
     // 重置所有商人的状态
     merchants.forEach(merchant => merchant.reset());
     hasDealed = true;
-    resetPet();
     closeMerchantModal();
 }
 
@@ -11126,7 +11334,7 @@ function resetPet() {
     currentPet.qualities.intelligence.current = currentPet.qualities.intelligence.min;
 
     // 初始化等级和其他基础属性
-    initializeEnemyPet();
+    restoreEnemyState();
     defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
     updatePetInfo();
     currentSpecialization = null;
@@ -11148,7 +11356,6 @@ function resetPet() {
     hallucinationLevel = 0;
     experienceTreasureOpenCount = 0;
     armsOpened = false;// 武装上锁
-    battleRounds = 0; // 记录玩家胜利的轮次
     currentExp = 0; // 当前经验值
     maxExp = 208; // 经验值上限
     playerCritRate = 0.1; // 10%
@@ -13239,17 +13446,7 @@ function loadGameState() {
             restoreItems(); // 恢复道具数据
         }
         // 需要重新更新显示的内容
-        updatePetInfo();
-        updatePetDisplay();
-        updateQualityCard();
-        updateAttributePanel();
-        updateTopBarItems();
-        updateAscensionStatus();
-        updateAscensionDisplay();
-        updateAwakenStatus();
-        updateAscensionButton();
-        restoreEnemyState();
-        updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
+        updateDisplayContent();
         setInnerText("hallucination-level", hallucinationLevel);
         setInnerText("skill-score", skillScore);
         setInnerText("current-wisdom", currentWisdom);
@@ -13271,7 +13468,20 @@ function loadGameState() {
     showInfoBox("读档成功！");
 }
 
-
+function updateDisplayContent() {
+    updatePetInfo();
+    updatePetDisplay();
+    updateQualityCard();
+    updateAttributePanel();
+    updateTopBarItems();
+    updateAscensionStatus();
+    updateAscensionDisplay();
+    updateAwakenStatus();
+    updateAscensionButton();
+    restoreEnemyState();
+    updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
+    // ...
+}
     </script>
 </body>
 </html>

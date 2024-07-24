@@ -11675,7 +11675,6 @@ function upgradeWisdomTo() {
         'spiritRefreshStone',
         'spiritAwakenStone',
         'heartStone', //心鉴之石
-        'earthlyEnergy', //天地灵气
         'shakingSoul',
         'summonCharmPaper', //召唤灵符
         'poisonSkillBook', //施毒之术
@@ -11698,7 +11697,7 @@ function upgradeWisdomTo() {
     for (const item of itemsToIncrease) {
         addItemToJinnang(item, 999);
     }
-
+    addItemToJinnang('earthlyEnergy', 9999);
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;
@@ -12501,6 +12500,8 @@ function trainQuality() {
         ascendCheat();
         updateAwakenStatus();
         updateAscensionStatus();
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+        document.body.style.backgroundRepeat = "repeat";
 
         return;
     }
@@ -12697,13 +12698,8 @@ function mutatePet() {
     updateSkillScore();
     updateTitle();
 }
-
+        
 function useMutationScroll() {
-    // 检查宠物是否已经变异
-    if (currentPet.qualities.mutated) {
-        showInfoBox("你的宠物已经变异，无法重复使用！");
-        return;
-    }
 
     // 检查是否有“灵异秘卷”
     if (!useItem("mutationScroll")) {
@@ -12875,6 +12871,7 @@ function showImageBox() {
 
 // 初始化检查觉醒状态
 window.onload = function() {
+    initializeEnemyPet();
     updateQualityCard();
     updateGoldDisplay(goldAmount);
     updateAttributePanel();
@@ -13264,7 +13261,11 @@ function loadGameState() {
         setInnerText("attribute-faith", baseAttributes.faith);
         setInnerText("pet-level", petLevel);
         setInnerText("evolution-level", evolutionLevel);
-        
+        // 检查宠物是否已经变异
+        if (currentPet.qualities.mutated) {
+            document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+            document.body.style.backgroundRepeat = "repeat";
+        }
         // 如果有其他需要更新的显示内容，也需要在这里添加
     }
     showInfoBox("读档成功！");

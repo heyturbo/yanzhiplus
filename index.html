@@ -2798,16 +2798,21 @@ const biographies = {
         
 const enemyImages = [
     { status: 'default', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
-    { status: 'rampaged', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' }
+    { status: 'rampaged', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
+    { status: 'mao', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' }
 ];
 
 function changeEnemyImage() {
     let enemyImage;
-    if (!battleState.enemy.rampaged) {
-        enemyImage = enemyImages.find(image => image.status === 'default');
-    } else {
+
+    if (battleRounds >= 150) {
+        enemyImage = enemyImages.find(image => image.status === 'mao');
+    } else if (battleState.enemy.rampaged) {
         enemyImage = enemyImages.find(image => image.status === 'rampaged');
+    } else {
+        enemyImage = enemyImages.find(image => image.status === 'default');
     }
+
     if (enemyImage) {
         document.getElementById("enemy-image").src = enemyImage.url;
     }
@@ -3326,6 +3331,8 @@ function storeCurrentPetData() {
             enemyCritDamage: enemyCritDamage,
             ascensionEnabled: ascensionEnabled,
             poisonSkillActivated: poisonSkillActivated,
+            specializations: specializations,
+            currentSpecialization: currentSpecialization,
             spiritLevel: spiritLevel,
             spiritMultiplier: spiritMultiplier,
             reenableAscension: reenableAscension,
@@ -3496,6 +3503,11 @@ function updatePetDisplay() {
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
     document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
     document.getElementById("your-pet-image").src = currentPet.image;
+    // 检查宠物是否已经变异
+    if (currentPet.qualities.mutated) {
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
+        document.body.style.backgroundRepeat = "repeat";
+    }
 }
         
 function showSummonPanel() {
@@ -6114,7 +6126,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`你造成了 ${damage} 点物理伤害。`, 'white');
     }
@@ -6361,7 +6373,7 @@ function performIndependentMagicAttack() {
     // 根据是否暴击来记录日志
     if (isCritical) {
         logBattleEvent(`暴击！！本次对敌方造成了 ${damage} 点伤害。`, 'red');
-        showEffect('playerEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
+        showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`你造成了 ${damage} 点伤害。`, 'wheat');
     }
@@ -7381,7 +7393,7 @@ function performEnemyPhysicalAttack(isCritical) {
 
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`深渊巨魔施放黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
     }
@@ -7412,7 +7424,7 @@ function performEnemyMagicalAttack(isCritical) {
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'wheat');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/667a859bd9c307b7e96bc387.webp');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`深渊巨魔施放嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
@@ -13482,6 +13494,7 @@ function updateDisplayContent() {
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
     // ...
 }
+
     </script>
 </body>
 </html>

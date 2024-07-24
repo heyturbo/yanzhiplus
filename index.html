@@ -1008,7 +1008,6 @@
         
         .battle-system-content {
             display: flex;
-            gap: 10px;
             flex-direction: column;
             padding: 10px;
             width: 100%;
@@ -1067,8 +1066,9 @@
         .battle-system-actions {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 10px 10px;
+            gap: 10px 5px;
             width: 100%;
+            margin-top: 10px;
             flex-direction: row;
             flex-wrap: nowrap;
         }
@@ -1987,11 +1987,11 @@
             </div>
             <div class="battle-system-actions">
                 <button onclick="performAttack('physical')">物攻</button>
-                <button onclick="performAttack('magical')">法攻</button>
+                <button onclick="useDrug()">药品</button>
                 <button onclick="performHeal()">治疗</button>
                 <button onclick="performPoison()">施毒</button>
                 <button onclick="performDefense()">格挡</button>
-                <button onclick="useDrug()">药品</button>
+                <button onclick="performAttack('magical')">法攻</button>
                 <button id="battle-spirit-button">精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升</button>
                 <button onclick="divinedWeapon()">神器</button>
@@ -2047,8 +2047,19 @@
             <div>游戏时长: <span id="game-timer">00:00</span></div>
             <div>金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
             <div id="loadContainer" style="display:flex; justify-content: space-between; width: 100%;">
-                <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px;" onclick="saveGameState()">存档</button>
-                <button style="border: orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px;" onclick="loadGameState()">读档</button>
+            <button style="border: 1px solid orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" 
+                    onmouseover="this.style.backgroundColor='#ffd700'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
+                    onmouseout="this.style.backgroundColor='gold'; this.style.boxShadow='none';" 
+                    onmousedown="this.style.transform='scale(0.95)'; this.style.boxShadow='0 0 5px rgba(0, 0, 0, 0.2)';" 
+                    onmouseup="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
+                    onclick="saveGameState()">存档</button>
+            
+            <button style="border: 1px solid orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" 
+                    onmouseover="this.style.backgroundColor='#ffd700'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
+                    onmouseout="this.style.backgroundColor='gold'; this.style.boxShadow='none';" 
+                    onmousedown="this.style.transform='scale(0.95)'; this.style.boxShadow='0 0 5px rgba(0, 0, 0, 0.2)';" 
+                    onmouseup="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
+                    onclick="loadGameState()">读档</button>
             </div>
         </div>
     </div>    
@@ -12947,7 +12958,7 @@ function useMutationScroll() {
     updateQualityCard();
     updateSkillScore();
     updateTitle();
-    showInfoBox("在上古卷轴的教导下，你的宠物实现蜕变");
+    showInfoBox("在上古卷轴的教诲下，你的宠物实现了本质的蜕变");
 }
 
 // Example usage:
@@ -13494,7 +13505,6 @@ function updateDisplayContent() {
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
     // ...
 }
-
     </script>
 </body>
 </html>

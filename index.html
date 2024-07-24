@@ -3322,7 +3322,6 @@ function storeCurrentPetData() {
             experienceTreasureOpenCount: experienceTreasureOpenCount,
             armsOpened: armsOpened,
             armsAttributes: JSON.stringify(armsAttributes),
-            drugInventory: JSON.stringify(drugInventory),
             currentExp: currentExp,
             maxExp: maxExp,
             playerCritRate: playerCritRate,
@@ -3341,6 +3340,7 @@ function storeCurrentPetData() {
             secondAscensionSkill: secondAscensionSkill ? getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level) : null,
             ascensionAttributes: ascensionAttributes,
             drugBonus: drugBonus,
+            alreadyUseDrug: alreadyUseDrug,
             baseAttributes: baseAttributes,
             skillScore: skillScore,
             existingSkills: existingSkills, // 存储技能数据
@@ -3368,7 +3368,6 @@ function restorePetData(petName) {
         experienceTreasureOpenCount = savedPetData.experienceTreasureOpenCount;
         armsOpened = savedPetData.armsOpened;
         armsAttributes = JSON.parse(savedPetData.armsAttributes);
-        drugInventory = JSON.parse(savedPetData.drugInventory);
         currentExp = savedPetData.currentExp;
         maxExp = savedPetData.maxExp;
         playerCritRate = savedPetData.playerCritRate;
@@ -3385,6 +3384,7 @@ function restorePetData(petName) {
         secondAscensionSkill = savedPetData.secondAscensionSkill ? getSkillFromName(savedPetData.secondAscensionSkill.name, savedPetData.secondAscensionSkill.level) : null;
         ascensionAttributes = savedPetData.ascensionAttributes;
         drugBonus = savedPetData.drugBonus;
+        alreadyUseDrug = savedPetData.alreadyUseDrug;
         baseAttributes = savedPetData.baseAttributes;
         skillScore = savedPetData.skillScore;
         
@@ -11327,7 +11327,7 @@ function sellPet() {
         return;
     }
 
-    showInfoBox("你的宠物会被运送至市场供商人出价，无论结果如何，宠物都会被出售，你做好准备了吗？", () => {
+    showInfoBox("\n1. 你的宠物会被运送至市场供商人出价，无论市场估价结果如何，宠物都会被出售。\n2.请注意首页下拉栏显示名称与你想出售的宠物一致，否则将错误地出售其他宠物！", () => {
         showMerchantModal();
     });
 }

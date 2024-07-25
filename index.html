@@ -1145,6 +1145,27 @@
             transform: scale(0);
             transition: transform 0.5s ease, opacity 0.5s ease;
         }
+        .battleOverlay {
+            display: none; /* 默认不显示 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0);
+            z-index: 9999; /* 确保遮罩在最顶层 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .battleOverlayContainer {
+            width: 80%;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: transparent;
+        }
         
 #visualEffectsContainer {
     position: relative;
@@ -1880,6 +1901,11 @@
     </div>
     <div id="fightingDrawer" class="battle-system-drawer">
         <div class="battle-system-content">
+            <div id="battleOverlay" class="battleOverlay">
+                <div class="battleOverlayContainer">
+                    <img id="battleOverlayImage" src="" alt="Battle Animation" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+            </div>
         <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
@@ -2092,10 +2118,10 @@
                     { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
                     { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '防御技能，小金牛的防御能力得到了微量提升。' },
                     { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '治疗技能，得到生命祝福的小金牛治疗能力得到了提升。' },
-                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '物理攻击技能，愤怒的小金牛超负荷奔跑，只为了朝它讨厌的人使出致命性的冲撞。' },
+                    { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '物理攻击技能，愤怒的小金牛超负荷奔跑，对敌人使出致命的冲撞。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                    { name: '法力恫吓', rarity: 'B', type: 'MA', multiplier: 3, description: '法术攻击技能，对目标造成法术伤害' },
+                    { name: '灵兽冲刺', rarity: 'B', type: 'MA', multiplier: 3, description: '法术攻击技能，对目标造成法术伤害' },
                     { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' }
                 ],
@@ -2148,15 +2174,15 @@
                 skills: [
                   { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '生命力上升' },
                   { name: '烈焰祝福', rarity: 'B', type: 'N', multiplier: 0, description: '法术攻击上升' },
-                  { name: '法力灼烧', rarity: 'B', type: 'MA', multiplier: 1.5, description: '单体法术攻击同时消耗目标法力和生命值' },
+                  { name: '法力灼烧', rarity: 'B', type: 'MA', multiplier: 1.8, description: '单体法术攻击' },
                   { name: '焰灵护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
                   { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
-                  { name: '浴火重生', rarity: 'B', type: 'PH', multiplier: 1.4, description: '死亡后自动复活' },
+                  { name: '浴火重生', rarity: 'B', type: 'PH', multiplier: 1.4, description: '回复大量生命值' },
                   { name: '智慧祷言', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '火焰甲胄', rarity: 'A', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
                   { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
                   { name: '火焰环绕', rarity: 'S', type: 'PP', multiplier: 1.8, description: '为友军增加一个可以对物理攻击进行反伤状态' },
-                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2.8, description: '对敌方全体造成法术伤害并附带灼烧效果' }
+                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2, description: '对敌方全体造成法术伤害并附带灼烧效果' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2176,7 +2202,7 @@
                 skills: [
                   { name: '绝对防御', rarity: 'B', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
                   { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.3, description: '法术防御上升' },
-                  { name: '致命喷射', rarity: 'B', type: 'PA', multiplier: 1.6, description: '对目标及其周围共6个目标造成物理伤害' },
+                  { name: '致命喷射', rarity: 'B', type: 'PA', multiplier: 1.8, description: '对目标及其周围共6个目标造成物理伤害' },
                   { name: '野性冲撞', rarity: 'B', type: 'PA', multiplier: 1.5, description: '单体攻击有几率令目标晕眩' },
                   { name: '灵力充盈', rarity: 'B', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2, description: '对十字范围造成物理伤害并有几率附带混乱效果' },
@@ -2240,11 +2266,11 @@
                   { name: '长寿', rarity: 'A', type: 'N', multiplier: 0, description: '寿命上升' },
                   { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合法力恢复' },
                   { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '用法力抵挡部分伤害' },
-                  { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 1.5, description: '单体法术攻击同时消费目标的生命和法力值' },
+                  { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 1.8, description: '单体法术攻击同时消费目标的生命和法力值' },
                   { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '耐力、敏捷、强壮上升' },
                   { name: '极速领域', rarity: 'SS', type: 'N', multiplier: 0, description: '我方全体速度上升' },
-                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 1.4, description: '全体法术攻击并附带灼烧效果' },
-                  { name: '精气爆裂', rarity: 'S', type: 'MA', multiplier: 1.8, description: '对十字范围造成法术伤害，并同时消耗生命及法力' }
+                  { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2, description: '全体法术攻击并附带灼烧效果' },
+                  { name: '精气爆裂', rarity: 'S', type: 'MA', multiplier: 2.2, description: '对十字范围造成法术伤害，并同时消耗生命及法力' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2325,7 +2351,7 @@
                     { name: '万法归宗', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，法术暴击上升' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
-                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.2, description: '主动技能，对目标造成法术伤害并吸取一定得法力值' },
+                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害并吸取一定得法力值' },
                     { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
                     { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
                     { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
@@ -2333,7 +2359,7 @@
                     { name: '月之祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、智力上升' },
                     { name: '硕果累累', rarity: 'SS', type: 'MA', multiplier: 1.6, description: '主动技能，胭脂抖了抖身，漫天果实坠落，对深渊巨魔造成法术伤害，' },
                     { name: '琼珠玉液', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，胭脂小手一挥，为我方恢复量增加20%。' },
-                    { name: '灼若旭日', rarity: 'SS', type: 'MA', multiplier: 1.8, description: '主动技能，胭脂单手投掷石榴花给单体目标造成法术伤害。' },
+                    { name: '灼若旭日', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，胭脂单手投掷石榴花给单体目标造成法术伤害。' },
                     { name: '春风徐徐', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，胭脂每回合有概率生成霸体护盾，护盾可免疫部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽），成功生成时，将消耗一定的寿命。' },
                     { name: '榴花如丹', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，榴花如丹红似火，源源不断为胭脂永久提升耐力。' }
                 ],
@@ -2380,29 +2406,29 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/666af8afd9c307b7e90e4638.gif',
                 skills: [
-                    { name: '唯爱结城（防御）', rarity: 'SS', type: 'PD', multiplier: 1, description: '主动技能，如果此生只能爱一人，她的姓，必须是结城。' },
-                    { name: '跨国相遇（法攻）', rarity: 'A', type: 'MA', multiplier: 1, description: '主动技能，在一个异国他乡的采访中，命运让他们相遇，从此开始了一段浪漫的爱情故事。' },
-                    { name: '意外之事（法攻）', rarity: 'B', type: 'MA', multiplier: 1.2, description: '主动技能，一次意外的车祸让他们被困在一个偏远的小镇，爱情在危险中悄然萌芽。' },
-                    { name: '隐瞒身份（防御）', rarity: 'B', type: 'PD', multiplier: 1.2, description: '主动技能，他隐藏了自己的明星身份，只为在她面前做个普通人，享受片刻的平凡。' },
+                    { name: '唯爱结城（法攻）', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，如果此生只能爱一人，她的姓，必须是结城。' },
+                    { name: '跨国相遇（被动）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，在一个异国他乡的采访中，命运让他们相遇，从此开始了一段浪漫的爱情故事。' },
+                    { name: '意外之事（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，一次意外的车祸让他们被困在一个偏远的小镇，爱情在危险中悄然萌芽。' },
+                    { name: '隐瞒身份（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，他隐藏了自己的明星身份，只为在她面前做个普通人，享受片刻的平凡。' },
                     { name: '温柔一面（治疗）', rarity: 'S', type: 'PH', multiplier: 2, description: '主动技能，她在后台看到了他温柔的一面，这让她对他有了新的认识。' },
                     { name: '共同依赖（防御）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，在偏远小镇的日子里，他们面对未知的危险，渐渐彼此依赖。' },
                     { name: '发现真心（回蓝）', rarity: 'A', type: 'HL', multiplier: 0.2, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
-                    { name: '日记重现（治疗）', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，一本旧日记让她找回了失去的记忆，重新记起了他们之间的点点滴滴。' },
-                    { name: '心灵触动（物攻）', rarity: 'SS', type: 'PA', multiplier: 2.8, description: '主动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
+                    { name: '日记重现（被动）', rarity: 'A', type: 'N', multiplier: 1.5, description: '被动技能，一本旧日记让她找回了失去的记忆，重新记起了他们之间的点点滴滴。' },
+                    { name: '心灵触动（被动）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，看着他的真心付出，她的心灵被深深触动，爱情在心中萌芽。' },
                     { name: '保护她（物攻）', rarity: 'S', type: 'PA', multiplier: 2.5, description: '主动技能，他在关键时刻挺身而出，保护她免受伤害，展现了真正的男子汉气概。' },
-                    { name: '继父威胁（施毒）', rarity: 'B', type: 'PP', multiplier: 0.5, description: '主动技能，继父的威胁不断升级，他挺身而出，保护她不受伤害。' },
+                    { name: '继父威胁（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，继父的威胁不断升级，他挺身而出，保护她不受伤害。' },
                     { name: '记忆恢复（治疗）', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，在危机中，她的记忆终于完全恢复，找回了曾经的甜蜜时光。' },
-                    { name: '法律制裁（施毒）', rarity: 'B', type: 'PP', multiplier: 1.2, description: '主动技能，他揭穿了继父的阴谋，让继父受到应有的法律制裁。' },
-                    { name: '重返工作（治疗）', rarity: 'A', type: 'PH', multiplier: 1, description: '主动技能，她重返《Fantasy!》杂志，继续她的事业，与他一起迎接未来的挑战。' },
-                    { name: '幸福结局（法攻）', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，经历了无数波折，他们最终找到了真正的幸福，成为彼此生命中最重要的存在。' },
+                    { name: '法律制裁（施毒）', rarity: 'B', type: 'PP', multiplier: 1.6, description: '主动技能，他揭穿了继父的阴谋，让继父受到应有的法律制裁。' },
+                    { name: '重返工作（被动）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，她重返《Fantasy!》杂志，继续她的事业，与他一起迎接未来的挑战。' },
+                    { name: '幸福结局（被动）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，经历了无数波折，他们最终找到了真正的幸福，成为彼此生命中最重要的存在。' },
                     { name: '守护夏奈（守护）', rarity: 'SH', type: 'PD', multiplier: 1.2, description: '主动技能，如果此生只能守护一人，她的名，必须是夏奈。' }
                 ],
                 qualities: {
                     endurance: { current: 4500, min: 4500, max: 6500 },
-                    strength: { current: 7750, min: 7750, max: 13400 },
+                    strength: { current: 6500, min: 6500, max: 9800 },
                     faith: { current: 1800, min: 1800, max: 3200 },
                     agility: { current: 4950, min: 4950, max: 7050 },
-                    intelligence: { current: 6750, min: 6750, max: 10400 },
+                    intelligence: { current: 3350, min: 3350, max: 6150 },
                     mutated: false
                 }
             },
@@ -2477,7 +2503,7 @@
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定' },
                 { name: '元素力量（赐福）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，智力及强壮上升' },
                 { name: '天神祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法术攻击力大幅提升' },
-                { name: '元素力量（四相）', rarity: 'S', type: 'MA', multiplier: 1.5, description: '主动技能，白虎驭四相之力对敌方施加无法躲避的法术攻击！' },
+                { name: '元素力量（四相）', rarity: 'S', type: 'MA', multiplier: 1.8, description: '主动技能，白虎驭四相之力对敌方施加无法躲避的法术攻击！' },
                 { name: '虚无', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升' },
                 { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，减免受到敌方攻击的伤害' },
                 { name: '元素力量（结界）', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，使自身免疫大量伤害' },
@@ -2513,7 +2539,7 @@
                 { name: '所向披靡', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将可以吸取灵域力量为自己所用，永久增加自身物理攻击力' },
                 { name: '灵域行者', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将进入灵域可以快速穿梭于时空之中，增加自身速度' },
                 { name: '饮鸩止渴', rarity: 'S', type: 'PP', multiplier: 5, description: '主动技能，以毒作引突破身体极限，净角神将给深渊巨魔附加跗骨之毒，毒性威震四野' },
-                { name: '灵域处刑', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，净角神将可以观察到深渊巨魔灵魂深处的弱点，对敌方单体造成物理伤害' }
+                { name: '灵域处刑', rarity: 'SS', type: 'PA', multiplier: 3.5, description: '主动技能，净角神将可以观察到深渊巨魔灵魂深处的弱点，对敌方单体造成物理伤害' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2542,7 +2568,7 @@
                 { name: '蚍蜉撼树', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，深渊巨魔的力量在上古神藤前如同蚍蜉撼树。借助大地守护者的力量，在受到群体攻击时，减免部分伤害，减免的额度与技能等级有关' },
                 { name: '仁者无敌', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，仁慈的强者通过宽恕深渊巨魔亦可通往无敌之路。' },
                 { name: '木魔爆', rarity: 'SS', type: 'PA', multiplier: 1.8, description: '主动技能，召唤木之灵对敌方全体目标造成巨大伤害' },
-                { name: '一叶障目', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，上古神藤神力凝聚的一片树叶，对单个深渊巨魔造成大量伤害' },
+                { name: '一叶障目', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，上古神藤神力凝聚的一片树叶，对单个深渊巨魔造成大量伤害' },
                 { name: '洞天福地', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，上古神藤通过神力凝聚的洞天福地空间，大幅增加自身格挡能力' }
                 ],
                 qualities: {
@@ -2566,14 +2592,14 @@
                     { name: '如鱼得水', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，水中的锦鲤能力有所加强，物理攻击和法术攻击上升' },
                     { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术闪避上升' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害' },
+                    { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.6, description: '主动技能，对目标造成法术伤害' },
                     { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
-                    { name: '水魔爆', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，对敌全体造成物理伤害' },
+                    { name: '水魔爆', rarity: 'S', type: 'PA', multiplier: 2.2, description: '主动技能，对敌全体造成物理伤害' },
                     { name: '相濡以沫', rarity: 'S', type: 'PH', multiplier: 1.5, description: '主动技能，传于危难之时，锦鲤会的治疗能力大大提升！' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，法术攻击上升' },
                     { name: '借花献佛', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，上善若水，水善利万物而不争。当锦鲤受到伤害时，会将自身的受到的伤害值转化为对我方队友的治疗，治疗范围为以双鲤中心的十字范围队友。转化伤害的比例随技能等级提升。' },
                     { name: '锦鲤庇佑', rarity: 'SS', type: 'PD', multiplier: 1.2, description: '主动技能，传说锦鲤受莫大吉运庇佑，格挡能力提升。' },
-                    { name: '梦幻泡影', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，锦鲤凝结法术泡沫攻击敌方，造成大量法术伤害。' },
+                    { name: '梦幻泡影', rarity: 'SS', type: 'MA', multiplier: 2.2, description: '主动技能，锦鲤凝结法术泡沫攻击敌方，造成大量法术伤害。' },
                 ],
                 qualities: {
                     tier: '普通',
@@ -2593,7 +2619,7 @@
                 skills: [
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: ' 被动技能，每回合法力值恢复' },
-                    { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2.5, description: '主动技能，以三倍速度对目标发动攻击，以目标为中心的十字范围内所有其他目标都会被冲击的余波刮伤。' },
+                    { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 3, description: '主动技能，以三倍速度对目标发动攻击，以目标为中心的十字范围内所有其他目标都会被冲击的余波刮伤。' },
                     { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，此生物具有极高的格挡能力，可大大降低深渊巨魔造成的伤害。' },
                     { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
                     { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
@@ -2624,7 +2650,7 @@
                 { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
                 { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
-                { name: '牛气冲天', rarity: 'B', type: 'MA', multiplier: 1.6, description: '主动技能，单体攻击有几率令目标晕眩' },
+                { name: '牛气冲天', rarity: 'B', type: 'PA', multiplier: 2.2, description: '主动技能，单体攻击有几率令目标晕眩' },
                 { name: '魔灵诀心', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理攻击力和法术攻击力大幅提升' },
                 { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力及生命值上限上升' },
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
@@ -2690,12 +2716,12 @@
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
                     { name: '仙风道骨', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
-                    { name: '斑斑之鸠', rarity: 'A', type: 'PH', multiplier: 1.5, description: '主动技能，持有此技能者将自动拥有北京大学外交学院硕士研究生学历（学信网可查/非函授/全日制）。' },
+                    { name: '斑斑之鸠', rarity: 'S', type: 'PH', multiplier: 1.5, description: '主动技能，持有此技能者将自动拥有北京大学外交学院硕士研究生学历（学信网可查/非函授/全日制）。' },
                     { name: '美腿术', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，一双美腿是她引以为豪的本钱，学会此技能可为她增加速度。' },
                     { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
                     { name: '疗伤解毒', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，妲茗儿和在天宫捣药的前辈学到了疗伤解毒技能，增强恢复能力。' },
                     { name: '上善若水', rarity: 'SS', type: 'PH', multiplier: 1.6, description: '主动技能，会疗伤的妲茗儿治疗能力大大提升，妲茗儿法术攻击越高治疗效果越好。' },
-                    { name: '步步生莲', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，妲茗儿曼妙的舞姿迷惑深渊巨魔后对敌方所有目标进行攻击，我方血量最低1个单位受到鼓舞恢复一定血量。' },
+                    { name: '步步生莲', rarity: 'SS', type: 'MA', multiplier: 2.4, description: '主动技能，妲茗儿曼妙的舞姿迷惑深渊巨魔后对敌方所有目标进行攻击，我方血量最低1个单位受到鼓舞恢复一定血量。' },
                     { name: '气急攻心', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，妲茗儿天生是个急性子，每回合结束后消耗当前生命1%，恢复最大生命1%的血量，恢复生命需要以寿命作为献祭，每回合扣除100寿命（技能16级以后不消耗寿命）。' },
                     { name: '狡兔三窟', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，名刀之下，妲茗儿的治疗能力得到提升。' },
                 ],
@@ -2716,7 +2742,7 @@ const biographies = {
     xiaojin: [
         "1️⃣————该宠物无传记",
         "2️⃣————说了没有传记",
-        "3️⃣————小金牛最开心的事情就是把小鸡撞得人仰马翻"
+        "3️⃣————真的没有传记"
     ],
     bobo: [
         "1️⃣————在青丘的边境，有一片古老的森林，那里居住着一只名为波波熊的神秘生物。波波熊以其强大的“自然屏障”技能闻名，它能够在遇到危险时瞬间提升法术防御。据说，有一次森林遭遇了一场突如其来的火灾，魔法火焰肆虐，森林中的生灵无处躲藏。波波熊挺身而出，施展自然屏障，保护了整片森林的动植物。火焰在它的屏障前无力地消散，最终被彻底扑灭。森林得以幸存，波波熊的英勇事迹迅速传遍四方。自那以后，许多人慕名前来，希望一睹波波熊的风采，并向它学习如何与大自然和谐共处。",
@@ -2840,6 +2866,23 @@ function changeEnemyImage() {
     if (enemyImage) {
         document.getElementById("enemy-image").src = enemyImage.url;
     }
+}
+
+function showBattleOverlay(imageUrl) {
+    const overlay = document.getElementById('battleOverlay');
+    const overlayImage = document.getElementById('battleOverlayImage');
+
+    // 先清空图片
+    overlayImage.src = '';
+
+    // 设置新的图片 URL
+    overlayImage.src = imageUrl;
+    overlay.style.display = 'flex';
+
+    // 设置动画，0.5秒后自动隐藏遮罩
+    setTimeout(() => {
+        overlay.style.display = 'none';
+    }, 500);
 }
 
 //保存游戏道具
@@ -3944,22 +3987,22 @@ let selectedDrug = null;
 let alreadyUseDrug = false;
 let drugInventory = {
     "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后永久增加20000生命值，且恢复至满状态" },
-    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，恢复玩家2000点法力值" },
-    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", tier: 3, description: "绿色品阶，恢复玩家3000点生命值" },
+    "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，每1.5秒恢复2%生命值，持续3秒，可叠加生效" },
+    "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", tier: 3, description: "绿色品阶，每1.5秒恢复1%法力值，持续3秒，可叠加生效" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高10%暴击率" },
-    "神力仙丹": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，10秒内暴击伤害提高50%" },
+    "神力仙丹": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，20秒内暴击伤害提高50%" },
     "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高10%暴击伤害" },
-    "狂暴印记": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，10秒内暴击率提高50%" },
-    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，10s内增加150%物理攻击力。" },
+    "狂暴印记": { quantity: 2, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，20秒内暴击率提高50%" },
+    "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，20秒内增加150%物理攻击力。" },
     "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },
     "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 3, description: "绿色品阶，恢复玩家20%的法力值" },
-    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，10秒内深渊巨魔暴击率降低至0%" },
-    "见手青": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 0, description: "橙色品阶，投喂敌人后，敌人能力下降50%直至敌人失败" },
+    "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，30秒内深渊巨魔暴击率降低至0%" },
+    "见手青": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 0, description: "橙色品阶，投喂敌人后敌人会中毒，能力下降50%，直至本轮胜利" },
     "沉檀凝香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
-    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
+    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
-    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
+    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后30秒内怪物的物理防御和法术防御归0" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
@@ -4138,6 +4181,8 @@ function updateDrugGrid() {
             .find(item => item.querySelector('div').innerText.startsWith(selectedDrug));
         if (selectedDrugItem) {
             selectedDrugItem.style.border = '2px solid white'; // 视觉提示
+            selectedDrugItem.style.borderRadius = '10px'; // 视觉提示
+            selectedDrugItem.style.padding = '5px'; // 视觉提示
         }
     }
 }
@@ -4155,7 +4200,7 @@ function checkConflictingBuffs(selectedDrug) {
     if (conflictingDrugs.includes(selectedDrug)) {
         for (const drug of conflictingDrugs) {
             if (activeBuffs[drug]) {
-                showInfoBox("已有同系效果发挥作用了");
+                showInfoBox("已有同系效果发挥作用或正在冷却中，无法叠加效果使用");
                 return true;
             }
         }
@@ -4227,7 +4272,7 @@ function useSelectedDrug() {
     }
 
     if (activeBuffs[selectedDrug]) {
-        showInfoBox(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
+        showInfoBox(`${selectedDrug}效果尚在冷却中，无法叠加使用。`);
         return;
     }
 
@@ -4247,12 +4292,38 @@ function useSelectedDrug() {
                 logBattleEvent(`使用长生泉，你如获新生。`, 'gold');
                 break;
             case "三花丸":
-                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 2000);
-                logBattleEvent(`使用三花丸，恢复了2000点法力值。`, 'gold');
+                const manaDuration = 3 * 1000; // 3 seconds
+                const manaInterval = 1.5 * 1000; // 0.5 second
+                const manaRegenAmount = Math.floor(maxMana * 0.01); // 1% of max mana
+
+                let manaElapsedTime = 0;
+                const manaRegenInterval = setInterval(() => {
+                    if (manaElapsedTime >= manaDuration) {
+                        clearInterval(manaRegenInterval);
+                    } else {
+                        battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + manaRegenAmount);
+                        logBattleEvent(`法力值 + ${manaRegenAmount}点。`, 'gold');
+                        updateUI();
+                        manaElapsedTime += manaInterval;
+                    }
+                }, manaInterval);
                 break;
             case "忘忧水":
-                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 3000);
-                logBattleEvent(`使用忘忧水，恢复了3000点生命值。`, 'gold');
+                const healthDuration = 3 * 1000; // 3 seconds
+                const healthInterval = 1.5 * 1000; // 0.5 second
+                const healthRegenAmount = Math.floor(maxHealth * 0.02); // 2% of max health
+
+                let healthElapsedTime = 0;
+                const healthRegenInterval = setInterval(() => {
+                    if (healthElapsedTime >= healthDuration) {
+                        clearInterval(healthRegenInterval);
+                    } else {
+                        battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRegenAmount);
+                        logBattleEvent(`生命值 + ${healthRegenAmount}点。`, 'gold');
+                        updateUI();
+                        healthElapsedTime += healthInterval;
+                    }
+                }, healthInterval);
                 break;
             case "寒天之晶":
                 applyTimedBuff(
@@ -4262,14 +4333,14 @@ function useSelectedDrug() {
                         const originalMagicDefense = battleState.enemy.magicDefense;
                         battleState.enemy.physicalDefense = 0;
                         battleState.enemy.magicDefense = 0;
-                        logBattleEvent(`使用寒天之晶，10秒内怪物的物理防御和法术防御归0。`, 'gold');
+                        logBattleEvent(`使用寒天之晶，30秒内怪物的物理防御和法术防御归0。`, 'gold');
                         return () => {
                             battleState.enemy.physicalDefense = originalPhysicalDefense;
                             battleState.enemy.magicDefense = originalMagicDefense;
                             logBattleEvent(`寒天之晶效果消失。`, 'red');
                         };
                     },
-                    10000
+                    30000
                 );
                 break;
             case "幸运金币":
@@ -4363,7 +4434,7 @@ function useSelectedDrug() {
                 if (!activeBuffs[selectedDrug]) {
                     applyBuff(selectedDrug);
                 } else {
-                    showInfoBox(`${selectedDrug}效果尚在持续中，无法叠加使用。`);
+                    showInfoBox(`${selectedDrug}效果尚在冷却中，无法叠加使用。`);
                     return;  // 提前返回，防止数量减少
                 }
                 break;
@@ -4420,13 +4491,13 @@ function applyBuff(drugName) {
                 () => {
                     const originalPhysicalAttack = battleAttributes.physicalAttack;
                     battleAttributes.physicalAttack = Math.floor(battleAttributes.physicalAttack * 1.5);
-                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续10秒。`, 'gold');
+                    logBattleEvent(`使用武尊秘露，物理攻击力提升150%，持续20秒。`, 'gold');
                     return () => {
                         battleAttributes.physicalAttack = originalPhysicalAttack;
-                        logBattleEvent(`武尊秘露效果消失。`, 'red');
+                        logBattleEvent(`武尊秘露冷却结束。`, 'red');
                     };
                 },
-                10000
+                20000
             );
             break;
         case "神力仙丹":
@@ -4434,13 +4505,13 @@ function applyBuff(drugName) {
                 drugName,
                 () => {
                     playerCritDamage = Math.min(30.0, playerCritDamage + 0.50); // 最大3000%
-                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续10秒。`, 'gold');
+                    logBattleEvent(`使用神力仙丹，暴击伤害提高50%，持续20秒。`, 'gold');
                     return () => {
                         playerCritDamage = playerCritDamage - 0.5;
-                        logBattleEvent(`神力仙丹效果消失。`, 'red');
+                        logBattleEvent(`神力仙丹冷却结束。`, 'red');
                     };
                 },
-                10000
+                20000
             );
             break;
         case "狂暴印记":
@@ -4448,13 +4519,13 @@ function applyBuff(drugName) {
                 drugName,
                 () => {
                     playerCritRate = Math.min(10.0, playerCritRate + 0.50); // 最大1000%
-                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续10秒。`, 'gold');
+                    logBattleEvent(`使用狂暴印记，暴击率提高50%，持续20秒。`, 'gold');
                     return () => {
                         playerCritRate = playerCritRate - 0.5;
-                        logBattleEvent(`狂暴印记效果消失。`, 'red');
+                        logBattleEvent(`狂暴印记冷却结束。`, 'red');
                     };
                 },
-                10000
+                20000
             );
             break;
         case "化功散":
@@ -4463,13 +4534,13 @@ function applyBuff(drugName) {
                 () => {
                     const originalEnemyCritRate = enemyCritRate;
                     enemyCritRate = 0;
-                    logBattleEvent(`使用化功散，深渊巨魔暴击率降低至0%，持续10秒。`, 'gold');
+                    logBattleEvent(`使用化功散，深渊巨魔暴击率降低至0%，持续30秒。`, 'gold');
                     return () => {
                         enemyCritRate = originalEnemyCritRate;
-                        logBattleEvent(`化功散效果消失。`, 'red');
+                        logBattleEvent(`化功散冷却结束。`, 'red');
                     };
                 },
-                10000
+                30000
             );
             break;
         case "沉檀凝香":
@@ -4498,16 +4569,16 @@ function applyBuff(drugName) {
                         battleAttributes.magicAttack = Math.floor(battleAttributes.magicAttack * 1.5);
                         playerCritRate = Math.min(10.0, playerCritRate + 0.50); // 最大1000%
                         playerCritDamage = Math.min(30.0, playerCritDamage + 0.50); // 最大3000%
-                        logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续10秒。`, 'gold');
+                        logBattleEvent(`使用焚灵之丸，消耗20%生命值，提升50%物理攻击力、法术攻击、暴击率和暴击伤害，持续20秒。`, 'gold');
                         return () => {
                             battleAttributes.physicalAttack = originalPA;
                             battleAttributes.magicAttack = originalMA;
                             playerCritRate -= 0.5;
                             playerCritDamage -= 0.5;
-                            logBattleEvent(`焚灵之丸效果消失。`, 'red');
+                            logBattleEvent(`焚灵之丸冷却结束。`, 'red');
                         };
                     },
-                    10000
+                    20000
                 );
             } else {
                 showInfoBox("焚灵之丸效果无法触发，生命值不足20%。");
@@ -5313,6 +5384,10 @@ function updatePetInfo() {
     battleAttributes = { ...battleState.player };
     maxHealth = battleAttributes.health;
     maxMana = battleAttributes.mana;
+    
+    if (playerCritRate > 1) {
+        playerCritRate = 1;
+    }
 
     updateUI();
     attributesFetched = true;
@@ -5421,6 +5496,7 @@ function updateEnemyAttributes() {
 
     battleState.enemy = { ...enemyPet };
     storeEnemyInitialState();
+    handleRampaged();
 }
 
 function updateUI() {
@@ -5476,8 +5552,8 @@ function updateUI() {
     document.getElementById("enemy-crit-damage").innerText = Math.round(enemyCritDamage * 100) + '%';
     
     // 更新状态显示
-    document.getElementById("player-status").innerText = getPlayerStatus();
-    document.getElementById("enemy-status").innerText = getEnemyStatus();
+    updatePlayerStatusDisplay();
+    updateEnemyStatusDisplay();
     document.getElementById('battleRounds').innerText = battleRounds;
     enemyLevel = battleRounds;
     document.getElementById('enemy-level').innerText = enemyLevel;
@@ -5486,13 +5562,13 @@ function updateUI() {
 }
 
 function updateHealthAndManaDisplay() {
-    updateDisplay('your-pet-health', 'your-pet-max-health', '#cc0000', 20, '#cc0000');
-    updateDisplay('your-pet-mana', 'your-pet-max-mana', '#0066ff', 10, '#0066ff');
-    updateDisplay('enemy-pet-health', 'enemy-max-health', '#cc0000', 20, '#cc0000');
-    updateDisplay('enemy-pet-mana', 'enemy-max-mana', '#0066ff', 10, '#0066ff');
+    updateDisplay('your-pet-health', 'your-pet-max-health', 'health', 20, '#cc0000');
+    updateDisplay('your-pet-mana', 'your-pet-max-mana', 'mana', 10, '#0066ff');
+    updateDisplay('enemy-pet-health', 'enemy-max-health', 'health', 20, '#cc0000');
+    updateDisplay('enemy-pet-mana', 'enemy-max-mana', 'mana', 10, '#0066ff');
 }
 
-function updateDisplay(currentId, maxId, color, warningThreshold, warningColor) {
+function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
     const currentElement = document.getElementById(currentId);
     const maxElement = document.getElementById(maxId);
 
@@ -5501,9 +5577,16 @@ function updateDisplay(currentId, maxId, color, warningThreshold, warningColor) 
 
     const percentage = (currentValue / maxValue) * 100;
 
+    let gradientColor;
+    if (type === 'health') {
+        gradientColor = 'linear-gradient(to bottom, #800000, #FF0000, #800000)';
+    } else if (type === 'mana') {
+        gradientColor = 'linear-gradient(to bottom, #0000CD, #00BFFF, #0000CD)';
+    }
+
     currentElement.innerHTML = `
         <div style="width: 100%; background-color: #888; border-radius: 5px; overflow: hidden; position: relative;">
-            <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background-color: ${color}; text-align: center; color: white; font-weight: bold; transition: width 0.5s ease-in-out;">
+            <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background: ${gradientColor}; text-align: center; color: white; font-weight: bold; transition: width 0.5s ease-in-out;">
                 <span style="text-stroke: 1px black;">${currentValue}/${maxValue}</span>
             </div>
             ${percentage < warningThreshold ? `
@@ -5515,6 +5598,84 @@ function updateDisplay(currentId, maxId, color, warningThreshold, warningColor) 
     maxElement.style.display = 'none';
 }
 
+// 全局解控
+let originalPerformAttack = performAttack;
+let originalPerformPhysicalAttack = performPhysicalAttack;
+let originalPerformMagicalAttack = performMagicalAttack;
+let originalPerformHeal = performHeal;
+let originalPerformPoison = performPoison;
+let originalPerformDefense = performDefense;
+
+const effectCooldowns = {
+    drunken: false,
+    healingBan: false,
+    soulCapture: false,
+    blindfold: false,
+    spellSlow: false,
+    torn: false,
+    suppressed: false,
+    taunt: false,
+    seal: false,
+};
+        
+function clearEnemyEffect() {
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
+
+    effects.forEach(effect => {
+        if (battleState.player[effect]) {
+            battleState.player[effect] = false;
+            effectCooldowns[effect] = false;
+
+            switch (effect) {
+                case 'drunken':
+                    // 清除醉酒效果，直接设置状态为false即可
+                    break;
+                case 'healingBan':
+                    // 清除禁疗效果，直接设置状态为false即可
+                    break;
+                case 'soulCapture':
+                    // 清除摄魂效果，恢复攻击力
+                    battleAttributes.physicalAttack *= 2;
+                    battleAttributes.magicAttack *= 2;
+                    updateUI();
+                    updatePlayerStatusDisplay();
+                    break;
+                case 'torn':
+                    // 清除撕裂效果，停止持续伤害
+                    clearInterval(battleState.player.tornInterval);
+                    break;
+                case 'suppressed':
+                    // 清除压制效果
+                    cleanSuppressed();
+                    break;
+                case 'taunt':
+                    // 清除嘲讽效果，恢复原始函数
+                    clearTaunt();
+                    break;
+                case 'seal':
+                    // 清除封印效果，恢复原始技能名称
+                    ascensionSkill.name = battleState.player.originalAscensionSkill;
+                    secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
+                    updateAscensionDisplay();
+                    updateSecondAscensionDisplay();
+                    updateUI();
+                    break;
+            }
+        }
+    });
+
+    updatePlayerStatusDisplay();
+}
+
+function clearPlayerEffect() {
+    const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
+    effects.forEach(effect => {
+        battleState.enemy[effect] = false;
+        effectCooldowns[effect] = false;
+    });
+    updateEnemyStatusDisplay();
+}
+            
 function getPlayerStatus() {
     let status = [];
     if (battleState.player.divineProtection) status.push("仙气护体");
@@ -6469,10 +6630,11 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
+
 //神器系统的描述
 const weaponDescriptions = {
     lostBook: "遗失的洛书开启后，能够为你的物理技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.破甲：根据物理攻击扣除怪物的物理防御力 \n2.恐吓：持续时间内禁止怪物触发暴击 \n3.眩晕：持续时间内怪物无法动作 \n4.穿透：造成伤害时额外附加物理攻击1/10的穿透伤害，并在持续时间结束后基于穿透伤害总和的一定比例给予怪物余波收尾伤害 \n5.麻痹：根据本次物理伤害减少怪物的血量上限",
-    fragmentedMap: "残页的河图开启后，能够为你的法术技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.迟缓：根据伤害量的比例降低敌人的当前速度 \n2.沉默：持续时间内禁止怪物施放法术技能及附加减益效果 \n3.混乱：持续时间内怪物可能会攻击自己 \n4.灼烧：造成伤害时会给敌人附加额外灼烧伤害，己方速度之于怪物越快，灼烧伤害越猛烈 \n5.法力燃烧：根据本次法术伤害减少怪物的当前法力值",
+    fragmentedMap: "残页的河图开启后，能够为你的法术技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.迟缓：根据伤害量的比例降低敌人的当前速度 \n2.沉默：持续时间内禁止怪物施放法术技能及附加减益效果 \n3.混乱：持续时间内怪物可能会攻击自己 \n4.灼烧：造成伤害时会给敌人附加额外灼烧伤害，己方速度之于怪物越快，灼烧伤害越猛烈 \n5.法力燃烧：根据本次法术伤害减少怪物的当前法力值，敌人法力为空时，将转化为生命伤害。",
     nirvanaGem: "定空的灵石开启后，每秒有概率驱散减益效果，同时最多驱散5个效果。可以驱散效果如下：\n1.醉酒：法术效果，玩家攻击怪物时会受到10%的反弹溅射伤害 \n2.禁疗：法术效果，持续时间内禁止玩家使用治疗技能 \n3.摄魂：法术效果，持续时间内玩家物理和法术攻击减半 \n4.失明：法术效果，持续时间内玩家物理攻击会被怪物闪避 \n5.法术迟钝：法术效果，持续时间内玩家使用法术技能时法力消耗值增至100倍 \n6.撕裂：物理效果，持续时间内玩家会受到每0.5秒的持续掉血效果，掉血量与怪物物理攻击有关 \n7.嘲讽：物理效果，持续时间内玩家的所有战斗行为会强制指向物理攻击，且物理伤害增至200% \n8.压制：物理效果，玩家若没有在3秒内做出战斗行为，血量会降至1 \n9.封印：物理效果，持续时间内玩家的飞升技能会被封印，使其无法生效"
 };
 
@@ -6880,7 +7042,7 @@ const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
 function divinedWeapon() {
     if (!divinedWeaponStatus) {
-        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。神器的开启和使用需要消耗大量经验值或特定的「钥匙」。");
+        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。/n1. 神器的开启和使用需要消耗大量经验值或特定的「钥匙」。 /n2. 【升满】按钮会根据你当前经验值或所拥有的道具数量直接升至最大值，请知悉。/n3. 不建议未满级（200级）前执行神器升级操作。");
         divinedWeaponStatus = true;
     }
     divineWeaponManager.openDivineWeaponUI();
@@ -7016,17 +7178,7 @@ function applyMagicAttackEffects(damage) {
             }, 3000); // 沉默持续3秒
             break;
         case '迟缓':
-            const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
-            battleState.enemy.speed -= slowAmount; // 速度降低
-            battleState.enemy.slow = true;
-            logBattleEvent(`深渊巨魔被迟缓，速度降低了 ${slowAmount} 点。`, 'wheat');
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
-            updateEnemyStatusDisplay();
-            setTimeout(() => {
-                battleState.enemy.speed += slowAmount;
-                battleState.enemy.slow = false;
-                updateEnemyStatusDisplay();
-            }, 10000); // 迟缓持续10秒
+            handleSlow();
             break;
         case '混乱':
             battleState.enemy.dazed = true; // 深渊巨魔混乱
@@ -7039,9 +7191,24 @@ function applyMagicAttackEffects(damage) {
             }, 5000); // 混乱持续5秒
             break;
         case '法力燃烧':
-            const manaLoss = Math.floor(damage * 0.6);
-            battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaLoss);
-            logBattleEvent(`法力燃烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
+            const manaLoss = Math.floor(damage * 0.8);
+            let actualManaLoss = manaLoss;
+            let healthLoss = 0;
+
+            if (battleState.enemy.mana < manaLoss) {
+                actualManaLoss = battleState.enemy.mana;
+                healthLoss = manaLoss - actualManaLoss;
+            }
+
+            battleState.enemy.mana = Math.max(0, battleState.enemy.mana - actualManaLoss);
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - healthLoss);
+
+            if (healthLoss > 0) {
+                logBattleEvent(`敌人的法力已经燃烧殆尽，敌人开始燃烧生命之力！失去了 ${healthLoss} 点生命值。`, '#FF4500');
+            } else {
+                logBattleEvent(`法力燃烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
+            }
+
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
             break;
         case '灼烧':
@@ -7144,6 +7311,10 @@ function performPoison() {
 }
 
 function handlePoison(skillMultiplier = 1) {
+    if (battleState.enemy.poisoned) {
+        return;
+    }
+    
     battleState.enemy.poisoned = true;
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif'); // 示例效果图，可以替换为实际中毒效果图
     updateEnemyStatusDisplay();
@@ -7334,16 +7505,42 @@ function enemyAttack() {
         return;
     }
 
-    handleRampaged();
-
     if (handleDazed()) return;
     if (handleStunned()) return;
 
     const enemyHealthPercentage = battleState.enemy.health / enemyMaxHealth;
+    const enemyManaPercentage = battleState.enemy.mana / enemyMaxMana;
     const healProbability = enemyHealthPercentage < 0.3 ? 0.7 : 0.1;
 
     if (Math.random() < healProbability) {
         enemyHeal();
+        return;
+    }
+
+    // 新增偷窃逻辑
+    if (enemyHealthPercentage < 0.05 && Math.random() < 0.5 && drugInventory['延寿露'] && drugInventory['延寿露'].quantity > 0) {
+        if (Math.random() < 0.8) {
+            const healthRecovered = Math.floor(enemyMaxHealth * 0.2);
+            battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
+            drugInventory['延寿露'].quantity -= 1;
+            logBattleEvent(`深渊巨魔窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
+        } else {
+            logBattleEvent("深渊巨魔想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
+            handleSlow(); // 直接应用迟缓效果
+        }
+    } else if (enemyManaPercentage < 0.05 && Math.random() < 0.5 && drugInventory['天山雪莲'] && drugInventory['天山雪莲'].quantity > 0) {
+        if (Math.random() < 0.8) {
+            const manaRecovered = Math.floor(enemyMaxMana * 0.2);
+            battleState.enemy.mana = Math.min(enemyMaxMana, battleState.enemy.mana + manaRecovered);
+            drugInventory['天山雪莲'].quantity -= 1;
+            logBattleEvent(`深渊巨魔窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
+        } else {
+            logBattleEvent("深渊巨魔想窃取你的资源，但你识破了，没受到任何损失", 'wheat');
+            handleSlow(); // 直接应用迟缓效果
+        }
+        updateUI();
         return;
     }
 
@@ -7352,7 +7549,6 @@ function enemyAttack() {
 
     if (battleState.enemy.intimidated) {
         isCritical = false;
-        logBattleEvent("深渊巨魔被恐吓，无法暴击。", 'wheat');
     }
 
     const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
@@ -7361,7 +7557,7 @@ function enemyAttack() {
     } else if (attackType === 'magical' && !battleState.enemy.silenced) {
         damage = performEnemyMagicalAttack(isCritical);
     } else {
-        logBattleEvent("深渊巨魔被沉默，无法进行法术攻击。", 'wheat');
+        logBattleEvent("深渊巨魔被沉默，无法进行法术攻击。", 'white');
         return;
     }
 
@@ -7383,6 +7579,20 @@ function enemyAttack() {
         updateUI();
         playerTurn = true;
     }
+}
+// 直接应用迟缓效果的函数
+function handleSlow() {
+    const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
+    battleState.enemy.speed -= slowAmount; // 速度降低
+    battleState.enemy.slow = true;
+    logBattleEvent(`深渊巨魔被迟缓，速度降低了 ${slowAmount} 点。`, 'wheat');
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
+    updateEnemyStatusDisplay();
+    setTimeout(() => {
+        battleState.enemy.speed += slowAmount;
+        battleState.enemy.slow = false;
+        updateEnemyStatusDisplay();
+    }, 10000); // 迟缓持续10秒
 }
 
 function handleRampaged() {
@@ -7848,85 +8058,6 @@ function applyEnemyMagicEffects(damage) {
     });
 }
 
-// 全局解控
-let originalPerformAttack = performAttack;
-let originalPerformPhysicalAttack = performPhysicalAttack;
-let originalPerformMagicalAttack = performMagicalAttack;
-let originalPerformHeal = performHeal;
-let originalPerformPoison = performPoison;
-let originalPerformDefense = performDefense;
-
-const effectCooldowns = {
-    drunken: false,
-    healingBan: false,
-    soulCapture: false,
-    blindfold: false,
-    spellSlow: false,
-    torn: false,
-    suppressed: false,
-    taunt: false,
-    seal: false,
-};
-        
-function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
-
-    effects.forEach(effect => {
-        if (battleState.player[effect]) {
-            battleState.player[effect] = false;
-            effectCooldowns[effect] = false;
-
-            switch (effect) {
-                case 'drunken':
-                    // 清除醉酒效果，直接设置状态为false即可
-                    break;
-                case 'healingBan':
-                    // 清除禁疗效果，直接设置状态为false即可
-                    break;
-                case 'soulCapture':
-                    // 清除摄魂效果，恢复攻击力
-                    battleAttributes.physicalAttack *= 2;
-                    battleAttributes.magicAttack *= 2;
-                    updateUI();
-                    updatePlayerStatusDisplay();
-                    break;
-                case 'torn':
-                    // 清除撕裂效果，停止持续伤害
-                    clearInterval(battleState.player.tornInterval);
-                    break;
-                case 'suppressed':
-                    // 清除压制效果
-                    cleanSuppressed();
-                    break;
-                case 'taunt':
-                    // 清除嘲讽效果，恢复原始函数
-                    clearTaunt();
-                    break;
-                case 'seal':
-                    // 清除封印效果，恢复原始技能名称
-                    ascensionSkill.name = battleState.player.originalAscensionSkill;
-                    secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
-                    updateAscensionDisplay();
-                    updateSecondAscensionDisplay();
-                    updateUI();
-                    break;
-            }
-        }
-    });
-
-    updatePlayerStatusDisplay();
-}
-
-function clearPlayerEffect() {
-    const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
-    effects.forEach(effect => {
-        battleState.enemy[effect] = false;
-        effectCooldowns[effect] = false;
-    });
-    updateEnemyStatusDisplay();
-}
-
-
 function handleBurnt() {
     if (battleState.enemy.burnt) {
         let burntDamage = 0;
@@ -7949,7 +8080,6 @@ function handleBurnt() {
         }
     }
 }
-
 
 function handleCriticalHit(isCritical) {
     if (isCritical) {
@@ -8192,7 +8322,7 @@ function showNextBattlePrompt(playerWon) {
 
         goldAmount += reward;
         logBattleEvent(`您赢得了此次战斗，金子+${reward}文！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png');
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png");
 
         battleRounds++;
         updateGoldDisplay(goldAmount);
@@ -8215,9 +8345,8 @@ function showNextBattlePrompt(playerWon) {
         } else {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
-
         showInfoBox(`您已经输掉此次战斗，扣除金子-${penalty}文！请再接再厉，点击任意按钮重置战斗！`);
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp');
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp");
         updateGoldDisplay(goldAmount);
     }
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
@@ -12825,6 +12954,12 @@ function trainQuality() {
         showInfoBox("您的宠物已经觉醒，无法还童！");
         return;
     }
+
+    if (currentPet.qualities.mutated) {
+        showInfoBox("您的宠物已经变异，无法使用一键还童！");
+        return;
+    }
+        
     const targetTier = prompt("请选择预期成长（普通，优秀，杰出，卓越，完美）:");
     if (targetTier === null) return;
     const stopOnMutation = confirm("宠物如果发生变异则停止还童？");
@@ -13089,7 +13224,17 @@ function useMutationScroll() {
         showInfoBox("灵异秘卷只能通过奇馈宝箱获得，传说中习得灵异秘卷中关于神兽之道的宠物，资质和成长率会获得质的跃迁！");
         return;
     }
+        
+    if (awakened) {
+        showInfoBox("您的宠物已经觉醒，无法使用灵异秘卷！");
+        return;
+    }
 
+    if (currentPet.qualities.mutated) {
+        showInfoBox("您的宠物已经变异，无法使用灵异秘卷！");
+        return;
+    }
+        
     // 设置宠物品质
     currentPet.qualities.tier = '完美';
     currentPet.qualities.growthRate = 400;
@@ -13656,6 +13801,7 @@ function updateDisplayContent() {
     updateAscensionButton();
     restoreEnemyState();
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
+    updateExpBar();
     // ...
 }
     </script>

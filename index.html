@@ -1942,10 +1942,10 @@
                     <p>法攻增加: <span id="spirit-magic-attack">0</span></p>
                     <p>法防增加: <span id="spirit-magic-defense">0</span></p>
                     <p>速度增加: <span id="spirit-speed">0</span></p>
-                    <div id="spirit-actions">
+                    <div id="spirit-actions" style="display: flex; flex-direction:row; justify-content:space-between;">
                     <button id="level-up-spirit">升级精灵</button>
                     <button id="enhance-spirit">增幅洗练</button>
-                    <button id="auto-level-up-spirit">一键速升</button>
+                    <button id="auto-level-up-spirit">一键升级</button>
                     <button id="close-spirit-modal">关闭面板</button>    
                     </div>
                 </div>
@@ -2005,7 +2005,6 @@
                 </div>
             </div>
             <div class="battle-pet-selector"><select id="battle-pet-select" onchange="changeBattlePet()"><option value="xiaojin"></option></select></div>
-            <div id="divinedWeaponEffect" class="visual-effect"></div>
             <div class="battle-system-log">
                 <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
@@ -3373,10 +3372,15 @@ function storeCurrentPetData() {
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
 }
-
+let alreadyLoadGameState = false;
 // 恢复指定宠物的数据
 function restorePetData(petName) {
     const savedPetData = JSON.parse(localStorage.getItem(`petData_${petName}`));
+    if (!alreadyLoadGameState) {
+        showInfoBox("当前宠物有系统数据，读档后可以直接读取");
+        return;
+    }
+    
     if (savedPetData) {
         currentPet = JSON.parse(savedPetData.currentPet);
         petLevel = savedPetData.petLevel;
@@ -5754,28 +5758,38 @@ function jumpByTenRounds() {
 //自动战斗函数
 let autoBattleInterval = null;
 
-function autoBattle() {
+function clearAutoBattle() {
     if (autoBattleInterval !== null) {
         clearInterval(autoBattleInterval);
         autoBattleInterval = null;
         logBattleEvent("自动战斗已停止。", 'red');
+    }
+}
+
+function autoBattle() {
+    if (autoBattleInterval !== null) {
+        clearAutoBattle();
         return;
     }
 
     logBattleEvent("自动战斗已开始。", 'green');
 
+    if (!battleState || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        clearAutoBattle();
+        return;
+    }
+
     autoBattleInterval = setInterval(() => {
         if (!battleState || !battleState.enemy) {
             console.error("战斗状态未初始化");
-            clearInterval(autoBattleInterval);
-            autoBattleInterval = null;
+            clearAutoBattle();
             return;
         }
 
         // 检查玩家是否赢得战斗
         if (battleState.playerWon === false) {
-            clearInterval(autoBattleInterval);
-            autoBattleInterval = null;
+            clearAutoBattle();
             logBattleEvent("本轮失败，终止自动战斗。", 'red');
             showNextBattlePrompt(false); // 玩家失败，传递失败状态
             battleState.playerWon = true;
@@ -5783,7 +5797,7 @@ function autoBattle() {
         }
 
         // 根据玩家生命值和状态进行行动
-        if (battleAttributes.health / maxHealth < 0.5) {
+        if (battleAttributes.health / maxHealth < 0.5 && playerTurn) {
             if (Math.random() < 0.5) {
                 performDefense();
             } else {
@@ -5814,17 +5828,17 @@ function autoBattle() {
             }
         }
 
-        if (battleState.player.blindfold) {
+        if (battleState.player.blindfold && playerTurn) {
             performAttack('magical');
         } else {
             if (Math.random() < 0.99) {
-                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
+                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
                     performAttack('magical');
                 } else {
                     performAttack('physical');
                 }
             } else {
-                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
+                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
                     performAttack('physical');
                 } else {
                     performAttack('magical');
@@ -6332,6 +6346,10 @@ function performAttack(type) {
         showNextBattlePrompt(false);
         return;
     }
+    
+    if (!battleState.player.taunt) {
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    }
 
     const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(type);
     let damageResult;
@@ -6451,11 +6469,13 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
-    const weaponDescriptions = {
-        lostBook: "This is the description for the Lost Book.",
-        fragmentedMap: "This is the description for the Fragmented Map.",
-        nirvanaGem: "This is the description for the Nirvana Gem."
-    };
+//神器系统的描述
+const weaponDescriptions = {
+    lostBook: "遗失的洛书开启后，能够为你的物理技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.破甲：根据物理攻击扣除怪物的物理防御力 \n2.恐吓：持续时间内禁止怪物触发暴击 \n3.眩晕：持续时间内怪物无法动作 \n4.穿透：造成伤害时额外附加物理攻击1/10的穿透伤害，并在持续时间结束后基于穿透伤害总和的一定比例给予怪物余波收尾伤害 \n5.麻痹：根据本次物理伤害减少怪物的血量上限",
+    fragmentedMap: "残页的河图开启后，能够为你的法术技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.迟缓：根据伤害量的比例降低敌人的当前速度 \n2.沉默：持续时间内禁止怪物施放法术技能及附加减益效果 \n3.混乱：持续时间内怪物可能会攻击自己 \n4.灼烧：造成伤害时会给敌人附加额外灼烧伤害，己方速度之于怪物越快，灼烧伤害越猛烈 \n5.法力燃烧：根据本次法术伤害减少怪物的当前法力值",
+    nirvanaGem: "定空的灵石开启后，每秒有概率驱散减益效果，同时最多驱散5个效果。可以驱散效果如下：\n1.醉酒：法术效果，玩家攻击怪物时会受到10%的反弹溅射伤害 \n2.禁疗：法术效果，持续时间内禁止玩家使用治疗技能 \n3.摄魂：法术效果，持续时间内玩家物理和法术攻击减半 \n4.失明：法术效果，持续时间内玩家物理攻击会被怪物闪避 \n5.法术迟钝：法术效果，持续时间内玩家使用法术技能时法力消耗值增至100倍 \n6.撕裂：物理效果，持续时间内玩家会受到每0.5秒的持续掉血效果，掉血量与怪物物理攻击有关 \n7.嘲讽：物理效果，持续时间内玩家的所有战斗行为会强制指向物理攻击，且物理伤害增至200% \n8.压制：物理效果，玩家若没有在3秒内做出战斗行为，血量会降至1 \n9.封印：物理效果，持续时间内玩家的飞升技能会被封印，使其无法生效"
+};
+
 //神器系统
 class DivineWeaponManager {
     constructor() {
@@ -6608,11 +6628,8 @@ class DivineWeaponManager {
     
     description(type) {
         const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
-
-        if (this[type].active) {
-            showInfoBox(weaponDescriptions[itemName]);
-            this.openDivineWeaponUI(); // 刷新界面显示
-        }
+        showInfoBox(weaponDescriptions[itemName]);
+        this.openDivineWeaponUI(); // 刷新界面显示
     }
     
     refreshDivineWeapon(type) {
@@ -6853,7 +6870,6 @@ class DivineWeaponManager {
             }
 
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
-            showEffect('divinedWeaponEffect', 'https://pic.imgdb.cn/item/66a205eed9c307b7e93962fc.gif');
             updatePlayerStatusDisplay();
             updateUI();
         }
@@ -7063,7 +7079,11 @@ function performPoison() {
         showNextBattlePrompt(true);
         return;
     }
-
+    
+    if (!battleState.player.taunt) {
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    }
+    
     if (!poisonSkillActivated) {
         if (useItem('poisonSkillBook')) {
             poisonSkillActivated = true;
@@ -7151,6 +7171,10 @@ function performDefense() {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
         return;
+    }
+    
+    if (!battleState.player.taunt) {
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
     }
 
     // 遍历技能区域并获取所有类型为 'PD' 的技能
@@ -7673,7 +7697,6 @@ function cleanSuppressed() {
     updateUI();
 }
 
-
 // 全局对象来管理嘲讽状态及相关变量
 const tauntState = {
     timeoutId: null
@@ -7992,28 +8015,34 @@ function handleResurrection(damage) {
 }
 
 function handlePoison() {
-    if (battleState.enemy.poisoned) {
-        // 假设我们有一个全局变量来存储定时器ID
-        if (!battleState.enemy.poisonInterval) {
-            battleState.enemy.poisonInterval = setInterval(() => {
-                const poisonDamage = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.06 - 0.03) + 0.03));
-                battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-                logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
-                updateUI();
+    battleState.enemy.poisoned = true;
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif'); // 示例效果图，可以替换为实际中毒效果图
+    updateEnemyStatusDisplay();
 
-                if (battleState.enemy.health <= 0 || !battleState.enemy.poisoned) {
-                    clearInterval(battleState.enemy.poisonInterval);
-                    battleState.enemy.poisonInterval = null;
-                }
-            }, 1000); // 每秒触发一次
+    const poisonInterval = setInterval(() => {
+        if (!battleState.enemy.poisoned) {
+            clearInterval(poisonInterval);
+            return;
         }
-    } else if (battleState.enemy.poisonInterval) {
-        // 如果敌人不再中毒，清除定时器
-        clearInterval(battleState.enemy.poisonInterval);
-        battleState.enemy.poisonInterval = null;
-    }
-}
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.06 - 0.03) + 0.03));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
+        updateUI();
+        updateEnemyStatusDisplay();
+        
+        if (battleState.enemy.health <= 0) {
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
+        }
+    }, 1000); // 每秒触发一次
 
+    setTimeout(() => {
+        battleState.enemy.poisoned = false;
+        clearInterval(poisonInterval);
+        updateEnemyStatusDisplay();
+    }, 5000); // 中毒效果持续5秒
+}
      
 function performHeal() {
     if (!attributesFetched) {
@@ -8031,7 +8060,10 @@ function performHeal() {
         showNextBattlePrompt(true);
         return;
     }
-
+    
+    if (!battleState.player.taunt) {
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    }
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
@@ -13465,7 +13497,6 @@ function getSkillFromName(name, level) {
     }
     return null;
 }
-
 // 加载游戏
 function loadGameState() {
     const savedState = JSON.parse(localStorage.getItem('gameState'));
@@ -13615,6 +13646,7 @@ function loadGameState() {
         }
         // 如果有其他需要更新的显示内容，也需要在这里添加
     }
+    alreadyLoadGameState = true;
     showInfoBox("读档成功！");
 }
 

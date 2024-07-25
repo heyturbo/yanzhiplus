@@ -7134,7 +7134,7 @@ function performPoison() {
     }
 
     if (Math.random() < poisonChance) {
-        applyPoisonEffect();
+        handlePoison(skillMultiplier); // 传递技能增益参数
     }
     
     playerTurn = false;
@@ -7143,13 +7143,38 @@ function performPoison() {
     updateUI();
 }
 
-function applyPoisonEffect() {
+function handlePoison(skillMultiplier = 1) {
     battleState.enemy.poisoned = true;
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif'); // 示例效果图，可以替换为实际中毒效果图
+    updateEnemyStatusDisplay();
+
+    const poisonInterval = setInterval(() => {
+        if (!battleState.enemy.poisoned) {
+            clearInterval(poisonInterval);
+            return;
+        }
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
+        updateUI();
+        updateEnemyStatusDisplay();
+        
+        if (battleState.enemy.health <= 0) {
+            clearInterval(poisonInterval);
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
+        }
+    }, 1000); // 每秒触发一次
+
     setTimeout(() => {
         battleState.enemy.poisoned = false;
+        clearInterval(poisonInterval);
+        updateEnemyStatusDisplay();
         logBattleEvent("深渊巨魔的中毒效果消失了。");
-    }, 5000);
+    }, 5000); // 中毒效果持续5秒
 }
+
 
 function performDefense() {
     if (!attributesFetched) {
@@ -7347,7 +7372,6 @@ function enemyAttack() {
     handleDamageReduction(damage);
     handleReflectAndHeal(damage);
     handleResurrection(damage);
-    handlePoison();
     handleManaRecover();
 
     if (battleAttributes.health <= 0) {
@@ -8012,36 +8036,6 @@ function handleResurrection(damage) {
             updateUI();
         }
     }
-}
-
-function handlePoison() {
-    battleState.enemy.poisoned = true;
-    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif'); // 示例效果图，可以替换为实际中毒效果图
-    updateEnemyStatusDisplay();
-
-    const poisonInterval = setInterval(() => {
-        if (!battleState.enemy.poisoned) {
-            clearInterval(poisonInterval);
-            return;
-        }
-        const poisonDamage = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.06 - 0.03) + 0.03));
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
-        updateUI();
-        updateEnemyStatusDisplay();
-        
-        if (battleState.enemy.health <= 0) {
-            updateEnemyAttributes();
-            showNextBattlePrompt(true);
-            return;
-        }
-    }, 1000); // 每秒触发一次
-
-    setTimeout(() => {
-        battleState.enemy.poisoned = false;
-        clearInterval(poisonInterval);
-        updateEnemyStatusDisplay();
-    }, 5000); // 中毒效果持续5秒
 }
      
 function performHeal() {

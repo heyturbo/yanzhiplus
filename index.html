@@ -5503,7 +5503,7 @@ function updateEnemyAttributes() {
         if (battleRounds <= 100) {
             const initialIncrease = 0.1 * increasePerRound[attribute];
             const remainingRounds = battleRounds;
-            const maxValueAt100 = maxValues[attribute] * 0.01;
+            const maxValueAt100 = maxValues[attribute] * 0.02;
             const remainingIncrease = maxValueAt100 - (initialValue + initialIncrease);
             return Math.min(maxValues[attribute], initialValue + initialIncrease + remainingIncrease * (remainingRounds / 1000));
         } else if (battleRounds <= 130) {

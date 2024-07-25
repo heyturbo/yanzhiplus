@@ -3863,11 +3863,11 @@ document.getElementById('closeMissionPanel').addEventListener('click', () => {
 //任务函数
 let tasks = {
     skillScore: [
-        { id: 1, description: '宠物评分达到100万', completed: false, target: 2000000, reward: 400 },
-        { id: 2, description: '宠物评分达到200万', completed: false, target: 4000000, reward: 1000 },
-        { id: 3, description: '宠物评分达到300万', completed: false, target: 5000000, reward: 1500 },
-        { id: 4, description: '宠物评分达到400万', completed: false, target: 6000000, reward: 2000 },
-        { id: 5, description: '宠物评分达到500万', completed: false, target: 10000000, reward: 3600 }
+        { id: 1, description: '宠物评分达到200万', completed: false, target: 2000000, reward: 400 },
+        { id: 2, description: '宠物评分达到400万', completed: false, target: 4000000, reward: 1000 },
+        { id: 3, description: '宠物评分达到500万', completed: false, target: 5000000, reward: 1500 },
+        { id: 4, description: '宠物评分达到600万', completed: false, target: 6000000, reward: 2000 },
+        { id: 5, description: '宠物评分达到1000万', completed: false, target: 10000000, reward: 3600 }
     ],
     petLevel: [
         { id: 6, description: '宠物等级达到60', completed: false, target: 60, reward: 50 },
@@ -3882,6 +3882,13 @@ let tasks = {
         { id: 13, description: '金子数量达到700000', completed: false, target: 700000, reward: 5 },
         { id: 14, description: '金子数量达到1000000', completed: false, target: 1000000, reward: 7 },
         { id: 15, description: '金子数量达到2000000', completed: false, target: 2000000, reward: 9 }
+    ],
+    battleRounds: [
+        { id: 16, description: '深渊巨魔挑战轮次达到101', completed: false, target: 101, reward: 100 },
+        { id: 17, description: '深渊巨魔挑战轮次达到121', completed: false, target: 121, reward: 100 },
+        { id: 18, description: '深渊巨魔挑战轮次达到131', completed: false, target: 131, reward: 100 },
+        { id: 19, description: '深渊巨魔挑战轮次达到141', completed: false, target: 141, reward: 1 },
+        { id: 20, description: '深渊巨魔挑战轮次达到151', completed: false, target: 151, reward: 1 }
     ]
 };
 
@@ -3894,8 +3901,7 @@ function showMissionPanel() {
 
 function completeTask(taskId) {
     let taskSeries, task;
-    
-    // 遍历所有任务系列，找到任务并确定所属系列
+
     Object.keys(tasks).forEach(series => {
         const foundTask = tasks[series].find(t => t.id === taskId);
         if (foundTask) {
@@ -3909,8 +3915,6 @@ function completeTask(taskId) {
         return;
     }
 
-    //console.log(`完成任务: ${taskId}, 任务系列: ${taskSeries}`);
-
     if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
         task.completed = true;
         stamps += task.reward;
@@ -3923,6 +3927,32 @@ function completeTask(taskId) {
         task.completed = true;
         addItemToJinnang('summonCharmPaper', task.reward);
         showInfoBox(`任务完成，获得${task.reward}张召唤灵符！`);
+    } else if (taskSeries === 'battleRounds' && battleRounds === task.target) {
+        if (task.id >= 16 && task.id <= 18) {
+            task.completed = true;
+            addItemToJinnang('天地灵气', 100);
+            showInfoBox('任务完成，获得100个天地灵气！');
+        } else if (task.id === 19 || task.id === 20) {
+            showInfoBox('恭喜你完成挑战，你有一次时光倒流回第1轮的机会，是否接受？点击确认将进入第一轮，取消则获得100个天地灵气', () => {
+                battleRounds = 1;
+                initializeEnemyPet();
+                updateUI();
+                showInfoBox('一阵悦耳的音乐在你耳畔响起来，结束时，你睁开了双眼');
+                task.completed = true;
+                updateTaskList();
+                updateStampCount();
+            }, () => {
+                addItemToJinnang('天地灵气', 100);
+                showInfoBox('任务完成，获得100个天地灵气！');
+                task.completed = true;
+                updateTaskList();
+                updateStampCount();
+            });
+            return; // 提前返回，等待回调处理任务完成逻辑
+        } else {
+            console.error('未知任务');
+            return;
+        }
     } else {
         console.error('任务完成条件未满足');
         return;
@@ -3959,6 +3989,11 @@ function updateTaskList() {
                 submitButton.innerText = '提交';
                 submitButton.addEventListener('click', () => completeTask(currentTask.id));
                 taskItem.appendChild(submitButton);
+            } else if (series === 'battleRounds' && battleRounds === currentTask.target) {
+                const submitButton = document.createElement('button');
+                submitButton.innerText = '提交';
+                submitButton.addEventListener('click', () => completeTask(currentTask.id));
+                taskItem.appendChild(submitButton);
             } else {
                 if (series === 'skillScore') {
                     taskItem.innerText += ` - 进度: ${window.skillScore}/${currentTask.target}`;
@@ -3966,13 +4001,14 @@ function updateTaskList() {
                     taskItem.innerText += ` - 进度: ${petLevel}/${currentTask.target}`;
                 } else if (series === 'goldAmount') {
                     taskItem.innerText += ` - 进度: ${goldAmount}/${currentTask.target}`;
+                } else if (series === 'battleRounds') {
+                    taskItem.innerText += ` - 进度: ${battleRounds}/${currentTask.target}`;
                 }
             }
             taskList.appendChild(taskItem);
         }
     });
 }
-
 
 // 初始化任务面板
 document.getElementById('missionButton').addEventListener('click', showMissionPanel);
@@ -4003,7 +4039,7 @@ let drugInventory = {
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后30秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后有10%概率让怪物血量变为1，70%概率获得10000经验，20%概率获得20000文金子" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后各有1/3的概率让怪物血量变为1/获得10000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，永久增加100点速度，收集3个可以合成1个绿色品阶的药品" },
@@ -4343,21 +4379,23 @@ function useSelectedDrug() {
                     30000
                 );
                 break;
-            case "幸运金币":
-                if (Math.random() < 0.1) {
-                    battleState.enemy.health = 1;
-                    logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
-                } else if (Math.random() < 0.8) {
-                    currentExp += 10000;
-                    logBattleEvent(`使用幸运金币，获得了10000点经验值。`, 'gold');
-                } else {
-                    goldAmount += 20000;
-                    logBattleEvent(`使用幸运金币，获得了20000文金子。`, 'gold');
-                }
-                updateUI();
-                updateGoldDisplay(goldAmount);
-                updateExpBar();
-                break;
+                case "幸运金币":
+                    if (Math.random() < 0.3 && battleRounds > 10) {
+                        const battleRoundsToDecrease = battleRounds - 10;
+                        initializeEnemyPet();
+                        battleRounds = battleRoundsToDecrease;
+                        updateEnemyAttributes();
+                        logBattleEvent(`使用幸运金币，你成功回退至10轮之前。`, 'gold');
+                    } else if (Math.random() < 0.4) {
+                        currentExp += 10000;
+                        logBattleEvent(`使用幸运金币，获得了10000点经验值。`, 'gold');
+                    } else {
+                        battleState.enemy.health = 1;
+                        logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
+                    }
+                    updateUI();
+                    updateExpBar();
+                    break;
             case "双倍经验药":
                 applyTimedBuff(
                     selectedDrug,
@@ -4390,45 +4428,6 @@ function useSelectedDrug() {
             case "神力仙丹":
             case "狂暴印记":
             case "化功散":
-            case "见手青":
-                const originalEnemyState = JSON.parse(JSON.stringify(enemyPet));
-                const reducedEnemyState = {
-                    health: Math.round(enemyPet.health * 0.5),
-                    mana: Math.round(enemyPet.mana * 0.5),
-                    physicalAttack: Math.round(enemyPet.physicalAttack * 0.5),
-                    physicalDefense: Math.round(enemyPet.physicalDefense * 0.5),
-                    magicAttack: Math.round(enemyPet.magicAttack * 0.5),
-                    magicDefense: Math.round(enemyPet.magicDefense * 0.5),
-                    speed: Math.round(enemyPet.speed * 0.5)
-                };
-            
-                enemyPet = reducedEnemyState;
-                enemyMaxHealth = enemyPet.health;
-                enemyMaxMana = enemyPet.mana;
-                battleState.enemy = { ...enemyPet };
-            
-                logBattleEvent("使用见手青，敌人的所有能力降至50%直至本轮战斗胜利。", 'silver');
-            
-                // 在战斗回合结束时恢复敌人的原始状态
-                function restoreOriginalEnemyState() {
-                    if (battleState.playerWon) {
-                        enemyPet = originalEnemyState;
-                        enemyMaxHealth = enemyPet.health;
-                        enemyMaxMana = enemyPet.mana;
-                        battleState.enemy = { ...enemyPet };
-                        updateEnemyAttributes();
-                    }
-                }
-            
-                // 监听战斗回合结束事件，恢复敌人的原始状态
-                const originalShowNextBattlePrompt = showNextBattlePrompt;
-                showNextBattlePrompt = function(playerWon) {
-                    restoreOriginalEnemyState();
-                    originalShowNextBattlePrompt(playerWon);
-                    showNextBattlePrompt = originalShowNextBattlePrompt;
-                };
-            
-                break;
             case "沉檀凝香":
             case "焚灵之丸":
                 if (!activeBuffs[selectedDrug]) {
@@ -4437,6 +4436,9 @@ function useSelectedDrug() {
                     showInfoBox(`${selectedDrug}效果尚在冷却中，无法叠加使用。`);
                     return;  // 提前返回，防止数量减少
                 }
+                break;
+            case "见手青":
+                handleMushroom();
                 break;
             case "狂暴之魂":
                 playerCritRate = Math.min(1.0, playerCritRate + 0.10); // 最大100%
@@ -4476,13 +4478,49 @@ function useSelectedDrug() {
                 applyDrugBonus("mana", 5000);
                 break;
         }
-
         updateUI();
     } else {
         showInfoBox("药品不足！", 'red');
     }
 }
 
+function handleMushroom() {
+    const originalEnemyState = JSON.parse(JSON.stringify(enemyPet));
+    const reducedEnemyState = {
+        health: Math.round(enemyPet.health * 0.5),
+        mana: Math.round(enemyPet.mana * 0.5),
+        physicalAttack: Math.round(enemyPet.physicalAttack * 0.5),
+        physicalDefense: Math.round(enemyPet.physicalDefense * 0.5),
+        magicAttack: Math.round(enemyPet.magicAttack * 0.5),
+        magicDefense: Math.round(enemyPet.magicDefense * 0.5),
+        speed: Math.round(enemyPet.speed * 0.5)
+    };
+
+    enemyPet = reducedEnemyState;
+    enemyMaxHealth = enemyPet.health;
+    enemyMaxMana = enemyPet.mana;
+    battleState.enemy = { ...enemyPet };
+
+    logBattleEvent("使用见手青，敌人的所有能力降至50%直至本轮战斗胜利。", 'silver');
+    // 在战斗回合结束时恢复敌人的原始状态
+    function restoreOriginalEnemyState() {
+        if (battleState.playerWon) {
+            enemyPet = originalEnemyState;
+            enemyMaxHealth = enemyPet.health;
+            enemyMaxMana = enemyPet.mana;
+            battleState.enemy = { ...enemyPet };
+            updateEnemyAttributes();
+        }
+    }
+    // 监听战斗回合结束事件，恢复敌人的原始状态
+    const originalShowNextBattlePrompt = showNextBattlePrompt;
+    showNextBattlePrompt = function(playerWon) {
+        restoreOriginalEnemyState();
+        originalShowNextBattlePrompt(playerWon);
+        showNextBattlePrompt = originalShowNextBattlePrompt;
+    };
+}
+        
 function applyBuff(drugName) {
     switch (drugName) {
         case "武尊秘露":
@@ -5463,33 +5501,38 @@ function updateEnemyAttributes() {
 
     function calculateAttributeValue(attribute, initialValue) {
         if (battleRounds <= 100) {
-            return initialValue + 2 * increasePerRound[attribute];
+            const initialIncrease = 0.1 * increasePerRound[attribute];
+            const remainingRounds = battleRounds;
+            const maxValueAt100 = maxValues[attribute] * 0.01;
+            const remainingIncrease = maxValueAt100 - (initialValue + initialIncrease);
+            return Math.min(maxValues[attribute], initialValue + initialIncrease + remainingIncrease * (remainingRounds / 1000));
         } else if (battleRounds <= 130) {
-            const initialIncrease = 8 * increasePerRound[attribute];
+            const initialIncrease = 100 * increasePerRound[attribute];
             const remainingRounds = battleRounds - 100;
             const maxValueAt130 = maxValues[attribute] * 0.6;
             const remainingIncrease = maxValueAt130 - (initialValue + initialIncrease);
-            return initialValue + initialIncrease + remainingIncrease * (remainingRounds / 30);
+            return Math.min(maxValues[attribute], initialValue + initialIncrease + remainingIncrease * (remainingRounds / 30));
         } else if (battleRounds <= 140) {
             const maxValueAt130 = maxValues[attribute] * 0.6;
             const remainingRounds = battleRounds - 130;
             const maxValueAt140 = maxValues[attribute] * 0.8;
             const remainingIncrease = maxValueAt140 - maxValueAt130;
-            return maxValueAt130 + remainingIncrease * (remainingRounds / 10);
+            return Math.min(maxValues[attribute], maxValueAt130 + remainingIncrease * (remainingRounds / 10));
         } else {
             const maxValueAt140 = maxValues[attribute] * 0.8;
             const remainingRounds = battleRounds - 140;
             const remainingIncrease = maxValues[attribute] - maxValueAt140;
-            return maxValueAt140 + remainingIncrease * (remainingRounds / 10);
+            return Math.min(maxValues[attribute], maxValueAt140 + remainingIncrease * (remainingRounds / 10));
         }
     }
-        enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
-        enemyPet.mana = Math.round(calculateAttributeValue('mana', enemyPet.mana));
-        enemyPet.physicalAttack = Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack));
-        enemyPet.physicalDefense = Math.round(calculateAttributeValue('physicalDefense', enemyPet.physicalDefense));
-        enemyPet.magicAttack = Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack));
-        enemyPet.magicDefense = Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense));
-        enemyPet.speed = Math.round(calculateAttributeValue('speed', enemyPet.speed));
+
+    enemyPet.health = Math.min(maxValues.health, Math.round(calculateAttributeValue('health', enemyPet.health)));
+    enemyPet.mana = Math.min(maxValues.mana, Math.round(calculateAttributeValue('mana', enemyPet.mana)));
+    enemyPet.physicalAttack = Math.min(maxValues.physicalAttack, Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack)));
+    enemyPet.physicalDefense = Math.min(maxValues.physicalDefense, Math.round(calculateAttributeValue('physicalDefense', enemyPet.physicalDefense)));
+    enemyPet.magicAttack = Math.min(maxValues.magicAttack, Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack)));
+    enemyPet.magicDefense = Math.min(maxValues.magicDefense, Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense)));
+    enemyPet.speed = Math.min(maxValues.speed, Math.round(calculateAttributeValue('speed', enemyPet.speed)));
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;

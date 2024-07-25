@@ -1235,6 +1235,28 @@
             background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
         }
+
+        .saveAndLoadGameState {
+            border: 2px solid orange;
+            background-color: gold;
+            font-size: 14px;
+            border-radius: 5px;
+            font-weight: bold;
+            color: #fefefc;
+            padding: 10px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+    
+        .saveAndLoadGameState:hover {
+            background-color: #ffd700; /* Slightly darker gold */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+    
+        .saveAndLoadGameState:active {
+            transform: scale(0.95);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
         
         .ascension-modal-content {
             background-color: rgb(0 0 0 / 40%);
@@ -1920,10 +1942,12 @@
                     <p>法攻增加: <span id="spirit-magic-attack">0</span></p>
                     <p>法防增加: <span id="spirit-magic-defense">0</span></p>
                     <p>速度增加: <span id="spirit-speed">0</span></p>
+                    <div id="spirit-actions">
                     <button id="level-up-spirit">升级精灵</button>
                     <button id="enhance-spirit">增幅洗练</button>
                     <button id="auto-level-up-spirit">一键速升</button>
-                    <button id="close-spirit-modal">关闭面板</button>                    
+                    <button id="close-spirit-modal">关闭面板</button>    
+                    </div>
                 </div>
             </div>            
             <!-- 飞升之术面板 -->
@@ -1981,6 +2005,7 @@
                 </div>
             </div>
             <div class="battle-pet-selector"><select id="battle-pet-select" onchange="changeBattlePet()"><option value="xiaojin"></option></select></div>
+            <div id="divinedWeaponEffect" class="visual-effect"></div>
             <div class="battle-system-log">
                 <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
@@ -2047,19 +2072,8 @@
             <div>游戏时长: <span id="game-timer">00:00</span></div>
             <div>金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
             <div id="loadContainer" style="display:flex; justify-content: space-between; width: 100%;">
-            <button style="border: 1px solid orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" 
-                    onmouseover="this.style.backgroundColor='#ffd700'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
-                    onmouseout="this.style.backgroundColor='gold'; this.style.boxShadow='none';" 
-                    onmousedown="this.style.transform='scale(0.95)'; this.style.boxShadow='0 0 5px rgba(0, 0, 0, 0.2)';" 
-                    onmouseup="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
-                    onclick="saveGameState()">存档</button>
-            
-            <button style="border: 1px solid orange; background-color: gold; font-size: 14px; border-radius: 5px; font-weight:bold; color: #fefefc; padding: 10px; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s;" 
-                    onmouseover="this.style.backgroundColor='#ffd700'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
-                    onmouseout="this.style.backgroundColor='gold'; this.style.boxShadow='none';" 
-                    onmousedown="this.style.transform='scale(0.95)'; this.style.boxShadow='0 0 5px rgba(0, 0, 0, 0.2)';" 
-                    onmouseup="this.style.transform='scale(1)'; this.style.boxShadow='0 0 10px rgba(0, 0, 0, 0.2)';" 
-                    onclick="loadGameState()">读档</button>
+                <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
+                <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
             </div>
         </div>
     </div>    
@@ -3500,13 +3514,7 @@ function changeBattlePet(skipConfirmation = false) {
             console.error('无法找到选中的宠物:', selectedPetKey);
         }
     };
-
-    if (skipConfirmation) {
         changeSelectedPet(); // 直接执行更换宠物的逻辑,不显示确认提示
-    } else {
-        // 提示用户确认
-        showInfoBox("切换宠物可能导致某些不可预知的数据丢失或混乱，请知悉", changeSelectedPet);
-    }
 }
         
 function updatePetDisplay() {
@@ -3942,9 +3950,9 @@ let drugInventory = {
     "延寿露": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },
     "天山雪莲": { quantity: 1, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png", tier: 3, description: "绿色品阶，恢复玩家20%的法力值" },
     "化功散": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b585.png", tier: 2, description: "蓝色品阶，10秒内深渊巨魔暴击率降低至0%" },
-    "闪电蘑菇": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 2, description: "蓝色品阶，10秒内增加玩家20000速度和20000法术攻击力" },
+    "见手青": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 0, description: "橙色品阶，投喂敌人后，敌人能力下降50%直至敌人失败" },
     "沉檀凝香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
-    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 0, description: "橙色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
+    "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，30秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后10秒内怪物的物理防御和法术防御归0" },
@@ -4307,7 +4315,45 @@ function useSelectedDrug() {
             case "神力仙丹":
             case "狂暴印记":
             case "化功散":
-            case "闪电蘑菇":
+            case "见手青":
+                const originalEnemyState = JSON.parse(JSON.stringify(enemyPet));
+                const reducedEnemyState = {
+                    health: Math.round(enemyPet.health * 0.5),
+                    mana: Math.round(enemyPet.mana * 0.5),
+                    physicalAttack: Math.round(enemyPet.physicalAttack * 0.5),
+                    physicalDefense: Math.round(enemyPet.physicalDefense * 0.5),
+                    magicAttack: Math.round(enemyPet.magicAttack * 0.5),
+                    magicDefense: Math.round(enemyPet.magicDefense * 0.5),
+                    speed: Math.round(enemyPet.speed * 0.5)
+                };
+            
+                enemyPet = reducedEnemyState;
+                enemyMaxHealth = enemyPet.health;
+                enemyMaxMana = enemyPet.mana;
+                battleState.enemy = { ...enemyPet };
+            
+                logBattleEvent("使用见手青，敌人的所有能力降至50%直至本轮战斗胜利。", 'silver');
+            
+                // 在战斗回合结束时恢复敌人的原始状态
+                function restoreOriginalEnemyState() {
+                    if (battleState.playerWon) {
+                        enemyPet = originalEnemyState;
+                        enemyMaxHealth = enemyPet.health;
+                        enemyMaxMana = enemyPet.mana;
+                        battleState.enemy = { ...enemyPet };
+                        updateEnemyAttributes();
+                    }
+                }
+            
+                // 监听战斗回合结束事件，恢复敌人的原始状态
+                const originalShowNextBattlePrompt = showNextBattlePrompt;
+                showNextBattlePrompt = function(playerWon) {
+                    restoreOriginalEnemyState();
+                    originalShowNextBattlePrompt(playerWon);
+                    showNextBattlePrompt = originalShowNextBattlePrompt;
+                };
+            
+                break;
             case "沉檀凝香":
             case "焚灵之丸":
                 if (!activeBuffs[selectedDrug]) {
@@ -4422,30 +4468,11 @@ function applyBuff(drugName) {
                 10000
             );
             break;
-        case "闪电蘑菇":
-            applyTimedBuff(
-                drugName,
-                () => {
-                    const originalSpeed = battleAttributes.speed;
-                    const originalMagicAttack = battleAttributes.magicAttack;
-                    battleAttributes.speed += 20000;
-                    battleAttributes.magicAttack += 20000;
-                    logBattleEvent(`使用闪电蘑菇，增加20000速度和20000法术攻击力，持续10秒。`, 'gold');
-                    return () => {
-                        battleAttributes.speed = originalSpeed;
-                        battleAttributes.magicAttack = originalMagicAttack;
-                        logBattleEvent(`闪电蘑菇效果消失。`, 'red');
-                    };
-                },
-                10000
-            );
-            break;
         case "沉檀凝香":
             // 恢复10%生命值
             const healthRestored = Math.floor(maxHealth * 0.1);
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRestored);
             logBattleEvent(`使用沉檀凝香，恢复了 ${healthRestored} 点生命值。`, 'gold');
-        
             // 80% 几率清除玩家的异常状态
             if (Math.random() < 0.8) {
                 clearEnemyEffect();
@@ -5160,7 +5187,7 @@ let battleRounds = 1; // 记录玩家胜利的轮次
 let currentExp = 0; // 当前经验值
 let maxExp = 208; // 经验值上限
 let enemyHealCount = 0; // 记录怪物治疗次数
-let enemyInitialState; // 存储每轮开始时的深渊巨魔初始状态
+
 
 function showEffect(effectId, imageUrl) {
     const effect = document.getElementById(effectId);
@@ -5254,12 +5281,11 @@ function updatePetInfo() {
             },
             enemy: { ...enemyPet }
         };
-
-        if (ascensionSkill.name && ascensionEnabled) {
+        if (ascensionSkill.name && ascensionEnabled && ascensionSkill.name !== "被封印的技能") {
             battleState.player.originalAscensionSkill = ascensionSkill.name;
         }
-
-        if (secondAscensionSkill.name && reenableAscension) {
+        
+        if (secondAscensionSkill.name && reenableAscension && secondAscensionSkill.name !== "被封印的技能") {
             battleState.player.originalSecondAscensionSkill = secondAscensionSkill.name;
         }
     } else {
@@ -5300,7 +5326,8 @@ let enemyPet = {
 
 let enemyMaxHealth = enemyPet.health;
 let enemyMaxMana = enemyPet.mana;
-            
+let enemyInitialState = null;
+
 function initializeEnemyPet() {
     enemyPet = {
         health: 18,
@@ -5318,9 +5345,22 @@ function initializeEnemyPet() {
     if (battleState) {
         battleState.enemy = { ...enemyPet };
     }
-    storeEnemyInitialState(); // 每次初始化敌人时存储初始状态
+    storeEnemyInitialState();
 }
-            
+
+function storeEnemyInitialState() {
+    enemyInitialState = JSON.parse(JSON.stringify(enemyPet));
+}
+
+function restoreEnemyState() {
+    if (enemyInitialState) {
+        enemyPet = JSON.parse(JSON.stringify(enemyInitialState));
+        enemyMaxHealth = enemyPet.health;
+        enemyMaxMana = enemyPet.mana;
+        battleState.enemy = { ...enemyPet };
+    }
+}
+
 function updateEnemyAttributes() {
     const maxValues = {
         health: 800000000,
@@ -5670,6 +5710,7 @@ function enemyInfo() {
     popup.appendChild(detailsContainer);
     popup.appendChild(jumpButton);
     popup.appendChild(autoButton);
+    
     // 将弹窗容器添加到页面的body中
     document.body.appendChild(popup);
 
@@ -6410,7 +6451,11 @@ function performIndependentMagicAttack() {
         }, 300);
     }
 }
-
+    const weaponDescriptions = {
+        lostBook: "This is the description for the Lost Book.",
+        fragmentedMap: "This is the description for the Fragmented Map.",
+        nirvanaGem: "This is the description for the Nirvana Gem."
+    };
 //神器系统
 class DivineWeaponManager {
     constructor() {
@@ -6480,6 +6525,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                     <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -6495,6 +6541,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                     <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -6510,6 +6557,7 @@ class DivineWeaponManager {
                     <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
                     <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
                     <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -6555,7 +6603,18 @@ class DivineWeaponManager {
         showInfoBox(`${type === 'lostBook' ? '遗失的洛书' : type === 'fragmentedMap' ? '残页的河图' : '定空的灵石'}已成功开启！`);
         this.openDivineWeaponUI(); // 刷新界面显示
     }
+    
 
+    
+    description(type) {
+        const itemName = type === 'lostBook' ? 'lostBook' : type === 'fragmentedMap' ? 'fragmentedMap' : 'nirvanaGem';
+
+        if (this[type].active) {
+            showInfoBox(weaponDescriptions[itemName]);
+            this.openDivineWeaponUI(); // 刷新界面显示
+        }
+    }
+    
     refreshDivineWeapon(type) {
         if (!this[type].active) {
             showInfoBox("开启神器后才能执行刷新！");
@@ -6777,20 +6836,11 @@ class DivineWeaponManager {
                     break;
                 case 'suppressed':
                     // 清除压制效果，恢复原始函数
-                    performPhysicalAttack = originalPerformPhysicalAttack;
-                    performMagicalAttack = originalPerformMagicalAttack;
-                    performHeal = originalPerformHeal;
-                    performPoison = originalPerformPoison;
-                    performDefense = originalPerformDefense;
-                    effectCooldowns.suppressed = false;
+                    cleanSuppressed();
                     break;
                 case 'taunt':
                     // 清除嘲讽效果，恢复原始函数
-                    performAttack = originalPerformAttack;
-                    performHeal = originalPerformHeal;
-                    performPoison = originalPerformPoison;
-                    performDefense = originalPerformDefense;
-                    effectCooldowns.taunt = false;
+                    clearTaunt();
                     break;
                 case 'seal':
                     ascensionSkill.name = battleState.player.originalAscensionSkill;
@@ -6803,6 +6853,7 @@ class DivineWeaponManager {
             }
 
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
+            showEffect('divinedWeaponEffect', 'https://pic.imgdb.cn/item/66a205eed9c307b7e93962fc.gif');
             updatePlayerStatusDisplay();
             updateUI();
         }
@@ -7366,6 +7417,7 @@ function enemyHeal() {
     }
 
     playerTurn = true; // 轮到玩家回合
+    handleBurnt();
     showEffect('enemyEffect');
     updateUI();
     handleManaRecover();
@@ -7548,6 +7600,11 @@ function handleTorn() {
         updatePlayerStatusDisplay();
     }, 10000); // 撕裂效果持续10秒
 }
+// 全局对象来管理压制状态及相关变量
+const suppressionState = {
+    actionPerformed: false,
+    timeoutId: null
+};
 
 function handleSuppressed() {
     if (battleState.player.suppressed) {
@@ -7560,11 +7617,17 @@ function handleSuppressed() {
     effectCooldowns.suppressed = true;
     updatePlayerStatusDisplay();
 
-    let actionPerformed = false;
+    suppressionState.actionPerformed = false; // 重置 actionPerformed
+
+    const originalPerformPhysicalAttack = performPhysicalAttack;
+    const originalPerformMagicalAttack = performMagicalAttack;
+    const originalPerformHeal = performHeal;
+    const originalPerformPoison = performPoison;
+    const originalPerformDefense = performDefense;
 
     const wrappedAction = (originalFunction) => {
         return function(...args) {
-            actionPerformed = true;
+            suppressionState.actionPerformed = true;
             return originalFunction.apply(this, args);
         };
     };
@@ -7575,23 +7638,46 @@ function handleSuppressed() {
     performPoison = wrappedAction(performPoison);
     performDefense = wrappedAction(performDefense);
 
-    setTimeout(() => {
-        battleState.player.suppressed = false;
-        effectCooldowns.suppressed = false;
-        if (!actionPerformed) {
-            battleAttributes.health = 1;
-            logBattleEvent("你的无动于衷助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
-            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
-            updateUI();
-        }
-        performPhysicalAttack = originalPerformPhysicalAttack;
-        performMagicalAttack = originalPerformMagicalAttack;
-        performHeal = originalPerformHeal;
-        performPoison = originalPerformPoison;
-        performDefense = originalPerformDefense;
-        updatePlayerStatusDisplay();
+    suppressionState.timeoutId = setTimeout(() => {
+        endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
     }, 3000); // 压制效果持续3秒
 }
+
+function endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense) {
+    battleState.player.suppressed = false;
+    effectCooldowns.suppressed = false;
+    if (!suppressionState.actionPerformed) {
+        battleAttributes.health = 1;
+        logBattleEvent("你的无动于衷助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
+        updateUI();
+    }
+    performPhysicalAttack = originalPerformPhysicalAttack;
+    performMagicalAttack = originalPerformMagicalAttack;
+    performHeal = originalPerformHeal;
+    performPoison = originalPerformPoison;
+    performDefense = originalPerformDefense;
+    updatePlayerStatusDisplay();
+}
+
+function cleanSuppressed() {
+    if (battleState.player.suppressed) {
+        clearTimeout(suppressionState.timeoutId); // 清除压制定时器
+        const originalPerformPhysicalAttack = performPhysicalAttack;
+        const originalPerformMagicalAttack = performMagicalAttack;
+        const originalPerformHeal = performHeal;
+        const originalPerformPoison = performPoison;
+        const originalPerformDefense = performDefense;
+        endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    } 
+    updateUI();
+}
+
+
+// 全局对象来管理嘲讽状态及相关变量
+const tauntState = {
+    timeoutId: null
+};
 
 function handleTaunt() {
     if (battleState.player.taunt) {
@@ -7605,6 +7691,11 @@ function handleTaunt() {
     effectCooldowns.taunt = true;
     updatePlayerStatusDisplay();
 
+    const originalPerformMagicalAttack = performMagicalAttack;
+    const originalPerformHeal = performHeal;
+    const originalPerformPoison = performPoison;
+    const originalPerformDefense = performDefense;
+
     const tauntWrappedAction = () => performAttack('physical');
 
     performMagicalAttack = tauntWrappedAction;
@@ -7613,16 +7704,33 @@ function handleTaunt() {
     performDefense = tauntWrappedAction;
     updateUI();
 
-    setTimeout(() => {
-        battleState.player.taunt = false;
-        effectCooldowns.taunt = false;
-        performMagicalAttack = originalPerformMagicalAttack;
-        performHeal = originalPerformHeal;
-        performPoison = originalPerformPoison;
-        performDefense = originalPerformDefense;
-        updatePlayerStatusDisplay();
-    }, 2000); // 嘲讽效果持续2秒
+    tauntState.timeoutId = setTimeout(() => {
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    }, 10000); // 嘲讽效果持续10秒
 }
+
+function endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense) {
+    battleState.player.taunt = false;
+    effectCooldowns.taunt = false;
+    performMagicalAttack = originalPerformMagicalAttack;
+    performHeal = originalPerformHeal;
+    performPoison = originalPerformPoison;
+    performDefense = originalPerformDefense;
+    updatePlayerStatusDisplay();
+}
+
+function clearTaunt() {
+    if (battleState.player.taunt) {
+        clearTimeout(tauntState.timeoutId); // 清除嘲讽定时器
+        const originalPerformMagicalAttack = performMagicalAttack;
+        const originalPerformHeal = performHeal;
+        const originalPerformPoison = performPoison;
+        const originalPerformDefense = performDefense;
+        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    } 
+    updateUI();
+}
+
         
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
@@ -7740,19 +7848,12 @@ function clearEnemyEffect() {
                     clearInterval(battleState.player.tornInterval);
                     break;
                 case 'suppressed':
-                    // 清除压制效果，恢复原始函数
-                    performPhysicalAttack = originalPerformPhysicalAttack;
-                    performMagicalAttack = originalPerformMagicalAttack;
-                    performHeal = originalPerformHeal;
-                    performPoison = originalPerformPoison;
-                    performDefense = originalPerformDefense;
+                    // 清除压制效果
+                    cleanSuppressed();
                     break;
                 case 'taunt':
                     // 清除嘲讽效果，恢复原始函数
-                    performMagicalAttack = originalPerformMagicalAttack;
-                    performHeal = originalPerformHeal;
-                    performPoison = originalPerformPoison;
-                    performDefense = originalPerformDefense;
+                    clearTaunt();
                     break;
                 case 'seal':
                     // 清除封印效果，恢复原始技能名称
@@ -7781,16 +7882,27 @@ function clearPlayerEffect() {
 
 function handleBurnt() {
     if (battleState.enemy.burnt) {
-        const burntDamage = 12888 * battleRounds;
+        let burntDamage = 0;
+        const speedDifference = battleState.player.speed - battleState.enemy.speed;
+
+        if (speedDifference > 0) { // player speed > enemy speed
+            burntDamage = 2000 + speedDifference * 20;
+        } else { // enemy speed >= player speed
+            burntDamage = 1000 + Math.abs(speedDifference) * 10;
+        }
+
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
         logBattleEvent(`深渊巨魔受到了 ${burntDamage} 点灼烧伤害。`, 'red');
-    if (battleState.enemy.health <= 0) {
-        updateEnemyAttributes();
-        showNextBattlePrompt(true);
-        return;
+        updateUI();
+
+        if (battleState.enemy.health <= 0) {
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
         }
     }
 }
+
 
 function handleCriticalHit(isCritical) {
     if (isCritical) {
@@ -7881,11 +7993,27 @@ function handleResurrection(damage) {
 
 function handlePoison() {
     if (battleState.enemy.poisoned) {
-        const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
+        // 假设我们有一个全局变量来存储定时器ID
+        if (!battleState.enemy.poisonInterval) {
+            battleState.enemy.poisonInterval = setInterval(() => {
+                const poisonDamage = Math.floor(battleAttributes.magicAttack * (Math.random() * (0.06 - 0.03) + 0.03));
+                battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+                logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害。`, '#C10066');
+                updateUI();
+
+                if (battleState.enemy.health <= 0 || !battleState.enemy.poisoned) {
+                    clearInterval(battleState.enemy.poisonInterval);
+                    battleState.enemy.poisonInterval = null;
+                }
+            }, 1000); // 每秒触发一次
+        }
+    } else if (battleState.enemy.poisonInterval) {
+        // 如果敌人不再中毒，清除定时器
+        clearInterval(battleState.enemy.poisonInterval);
+        battleState.enemy.poisonInterval = null;
     }
 }
+
      
 function performHeal() {
     if (!attributesFetched) {
@@ -8241,15 +8369,6 @@ function setBackgroundImage(imageUrl) {
     if (drawer) {
         drawer.style.backgroundImage = `url('${imageUrl}')`;
     }
-}
-
-function storeEnemyInitialState() {
-    enemyInitialState = { ...enemyPet };
-}
-
-function restoreEnemyState() {
-    enemyPet = { ...enemyInitialState };
-    battleState.enemy = { ...enemyPet };
 }
 
 function clearBattleLog() {
@@ -9057,6 +9176,9 @@ function collectTreasure() {
             case '毒粉':
                 addItemToJinnang('poisonPowder');
                 break;
+            case '毒粉礼包（10）':
+                addItemToJinnang('poisonPowder',10);
+                break;
             case '遗失的洛书·密钥':
                 addItemToJinnang('lostBook');
                 break;
@@ -9071,6 +9193,9 @@ function collectTreasure() {
                 break;
             case '天地灵气':
                 addItemToJinnang('earthlyEnergy');
+                break;
+            case '天地灵气礼包（10）':
+                addItemToJinnang('earthlyEnergy',10);
                 break;
             case '仙人醍醐':
                 addItemToJinnang('ultraSkillBoomer');
@@ -9227,11 +9352,13 @@ function getRandomReward(type) {
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 6 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5 },
+            { name: '毒粉礼包（10）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 50 }
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 49 },
+            { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '至尊宝箱': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 5 },
@@ -11879,9 +12006,9 @@ function upgradeWisdomTo() {
         goldenRebornPill += 999;
         miraculousPill += 999;
         qualityPill += 999;
-        highGradePill += 9999;
+        highGradePill += 99999;
         goldAmount += 9999999;
-        stamps = 5000000;
+        stamps = 500000;
         updateStampCount();
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
@@ -11900,7 +12027,6 @@ function upgradeWisdomTo() {
         'awakenPill', // 醒悟丹
         'coagulateStone', // 凝魄石
         'seperateStone', // 离魂石
-        'tejiWisdomPill',
         'radiantSoul',
         'spiritRefreshStone',
         'spiritAwakenStone',
@@ -11928,6 +12054,7 @@ function upgradeWisdomTo() {
         addItemToJinnang(item, 999);
     }
     addItemToJinnang('earthlyEnergy', 9999);
+    addItemToJinnang('tejiWisdomPill', 99999);
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;

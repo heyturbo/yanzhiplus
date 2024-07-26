@@ -1185,10 +1185,24 @@
     background-repeat: no-repeat;
     background-position: center;
 }
+
+.general-visual-effect {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+    transform: scale(0);
+    transition: opacity 0.3s, transform 0.3s;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
 #generalEffect {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    z-index: 0;
 }
         
 #playerEffect {
@@ -1206,6 +1220,7 @@
 .show-effect {
     opacity: 1;
     transform: scale(1);
+    display:block;
 }
 
         .status-display {
@@ -1849,7 +1864,7 @@
             </div>
             </div>
             <div id="treasure-reward" class="reward-box"></div>
-            <div id="generalEffect" class="visual-effect"></div>
+            <div id="generalEffect" class="general-visual-effect"></div>
             <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">开启宝箱</button>
@@ -9622,7 +9637,7 @@ function openTreasure(times = 1) {
         rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
     }
     document.getElementById('treasure-reward').innerHTML = rewardHTML;
-    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66793494d9c307b7e9dae0f9.png');
+    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66a34156d9c307b7e94568b1.gif');
 }
 
 function openTenthTreasure() {

@@ -665,7 +665,7 @@
             text-align: center;
             justify-content: center;
             margin: 15px 5px;
-            padding: 30px 30px;
+            padding: 40px 30px 30px 30px;
             min-height: 220px;
         }
         .reward-box img {
@@ -3955,7 +3955,7 @@ function completeTask(taskId) {
         task.completed = true;
         addItemToJinnang('summonCharmPaper', task.reward);
         showInfoBox(`任务完成，获得${task.reward}张召唤灵符！`);
-    } else if (taskSeries === 'battleRounds' && battleRounds === task.target) {
+    } else if (taskSeries === 'battleRounds' && battleRounds >= task.target) {
         if (task.id >= 16 && task.id <= 18) {
             task.completed = true;
             addItemToJinnang('天地灵气', 100);
@@ -4084,6 +4084,12 @@ function useDrug() {
         showInfoBox("这是你第一次打开药品面板，附送至尊药品礼包一份！");
         alreadyUseDrug = true; // 修正拼写错误
     }
+    
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
+    }
+    
     document.getElementById('drug-modal').style.display = 'block';
     updateDrugGrid();
 }
@@ -4844,6 +4850,9 @@ function applySingleAscensionEffect(skill) {
 document.getElementById('ascension-skill-button').addEventListener('click', () => {
     if (!petAscended) {
         showInfoBox('您的宠物未飞升，还没有掌握飞升之术！');
+    } else if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
     } else {
         document.getElementById('ascension-skill-modal').style.display = 'block';
         updateAscensionDisplay(); // 打开时更新显示
@@ -5131,6 +5140,11 @@ function checkAwakening() {
 
 // 打开战斗精灵界面
 document.getElementById('battle-spirit-button').addEventListener('click', () => {
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
+    }
+    
     if (!awakened) {
         showInfoBox('宠物在觉醒后可以开启战斗精灵。经过精心培养的精灵不仅可以大幅增加你的战斗能力，还可以带来额外的胜场奖励。等级越高，获得奖励的概率越高。');
     } else {
@@ -5347,7 +5361,12 @@ function toggleFightingDrawer() {
         showInfoBox("请先从属性面板获取属性。");
         return;
     }
-
+    
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
+    }
+    
     const drawer = document.getElementById('fightingDrawer');
     const isOpen = drawer.classList.toggle('open');
 
@@ -5523,7 +5542,7 @@ function updateEnemyAttributes() {
         magicAttack: 2200000,
         magicDefense: 450000,
         speed: 108020,
-        cultivation: 160000
+        cultivation: 240000
     };
 
     const increasePerRound = {
@@ -5534,7 +5553,7 @@ function updateEnemyAttributes() {
         magicAttack: 650,
         magicDefense: 610,
         speed: 150,
-        cultivation: 1000
+        cultivation: 1600
     };
 
     const increasePerRoundAfter150 = {
@@ -6000,6 +6019,10 @@ function enemyInfo() {
 }        
 //跳过十轮函数
 function jumpByTenRounds() {
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
+    }
     const maxSkipRounds = Math.min(99, petLevel + 20);
 
     if (battleRounds >= maxSkipRounds) {
@@ -6136,6 +6159,11 @@ function checkCriticalHit(critRate) {
 }
 //技能升级函数
 function levelUpSkill() {
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
+    }
+    
     // 创建遮罩层
     const overlay = document.createElement('div');
     overlay.style.position = 'fixed';
@@ -6619,19 +6647,20 @@ function performAttack(type) {
         showNextBattlePrompt(false);
         return;
     }
-    
-    // 战斗逻辑判断
-    if (!battleState.player.taunt || !battleState.player.suppressed) {
-        clearTaunt();
-        cleanSuppressed();
+
+    let attackType = type; //标志变量
+
+    // 检查 taunt 状态并执行物理攻击
+    if (battleState.player.taunt) {
+        attackType = 'physical';
     }
     
-    const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(type);
+    const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(attackType);
     let damageResult;
 
-    if (type === 'physical') {
+    if (attackType === 'physical') {
         damageResult = performPhysicalAttack(skillMultiplier, isSkillUsed);
-    } else if (type === 'magical') {
+    } else if (attackType === 'magical') {
         const result = performMagicalAttack(skillMultiplier, isSkillUsed);
         if (result.retryPhysical) {
             logBattleEvent("法力值不足，自动转为物理攻击。", 'red');
@@ -6778,6 +6807,11 @@ class DivineWeaponManager {
     openDivineWeaponUI() {
         if (this.divineWeaponUI) {
             this.divineWeaponUI.remove();
+        }
+        
+        if (battleState.player.taunt) {
+            performAttack('physical');
+            return;
         }
 
         this.divineWeaponUI = document.createElement('div');
@@ -7162,7 +7196,7 @@ const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
 function divinedWeapon() {
     if (!divinedWeaponStatus) {
-        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。\n1.神器的开启和使用需要消耗大量经验值或特定的「钥匙」。 \n1.升满】按钮会根据你当前经验值或所拥有的道具数量直接升至最大值，请知悉。\n1.不建议未满级（200级）前执行神器升级操作。");
+        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。\n1.神器的开启和使用需要消耗大量经验值或特定的「钥匙」。 \n2.【升满】按钮会根据你当前经验值或所拥有的道具数量直接升至最大值，请知悉。\n3.不建议未满级（200级）前执行神器升级操作。");
         divinedWeaponStatus = true;
     }
     divineWeaponManager.openDivineWeaponUI();
@@ -7366,8 +7400,9 @@ function performPoison() {
         return;
     }
     
-    if (!battleState.player.taunt) {
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
     }
     
     if (!poisonSkillActivated) {
@@ -7482,8 +7517,9 @@ function performDefense() {
         return;
     }
     
-    if (!battleState.player.taunt) {
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
     }
 
     // 遍历技能区域并获取所有类型为 'PD' 的技能
@@ -7819,6 +7855,7 @@ function handleStunned() {
     handleManaRecover();
 }
 
+let enemyPhysicalAttackCount = 0; // 在函数外部定义变量怪物杀戮状态下的攻击次数
 //深渊巨魔使用物理攻击
 function performEnemyPhysicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -7839,7 +7876,28 @@ function performEnemyPhysicalAttack(isCritical) {
     } else {
         logBattleEvent(`深渊巨魔处于沉默状态，无法施加物理效果。`, 'grey');
     }
-    
+
+    // 新增规则判断
+    if (battleState.player.slaughter) {
+        const cultivationDiff = playerCultivation - enemyPetCultivation;
+        let extraDamage = 0;
+
+        if (cultivationDiff < 0) {
+            // 玩家修为低于敌人修为
+            const absM = Math.abs(cultivationDiff);
+            enemyPhysicalAttackCount++;
+            extraDamage = absM * enemyPhysicalAttackCount;
+            logBattleEvent(`杀戮状态下由于修为差距，敌人本次物理攻击额外造成了 ${extraDamage} 点伤害！`, 'grey');
+        } else if (cultivationDiff > 0) {
+            // 玩家修为高于敌人修为
+            const mPlus = cultivationDiff;
+            battleState.enemy.health -= mPlus;
+            logBattleEvent(`杀戮状态下由于修为差距，敌人在施放物理攻击时自身损失了 ${mPlus} 点生命值！`, 'grey');
+        }
+
+        damage += extraDamage;
+    }
+
     return damage;
 }
 
@@ -7906,7 +7964,7 @@ function applyEnemyPhysicalEffects(damage) {
                 }
                 break;
             case 'slaughter':
-                if (effectChance > adjustedChance && !battleState.player.slaughter) {
+                if (effectChance > baseChance && !battleState.player.slaughter) {
                     handleSlaughter();
                 }
                 break;
@@ -7922,6 +7980,7 @@ function applyEnemyPhysicalEffects(damage) {
 function cleanSlaughter() {
     battleState.player.slaughter = false;
     effectCooldowns.slaughter = false;
+    enemyPhysicalAttackCount = 0;
     updatePlayerStatusDisplay();
     console.log("杀戮状态已被解除。");
 }
@@ -7945,9 +8004,9 @@ function handleSlaughter() {
 
         const cultivationDifference = playerCultivation - enemyPetCultivation;
 
-        if (cultivationDifference > 0 && battleState.enemy.health <= cultivationDifference * 100) {
+        if (cultivationDifference > 0 && battleState.enemy.health <= cultivationDifference * 150) {
             battleState.enemy.health = 0;
-            logBattleEvent("道高一尺，魔高一丈，敌人低于你的修为，被当即斩杀！", 'red');
+            logBattleEvent(`道高一尺，魔高一丈，敌人低于你的修为，施法时损失${battleState.enemy.health}点生命值，被当即斩杀！`, '#FFDD55');
             updateUI();
             updatePlayerStatusDisplay();
             
@@ -7958,7 +8017,7 @@ function handleSlaughter() {
             }
         } else if (cultivationDifference < 0 && battleAttributes.health <= Math.abs(cultivationDifference)) {
             battleAttributes.health = 0;
-            logBattleEvent("道高一尺，魔高一丈，你低于敌人的修为，在千钧一发之际施法陨落了", 'red');
+            logBattleEvent("道高一尺，魔高一丈，你低于敌人的修为，施法时损失${battleAttributes.health}点生命值，被当即斩杀！", '#FFDD55');
             updateUI();
             updatePlayerStatusDisplay();
 
@@ -7973,6 +8032,7 @@ function handleSlaughter() {
     setTimeout(() => {
         battleState.player.slaughter = false;
         effectCooldowns.slaughter = false;
+        enemyPhysicalAttackCount = 0;
         clearInterval(slaughterInterval);
         updatePlayerStatusDisplay();
     }, 10000); // 杀戮效果持续10秒
@@ -8115,60 +8175,34 @@ function cleanSuppressed() {
     updateUI();
 }
 
-// 全局对象来管理嘲讽状态及相关变量
-const tauntState = {
-    timeoutId: null
-};
+let tauntTimeout; // 保存定时器 ID
 
 function handleTaunt() {
     if (battleState.player.taunt) {
-        logBattleEvent("你已经被嘲讽，不能使用其他技能。", '#FF4500');
+        logBattleEvent("你已经被嘲讽,不能使用其他技能。", '#FF4500');
         return;
     }
 
     battleState.player.taunt = true;
-    logBattleEvent("深渊巨魔极尽嬉笑怒骂之攻势，你未能压抑心中怒火，嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
+    logBattleEvent("深渊巨魔极尽嬉笑怒骂之攻势,你未能压抑心中怒火,嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.taunt = true;
     updatePlayerStatusDisplay();
-
-    const originalPerformMagicalAttack = performMagicalAttack;
-    const originalPerformHeal = performHeal;
-    const originalPerformPoison = performPoison;
-    const originalPerformDefense = performDefense;
-
-    const tauntWrappedAction = () => performAttack('physical');
-
-    performMagicalAttack = tauntWrappedAction;
-    performHeal = tauntWrappedAction;
-    performPoison = tauntWrappedAction;
-    performDefense = tauntWrappedAction;
     updateUI();
 
-    tauntState.timeoutId = setTimeout(() => {
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    tauntTimeout = setTimeout(() => {
+        battleState.player.taunt = false;
+        effectCooldowns.taunt = false;
+        updatePlayerStatusDisplay();
+        updateUI();
     }, 10000); // 嘲讽效果持续10秒
 }
 
-function endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense) {
+function clearTaunt() {
     battleState.player.taunt = false;
     effectCooldowns.taunt = false;
-    performMagicalAttack = originalPerformMagicalAttack;
-    performHeal = originalPerformHeal;
-    performPoison = originalPerformPoison;
-    performDefense = originalPerformDefense;
+    clearTimeout(tauntTimeout); // 清除嘲讽定时器
     updatePlayerStatusDisplay();
-}
-
-function clearTaunt() {
-    if (battleState.player.taunt) {
-        clearTimeout(tauntState.timeoutId); // 清除嘲讽定时器
-        const originalPerformMagicalAttack = performMagicalAttack;
-        const originalPerformHeal = performHeal;
-        const originalPerformPoison = performPoison;
-        const originalPerformDefense = performDefense;
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
-    } 
     updateUI();
 }
 
@@ -8377,9 +8411,11 @@ function performHeal() {
         return;
     }
     
-    if (!battleState.player.taunt) {
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    if (battleState.player.taunt) {
+        performAttack('physical');
+        return;
     }
+    
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
@@ -9550,6 +9586,12 @@ function collectTreasure() {
             case '天地灵气礼包（10）':
                 addItemToJinnang('earthlyEnergy',10);
                 break;
+            case '特级悟性丹':
+                addItemToJinnang('tejiWisdomPill');
+                break;
+            case '特级悟性丹礼包（10）':
+                addItemToJinnang('tejiWisdomPill',10);
+                break;
             case '仙人醍醐':
                 addItemToJinnang('ultraSkillBoomer');
                 break;
@@ -9683,7 +9725,7 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '奇馈宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 24 },
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 20 },
             { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 23 },
             { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', chance: 10 },
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 10 },
@@ -9691,7 +9733,9 @@ function getRandomReward(type) {
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
             { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.5 },
-            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.5 }
+            { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 3.5 },
+            { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.8 },
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.2 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },

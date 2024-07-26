@@ -2203,7 +2203,7 @@
                     { name: '天河召唤', rarity: 'S', type: 'PA', multiplier: 2.5, description: '天蓬元帅召唤八万天河水军吞噬一切妖魔鬼怪。对敌方造成物理伤害。' },
                     { name: '九齿透骨', rarity: 'SS', type: 'PP', multiplier: 2.5, description: '九戒使用九齿钉耙发动猛击，对一横排范围目标造成持续流血伤害。' },
                     { name: '上宝沁金耙', rarity: 'SS', type: 'MA', multiplier: 2.8, description: '上宝沁金耙蕴含无穷法力，对十字目标进行法术攻击' },
-                    { name: '天蓬下凡', rarity: 'SS', type: 'PD', multiplier: 2, description: '传说天蓬元帅下凡时周身簇拥着无数天兵为其护法。消耗自身60%寿命及百分比蓝为己方十字目标增加百分比法术防御，技能效果随宠物修为和技能等级提升而提升。' }
+                    { name: '天蓬下凡', rarity: 'SS', type: 'PD', multiplier: 1.8, description: '传说天蓬元帅下凡时周身簇拥着无数天兵为其护法。消耗自身60%寿命及百分比蓝为己方十字目标增加百分比法术防御，技能效果随宠物修为和技能等级提升而提升。' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -2291,7 +2291,7 @@
                     { name: '鸟鸣', rarity: 'S', type: 'MA', multiplier: 2.5, description: '五彩鸟的尖叫声足以摧毁敌人的意志，对单个敌人造成法术伤害同时使敌人无法使用法术攻击，效果持续2回合，技能等级越高伤害越高。' },
                     { name: '百鸟朝凤', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '五彩鸟挥动翅膀召唤百鸟冲向敌人，对敌方全体单位造成伤害，敌人沉浸在鸟群中无法躲避。' },
                     { name: '拯救', rarity: 'SS', type: 'PH', multiplier: 2, description: '五彩鸟牺牲自己的寿命拯救别人，恢复目标自身以及目标旁边随机一个目标百分比的血量。' },
-                    { name: '凤佑天下', rarity: 'SS', type: 'SH', multiplier: 1.2, description: '五彩鸟在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
+                    { name: '凤佑天下', rarity: 'SS', type: 'PD', multiplier: 2, description: '五彩鸟在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -6839,7 +6839,6 @@ function performAttack(type) {
     }
 
     let attackType = type; //标志变量
-
     // 检查 taunt 状态并执行物理攻击
     if (battleState.player.taunt) {
         attackType = 'physical';
@@ -6858,10 +6857,11 @@ function performAttack(type) {
             return;
         }
         damageResult = result.damage;
+        console.log(`performAttack中本次伤害输出为${result.damage}。`)
     }
 
     handleCriticalAndDrunken(damageResult);
-    applyDefenseBonus(); // 处理防御后的增益效果
+    applyDefenseBonusEffect(); // 处理防御后的增益效果
 
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
@@ -6873,20 +6873,6 @@ function performAttack(type) {
     setTimeout(enemyAttack, 500);
     updateUI();
     applyAscensionEffects();
-}
-
-function applyDefenseBonus() {
-    if (battleState.player.defenseBonus) {
-        const { critRate, critDamage } = battleState.player.defenseBonus;
-
-        // 立即移除增益
-        playerCritRate -= critRate;
-        playerCritDamage -= critDamage;
-
-        logBattleEvent(`你的蓄力增益效果已应用：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
-        battleState.player.defenseBonusCount = 0; // 重置计数
-        battleState.player.defenseBonus = null; // 重置增益状态
-    }
 }
 
 function performIndependentMagicAttack() {
@@ -7718,7 +7704,6 @@ function performDefense() {
         return;
     }
 
-    // 遍历技能区域并获取所有类型为 'PD' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -7736,30 +7721,33 @@ function performDefense() {
     }
 
     let defenseReduction = (Math.random() * (0.99 - 0.8) + 0.8) * skillMultiplier;
-    if (defenseReduction > 1) {
-        defenseReduction = 1; // 将减伤倍数限制为最大100%
-    }
+
     battleState.player.defending = true;
     battleState.player.defenseReduction = defenseReduction;
     logBattleEvent(`你施放了 ${selectedSkillName}，本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
 
-    // 更新防御增益计数
+    applyDefenseBonus(selectedSkillName);
+    playerTurn = false;
+    setTimeout(enemyAttack, 500);
+
+    applyAscensionEffects();
+    updateUI();
+}
+
+function applyDefenseBonus(selectedSkillName) {
     if (!battleState.player.defenseBonusCount) {
         battleState.player.defenseBonusCount = 0;
     }
     if (battleState.player.defenseBonusCount < 5) {
         battleState.player.defenseBonusCount += 1;
 
-        // 固定增加的暴击率和暴击伤害
-        const bonusCritRate = 0.06; // 每次防御增加6%暴击率
-        const bonusCritDamage = 0.09; // 每次防御增加9%暴击伤害
+        const bonusCritRate = 0.06;
+        const bonusCritDamage = 0.09;
 
-        // 应用增益
         playerCritRate += bonusCritRate;
         playerCritDamage += bonusCritDamage;
 
-        // 更新防御增益状态
         if (!battleState.player.defenseBonus) {
             battleState.player.defenseBonus = {
                 critRate: 0,
@@ -7770,54 +7758,25 @@ function performDefense() {
         battleState.player.defenseBonus.critDamage += bonusCritDamage;
 
         logBattleEvent(`这是你第 ${battleState.player.defenseBonusCount} 次施放 ${selectedSkillName} ，蓄力了 ${bonusCritRate * 100}% 暴击率和 ${bonusCritDamage * 100}% 暴击伤害的增益。`, 'yellow');
-        updatePlayerStatusDisplay(); // 更新玩家状态显示
+        updatePlayerStatusDisplay();
     } else {
         logBattleEvent(`防御增益已达到最大值，无法再增加。`, 'yellow');
     }
-
-    playerTurn = false; // 轮到深渊巨魔回合
-    setTimeout(enemyAttack, 500); // 延迟0.5秒后深渊巨魔回合
-
-    applyAscensionEffects();
-    updateUI();
 }
 
-//应用智慧守护
-function handleWiseDefense(damage) {
-    const shSkills = [];
-    const skillsArea = document.getElementById("skills-area");
-    if (skillsArea) {
-        Array.from(skillsArea.children).forEach(skillDiv => {
-            const skillName = skillDiv.innerText.split(' ')[0];
-            const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === "SH");
-            if (skill) {
-                shSkills.push(skill);
-            }
-        });
+function applyDefenseBonusEffect() {
+    if (battleState.player.defenseBonus) {
+        const { critRate, critDamage } = battleState.player.defenseBonus;
+
+        playerCritRate -= critRate;
+        playerCritDamage -= critDamage;
+
+        logBattleEvent(`你的蓄力增益效果已应用：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
+        battleState.player.defenseBonusCount = 0;
+        battleState.player.defenseBonus = null;
     }
-
-    if (shSkills.length === 0) return damage;
-
-    let finalDamage = damage;
-
-    for (const shSkill of shSkills) {
-        const { skillLevel, skillMultiplier } = calculateSkillLevelAndMultiplier(shSkill);
-        const damageReductionPercentage = Math.min(0.6, 0.4 + skillLevel * 0.01);
-        const defenseFactor = 1 + 0.05 * (skillLevel - 1);
-        const reservePercentage = Math.max(0, 0.19 - 0.01 * (skillLevel - 1));
-        const maxManaUsed = Math.floor(battleAttributes.mana * (1 - reservePercentage));
-        const maxDamageToCancel = Math.round(finalDamage * damageReductionPercentage);
-        const damageToCancel = Math.min(maxDamageToCancel, maxManaUsed * defenseFactor);
-        const manaUsed = Math.min(maxManaUsed, Math.ceil(damageToCancel / defenseFactor));
-        battleAttributes.mana -= manaUsed;
-        finalDamage -= Math.round(manaUsed * defenseFactor);
-
-        logBattleEvent(`${shSkill.name} ${skillLevel}级为你消耗 ${manaUsed} 点法力值抵抗了 ${Math.round(manaUsed * defenseFactor)} 点伤害。`, '#99FFFF');
-
-    }
-
-    return finalDamage;
 }
+        
 
 function handleManaRecover() {
     const hlSkills = [];
@@ -7843,7 +7802,7 @@ function handleManaRecover() {
         logBattleEvent(`${hlSkill.name} ${skillLevel}级为你恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
     }
 }
-
+        
 // 更新 enemyAttack 函数，确保战斗效果生效
 function enemyAttack() {
     if (!battleState || !battleAttributes || !battleState.enemy) {
@@ -7853,17 +7812,59 @@ function enemyAttack() {
 
     if (handleDazed()) return;
     if (handleStunned()) return;
-
+    
     const enemyHealthPercentage = battleState.enemy.health / enemyMaxHealth;
     const enemyManaPercentage = battleState.enemy.mana / enemyMaxMana;
     const healProbability = enemyHealthPercentage < 0.3 ? 0.7 : 0.1;
-
+    
     if (Math.random() < healProbability) {
         enemyHeal();
         return;
     }
 
-    // 新增偷窃逻辑
+    if (handleEnemySteal(enemyHealthPercentage, enemyManaPercentage)) {
+        updateUI();
+        return;
+    }
+    
+    let damage;
+    let isCritical = checkCriticalHit(enemyCritRate);
+    
+    if (battleState.enemy.intimidated) {
+        isCritical = false;
+    }
+    
+    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
+    if (attackType === 'physical') {
+        damage = performEnemyPhysicalAttack(isCritical);
+    } else if (attackType === 'magical' && !battleState.enemy.silenced) {
+        damage = performEnemyMagicalAttack(isCritical);
+    } else {
+        logBattleEvent("深渊巨魔被沉默，无法进行法术攻击。", 'white');
+        return;
+    }
+    
+    damage = handleWiseDefense(damage);
+    
+    handleBurnt();
+    handleCriticalHit(isCritical);
+    handleDamageReduction(damage);
+    handleReflectAndHeal(damage);
+    handleResurrection(damage);
+    handleManaRecover();
+    
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+    } else if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+    } else {
+        updateUI();
+        playerTurn = true;
+    }
+}
+
+function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
     if (enemyHealthPercentage < 0.05 && Math.random() < 0.5 && drugInventory['延寿露'] && drugInventory['延寿露'].quantity > 0) {
         if (Math.random() < 0.8) {
             const healthRecovered = Math.floor(enemyMaxHealth * 0.2);
@@ -7875,6 +7876,7 @@ function enemyAttack() {
             logBattleEvent("深渊巨魔想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
             handleSlow(); // 直接应用迟缓效果
         }
+        return true;
     } else if (enemyManaPercentage < 0.05 && Math.random() < 0.5 && drugInventory['天山雪莲'] && drugInventory['天山雪莲'].quantity > 0) {
         if (Math.random() < 0.8) {
             const manaRecovered = Math.floor(enemyMaxMana * 0.2);
@@ -7886,46 +7888,11 @@ function enemyAttack() {
             logBattleEvent("深渊巨魔想窃取你的资源，但你识破了，没受到任何损失", 'wheat');
             handleSlow(); // 直接应用迟缓效果
         }
-        updateUI();
-        return;
+        return true;
     }
-
-    let damage;
-    let isCritical = checkCriticalHit(enemyCritRate);
-
-    if (battleState.enemy.intimidated) {
-        isCritical = false;
-    }
-
-    const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
-    if (attackType === 'physical') {
-        damage = performEnemyPhysicalAttack(isCritical);
-    } else if (attackType === 'magical' && !battleState.enemy.silenced) {
-        damage = performEnemyMagicalAttack(isCritical);
-    } else {
-        logBattleEvent("深渊巨魔被沉默，无法进行法术攻击。", 'white');
-        return;
-    }
-
-    damage = handleWiseDefense(damage);
-    
-    handleBurnt();
-    handleCriticalHit(isCritical);
-    handleDamageReduction(damage);
-    handleReflectAndHeal(damage);
-    handleResurrection(damage);
-    handleManaRecover();
-
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false);
-    } else if (battleState.enemy.health <= 0) {
-        updateEnemyAttributes();
-        showNextBattlePrompt(true);
-    } else {
-        updateUI();
-        playerTurn = true;
-    }
+    return false;
 }
+
 // 直接应用迟缓效果的函数
 function handleSlow() {
     const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
@@ -8059,6 +8026,7 @@ function performEnemyPhysicalAttack(isCritical) {
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
+
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
@@ -8109,6 +8077,7 @@ function performEnemyMagicalAttack(isCritical) {
     let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
+
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
@@ -8138,7 +8107,7 @@ function applyEnemyPhysicalEffects(damage) {
         const adjustedChance = Math.max(0.01, baseChance + probabilityAdjustment);
         const effectChance = Math.random();
 
-        console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
+        //console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
 
         if (battleState.player[effect]) {
             console.log(`玩家已经处于 ${effect} 状态，无法叠加。`);
@@ -8354,7 +8323,7 @@ function handleSuppressed() {
 function endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense) {
     battleState.player.suppressed = false;
     effectCooldowns.suppressed = false;
-    if (!suppressionState.actionPerformed) {
+    if (!suppressionState.actionPerformed || battleState.player.suppressed) {
         battleAttributes.health = 1;
         battleAttributes.mana = 1;
         battleAttributes.physicalAttack = 1;
@@ -8428,7 +8397,7 @@ function applyEnemyMagicEffects(damage) {
         const adjustedChance = Math.max(0.01, baseChance + probabilityAdjustment);
         const effectChance = Math.random();
 
-        console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
+        //console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
         
         if (effectChance < adjustedChance) {
             triggeredEffects.push(effect);
@@ -8536,10 +8505,18 @@ function handleCriticalHit(isCritical) {
     }
 }
 
+let extraShield = 0;
 function handleDamageReduction(damage) {
+    let initialDamage = damage;
+    let totalDamageReduction = 0;
+    let shieldReduction = 0;
+    let defenseReduction = 0;
+    let finalDamage = damage;
+
     if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
         damage = 0;
         logBattleEvent("无我之境触发，玩家免疫一切伤害！", 'silver');
+        return;
     }
 
     if (isNaN(damage)) {
@@ -8547,24 +8524,100 @@ function handleDamageReduction(damage) {
         console.error("Damage is NaN, setting to 0.");
     }
 
-    const damageReduction = battleState.player.damageReductionPercentage / 100;
-    if (damageReduction > 0) {
-        const reducedDamage = Math.floor(damage * damageReduction);
-        damage = Math.floor(damage * (1 - damageReduction));
-        logBattleEvent(`铜墙铁壁触发，伤害减少了 ${reducedDamage} 点。`, 'orange');
+    if (extraShield > 0) {
+        const shieldBefore = extraShield;
+        damage -= extraShield;
+        if (damage < 0) {
+            extraShield = -damage;
+            damage = 0;
+        } else {
+            extraShield = 0;
+        }
+        shieldReduction = shieldBefore - extraShield;
+    }
+
+    const damageReductionPercentage = battleState.player.damageReductionPercentage / 100;
+    if (damageReductionPercentage > 0) {
+        const reduction = Math.floor(damage * damageReductionPercentage);
+        damage -= reduction;
+        totalDamageReduction += reduction;
     }
 
     if (battleState.player.defending) {
-        const defenseReduction = battleState.player.defenseReduction;
-        const reducedDamage = Math.floor(damage * defenseReduction);
-        damage = Math.floor(damage * (1 - defenseReduction));
-        logBattleEvent(`护体格挡生效，伤害减少了 ${reducedDamage} 点。`, 'orange');
+        const defenseReductionPercentage = battleState.player.defenseReduction;
+        const reduction = Math.floor(damage * defenseReductionPercentage);
+        
+        if (defenseReductionPercentage > 1) {
+            extraShield += Math.floor(damage * (defenseReductionPercentage - 1));        
+        }
+        
+        damage -= reduction;
+        defenseReduction += reduction;
         battleState.player.defending = false;
     }
 
-    battleAttributes.health = Math.max(0, battleAttributes.health - damage);
+    finalDamage = damage;
+    const rightBattleAttributesHealth = battleAttributes.health
+    battleAttributes.health = Math.max(0, battleAttributes.health - finalDamage);
+    if (battleAttributes.health > rightBattleAttributesHealth) {
+    battleAttributes.health = rightBattleAttributesHealth;
+    }
+    
+    // 假设 wiseDefense 在函数外有定义
+    const finalDamageReduction = shieldReduction + defenseReduction + totalDamageReduction + (isNaN(wiseDefense) ? 0 : wiseDefense);
+
+    const formattedFinalDamageReduction = isNaN(finalDamageReduction) ? 0 : finalDamageReduction;
+    const formattedFinalDamage = isNaN(finalDamage) ? 0 : finalDamage;
+    const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
+    if (formattedFinalDamage >= 0){
+        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, '#99FFFF');
+    } else {
+        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，通过格挡你积累了 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
+    }
+    
+    console.log(`护盾抵挡了 ${shieldReduction} 点伤害，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，飞升技能抵挡 ${totalDamageReduction} 点伤害。目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
 }
 
+//智慧守护
+let wiseDefense;
+function handleWiseDefense(damage) {
+    const shSkills = [];
+    const skillsArea = document.getElementById("skills-area");
+    if (skillsArea) {
+        Array.from(skillsArea.children).forEach(skillDiv => {
+            const skillName = skillDiv.innerText.split(' ')[0];
+            const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === "SH");
+            if (skill) {
+                shSkills.push(skill);
+            }
+        });
+    }
+
+    if (shSkills.length === 0) return damage;
+
+    let finalDamage = damage;
+
+    for (const shSkill of shSkills) {
+        const { skillLevel, skillMultiplier } = calculateSkillLevelAndMultiplier(shSkill);
+        const damageReductionPercentage = Math.min(0.6, 0.4 + skillLevel * 0.01);
+        const defenseFactor = 1 + 0.05 * (skillLevel - 1);
+        const reservePercentage = Math.max(0, 0.19 - 0.01 * (skillLevel - 1));
+        const maxManaUsed = Math.floor(battleAttributes.mana * (1 - reservePercentage));
+        const maxDamageToCancel = Math.round(finalDamage * damageReductionPercentage);
+        const damageToCancel = Math.min(maxDamageToCancel, maxManaUsed * defenseFactor);
+        const manaUsed = Math.min(maxManaUsed, Math.ceil(damageToCancel / defenseFactor));
+        battleAttributes.mana -= manaUsed;
+        finalDamage -= Math.round(manaUsed * defenseFactor);
+
+        wiseDefense = Math.round(manaUsed * defenseFactor);
+
+        logBattleEvent(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`, '#99FFFF');
+
+    }
+
+    return finalDamage;
+}
+        
 function handleReflectAndHeal(damage) {
     if (ascensionSkill.name === '以牙还牙' || secondAscensionSkill.name === '以牙还牙') {
         const reflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
@@ -8796,6 +8849,7 @@ function showNextBattlePrompt(playerWon) {
         showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp");
         updateGoldDisplay(goldAmount);
     }
+    extraShield = 0;
     resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
     resetBuffState(playerWon);
     clearEnemyEffect();

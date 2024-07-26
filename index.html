@@ -705,8 +705,7 @@
             transform: translateY(0);
         }
         .jinnang-info {
-            display: flex;
-            padding: 15px;
+            padding: 20px;
             justify-items: center;
         }
         .jinnang-info.open {
@@ -718,7 +717,7 @@
             gap: 10px 0px;
             justify-content: center;
             margin-top: 5px;
-            font-size: 14px;
+            font-size: 12px;
         }
         .jinnang-reward img {
             width: 40px;
@@ -1882,6 +1881,7 @@
         <div class="jinnang-info" id="jinnang-info">
             <div class="jinnang-reward" id="jinnang-reward"></div>
         </div>
+        <div id="jinnang-description" class="treasure-description-box">背包内的物品可以点击查看其描述，如果你不需要多余的物品，还可以直接出售。每个物品的售价因其稀有程度而有所不同。</div>
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
@@ -9927,6 +9927,10 @@ function updateJinnangItems() {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'jinnang-item';
             itemDiv.style.position = 'relative'; // 为了定位描述框
+            itemDiv.style.display = 'flex'; 
+            itemDiv.style.flexDirection = 'column'; 
+            itemDiv.style.alignItems = 'center'; 
+            itemDiv.style.justifyContent = 'space-between'; 
             itemDiv.innerHTML = `
                 <img src="${item.url}" alt="${item.name}">
                 <div>${item.displayName}</div>

@@ -1762,7 +1762,8 @@
                     </div>
                     <div id="remaining-points-display">剩余点数: 0</div>
                     <div>飞升状态: <span id="ascension-status">未飞升</span></div>
-                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>                    
+                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>  
+                    <div>当前修为: <span id="player-cultivation">0</span></div> 
                     <div>宠物评分: <span id="skill-score">0</span></div>
                 </div>
                 <div class="image-frame">
@@ -1925,6 +1926,7 @@
                     <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
                     <p>法术防御: <span id="your-pet-magic-defense"></span></p>
                     <p>速度: <span id="your-pet-speed"></span></p>
+                    <p>修为: <span id="your-pet-cultivation"></span></p>
                     <p>暴击: <span id="player-crit-rate"></span></p>
                     <p>暴击伤害: <span id="player-crit-damage"></span></p>
                     <div id="exp-bar-container">
@@ -1949,6 +1951,7 @@
                     <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
                     <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
                     <p>速度: <span id="enemy-pet-speed"></span></p>
+                    <p>修为: <span id="enemy-pet-cultivation"></span></p>
                     <p>暴击: <span id="enemy-crit-rate"></span></p>
                     <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
                     </div>
@@ -3393,6 +3396,8 @@ function storeCurrentPetData() {
             maxExp: maxExp,
             playerCritRate: playerCritRate,
             playerCritDamage: playerCritDamage,
+            playerCultivation: playerCultivation,
+            enemyPetCultivation: enemyPetCultivation,
             enemyCritRate: enemyCritRate,
             enemyCritDamage: enemyCritDamage,
             ascensionEnabled: ascensionEnabled,
@@ -3408,6 +3413,7 @@ function storeCurrentPetData() {
             ascensionAttributes: ascensionAttributes,
             drugBonus: drugBonus,
             alreadyUseDrug: alreadyUseDrug,
+            divinedWeaponStatus: divinedWeaponStatus,
             baseAttributes: baseAttributes,
             skillScore: skillScore,
             existingSkills: existingSkills, // 存储技能数据
@@ -3444,6 +3450,8 @@ function restorePetData(petName) {
         maxExp = savedPetData.maxExp;
         playerCritRate = savedPetData.playerCritRate;
         playerCritDamage = savedPetData.playerCritDamage;
+        playerCultivation = savedPetData.playerCultivation;
+        enemyPetCultivation = savedPetData.enemyPetCultivation;
         enemyCritRate = savedPetData.enemyCritRate;
         enemyCritDamage = savedPetData.enemyCritDamage;
         ascensionEnabled = savedPetData.ascensionEnabled;
@@ -3456,6 +3464,7 @@ function restorePetData(petName) {
         secondAscensionSkill = savedPetData.secondAscensionSkill ? getSkillFromName(savedPetData.secondAscensionSkill.name, savedPetData.secondAscensionSkill.level) : null;
         ascensionAttributes = savedPetData.ascensionAttributes;
         drugBonus = savedPetData.drugBonus;
+        divinedWeaponStatus = savedPetData.divinedWeaponStatus;
         alreadyUseDrug = savedPetData.alreadyUseDrug;
         baseAttributes = savedPetData.baseAttributes;
         skillScore = savedPetData.skillScore;
@@ -3933,17 +3942,18 @@ function completeTask(taskId) {
             addItemToJinnang('天地灵气', 100);
             showInfoBox('任务完成，获得100个天地灵气！');
         } else if (task.id === 19 || task.id === 20) {
-            showInfoBox('恭喜你完成挑战，你有一次时光倒流回第1轮的机会，是否接受？点击确认将进入第一轮，取消则获得100个天地灵气', () => {
+            showInfoBox('恭喜你完成挑战，你有一次时光倒流回第1轮的机会，是否接受？点击确认将进入第一轮，取消则获得200个天地灵气', () => {
                 battleRounds = 1;
                 initializeEnemyPet();
+                updateEnemyAttributes();
                 updateUI();
                 showInfoBox('一阵悦耳的音乐在你耳畔响起来，结束时，你睁开了双眼');
                 task.completed = true;
                 updateTaskList();
                 updateStampCount();
             }, () => {
-                addItemToJinnang('天地灵气', 100);
-                showInfoBox('任务完成，获得100个天地灵气！');
+                addItemToJinnang('天地灵气', 200);
+                showInfoBox('任务完成，获得200个天地灵气！');
                 task.completed = true;
                 updateTaskList();
                 updateStampCount();
@@ -3989,7 +3999,7 @@ function updateTaskList() {
                 submitButton.innerText = '提交';
                 submitButton.addEventListener('click', () => completeTask(currentTask.id));
                 taskItem.appendChild(submitButton);
-            } else if (series === 'battleRounds' && battleRounds === currentTask.target) {
+            } else if (series === 'battleRounds' && battleRounds >= currentTask.target) {
                 const submitButton = document.createElement('button');
                 submitButton.innerText = '提交';
                 submitButton.addEventListener('click', () => completeTask(currentTask.id));
@@ -4039,7 +4049,7 @@ let drugInventory = {
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
     "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后30秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后各有1/3的概率让怪物血量变为1/获得10000经验/回退10轮" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得10000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，永久增加100点速度，收集3个可以合成1个绿色品阶的药品" },
@@ -4380,13 +4390,13 @@ function useSelectedDrug() {
                 );
                 break;
                 case "幸运金币":
-                    if (Math.random() < 0.3 && battleRounds > 10) {
+                    if (Math.random() < 0.1 && battleRounds > 10) {
                         const battleRoundsToDecrease = battleRounds - 10;
                         initializeEnemyPet();
                         battleRounds = battleRoundsToDecrease;
                         updateEnemyAttributes();
                         logBattleEvent(`使用幸运金币，你成功回退至10轮之前。`, 'gold');
-                    } else if (Math.random() < 0.4) {
+                    } else if (Math.random() < 0.8) {
                         currentExp += 10000;
                         logBattleEvent(`使用幸运金币，获得了10000点经验值。`, 'gold');
                     } else {
@@ -4493,7 +4503,8 @@ function handleMushroom() {
         physicalDefense: Math.round(enemyPet.physicalDefense * 0.5),
         magicAttack: Math.round(enemyPet.magicAttack * 0.5),
         magicDefense: Math.round(enemyPet.magicDefense * 0.5),
-        speed: Math.round(enemyPet.speed * 0.5)
+        speed: Math.round(enemyPet.speed * 0.5),
+        cultivation: Math.round(enemyPet.cultivation * 1)
     };
 
     enemyPet = reducedEnemyState;
@@ -5438,12 +5449,15 @@ let enemyPet = {
     physicalDefense: 1,
     magicAttack: 2,
     magicDefense: 3,
-    speed: 6
+    speed: 6,
+    cultivation: 0
 };
 
 let enemyMaxHealth = enemyPet.health;
 let enemyMaxMana = enemyPet.mana;
 let enemyInitialState = null;
+let enemyPetCultivation;
+let playerCultivation;
 
 function initializeEnemyPet() {
     enemyPet = {
@@ -5453,11 +5467,13 @@ function initializeEnemyPet() {
         physicalDefense: 1,
         magicAttack: 2,
         magicDefense: 3,
-        speed: 6
+        speed: 6,
+        cultivation: 0
     };
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
+    enemyPetCultivation = enemyPet.cultivation;
 
     if (battleState) {
         battleState.enemy = { ...enemyPet };
@@ -5474,6 +5490,7 @@ function restoreEnemyState() {
         enemyPet = JSON.parse(JSON.stringify(enemyInitialState));
         enemyMaxHealth = enemyPet.health;
         enemyMaxMana = enemyPet.mana;
+        enemyPetCultivation = enemyPet.cultivation;
         battleState.enemy = { ...enemyPet };
     }
 }
@@ -5486,7 +5503,8 @@ function updateEnemyAttributes() {
         physicalDefense: 550000,
         magicAttack: 2200000,
         magicDefense: 450000,
-        speed: 108020
+        speed: 108020,
+        cultivation: 160000
     };
 
     const increasePerRound = {
@@ -5496,7 +5514,19 @@ function updateEnemyAttributes() {
         physicalDefense: 620,
         magicAttack: 650,
         magicDefense: 610,
-        speed: 150
+        speed: 150,
+        cultivation: 1000
+    };
+
+    const increasePerRoundAfter150 = {
+        health: 60000,
+        mana: 32000,
+        physicalAttack: 350,
+        physicalDefense: 300,
+        magicAttack: 350,
+        magicDefense: 300,
+        speed: 20,
+        cultivation: 20
     };
 
     function calculateAttributeValue(attribute, initialValue) {
@@ -5518,24 +5548,33 @@ function updateEnemyAttributes() {
             const maxValueAt140 = maxValues[attribute] * 0.8;
             const remainingIncrease = maxValueAt140 - maxValueAt130;
             return Math.min(maxValues[attribute], maxValueAt130 + remainingIncrease * (remainingRounds / 10));
-        } else {
+        } else if (battleRounds <= 150) {
             const maxValueAt140 = maxValues[attribute] * 0.8;
             const remainingRounds = battleRounds - 140;
             const remainingIncrease = maxValues[attribute] - maxValueAt140;
             return Math.min(maxValues[attribute], maxValueAt140 + remainingIncrease * (remainingRounds / 10));
+        } else {
+            const maxValueAt150 = maxValues[attribute];
+            const roundsAfter150 = battleRounds - 150;
+            const randomMultiplier = Math.floor(Math.random() * (150 - 2 + 1)) + 2;
+            const increaseAfter150 = roundsAfter150 * (increasePerRoundAfter150[attribute] * randomMultiplier);
+            const attributeValue = maxValueAt150 + increaseAfter150;
+            return attributeValue;
         }
     }
 
-    enemyPet.health = Math.min(maxValues.health, Math.round(calculateAttributeValue('health', enemyPet.health)));
-    enemyPet.mana = Math.min(maxValues.mana, Math.round(calculateAttributeValue('mana', enemyPet.mana)));
-    enemyPet.physicalAttack = Math.min(maxValues.physicalAttack, Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack)));
-    enemyPet.physicalDefense = Math.min(maxValues.physicalDefense, Math.round(calculateAttributeValue('physicalDefense', enemyPet.physicalDefense)));
-    enemyPet.magicAttack = Math.min(maxValues.magicAttack, Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack)));
-    enemyPet.magicDefense = Math.min(maxValues.magicDefense, Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense)));
-    enemyPet.speed = Math.min(maxValues.speed, Math.round(calculateAttributeValue('speed', enemyPet.speed)));
+    enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
+    enemyPet.mana = Math.round(calculateAttributeValue('mana', enemyPet.mana));
+    enemyPet.physicalAttack = Math.round(calculateAttributeValue('physicalAttack', enemyPet.physicalAttack));
+    enemyPet.physicalDefense = Math.round(calculateAttributeValue('physicalDefense', enemyPet.physicalDefense));
+    enemyPet.magicAttack = Math.round(calculateAttributeValue('magicAttack', enemyPet.magicAttack));
+    enemyPet.magicDefense = Math.round(calculateAttributeValue('magicDefense', enemyPet.magicDefense));
+    enemyPet.speed = Math.round(calculateAttributeValue('speed', enemyPet.speed));
+    enemyPet.cultivation = Math.round(calculateAttributeValue('cultivation', enemyPet.cultivation));
 
     enemyMaxHealth = enemyPet.health;
     enemyMaxMana = enemyPet.mana;
+    enemyPetCultivation = enemyPet.cultivation;
 
     battleState.enemy = { ...enemyPet };
     storeEnemyInitialState();
@@ -5581,12 +5620,17 @@ function updateUI() {
     document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack;
     document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense;
     document.getElementById("your-pet-speed").innerText = battleAttributes.speed;
+    document.getElementById("your-pet-cultivation").innerText = playerCultivation;
 
     document.getElementById("enemy-pet-physical-attack").innerText = battleState.enemy.physicalAttack;
     document.getElementById("enemy-pet-physical-defense").innerText = battleState.enemy.physicalDefense;
     document.getElementById("enemy-pet-magic-attack").innerText = battleState.enemy.magicAttack;
     document.getElementById("enemy-pet-magic-defense").innerText = battleState.enemy.magicDefense;
     document.getElementById("enemy-pet-speed").innerText = battleState.enemy.speed;
+    
+    //更新敌人修为显示
+    const enemyPetCultivationElement = document.getElementById("enemy-pet-cultivation");
+    enemyPetCultivationElement.innerText = battleState.enemy.cultivation;
 
     // 更新暴击率和暴击伤害
     document.getElementById("player-crit-rate").innerText = Math.round(playerCritRate * 100) + '%';
@@ -5602,6 +5646,7 @@ function updateUI() {
     document.getElementById('enemy-level').innerText = enemyLevel;
     updatePetLevel();
     updateHealthAndManaDisplay();
+
 }
 
 function updateHealthAndManaDisplay() {
@@ -5659,10 +5704,11 @@ const effectCooldowns = {
     suppressed: false,
     taunt: false,
     seal: false,
+    slaughter:false,
 };
         
 function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal', 'slaughter'];
 
     effects.forEach(effect => {
         if (battleState.player[effect]) {
@@ -5695,6 +5741,10 @@ function clearEnemyEffect() {
                     // 清除嘲讽效果，恢复原始函数
                     clearTaunt();
                     break;
+                case 'slaughter':
+                    // 清除杀戮效果，恢复原始函数
+                    cleanSlaughter();
+                    break;
                 case 'seal':
                     // 清除封印效果，恢复原始技能名称
                     ascensionSkill.name = battleState.player.originalAscensionSkill;
@@ -5714,7 +5764,6 @@ function clearPlayerEffect() {
     const effects = ['armorBreak', 'pierced', 'silenced', 'poisoned', 'stunned', 'intimidated', 'benumbed', 'dazed', 'burnt', 'slow'];
     effects.forEach(effect => {
         battleState.enemy[effect] = false;
-        effectCooldowns[effect] = false;
     });
     updateEnemyStatusDisplay();
 }
@@ -5727,6 +5776,7 @@ function getPlayerStatus() {
     if (battleState.player.suppressed) status.push("压制");
     if (battleState.player.taunt) status.push("嘲讽");
     if (battleState.player.seal) status.push("封印");
+    if (battleState.player.slaughter) status.push("杀戮");
     if (battleState.player.healingBan) status.push("禁疗");
     if (battleState.player.soulCapture) status.push("摄魂");
     if (battleState.player.blindfold) status.push("失明");
@@ -6551,10 +6601,12 @@ function performAttack(type) {
         return;
     }
     
-    if (!battleState.player.taunt) {
-        endTaunt(originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+    // 战斗逻辑判断
+    if (!battleState.player.taunt || !battleState.player.suppressed) {
+        clearTaunt();
+        cleanSuppressed();
     }
-
+    
     const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(type);
     let damageResult;
 
@@ -6678,7 +6730,7 @@ function performIndependentMagicAttack() {
 const weaponDescriptions = {
     lostBook: "遗失的洛书开启后，能够为你的物理技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.破甲：根据物理攻击扣除怪物的物理防御力 \n2.恐吓：持续时间内禁止怪物触发暴击 \n3.眩晕：持续时间内怪物无法动作 \n4.穿透：造成伤害时额外附加物理攻击1/10的穿透伤害，并在持续时间结束后基于穿透伤害总和的一定比例给予怪物余波收尾伤害 \n5.麻痹：根据本次物理伤害减少怪物的血量上限",
     fragmentedMap: "残页的河图开启后，能够为你的法术技能附加专属效果，同时最多拥有3个效果。可以附加效果如下：\n1.迟缓：根据伤害量的比例降低敌人的当前速度 \n2.沉默：持续时间内禁止怪物施放法术技能及附加减益效果 \n3.混乱：持续时间内怪物可能会攻击自己 \n4.灼烧：造成伤害时会给敌人附加额外灼烧伤害，己方速度之于怪物越快，灼烧伤害越猛烈 \n5.法力燃烧：根据本次法术伤害减少怪物的当前法力值，敌人法力为空时，将转化为生命伤害。",
-    nirvanaGem: "定空的灵石开启后，每秒有概率驱散减益效果，同时最多驱散5个效果。可以驱散效果如下：\n1.醉酒：法术效果，玩家攻击怪物时会受到10%的反弹溅射伤害 \n2.禁疗：法术效果，持续时间内禁止玩家使用治疗技能 \n3.摄魂：法术效果，持续时间内玩家物理和法术攻击减半 \n4.失明：法术效果，持续时间内玩家物理攻击会被怪物闪避 \n5.法术迟钝：法术效果，持续时间内玩家使用法术技能时法力消耗值增至100倍 \n6.撕裂：物理效果，持续时间内玩家会受到每0.5秒的持续掉血效果，掉血量与怪物物理攻击有关 \n7.嘲讽：物理效果，持续时间内玩家的所有战斗行为会强制指向物理攻击，且物理伤害增至200% \n8.压制：物理效果，玩家若没有在3秒内做出战斗行为，血量会降至1 \n9.封印：物理效果，持续时间内玩家的飞升技能会被封印，使其无法生效"
+    nirvanaGem: "定空的灵石开启后，每秒有概率驱散减益效果，同时最多驱散5个效果。可以驱散效果如下：\n1.醉酒：法术效果，玩家攻击怪物时会受到10%的反弹溅射伤害 \n2.禁疗：法术效果，持续时间内禁止玩家使用治疗技能 \n3.摄魂：法术效果，持续时间内玩家物理和法术攻击减半 \n4.失明：法术效果，持续时间内玩家物理攻击会被怪物闪避 \n5.法术迟钝：法术效果，持续时间内玩家使用法术技能时法力消耗值增至100倍 \n6.撕裂：物理效果，持续时间内玩家会受到每0.5秒的持续掉血效果，掉血量与怪物物理攻击有关 \n7.嘲讽：物理效果，持续时间内玩家的所有战斗行为会强制指向物理攻击，且物理伤害增至200% \n8.压制：物理效果，玩家若没有在3秒内做出战斗行为，血量会降至1 \n9.封印：物理效果，持续时间内玩家的飞升技能会被封印，使其无法生效 \n10.杀戮：物理效果，持续时间内会根据双方修为之差判断斩杀线，当一方血量低于双方修为差值的一定比例时，负值一方会被斩杀"
 };
 
 //神器系统
@@ -6994,7 +7046,7 @@ class DivineWeaponManager {
             const effects = ['沉默', '迟缓', '混乱', '法力燃烧', '灼烧'];
             return effects[Math.floor(Math.random() * effects.length)];
         } else if (type === 'nirvanaGem') {
-            const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
+            const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal', 'slaughter'];
             return effects[Math.floor(Math.random() * effects.length)];
         }
     }
@@ -7019,7 +7071,8 @@ class DivineWeaponManager {
             'torn': '撕裂',
             'suppressed': '压制',
             'taunt': '嘲讽',
-            'seal': '封印'
+            'seal': '封印',
+            'slaughter': '杀戮'
         };
         return effectMap[effect] || effect;
     }
@@ -7030,7 +7083,7 @@ class DivineWeaponManager {
         const triggerProbability = Math.min(1, 0.005 + (this.nirvanaGem.level - 1) * 0.003);
         if (Math.random() > triggerProbability) return; // 没有触发效果
 
-        const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal'];
+        const debuffs = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal', 'slaughter'];
         const activeDebuffs = debuffs.filter(debuff => battleState.player[debuff]);
         const applicableDebuffs = this.nirvanaGem.effects.filter(effect => debuffs.includes(effect));
 
@@ -7064,6 +7117,10 @@ class DivineWeaponManager {
                     // 清除嘲讽效果，恢复原始函数
                     clearTaunt();
                     break;
+                case 'slaughter':
+                    // 清除杀戮效果，恢复原始函数
+                    cleanSlaughter();
+                    break;
                 case 'seal':
                     ascensionSkill.name = battleState.player.originalAscensionSkill;
                     secondAscensionSkill.name = battleState.player.originalSecondAscensionSkill;
@@ -7075,6 +7132,7 @@ class DivineWeaponManager {
             }
 
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
+            showBattleOverlay("https://pic.imgdb.cn/item/66a33f3ad9c307b7e942c38c.gif");
             updatePlayerStatusDisplay();
             updateUI();
         }
@@ -7085,7 +7143,7 @@ const divineWeaponManager = new DivineWeaponManager();
 let divinedWeaponStatus = false;
 function divinedWeapon() {
     if (!divinedWeaponStatus) {
-        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。/n1. 神器的开启和使用需要消耗大量经验值或特定的「钥匙」。 /n2. 【升满】按钮会根据你当前经验值或所拥有的道具数量直接升至最大值，请知悉。/n3. 不建议未满级（200级）前执行神器升级操作。");
+        showInfoBox("使用神器可以为你的技能附加各种强力效果，极大增强你的战斗能力。\n1.神器的开启和使用需要消耗大量经验值或特定的「钥匙」。 \n1.升满】按钮会根据你当前经验值或所拥有的道具数量直接升至最大值，请知悉。\n1.不建议未满级（200级）前执行神器升级操作。");
         divinedWeaponStatus = true;
     }
     divineWeaponManager.openDivineWeaponUI();
@@ -7093,7 +7151,7 @@ function divinedWeapon() {
 
 // 在战斗循环中调用以定期检查定空的灵石效果
 setInterval(() => {
-    divineWeaponManager.applyNirvanaGemEffects();
+    divineWeaponManager.applyNirvanaGemEffects();  
 }, 1000);
 
 
@@ -7143,8 +7201,7 @@ function applyPhysicalAttackEffects() {
         case '穿透':
             if (battleState.enemy.pierced) {
                 return;
-            }
-    
+            }    
             battleState.enemy.pierced = true;
             pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
             logBattleEvent("深渊巨魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予深渊巨魔致命的余波伤害。", '#ADFF2F');
@@ -7343,7 +7400,8 @@ function performPoison() {
         poisonChance = 0.7;
     }
 
-    if (Math.random() < poisonChance) {
+    if (Math.random() < poisonChance && !battleState.enemy.poisoned) {
+        battleState.enemy.poisoned = true;
         handlePoison(skillMultiplier); // 传递技能增益参数
     }
     
@@ -7354,13 +7412,6 @@ function performPoison() {
 }
 
 function handlePoison(skillMultiplier = 1) {
-    if (battleState.enemy.poisoned) {
-        return;
-    }
-    
-    battleState.enemy.poisoned = true;
-    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif'); // 示例效果图，可以替换为实际中毒效果图
-    updateEnemyStatusDisplay();
 
     const poisonInterval = setInterval(() => {
         if (!battleState.enemy.poisoned) {
@@ -7479,6 +7530,7 @@ function performDefense() {
     applyAscensionEffects();
     updateUI();
 }
+
 //应用智慧守护
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -7509,7 +7561,7 @@ function handleWiseDefense(damage) {
         battleAttributes.mana -= manaUsed;
         finalDamage -= Math.round(manaUsed * defenseFactor);
 
-        logBattleEvent(`${shSkill.name} ${skillLevel}级生效，消耗 ${manaUsed} 点法力值抵抗了 ${Math.round(manaUsed * defenseFactor)} 点伤害。`, '#99FFFF');
+        logBattleEvent(`${shSkill.name} ${skillLevel}级为你消耗 ${manaUsed} 点法力值抵抗了 ${Math.round(manaUsed * defenseFactor)} 点伤害。`, '#99FFFF');
 
     }
 
@@ -7537,7 +7589,7 @@ function handleManaRecover() {
         const manaRecoverPercentage = skillMultiplier + skillLevel * 0.01;
         const manaRecovered = Math.round(maxMana * manaRecoverPercentage);
         battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + manaRecovered);
-        logBattleEvent(`${hlSkill.name} ${skillLevel}级生效，恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
+        logBattleEvent(`${hlSkill.name} ${skillLevel}级为你恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
     }
 }
 
@@ -7801,12 +7853,18 @@ function performEnemyMagicalAttack(isCritical) {
 }
 
 function applyEnemyPhysicalEffects(damage) {
-    const effects = ['torn', 'suppressed', 'taunt', 'seal'];
+    const effects = ['torn', 'suppressed', 'taunt', 'seal', 'slaughter'];
+    
+    const cultivationDifference = enemyPetCultivation - playerCultivation;
+    const probabilityAdjustment = cultivationDifference / 10000 * 0.01;
     
     effects.forEach(effect => {
+        const baseChance = 0.1; // 基础触发概率为10%
+        const adjustedChance = Math.max(0.01, baseChance + probabilityAdjustment);
         const effectChance = Math.random();
 
-        // 前置判断，检查当前状态是否已经存在
+        console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
+
         if (battleState.player[effect]) {
             console.log(`玩家已经处于 ${effect} 状态，无法叠加。`);
             return;
@@ -7814,29 +7872,93 @@ function applyEnemyPhysicalEffects(damage) {
 
         switch (effect) {
             case 'torn':
-                if (effectChance < 0.1 && !effectCooldowns.torn) {
+                if (effectChance < adjustedChance && !effectCooldowns.torn) {
                     handleTorn();
                 }
                 break;
             case 'suppressed':
-                if (effectChance < 0.1 && !effectCooldowns.suppressed) {
+                if (effectChance < adjustedChance && !effectCooldowns.suppressed) {
                     handleSuppressed();
                 }
                 break;
             case 'taunt':
-                if (effectChance < 0.1 && !battleState.player.taunt) {
+                if (effectChance < adjustedChance && !battleState.player.taunt) {
                     handleTaunt();
                 }
                 break;
+            case 'slaughter':
+                if (effectChance > adjustedChance && !battleState.player.slaughter) {
+                    handleSlaughter();
+                }
+                break;
             case 'seal':
-                if (effectChance < 0.1 && !battleState.player.seal) {
+                if (effectChance < adjustedChance && !battleState.player.seal) {
                     handleSeal();
                 }
                 break;
         }
     });
 }
+        
+function cleanSlaughter() {
+    battleState.player.slaughter = false;
+    effectCooldowns.slaughter = false;
+    updatePlayerStatusDisplay();
+    console.log("杀戮状态已被解除。");
+}
+        
+function handleSlaughter() {
+    if (battleState.player.slaughter) {
+        console.log("玩家已经处于杀戮状态，无法叠加。");
+        return;
+    }
+    
+    battleState.player.slaughter = true;
+    effectCooldowns.slaughter = true;
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a33f39d9c307b7e942c36c.gif');
+    updatePlayerStatusDisplay();
 
+    const slaughterInterval = setInterval(() => {
+        if (!battleState.player.slaughter) {
+            clearInterval(slaughterInterval);
+            return;
+        }
+
+        const cultivationDifference = playerCultivation - enemyPetCultivation;
+
+        if (cultivationDifference > 0 && battleState.enemy.health <= cultivationDifference * 100) {
+            battleState.enemy.health = 0;
+            logBattleEvent("道高一尺，魔高一丈，敌人低于你的修为，被当即斩杀！", 'red');
+            updateUI();
+            updatePlayerStatusDisplay();
+            
+            if (battleState.enemy.health <= 0) {
+                updateEnemyAttributes();
+                showNextBattlePrompt(true);
+                return;
+            }
+        } else if (cultivationDifference < 0 && battleAttributes.health <= Math.abs(cultivationDifference)) {
+            battleAttributes.health = 0;
+            logBattleEvent("道高一尺，魔高一丈，你低于敌人的修为，在千钧一发之际施法陨落了", 'red');
+            updateUI();
+            updatePlayerStatusDisplay();
+
+            if (battleAttributes.health <= 0) {
+                showNextBattlePrompt(false);
+                return;
+            }
+        }
+
+    }, 500);
+
+    setTimeout(() => {
+        battleState.player.slaughter = false;
+        effectCooldowns.slaughter = false;
+        clearInterval(slaughterInterval);
+        updatePlayerStatusDisplay();
+    }, 10000); // 杀戮效果持续10秒
+}
+        
 function handleSeal() {
     if (battleState.player.seal) {
         return;
@@ -8031,14 +8153,22 @@ function clearTaunt() {
     updateUI();
 }
 
-        
 function applyEnemyMagicEffects(damage) {
     const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow'];
+    
+    const cultivationDifference = enemyPetCultivation - playerCultivation;
+    const probabilityAdjustment = cultivationDifference / 10000 * 0.01;
+    
     effects.forEach(effect => {
+        const baseChance = 0.1; // 基础触发概率为10%
+        const adjustedChance = Math.max(0.01, baseChance + probabilityAdjustment);
         const effectChance = Math.random();
+
+        console.log(`Effect: ${effect}, 修为差：${cultivationDifference}, Effect Chance: ${effectChance}, Adjusted Chance: ${adjustedChance}`);
+        
         switch (effect) {
             case 'drunken':
-                if (effectChance < 0.1 && !effectCooldowns.drunken) { // 10%的概率触发醉酒效果
+                if (effectChance < adjustedChance && !effectCooldowns.drunken) {
                     battleState.player.drunken = true;
                     logBattleEvent("你受到了醉酒效果，每次攻击都会受到额外伤害。", '#FF0088');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
@@ -8048,11 +8178,11 @@ function applyEnemyMagicEffects(damage) {
                         battleState.player.drunken = false;
                         effectCooldowns.drunken = false;
                         updatePlayerStatusDisplay();
-                    }, 5000); // 醉酒效果持续5秒
+                    }, 5000);
                 }
                 break;
             case 'healingBan':
-                if (effectChance < 0.1 && !effectCooldowns.healingBan) { // 10%的概率触发禁疗效果
+                if (effectChance < adjustedChance && !effectCooldowns.healingBan) {
                     battleState.player.healingBan = true;
                     logBattleEvent("你受到了禁疗效果，无法恢复生命值。", '#B94FFF');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
@@ -8062,16 +8192,16 @@ function applyEnemyMagicEffects(damage) {
                         battleState.player.healingBan = false;
                         effectCooldowns.healingBan = false;
                         updatePlayerStatusDisplay();
-                    }, 5000); // 禁疗效果持续5秒
+                    }, 5000);
                 }
                 break;
             case 'soulCapture':
-                if (effectChance < 0.1 && !effectCooldowns.soulCapture) { // 10%的概率触发摄魂效果
+                if (effectChance < adjustedChance && !effectCooldowns.soulCapture) {
                     handleSoulCapture();
                 }
                 break;
             case 'spellSlow':
-                if (effectChance < 0.1 && !effectCooldowns.spellSlow) { // 10%的概率触发法术迟钝效果
+                if (effectChance < adjustedChance && !effectCooldowns.spellSlow) {
                     battleState.player.spellSlow = true;
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
                     effectCooldowns.spellSlow = true;
@@ -8080,11 +8210,11 @@ function applyEnemyMagicEffects(damage) {
                         battleState.player.spellSlow = false;
                         effectCooldowns.spellSlow = false;
                         updatePlayerStatusDisplay();
-                    }, 5000); // 法术迟钝效果持续5秒
+                    }, 5000);
                 }
                 break;
             case 'blindfold':
-                if (effectChance < 0.1 && !effectCooldowns.blindfold) { // 10%的概率触发失明效果
+                if (effectChance < adjustedChance && !effectCooldowns.blindfold) {
                     battleState.player.blindfold = true;
                     logBattleEvent("你被附加了失明，施放物理技能时将无法对敌人造成伤害！", 'yellow');
                     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
@@ -8094,7 +8224,7 @@ function applyEnemyMagicEffects(damage) {
                         battleState.player.blindfold = false;
                         effectCooldowns.blindfold = false;
                         updatePlayerStatusDisplay();
-                    }, 5000); // 失明效果持续5秒
+                    }, 5000);
                 }
                 break;
         }
@@ -8406,6 +8536,8 @@ function resetBuffState(playerWon) {
     }
 
     if (playerWon) {
+        const obtainedDrugs = [];
+        
         // 获取药品概率
         const drugProbability = Math.random();
         let drugTier;
@@ -8423,8 +8555,7 @@ function resetBuffState(playerWon) {
         const drugKeys = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === drugTier);
         const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
         drugInventory[randomDrug].quantity += 1;
-        logBattleEvent(`你获得了 ${randomDrug} x1`, 'pink');
-        updateDrugGrid();
+        obtainedDrugs.push(`${randomDrug} x1`);
 
         // battleRounds 大于等于 100 时额外掉落药品
         if (battleRounds >= 100) {
@@ -8445,9 +8576,8 @@ function resetBuffState(playerWon) {
                 const extraDrugKeys = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === extraDrugTier);
                 const extraRandomDrug = extraDrugKeys[Math.floor(Math.random() * extraDrugKeys.length)];
                 drugInventory[extraRandomDrug].quantity += 1;
-                logBattleEvent(`你额外获得了 ${extraRandomDrug} x1`, 'pink');
+                obtainedDrugs.push(`${extraRandomDrug} x1`);
             }
-            updateDrugGrid();
         }
 
         // spiritLevel 在 81 到 100 之间时，额外获取药品的概率
@@ -8464,12 +8594,20 @@ function resetBuffState(playerWon) {
                 const extraDrugKeys = Object.keys(drugInventory);
                 const extraRandomDrug = extraDrugKeys[Math.floor(Math.random() * extraDrugKeys.length)];
                 drugInventory[extraRandomDrug].quantity += 1;
-                logBattleEvent(`战斗精灵的赐福，你额外获得了 ${extraRandomDrug} x1`, 'pink');
-                updateDrugGrid();
+                obtainedDrugs.push(`战斗精灵的赐福，你额外获得了 ${extraRandomDrug} x1`);
             }
         }
+
+        // 记录所有获得的药品
+        if (obtainedDrugs.length > 0) {
+            const drugMessage = obtainedDrugs.join(', ');
+            logBattleEvent(`本轮战斗胜利获得了: ${drugMessage}`, 'pink');
+        }
+
+        updateDrugGrid();
     }
 }
+
 
 function gainExp() {
     let expMultiplier = battleState.player.expMultiplier || 1;
@@ -8550,8 +8688,6 @@ function resetBattleState(playerWon) {
         battleState.enemy.benumbStack = 0;
         battleState.enemy.originalMaxHealth = undefined;
     }
-
-    logBattleEvent(`新一轮战斗开始！当前是第 ${battleRounds} 轮！`, "pink");
     
     updateUI();
     storeEnemyInitialState();
@@ -9428,7 +9564,7 @@ function openTreasure(times = 1) {
         if (treasureMapItem && treasureMapItem.quantity > 0) {
             // 使用一个藏宝图
             useItem('treasureMap', 1);
-            showEffect('generalEffect', 'https://pic.imgdb.cn/item/669ced96d9c307b7e9b1ea4d.gif');
+            showEffect('generalEffect', 'https://pic.imgdb.cn/item/66a34156d9c307b7e94568b1.gif');
         } else {
             const cost = getTreasureCost(selectedTreasure) * times;
             if (goldAmount < cost) {
@@ -10470,6 +10606,8 @@ function updateSecondaryAttributes() {
     const speedBonusElement = document.getElementById("secondary-speed-bonus");
     speedBonusElement.innerText = `+${wisdomBonus}%`;
     speedBonusElement.classList.toggle("red-text", wisdomBonus > 0);
+
+    updateSkillScore();
 }
 
 function transformPet() {
@@ -10683,7 +10821,7 @@ function refreshSpecializationUI() {
 function getSpecDescription(key) {
     switch (key) {
         case '慧光辉耀':
-            return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击、法力值）。';
+            return '宠物的智力属性会按更高的比例增加对应二级属性（法术攻击、法力值）。与此同时，宠物修为的提升会更显著';
         case '神魔之力':
             return '宠物的强壮和敏捷属性会按更高的比例增加对应二级属性。（物理攻击、速度）';
         case '坚韧之心':
@@ -10713,6 +10851,7 @@ function upgradeSpecialization(key) {
         showInfoBox(`升级所需金子不足，需要${upgradeCost}文金子。`);
     }
     refreshSpecializationUI();
+    updateSkillScore();
 }
 
 function upgradeToMax(key) {
@@ -10736,12 +10875,14 @@ function upgradeToMax(key) {
         }
         refreshSpecializationUI();
     });
+    updateSkillScore();
 }
         
 function applySpecialization() {
     updateSecondaryAttributes();
     updateAttributePanel();
     refreshSpecializationUI();
+    updateSkillScore();
 }
 
 let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
@@ -12123,16 +12264,28 @@ function updateSkillScore(selectedSkills = []) {
     if (sSkillCount > 1) skillsScore += 10000;
     if (ssSkillCount > 1) skillsScore += 50000;
 
-
-
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore;
-    // 获取具有 ID "skill-score" 的元素
+    const calculatePlayerCultivation = (totalScore) => {
+        let playerCultivation;
+        if (currentSpecialization === '慧光辉耀') {
+            const spec = specializations['慧光辉耀'];
+            const multiplier = Math.min(1 + (spec.level * 0.025), 4);
+            playerCultivation = Math.round(totalScore / 105 * multiplier);
+        } else {
+            playerCultivation = Math.round(totalScore / 105);
+        }
+        return playerCultivation;
+    };
     const skillScoreElement = document.getElementById("skill-score");
-    // 设置该元素的文本内容为 totalScore
+    const playerCultivationElement = document.getElementById("player-cultivation");
+    const playerCultivationCalculation = calculatePlayerCultivation(totalScore);
+    playerCultivation = playerCultivationCalculation; //玩家修为赋值
+    
     skillScoreElement.innerText = totalScore;
-    // 添加 .text 类以应用红色样式
+    playerCultivationElement.innerText = playerCultivation;
     skillScoreElement.classList.add("gold-text");
+    playerCultivationElement.classList.add("red-text");
 
     // 更新全局 skillScore 变量
     window.skillScore = totalScore; // 确保 skillScore 是全局变量
@@ -13340,26 +13493,25 @@ document.addEventListener('DOMContentLoaded', (event) => {
     updateTitle();
 });
 
+//用于实时更新某些状态的全局时钟变量
 function startGameTimer() {
-    let startTime = Date.now(); // 获取当前时间戳
+    let startTime = Date.now();
     const timerElement = document.getElementById('game-timer');
 
     function updateTimer() {
-        let elapsedTime = Date.now() - startTime; // 计算已过去的时间
-        let minutes = Math.floor(elapsedTime / 60000); // 计算分钟
-        let seconds = Math.floor((elapsedTime % 60000) / 1000); // 计算秒
+        let elapsedTime = Date.now() - startTime;
+        let minutes = Math.floor(elapsedTime / 60000);
+        let seconds = Math.floor((elapsedTime % 60000) / 1000);
 
-        // 格式化时间为 mm:ss
         let formattedTime = `${padZero(minutes)}:${padZero(seconds)}`;
         timerElement.innerText = formattedTime;
 
-        // 在30秒时显示图像框
-        if (Math.floor(elapsedTime / 1000) === 3000) {
+        // 在30000秒时显示图像框
+        if (Math.floor(elapsedTime / 1000) === 30000) {
             showImageBox();
         }
     }
 
-    // 每秒更新一次计时器
     setInterval(updateTimer, 1000);
 }
 
@@ -13581,6 +13733,8 @@ function saveGameState() {
         maxExp: maxExp,
         playerCritRate: playerCritRate,
         playerCritDamage: playerCritDamage,
+        playerCultivation: playerCultivation,
+        enemyPetCultivation: enemyPetCultivation,
         enemyCritRate: enemyCritRate,
         enemyCritDamage: enemyCritDamage,
         ascensionEnabled: ascensionEnabled,
@@ -13731,6 +13885,8 @@ function loadGameState() {
         goldAmount = savedState.goldAmount;
         playerCritRate = savedState.playerCritRate;
         playerCritDamage = savedState.playerCritDamage;
+        playerCultivation = savedState.playerCultivation;
+        enemyPetCultivation = savedState.enemyPetCultivation;
         enemyCritRate = savedState.enemyCritRate;
         enemyCritDamage = savedState.enemyCritDamage;
         ascensionEnabled = savedState.ascensionEnabled;

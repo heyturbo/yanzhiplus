@@ -7495,14 +7495,12 @@ function applyMagicAttackEffects(damage) {
 
     const effects = divineWeaponManager.fragmentedMap.effects;
     const effect = effects[Math.floor(Math.random() * effects.length)];
-
     const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.fragmentedMap.level - 1) * 0.006);
     if (Math.random() > triggerProbability) return; // 没有触发效果
 
     switch (effect) {
         case '沉默':
             battleState.enemy.silenced = true; // 深渊巨魔沉默
-            logBattleEvent("深渊巨魔被沉默，无法使用法术攻击。", 'wheat');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
@@ -7515,7 +7513,6 @@ function applyMagicAttackEffects(damage) {
             break;
         case '混乱':
             battleState.enemy.dazed = true; // 深渊巨魔混乱
-            logBattleEvent("深渊巨魔被混乱，可能会攻击自己。", '#FF00FF');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {

@@ -10306,6 +10306,9 @@ let selectedItem = null; // 在函数外部定义selectedItem
 function updateJinnangItems() {
     const jinnangReward = document.getElementById('jinnang-reward');
     jinnangReward.innerHTML = ''; // 清空现有内容
+    if (isNaN(jinnangCapacity)) {
+        jinnangCapacity = 5000;
+    }
 
     jinnangItems.forEach(item => {
         if (item.quantity > 0) {

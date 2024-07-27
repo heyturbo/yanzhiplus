@@ -3619,6 +3619,7 @@ function storeCurrentPetData() {
             petMaxLevel: petMaxLevel,
             petWisdom: petWisdom,
             awakened: awakened,
+            awakenAttributes: awakenAttributes,
             hallucinated: hallucinated,
             hallucinationLevel: hallucinationLevel,
             experienceTreasureOpenCount: experienceTreasureOpenCount,
@@ -3647,7 +3648,6 @@ function storeCurrentPetData() {
             alreadyUseDrug: alreadyUseDrug,
             divinedWeaponStatus: divinedWeaponStatus,
             divineWeapons: divineWeaponManager.getWeaponData(),
-            baseAttributes: baseAttributes,
             skillScore: skillScore,
             existingSkills: existingSkills, // 存储技能数据
         };
@@ -3674,6 +3674,7 @@ function restorePetData(petName) {
         petMaxLevel = savedPetData.petMaxLevel;
         petWisdom = savedPetData.petWisdom;
         awakened = savedPetData.awakened;
+        awakenAttributes = savedPetData.awakenAttributes;
         hallucinated = savedPetData.hallucinated;
         hallucinationLevel = savedPetData.hallucinationLevel;
         experienceTreasureOpenCount = savedPetData.experienceTreasureOpenCount;
@@ -3699,9 +3700,11 @@ function restorePetData(petName) {
         drugBonus = savedPetData.drugBonus;
         divinedWeaponStatus = savedPetData.divinedWeaponStatus;
         alreadyUseDrug = savedPetData.alreadyUseDrug;
-        baseAttributes = savedPetData.baseAttributes;
         skillScore = savedPetData.skillScore;
-        
+
+        if (awakened && savedPetData.awakenAttributes) {
+            awakenAttributes = savedPetData.awakenAttributes;
+        }
         if (savedPetData.specializations) {
             specializations = savedPetData.specializations;
         }
@@ -12500,15 +12503,6 @@ function resetPet() {
     const secondSkillBox = document.getElementById('second-ascension-skill');
     secondSkillBox.style.display = 'none';
 
-    // 重置基础属性为初始值，调用calculateAttribute
-    baseAttributes = {
-        endurance: calculateAttribute(currentPet.qualities.endurance.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        intelligence: calculateAttribute(currentPet.qualities.intelligence.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        strength: calculateAttribute(currentPet.qualities.strength.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        agility: calculateAttribute(currentPet.qualities.agility.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        faith: calculateAttribute(currentPet.qualities.faith.min, currentPet.qualities.growthRate / 100, petLevel, 0, false)
-    };
-
     // 更新显示的资质和属性值
     setInnerText("tier", currentPet.qualities.tier);
     setInnerText("growth-rate", currentPet.qualities.growthRate);
@@ -12532,11 +12526,6 @@ function resetPet() {
     // 更新显示的各项数值
     setInnerText("current-wisdom", 0);
     setInnerText("train-count", 0);
-    setInnerText("attribute-endurance", baseAttributes.endurance);
-    setInnerText("attribute-intelligence", baseAttributes.intelligence);
-    setInnerText("attribute-strength", baseAttributes.strength);
-    setInnerText("attribute-agility", baseAttributes.agility);
-    setInnerText("attribute-faith", baseAttributes.faith);
     setInnerText("pet-level", petLevel);
     setInnerText("evolution-level", evolutionLevel);
 
@@ -13106,7 +13095,70 @@ function upgradeWisdomTo() {
 }
 
         
+
+
+let remainingPoints = 0;
+const allocationHistory = [];
+const allocationCount = {}; // 用于记录每个属性的连续分配次数
+
+function updateRemainingPointsDisplay() {
+    document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
+}
+
+function increaseBonusAttribute(attribute) {
+    if (remainingPoints <= 0) {
+        showInfoBox("您的宠物没有可分配点数了!");
+        return;
+    }
+
+    // 记录属性分配
+    allocationHistory.push({ attribute, value: 1 });
+
+    // 更新连续分配次数
+    if (allocationCount[attribute]) {
+        allocationCount[attribute]++;
+    } else {
+        allocationCount[attribute] = 1;
+    }
+
+    // 检查连续分配次数是否达到5次
+    if (allocationCount[attribute] >= 5) {
+        const confirmMessage = `您已连续分配5次这项属性，是否将剩余的点数全部分配至该属性?`;
+        showInfoBox(confirmMessage, () => {
+            bonusAttributes[attribute] += remainingPoints;
+            remainingPoints = 0;
+            allocationHistory.push({ attribute, value: remainingPoints });
+            allocationCount[attribute] = 0; // 重置计数
+            updateAttributePanel();
+            updateRemainingPointsDisplay();
+            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+        }, () => {
+            allocationCount[attribute] = 0; // 重置计数
+            bonusAttributes[attribute] += 1;
+            remainingPoints -= 1;
+            updateAttributePanel();
+            updateRemainingPointsDisplay();
+            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+        });
+    } else {
+        bonusAttributes[attribute] += 1;
+        remainingPoints -= 1;
+        updateAttributePanel();
+        updateRemainingPointsDisplay();
+        //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
+    }
+}
+
+// 动态修改额外属性的函数
 let awakened = false; // 复位觉醒状态
+
+let awakenAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+};
 
 let bonusAttributes = {
     endurance: 0,
@@ -13116,54 +13168,36 @@ let bonusAttributes = {
     faith: 0
 };
 
-let baseAttributes = {
-    endurance: 5,
-    intelligence: 6,
-    strength: 2,
-    agility: 3,
-    faith: 2
-};
-
 function calculateAttribute(currentValue, growthRate, level) {
     return Math.floor((currentValue / 2000) * growthRate * 4 * level);
 }
 
-function calculateAwakenedAttributes(currentValue, growthRate, level, baseLevel) {
-    const awakenedLevels = level - baseLevel;
-    return calculateAttribute(currentValue, growthRate, awakenedLevels);
-}
+function calculateCurrentAttributes() {
+    const qualities = currentPet.qualities;
+    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
 
-function calculatePreAwakenedAttributes(currentValue, growthRate, level) {
-    return calculateAttribute(currentValue, growthRate, level);
-}
+    const attributes = {
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith
+    };
 
-function calculateBonusAttributes(attribute, bonus) {
-    return attribute + Math.floor(attribute * bonus);
-}
-
-function calculateTotalAttributes(currentValue, growthRate, level, baseLevel, isAwakened) {
-    const baseAttribute = isAwakened ?
-        calculateAwakenedAttributes(currentValue, growthRate, level, baseLevel) :
-        calculatePreAwakenedAttributes(currentValue, growthRate, level);
-
-    return baseAttribute;
+    return attributes;
 }
 
 function onlyDisplayLeftAttributes() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    const baseLevel = awakened ? qualities.baseLevel : 0;
 
     const leftAttributes = {
-        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened),
-        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened),
-        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, awakened),
-        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, awakened),
-        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, awakened)
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith
     };
-
-    //console.log("Current Attributes:", attributes);
-    //console.log("Bonus Attributes:", bonusAttributes);
 
     return leftAttributes;
 }
@@ -13231,94 +13265,6 @@ function calculateGrowthRateDisplayAndValue(qualities) {
     return { growthRateDisplay, growthRate };
 }
         
-function calculateCurrentAttributes() {
-    const qualities = currentPet.qualities;
-    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    const baseLevel = awakened ? qualities.baseLevel : 0;
-
-    const attributes = {
-        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.endurance,
-        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.intelligence,
-        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.strength,
-        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.agility,
-        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, awakened) + bonusAttributes.faith
-    };
-
-    //console.log("Current Attributes:", attributes);
-    //console.log("Bonus Attributes:", bonusAttributes);
-
-    return attributes;
-}
-
-
-let remainingPoints = 0;
-const allocationHistory = [];
-const allocationCount = {}; // 用于记录每个属性的连续分配次数
-
-function updateRemainingPointsDisplay() {
-    document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
-}
-
-function increaseBonusAttribute(attribute) {
-    if (remainingPoints <= 0) {
-        showInfoBox("您的宠物没有可分配点数了!");
-        return;
-    }
-
-    // 记录属性分配
-    allocationHistory.push({ attribute, value: 1 });
-
-    // 更新连续分配次数
-    if (allocationCount[attribute]) {
-        allocationCount[attribute]++;
-    } else {
-        allocationCount[attribute] = 1;
-    }
-
-    // 检查连续分配次数是否达到5次
-    if (allocationCount[attribute] >= 5) {
-        const confirmMessage = `您已连续分配5次这项属性，是否将剩余的点数全部分配至该属性?`;
-        showInfoBox(confirmMessage, () => {
-            bonusAttributes[attribute] += remainingPoints;
-            remainingPoints = 0;
-            allocationHistory.push({ attribute, value: remainingPoints });
-            allocationCount[attribute] = 0; // 重置计数
-            updateAttributePanel();
-            updateRemainingPointsDisplay();
-            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
-        }, () => {
-            allocationCount[attribute] = 0; // 重置计数
-            bonusAttributes[attribute] += 1;
-            remainingPoints -= 1;
-            updateAttributePanel();
-            updateRemainingPointsDisplay();
-            //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
-        });
-    } else {
-        bonusAttributes[attribute] += 1;
-        remainingPoints -= 1;
-        updateAttributePanel();
-        updateRemainingPointsDisplay();
-        //console.log(`Increase Bonus Attribute: ${attribute} = ${bonusAttributes[attribute]}, Remaining Points = ${remainingPoints}`);
-    }
-}
-
-// 动态修改额外属性的函数
-function addBonusAttribute(attribute, value) {
-    if (bonusAttributes.hasOwnProperty(attribute)) {
-        bonusAttributes[attribute] += value;
-    }
-}
-
-function removeBonusAttribute(attribute, value) {
-    if (bonusAttributes.hasOwnProperty(attribute)) {
-        bonusAttributes[attribute] -= value;
-        if (bonusAttributes[attribute] < 0) {
-            bonusAttributes[attribute] = 0;
-        }
-    }
-}
-        
 function updateAwakenStatus() {
     const awakenStatusElement = document.getElementById("awaken-status");
     if (awakened) {
@@ -13344,24 +13290,16 @@ function awakenPet() {
 
     const confirmationMessage = "觉醒需要消耗一个珍贵道具醒悟丹。宠物觉醒后等级会有所回退，但成长率、属性值、成长和悟性上限会得到大幅提升。觉醒后的宠物还能控制并培养战斗精灵，在战斗时得到更强悍的助力！";
     showInfoBox(confirmationMessage, () => {
-        const qualities = currentPet.qualities;
-        const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-        const baseLevel = petLevel;
+        const leftAttributes = onlyDisplayLeftAttributes();
 
-        const newAttributes = {
-            endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
-            intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
-            strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
-            agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
-            faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
+        // 计算awakenAttributes，为leftAttributes的20%
+        awakenAttributes = {
+            endurance: Math.floor(leftAttributes.endurance * 0.2),
+            intelligence: Math.floor(leftAttributes.intelligence * 0.2),
+            strength: Math.floor(leftAttributes.strength * 0.2),
+            agility: Math.floor(leftAttributes.agility * 0.2),
+            faith: Math.floor(leftAttributes.faith * 0.2)
         };
-
-        // 计算bonusAttributes
-        bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
-        bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
-        bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
-        bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
-        bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
 
         currentPet.qualities.baseLevel = petLevel;
         currentPet.qualities.tier = '超凡';
@@ -13384,7 +13322,6 @@ function awakenPet() {
         updateQualityCard();
     });
 }
-
 
 let hallucinated = false;
 let hallucinationLevel = 0;
@@ -14346,6 +14283,7 @@ function saveGameState() {
         petMaxLevel: petMaxLevel,
         petWisdom: petWisdom,
         awakened: awakened,
+        awakenAttributes: awakenAttributes,
         hallucinated: hallucinated,
         hallucinationLevel: hallucinationLevel,
         experienceTreasureOpenCount: experienceTreasureOpenCount,
@@ -14371,7 +14309,6 @@ function saveGameState() {
         secondAscensionSkill: getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level),
         ascensionAttributes: ascensionAttributes,
         drugBonus: drugBonus,
-        baseAttributes: baseAttributes,
         skillScore: skillScore,
         specializations: specializations,
         currentSpecialization: currentSpecialization,
@@ -14535,7 +14472,6 @@ function loadGameState() {
 
         ascensionAttributes = savedState.ascensionAttributes;
         drugBonus = savedState.drugBonus;
-        baseAttributes = savedState.baseAttributes;
         skillScore = savedState.skillScore;
         blessGiftClaimed = savedState.blessGiftClaimed;
         enemyPet = savedState.enemyPet;
@@ -14548,7 +14484,9 @@ function loadGameState() {
         collectCost= savedState.collectCost; //采集药物成本
         experienceTreasureOpenCount= savedState.experienceTreasureOpenCount; //经验宝箱成本
 
-        
+        if (awakened && savedState.awakenAttributes) {
+            awakenAttributes = savedState.awakenAttributes;
+        }
         if (savedState.specializations) {
             specializations = savedState.specializations;
         }
@@ -14596,11 +14534,6 @@ function loadGameState() {
         setInnerText("skill-score", skillScore);
         setInnerText("current-wisdom", currentWisdom);
         setInnerText("train-count", trainingCount);
-        setInnerText("attribute-endurance", baseAttributes.endurance);
-        setInnerText("attribute-intelligence", baseAttributes.intelligence);
-        setInnerText("attribute-strength", baseAttributes.strength);
-        setInnerText("attribute-agility", baseAttributes.agility);
-        setInnerText("attribute-faith", baseAttributes.faith);
         setInnerText("pet-level", petLevel);
         setInnerText("evolution-level", evolutionLevel);
         // 检查宠物是否已经变异

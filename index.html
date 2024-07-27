@@ -707,6 +707,8 @@
         .jinnang-info {
             padding: 20px;
             justify-items: center;
+            background-image: url(https://pic.imgdb.cn/item/66a4b934d9c307b7e98c69fc.gif);
+            background-size: cover;
         }
         .jinnang-info.open {
             display: block;
@@ -1882,6 +1884,11 @@
             <div class="jinnang-reward" id="jinnang-reward"></div>
         </div>
         <div id="jinnang-description" class="treasure-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
+        <div class="treasure-action">
+            <button onclick="sellItem()">出售道具</button>
+            <div id="jinnang-capacity">背包容量：0/5000</div>
+            <button onclick="enlargeCapacity()">拓展背包</button>
+        </div>
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
@@ -6002,6 +6009,7 @@ function clearPlayerEffect() {
             
 function getPlayerStatus() {
     let status = [];
+    if (battleState.player.defensing) status.push("蓄力中");
     if (battleState.player.divineProtection) status.push("仙气护体");
     if (battleState.player.drunken) status.push("醉酒");
     if (battleState.player.torn) status.push("撕裂");
@@ -7387,6 +7395,13 @@ setInterval(() => {
     divineWeaponManager.applyNirvanaGemEffects();  
 }, 1000);
 
+//计算修为的效果时长增益
+function getCultivationBonusDuration() {
+    if (playerCultivation <= 120000) {
+        return 0;
+    }
+    return Math.min(10, ((playerCultivation - 120000) / 10000) * 0.1);
+}
 
 // 应用物理攻击效果的函数
 function applyPhysicalAttackEffects() {
@@ -7394,9 +7409,10 @@ function applyPhysicalAttackEffects() {
 
     const effects = divineWeaponManager.lostBook.effects;
     const effect = effects[Math.floor(Math.random() * effects.length)];
-
     const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.lostBook.level - 1) * 0.006);
     if (Math.random() > triggerProbability) return; // 没有触发效果
+
+    const cultivationBonus = getCultivationBonusDuration();
 
     switch (effect) {
         case '破甲':
@@ -7410,7 +7426,7 @@ function applyPhysicalAttackEffects() {
                 battleState.enemy.physicalDefense += armorBreakValue;
                 battleState.enemy.armorBreak = false;
                 updateEnemyStatusDisplay();
-            }, 10000); // 破甲持续10秒
+            }, 3000 + cultivationBonus * 1000); // 破甲持续3秒
             break;
         case '眩晕':
             battleState.enemy.stunned = true; // 深渊巨魔眩晕
@@ -7420,7 +7436,7 @@ function applyPhysicalAttackEffects() {
             setTimeout(() => {
                 battleState.enemy.stunned = false;
                 updateEnemyStatusDisplay();
-            }, 1000); // 眩晕持续1秒
+            }, 1000 + cultivationBonus * 1000); // 眩晕持续1秒
             break;
         case '恐吓':
             battleState.enemy.intimidated = true; // 深渊巨魔恐吓状态
@@ -7429,7 +7445,7 @@ function applyPhysicalAttackEffects() {
             setTimeout(() => {
                 battleState.enemy.intimidated = false;
                 updateEnemyStatusDisplay();
-            }, 5000); // 恐吓持续5秒
+            }, 1000 + cultivationBonus * 1000); // 恐吓持续1秒
             break;
         case '穿透':
             if (battleState.enemy.pierced) {
@@ -7441,7 +7457,6 @@ function applyPhysicalAttackEffects() {
             showEffect('playerEffect', 'https://example.com/pierce-effect.gif');
             updateEnemyStatusDisplay();
     
-            // 在穿透效果结束后计算并应用“刀剑的余波”伤害
             setTimeout(() => {
                 battleState.enemy.pierced = false; // 清除穿透状态
                 const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
@@ -7452,12 +7467,12 @@ function applyPhysicalAttackEffects() {
                 showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
                 
                 if (battleState.enemy.health <= 0) {
-                updateEnemyAttributes();
-                showNextBattlePrompt(true);
-                return;
+                    updateEnemyAttributes();
+                    showNextBattlePrompt(true);
+                    return;
                 }
                 updateEnemyStatusDisplay();
-            }, 5000); // 穿透效果持续5秒
+            }, 3000 + cultivationBonus * 1000); // 穿透效果持续3秒
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -7485,7 +7500,7 @@ function applyPhysicalAttackEffects() {
                     }
                 }
                 updateEnemyStatusDisplay();
-            }, 8000); // 麻痹持续8秒
+            }, 3000 + cultivationBonus * 1000); // 麻痹持续3秒
             break;
     }
 }
@@ -7498,6 +7513,8 @@ function applyMagicAttackEffects(damage) {
     const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.fragmentedMap.level - 1) * 0.006);
     if (Math.random() > triggerProbability) return; // 没有触发效果
 
+    const cultivationBonus = getCultivationBonusDuration();
+
     switch (effect) {
         case '沉默':
             battleState.enemy.silenced = true; // 深渊巨魔沉默
@@ -7506,10 +7523,10 @@ function applyMagicAttackEffects(damage) {
             setTimeout(() => {
                 battleState.enemy.silenced = false;
                 updateEnemyStatusDisplay();
-            }, 3000); // 沉默持续3秒
+            }, 3000 + cultivationBonus * 1000); // 沉默持续3秒
             break;
         case '迟缓':
-            handleSlow();
+            handleSlow(cultivationBonus);
             break;
         case '混乱':
             battleState.enemy.dazed = true; // 深渊巨魔混乱
@@ -7518,7 +7535,7 @@ function applyMagicAttackEffects(damage) {
             setTimeout(() => {
                 battleState.enemy.dazed = false;
                 updateEnemyStatusDisplay();
-            }, 5000); // 混乱持续5秒
+            }, 3000 + cultivationBonus * 1000); // 混乱持续3秒
             break;
         case '法力燃烧':
             const manaLoss = Math.floor(damage * 0.8);
@@ -7548,7 +7565,7 @@ function applyMagicAttackEffects(damage) {
             setTimeout(() => {
                 battleState.enemy.burnt = false;
                 updateEnemyStatusDisplay();
-            }, 10000); // 灼烧持续10秒
+            }, 3000 + cultivationBonus * 1000); // 灼烧持续3秒
             break;
     }
 }
@@ -7713,7 +7730,7 @@ function performDefense() {
         .filter(skill => skill);
 
     let skillMultiplier = 1;
-    let selectedSkillName = '防御';
+    let selectedSkillName = '普通防御';
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
         const selectedSkill = selectedSkills[randomIndex];
@@ -7725,7 +7742,13 @@ function performDefense() {
 
     battleState.player.defending = true;
     battleState.player.defenseReduction = defenseReduction;
-    logBattleEvent(`你施放了 ${selectedSkillName}，本回合免受 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
+    
+    if (defenseReduction < 1){
+        logBattleEvent(`你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
+    } else {
+        logBattleEvent(`你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害，溢出值已形成护盾。`, 'orange');
+    }
+    
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
 
     applyDefenseBonus(selectedSkillName);
@@ -7757,8 +7780,7 @@ function applyDefenseBonus(selectedSkillName) {
         }
         battleState.player.defenseBonus.critRate += bonusCritRate;
         battleState.player.defenseBonus.critDamage += bonusCritDamage;
-
-        logBattleEvent(`这是你第 ${battleState.player.defenseBonusCount} 次施放 ${selectedSkillName} ，蓄力了 ${bonusCritRate * 100}% 暴击率和 ${bonusCritDamage * 100}% 暴击伤害的增益。`, 'yellow');
+        battleState.player.defensing = true;
         updatePlayerStatusDisplay();
     } else {
         logBattleEvent(`防御增益已达到最大值，无法再增加。`, 'yellow');
@@ -7775,6 +7797,7 @@ function applyDefenseBonusEffect() {
         logBattleEvent(`你的蓄力增益效果已应用：${Math.round(critRate * 100)}% 暴击率和 ${Math.round(critDamage * 100)}% 暴击伤害。`, 'yellow');
         battleState.player.defenseBonusCount = 0;
         battleState.player.defenseBonus = null;
+        battleState.player.defensing = false;
     }
 }
         
@@ -7895,7 +7918,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
 }
 
 // 直接应用迟缓效果的函数
-function handleSlow() {
+function handleSlow(cultivationBonus) {
     const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
     battleState.enemy.speed -= slowAmount; // 速度降低
     battleState.enemy.slow = true;
@@ -7906,7 +7929,7 @@ function handleSlow() {
         battleState.enemy.speed += slowAmount;
         battleState.enemy.slow = false;
         updateEnemyStatusDisplay();
-    }, 10000); // 迟缓持续10秒
+    }, 3000 + cultivationBonus * 1000); // 迟缓持续3秒
 }
 
 function handleRampaged() {
@@ -8510,7 +8533,7 @@ function handleCriticalHit(isCritical) {
     }
 }
 
-let extraShield = 0;
+let extraShield = 0; //额外盾量
 function handleDamageReduction(damage) {
     let initialDamage = damage;
     let totalDamageReduction = 0;
@@ -8575,7 +8598,7 @@ function handleDamageReduction(damage) {
     const formattedFinalDamage = isNaN(finalDamage) ? 0 : finalDamage;
     const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
     if (formattedFinalDamage >= 0){
-        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, '#99FFFF');
+        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, '#FF0000');
     } else {
         logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，通过格挡你积累了 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
     }
@@ -8584,7 +8607,8 @@ function handleDamageReduction(damage) {
 }
 
 //智慧守护
-let wiseDefense;
+let wiseDefense; //此变量用于外部调用该数值并进行显示
+
 function handleWiseDefense(damage) {
     const shSkills = [];
     const skillsArea = document.getElementById("skills-area");
@@ -8613,8 +8637,7 @@ function handleWiseDefense(damage) {
         const manaUsed = Math.min(maxManaUsed, Math.ceil(damageToCancel / defenseFactor));
         battleAttributes.mana -= manaUsed;
         finalDamage -= Math.round(manaUsed * defenseFactor);
-
-        wiseDefense = Math.round(manaUsed * defenseFactor);
+        wiseDefense = Math.round(manaUsed * defenseFactor); //此变量用于外部调用该数值并进行显示
 
         logBattleEvent(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`, '#99FFFF');
 
@@ -9136,7 +9159,7 @@ function performLotteryDraw() {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
             pendingPrize += prize;
-            showInfoBox(`恭喜你彩票中得${prize}金子，请速速领取！`);
+            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！`);
         }
     }
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
@@ -10060,6 +10083,7 @@ function selectReward(rewardList) {
 }
             
 // 新增全局变量
+let jinnangCapacity = 5000;
 let jinnangItems = [
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后等级+1' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
@@ -10099,16 +10123,44 @@ function toggleJinnangDrawer() {
     const info = document.getElementById('jinnang-info');
     drawer.classList.toggle('open');
     info.classList.toggle('open');
+    selectedItem = null;
     updateJinnangItems();
 }
 
 function addItemToJinnang(itemName, quantity = 1) {
     const item = jinnangItems.find(i => i.name === itemName);
+
+    // 计算当前背包中的总物品数量
+    let currentTotalQuantity = jinnangItems.reduce((sum, i) => sum + i.quantity, 0);
+
     if (item) {
-        item.quantity += quantity;
+        // 如果已有该物品，计算可以添加的数量
+        let availableSpace = jinnangCapacity - currentTotalQuantity;
+        if (availableSpace > 0) {
+            let quantityToAdd = Math.min(quantity, availableSpace);
+            item.quantity += quantityToAdd;
+            quantity -= quantityToAdd;
+        }
+
+        // 若有剩余数量，提示背包已满
+        if (quantity > 0) {
+            showInfoBox("当前背包已没有空余位置！");
+        }
     } else {
-        jinnangItems.push({ name: itemName, quantity: quantity });
+        // 如果没有该物品，且背包有足够空间，则添加新物品
+        let availableSpace = jinnangCapacity - currentTotalQuantity;
+        if (availableSpace > 0) {
+            let quantityToAdd = Math.min(quantity, availableSpace);
+            jinnangItems.push({ name: itemName, quantity: quantityToAdd });
+            quantity -= quantityToAdd;
+        }
+
+        // 若有剩余数量，提示背包已满
+        if (quantity > 0) {
+            showInfoBox("当前背包已没有空余位置！");
+        }
     }
+
     updateJinnangItems();
 }
 
@@ -10121,65 +10173,24 @@ function useItem(itemName, quantity = 1) {
             jinnangItems[itemIndex].quantity = 0;
         }
         updateJinnangItems();
+        updateJinnangCapacityDisplay();
         return true;
     }
+    showInfoBox("道具数量不足或未找到该道具");
     return false;
 }
 
-let currentDescriptionBox = null; // 存储当前显示的描述框
-let autoCloseTimer = null;
-
 function showItemDescription(description, itemDiv, item) {
-    // 如果当前有描述框，移除它
-    if (currentDescriptionBox) {
-        currentDescriptionBox.remove();
-        currentDescriptionBox = null;
-        clearTimeout(autoCloseTimer);
-    }
+    const jinnangDescription = document.getElementById('jinnang-description');
+    jinnangDescription.innerHTML = `<p>${description}</p>`;; // 清空现有内容
 
-    let descriptionBox = document.createElement('div');
-    descriptionBox.className = 'description-box';
-    descriptionBox.style.position = 'fixed';
-    descriptionBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    descriptionBox.style.color = 'white';
-    descriptionBox.style.padding = '10px';
-    descriptionBox.style.borderRadius = '5px';
-    descriptionBox.style.zIndex = '1000';
-    descriptionBox.style.width = '300px';
-    descriptionBox.style.maxWidth = '80%';
-    descriptionBox.style.top = '50%';
-    descriptionBox.style.left = '50%';
-    descriptionBox.style.transform = 'translate(-50%, -50%)';
-    descriptionBox.style.wordWrap = 'break-word';
-    descriptionBox.style.textAlign = 'center';
-    descriptionBox.innerHTML = `<p>${description}</p>`;
-
-    let sellButton = document.createElement('button');
-    sellButton.innerText = '出售';
-    sellButton.style.marginTop = '10px';
-    sellButton.style.marginRight = '20px';
-    sellButton.addEventListener('click', () => sellItem(item));
-    descriptionBox.appendChild(sellButton);
-
-    let closeButton = document.createElement('button');
-    closeButton.innerText = '关闭';
-    closeButton.style.marginTop = '10px';
-    sellButton.style.marginLeft = '20px';
-    closeButton.addEventListener('click', closeDescriptionBox);
-    descriptionBox.appendChild(closeButton);
-
-    document.body.appendChild(descriptionBox);
-    currentDescriptionBox = descriptionBox;
-
-    // 设置3秒后自动关闭
-    autoCloseTimer = setTimeout(() => {
-        if (descriptionBox) {
-            descriptionBox.remove();
-            currentDescriptionBox = null;
-        }
-    }, 3000);
 }
 
+function updateJinnangCapacityDisplay() {
+    let currentTotalQuantity = jinnangItems.reduce((sum, i) => sum + i.quantity, 0);
+    document.getElementById('jinnang-capacity').innerText = `背包容量：${currentTotalQuantity}/${jinnangCapacity}`;
+}
+        
 function closeDescriptionBox() {
     if (currentDescriptionBox) {
         currentDescriptionBox.remove();
@@ -10188,27 +10199,85 @@ function closeDescriptionBox() {
     }
 }
 
-function sellItem(item) {
-    let quantityToSell = prompt('请输入要出售的数量:');
-    if (quantityToSell !== null) {
-        quantityToSell = parseInt(quantityToSell, 10);
-        if (isNaN(quantityToSell) || quantityToSell <= 0) {
-            showInfoBox('请输入有效的数量');
-            return;
-        }
-        if (quantityToSell > item.quantity) {
-            showInfoBox('您没有足够的道具数量');
-            return;
-        }
-
-        item.quantity -= quantityToSell;
-        let totalPrice = quantityToSell * item.price; // 使用 item.price 作为单价
-        goldAmount += totalPrice;
-        showInfoBox(`成功出售${quantityToSell}个${item.displayName}，获得${convertPrice(totalPrice)}金子`);
-
-        updateJinnangItems();
-        updateGoldDisplay(goldAmount); // 更新金币数量显示的函数
+function sellItem() {
+    if (!selectedItem) {
+        showInfoBox("请先选择需要出售的物品！");
+        return;
     }
+
+    const itemName = selectedItem.dataset.itemName;
+    const itemIndex = jinnangItems.findIndex(i => i.name === itemName);
+
+    if (itemIndex !== -1) {
+        let quantityToSell = prompt('请输入要出售的数量:');
+        if (quantityToSell !== null) {
+            quantityToSell = parseInt(quantityToSell, 10);
+            if (isNaN(quantityToSell) || quantityToSell <= 0) {
+                showInfoBox('请输入有效的数量');
+                return;
+            }
+            if (quantityToSell > jinnangItems[itemIndex].quantity) {
+                showInfoBox('您没有足够的道具数量');
+                return;
+            }
+
+            jinnangItems[itemIndex].quantity -= quantityToSell;
+            let totalPrice = quantityToSell * jinnangItems[itemIndex].price;
+            goldAmount += totalPrice;
+            showInfoBox(`成功出售${quantityToSell}个${jinnangItems[itemIndex].displayName}，获得${convertPrice(totalPrice)}金子`);
+
+            updateJinnangItems();
+            updateGoldDisplay(goldAmount);
+        }
+    } else {
+        showInfoBox("请先选择需要出售的物品！");
+    }
+}
+//拓展背包
+
+function enlargeCapacity() {
+    let cost;
+    let increaseAmount;
+
+    if (jinnangCapacity < 6000) {
+        cost = 100000;
+        increaseAmount = 500;
+    } else if (jinnangCapacity < 7000) {
+        cost = 150000;
+        increaseAmount = 500;
+    } else if (jinnangCapacity < 8000) {
+        cost = 180000;
+        increaseAmount = 500;
+    } else if (jinnangCapacity < 10000) {
+        cost = 240000;
+        increaseAmount = 500;
+    } else if (jinnangCapacity < 20000) {
+        cost = 500000;
+        increaseAmount = 500;
+    } else if (jinnangCapacity < 50000) {
+        cost = 1000000;
+        increaseAmount = 500;
+    } else {
+        cost = 3000000;
+        increaseAmount = 1000;
+    }
+
+    // 显示花费信息并请求确认
+    showInfoBox(`花费${convertPrice(cost)}金子可以增加${increaseAmount}容量，是否确认？`, () => {
+        if (confirm) {
+            if (goldAmount >= cost) {
+                goldAmount -= cost;
+                jinnangCapacity += increaseAmount;
+                showInfoBox(`容量已增加${increaseAmount}，当前容量为${jinnangCapacity}`);
+                updateGoldDisplay(goldAmount);
+                updateJinnangCapacityDisplay();
+            } else {
+                showInfoBox("金子不足，无法增加容量。");
+            }
+        } else {
+            return;
+        }
+    });
 }
 
 // 单位换算函数
@@ -10269,11 +10338,15 @@ function updateJinnangItems() {
                 selectedItem.style.border = '2px solid green';
                 selectedItem.style.borderRadius = '10px';
                 selectedItem.style.padding = '5px';
+
+                // 将 item 存储到 selectedItem 的 dataset 中，以便出售时使用
+                selectedItem.dataset.itemName = item.name;
             });
 
             jinnangReward.appendChild(itemDiv);
         }
     });
+    updateJinnangCapacityDisplay();
 }
         
 // 更新顶栏道具数量
@@ -10379,7 +10452,7 @@ function showTopBarItemDescription(description, itemDiv, item) {
     }, 3000);
 }
 
-// 出售道具函数
+// 出售顶部道具函数
 function sellTopBarItem(item) {
     let quantityToSell = prompt('请输入要出售的数量:');
     if (quantityToSell !== null) {
@@ -12581,9 +12654,10 @@ function updateSkillsArea(selectedSkills) {
 
 function deleteSkill(skill, skillDiv, skillsArea) {
     const messageBox = document.createElement('div');
+    const skillDescrip = skill.description;
     messageBox.style = "padding: 5px; font-size: 14px; border-radius: 10px; background: rgb(255 255 255 / 90%); border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
     messageBox.innerHTML = `
-        <p>描述：${skill.description}</p>
+        <p>描述：${skillDescrip}</p>
         <p>是否删除？</p>
         <button id="confirm-delete">删除</button>
         <button onclick="document.body.removeChild(this.parentNode)">取消</button>
@@ -12764,6 +12838,7 @@ function upgradeWisdomTo() {
         highGradePill += 99999;
         goldAmount += 9999999;
         stamps = 500000;
+        jinnangCapacity = 99999999;
         updateStampCount();
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
@@ -14187,7 +14262,7 @@ function storeItems() {
     gameItems.highGradePill = highGradePill;
     gameItems.goldAmount = goldAmount;
     gameItems.stamps = stamps;
-
+    gameItems.jinnangCapacity = jinnangCapacity;
     gameItems.jinnangItems = jinnangItems.map(item => ({
         name: item.name,
         quantity: item.quantity
@@ -14205,6 +14280,7 @@ function restoreItems() {
     highGradePill = gameItems.highGradePill;
     goldAmount = gameItems.goldAmount;
     stamps = gameItems.stamps;
+    jinnangCapacity = gameItems.jinnangCapacity;
 
     for (const savedItem of gameItems.jinnangItems) {
         const item = jinnangItems.find(i => i.name === savedItem.name);

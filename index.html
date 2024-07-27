@@ -1162,8 +1162,8 @@
         }
 
         .battleOverlayContainer {
-            width: 80%;
-            height: 80%;
+            width: 100%;
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -1868,7 +1868,7 @@
             </div>
             <div id="treasure-reward" class="reward-box"></div>
             <div id="generalEffect" class="general-visual-effect"></div>
-            <div id="treasure-description" class="treasure-description-box">无需点击“拿走奖品”，每次开启宝箱会自动帮你收集至背包。背包中的道具皆可点击出售。</div>
+            <div id="treasure-description" class="treasure-description-box">连续开启宝箱无需点击“取出道具”，每次开启宝箱会自动帮你收集至背包。</div>
             <div class="treasure-action">
                 <button onclick="openTreasure()">开启宝箱</button>
                 <button onclick="openTenthTreasure()">十连开启</button>
@@ -1881,7 +1881,7 @@
         <div class="jinnang-info" id="jinnang-info">
             <div class="jinnang-reward" id="jinnang-reward"></div>
         </div>
-        <div id="jinnang-description" class="treasure-description-box">背包内的物品可以点击查看其描述，如果你不需要多余的物品，还可以直接出售。每个物品的售价因其稀有程度而有所不同。</div>
+        <div id="jinnang-description" class="treasure-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
         <div class="lottery-section lottery-top">
@@ -3061,23 +3061,27 @@ function changeEnemyImage() {
     }
 }
 
-function showBattleOverlay(imageUrl) {
+function showBattleOverlay(imageUrl, duration = 500, opacity = 1) {
     const overlay = document.getElementById('battleOverlay');
     const overlayImage = document.getElementById('battleOverlayImage');
 
-    // 先清空图片
+    // 清空图片
     overlayImage.src = '';
 
     // 设置新的图片 URL
     overlayImage.src = imageUrl;
+
+    // 设置透明度
+    overlayImage.style.opacity = opacity;
+
+    // 显示遮罩
     overlay.style.display = 'flex';
 
-    // 设置动画，0.5秒后自动隐藏遮罩
+    // 设置动画，duration 毫秒后自动隐藏遮罩
     setTimeout(() => {
         overlay.style.display = 'none';
-    }, 500);
+    }, duration);
 }
-
 //保存游戏道具
 let gameItems = {
     transmutationPill: 0,
@@ -4406,9 +4410,9 @@ function collectDrug() {
 
     if (multiplier > 1) {
         drugInventory[collectedDrug].quantity += (multiplier - 1);
-        document.getElementById('drug-description').innerText = `你花费${collectCost - 100}金子打点进山凭证，采集到了${multiplier}个${collectedDrug}！`;
+        document.getElementById('drug-description').innerText = `你花费${convertPrice(collectCost - 100)}金子打点进山凭证，采集到了${multiplier}个${collectedDrug}！`;
     } else {
-        document.getElementById('drug-description').innerText = `你花费${collectCost - 100}金子打点进山凭证，采集到了1个${collectedDrug}！`;
+        document.getElementById('drug-description').innerText = `你花费${convertPrice(collectCost - 100)}金子打点进山凭证，采集到了1个${collectedDrug}！`;
     }
 
     updateDrugGrid(); // 更新药品显示
@@ -7052,7 +7056,7 @@ class DivineWeaponManager {
             </div>
             <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
                 <div style="display: flex; align-items: center;">
-                    <img src="${this.nirvanaGem.active ? 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="定空的灵石" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
+                    <img src="${this.nirvanaGem.active ? 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png' : 'https://pic.imgdb.cn/item/665aecc0d9c307b7e90a239e.png'}" alt="定空的灵石" style="width: 45px; height: 45px; border: 1px solid white; border-radius: 5px; margin-right: 10px;">
                     <div>
                         <h3 style="margin: 0;">${nirvanaGemTitle}</h3>
                         <p style="margin: 0;">${nirvanaGemDescription}</p>
@@ -8316,40 +8320,44 @@ function handleSuppressed() {
     performDefense = wrappedAction(performDefense);
 
     suppressionState.timeoutId = setTimeout(() => {
-        endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
+        cleanSuppressed();
     }, 3000); // 压制效果持续3秒
-}
-
-function endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense) {
-    battleState.player.suppressed = false;
-    effectCooldowns.suppressed = false;
-    if (!suppressionState.actionPerformed || battleState.player.suppressed) {
-        battleAttributes.health = 1;
-        battleAttributes.mana = 1;
-        battleAttributes.physicalAttack = 1;
-        battleAttributes.magicAttack = 1;
-        logBattleEvent("你的无动于衷助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
-        updateUI();
-    }
-    performPhysicalAttack = originalPerformPhysicalAttack;
-    performMagicalAttack = originalPerformMagicalAttack;
-    performHeal = originalPerformHeal;
-    performPoison = originalPerformPoison;
-    performDefense = originalPerformDefense;
-    updatePlayerStatusDisplay();
 }
 
 function cleanSuppressed() {
     if (battleState.player.suppressed) {
         clearTimeout(suppressionState.timeoutId); // 清除压制定时器
+
+        // 备份原始的攻击和防御函数
         const originalPerformPhysicalAttack = performPhysicalAttack;
         const originalPerformMagicalAttack = performMagicalAttack;
         const originalPerformHeal = performHeal;
         const originalPerformPoison = performPoison;
         const originalPerformDefense = performDefense;
-        endSuppression(originalPerformPhysicalAttack, originalPerformMagicalAttack, originalPerformHeal, originalPerformPoison, originalPerformDefense);
-    } 
+
+        // 重置玩家的压制状态和效果冷却时间
+        battleState.player.suppressed = false;
+        effectCooldowns.suppressed = false;
+
+        if (!suppressionState.actionPerformed || battleState.player.suppressed) {
+            battleAttributes.health = 1;
+            battleAttributes.mana = 1;
+            battleAttributes.physicalAttack = 1;
+            battleAttributes.magicAttack = 1;
+            logBattleEvent("你的无动于衷极大助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
+            showBattleOverlay("https://pic.imgdb.cn/item/66a484fcd9c307b7e95c2645.gif", 1000, 0.5);
+        }
+
+        // 恢复原始的攻击和防御函数
+        performPhysicalAttack = originalPerformPhysicalAttack;
+        performMagicalAttack = originalPerformMagicalAttack;
+        performHeal = originalPerformHeal;
+        performPoison = originalPerformPoison;
+        performDefense = originalPerformDefense;
+
+        // 更新玩家状态显示和 UI
+        updatePlayerStatusDisplay();
+    }
     updateUI();
 }
 
@@ -10024,7 +10032,7 @@ function getRandomReward(type) {
             { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5 },
             { name: '毒粉礼包（10）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
-            { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669cc578d9c307b7e9882e14.png', chance: 1 },
+            { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 49 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
@@ -10083,7 +10091,7 @@ let jinnangItems = [
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
     { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14046.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
     { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e1403e.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
-    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14027.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
+    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e29d9c307b7e9648ba5.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
     { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具进行一次任意宝箱的十连' },
     { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可以免费投注一次1000注以内的彩券' },
 ];

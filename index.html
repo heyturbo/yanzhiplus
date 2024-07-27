@@ -261,7 +261,7 @@
             background-color: rgb(255 255 255 / 90%);
             border-radius: 10px;
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
-            text-align: justify;
+            text-align: center;
         }
         .pet-selector {
             width: 90%;
@@ -409,25 +409,23 @@
         }
         .shop-info {
             display: none;
-            padding: 10px;
+            padding: 20px;
         }
         .shop-info.open {
             display: block;
         }
         .shop-items {
             display: grid;
-            padding: 0px;
             margin: 0;
             font-size: 11px;
             grid-template-columns: repeat(6, 1fr);
-            gap: 0px;
+            gap: 5px;
             align-items: stretch;
         }
         .shop-item {
             text-align: center;
             cursor: pointer;
             border: 2px solid transparent;
-            padding: 5px;
             border-radius: 5px;
             di's'padding: disp;
         }
@@ -439,7 +437,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            margin-top: 20px;
         }
         .shop-bar button {
             padding: 5px 10px;
@@ -1438,19 +1436,19 @@
     position: fixed;
     top: 50%;
     left: 50%;
-    height: 65%;
+    height: 400px;
     width: 85%;
     transform: translate(-50%, -50%);
-    background-color: rgba(0, 0, 0, 0.8);
+    background-image: url(https://pic.imgdb.cn/item/66a4d128d9c307b7e9a1dcd3.gif);
+    background-size: cover;
+    border: 1px solid floralwhite;
     color: #fff;
     padding: 20px;
-    border: 1px solid #ffffff;
     z-index: 1000;
-    overflow-y: auto;
+    overflow-y: scroll;
     font-size: 14px;
     border-radius: 10px;
     display: none;
-
 
 /* 召唤面板特定样式 */
 .summon-popup-panel {
@@ -1469,15 +1467,15 @@
 
 .summon-area {
     height: 240px;
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-around;
-    border: 1px solid #f6e193;
     padding: 10px;
-    background-color: rgb(0 0 0);
+    background-color: rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
     margin-top: 20px;
-    border-radius: 10px;
+    border-radius: 50px;
     flex-direction: column;
 }
 
@@ -1881,7 +1879,9 @@
     <div class="jinnang-drawer" id="jinnang-drawer">
         <div class="drawer-toggle" onclick="toggleJinnangDrawer()">背包</div>
         <div class="jinnang-info" id="jinnang-info">
-            <div class="jinnang-reward" id="jinnang-reward"></div>
+            <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll;">
+                <div class="jinnang-reward" id="jinnang-reward"></div>
+            </div>
         </div>
         <div id="jinnang-description" class="treasure-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
         <div class="treasure-action">
@@ -2099,17 +2099,15 @@
         <button id="exchangeButton" class="summon-button">兑换</button>
         <button id="openPetShopButton" class="summon-button">商店</button>
     </div>
-    <div class="container">
-        <p>每次召唤需要消耗一张召唤灵符</p>
-        <p>印花是珍贵货币，需要合理分配和使用</p>
-    </div>
 </div>
 
 <div id="petShop" class="pet-shop-popup-panel" style="display:none;">
     <h3>宠物商店（可下划）</h3>
     <button id="closePetShop" class="pet-shop-close-button">关闭</button>
-    <div id="shopItems" class="shop-grid">
-        <!-- 商店物品列表 -->
+    <div id="petShopItemsContainer" style="max-height:300px; overflow-y:scroll">
+        <div id="shopItems" class="shop-grid">
+            <!-- 商店物品列表 -->
+        </div>
     </div>
     <div class="pet-shop-actions">
         <button id="buySummonCharmButton" class="pet-shop-button">购买灵符（当前印花: <span id="currentStampCount">1000</span>）</button>
@@ -2289,7 +2287,7 @@
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
                     { name: '法术精通', rarity: 'B', type: 'N', multiplier: 0, description: '天生就是使用法术的奇才，如潜心修习法术，法术攻击力必然高于常人。被动技能，法术攻击力增加。' },
                     { name: '灵力充盈', rarity: 'B', type: 'N', multiplier: 0, description: '此生物充满了灵力能量，速度大幅提升。' },
-                    { name: '生命祝福', rarity: 'B', type: 'PH', multiplier: 1.2, description: '对于生命的赐予是自然最善意的祝福，拥有此种天赋的生物，生命值将大大提高。野兽较容易得到这类祝福。' },
+                    { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '对于生命的赐予是自然最善意的祝福，拥有此种天赋的生物，生命值将大大提高。野兽较容易得到这类祝福。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
                     { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '提高自身物理和法术闪避。' },
                     { name: '冥想', rarity: 'S', type: 'HL', multiplier: 0.01, description: '通过冥想，可以使自己的法力大大增加。被动技能，拥有此技能的人每次回合结束时（所有人行动完毕后），法力增加100,每场战斗结束后寿命额外减少1点.' },
@@ -3882,9 +3880,15 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
         summonedPet = pets[randomPetKey];
 
         // 显示加载图片
-        document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/666d9c32d9c307b7e96da6b1.gif" alt="加载中" id="loadingGif">
+        if (summonedRank !== 'SSR'){
+            document.getElementById('summonArea').innerHTML = `
+            <img src="https://pic.imgdb.cn/item/66a4d223d9c307b7e9a2c147.gif" alt="加载中" id="loadingGif">
         `;
+        } else{
+            document.getElementById('summonArea').innerHTML = `
+            <img src="https://pic.imgdb.cn/item/66a4d39cd9c307b7e9a57a82.gif" alt="加载中" id="loadingGif">
+        `;
+        }
 
         const loadingGif = document.getElementById('loadingGif');
         
@@ -4005,7 +4009,7 @@ function showPetShop() {
             const petDiv = document.createElement('div');
             petDiv.className = 'shop-item';
             petDiv.innerHTML = `
-                <img src="https://pic.imgdb.cn/item/666d688ed9c307b7e903ce17.png" alt="${pet.name}">
+                <img src="https://pic.imgdb.cn/item/666d688ed9c307b7e903ce17.png" alt="${pet.name}" style="height: 45px; width: 45px">
                 <div>${pet.name} (${pet.rank})</div>
                 <div>价格: ${price}印花</div>
             `;
@@ -10412,7 +10416,6 @@ function getTopBarItemPrice(itemId) {
             return 0;
     }
 }
-
 let currentDescriptionBox = null;
 function showTopBarItemDescription(description, itemDiv, item) {
     // 如果当前有描述框，移除它
@@ -11641,7 +11644,7 @@ function refreshShop(auto = false) {
             itemDiv.classList.add('shop-item');
             itemDiv.dataset.name = item.name;
             itemDiv.dataset.price = item.price;
-            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
+            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="height: 45px; width: 45px"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
             itemDiv.addEventListener('click', () => {
                 document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
                 itemDiv.classList.add('selected');
@@ -11691,7 +11694,7 @@ function refreshShop(auto = false) {
         itemDiv.classList.add('shop-item');
         itemDiv.dataset.name = item.name;
         itemDiv.dataset.price = item.price;
-        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
+        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name} style="height: 45px; width: 45px"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
         itemDiv.addEventListener('click', () => {
             document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
             itemDiv.classList.add('selected');

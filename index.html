@@ -132,6 +132,14 @@
             height: 45px;
         }
         .core-area {
+            background-color: #fff;
+            display: flex;
+            border-radius: 5px;
+            justify-content: center;
+            background-image: url(https://pic.imgdb.cn/item/66a4f420d9c307b7e9c23f5c.gif);
+            background-size: contain;
+        }
+        .core-area-for-skills {
             width: 90%;
             margin: 10px 0px 5px 0px;
             padding: 5px;
@@ -209,16 +217,14 @@
         }
         .core-area .skills {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             padding: 0px 0px;
-            margin: 5px 0px;
             gap: 5px 5px;
-            width: 95%;
+            width: 100%;
         }
         .core-area .skills div {
-            padding: 10px;
+            padding: 5px;
             margin: 5px 0px;
-            background-color: #ffffffcf;
             text-align: center;
             border-radius: 5px;
             font-size: 12px;
@@ -373,7 +379,7 @@
         }
         .quality-info {
             display: none;
-            padding: 5px;
+            padding: 10px;
         }
         .quality-info.open {
             display: block;
@@ -541,9 +547,10 @@
              /* 使两个子容器分布在容器的两边 */
             gap: 0px; /* 调整两列之间的间距 */
             align-items: stretch;
-            font-size: 14px;
+            font-size: 12px;
             flex-direction: row;
             justify-content: space-between;
+            margin-bottom: 10px;
         }
         .progress-bars {
             display: flex;
@@ -600,13 +607,10 @@
         
         .quality-details {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            flex-direction: row;
+            grid-template-columns: repeat(3, 2fr);
             padding: 0px 0px 10px 0px;
             gap: 5px 0px; /* 调整每个条目之间的间距 */
             font-size: 14px;
-            justify-content: space-around;
-            flex-wrap: wrap;
             align-items: flex-start;
         }
         .image-frame img {
@@ -619,7 +623,7 @@
             gap: 10px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
             justify-items: stretch;
-            padding: 15px 0px;
+            padding: 10px 0px;
         }
         .button-grid button {
             padding: 8px 0px;
@@ -1644,7 +1648,7 @@
             <div id="progressBar"></div>
         </div>
     </div>
-    <div class="core-area">
+    <div class="core-area-for-skills">
         <div class="buttons">
             <div class="button-row">
                 <button id="guideButton" onclick="showGuide()">玩法</button>
@@ -1659,8 +1663,9 @@
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
             </div>
         </div>
-        <div class="skills" id="skills-area"></div>
+        
     </div>
+
     <div class="top-bar">
         <div>
             <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
@@ -1761,22 +1766,22 @@
             <div class="attributes-container">
                 <div class="progress-bars">
                     <div class="progress-bar">
-                        耐力: <span id="attribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">＋</button>
+                        耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
                     </div>
                     <div class="progress-bar">
-                        智力: <span id="attribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">＋</button>
+                        智力: <span id="attribute-intelligence"></span><span id="bonusAttribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">+</button>
                     </div>
                     <div class="progress-bar">
-                        强壮: <span id="attribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">＋</button>
+                        强壮: <span id="attribute-strength"></span><span id="bonusAttribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">+</button>
                     </div>
                     <div class="progress-bar">
-                        敏捷: <span id="attribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">＋</button>
+                        敏捷: <span id="attribute-agility"></span><span id="bonusAttribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">+</button>
                     </div>
                     <div class="progress-bar">
-                        信仰: <span id="attribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">＋</button>
+                        信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
                     </div>
                     <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">＋</button>
+                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                     </div>
                     <div id="remaining-points-display">剩余点数: 0</div>
                     <div>飞升状态: <span id="ascension-status">未飞升</span></div>
@@ -1809,6 +1814,9 @@
                     <div>法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
                     <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                 </div>
+            </div>
+            <div class="core-area">
+                <div class="skills" id="skills-area"></div>
             </div>
             <div class="button-grid">
                 <button onclick="trainAttributes()">金子培养</button>
@@ -3233,7 +3241,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.maxWidth = '600px'; // 限制最大宽度
     infoBox.style.maxHeight = '60%'; // 限制最大高度
     infoBox.style.overflowY = 'auto'; // 添加垂直滚动条
-    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
     infoBox.style.color = 'white';
     infoBox.style.border = '1px solid white';
     infoBox.style.borderRadius = '10px';
@@ -3638,6 +3646,7 @@ function storeCurrentPetData() {
             drugBonus: drugBonus,
             alreadyUseDrug: alreadyUseDrug,
             divinedWeaponStatus: divinedWeaponStatus,
+            divineWeapons: divineWeaponManager.getWeaponData(),
             baseAttributes: baseAttributes,
             skillScore: skillScore,
             existingSkills: existingSkills, // 存储技能数据
@@ -3882,7 +3891,7 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
         // 显示加载图片
         if (summonedRank !== 'SSR'){
             document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/66a4d223d9c307b7e9a2c147.gif" alt="加载中" id="loadingGif">
+            <img src="https://pic.imgdb.cn/item/66a4f555d9c307b7e9c33849.gif" alt="加载中" id="loadingGif">
         `;
         } else{
             document.getElementById('summonArea').innerHTML = `
@@ -5769,7 +5778,7 @@ function updateEnemyAttributes() {
         magicAttack: 350,
         magicDefense: 300,
         speed: 20,
-        cultivation: 200
+        cultivation: 100
     };
 
     function calculateAttributeValue(attribute, initialValue) {
@@ -6252,6 +6261,7 @@ function jumpByTenRounds() {
     }
 
     currentExp = 0; // 确保 currentExp 被重置为0
+    updateExpBar();
 
     // 刷新玩家和深渊巨魔的UI
     updatePetInfo();
@@ -7873,13 +7883,12 @@ function enemyAttack() {
     }
     
     damage = handleWiseDefense(damage);
-    
+    handleManaRecover();
     handleBurnt();
     handleCriticalHit(isCritical);
     handleDamageReduction(damage);
     handleReflectAndHeal(damage);
     handleResurrection(damage);
-    handleManaRecover();
     
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
@@ -7926,7 +7935,6 @@ function handleSlow(cultivationBonus) {
     const slowAmount = Math.floor(battleState.enemy.speed * 0.25);
     battleState.enemy.speed -= slowAmount; // 速度降低
     battleState.enemy.slow = true;
-    logBattleEvent(`深渊巨魔被迟缓，速度降低了 ${slowAmount} 点。`, 'wheat');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b159.gif');
     updateEnemyStatusDisplay();
     setTimeout(() => {
@@ -8017,9 +8025,9 @@ function enemyHeal() {
 
     playerTurn = true; // 轮到玩家回合
     handleBurnt();
+    handleManaRecover();
     showEffect('enemyEffect');
     updateUI();
-    handleManaRecover();
 }
   
 function handleDazed() {
@@ -8029,21 +8037,21 @@ function handleDazed() {
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
             logBattleEvent(`混乱状态下，深渊巨魔攻击了自己，造成了 ${selfDamage} 点伤害。`, 'wheat');
             playerTurn = true;
+            handleManaRecover();
             return true;
         }
     }
     return false;
-    handleManaRecover();
 }
 
 function handleStunned() {
     if (battleState.enemy.stunned) {
         logBattleEvent("深渊巨魔眩晕，无法行动。", 'wheat');
         playerTurn = true;
+        handleManaRecover();
         return true;
     }
     return false;
-    handleManaRecover();
 }
 
 let enemyPhysicalAttackCount = 0; // 在函数外部定义变量怪物杀戮状态下的攻击次数
@@ -8057,18 +8065,17 @@ function performEnemyPhysicalAttack(isCritical) {
 
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`深渊巨魔施放黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
     }
-    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66728e8dd9c307b7e956a4e4.gif');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
 
     if (!battleState.enemy.silenced) {
         applyEnemyPhysicalEffects(damage);
     } else {
         logBattleEvent(`深渊巨魔处于沉默状态，无法施加物理效果。`, 'grey');
     }
-
+    
     // 新增规则判断
     if (battleState.player.slaughter) {
         const cultivationDiff = playerCultivation - enemyPetCultivation;
@@ -8109,7 +8116,7 @@ function performEnemyMagicalAttack(isCritical) {
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
-        logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'wheat');
+        logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'red');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
         logBattleEvent(`深渊巨魔施放嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
@@ -8595,23 +8602,25 @@ function handleDamageReduction(damage) {
     battleAttributes.health = rightBattleAttributesHealth;
     }
     
-    // 假设 wiseDefense 在函数外有定义
     const finalDamageReduction = shieldReduction + defenseReduction + totalDamageReduction + (isNaN(wiseDefense) ? 0 : wiseDefense);
 
     const formattedFinalDamageReduction = isNaN(finalDamageReduction) ? 0 : finalDamageReduction;
     const formattedFinalDamage = isNaN(finalDamage) ? 0 : finalDamage;
     const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
     if (formattedFinalDamage >= 0){
-        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, '#FF0000');
+        logBattleEvent(`格挡消耗${wiseDefenseManaCost}法力减少${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
+        wiseDefenseManaCost = 0;
     } else {
-        logBattleEvent(`减伤技能为你抵消了${formattedFinalDamageReduction}点伤害，通过格挡你积累了 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
+        logBattleEvent(`格挡消耗${wiseDefenseManaCost}法力减少${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
+        wiseDefenseManaCost = 0;
     }
-    
+            
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，飞升技能抵挡 ${totalDamageReduction} 点伤害。目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
 }
 
 //智慧守护
 let wiseDefense; //此变量用于外部调用该数值并进行显示
+let wiseDefenseManaCost; //此变量用于外部调用该数值并进行显示
 
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -8642,8 +8651,9 @@ function handleWiseDefense(damage) {
         battleAttributes.mana -= manaUsed;
         finalDamage -= Math.round(manaUsed * defenseFactor);
         wiseDefense = Math.round(manaUsed * defenseFactor); //此变量用于外部调用该数值并进行显示
+        wiseDefenseManaCost = manaUsed; //此变量用于外部调用该数值并进行显示
 
-        logBattleEvent(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`, '#99FFFF');
+        console.log(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`);
 
     }
 
@@ -8720,23 +8730,21 @@ function performHeal() {
         return;
     }
     
-    // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
         manaCostMultiplier = 500;
         logBattleEvent("深渊巨魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
     }
 
-    // 遍历技能区域并获取所有类型为 'PH' 的技能
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
         .map(skillDiv => skillDiv.innerText.split(' ')[0])
         .map(skillName => currentPet.skills.find(skill => skill.name === skillName && skill.type === 'PH'))
-        .filter(skill => skill);
+        .filter(skill => { return skill; });
 
     let skillMultiplier = 1;
-    let skillLevel = 1; // 默认技能等级为1
+    let skillLevel = 1;
 
     if (selectedSkills.length > 0) {
         const randomIndex = Math.floor(Math.random() * selectedSkills.length);
@@ -8747,14 +8755,12 @@ function performHeal() {
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级，治疗效果大大提升。`, 'aqua');
     }
 
-    // 根据技能等级计算 mana 消耗
     const manaCost = Math.round(38 * battleRounds * skillLevel * 0.1) * manaCostMultiplier;
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
     }
 
-    // 调用处理禁疗状态的函数
     const healAmount = handleHealingBan(skillMultiplier);
 
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
@@ -8763,36 +8769,45 @@ function performHeal() {
     logBattleEvent(`你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66713171d9c307b7e9fe40d2.gif');
 
-    // 检查仙气护体效果
-    let divineProtectionChance = 0.05; // 默认概率5%
-    let divineProtectionDuration = 3; // 默认持续时间3秒
-
-    // 如果存在PH技能，增加仙气护体的触发概率和持续时间
-    if (selectedSkills.length > 0) {
-        divineProtectionChance += skillLevel * 0.01; // 每级增加1%
-        divineProtectionDuration += skillLevel * 0.1; // 每级增加0.1秒
-    }
-
-    // 检查天降甘霖增益
-    if (ascensionSkill.name === '天降甘霖' || secondAscensionSkill.name === '天降甘霖') {
-        divineProtectionChance = battleState.player.divineProtectionChance || 0.5;
-        divineProtectionDuration = battleState.player.divineProtectionDuration || 5;
-    }
-
-    if (Math.random() < divineProtectionChance) {
-        battleState.player.divineProtection = true; // 仙气护体
-        logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。", 'aqua');
-        updatePlayerStatusDisplay();
-        setTimeout(() => {
-            battleState.player.divineProtection = false;
-            updatePlayerStatusDisplay();
-        }, divineProtectionDuration * 3000); // 仙气护体持续指定时间
-    }
+    handleDivineProtection(selectedSkills, skillLevel);
 
     playerTurn = false; // 轮到深渊巨魔回合
     enemyAttack();
     applyAscensionEffects();
     updateUI();
+}
+
+function handleDivineProtection(selectedSkills, skillLevel) {
+    let divineProtectionChance = 0.05;
+    let additionalDurationBySkill = 0;
+    let additionalDurationByCultivation = 0;
+    
+    if (selectedSkills.length > 0) {
+        divineProtectionChance += skillLevel * 0.01;
+        additionalDurationBySkill += skillLevel * 0.1;
+    }
+    
+    if (playerCultivation >= 64000) {
+        additionalDurationByCultivation += playerCultivation / 12000 * 0.1;
+    }
+    
+    let divineProtectionDuration = 3 + additionalDurationBySkill + additionalDurationByCultivation;
+    console.log(`当前仙气护体持续时间为：${divineProtectionDuration}`);
+    
+    if (ascensionSkill.name === '天降甘霖' || secondAscensionSkill.name === '天降甘霖') {
+        divineProtectionChance = battleState.player.divineProtectionChance || 0.5;
+        divineProtectionDuration = battleState.player.divineProtectionDuration || 5;
+    }
+    
+    if (Math.random() < divineProtectionChance) {
+        battleState.player.divineProtection = true;
+        logBattleEvent("你获得了仙气护体状态，受到伤害时会恢复生命值。", 'aqua');
+        updatePlayerStatusDisplay();
+        setTimeout(() => {
+            battleState.player.divineProtection = false;
+            updatePlayerStatusDisplay();
+        }, divineProtectionDuration * 1000);
+    }
 }
 
 function handleHealingBan(skillMultiplier) {
@@ -9056,7 +9071,6 @@ function resetBattleState(playerWon) {
     updatePetInfo();
 }
 
-
 function setBackgroundImage(imageUrl) {
     const drawer = document.querySelector('.battle-system-drawer');
     if (drawer) {
@@ -9217,7 +9231,7 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         }, 1000);
     }
     
-    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `结果区: <span style="color: gold; font-weight: bold;">${prize}</span>` : `结果区: ${prize}`;
+    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `结果区: <span style="color: gold; font-weight: bold;">${convertPrice(prize)}</span>` : `结果区: ${convertPrice(prize)}`;
     return prize;
 }
 
@@ -9320,7 +9334,7 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
         const casinoCoverLetterItem = jinnangItems.find(i => i.name === 'casinoCoverLetter');
         const hasCasinoCoverLetter = casinoCoverLetterItem && casinoCoverLetterItem.quantity > 0;
 
-        if (hasCasinoCoverLetter && lotteryBetCount <= 1000) {
+        if (hasCasinoCoverLetter && lotteryBetCount <= 500) {
             // 使用casinoCoverLetter进行投注
             useItem('casinoCoverLetter', 1);
             lastSelectedNumbers = [...lotterySelectedNumbers];
@@ -9367,8 +9381,8 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
 function updateLotteryDisplay() {
     document.getElementById('lotteryPrizePool').textContent = `奖金池: ${lotteryPrizePool}`;
     document.getElementById('lotteryBetCount').textContent = `投注数: ${lotteryBetCount}`;
-    document.getElementById('lotteryBetAmount').textContent = `投注金: ${lotteryBetAmount}`;
-    document.getElementById('lotteryResultAmount').innerHTML = pendingPrize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${pendingPrize}</span>` : '奖金区: 0';
+    document.getElementById('lotteryBetAmount').textContent = `投注金: ${convertPrice(lotteryBetAmount)}`;
+    document.getElementById('lotteryResultAmount').innerHTML = pendingPrize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${convertPrice(pendingPrize)}</span>` : '奖金区: 0';
 }
 
 function clearSelections() {
@@ -10087,7 +10101,7 @@ function selectReward(rewardList) {
 }
             
 // 新增全局变量
-let jinnangCapacity = 5000;
+let jinnangCapacity = 2000;
 let jinnangItems = [
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后等级+1' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
@@ -10117,8 +10131,8 @@ let jinnangItems = [
     { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14046.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
     { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e1403e.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
     { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e29d9c307b7e9648ba5.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
-    { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具进行一次任意宝箱的十连' },
-    { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可以免费投注一次1000注以内的彩券' },
+    { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可进行一次免费十连任意宝箱' },
+    { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可免费投注一次500倍以内的彩券' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -10556,7 +10570,6 @@ function toggleAttributeDrawer() {
     drawer.classList.toggle('open');
     info.classList.toggle('open');
     updateAttributePanel();
-    updatePetInfo(); // 确保更新属性后设置 attributesFetched
 }
 
 //宠物武装
@@ -10808,34 +10821,63 @@ function showInfo() {
     showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 除金子锻造外，可以每次使用100个“天地灵气”进行更有力的锻造。\n3. 当宠物等级达到一定等级后，可以分别解锁后续五个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
 }
 
-function forgeArm(key, infoDiv) {
-    if (goldAmount < 800) {
-        showInfoBox("金子不足，无法锻造！");
-        return;
+function forgeArm(key, infoDiv, useGold = true) {
+    if (useGold) {
+        if (goldAmount < 800) {
+            showInfoBox("金子不足，无法锻造！");
+            return;
+        }
+        goldAmount -= 800;
+        updateGoldDisplay(goldAmount);
+    } else {
+        if (!useItem('earthlyEnergy', 100)) {
+            showInfoBox("您还没有天地灵气，此道具可通过开启武神宝箱或商店购买获得。");
+            return;
+        }
     }
 
-    goldAmount -= 800;
     const arm = armsAttributes[key];
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
+
     let newValue;
-    let rand = Math.random();
+    if (useGold) {
+        let rand = Math.random();
         if (rand < 0.9) {
-        newValue = Math.floor(100 + Math.random() * 0.3 * (
-            attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 58999 :
-            attribute === "speed" ? 8899 :
-            attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-            73999
-        ));
+            newValue = Math.floor(100 + Math.random() * 0.3 * (
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
+                attribute === "magicAttack" ? 58999 :
+                attribute === "speed" ? 8899 :
+                attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
+                73999
+            ));
+        } else {
+            newValue = Math.floor(100 + Math.random() * (
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
+                attribute === "magicAttack" ? 58999 :
+                attribute === "speed" ? 8899 :
+                attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
+                73999
+            ));
+        }
     } else {
-        newValue = Math.floor(100 + Math.random() * (
-            attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-            attribute === "magicAttack" ? 58999 :
-            attribute === "speed" ? 8899 :
-            attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-            73999
-        ));
+        const maxRanges = {
+            physicalDefense: 87998,
+            magicDefense: 87998,
+            magicAttack: 58999,
+            speed: 8899,
+            health: 366666,
+            mana: 366666,
+            default: 73999
+        };
+
+        const maxRange = maxRanges[attribute] || maxRanges.default;
+
+        const minValue = 100 + 0.8 * maxRange;  // 80% 的极值
+        const maxValue = 100 + maxRange;        // 100% 的极值
+
+        newValue = Math.floor(minValue + Math.random() * (maxValue - minValue));
     }
+
     arm.value = newValue;
     arm.attribute = attribute;
 
@@ -10854,63 +10896,19 @@ function forgeArm(key, infoDiv) {
     arm.forgedInfo = `增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
 
     infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
-    updateGoldDisplay(goldAmount);
     updateSkillScore();
     updateTitle();
     updateAttributePanel();
 }
 
+// 使用金子锻造
+function goldForgeArm(key, infoDiv) {
+    forgeArm(key, infoDiv, true);
+}
+
+// 使用天地灵气锻造
 function energyForgeArm(key, infoDiv) {
-    if (!useItem('earthlyEnergy', 100)) {
-        showInfoBox("您还没有天地灵气，此道具可通过开启武神宝箱或商店购买获得。");
-        return;
-    }
-
-    const arm = armsAttributes[key];
-    const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
-    
-    // 定义属性值的最大范围
-    const maxRanges = {
-        physicalDefense: 87998,
-        magicDefense: 87998,
-        magicAttack: 58999,
-        speed: 8899,
-        health: 366666,
-        mana: 366666,
-        default: 73999
-    };
-
-    // 获取该属性对应的最大范围
-    const maxRange = maxRanges[attribute] || maxRanges.default;
-
-    // 计算最低和最高值
-    const minValue = 100 + 0.8 * maxRange;  // 80% 的极值
-    const maxValue = 100 + maxRange;        // 100% 的极值
-
-    // 生成 80% 到 100% 范围内的随机值
-    const newValue = Math.floor(minValue + Math.random() * (maxValue - minValue));
-
-    arm.value = newValue;
-    arm.attribute = attribute;
-
-    const attributeMap = {
-        physicalAttack: '物攻',
-        magicAttack: '法攻',
-        physicalDefense: '物防',
-        magicDefense: '法防',
-        speed: '速度',
-        health: 'HP',
-        mana: 'MP'
-    };
-
-    const attributeNameInChinese = attributeMap[arm.attribute];
-
-    arm.forgedInfo = `增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
-
-    infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
-    updateSkillScore();
-    updateTitle();
-    updateAttributePanel();
+    forgeArm(key, infoDiv, false);
 }
 
 function lockArms() {
@@ -11380,13 +11378,133 @@ function calculateAvailableTrainingCount(petLevel) {
     return count;
 }
 
+let triggerAutoTrainingCountDown = 0;
+let autoTrainingInterval = null;
+let autoTrainingTimeout = null;
+
+function startAutoTraining() {
+    // 开始以0.1秒频率自动执行trainAttributesAfterFifth
+    autoTrainingInterval = setInterval(() => {
+        if (goldAmount <= 0) {
+            stopAutoTraining();
+        } else {
+            trainAttributesAfterFifth();
+        }
+    }, 100);
+
+    // 10秒后停止自动执行
+    autoTrainingTimeout = setTimeout(() => {
+        stopAutoTraining();
+    }, 10000);
+}
+
+function stopAutoTraining() {
+    clearInterval(autoTrainingInterval);
+    clearTimeout(autoTrainingTimeout);
+    autoTrainingInterval = null;
+    autoTrainingTimeout = null;
+    triggerAutoTrainingCountDown = 0;
+    showInfoBox("自动培养已停止。");
+}
+
+function trainAttributesAfterFifth() {
+    if (goldAmount < 4888) {
+        showInfoBox("金子不足4两888文，无法培养！");
+        return;
+    }
+
+    triggerAutoTrainingCountDown += 1;
+
+    const leftAttributes = onlyDisplayLeftAttributes();
+
+    const maxEndurance = Math.round(leftAttributes.endurance * 0.6);
+    const maxIntelligence = Math.round(leftAttributes.intelligence * 0.6);
+    const maxStrength = Math.round(leftAttributes.strength * 0.6);
+    const maxAgility = Math.round(leftAttributes.agility * 0.6);
+    const maxFaith = Math.round(leftAttributes.faith * 0.6);
+    console.log(`金子培养上限值：${maxEndurance}, ${maxIntelligence}, ${maxStrength}, ${maxAgility}, ${maxFaith},`);
+
+    const randomGrowthCount = () => {
+        const rand = Math.random();
+        if (rand < 0.05) return 5;
+        if (rand < 0.20) return 4;
+        if (rand < 0.45) return 3;
+        if (rand < 0.80) return 2;
+        return 1;
+    }
+
+    const growthCount = randomGrowthCount();
+    const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    const maxAttributes = {
+        endurance: maxEndurance,
+        intelligence: maxIntelligence,
+        strength: maxStrength,
+        agility: maxAgility,
+        faith: maxFaith
+    };
+    let results = [];
+
+    for (let i = 0; i < growthCount; i++) {
+        const attribute = attributes[Math.floor(Math.random() * attributes.length)];
+        const maxAttribute = maxAttributes[attribute];
+        const bonusAttribute = bonusAttributes[attribute];
+        const currentAttribute = leftAttributes[attribute];
+
+        let growthRange = [1, 3];
+        if (bonusAttribute >= maxAttribute * 0.55) {
+            growthRange = [-1, 2];
+        }
+
+        const growthValue = Math.floor(Math.random() * (growthRange[1] - growthRange[0] + 1)) + growthRange[0];
+        const newBonusValue = Math.min(bonusAttribute + growthValue, maxAttribute);
+
+        bonusAttributes[attribute] = newBonusValue;
+        results.push(`${i + 1}. ${attributeMap(attribute)}: ${growthValue}`);
+    }
+
+    goldAmount -= 4888;
+    updateGoldDisplay(goldAmount);
+    updateAttributePanel();
+
+    showInfoBox(`本次花费4两888文金子培养，结果为：\n${results.join('\n')}`);
+
+    // 如果触发自动执行条件且尚未开始自动执行
+    if (triggerAutoTrainingCountDown >= 5 && !autoTrainingInterval) {
+        startAutoTraining();
+    }
+}
+
+function bonusAttributesDisplay() {
+    const attributeNames = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    attributeNames.forEach(attribute => {
+        const spanElement = document.getElementById(`bonusAttribute-${attribute}`);
+        if (spanElement) {
+            spanElement.innerText = `(+${bonusAttributes[attribute]})`;
+        }
+    });
+}
+
+function attributeMap(attribute) {
+    const map = {
+        endurance: '耐力',
+        intelligence: '智力',
+        strength: '强壮',
+        agility: '敏捷',
+        faith: '信仰'
+    };
+    return map[attribute] || attribute;
+}
+
 function trainAttributes() {
     // 计算可用的金子培养次数
     const availableTrainingCount = calculateAvailableTrainingCount(petLevel);
 
     // 检查当前培养次数是否达到可用次数
-    if (trainingCount >= availableTrainingCount) {
-        showInfoBox("当前没有可用培养次数了。只有当宠物等级达到60、120、180和200级时，才能各获得一次培养机会！每次培养会按比例增加宠物的属性值，请合理分配培养机会。");
+    if (trainingCount >= availableTrainingCount && trainingCount >= 5) {
+        trainAttributesAfterFifth();
+        return;
+    } else if (trainingCount >= availableTrainingCount){
+        showInfoBox("当前没有可用培养次数。\n1. 当等级达到60/120/180/200级时会各获得一次培养机会 \n2. 每次培养会按比固定例增加宠物的属性值 \n3. 第五次培养后可按照每一次4两888文的花费为宠物进行随机属性增长 \n4. 连续随机增长5次会自动执行10秒培养，请注意金子花费 \n5. 随机金子培养值存在上限，宠物资质越好上限越高 ");
         return; // 退出函数
     }
 
@@ -13031,12 +13149,31 @@ function calculateTotalAttributes(currentValue, growthRate, level, baseLevel, is
     return baseAttribute;
 }
 
+function onlyDisplayLeftAttributes() {
+    const qualities = currentPet.qualities;
+    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const baseLevel = awakened ? qualities.baseLevel : 0;
+
+    const leftAttributes = {
+        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, awakened),
+        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, awakened),
+        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, awakened),
+        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, awakened),
+        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, awakened)
+    };
+
+    //console.log("Current Attributes:", attributes);
+    //console.log("Bonus Attributes:", bonusAttributes);
+
+    return leftAttributes;
+}
+        
 function updateAttributePanel() {
     const pet = currentPet;
     const qualities = pet.qualities;
     const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
 
-    const currentAttributes = calculateCurrentAttributes();
+    const currentAttributes = onlyDisplayLeftAttributes();
 
     const totalAttributes = {
         endurance: currentAttributes.endurance,
@@ -13064,6 +13201,7 @@ function updateAttributePanel() {
     document.getElementById("attribute-faith").innerText = totalAttributes.faith;
 
     updateRemainingPointsDisplay();
+    bonusAttributesDisplay();
 }
     
 function updatePrimaryAttributes(totalAttributes) {
@@ -13111,6 +13249,7 @@ function calculateCurrentAttributes() {
 
     return attributes;
 }
+
 
 let remainingPoints = 0;
 const allocationHistory = [];
@@ -14239,6 +14378,7 @@ function saveGameState() {
         collectedPets: collectedPets,
         collectedPetCount: collectedPetCount,
         divineWeapons: divineWeaponManager.getWeaponData(),
+        divinedWeaponStatus: divinedWeaponStatus, //保存神器提示
         existingSkills: existingSkills,
         goldAmount: goldAmount,
         blessGiftClaimed: blessGiftClaimed,
@@ -14246,7 +14386,6 @@ function saveGameState() {
         enemyMaxHealth: enemyMaxHealth,
         enemyMaxMana: enemyMaxMana,
         enemyInitialState: enemyInitialState, // 保存敌人的初始状态
-        divinedWeaponStatus: divinedWeaponStatus, //保存神器提示
         drugInventory: JSON.stringify(drugInventory), // 保存药物系统
         alreadyUseDrug: alreadyUseDrug, //使用药物提示
         collectCost: collectCost, //采集药物成本
@@ -14422,6 +14561,7 @@ function loadGameState() {
         if (savedState.collectedPetCount !== undefined) {
             collectedPetCount = savedState.collectedPetCount;
         }
+        //假如存在神器
         if (savedState.divineWeapons) {
             divineWeaponManager.setWeaponData(savedState.divineWeapons);
         }

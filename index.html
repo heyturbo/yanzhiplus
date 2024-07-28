@@ -6337,20 +6337,20 @@ function autoBattle() {
         }
 
         if (battleState.player.blindfold && playerTurn) {
+            // 玩家处于失明状态且处于玩家回合时，使用法术攻击
             performAttack('magical');
-        } else {
-            if (Math.random() < 0.99) {
-                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
+        } else if (playerTurn) {
+            // 玩家不处于失明状态且处于玩家回合时
+            if (battleAttributes.magicAttack > 0.8 * battleAttributes.physicalAttack) {
+                // 99% 概率使用法术攻击
+                if (Math.random() < 0.99) {
                     performAttack('magical');
                 } else {
                     performAttack('physical');
                 }
             } else {
-                if (battleAttributes.physicalAttack > battleAttributes.magicAttack && playerTurn) {
-                    performAttack('physical');
-                } else {
-                    performAttack('magical');
-                }
+                // 否则使用物理攻击
+                performAttack('physical');
             }
         }
     }, 300);

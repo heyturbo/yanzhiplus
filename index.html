@@ -5922,7 +5922,6 @@ function updateUI() {
     document.getElementById('enemy-level').innerText = enemyLevel;
     updatePetLevel();
     updateHealthAndManaDisplay();
-
 }
 
 function updateHealthAndManaDisplay() {
@@ -7914,6 +7913,7 @@ function enemyAttack() {
     handleDamageReduction(damage);
     handleReflectAndHeal(damage);
     handleResurrection(damage);
+    handleRampaged();
     
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
@@ -8007,7 +8007,7 @@ function handleRampaged() {
     }
 
     // 检查并处理敌人复活机制
-    if (battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
+    if (battleState.enemy.rampaged && battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
         battleState.enemy.revivalCount += 1;
         logBattleEvent("深渊巨魔的生命力正在复苏，请在2秒内击杀它，否则它将复活！", "red");
         battleState.enemy.revived = true;

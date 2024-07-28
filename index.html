@@ -3054,24 +3054,21 @@ const biographies = {
 };
         
 const enemyImages = [
-    { status: 'default', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
-    { status: 'rampaged', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
-    { status: 'mao', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' }
+    { status: 'default', name: '深渊巨魔', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
+    { status: 'rampaged', name: '狂暴量子态', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
+    { status: 'mao', name: '魔主形态', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' },
+    { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
+    { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
 ];
 
-function changeEnemyImage() {
-    let enemyImage;
-
-    if (battleRounds >= 150) {
-        enemyImage = enemyImages.find(image => image.status === 'mao');
-    } else if (battleState.enemy.rampaged) {
-        enemyImage = enemyImages.find(image => image.status === 'rampaged');
-    } else {
-        enemyImage = enemyImages.find(image => image.status === 'default');
-    }
+function changeEnemyImage(status) {
+    const enemyImage = enemyImages.find(image => image.status === status);
 
     if (enemyImage) {
         document.getElementById("enemy-image").src = enemyImage.url;
+        document.getElementById("enemy-name").innerText = enemyImage.name;
+    } else {
+        console.error(`Status '${status}' not found in enemyImages.`);
     }
 }
 
@@ -3079,24 +3076,19 @@ function showBattleOverlay(imageUrl, duration = 500, opacity = 1) {
     const overlay = document.getElementById('battleOverlay');
     const overlayImage = document.getElementById('battleOverlayImage');
 
-    // 清空图片
     overlayImage.src = '';
 
-    // 设置新的图片 URL
     overlayImage.src = imageUrl;
 
-    // 设置透明度
     overlayImage.style.opacity = opacity;
 
-    // 显示遮罩
     overlay.style.display = 'flex';
 
-    // 设置动画，duration 毫秒后自动隐藏遮罩
     setTimeout(() => {
         overlay.style.display = 'none';
     }, duration);
 }
-//保存游戏道具
+
 let gameItems = {
     transmutationPill: 0,
     rebornPill: 0,
@@ -6272,8 +6264,14 @@ function jumpByTenRounds() {
     updateUI();
 }
 //自动战斗函数
+let autoBattleMode = 'auto'; // 默认自动施法，'physical' - 默认物理攻击, 'magical' - 默认法术攻击, 'auto' - 自动施法
 let autoBattleInterval = null;
 
+function setAutoBattleMode(mode) {
+    autoBattleMode = mode;
+    logBattleEvent(`自动战斗模式已设置为${mode === 'physical' ? '默认物理攻击' : mode === 'magical' ? '默认法术攻击' : '自动施法'}`, 'white');
+}
+//setAutoBattleMode('physical');
 function clearAutoBattle() {
     if (autoBattleInterval !== null) {
         clearInterval(autoBattleInterval);
@@ -6288,7 +6286,7 @@ function autoBattle() {
         return;
     }
 
-    logBattleEvent("自动战斗已开始。", 'green');
+    logBattleEvent("自动战斗已开始。", 'white');
 
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
@@ -6344,21 +6342,34 @@ function autoBattle() {
             }
         }
 
-        if (battleState.player.blindfold && playerTurn) {
-            performAttack('magical');
-        } else {
-            if (Math.random() < 0.99) {
-                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
-                    performAttack('magical');
-                } else {
+        if (playerTurn) {
+            switch (autoBattleMode) {
+                case 'physical':
                     performAttack('physical');
-                }
-            } else {
-                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
-                    performAttack('physical');
-                } else {
+                    break;
+                case 'magical':
                     performAttack('magical');
-                }
+                    break;
+                case 'auto':
+                default:
+                    if (battleState.player.blindfold) {
+                        performAttack('magical');
+                    } else {
+                        if (Math.random() < 0.99) {
+                            if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
+                                performAttack('magical');
+                            } else {
+                                performAttack('physical');
+                            }
+                        } else {
+                            if (battleAttributes.physicalAttack >= battleAttributes.magicAttack) {
+                                performAttack('physical');
+                            } else {
+                                performAttack('magical');
+                            }
+                        }
+                    }
+                    break;
             }
         }
     }, 300);
@@ -6927,7 +6938,7 @@ function performIndependentMagicAttack() {
         const result = calculateSkillLevelAndMultiplier(selectedSkill);
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
-        logBattleEvent(`触发法术精通，你再次施放了 ${selectedSkill.name} ${skillLevel}级。`, 'wheat');
+        logBattleEvent(`触发法术精通，你再次施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
     } else {
         logBattleEvent("触发法术精通，但没有可用的法术攻击技能，使用普通法术攻击。");
     }
@@ -7926,7 +7937,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
             logBattleEvent(`深渊巨魔窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
         } else {
-            logBattleEvent("深渊巨魔想窃取你的资源，但你识破了，没受到任何损失", 'wheat');
+            logBattleEvent("深渊巨魔想窃取你的资源，但你识破了，没受到任何损失", '#66CDAA');
             handleSlow(); // 直接应用迟缓效果
         }
         return true;
@@ -7951,44 +7962,56 @@ function handleSlow(cultivationBonus) {
 function handleRampaged() {
     console.log(`handleRampaged called. battleRounds: ${battleRounds}, enemy health: ${battleState.enemy.health}, enemyMaxHealth: ${enemyMaxHealth}`);
 
-    if (battleRounds > 0 && battleRounds % 10 === 0) {
+    if (battleRounds === 150) {
         enemyCritRate = 1;
-        enemyCritDamage = battleRounds === 150 ? 3.5 : 2.2;
+        enemyCritDamage = 3.5;
         battleState.enemy.rampaged = true;
-        changeEnemyImage();
+        changeEnemyImage("mao");
         setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
-        document.getElementById("enemy-name").innerText = '量子狂暴体'; 
         console.log('Enemy is rampaged.');
-
-        if (!battleState.enemy.revivalCount) {
-            battleState.enemy.revivalCount = 0;
-        }
-
-        // 检查并处理敌人复活机制
-        if (battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
-            battleState.enemy.revivalCount += 1;
-            logBattleEvent("深渊巨魔的生命力正在复苏，请在2秒内击杀它，否则它将复活！", "red");
-            battleState.enemy.revived = true;
-            console.log(`Revival triggered. revivalCount: ${battleState.enemy.revivalCount}`);
-
-            setTimeout(() => {
-                if (battleState.enemy.health < enemyMaxHealth) {
-                    battleState.enemy.health = enemyMaxHealth;
-                    logBattleEvent("深渊巨魔复生成功，生命值恢复到100%！", "red");
-                    battleState.enemy.revived = false;
-                    updateUI();
-                    console.log('Enemy revived to full health.');
-                }
-            }, 2000);
-        }
+    } else if (battleRounds <= 150 && battleRounds % 10 === 0) {
+        enemyCritRate = 1;
+        enemyCritDamage = 2.2;
+        battleState.enemy.rampaged = true;
+        changeEnemyImage("rampaged");
+        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
+        console.log('Enemy is rampaged.');
+    } else if (battleRounds > 150 && battleRounds % 10 === 0) {
+        enemyCritRate = 1;
+        enemyCritDamage = 3.5;
+        battleState.enemy.rampaged = true;
+        changeEnemyImage("darkShape");
+        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
+        console.log('Enemy is rampaged.');
     } else {
         enemyCritRate = 0.6;
         enemyCritDamage = 1.8;
         battleState.enemy.rampaged = false;
-        changeEnemyImage();
-        document.getElementById("enemy-name").innerText = '深渊巨魔'; 
+        changeEnemyImage("default");
         setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
         console.log('Enemy is not rampaged.');
+    }
+
+    if (!battleState.enemy.revivalCount) {
+        battleState.enemy.revivalCount = 0;
+    }
+
+    // 检查并处理敌人复活机制
+    if (battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
+        battleState.enemy.revivalCount += 1;
+        logBattleEvent("深渊巨魔的生命力正在复苏，请在2秒内击杀它，否则它将复活！", "red");
+        battleState.enemy.revived = true;
+        console.log(`Revival triggered. revivalCount: ${battleState.enemy.revivalCount}`);
+
+        setTimeout(() => {
+            if (battleState.enemy.health < enemyMaxHealth) {
+                battleState.enemy.health = enemyMaxHealth;
+                logBattleEvent("深渊巨魔复生成功，生命值恢复到100%！", "red");
+                battleState.enemy.revived = false;
+                updateUI();
+                console.log('Enemy revived to full health.');
+            }
+        }, 2000);
     }
 }
 
@@ -8039,7 +8062,7 @@ function handleDazed() {
         if (Math.random() < 0.5) {
             const selfDamage = battleState.enemy.physicalAttack;
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
-            logBattleEvent(`混乱状态下，深渊巨魔攻击了自己，造成了 ${selfDamage} 点伤害。`, 'wheat');
+            logBattleEvent(`混乱状态下，深渊巨魔攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
             playerTurn = true;
             handleManaRecover();
             return true;
@@ -8142,7 +8165,7 @@ function applyEnemyPhysicalEffects(damage) {
     const triggeredEffects = [];
     
     effects.forEach(effect => {
-        const baseChance = 0.2; // 基础触发概率为10%
+        const baseChance = 0.2; // 基础触发概率为20%
         const adjustedChance = Math.max(0.01, baseChance + probabilityAdjustment);
         const effectChance = Math.random();
 
@@ -9055,8 +9078,9 @@ function resetBattleState(playerWon) {
         addItemToJinnang('magicPetAmulet', 1);
         showInfoBox('恭喜你战胜了第100轮深渊巨魔，获得了1个灵兽符文！');
     }
-
-    if (battleRounds === 151) {
+    
+    if (battleRounds >= 151) {
+        changeEnemyImage("realShape");
         showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }
 
@@ -9071,7 +9095,6 @@ function resetBattleState(playerWon) {
     storeEnemyInitialState();
     clearEnemyEffect();
     enemyHealCount = 0;
-    changeEnemyImage();
     updatePetInfo();
 }
 

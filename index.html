@@ -6264,14 +6264,8 @@ function jumpByTenRounds() {
     updateUI();
 }
 //自动战斗函数
-let autoBattleMode = 'auto'; // 默认自动施法，'physical' - 默认物理攻击, 'magical' - 默认法术攻击, 'auto' - 自动施法
 let autoBattleInterval = null;
 
-function setAutoBattleMode(mode) {
-    autoBattleMode = mode;
-    logBattleEvent(`自动战斗模式已设置为${mode === 'physical' ? '默认物理攻击' : mode === 'magical' ? '默认法术攻击' : '自动施法'}`, 'white');
-}
-//setAutoBattleMode('physical');
 function clearAutoBattle() {
     if (autoBattleInterval !== null) {
         clearInterval(autoBattleInterval);
@@ -6286,7 +6280,7 @@ function autoBattle() {
         return;
     }
 
-    logBattleEvent("自动战斗已开始。", 'white');
+    logBattleEvent("自动战斗已开始。", 'green');
 
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
@@ -6342,34 +6336,21 @@ function autoBattle() {
             }
         }
 
-        if (playerTurn) {
-            switch (autoBattleMode) {
-                case 'physical':
-                    performAttack('physical');
-                    break;
-                case 'magical':
+        if (battleState.player.blindfold && playerTurn) {
+            performAttack('magical');
+        } else {
+            if (Math.random() < 0.99) {
+                if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack && playerTurn) {
                     performAttack('magical');
-                    break;
-                case 'auto':
-                default:
-                    if (battleState.player.blindfold) {
-                        performAttack('magical');
-                    } else {
-                        if (Math.random() < 0.99) {
-                            if (battleAttributes.magicAttack >= 0.8 * battleAttributes.physicalAttack) {
-                                performAttack('magical');
-                            } else {
-                                performAttack('physical');
-                            }
-                        } else {
-                            if (battleAttributes.physicalAttack >= battleAttributes.magicAttack) {
-                                performAttack('physical');
-                            } else {
-                                performAttack('magical');
-                            }
-                        }
-                    }
-                    break;
+                } else {
+                    performAttack('physical');
+                }
+            } else {
+                if (battleAttributes.physicalAttack > battleAttributes.magicAttack && playerTurn) {
+                    performAttack('physical');
+                } else {
+                    performAttack('magical');
+                }
             }
         }
     }, 300);
@@ -7981,14 +7962,14 @@ function handleRampaged() {
         enemyCritDamage = 3.5;
         battleState.enemy.rampaged = true;
         changeEnemyImage("darkShape");
-        setBackgroundImage('https://pic.imgdb.cn/item/66715129d9c307b7e93f5f0c.webp');
+        setBackgroundImage('https://pic.imgdb.cn/item/66a62dd3d9c307b7e9cbe51b.gif');
         console.log('Enemy is rampaged.');
     } else {
         enemyCritRate = 0.6;
         enemyCritDamage = 1.8;
         battleState.enemy.rampaged = false;
-        changeEnemyImage("default");
-        setBackgroundImage('https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
+        changeEnemyImage(battleRounds > 150 ? "realShape" : "default");
+        setBackgroundImage(battleRounds > 150 ? 'https://pic.imgdb.cn/item/66a62dd3d9c307b7e9cbe52b.gif' : 'https://pic.imgdb.cn/item/667fa3b3d9c307b7e916f84c.gif');
         console.log('Enemy is not rampaged.');
     }
 
@@ -9079,7 +9060,7 @@ function resetBattleState(playerWon) {
         showInfoBox('恭喜你战胜了第100轮深渊巨魔，获得了1个灵兽符文！');
     }
     
-    if (battleRounds >= 151) {
+    if (battleRounds === 151) {
         changeEnemyImage("realShape");
         showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }

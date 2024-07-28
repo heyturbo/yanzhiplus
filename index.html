@@ -125,6 +125,7 @@
         .bottom-bar div {
             display: flex;
             flex-direction: row;
+            justify-content: center;
         }
         
         .bottom-bar img {
@@ -249,9 +250,10 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            margin-right: 20px;
+            margin: 5px;
             font-size: 16px;
             gap: 5px;
+            width: 200px;
         }
         .bottom-bar .info div {
             margin: 5px 0;
@@ -3579,7 +3581,7 @@ function deletePetData(petName) {
 
 //删档函数
 function deleteAllPetData() {
-    showInfoBox('你确定删除所有数据吗？操作不可恢复！', () => {
+    showInfoBox('你确定删除其他宠物数据吗？操作不可恢复！', () => {
         const keysToRemove = [];
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
@@ -3595,7 +3597,7 @@ function deleteAllPetData() {
         } else {
             console.log('gameState 不存在');
         }
-        showInfoBox('所有数据已删除！');
+        showInfoBox('除当前宠物外，其他宠物数据均已删除！');
         console.log(`Deleted ${keysToRemove.length} pet data entries.`);
     });
 }

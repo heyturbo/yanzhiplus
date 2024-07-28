@@ -5689,7 +5689,8 @@ function updatePetInfo() {
     updateUI();
     attributesFetched = true;
 }
-
+let enemyPetCultivation;
+let playerCultivation;
 let enemyPet = {
     health: 18,
     mana: 13,
@@ -5704,8 +5705,6 @@ let enemyPet = {
 let enemyMaxHealth = enemyPet.health;
 let enemyMaxMana = enemyPet.mana;
 let enemyInitialState = null;
-let enemyPetCultivation;
-let playerCultivation;
 
 function initializeEnemyPet() {
     enemyPet = {
@@ -6322,7 +6321,8 @@ function autoBattle() {
             battleState.player.seal,
             battleState.player.torn,
             battleState.player.taunt,
-            battleState.player.spellSlow
+            battleState.player.spellSlow,
+            battleState.player.slaughter
         ];
         const activeDebuffs = debuffStates.filter(Boolean).length;
 
@@ -8408,13 +8408,19 @@ function handleTaunt() {
         return;
     }
 
+    // 清除现有的嘲讽定时器（如果有）
+    clearTimeout(tauntTimeout);
+
     battleState.player.taunt = true;
     logBattleEvent("深渊巨魔极尽嬉笑怒骂之攻势,你未能压抑心中怒火,嘲讽时间内你只能对其使用物理攻击。", '#FF4500');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.taunt = true;
+
+    // 更新状态显示和UI
     updatePlayerStatusDisplay();
     updateUI();
 
+    // 设置新的嘲讽定时器
     tauntTimeout = setTimeout(() => {
         battleState.player.taunt = false;
         effectCooldowns.taunt = false;
@@ -8427,6 +8433,8 @@ function clearTaunt() {
     battleState.player.taunt = false;
     effectCooldowns.taunt = false;
     clearTimeout(tauntTimeout); // 清除嘲讽定时器
+
+    // 更新状态显示和UI
     updatePlayerStatusDisplay();
     updateUI();
 }

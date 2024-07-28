@@ -6834,7 +6834,6 @@ function handlePierced() {
     logBattleEvent(`本次攻击额外给敌人造成 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
     pierceDamageContainer.totalPierceDamage += extraDamage; // 累积穿透伤害
     updateUI();
-    showEffect('playerEffect', 'https://pic.imgdb.cn/item/669b98ced9c307b7e971cfc7.gif');
 
     if (battleState.enemy.health <= 0) {
     updateEnemyAttributes();
@@ -7492,7 +7491,7 @@ function applyPhysicalAttackEffects() {
             battleState.enemy.pierced = true;
             pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
             logBattleEvent("深渊巨魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予深渊巨魔致命的余波伤害。", '#ADFF2F');
-            showEffect('playerEffect', 'https://example.com/pierce-effect.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c43c.gif');
             updateEnemyStatusDisplay();
     
             setTimeout(() => {
@@ -7502,7 +7501,7 @@ function applyPhysicalAttackEffects() {
                 logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
                 pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
                 updateUI();
-                showEffect('playerEffect', 'https://example.com/aftershock-effect.gif');
+                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1000, 0.5);
                 
                 if (battleState.enemy.health <= 0) {
                     updateEnemyAttributes();
@@ -7598,7 +7597,7 @@ function applyMagicAttackEffects(damage) {
             break;
         case '灼烧':
             battleState.enemy.burnt = true;
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a636c7d9c307b7e9d87e0c.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c332.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 battleState.enemy.burnt = false;

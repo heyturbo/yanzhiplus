@@ -997,7 +997,7 @@
         }
         .battle-system-drawer {
             display: none;
-            position: absolute;
+            position: fixed;
             right: 0px;
             top: 0;
             height: 100%;
@@ -6203,17 +6203,21 @@ function enemyInfo() {
         p.style.margin = '10px 0';
         detailsContainer.appendChild(p);
     });
-
+    
+    // 创建按钮容器
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'space-between';
+    buttonContainer.style.width = '100%';
+    buttonContainer.style.marginTop = '20px';
+    
     // 创建 "跳过十轮" 按钮
     const jumpButton = document.createElement('button');
     jumpButton.innerText = '跳过十轮';
-    jumpButton.style.position = 'absolute';
-    jumpButton.style.bottom = '10px';
-    jumpButton.style.right = '10px';
     jumpButton.style.padding = '5px 10px';
     jumpButton.style.backgroundColor = '#003670';
     jumpButton.style.color = 'white';
-    jumpButton.style.border = 'white';
+    jumpButton.style.border = 'none';
     jumpButton.style.borderRadius = '5px';
     jumpButton.style.cursor = 'pointer';
     jumpButton.addEventListener('click', () => {
@@ -6223,27 +6227,41 @@ function enemyInfo() {
     // 创建 "自动战斗" 按钮
     const autoButton = document.createElement('button');
     autoButton.innerText = '自动战斗';
-    autoButton.style.position = 'absolute';
-    autoButton.style.bottom = '10px';
-    autoButton.style.right = '100px'; // 调整位置，避免重叠
     autoButton.style.padding = '5px 10px';
     autoButton.style.backgroundColor = '#003670';
     autoButton.style.color = 'white';
-    autoButton.style.border = 'white';
+    autoButton.style.border = 'none';
     autoButton.style.borderRadius = '5px';
     autoButton.style.cursor = 'pointer';
     autoButton.addEventListener('click', () => {
         autoBattle();
         document.body.removeChild(popup);
     });
+
+    // 创建 "忘却之时" 按钮
+    const backToRoundOneButton = document.createElement('button');
+    backToRoundOneButton.innerText = '忘却之时';
+    backToRoundOneButton.style.padding = '5px 10px';
+    backToRoundOneButton.style.backgroundColor = '#003670';
+    backToRoundOneButton.style.color = 'white';
+    backToRoundOneButton.style.border = 'none';
+    backToRoundOneButton.style.borderRadius = '5px';
+    backToRoundOneButton.style.cursor = 'pointer';
+    backToRoundOneButton.addEventListener('click', () => {
+        backToRoundOne();
+    });
+
+    // 将按钮添加到按钮容器中
+    buttonContainer.appendChild(jumpButton);
+    buttonContainer.appendChild(autoButton);
+    buttonContainer.appendChild(backToRoundOneButton);
     
     // 将所有元素添加到弹窗容器中
     popup.appendChild(closeButton);
     popup.appendChild(topContainer);
     popup.appendChild(separator);
     popup.appendChild(detailsContainer);
-    popup.appendChild(jumpButton);
-    popup.appendChild(autoButton);
+    popup.appendChild(buttonContainer);
     
     // 将弹窗容器添加到页面的body中
     document.body.appendChild(popup);
@@ -6254,7 +6272,31 @@ function enemyInfo() {
             document.body.removeChild(popup);
         }
     });
-}        
+}
+
+function backToRoundOne() {
+    showInfoBox("你可以使用100个无限宝石和100个清心酿回到第一轮", () => {
+        const infiniteGemItem = jinnangItems.find(item => item.name === 'infiniteGem');
+        const ignoranceWaterItem = jinnangItems.find(item => item.name === 'ignoranceWater');
+
+        if (!infiniteGemItem || infiniteGemItem.quantity < 100 || !ignoranceWaterItem || ignoranceWaterItem.quantity < 100) {
+            showInfoBox("你的无限宝石或清心酿数量不足，无法回退！");
+            return;
+        }
+
+        // 使用道具
+        useItem('infiniteGem', 100);
+        useItem('ignoranceWater', 100);
+
+        // 重置回合
+        battleRounds = 1;
+        initializeEnemyPet();
+        updateEnemyAttributes();
+        updateUI();
+        showInfoBox("时钟空转，你已进入忘却之时……");
+    });
+}
+        
 //跳过十轮函数
 function jumpByTenRounds() {
     if (battleState.player.taunt) {
@@ -11506,7 +11548,7 @@ function trainAttributesAfterFifth() {
         const newBonusValue = Math.min(bonusAttribute + growthValue, maxAttribute);
 
         bonusAttributes[attribute] = newBonusValue;
-        results.push(`${i + 1}. ${attributeMap(attribute)}: ${growthValue}`);
+        results.push(`${i + 1}. ${attributeMap(attribute)}: ${growthValue > 0 ? '+' : ''}${growthValue}`);
     }
 
     goldAmount -= 4888;
@@ -11523,10 +11565,25 @@ function trainAttributesAfterFifth() {
 
 function bonusAttributesDisplay() {
     const attributeNames = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    const leftAttributes = onlyDisplayLeftAttributes();
+    const maxAttributes = {
+        endurance: Math.round(leftAttributes.endurance * 0.6),
+        intelligence: Math.round(leftAttributes.intelligence * 0.6),
+        strength: Math.round(leftAttributes.strength * 0.6),
+        agility: Math.round(leftAttributes.agility * 0.6),
+        faith: Math.round(leftAttributes.faith * 0.6)
+    };
+
     attributeNames.forEach(attribute => {
         const spanElement = document.getElementById(`bonusAttribute-${attribute}`);
         if (spanElement) {
-            spanElement.innerText = `(+${bonusAttributes[attribute]})`;
+            const bonusValue = bonusAttributes[attribute];
+            const maxValue = maxAttributes[attribute];
+            if (bonusValue >= maxValue) {
+                spanElement.innerText = `(+${bonusValue}(满))`;
+            } else {
+                spanElement.innerText = `(+${bonusValue})`;
+            }
         }
     });
 }
@@ -13024,7 +13081,7 @@ function upgradeWisdomTo() {
         highGradePill += 99999;
         goldAmount += 9999999;
         stamps = 500000;
-        jinnangCapacity = 99999999;
+        jinnangCapacity = 500000;
         updateStampCount();
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
@@ -13074,20 +13131,6 @@ function upgradeWisdomTo() {
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;
-    }
-
-    if (target === "我爱金珉奎") {
-        const petSelect = document.getElementById('pet-select');
-        const key = "jinmin";
-        const pet = pets[key];
-        if (!Array.from(petSelect.options).some(option => option.value === key)) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.text = pet.name;
-            petSelect.appendChild(option);
-        }
-        showInfoBox(`你用你的爱召唤了${pet.name} (${pet.rank})！`);
-        return;
     }
     
     if (target === "88888") {

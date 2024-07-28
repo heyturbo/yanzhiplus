@@ -1290,7 +1290,7 @@
             border-radius: 5px;
             font-weight: bold;
             color: #fefefc;
-            padding: 10px;
+            padding: 5px;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
         }
@@ -2135,6 +2135,7 @@
             <div id="loadContainer" style="display:flex; justify-content: space-between; width: 100%;">
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
+                <button class="saveAndLoadGameState" onclick="deleteAllPetData()">删档</button>
             </div>
         </div>
     </div>    
@@ -3576,18 +3577,27 @@ function deletePetData(petName) {
     }
 }
 
-//一键删除所有宠物数据暂不启用
+//删档函数
 function deleteAllPetData() {
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.startsWith('petData_')) {
-            keysToRemove.push(key);
+    showInfoBox('你确定删除所有数据吗？操作不可恢复！', () => {
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('petData_')) {
+                keysToRemove.push(key);
+            }
         }
-    }
-
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    console.log(`Deleted ${keysToRemove.length} pet data entries.`);
+        keysToRemove.forEach(key => localStorage.removeItem(key));
+        // 检查 localStorage 中是否存在 'gameState' 数据
+        if (localStorage.getItem('gameState') !== null) {
+            localStorage.removeItem('gameState');
+            console.log('gameState 已被删除');
+        } else {
+            console.log('gameState 不存在');
+        }
+        showInfoBox('所有数据已删除！');
+        console.log(`Deleted ${keysToRemove.length} pet data entries.`);
+    });
 }
         
 // 存储当前宠物的数据
@@ -3613,6 +3623,7 @@ function storeCurrentPetData() {
             petWisdom: petWisdom,
             awakened: awakened,
             awakenAttributes: awakenAttributes,
+            baseAttributes: baseAttributes,
             hallucinated: hallucinated,
             hallucinationLevel: hallucinationLevel,
             experienceTreasureOpenCount: experienceTreasureOpenCount,
@@ -3652,7 +3663,6 @@ let alreadyLoadGameState = false;
 function restorePetData(petName) {
     const savedPetData = JSON.parse(localStorage.getItem(`petData_${petName}`));
     if (!alreadyLoadGameState) {
-        showInfoBox("当前宠物有系统数据，读档后可以直接读取");
         return;
     }
     
@@ -3694,7 +3704,15 @@ function restorePetData(petName) {
         divinedWeaponStatus = savedPetData.divinedWeaponStatus;
         alreadyUseDrug = savedPetData.alreadyUseDrug;
         skillScore = savedPetData.skillScore;
-
+        if (!savedPetData.baseAttributes) {
+            baseAttributes = {
+                endurance: 0,
+                intelligence: 0,
+                strength: 0,
+                agility: 0,
+                faith: 0
+            };
+        }
         if (awakened && savedPetData.awakenAttributes) {
             awakenAttributes = savedPetData.awakenAttributes;
         }
@@ -3740,6 +3758,11 @@ function restorePetData(petName) {
 
 // 修改changePet函数
 function changePet(skipConfirmation = false) {
+    if (autoBattleInterval !== null) {
+        showInfoBox("请先关闭自动战斗！");
+        return;
+    }
+    
     // 获取 pet-select 下拉列表的选定值
     const petSelectValue = document.getElementById("pet-select").value;
 
@@ -3769,6 +3792,10 @@ function changePet(skipConfirmation = false) {
 
 // 修改changeBattlePet函数
 function changeBattlePet(skipConfirmation = false) {
+    if (autoBattleInterval !== null) {
+        showInfoBox("请先关闭自动战斗！");
+        return;
+    }
     // 获取 battle-pet-select 下拉列表的选定值
     const battlePetSelectValue = document.getElementById("battle-pet-select").value;
 
@@ -12435,12 +12462,21 @@ function resetPet() {
     currentPet.qualities.growthRate = 100;
     currentPet.qualities.mutated = false;
 
-    // 重置当前属性值为最小值
+    // 重置当前资质为最小值
     currentPet.qualities.endurance.current = currentPet.qualities.endurance.min;
     currentPet.qualities.strength.current = currentPet.qualities.strength.min;
     currentPet.qualities.faith.current = currentPet.qualities.faith.min;
     currentPet.qualities.agility.current = currentPet.qualities.agility.min;
     currentPet.qualities.intelligence.current = currentPet.qualities.intelligence.min;
+
+    // 重置基础属性为初始值，调用calculateAttribute
+    baseAttributes = {
+        endurance: calculateAttribute(currentPet.qualities.endurance.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        intelligence: calculateAttribute(currentPet.qualities.intelligence.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        strength: calculateAttribute(currentPet.qualities.strength.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        agility: calculateAttribute(currentPet.qualities.agility.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        faith: calculateAttribute(currentPet.qualities.faith.min, currentPet.qualities.growthRate / 100, petLevel, 0, false)
+    };
 
     // 初始化等级和其他基础属性
     restoreEnemyState();
@@ -12477,6 +12513,20 @@ function resetPet() {
     spiritMultiplier = 1.00;
     reenableAscension = false;//第二个飞升之术关闭
     bonusAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+    };
+    awakenAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+    };
+    baseAttributes = {
     endurance: 0,
     intelligence: 0,
     strength: 0,
@@ -12528,6 +12578,11 @@ function resetPet() {
     setInnerText("faith-current", currentPet.qualities.faith.current);
     setInnerText("agility-current", currentPet.qualities.agility.current);
     setInnerText("intelligence-current", currentPet.qualities.intelligence.current);
+    setInnerText("attribute-endurance", baseAttributes.endurance);
+    setInnerText("attribute-intelligence", baseAttributes.intelligence);
+    setInnerText("attribute-strength", baseAttributes.strength);
+    setInnerText("attribute-agility", baseAttributes.agility);
+    setInnerText("attribute-faith", baseAttributes.faith);
 
     // 初始化评分
     skillScore = 0;
@@ -13184,6 +13239,14 @@ let bonusAttributes = {
     faith: 0
 };
 
+let baseAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+};
+        
 function calculateAttribute(currentValue, growthRate, level) {
     return Math.floor((currentValue / 2000) * growthRate * 4 * level);
 }
@@ -14295,6 +14358,8 @@ function saveGameState() {
         petWisdom: petWisdom,
         awakened: awakened,
         awakenAttributes: awakenAttributes,
+        bonusAttributes: bonusAttributes,
+        baseAttributes: baseAttributes,
         hallucinated: hallucinated,
         hallucinationLevel: hallucinationLevel,
         experienceTreasureOpenCount: experienceTreasureOpenCount,
@@ -14315,7 +14380,6 @@ function saveGameState() {
         spiritLevel: spiritLevel,
         spiritMultiplier: spiritMultiplier,
         reenableAscension: reenableAscension,
-        bonusAttributes: bonusAttributes,
         ascensionSkill: getSkillFromName(ascensionSkill.name, ascensionSkill.level),
         secondAscensionSkill: getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level),
         ascensionAttributes: ascensionAttributes,
@@ -14467,8 +14531,8 @@ function loadGameState() {
         spiritLevel = savedState.spiritLevel;
         spiritMultiplier = savedState.spiritMultiplier;
         reenableAscension = savedState.reenableAscension;
-        bonusAttributes = savedState.bonusAttributes;
-
+        bonusAttributes = savedState.bonusAttributes;        
+        baseAttributes = savedState.baseAttributes;
         // 检查并获取技能
         if (savedState.ascensionSkill && savedState.ascensionSkill.name) {
             ascensionSkill = getSkillFromName(savedState.ascensionSkill.name, savedState.ascensionSkill.level);

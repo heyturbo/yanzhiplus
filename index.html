@@ -419,29 +419,29 @@
         }
         .shop-info {
             display: none;
-            padding: 20px;
+            padding: 10px;
         }
         .shop-info.open {
             display: block;
         }
         .shop-items {
             display: grid;
-            margin: 0;
-            font-size: 11px;
+            margin: 0px;
+            font-size: 12px;
             grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
             align-items: stretch;
+            gap: 5px;
         }
         .shop-item {
             text-align: center;
             cursor: pointer;
-            border: 2px solid transparent;
+            border: 2px solid #fff0;
             border-radius: 5px;
             di's'padding: disp;
         }
         .shop-item.selected {
             border-color: #0a8c00;
-            background-color: #fff;
+            /* background-color: #fff; */
         }
         .shop-bar {
             display: flex;
@@ -711,7 +711,7 @@
             transform: translateY(0);
         }
         .jinnang-info {
-            padding: 20px;
+            padding: 10px;
             justify-items: center;
             background-image: url(https://pic.imgdb.cn/item/66a4b934d9c307b7e98c69fc.gif);
             background-size: cover;
@@ -1475,7 +1475,6 @@
 
 .summon-area {
     height: 240px;
-    width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -1532,8 +1531,6 @@
 .shop-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    padding: 5px;
     font-size: 12px;
     flex-wrap: wrap;
     flex-direction: row;
@@ -1837,8 +1834,10 @@
     <div class="shop-drawer" id="shop-drawer">
         <div class="drawer-toggle" onclick="toggleShop()">商店</div>
         <div class="shop-info" id="shop-info">
-            <div class="shop-items" id="shop-items">
-                <!-- 商店商品展示区 -->
+            <div id="shop-info-container" style="background-image: url(https://pic.imgdb.cn/item/66a5dab8d9c307b7e975074b.webp);background-size: cover;background-position: center;">
+                <div class="shop-items" id="shop-items">
+                    <!-- 商店商品展示区 -->
+                </div>
             </div>
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
@@ -3896,11 +3895,11 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
         // 显示加载图片
         if (summonedRank !== 'SSR'){
             document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/66a4f555d9c307b7e9c33849.gif" alt="加载中" id="loadingGif">
+            <img src="https://pic.imgdb.cn/item/66a4d223d9c307b7e9a2c147.gif" alt="加载中" id="loadingGif">
         `;
         } else{
             document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/66a4d39cd9c307b7e9a57a82.gif" alt="加载中" id="loadingGif">
+            <img src="https://pic.imgdb.cn/item/66a4f555d9c307b7e9c33849.gif" alt="加载中" id="loadingGif">
         `;
         }
 
@@ -7506,7 +7505,7 @@ function applyPhysicalAttackEffects() {
                 battleState.enemy.health = enemyMaxHealth;
             }
             logBattleEvent(`深渊巨魔被麻痹，最大生命值减少了 ${benumbValue} 点。`, 'lightblue');
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fb054d9c307b7e926ec17.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718cb5.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 if (battleState.enemy.originalMaxHealth) {
@@ -7575,7 +7574,7 @@ function applyMagicAttackEffects(damage) {
                 logBattleEvent(`法力燃烧！深渊巨魔失去了 ${manaLoss} 点法力值。`, '#00BBFF');
             }
 
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742a77d9c307b7e92c525c.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c68.gif');
             break;
         case '灼烧':
             battleState.enemy.burnt = true;
@@ -7768,7 +7767,7 @@ function performDefense() {
         logBattleEvent(`你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害，溢出值已形成护盾。`, 'orange');
     }
     
-    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66712e30d9c307b7e9f8022b.gif');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718ca1.gif');
 
     applyDefenseBonus(selectedSkillName);
     playerTurn = false;
@@ -8695,7 +8694,7 @@ function handleReflectAndHeal(damage) {
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
         logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
-        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/6671326ad9c307b7e9ffea12.gif');
+        showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c7d.gif');
     }
 }
 
@@ -8772,7 +8771,7 @@ function performHeal() {
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     logBattleEvent(`你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
-    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66713171d9c307b7e9fe40d2.gif');
+    showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c8f.gif');
 
     handleDivineProtection(selectedSkills, skillLevel);
 
@@ -9537,7 +9536,7 @@ const descriptions = [
     "宠物变异时，资质会得到明显的提升，甚至超出原有的资质上限！",
     "目前共有三种还童丹，每种还童丹的功能各不同，详情可见“玩法”说明",
     "稀有道具只能通过宝箱开启获得。开启宝箱时，有概率同时出现1~3个奖品",
-    "如果你需要删除某个技能，你可以点击进行操作"
+    "如果你需要删除某个技能，可以点击该技能进行操作"
 ];        
 
 function updateDescriptionBox() {
@@ -11439,7 +11438,7 @@ function trainAttributesAfterFifth() {
     }
 
     const growthCount = randomGrowthCount();
-    const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    let attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
     const maxAttributes = {
         endurance: maxEndurance,
         intelligence: maxIntelligence,
@@ -11450,7 +11449,10 @@ function trainAttributesAfterFifth() {
     let results = [];
 
     for (let i = 0; i < growthCount; i++) {
-        const attribute = attributes[Math.floor(Math.random() * attributes.length)];
+        const randomIndex = Math.floor(Math.random() * attributes.length);
+        const attribute = attributes[randomIndex];
+        attributes.splice(randomIndex, 1); // 移除已经选择的属性
+
         const maxAttribute = maxAttributes[attribute];
         const bonusAttribute = bonusAttributes[attribute];
         const currentAttribute = leftAttributes[attribute];
@@ -13189,6 +13191,7 @@ function calculateCurrentAttributes() {
     return attributes;
 }
 
+//所谓的leftAttributes就是指仅用于显示在括号左边的属性值
 function onlyDisplayLeftAttributes() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);

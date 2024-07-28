@@ -6341,7 +6341,7 @@ function autoBattle() {
             performAttack('magical');
         } else {
             // 玩家不处于失明状态且处于玩家回合时
-            if (battleAttributes.magicAttack > 0.8 * battleAttributes.physicalAttack) {
+            if (battleAttributes.magicAttack > 0.8 * battleAttributes.physicalAttack && !battleState.player.taunt) {
                 // 99% 概率使用法术攻击
                 if (Math.random() < 0.99) {
                     performAttack('magical');
@@ -7528,7 +7528,7 @@ function applyMagicAttackEffects(damage) {
     switch (effect) {
         case '沉默':
             battleState.enemy.silenced = true; // 深渊巨魔沉默
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b149.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a63612d9c307b7e9d72d78.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 battleState.enemy.silenced = false;
@@ -7540,7 +7540,7 @@ function applyMagicAttackEffects(damage) {
             break;
         case '混乱':
             battleState.enemy.dazed = true; // 深渊巨魔混乱
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66742c80d9c307b7e930b192.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a63695d9c307b7e9d82c29.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 battleState.enemy.dazed = false;
@@ -7570,7 +7570,7 @@ function applyMagicAttackEffects(damage) {
             break;
         case '灼烧':
             battleState.enemy.burnt = true;
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/667fa3ecd9c307b7e91737c0.gif');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a636c7d9c307b7e9d87e0c.gif');
             updateEnemyStatusDisplay();
             setTimeout(() => {
                 battleState.enemy.burnt = false;

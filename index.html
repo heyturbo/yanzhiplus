@@ -134,10 +134,14 @@
         .core-area {
             background-color: #fff;
             display: flex;
-            border-radius: 5px;
+            border-radius: 10px;
             justify-content: center;
             background-image: url(https://pic.imgdb.cn/item/66a4f420d9c307b7e9c23f5c.gif);
             background-size: contain;
+            opacity: 0.95;
+            width: 90%;
+            padding: 5px;
+            margin: 5px 0px 5px 0px;
         }
         .core-area-for-skills {
             width: 90%;
@@ -1663,9 +1667,10 @@
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
             </div>
         </div>
-        
     </div>
-
+    <div class="core-area">
+        <div class="skills" id="skills-area"></div>
+    </div>
     <div class="top-bar">
         <div>
             <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
@@ -1814,9 +1819,6 @@
                     <div>法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
                     <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                 </div>
-            </div>
-            <div class="core-area">
-                <div class="skills" id="skills-area"></div>
             </div>
             <div class="button-grid">
                 <button onclick="trainAttributes()">金子培养</button>
@@ -9521,7 +9523,7 @@ let skillScore = 0;
 let petWisdom = 0; 
         
 const descriptions = [
-    "切换宠物可能会不可预知地丢失部分数据，目前正在修复",
+    "在第五次金子培养后，你可以进行单次随机培养，每次花费4两888文金子",
     "当你每达到一个里程碑，你的称号都会有所提升，直到最终成为“魔兽之王”！",
     "宠物的各项技能效果在本模拟器中进行了简化，尤其是被动技能将只按一定比例增加各项属性值，增量随技能等级提高而提高。",
     "宠物的资质可以用“资质重生丹”洗练到更高的程度",
@@ -9535,7 +9537,7 @@ const descriptions = [
     "宠物变异时，资质会得到明显的提升，甚至超出原有的资质上限！",
     "目前共有三种还童丹，每种还童丹的功能各不同，详情可见“玩法”说明",
     "稀有道具只能通过宝箱开启获得。开启宝箱时，有概率同时出现1~3个奖品",
-    "如果你需要删除某个技能，你可以点击该技能确认删除"
+    "如果你需要删除某个技能，你可以点击进行操作"
 ];        
 
 function updateDescriptionBox() {
@@ -13810,28 +13812,21 @@ function awakenPetCheat() {
     }
 
     // 略过道具检查和消耗部分
-    const qualities = currentPet.qualities;
-    const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    const baseLevel = petLevel;
+    const leftAttributes = onlyDisplayLeftAttributes();
 
-    const newAttributes = {
-        endurance: calculateTotalAttributes(qualities.endurance.current, growthRate, petLevel, baseLevel, false),
-        intelligence: calculateTotalAttributes(qualities.intelligence.current, growthRate, petLevel, baseLevel, false),
-        strength: calculateTotalAttributes(qualities.strength.current, growthRate, petLevel, baseLevel, false),
-        agility: calculateTotalAttributes(qualities.agility.current, growthRate, petLevel, baseLevel, false),
-        faith: calculateTotalAttributes(qualities.faith.current, growthRate, petLevel, baseLevel, false)
+    // 计算awakenAttributes，为leftAttributes的20%
+    awakenAttributes = {
+        endurance: Math.floor(leftAttributes.endurance * 0.2),
+        intelligence: Math.floor(leftAttributes.intelligence * 0.2),
+        strength: Math.floor(leftAttributes.strength * 0.2),
+        agility: Math.floor(leftAttributes.agility * 0.2),
+        faith: Math.floor(leftAttributes.faith * 0.2)
     };
-
-    bonusAttributes.endurance += calculateBonusAttributes(newAttributes.endurance, 0.2);
-    bonusAttributes.intelligence += calculateBonusAttributes(newAttributes.intelligence, 0.2);
-    bonusAttributes.strength += calculateBonusAttributes(newAttributes.strength, 0.2);
-    bonusAttributes.agility += calculateBonusAttributes(newAttributes.agility, 0.2);
-    bonusAttributes.faith += calculateBonusAttributes(newAttributes.faith, 0.2);
 
     currentPet.qualities.baseLevel = petLevel;
     currentPet.qualities.tier = '超凡';
     currentPet.qualities.growthRate = 400 + hallucinationLevel * 5;
-
+        
     petMaxLevel = 160;
     awakened = true;
 
@@ -13839,6 +13834,7 @@ function awakenPetCheat() {
     updatePetLevel();
     updateAttributePanel();
     updateQualityCard();
+    updateAwakenStatus();
 }
 
 function setPetWisdom(value) {
@@ -14480,7 +14476,7 @@ function loadGameState() {
         enemyInitialState = savedState.enemyInitialState; // 加载敌人的初始状态
         divinedWeaponStatus = savedState.divinedWeaponStatus;
         alreadyUseDrug= savedState.alreadyUseDrug; //使用药物提示
-        drugInventory = JSON.parse(savedState.drugInventory); // 恢复药物系统
+        drugInventory = JSON.parse(savedState.drugInventory); // 恢复药品系统
         collectCost= savedState.collectCost; //采集药物成本
         experienceTreasureOpenCount= savedState.experienceTreasureOpenCount; //经验宝箱成本
 

@@ -5365,15 +5365,16 @@ function getBaseSpiritAttributes() {
 //战斗精灵的随机回血
 function handleSpiritHeal() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const finalProbability = baseProbability + spiritMultiplier / 200;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
         const spiritAttributes = getCurrentSpiritAttributes();
-        const healValue = Math.round((spiritAttributes.magicAttack * spiritMultiplier) * 0.25);
+        const healValue = Math.round((Math.random() * (1.8 - 0.9) + 0.9) * spiritAttributes.magicAttack * spiritMultiplier * 0.5);
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f040.gif", 3000, 0.3);
         updateUI();
     }
 }
@@ -5382,7 +5383,7 @@ let spiritPowerActive = false;
 
 function handleSpiritPower() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const finalProbability = baseProbability + spiritMultiplier / 200;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability && !spiritPowerActive) {
@@ -5406,6 +5407,7 @@ function handleSpiritPower() {
         });
 
         logBattleEvent(`🧚🏻‍♀️Bless from your best teammate！战斗精灵带来全属性提升！`, "pink");
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f00c.gif", 3000, 0.3);
         updateUI();
 
         // Remove the boost after 5 seconds
@@ -5423,15 +5425,22 @@ function handleSpiritPower() {
 
 function handleSpiritAttack() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const finalProbability = baseProbability + spiritMultiplier / 200;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
         const spiritAttributes = getCurrentSpiritAttributes();
-        const attackValue = Math.round(spiritAttributes.magicAttack * spiritMultiplier);
+        const attackValue = Math.round((Math.random() * (1.8 - 0.9) + 0.8) * spiritAttributes.magicAttack * spiritMultiplier);
         battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
 
-        logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害`, "pink");
+        logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害！`, "pink");
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f035.gif", 3000, 0.3);
+        
+        if (battleState.enemy.health <= 0) {
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
+        }
 
 
         if (Math.random() < 0.2 + finalProbability) { // 20% 的基础概率触发沉睡效果

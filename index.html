@@ -1175,9 +1175,10 @@
             width: 100%;
             height: 100%;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            align-items: stretch;
             background-color: transparent;
+            flex-direction: column;
         }
         
 #visualEffectsContainer {
@@ -3087,20 +3088,23 @@ function changeEnemyImage(status) {
     }
 }
 
-function showBattleOverlay(imageUrl, duration = 500, opacity = 1) {
+function showBattleOverlay(imageUrl, duration = 500, opacity = 1, zIndex = -1) {
     const overlay = document.getElementById('battleOverlay');
     const overlayImage = document.getElementById('battleOverlayImage');
 
-    overlayImage.src = '';
+    if (!overlay || !overlayImage) {
+        console.error('Overlay elements not found.');
+        return;
+    }
 
-    overlayImage.src = imageUrl;
-
-    overlayImage.style.opacity = opacity;
-
-    overlay.style.display = 'flex';
+    overlayImage.src = '';  // Clear the image first
+    overlayImage.src = imageUrl;  // Set the new image URL
+    overlayImage.style.opacity = String(opacity);  // Ensure opacity is a string
+    overlay.style.display = 'flex';  // Make the overlay visible
+    overlay.style.zIndex = String(zIndex);  // Set the z-index
 
     setTimeout(() => {
-        overlay.style.display = 'none';
+        overlay.style.display = 'none';  // Hide the overlay after duration
     }, duration);
 }
 
@@ -5378,7 +5382,7 @@ function handleSpiritHeal() {
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f040.gif", 3000, 0.3);
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f040.gif", 3000, 0.5);
         updateUI();
     }
 }
@@ -5415,7 +5419,7 @@ function handleSpiritPower() {
         });
 
         logBattleEvent(`🧚🏻‍♀️Bless from your best teammate！战斗精灵带来全属性提升！`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f00c.gif", 3000, 0.3);
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f00c.gif", 3000, 0.5);
         updateUI();
 
         // Remove the boost after 5 seconds
@@ -5446,7 +5450,7 @@ function handleSpiritAttack() {
         battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
 
         logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害！`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f035.gif", 3000, 0.3);
+        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f035.gif", 3000, 0.5);
         
         if (battleState.enemy.health <= 0) {
             updateEnemyAttributes();
@@ -7623,7 +7627,7 @@ class DivineWeaponManager {
             }
 
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
-            showBattleOverlay("https://pic.imgdb.cn/item/66a33f3ad9c307b7e942c38c.gif");
+            showBattleOverlay("https://pic.imgdb.cn/item/66a33f3ad9c307b7e942c38c.gif", 1000, 1, 0);
             updatePlayerStatusDisplay();
             updateUI();
         }
@@ -7709,7 +7713,7 @@ function applyPhysicalAttackEffects() {
                 logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
                 pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
                 updateUI();
-                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 500, 0.8);
+                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
                 
                 if (battleState.enemy.health <= 0) {
                     updateEnemyAttributes();
@@ -8630,7 +8634,7 @@ function cleanSuppressed() {
             battleAttributes.physicalAttack = 1;
             battleAttributes.magicAttack = 1;
             logBattleEvent("你的无动于衷极大助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
-            showBattleOverlay("https://pic.imgdb.cn/item/66a484fcd9c307b7e95c2645.gif", 1000, 0.8);
+            showBattleOverlay("https://pic.imgdb.cn/item/66a484fcd9c307b7e95c2645.gif", 1500, 0.8);
         }
 
         // 恢复原始的攻击和防御函数
@@ -9143,7 +9147,7 @@ function showNextBattlePrompt(playerWon) {
 
         goldAmount += reward;
         logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png");
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 0);
 
         battleRounds++;
         updateGoldDisplay(goldAmount);
@@ -9167,7 +9171,7 @@ function showNextBattlePrompt(playerWon) {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
         showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp");
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 0);
         updateGoldDisplay(goldAmount);
     }
     extraShield = 0;
@@ -9243,7 +9247,7 @@ function resetBuffState(playerWon) {
                 const extraDrugKeys = Object.keys(drugInventory);
                 const extraRandomDrug = extraDrugKeys[Math.floor(Math.random() * extraDrugKeys.length)];
                 drugInventory[extraRandomDrug].quantity += 1;
-                obtainedDrugs.push(`战斗精灵的赐福，你还额外获得了 ${extraRandomDrug} x1`);
+                obtainedDrugs.push(`🧚🏻‍♀️战斗精灵的赐福，你还额外获得了 ${extraRandomDrug} x1`);
             }
         }
 

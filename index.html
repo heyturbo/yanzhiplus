@@ -1392,10 +1392,14 @@
     border: 1px solid #888;
     display: flex;
     width: 80%;
-    flex-direction: row;
+    height: 450px;
+    flex-direction: column;
     flex-wrap: wrap;
-    justify-content: space-around;
+    justify-content: space-between;
     gap: 10px;
+    top: 20%;
+    position: fixed;
+    left: 5%;
 }
 
 .drug-modal .use-button,
@@ -1435,7 +1439,7 @@
 }
 
 .drug-modal .drug-description {
-    margin: 20px 0px;
+    margin: 0px 0px;
     padding: 10px 0px;
     font-size: 16px;
     width: 100%;
@@ -1633,6 +1637,12 @@
     margin-bottom: 10px;
 }
 
+.drug-grid-container {
+    height: 240px;
+    overflow-y: scroll;
+    margin-top: 20px;
+}
+    
 .avatar {
     width: 25px;
     height: 25px;
@@ -2058,15 +2068,19 @@
             <!-- 使用药品面板 -->
             <div id="drug-modal" class="drug-modal modal">
                 <div class="modal-content">
-                    <button class="use-button" onclick="useSelectedDrug()">使用</button>
-                    <button class="use-button" onclick="mergeDrug()">合成</button>
-                    <button class="use-button" onclick="collectDrug()">采集</button>
-                    <button class="close-button" onclick="closeDrugModal()">关闭</button>
-                    <div class="drug-grid" id="drug-grid">
-                        <!-- 药品项会通过JavaScript动态生成 -->
+                    <div class = "drug-grid-container" id="drug-grid-container" style="height: 280px;overflow-y: scroll;margin-top: 10px;">
+                        <div class="drug-grid" id="drug-grid">
+                            <!-- 药品项会通过JavaScript动态生成 -->
+                        </div>
                     </div>
                     <div class="drug-description" id="drug-description">
                         本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效！
+                    </div>
+                    <div id="drug-button-container" style="width: 100%; display: flex; justify-content: space-between;">
+                        <button class="use-button" onclick="useSelectedDrug()">使用</button>
+                        <button class="use-button" onclick="mergeDrug()">合成</button>
+                        <button class="use-button" onclick="collectDrug()">采集</button>
+                        <button class="close-button" onclick="closeDrugModal()">关闭</button>
                     </div>
                 </div>
             </div>

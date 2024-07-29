@@ -5365,7 +5365,7 @@ function getBaseSpiritAttributes() {
 //战斗精灵的随机回血
 function handleSpiritHeal() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 200;
+    const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
@@ -5383,7 +5383,7 @@ let spiritPowerActive = false;
 
 function handleSpiritPower() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 200;
+    const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability && !spiritPowerActive) {
@@ -5425,12 +5425,12 @@ function handleSpiritPower() {
 
 function handleSpiritAttack() {
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 200;
+    const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
         const spiritAttributes = getCurrentSpiritAttributes();
-        const attackValue = Math.round((Math.random() * (1.8 - 0.9) + 0.8) * spiritAttributes.magicAttack * spiritMultiplier);
+        const attackValue = Math.round((Math.random() * (2.4 - 1.8) + 1.8) * spiritAttributes.magicAttack * spiritMultiplier);
         battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
 
         logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害！`, "pink");
@@ -5443,7 +5443,7 @@ function handleSpiritAttack() {
         }
 
 
-        if (Math.random() < 0.2 + finalProbability) { // 20% 的基础概率触发沉睡效果
+        if (Math.random() < 0.4 + finalProbability) { // 40% 的基础概率触发沉睡效果
             handleSleep();
         }
 

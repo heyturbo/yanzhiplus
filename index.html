@@ -974,7 +974,7 @@
         
         .modal-content {
             background-color: rgb(255 255 255 / 90%);
-            margin: 15% auto;
+            /* margin: 15% auto; */
             padding: 10px;
             border: 1px solid #888;
             width: 90%;
@@ -1385,20 +1385,19 @@
 
 .drug-modal .modal-content {
     background-color: rgb(0 0 0 / 60%);
-    margin: 5% auto;
     font-size: 14px;
     align-items: center;
     padding: 20px;
     border: 1px solid #888;
     display: flex;
     width: 80%;
-    height: 450px;
+    height: 500px;
     flex-direction: column;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 10px;
-    top: 20%;
-    position: fixed;
+    top: 5%;
+    position: absolute;
     left: 5%;
 }
 
@@ -1440,8 +1439,7 @@
 
 .drug-modal .drug-description {
     margin: 0px 0px;
-    padding: 10px 0px;
-    font-size: 16px;
+    font-size: 14px;
     width: 100%;
 }
 
@@ -2076,7 +2074,7 @@
                     <div class="drug-description" id="drug-description">
                         本游戏药品系统丰富，战斗胜利后会随机掉落各类药品，合理分配使用会带来奇效！
                     </div>
-                    <div id="drug-button-container" style="width: 100%; display: flex; justify-content: space-between;">
+                    <div id="drug-button-container" style="width: 100%; display: flex; justify-content: space-between; max-height: 100px;">
                         <button class="use-button" onclick="useSelectedDrug()">使用</button>
                         <button class="use-button" onclick="mergeDrug()">合成</button>
                         <button class="use-button" onclick="collectDrug()">采集</button>
@@ -2100,7 +2098,7 @@
                 <button id="ascension-skill-button" class="ascension-button">飞升</button>
                 <button onclick="divinedWeapon()">神器</button>
                 <button onclick="levelUpSkill()">技能</button>
-                <button onclick="enemyInfo()">托管</button>
+                <button onclick="enemyInfo()">自动</button>
                 <button onclick="clearBattleLog()">清屏</button>
             </div>            
         </div>
@@ -5332,8 +5330,6 @@ function checkAscensionEnabled() {
     return true;
 }
 
-
-
 // 战斗精灵属性
 let spiritLevel = 1;
 let spiritMultiplier = 1.00;
@@ -5343,17 +5339,137 @@ const maxSpiritMultiplier = 4.15;
 
 // 获取精灵提供的基础属性增益
 function getBaseSpiritAttributes() {
-    return {
-        health: 41,
-        mana: 19,
-        physicalAttack: 6,
-        physicalDefense: 9,
-        magicAttack: 5.8,
-        magicDefense: 9,
-        speed: 1
-    };
+    if (!awakened) {
+        return {
+            health: 0,
+            mana: 0,
+            physicalAttack: 0,
+            physicalDefense: 0,
+            magicAttack: 0,
+            magicDefense: 0,
+            speed: 0
+        };
+    } else {
+        return {
+            health: 41,
+            mana: 19,
+            physicalAttack: 6,
+            physicalDefense: 9,
+            magicAttack: 5.8,
+            magicDefense: 9,
+            speed: 1
+        };
+    }
 }
 
+//战斗精灵的随机回血
+function handleSpiritHeal() {
+    const baseProbability = 0.01;
+    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const triggerProbability = Math.round(finalProbability * 100);
+
+    if (Math.random() * 100 < triggerProbability) {
+        const spiritAttributes = getCurrentSpiritAttributes();
+        const healValue = Math.round((spiritAttributes.magicAttack * spiritMultiplier) * 0.25);
+        battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
+
+        logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
+        updateUI();
+    }
+}
+
+let spiritPowerActive = false;
+
+function handleSpiritPower() {
+    const baseProbability = 0.01;
+    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const triggerProbability = Math.round(finalProbability * 100);
+
+    if (Math.random() * 100 < triggerProbability && !spiritPowerActive) {
+        spiritPowerActive = true;
+        battleState.player.spiritPowerActive = true;
+
+        const spiritAttributes = getCurrentSpiritAttributes();
+        const attributeBoost = {
+            health: Math.round(spiritAttributes.health / 10),
+            mana: Math.round(spiritAttributes.mana / 10),
+            physicalAttack: Math.round(spiritAttributes.physicalAttack / 5),
+            physicalDefense: Math.round(spiritAttributes.physicalDefense / 5),
+            magicAttack: Math.round(spiritAttributes.magicAttack / 5),
+            magicDefense: Math.round(spiritAttributes.magicDefense / 5),
+            speed: Math.round(spiritAttributes.speed / 3)
+        };
+
+        // Apply the boost
+        Object.keys(attributeBoost).forEach(attr => {
+            battleAttributes[attr] += attributeBoost[attr];
+        });
+
+        logBattleEvent(`🧚🏻‍♀️Bless from your best teammate！战斗精灵带来全属性提升！`, "pink");
+        updateUI();
+
+        // Remove the boost after 5 seconds
+        setTimeout(() => {
+            Object.keys(attributeBoost).forEach(attr => {
+                battleAttributes[attr] -= attributeBoost[attr];
+            });
+
+            spiritPowerActive = false;
+            battleState.player.spiritPowerActive = false;
+            updateUI();
+        }, 5000);
+    }
+}
+
+function handleSpiritAttack() {
+    const baseProbability = 0.01;
+    const finalProbability = baseProbability + spiritMultiplier / 100;
+    const triggerProbability = Math.round(finalProbability * 100);
+
+    if (Math.random() * 100 < triggerProbability) {
+        const spiritAttributes = getCurrentSpiritAttributes();
+        const attackValue = Math.round(spiritAttributes.magicAttack * spiritMultiplier);
+        battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
+
+        logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害`, "pink");
+
+
+        if (Math.random() < 0.2 + finalProbability) { // 20% 的基础概率触发沉睡效果
+            handleSleep();
+        }
+
+        updateUI();
+    }
+}
+
+function handleSleep() {
+    if (battleState.enemy.sleep) {
+        return; // 如果已经处于睡眠状态，直接返回
+    }
+
+    battleState.enemy.sleep = true;
+    logBattleEvent(`🧚🏻‍♀️对方在精灵的低语里陷入沉睡`, "pink");
+
+    const sleepDuration = 3000; // 沉睡持续时间3秒
+    const healInterval = 300; // 每0.3秒回血
+
+    const healTimer = setInterval(() => {
+        if (!battleState.enemy.sleep) {
+            clearInterval(healTimer);
+            return;
+        }
+        battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + Math.round(enemyMaxHealth * 0.05));
+        updateUI();
+    }, healInterval);
+
+    setTimeout(() => {
+        clearInterval(healTimer);
+        battleState.enemy.sleep = false;
+        logBattleEvent(`敌人从沉睡中醒来了。`, "pink");
+        updateUI();
+    }, sleepDuration);
+}
+        
 // 计算精灵当前等级和倍数提供的属性增益
 function getCurrentSpiritAttributes() {
     const baseAttributes = getBaseSpiritAttributes();
@@ -5399,7 +5515,7 @@ document.getElementById('battle-spirit-button').addEventListener('click', () => 
     }
     
     if (!awakened) {
-        showInfoBox('宠物在觉醒后可以开启战斗精灵。经过精心培养的精灵不仅可以大幅增加你的战斗能力，还可以带来额外的胜场奖励。等级越高，获得奖励的概率越高。');
+        showInfoBox("\n1.宠物在觉醒后可以开启战斗精灵 \n2.经过精心培养的精灵可以大幅增加战斗属性\n3.精灵会提供额外的战场胜利物资\n4.战斗中精灵有概率施加恢复、控制或强化 \n5.精灵等级和增幅越高，增益越明显");
     } else {
         document.getElementById('battle-spirit-modal').style.display = 'block';
         updateSpiritDisplay(); // 打开时更新显示
@@ -6060,6 +6176,7 @@ function clearPlayerEffect() {
 function getPlayerStatus() {
     let status = [];
     if (battleState.player.defensing) status.push("蓄力中");
+    if (battleState.player.spiritPowerActive) status.push("Blessing!");
     if (battleState.player.divineProtection) status.push("仙气护体");
     if (battleState.player.drunken) status.push("醉酒");
     if (battleState.player.torn) status.push("撕裂");
@@ -6079,6 +6196,7 @@ function getEnemyStatus() {
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (battleState.enemy.revived) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
+    if (battleState.enemy.sleep) status.push("沉睡");
     if (battleState.enemy.pierced) status.push("穿透");
     if (battleState.enemy.silenced) status.push("沉默");
     if (battleState.enemy.poisoned) status.push("中毒");
@@ -7486,6 +7604,9 @@ function divinedWeapon() {
 // 在战斗循环中调用以定期检查定空的灵石效果
 setInterval(() => {
     divineWeaponManager.applyNirvanaGemEffects();  
+    handleSpiritHeal();
+    handleSpiritPower();
+    handleSpiritAttack();
 }, 1000);
 
 //计算修为的效果时长增益
@@ -7552,12 +7673,12 @@ function applyPhysicalAttackEffects() {
     
             setTimeout(() => {
                 battleState.enemy.pierced = false; // 清除穿透状态
-                const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.48 - 0.24) + 0.24));
+                const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.84 - 0.42) + 0.24));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
                 logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
                 pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
                 updateUI();
-                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1000, 0.5);
+                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 500, 0.8);
                 
                 if (battleState.enemy.health <= 0) {
                     updateEnemyAttributes();
@@ -7919,6 +8040,8 @@ function handleManaRecover() {
         logBattleEvent(`${hlSkill.name} ${skillLevel}级为你恢复了 ${manaRecovered} 点法力值。`, 'lightblue');
     }
 }
+
+
         
 // 更新 enemyAttack 函数，确保战斗效果生效
 function enemyAttack() {
@@ -7929,6 +8052,10 @@ function enemyAttack() {
 
     if (handleDazed()) return;
     if (handleStunned()) return;
+    
+    if (battleState.enemy.sleep) {
+        return;
+    }
     
     const enemyHealthPercentage = battleState.enemy.health / enemyMaxHealth;
     const enemyManaPercentage = battleState.enemy.mana / enemyMaxMana;
@@ -8085,6 +8212,10 @@ function enemyHeal() {
         return;
     }
 
+    if (battleState.enemy.sleep) {
+        return;
+    }
+    
     const manaCost = 288 * battleRounds;
 
     // 检查深渊巨魔的法力值是否足够
@@ -8617,9 +8748,9 @@ function handleBurnt() {
         const speedDifference = battleState.player.speed - battleState.enemy.speed;
 
         if (speedDifference > 0) { // player speed > enemy speed
-            burntDamage = 2000 + speedDifference * 20;
+            burntDamage = 2000 + speedDifference * 50;
         } else { // enemy speed >= player speed
-            burntDamage = 1000 + Math.abs(speedDifference) * 10;
+            burntDamage = 1000 + Math.abs(speedDifference) * 25;
         }
 
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
@@ -8863,7 +8994,7 @@ function performHeal() {
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级，治疗效果大大提升。`, 'aqua');
     }
 
-    const manaCost = Math.round(38 * battleRounds * skillLevel * 0.1) * manaCostMultiplier;
+    const manaCost = Math.round(388 * battleRounds * skillLevel * 0.1) * manaCostMultiplier;
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法治疗！", 'red');
         return;
@@ -8936,7 +9067,7 @@ function startBattle() {
 
     // 检查全局变量 firstStartBattle 的状态
     if (!firstStartBattle) {
-        logBattleEvent("战斗系统正在逐步开发中，欢迎试玩！宠物技能可在战斗中应用，如需体验可以通过“万化灵丹”于资质面板洗练宠物技能。目前宠物的主动技能可以应用于物理/法术攻击、治疗、施毒和格挡等战斗事件中，而被动技能则统一按照固定值为宠物增加战斗属性。");
+        logBattleEvent("养兵千日，用兵一时。欢迎挑战“战力树桩”，使用各种战斗功能，测试你的培育实力！");
         firstStartBattle = true;
     }
 
@@ -10926,7 +11057,7 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 除金子锻造外，可以每次使用100个“天地灵气”进行更有力的锻造。\n3. 当宠物等级达到一定等级后，可以分别解锁后续五个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 出售、收录或更换宠物，会导致武装丢失。");
+    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 除金子锻造外，可以每次使用100个“天地灵气”进行更有力的锻造。\n3. 当宠物等级达到一定等级后，可以分别解锁后续五个武装栏。\n4. 解锁需要花费200000文金子（200两），确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收费800文金子。\n6. 不同宠物的武装不通用，出售宠物也会丢失武装。");
 }
 
 function forgeArm(key, infoDiv, useGold = true) {
@@ -13021,13 +13152,19 @@ function updateSkillScore(selectedSkills = []) {
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
     const calculatePlayerCultivation = (totalScore) => {
         let playerCultivation;
+        
         if (currentSpecialization === '慧光辉耀') {
             const spec = specializations['慧光辉耀'];
             const multiplier = Math.min(1 + (spec.level * 0.025), 4);
             playerCultivation = Math.round(totalScore / 128 * multiplier);
+        } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
+            const spec = specializations[currentSpecialization];
+            const multiplier = Math.min(1 + (spec.level * 0.02), 3);
+            playerCultivation = Math.round(totalScore / 128 * multiplier);
         } else {
             playerCultivation = Math.round(totalScore / 128);
         }
+        
         return playerCultivation;
     };
     const skillScoreElement = document.getElementById("skill-score");
@@ -14330,7 +14467,7 @@ const titles = [
     "初来乍到", "懵懵懂懂", "初窥门径", "小有所成", "渐入佳境",
     "如鱼得水", "游刃有余", "青云直上", "名扬四海", "独占鳌头",
     "炙手可热", "举世无双", "威震八方", "震古烁今", "登峰造极",
-    "傲视群雄", "龙腾四海", "王者归来", "至尊无上", "魔兽之王",
+    "傲视群雄", "龙腾四海", "王者归来", "魔兽之王", "Legend",
     "神"
 ];
 let petScore;

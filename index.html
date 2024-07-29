@@ -1291,7 +1291,7 @@
             font-size: 14px;
             border-radius: 5px;
             font-weight: bold;
-            color: #fefefc;
+            color: #725d2e;
             padding: 5px;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
@@ -11540,7 +11540,7 @@ function trainAttributesAfterFifth() {
         const currentAttribute = leftAttributes[attribute];
 
         let growthRange = [1, 3];
-        if (bonusAttribute >= maxAttribute * 0.55) {
+        if (bonusAttribute >= maxAttribute * 0.58) {
             growthRange = [-1, 2];
         }
 
@@ -12954,6 +12954,17 @@ function updateSkillScore(selectedSkills = []) {
 
     const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
+    //计算药物附加值
+    const drugHealth = drugBonus.health;
+    const drugMana = drugBonus.mana;
+    const drugPhysicalAttack = drugBonus.physicalAttack;
+    const drugPhysicalDefense = drugBonus.physicalDefense;
+    const drugMagicAttack = drugBonus.magicAttack;
+    const drugMagicDefense = drugBonus.magicDefense;
+    const drugSpeed = drugBonus.speed;
+
+    const drugAttributeScore = Math.round((drugHealth + drugMana + drugPhysicalAttack + drugPhysicalDefense + drugMagicAttack + drugMagicDefense + drugSpeed) * 1.2);
+    
     // 计算技能评分
     let skillsScore = 0;
     let aSkillCount = 0;
@@ -12985,7 +12996,7 @@ function updateSkillScore(selectedSkills = []) {
     if (ssSkillCount > 1) skillsScore += 50000;
 
     // 计算总评分
-    const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore;
+    const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
     const calculatePlayerCultivation = (totalScore) => {
         let playerCultivation;
         if (currentSpecialization === '慧光辉耀') {
@@ -13022,13 +13033,13 @@ let blessGiftClaimed = false;
 function blessGift() {
     if (!blessGiftClaimed) {
         transmutationPill += 200;
-        rebornPill += 300;
+        rebornPill += 200;
         bingpoRebornPill += 200;
         goldenRebornPill += 200;
-        miraculousPill += 50;
+        miraculousPill += 10;
         qualityPill += 200;
         highGradePill += 500;
-        goldAmount += 500000;
+        goldAmount += 1000000;
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
         document.getElementById("high-grade-pill").innerText = highGradePill;
@@ -13057,7 +13068,7 @@ function blessGift() {
         addItemToJinnang('summonCharmPaper', 20);
         blessGiftClaimed = true;
         updateJinnangItems();
-        showInfoBox("您获得了500两金子和新手大礼包!请检查你的背包！", null, () => {
+        showInfoBox("您获得了1000两金子和新手大礼包！其他物品请检查你的背包！", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
     } else {

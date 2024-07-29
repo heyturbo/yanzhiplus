@@ -8454,7 +8454,7 @@ function cleanSuppressed() {
             battleAttributes.physicalAttack = 1;
             battleAttributes.magicAttack = 1;
             logBattleEvent("你的无动于衷极大助长了深渊巨魔的威压，它降下地狱之火焚尽了你的战斗能力。", '#FF4500');
-            showBattleOverlay("https://pic.imgdb.cn/item/66a484fcd9c307b7e95c2645.gif", 1000, 0.5);
+            showBattleOverlay("https://pic.imgdb.cn/item/66a484fcd9c307b7e95c2645.gif", 1000, 0.8);
         }
 
         // 恢复原始的攻击和防御函数
@@ -8693,13 +8693,21 @@ function handleDamageReduction(damage) {
     const formattedFinalDamageReduction = isNaN(finalDamageReduction) ? 0 : finalDamageReduction;
     const formattedFinalDamage = isNaN(finalDamage) ? 0 : finalDamage;
     const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
-    if (formattedFinalDamage >= 0){
-        logBattleEvent(`格挡消耗${wiseDefenseManaCost}法力减少${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
-        wiseDefenseManaCost = 0;
+    
+    if (formattedFinalDamage >= 0) {
+        if (wiseDefenseManaCost != 0) {
+            logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
+        } else {
+            logBattleEvent(`格挡为你减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
+        }
     } else {
-        logBattleEvent(`格挡消耗${wiseDefenseManaCost}法力减少${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
-        wiseDefenseManaCost = 0;
+        if (wiseDefenseManaCost != 0) {
+            logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
+        } else {
+            logBattleEvent(`格挡为你减少了${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
+        }
     }
+    wiseDefenseManaCost = 0;
             
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，飞升技能抵挡 ${totalDamageReduction} 点伤害。目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
 }

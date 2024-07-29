@@ -5364,6 +5364,10 @@ function getBaseSpiritAttributes() {
 
 //战斗精灵的随机回血
 function handleSpiritHeal() {
+    if (!awakened){
+        return;
+    }
+    
     const baseProbability = 0.01;
     const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
@@ -5382,6 +5386,10 @@ function handleSpiritHeal() {
 let spiritPowerActive = false;
 
 function handleSpiritPower() {
+    if (!awakened){
+        return;
+    }
+    
     const baseProbability = 0.01;
     const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
@@ -5424,6 +5432,10 @@ function handleSpiritPower() {
 }
 
 function handleSpiritAttack() {
+    if (!awakened){
+        return;
+    }
+    
     const baseProbability = 0.01;
     const finalProbability = baseProbability + spiritMultiplier / 300;
     const triggerProbability = Math.round(finalProbability * 100);
@@ -5478,6 +5490,24 @@ function handleSleep() {
         updateUI();
     }, sleepDuration);
 }
+
+// 在战斗循环中调用以定期检查定空的灵石效果
+setInterval(() => {
+    if (attributesFetched) {
+        if (battleAttributes.health <= 0 && onBattleState){
+            showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        } else if (onBattleState){
+            battleAttributes.health -= Math.round(maxHealth * 0.01);
+        }
+        updateUI();
+    } else {
+        console.log('尚未开始战斗');
+    }        
+    divineWeaponManager.applyNirvanaGemEffects();  
+    handleSpiritHeal();
+    handleSpiritPower();
+    handleSpiritAttack();
+}, 1000);
         
 // 计算精灵当前等级和倍数提供的属性增益
 function getCurrentSpiritAttributes() {
@@ -7610,14 +7640,6 @@ function divinedWeapon() {
     divineWeaponManager.openDivineWeaponUI();
 }
 
-// 在战斗循环中调用以定期检查定空的灵石效果
-setInterval(() => {
-    divineWeaponManager.applyNirvanaGemEffects();  
-    handleSpiritHeal();
-    handleSpiritPower();
-    handleSpiritAttack();
-}, 1000);
-
 //计算修为的效果时长增益
 function getCultivationBonusDuration() {
     if (playerCultivation <= 120000) {
@@ -9068,6 +9090,7 @@ function handleHealingBan(skillMultiplier) {
 
 // 将 firstStartBattle 定义为全局变量
 let firstStartBattle = false;
+let onBattleState;
 function startBattle() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -9076,9 +9099,11 @@ function startBattle() {
 
     // 检查全局变量 firstStartBattle 的状态
     if (!firstStartBattle) {
-        logBattleEvent("养兵千日，用兵一时。欢迎挑战“战力树桩”，使用各种战斗功能，测试你的培育实力！");
+        logBattleEvent("模拟回合制，为了防止作弊，每秒玩家会固定掉血1%，请及时操作！");
         firstStartBattle = true;
     }
+
+    onBattleState = true;
 
     playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
     updateUI();
@@ -9090,6 +9115,7 @@ function startBattle() {
 
 function stopBattle() {
     clearInterval(battleInterval);
+    onBattleState = false;
     logBattleEvent("战斗停止。");
 }
 

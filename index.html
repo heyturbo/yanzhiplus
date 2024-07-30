@@ -7627,7 +7627,7 @@ class DivineWeaponManager {
             }
 
             logBattleEvent(`定空的灵石解除了你的${this.getEffectChineseName(debuffToRemove)}状态。`, '#D3D3D3');
-            showBattleOverlay("https://pic.imgdb.cn/item/66a33f3ad9c307b7e942c38c.gif", 1000, 1, 0);
+            showBattleOverlay("https://pic.imgdb.cn/item/66a33f3ad9c307b7e942c38c.gif", 1000, 1, 1000);
             updatePlayerStatusDisplay();
             updateUI();
         }
@@ -9147,7 +9147,7 @@ function showNextBattlePrompt(playerWon) {
 
         goldAmount += reward;
         logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 0);
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
 
         battleRounds++;
         updateGoldDisplay(goldAmount);
@@ -9171,7 +9171,7 @@ function showNextBattlePrompt(playerWon) {
             goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
         }
         showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 0);
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
         updateGoldDisplay(goldAmount);
     }
     extraShield = 0;
@@ -11731,9 +11731,9 @@ function trainAttributesAfterFifth() {
         const bonusAttribute = bonusAttributes[attribute];
         const currentAttribute = leftAttributes[attribute];
 
-        let growthRange = [1, 3];
+        let growthRange = [1, 6];
         if (bonusAttribute >= maxAttribute * 0.58) {
-            growthRange = [-1, 2];
+            growthRange = [-1, 5];
         }
 
         const growthValue = Math.floor(Math.random() * (growthRange[1] - growthRange[0] + 1)) + growthRange[0];
@@ -11773,6 +11773,7 @@ function bonusAttributesDisplay() {
             const maxValue = maxAttributes[attribute];
             if (bonusValue >= maxValue) {
                 spanElement.innerText = `(+${bonusValue}(满))`;
+                 spanElement.style.color = "red";
             } else {
                 spanElement.innerText = `(+${bonusValue})`;
             }

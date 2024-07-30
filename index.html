@@ -551,26 +551,35 @@
         .attributes-container {
             display: flex;
              /* 使两个子容器分布在容器的两边 */
-            gap: 0px; /* 调整两列之间的间距 */
-            align-items: stretch;
-            font-size: 12px;
+             /* 调整两列之间的间距 */
+            font-size: 14px;
             flex-direction: row;
             justify-content: space-between;
-            margin-bottom: 10px;
+            min-height: 300px;
+            background-image: url(https://pic.imgdb.cn/item/66a89fd8d9c307b7e9f8bbf3.gif);
+            background-size: cover;
         }
         .progress-bars {
             display: flex;
-            gap: 0px; /* 调整每个条目之间的间距 */
-            flex-direction: column-reverse;
+            gap: 5px; /* 调整每个条目之间的间距 */
+            flex-direction: column;
             justify-content: space-between;
+            min-width: 130px;
+            background-color: hsl(0deg 0% 100% / 70%);
+            padding: 10px;
+            border-radius: 10px;
         }
         .secondary-attributes {
             display: flex;
             flex-direction: column;
              /* 调整每个条目之间的间距 */
+            min-width: 130px;
+            gap: 5px;
+            padding: 10px;
+            background-color: hsl(0deg 0% 100% / 70%);
+            border-radius: 10px;
+            flex-wrap: nowrap;
             align-items: stretch;
-            flex-wrap: wrap;
-            justify-content: space-between;
         }
         .image-frame {
             display: flex;
@@ -1779,6 +1788,25 @@
             <div class="attributes-container">
                 <div class="progress-bars">
                     <div class="progress-bar">
+                        等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
+                    </div>
+                    <div class="progress-bar">
+                        品质: <span id="attribute-tier"></span>
+                    </div>
+                    <div class="progress-bar">
+                        幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
+                    </div>
+                    <div class="progress-bar">
+                        成长率: <span id="attribute-growth-rate"></span>
+                    </div>
+
+                    <div class="progress-bar">
+                        潜力点: <span id="remaining-points-display"></span>
+                    </div>
+
+
+
+                    <div class="progress-bar">
                         耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
                     </div>
                     <div class="progress-bar">
@@ -1793,39 +1821,23 @@
                     <div class="progress-bar">
                         信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
                     </div>
-                    <div class="progress-bar">
-                        悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
-                    </div>
-                    <div id="remaining-points-display">剩余点数: 0</div>
-                    <div>飞升状态: <span id="ascension-status">未飞升</span></div>
-                    <div>觉醒状态: <span id="awaken-status">未觉醒</span></div>  
-                    <div>当前修为: <span id="player-cultivation">0</span></div> 
-                    <div>宠物评分: <span id="skill-score">0</span></div>
-                </div>
-                <div class="image-frame">
-                    <img src="https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png" alt="神兽之地">
-                    <div>修炼之地</div>
+
                 </div>
                 <div class="secondary-attributes">
-                    <div class="progress-bar">
-                        等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        品质: <span id="attribute-tier"></span>
-                    </div>
-                    <div class="progress-bar">
-                        成长率: <span id="attribute-growth-rate"></span>
-                    </div>
-                    <div class="progress-bar">
-                        幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
-                    </div>
-                    <div>HP: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                    <div>MP: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                    <div>物攻: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                    <div>物防: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                    <div>法攻: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                    <div>法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-                    <div>速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">飞升状态: <span id="ascension-status">未飞升</span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">觉醒状态: <span id="awaken-status">未觉醒</span></div>  
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">当前修为: <span id="player-cultivation">0</span></div> 
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">宠物评分: <span id="skill-score">0</span></div>
+                        <div class="progress-bar">
+                            悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                        </div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">物攻: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">物防: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法攻: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                 </div>
             </div>
             <div class="button-grid">
@@ -10052,7 +10064,6 @@ function ascend() {
     updateAscensionStatus();
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");
-    updateImageFrame(customImageUrls.ascend, 5000);
     
 }
 
@@ -13428,7 +13439,7 @@ const allocationHistory = [];
 const allocationCount = {}; // 用于记录每个属性的连续分配次数
 
 function updateRemainingPointsDisplay() {
-    document.getElementById("remaining-points-display").innerText = `剩余点数: ${remainingPoints}`;
+    document.getElementById("remaining-points-display").innerText = `${remainingPoints}`;
 }
 
 function increaseBonusAttribute(attribute) {
@@ -13651,7 +13662,7 @@ function awakenPet() {
         updateAwakenStatus();
 
         showInfoBox("成功觉醒，宠物的当前属性大幅提升，成长率升为超凡；悟性上限提升至25，等级上限提高至160级！");
-        updateImageFrame(customImageUrls.awaken);
+        
         updatePetLevel();
         updateAttributePanel();
         updateQualityCard();
@@ -13713,7 +13724,7 @@ function hallucinatePet() {
             hallucinationLevel++;
             document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
             showInfoBox(`幻化提升成功！当前幻化等级为${hallucinationLevel}级！`);
-            updateImageFrame(customImageUrls.hallucinate, 2000);
+            
             
         } else {
             showInfoBox("幻化提升失败！");
@@ -14403,39 +14414,6 @@ function startGameTimer() {
     }
 
     setInterval(updateTimer, 1000);
-}
-
-// 确保此数组名称在项目中是唯一的，避免冲突
-const customImageUrls = {
-    ascend: "https://pic.imgdb.cn/item/668a3179d9c307b7e9c63fb9.gif",
-    hallucinate: "https://pic.imgdb.cn/item/668a317ad9c307b7e9c63fcf.gif",
-    awaken: "https://pic.imgdb.cn/item/668a3613d9c307b7e9cc9530.webp"
-};
-
-let defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
-let imageFrameTimeout;
-
-function updateImageFrame(url, duration) {
-    const imageFrame = document.querySelector(".image-frame img");
-
-    if (!imageFrame) {
-        console.error("Image frame element not found.");
-        return;
-    }
-
-    // Update the image source
-    imageFrame.src = url;
-
-    // If duration is specified, set a timeout to revert to the default image
-    if (duration && duration > 0) {
-        if (imageFrameTimeout) {
-            clearTimeout(imageFrameTimeout);
-        }
-        imageFrameTimeout = setTimeout(() => {
-            imageFrame.src = defaultImageUrl;
-        }, duration);
-    }
-    updateAttributePanel();
 }
 
 // 在个位数前补零

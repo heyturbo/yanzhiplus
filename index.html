@@ -3437,14 +3437,15 @@ function petCollection() {
     collectionPanel.style.top = '50%';
     collectionPanel.style.left = '50%';
     collectionPanel.style.transform = 'translate(-50%, -50%)';
-    collectionPanel.style.width = '90%';
-    collectionPanel.style.height = '80%';
+    collectionPanel.style.width = '95%';
+    collectionPanel.style.height = '550px';
     collectionPanel.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
     collectionPanel.style.borderRadius = '10px';
     collectionPanel.style.zIndex = '1000';
-    collectionPanel.style.padding = '10px';
+    collectionPanel.style.padding = '5px';
     collectionPanel.style.overflowY = 'scroll';
     collectionPanel.style.color = 'white';
+    collectionPanel.style.border = '1px solid white';
     document.body.appendChild(collectionPanel);
 
     // 创建关闭按钮
@@ -3470,7 +3471,10 @@ function petCollection() {
     collectionContent.style.display = 'grid';
     collectionContent.style.gap = '5px';
     collectionContent.style.gridTemplateColumns = 'repeat(5, 1fr)';
-    collectionContent.style.fontSize = '11px';
+    collectionContent.style.fontSize = '12px';
+    collectionContent.style.height = '330px';
+    collectionContent.style.overflowY = 'scroll';
+    collectionContent.style.width = '100%';
 
     Object.keys(pets).forEach(petKey => {
         const pet = pets[petKey];
@@ -3480,7 +3484,7 @@ function petCollection() {
         petDiv.style.flexDirection = 'column';
         petDiv.style.justifyContent = 'space-between';
         petDiv.style.alignItems = 'center';
-        petDiv.style.padding = '10px';
+        petDiv.style.padding = '5px';
         petDiv.style.border = '1px solid #fff';
         petDiv.style.borderRadius = '5px';
 
@@ -3850,6 +3854,7 @@ function restorePetData(petName) {
             secondSkillBox.style.display = 'block';
             updateSecondAscensionDisplay();
         }
+        updateDisplayContent();
     }
 }
 
@@ -5743,7 +5748,7 @@ function performPoison() {
 
 function handlePoison(skillMultiplier = 1) {
     const basePoisonDuration = 3000; // 基础持续时间3秒
-    const additionalPoisonDuration = Math.round(playerCultivation / 20000) * 1000; // 计算附加的持续时间，以毫秒为单位
+    const additionalPoisonDuration = Math.round(playerCultivation / 40000) * 1000; // 计算附加的持续时间，以毫秒为单位
     const totalPoisonDuration = basePoisonDuration + additionalPoisonDuration; // 总持续时间
 
     let remainingDuration = totalPoisonDuration; // 初始化剩余时间
@@ -5758,7 +5763,7 @@ function handlePoison(skillMultiplier = 1) {
         remainingDuration -= 1000; // 每次循环减少1秒
 
         const remainingSeconds = Math.max(0, Math.round(remainingDuration / 1000)); // 计算剩余秒数
-        logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害，当前修为加持下，中毒效果还将持续 ${remainingSeconds} 秒。`, '#C10066');
+        //logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害，当前修为加持下，中毒效果还将持续 ${remainingSeconds} 秒。`, '#C10066');
         updateUI();
         updateEnemyStatusDisplay();
         
@@ -5768,7 +5773,7 @@ function handlePoison(skillMultiplier = 1) {
             showNextBattlePrompt(true);
             return;
         }
-    }, 1000); // 每秒触发一次
+    }, 500); // 每秒触发一次
 
     setTimeout(() => {
         battleState.enemy.poisoned = false;
@@ -14833,12 +14838,7 @@ function loadGameState() {
         }
         // 需要重新更新显示的内容
         updateDisplayContent();
-        setInnerText("hallucination-level", hallucinationLevel);
-        setInnerText("skill-score", skillScore);
-        setInnerText("current-wisdom", currentWisdom);
-        setInnerText("train-count", trainingCount);
-        setInnerText("pet-level", petLevel);
-        setInnerText("evolution-level", evolutionLevel);
+
         // 检查宠物是否已经变异
         if (currentPet.qualities.mutated) {
             document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
@@ -14863,6 +14863,13 @@ function updateDisplayContent() {
     restoreEnemyState();
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
     updateExpBar();
+
+    setInnerText("hallucination-level", hallucinationLevel);
+    setInnerText("skill-score", skillScore);
+    setInnerText("current-wisdom", currentWisdom);
+    setInnerText("train-count", trainingCount);
+    setInnerText("pet-level", petLevel);
+    setInnerText("evolution-level", evolutionLevel);
     // ...
 }
     </script>

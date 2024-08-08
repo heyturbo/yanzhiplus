@@ -5795,7 +5795,16 @@ function applyPhysicalAttackEffects() {
 
     const effects = divineWeaponManager.lostBook.effects;
     const effect = effects[Math.floor(Math.random() * effects.length)];
-    const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.lostBook.level - 1) * 0.006);
+    let triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.lostBook.level - 1) * 0.006);
+    
+    // 计算修为差值对触发概率的影响
+    const cultivationDifference = playerCultivation - battleState.enemy.cultivation;
+    if (cultivationDifference < 0) {
+        const reduction = Math.floor(-cultivationDifference / 10000) * 0.01;
+        triggerProbability = Math.max(0.01, triggerProbability - reduction);
+        console.log(`当前物理效果真实触发概率为：${triggerProbability}`);
+    }
+    
     if (Math.random() > triggerProbability) return; // 没有触发效果
 
     const cultivationBonus = getCultivationBonusDuration();
@@ -5896,7 +5905,16 @@ function applyMagicAttackEffects(damage) {
 
     const effects = divineWeaponManager.fragmentedMap.effects;
     const effect = effects[Math.floor(Math.random() * effects.length)];
-    const triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.fragmentedMap.level - 1) * 0.006);
+    let triggerProbability = Math.min(1, 0.01 + (divineWeaponManager.fragmentedMap.level - 1) * 0.006);
+    
+    // 计算修为差值对触发概率的影响
+    const cultivationDifference = playerCultivation - battleState.enemy.cultivation;
+    if (cultivationDifference < 0) {
+        const reduction = Math.floor(-cultivationDifference / 10000) * 0.01;
+        triggerProbability = Math.max(0.01, triggerProbability - reduction);
+        console.log(`当前法术效果真实触发概率为：${triggerProbability}`);
+    }
+    
     if (Math.random() > triggerProbability) return; // 没有触发效果
 
     const cultivationBonus = getCultivationBonusDuration();

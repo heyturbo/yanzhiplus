@@ -4364,7 +4364,7 @@ let playerCritRate = 0.1; // 10%
 let playerCritDamage = 1.5; // 150%
 let enemyCritRate = 0.6; // 60%
 let enemyCritDamage = 1.8; // 180%
-const pierceDamageContainer = {
+let pierceDamageContainer = {
     totalPierceDamage: 0
 };
 let poisonSkillActivated = false;
@@ -5752,21 +5752,24 @@ function handlePoison(skillMultiplier = 1) {
     const totalPoisonDuration = basePoisonDuration + additionalPoisonDuration; // 总持续时间
 
     let remainingDuration = totalPoisonDuration; // 初始化剩余时间
+    let totalPoisonDamage = 0; // 初始化总毒性伤害
 
     const poisonInterval = setInterval(() => {
         if (!battleState.enemy.poisoned) {
             clearInterval(poisonInterval);
             return;
         }
-        const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9) * playerCritDamage);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+        totalPoisonDamage += poisonDamage; // 累积毒性伤害
         remainingDuration -= 1000; // 每次循环减少1秒
 
         const remainingSeconds = Math.max(0, Math.round(remainingDuration / 1000)); // 计算剩余秒数
+
         //logBattleEvent(`深渊巨魔中毒，受到 ${poisonDamage} 点毒性伤害，当前修为加持下，中毒效果还将持续 ${remainingSeconds} 秒。`, '#C10066');
         updateUI();
         updateEnemyStatusDisplay();
-        
+
         if (battleState.enemy.health <= 0) {
             clearInterval(poisonInterval);
             updateEnemyAttributes();
@@ -5779,8 +5782,10 @@ function handlePoison(skillMultiplier = 1) {
         battleState.enemy.poisoned = false;
         clearInterval(poisonInterval);
         updateEnemyStatusDisplay();
+        logBattleEvent(`持续时间内，敌人一共受到 ${totalPoisonDamage} 点毒性伤害。`, '#C10066');
     }, totalPoisonDuration); // 动态调整中毒效果持续时间
 }
+
 
 //计算修为的效果时长增益
 function getCultivationBonusDuration() {
@@ -5843,31 +5848,7 @@ function applyPhysicalAttackEffects() {
             }, 1000 + cultivationBonus * 1000); // 恐吓持续1秒
             break;
         case '穿透':
-            if (battleState.enemy.pierced) {
-                return;
-            }    
-            battleState.enemy.pierced = true;
-            pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
-            logBattleEvent("深渊巨魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予深渊巨魔致命的余波伤害。", '#ADFF2F');
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c43c.gif');
-            updateEnemyStatusDisplay();
-    
-            setTimeout(() => {
-                battleState.enemy.pierced = false; // 清除穿透状态
-                const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.84 - 0.42) + 0.24));
-                battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
-                logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
-                pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
-                updateUI();
-                showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
-                
-                if (battleState.enemy.health <= 0) {
-                    updateEnemyAttributes();
-                    showNextBattlePrompt(true);
-                    return;
-                }
-                updateEnemyStatusDisplay();
-            }, 3000 + cultivationBonus * 1000); // 穿透效果持续3秒
+            handlePiercedEffect(cultivationBonus);
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -5973,19 +5954,46 @@ function applyMagicAttackEffects(damage) {
 }
 
 //具体的效果函数（分离后）
+function handlePiercedEffect(cultivationBonus) {
+    if (battleState.enemy.pierced) return;
+
+    battleState.enemy.pierced = true;
+    pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
+    logBattleEvent("深渊巨魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予深渊巨魔致命的余波伤害。", '#ADFF2F');
+    showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c43c.gif');
+    updateEnemyStatusDisplay();
+
+    setTimeout(() => {
+        battleState.enemy.pierced = false; // 清除穿透状态
+        const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.84 - 0.42) + 0.24) * (1 + playerCultivation / 500000));
+        battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
+        logBattleEvent(`刀剑震颤之余波！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
+        pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
+        updateUI();
+        showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
+
+        if (battleState.enemy.health <= 0) {
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
+        }
+        updateEnemyStatusDisplay();
+    }, 3000 + cultivationBonus * 1000); // 穿透效果持续3秒
+}
+
 function handlePierced() {
     if (!battleState.enemy.pierced) return;
 
     const extraDamage = Math.floor(battleAttributes.physicalAttack * 5);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
-    logBattleEvent(`本次攻击额外给敌人造成 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
+    logBattleEvent(`敌人受到 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
     pierceDamageContainer.totalPierceDamage += extraDamage; // 累积穿透伤害
     updateUI();
 
     if (battleState.enemy.health <= 0) {
-    updateEnemyAttributes();
-    showNextBattlePrompt(true);
-    return;
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
     }
 }
 
@@ -7772,9 +7780,9 @@ function getBaseSpiritAttributes() {
             health: 41,
             mana: 19,
             physicalAttack: 6,
-            physicalDefense: 9,
+            physicalDefense: 13,
             magicAttack: 5.8,
-            magicDefense: 9,
+            magicDefense: 12.7,
             speed: 1
         };
     }
@@ -8020,11 +8028,11 @@ function handleSpiritPower() {
         const spiritAttributes = getCurrentSpiritAttributes();
         const attributeBoost = {
             health: Math.round(spiritAttributes.health / 10),
-            mana: Math.round(spiritAttributes.mana / 10),
+            mana: Math.round(spiritAttributes.mana / 8),
             physicalAttack: Math.round(spiritAttributes.physicalAttack / 5),
-            physicalDefense: Math.round(spiritAttributes.physicalDefense / 5),
+            physicalDefense: Math.round(spiritAttributes.physicalDefense / 3),
             magicAttack: Math.round(spiritAttributes.magicAttack / 5),
-            magicDefense: Math.round(spiritAttributes.magicDefense / 5),
+            magicDefense: Math.round(spiritAttributes.magicDefense / 3),
             speed: Math.round(spiritAttributes.speed / 3)
         };
 
@@ -9290,6 +9298,8 @@ setInterval(() => {
     if (attributesFetched) {
         if (battleAttributes.health <= 0 && onBattleState){
             showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        } else if (onBattleState && battleRounds >= 151){
+            battleAttributes.health -= Math.round(maxHealth * 0.017);
         } else if (onBattleState){
             battleAttributes.health -= Math.round(maxHealth * 0.01);
         }
@@ -13028,7 +13038,7 @@ function updateSkillScore(selectedSkills = []) {
     const drugMagicDefense = drugBonus.magicDefense;
     const drugSpeed = drugBonus.speed;
 
-    const drugAttributeScore = Math.round((drugHealth + drugMana + drugPhysicalAttack + drugPhysicalDefense + drugMagicAttack + drugMagicDefense + drugSpeed) * 0.8);
+    const drugAttributeScore = Math.round((drugHealth + drugMana + drugPhysicalAttack + drugPhysicalDefense + drugMagicAttack + drugMagicDefense + drugSpeed) * 0.56);
     
     // 计算技能评分
     let skillsScore = 0;
@@ -13071,7 +13081,7 @@ function updateSkillScore(selectedSkills = []) {
             playerCultivation = Math.round(totalScore / 128 * multiplier);
         } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
             const spec = specializations[currentSpecialization];
-            const multiplier = Math.min(1 + (spec.level * 0.02), 2.5);
+            const multiplier = Math.min(1 + (spec.level * 0.017), 2);
             playerCultivation = Math.round(totalScore / 128 * multiplier);
         } else {
             playerCultivation = Math.round(totalScore / 128);
@@ -13290,8 +13300,6 @@ function upgradeWisdomTo() {
         showInfoBox(`请输入1到${awakened ? 25 : 20}之间的整数！`);
     }
 }
-
-        
 
 
 let remainingPoints = 0;
@@ -14325,7 +14333,7 @@ function completeTask(taskId) {
                 initializeEnemyPet();
                 updateEnemyAttributes();
                 updateUI();
-                showInfoBox('一阵悦耳的音乐在你耳畔响起来，结束时，你睁开了双眼');
+                showInfoBox('一阵悦耳的音乐在你耳畔响起来，结束时，你睁开了双眼，一切景象从模糊变得清楚。你惊奇的发现，曾经依稀的时光竟重新映入你的眼前。');
                 task.completed = true;
                 updateTaskList();
                 updateStampCount();

@@ -1660,6 +1660,7 @@
 .info-text {
     flex-grow: 1;
 }
+
    </style>
 </head>
 <body>
@@ -1803,9 +1804,6 @@
                     <div class="progress-bar">
                         潜力点: <span id="remaining-points-display"></span>
                     </div>
-
-
-
                     <div class="progress-bar">
                         耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
                     </div>
@@ -1821,7 +1819,6 @@
                     <div class="progress-bar">
                         信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
                     </div>
-
                 </div>
                 <div class="secondary-attributes">
                         <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">飞升状态: <span id="ascension-status">未飞升</span></div>
@@ -1973,7 +1970,11 @@
                         <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove black;">
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
-                    <div style="margin-bottom: 5px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
+                    <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
+                    <div style="margin-bottom: 5px; position: relative; width: 100%; height: 12px; background-color: gray; border-radius: 5px;" id="exp-bar-container">
+                        <div style="position: absolute; left: 0; top: 0; height: 100%; width: 0; background: linear-gradient(to bottom, #4B0082, #9370DB, #4B0082); border-radius: 5px;" id="exp-bar"></div>
+                        <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
+                    </div>
                     <div id="player-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
@@ -1987,9 +1988,7 @@
                     <p>修为: <span id="your-pet-cultivation"></span></p>
                     <p>暴击: <span id="player-crit-rate"></span></p>
                     <p>暴击伤害: <span id="player-crit-damage"></span></p>
-                    <div id="exp-bar-container">
-                    <p>经验值:<span id="exp-bar">0 / 208</span></p>
-                    </div>
+
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
@@ -3081,6 +3080,7 @@ const biographies = {
     ]
 };
 
+        
 function showGuide() {
     const messageBox = document.createElement('div');
     messageBox.style = `
@@ -3322,32 +3322,32 @@ function showInfoBox(message, onConfirm, onCancel) {
     // 创建提示框元素
     const infoBox = document.createElement('div');
     infoBox.style.position = 'fixed';
-    infoBox.style.top = '50%';
+    infoBox.style.top = '30%';
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
-    infoBox.style.width = '70%'; // 增加宽度
+    infoBox.style.width = '85%'; // 增加宽度
     infoBox.style.maxWidth = '600px'; // 限制最大宽度
     infoBox.style.maxHeight = '60%'; // 限制最大高度
     infoBox.style.overflowY = 'auto'; // 添加垂直滚动条
-    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
     infoBox.style.color = 'white';
-    infoBox.style.border = '1px solid black';
+    infoBox.style.border = '1px solid white';
     infoBox.style.borderRadius = '10px';
-    infoBox.style.padding = '20px';
+    infoBox.style.padding = '10px';
     infoBox.style.zIndex = '9999';
     infoBox.style.fontSize = '14px';
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
     messageElement.style.margin = '0';
-    messageElement.style.padding = '0';
+    messageElement.style.padding = '20px';
     messageElement.style.wordBreak = 'break-word';
     messageElement.innerText = message;
     infoBox.appendChild(messageElement);
 
     // 创建按钮容器元素
     const buttonContainer = document.createElement('div');
-    buttonContainer.style.marginTop = '30px';
+    buttonContainer.style.marginTop = '20px';
     buttonContainer.style.textAlign = 'right';
     buttonContainer.style.display = 'flex';
     buttonContainer.style.flexDirection = 'row';
@@ -3357,7 +3357,6 @@ function showInfoBox(message, onConfirm, onCancel) {
     // 创建确认按钮
     const confirmButton = document.createElement('button');
     confirmButton.innerText = '确认';
-    confirmButton.style.marginLeft = '10px';
     confirmButton.style.padding = '8px 16px';
     confirmButton.style.backgroundColor = '#4CAF50';
     confirmButton.style.color = 'white';
@@ -4249,8 +4248,8 @@ let drugInventory = {
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
-    "寒天之晶": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，使用后30秒内怪物的物理防御和法术防御归0" },
-    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得10000经验/回退10轮" },
+    "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗10000当前经验转化为1000点修为值" },
+    "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得50000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，永久增加100点速度，收集3个可以合成1个绿色品阶的药品" },
@@ -4563,7 +4562,7 @@ function resetBuffState(playerWon) {
     }
 }
 
-function gainExp() {
+function gainExp(expToAdd = 0) {
     let expMultiplier = battleState.player.expMultiplier || 1;
 
     // 检查并应用举一反三技能的经验值加成
@@ -4579,13 +4578,32 @@ function gainExp() {
         logBattleEvent(`举一反三触发，经验值增加了 ${extraExpMultiplier * 100}%。`, "pink");
     }
 
-    // 计算非线性经验值增长
-    const gainedExp = Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier);
+    // 计算非线性经验值增长，如果expToAdd为0，则使用默认战斗经验值增长
+    const gainedExp = expToAdd > 0 
+        ? expToAdd 
+        : Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier);
+
     let totalGainedExp = currentExp + gainedExp;
 
     while (totalGainedExp >= maxExp) {
         totalGainedExp -= maxExp; // 保存多余的经验值
-        maxExp = Math.floor(maxExp * 1.85); // 调整升级所需经验值的增长系数
+        
+        // 确定 maxExp 的增量
+        let increment;
+        if (petLevel < 100 && battleRounds < 100) {
+            increment = Math.floor(Math.random() * (1000 - 600 + 1)) + 600;
+        } else if (petLevel >= 101 && petLevel <= 180 && battleRounds >= 101 && battleRounds <= 140) {
+            increment = Math.floor(Math.random() * (1800 - 1200 + 1)) + 1200;
+        } else if (petLevel >= 181 && petLevel <= 200 && battleRounds >= 141 && battleRounds <= 150) {
+            increment = Math.floor(Math.random() * (3600 - 2000 + 1)) + 2000;
+        } else if (petLevel == 200 && battleRounds > 150) {
+            maxExp = Math.floor(maxExp * 1.85); // 按照固定倍数增长
+            continue; // 跳过本次循环剩余部分，直接进入下一次循环
+        } else {
+            increment = Math.floor(Math.random() * (3600 - 600 + 1)) + 600; // 默认增长规则
+        }
+        
+        maxExp += increment; // 根据规则增长 maxExp
 
         if (petLevel >= 200) {
             logBattleEvent("宠物已达到最高等级，经验转化为普通经验书！", "pink");
@@ -4607,10 +4625,22 @@ function gainExp() {
 
     updateExpBar(); // 更新经验条显示
 }
-
+        
 function updateExpBar() {
-    document.getElementById("exp-bar").innerText = `${currentExp} / ${maxExp}`;
+  const expBar = document.getElementById('exp-bar');
+  const expText = document.getElementById('exp-text');
+
+  // 计算进度条宽度百分比
+  const expPercentage = (currentExp / maxExp) * 100;
+
+  // 更新进度条宽度
+  expBar.style.width = `${expPercentage}%`;
+
+  // 更新经验值文字
+  expText.textContent = `经验值:${currentExp} / ${maxExp}`;
 }
+
+
 
 function resetBattleState(playerWon) {
     if (!playerWon) {
@@ -4844,7 +4874,7 @@ function updateEnemyAttributes() {
         magicAttack: 2200000,
         magicDefense: 450000,
         speed: 108020,
-        cultivation: 240000
+        cultivation: 600000
     };
 
     const increasePerRound = {
@@ -4859,7 +4889,7 @@ function updateEnemyAttributes() {
     };
 
     const increasePerRoundAfter150 = {
-        health: 70000,
+        health: 350000,
         mana: 32000,
         physicalAttack: 350,
         physicalDefense: 300,
@@ -5465,7 +5495,7 @@ function performAttack(type) {
             return;
         }
         damageResult = result.damage;
-        console.log(`performAttack中本次伤害输出为${result.damage}。`)
+        //console.log(`performAttack中本次伤害输出为${result.damage}。`)
     }
 
     handleCriticalAndDrunken(damageResult);
@@ -7312,41 +7342,34 @@ function useSelectedDrug() {
                     }
                 }, healthInterval);
                 break;
-            case "寒天之晶":
-                applyTimedBuff(
-                    selectedDrug,
-                    () => {
-                        const originalPhysicalDefense = battleState.enemy.physicalDefense;
-                        const originalMagicDefense = battleState.enemy.magicDefense;
-                        battleState.enemy.physicalDefense = 0;
-                        battleState.enemy.magicDefense = 0;
-                        logBattleEvent(`使用寒天之晶，30秒内怪物的物理防御和法术防御归0。`, 'gold');
-                        return () => {
-                            battleState.enemy.physicalDefense = originalPhysicalDefense;
-                            battleState.enemy.magicDefense = originalMagicDefense;
-                            logBattleEvent(`寒天之晶效果消失。`, 'red');
-                        };
-                    },
-                    30000
-                );
+            case "魔术棱柱":
+                if (currentExp >= 10000) {
+                    currentExp -= 10000; // 消耗10000点经验值
+                    playerCultivation += 1000; // 增加1000点修为值
+                    updateExpBar(); // 更新经验条显示
+                    updateUI(); // 更新界面显示
+                    logBattleEvent(`使用魔术棱柱，消耗10000点经验值转换为1000点修为。`, 'gold');
+                } else {
+                    showInfoBox("经验不足，无法使用魔术棱柱。");
+                }
                 break;
-                case "幸运金币":
-                    if (Math.random() < 0.1 && battleRounds > 10) {
-                        const battleRoundsToDecrease = battleRounds - 10;
-                        initializeEnemyPet();
-                        battleRounds = battleRoundsToDecrease;
-                        updateEnemyAttributes();
-                        logBattleEvent(`使用幸运金币，你成功回退至10轮之前。`, 'gold');
-                    } else if (Math.random() < 0.8) {
-                        currentExp += 10000;
-                        logBattleEvent(`使用幸运金币，获得了10000点经验值。`, 'gold');
-                    } else {
-                        battleState.enemy.health = 1;
-                        logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
-                    }
-                    updateUI();
-                    updateExpBar();
-                    break;
+            case "幸运金币":
+                if (Math.random() < 0.1 && battleRounds > 10) {
+                    const battleRoundsToDecrease = battleRounds - 10;
+                    initializeEnemyPet();
+                    battleRounds = battleRoundsToDecrease;
+                    updateEnemyAttributes();
+                    logBattleEvent(`使用幸运金币，你成功回退至10轮之前。`, 'gold');
+                } else if (Math.random() < 0.8) {
+                    gainExp(50000);
+                    logBattleEvent(`使用幸运金币，获得了50000点经验值。`, 'gold');
+                } else {
+                    battleState.enemy.health = 1;
+                    logBattleEvent(`使用幸运金币，怪物血量变为1。`, 'gold');
+                }
+                updateUI();
+                updateExpBar();
+                break;
             case "双倍经验药":
                 applyTimedBuff(
                     selectedDrug,
@@ -9867,33 +9890,68 @@ function increasePetLevel(levels) {
     updateTitle();
 }
 
+let absorbCount = 0; // 跟踪连续使用次数
+
 function absorbExperience() {
+    absorbCount++;
+
     const advancedItem = jinnangItems.find(i => i.name === 'advancedExperienceBook');
     const normalItem = jinnangItems.find(i => i.name === 'normalExperienceBook');
 
+    if (absorbCount >= 5) {
+        showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
+            // 玩家选择确认，进入自动使用循环
+            while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
+                if (petLevel >= petMaxLevel) {
+                    showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
+                    break;
+                }
+
+                if (advancedItem && advancedItem.quantity > 0) {
+                    useExperienceBook(advancedItem, 30000); // 使用高级经验书
+                } else if (normalItem && normalItem.quantity > 0) {
+                    useExperienceBook(normalItem, 10000); // 使用普通经验书
+                } else {
+                    break;
+                }
+            }
+            showInfoBox(`自动吸收完成，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
+            absorbCount = 0; // 重置计数器
+        }, () => {
+            // 玩家选择取消，继续单次使用逻辑
+            performSingleAbsorption(advancedItem, normalItem);
+            absorbCount = 0; // 重置计数器
+        });
+    } else {
+        performSingleAbsorption(advancedItem, normalItem);
+    }
+}
+
+function performSingleAbsorption(advancedItem, normalItem) {
     if (advancedItem && advancedItem.quantity > 0) {
-        useExperienceBook(advancedItem, 3);
+        useExperienceBook(advancedItem, 30000); // 使用高级经验书，增加30000经验值
+        showInfoBox(`自动使用高级经验书，获得30000经验值，当前经验为${currentExp} / ${maxExp}`);
     } else if (normalItem && normalItem.quantity > 0) {
-        useExperienceBook(normalItem, 1);
+        useExperienceBook(normalItem, 10000); // 使用普通经验书，增加10000经验值
+        showInfoBox(`自动使用普通经验书，获得10000经验值，当前经验为${currentExp} / ${maxExp}`);
     } else {
         showInfoBox("您的经验书不足，无法吸收经验！");
     }
 }
 
-function useExperienceBook(item, levelIncrease) {
+function useExperienceBook(item, expAmount) {
     if (petLevel >= petMaxLevel) {
         showInfoBox("宠物等级已达上限，无法继续升级！");
-        return;
-    }
-    if (petAscended && petLevel >= 190) {
-        showInfoBox("强者唯有历经战场的淬炼，潜力才会得到更惊人的激发！");
         return;
     }
 
     item.quantity--;
     updateJinnangItems();
-    increasePetLevel(levelIncrease);
+    
+    // 调用 gainExp 函数处理经验值增长、升级逻辑
+    gainExp(expAmount);
 }
+
         
 function updateAscensionStatus() {
     const ascensionStatusElement = document.getElementById('ascension-status');
@@ -10262,9 +10320,9 @@ function selectReward(rewardList) {
 // 新增全局变量
 let jinnangCapacity = 2000;
 let jinnangItems = [
-    { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后等级+1' },
+    { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
-    { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后等级+3' },
+    { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后获得30000经验值' },
     { name: 'awakenPill', displayName: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', price: 500, quantity: 0, description: '宠物觉醒时必不可少的玄妙丹药' },
     { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', price: 300, quantity: 0, description: '开启宠物幻化的必要道具' },
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
@@ -13073,7 +13131,7 @@ function updateSkillScore(selectedSkills = []) {
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
     const calculatePlayerCultivation = (totalScore) => {
-        let playerCultivation;
+        
         
         if (currentSpecialization === '慧光辉耀') {
             const spec = specializations['慧光辉耀'];
@@ -13093,7 +13151,7 @@ function updateSkillScore(selectedSkills = []) {
     const playerCultivationElement = document.getElementById("player-cultivation");
     const playerCultivationCalculation = calculatePlayerCultivation(totalScore);
     
-    playerCultivation = playerCultivationCalculation; //玩家修为赋值
+    playerCultivation += playerCultivationCalculation; //玩家修为赋值
     
     skillScoreElement.innerText = totalScore;
     playerCultivationElement.innerText = playerCultivation;
@@ -14492,10 +14550,10 @@ window.onload = function() {
     updateQualityCard();
     updateGoldDisplay(goldAmount);
     updateAttributePanel();
+    updateExpBar();
     updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
     document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
     checkAwakening(); // 检查宠物觉醒状态
-    updateExpBar(); // 更新经验条
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
 }
         

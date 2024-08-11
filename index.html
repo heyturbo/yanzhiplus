@@ -1971,7 +1971,7 @@
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
                     <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
-                    <div style="margin-bottom: 5px; position: relative; width: 100%; height: 12px; background-color: gray; border-radius: 5px;" id="exp-bar-container">
+                    <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 12px; background-color: gray; border-radius: 5px;" id="exp-bar-container">
                         <div style="position: absolute; left: 0; top: 0; height: 100%; width: 0; background: linear-gradient(to bottom, #4B0082, #9370DB, #4B0082); border-radius: 5px;" id="exp-bar"></div>
                         <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
                     </div>
@@ -3326,8 +3326,8 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
     infoBox.style.width = '85%'; // 增加宽度
-    infoBox.style.maxWidth = '600px'; // 限制最大宽度
-    infoBox.style.maxHeight = '60%'; // 限制最大高度
+    infoBox.style.maxWidth = '300px'; // 限制最大宽度
+    infoBox.style.maxHeight = '50%'; // 限制最大高度
     infoBox.style.overflowY = 'auto'; // 添加垂直滚动条
     infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
     infoBox.style.color = 'white';
@@ -4248,7 +4248,7 @@ let drugInventory = {
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
-    "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗10000当前经验转化为1000点修为值" },
+    "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得50000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
@@ -4294,7 +4294,7 @@ const ascensionSkills = {
         { name: '力劈华山', effect: level => `额外提供${50000 + level * 3500}点物理攻击力`, baseValue: 50000, increment: level => level * 3500 },
         { name: '慈悲心怀', effect: level => `额外提供${500000 + level * 20000}点生命值和${200000 + level * 20000}点法力值`, baseValue: 500000, increment: level => 20000 * level },
         { name: '势如破竹', effect: level => `额外提供${20000 + 3000 * level}点速度和${40000 + 3000 * level}点法术攻击力`, baseValue: 20000, increment: level => 3000 * level },
-        { name: '固若金汤', effect: level => `额外提供${100000 + 20000 * level}点物理防御和${100000 + 20000 * level}点法术防御`, baseValue: 100000, increment: level => 20000 * level },
+        { name: '固若金汤', effect: level => `额外提供${2000000 + 200000 * level}点物理防御和${2000000 + 200000 * level}点法术防御`, baseValue: 2000000, increment: level => 200000 * level },
         { name: '未开启', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 },
         { name: '被封印的技能', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 }
     ],
@@ -4303,7 +4303,7 @@ const ascensionSkills = {
         { name: '斩龙一式', effect: level => `当深渊巨魔生命值在${87 - 3 * (level - 1)}%以上时，对深渊巨魔的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
         { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给深渊巨魔附加等同于玩家物理攻击力1000%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
-        { name: '无我之境', effect: level => `当玩家受击时，有${11 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
+        { name: '无我之境', effect: level => `当玩家受击时，有${21 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${45 + 2 * level}%~${60 + 2 * level}%`, baseValue: 35, increment: level => 2 * level },
         { name: '铜墙铁壁', effect: level => `承受伤害降低${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
@@ -4581,13 +4581,22 @@ function gainExp(expToAdd = 0) {
     // 计算非线性经验值增长，如果expToAdd为0，则使用默认战斗经验值增长
     const gainedExp = expToAdd > 0 
         ? expToAdd 
-        : Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier);
+        : (petLevel >= 200 
+            ? Math.floor(Math.random() * (2288 - 1288 + 1)) + 1288 
+            : Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier));
 
     let totalGainedExp = currentExp + gainedExp;
 
     while (totalGainedExp >= maxExp) {
         totalGainedExp -= maxExp; // 保存多余的经验值
-        
+
+        // 当宠物等级为200时，不再增长 maxExp，并且退出循环
+        if (petLevel == 200) {
+            maxExp = 99999999999999999999; // 设置 maxExp 为 99999999999999999999
+            logBattleEvent("宠物已达到最高等级，经验值上限被设为最大值。", "pink");
+            break; // 退出循环
+        }
+
         // 确定 maxExp 的增量
         let increment;
         if (petLevel < 100 && battleRounds < 100) {
@@ -4596,22 +4605,19 @@ function gainExp(expToAdd = 0) {
             increment = Math.floor(Math.random() * (1800 - 1200 + 1)) + 1200;
         } else if (petLevel >= 181 && petLevel <= 200 && battleRounds >= 141 && battleRounds <= 150) {
             increment = Math.floor(Math.random() * (3600 - 2000 + 1)) + 2000;
-        } else if (petLevel == 200 && battleRounds > 150) {
-            maxExp = Math.floor(maxExp * 1.85); // 按照固定倍数增长
-            continue; // 跳过本次循环剩余部分，直接进入下一次循环
         } else {
             increment = Math.floor(Math.random() * (3600 - 600 + 1)) + 600; // 默认增长规则
         }
-        
+
         maxExp += increment; // 根据规则增长 maxExp
 
-        if (petLevel >= 200) {
+        if (petLevel < 200) {
+            logBattleEvent("恭喜您升级了！", "pink");
+            increasePetLevel(1); // 提升宠物一级
+        } else {
             logBattleEvent("宠物已达到最高等级，经验转化为普通经验书！", "pink");
             addItemToJinnang('normalExperienceBook');
             updateJinnangItems();
-        } else {
-            logBattleEvent("恭喜您升级了！", "pink");
-            increasePetLevel(1); // 提升宠物一级
         }
     }
 
@@ -4625,6 +4631,8 @@ function gainExp(expToAdd = 0) {
 
     updateExpBar(); // 更新经验条显示
 }
+
+
         
 function updateExpBar() {
   const expBar = document.getElementById('exp-bar');
@@ -5068,7 +5076,8 @@ function updateUI() {
     document.getElementById("your-pet-magic-attack").innerText = battleAttributes.magicAttack;
     document.getElementById("your-pet-magic-defense").innerText = battleAttributes.magicDefense;
     document.getElementById("your-pet-speed").innerText = battleAttributes.speed;
-    document.getElementById("your-pet-cultivation").innerText = playerCultivation;
+    document.getElementById("your-pet-cultivation").innerText = playerCultivation; //玩家修为
+    document.getElementById("player-cultivation").innerText = playerCultivation;
 
     document.getElementById("enemy-pet-physical-attack").innerText = battleState.enemy.physicalAttack;
     document.getElementById("enemy-pet-physical-defense").innerText = battleState.enemy.physicalDefense;
@@ -6404,7 +6413,8 @@ function handleDamageReduction(damage) {
 
     if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
         damage = 0;
-        logBattleEvent("无我之境触发，玩家免疫一切伤害！", 'silver');
+        logBattleEvent("遁入无我之境！", 'silver');
+        showBattleOverlay("https://pic.imgdb.cn/item/66b86c3ad9c307b7e93202e9.gif", 3000, 0.8);
         return;
     }
 
@@ -7343,12 +7353,31 @@ function useSelectedDrug() {
                 }, healthInterval);
                 break;
             case "魔术棱柱":
-                if (currentExp >= 10000) {
-                    currentExp -= 10000; // 消耗10000点经验值
-                    playerCultivation += 1000; // 增加1000点修为值
+                if (currentExp >= 30000) {
+                    const upgradableSkills = currentPet.skills.filter(skill => skill.level < 24);
+                    
+                    if (upgradableSkills.length === 0) {
+                        showInfoBox("所有技能已达到24级，无法使用魔术棱柱。");
+                        break;
+                    }
+                    
+                    currentExp -= 30000; // 消耗30000点经验值
+                    
+                    // 随机选择一个技能并提升一级
+                    let skillToUpgrade = upgradableSkills[Math.floor(Math.random() * upgradableSkills.length)];
+                    
+                    if (skillToUpgrade.level >= 24) {
+                        // 如果随机选择的技能已经24级，则遍历其他技能进行升级
+                        skillToUpgrade = upgradableSkills.find(skill => skill.level < 24);
+                    }
+                    
+                    if (skillToUpgrade) {
+                        skillToUpgrade.level += 1;
+                        showInfoBox(`你消耗了30000点经验值，将${skillToUpgrade.name} 成功升至 ${skillToUpgrade.level} 级，威力增加了！`);
+                    }
+                    
                     updateExpBar(); // 更新经验条显示
                     updateUI(); // 更新界面显示
-                    logBattleEvent(`使用魔术棱柱，消耗10000点经验值转换为1000点修为。`, 'gold');
                 } else {
                     showInfoBox("经验不足，无法使用魔术棱柱。");
                 }
@@ -8020,8 +8049,8 @@ function handleSpiritHeal() {
         return;
     }
     
-    const baseProbability = 0.02;
-    const finalProbability = baseProbability + spiritMultiplier / 300;
+    const baseProbability = 0.01;
+    const finalProbability = baseProbability + spiritMultiplier / 400;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
@@ -8030,7 +8059,6 @@ function handleSpiritHeal() {
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f040.gif", 3000, 0.5);
         updateUI();
     }
 } //战斗精灵的随机回血
@@ -8041,7 +8069,7 @@ function handleSpiritPower() {
     }
     
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 300;
+    const finalProbability = baseProbability + spiritMultiplier / 400;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability && !spiritPowerActive) {
@@ -8065,7 +8093,6 @@ function handleSpiritPower() {
         });
 
         logBattleEvent(`🧚🏻‍♀️Bless from your best teammate！战斗精灵带来全属性提升！`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f00c.gif", 3000, 0.5);
         updateUI();
 
         // Remove the boost after 5 seconds
@@ -8087,7 +8114,7 @@ function handleSpiritAttack() {
     }
     
     const baseProbability = 0.01;
-    const finalProbability = baseProbability + spiritMultiplier / 300;
+    const finalProbability = baseProbability + spiritMultiplier / 400;
     const triggerProbability = Math.round(finalProbability * 100);
 
     if (Math.random() * 100 < triggerProbability) {
@@ -8096,7 +8123,6 @@ function handleSpiritAttack() {
         battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
 
         logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害！`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/66a7aa22d9c307b7e944f035.gif", 3000, 0.5);
         
         if (battleState.enemy.health <= 0) {
             updateEnemyAttributes();
@@ -8375,7 +8401,7 @@ function applySingleAscensionBonus(skill, attributes) {
             break;
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
-            attributes.magicDefense += 100000 + skill.increment(skill.level);
+            attributes.magicDefense += 2000000 + skill.increment(skill.level);
             break;
         // 其他技能增益逻辑...
     }
@@ -9987,7 +10013,7 @@ function ascend() {
     updateJinnangItems();
 
     // Update pet's max level and ascension status
-    petMaxLevel = 200;
+    petMaxLevel = 201;
     petAscended = true;
     updateAscensionStatus();
 
@@ -13055,6 +13081,24 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
 }
 
+function calculatePlayerCultivation(totalScore) {
+    let playerCultivation;
+
+    if (currentSpecialization === '慧光辉耀') {
+        const spec = specializations['慧光辉耀'];
+        const multiplier = Math.min(1 + (spec.level * 0.025), 4);
+        playerCultivation = Math.round(totalScore / 128 * multiplier);
+    } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
+        const spec = specializations[currentSpecialization];
+        const multiplier = Math.min(1 + (spec.level * 0.017), 2);
+        playerCultivation = Math.round(totalScore / 128 * multiplier);
+    } else {
+        playerCultivation = Math.round(totalScore / 128);
+    }
+
+    return playerCultivation;
+}
+
 function updateSkillScore(selectedSkills = []) {
     // 计算资质评分
     const petQualities = currentPet.qualities;
@@ -13087,7 +13131,7 @@ function updateSkillScore(selectedSkills = []) {
 
     const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
-    //计算药物附加值
+    // 计算药物附加值
     const drugHealth = drugBonus.health;
     const drugMana = drugBonus.mana;
     const drugPhysicalAttack = drugBonus.physicalAttack;
@@ -13130,28 +13174,12 @@ function updateSkillScore(selectedSkills = []) {
 
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
-    const calculatePlayerCultivation = (totalScore) => {
-        
-        
-        if (currentSpecialization === '慧光辉耀') {
-            const spec = specializations['慧光辉耀'];
-            const multiplier = Math.min(1 + (spec.level * 0.025), 4);
-            playerCultivation = Math.round(totalScore / 128 * multiplier);
-        } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
-            const spec = specializations[currentSpecialization];
-            const multiplier = Math.min(1 + (spec.level * 0.017), 2);
-            playerCultivation = Math.round(totalScore / 128 * multiplier);
-        } else {
-            playerCultivation = Math.round(totalScore / 128);
-        }
-        
-        return playerCultivation;
-    };
+
+    // 计算修为值
+    playerCultivation = calculatePlayerCultivation(totalScore);
+
     const skillScoreElement = document.getElementById("skill-score");
     const playerCultivationElement = document.getElementById("player-cultivation");
-    const playerCultivationCalculation = calculatePlayerCultivation(totalScore);
-    
-    playerCultivation += playerCultivationCalculation; //玩家修为赋值
     
     skillScoreElement.innerText = totalScore;
     playerCultivationElement.innerText = playerCultivation;
@@ -14130,7 +14158,7 @@ function increasePetLevelCheat(levels) {
 }
 
 function ascendCheat() {
-    petMaxLevel = 200;
+    petMaxLevel = 201;
     petAscended = true;
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");

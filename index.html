@@ -3792,6 +3792,7 @@ function restorePetData(petName) {
         playerCritRate = savedPetData.playerCritRate;
         playerCritDamage = savedPetData.playerCritDamage;
         playerCultivation = savedPetData.playerCultivation;
+        additionalPlayerCultivation = savedPetData.additionalPlayerCultivation;
         enemyPetCultivation = savedPetData.enemyPetCultivation;
         enemyCritRate = savedPetData.enemyCritRate;
         enemyCritDamage = savedPetData.enemyCritDamage;
@@ -13115,6 +13116,8 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
 }
 
+let cultivationTime; // 提取共用的时间参数
+
 function upgradePlayerCultivation() {
     // 提示玩家是否进行修炼
     showInfoBox("你可以使用1个仙人醍醐进行修炼，修炼时间为1分钟，修炼结束后会获得一定数量的修为，确认请继续", () => {
@@ -13122,7 +13125,8 @@ function upgradePlayerCultivation() {
         const ultraSkillBoomerItem = jinnangItems.find(i => i.name === 'ultraSkillBoomer');
         if (ultraSkillBoomerItem.quantity > 0) {
             useItem('ultraSkillBoomer', 1);
-            startCultivationProcess(60); // 默认修炼时间60秒
+            cultivationTime = 60; // 默认修炼时间60秒
+            startCultivationProcess(); // 开始修炼过程
         } else {
             showInfoBox("必要道具不足，无法进行修炼。");
         }
@@ -13132,9 +13136,7 @@ function upgradePlayerCultivation() {
     });
 }
 
-function startCultivationProcess(initialTime) {
-    let cultivationTime = initialTime;
-
+function startCultivationProcess() {
     // 创建修炼界面
     const cultivationInterface = document.createElement("div");
     cultivationInterface.style = `
@@ -13143,7 +13145,8 @@ function startCultivationProcess(initialTime) {
         left: 5%;
         width: 80%;
         height: 25%;
-        border-radius: 10px;
+        border-radius: 20px;
+        border: 2px solid lightblue;
         background-image: url(https://pic.imgdb.cn/item/66ba4084d9c307b7e9967b45.gif);
         background-position: center;
         background-size: contain;
@@ -13163,6 +13166,7 @@ function startCultivationProcess(initialTime) {
         height: 40px;
         background-color: rgb(105, 105, 105);
         box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 0 10px rgba(20, 144, 194, 0.8);
         border-radius: 20px;
         overflow: hidden;
         position: relative;
@@ -13175,6 +13179,7 @@ function startCultivationProcess(initialTime) {
         height: 100%;
         width: 0%;
         background: linear-gradient(to bottom, #63786E, #94A69E, #63786E);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
         position: absolute;
         top: 0;
         left: 0;
@@ -13207,7 +13212,7 @@ function startCultivationProcess(initialTime) {
         font-size: 14px;
     `;
     speedUpButton.addEventListener("click", () => {
-        speedUpCultivation(progress, cultivationTime, timeRemaining, updateProgress);
+        speedUpCultivation(progress, timeRemaining, updateProgress);
     });
     
     // 创建“停止修炼”按钮
@@ -13226,7 +13231,7 @@ function startCultivationProcess(initialTime) {
         showInfoBox("若取消修炼，宠物的修炼会被终止而无任何收益，且消耗的道具不会被归还，确认请继续", () => {
             document.body.removeChild(cultivationInterface);
             clearInterval(progressInterval); // 清除进度条更新
-            showInfoBox("你已停止修炼，未获得任何修为。");
+            showInfoBox("你已停止修炼。");
         });
     });
 
@@ -13238,7 +13243,7 @@ function startCultivationProcess(initialTime) {
         margin-left: 10px;
         margin-right: 10px;
     `;
-    updateTimeRemaining(timeRemaining, cultivationTime);
+    updateTimeRemaining(timeRemaining);
 
     buttonContainer.appendChild(speedUpButton);
     buttonContainer.appendChild(timeRemaining);
@@ -13248,23 +13253,67 @@ function startCultivationProcess(initialTime) {
     document.body.appendChild(cultivationInterface);
     
     // 开始修炼过程和进度条更新
-    let progressInterval = startProgressUpdate(progress, timeRemaining, cultivationTime, updateProgress);
+    let progressInterval = startProgressUpdate(progress, timeRemaining, updateProgress);
 }
 
-function startProgressUpdate(progress, timeRemaining, cultivationTime, updateProgress) {
+// 更新剩余时间显示和进度条
+function updateProgress(progress, timeRemaining) {
+    progress.style.width = `${((60 - cultivationTime) / 60) * 100}%`;
+    updateTimeRemaining(timeRemaining);
+}
+
+function updateTimeRemaining(element) {
+    const minutes = Math.floor(cultivationTime / 60);
+    const seconds = cultivationTime % 60;
+    element.innerText = `剩余时间：${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
+let totalGainedCultivation = 0; // 全局变量，用于累加修为值
+
+function speedUpCultivation(progress, timeRemainingElement, updateProgress) {
+    const usedBoomers = prompt("你可以投入更多仙人醍醐加速修炼过程并得到更显著的修炼成果，请输入愿意花费的仙人醍醐数量：");
+    const boomerCount = parseInt(usedBoomers, 10);
+    const ultraSkillBoomerItem = jinnangItems.find(i => i.name === 'ultraSkillBoomer');
+    
+    if (boomerCount > 0 && boomerCount <= ultraSkillBoomerItem.quantity) {
+        useItem('ultraSkillBoomer', boomerCount);
+        cultivationTime -= boomerCount * 10;
+        cultivationTime = Math.max(cultivationTime, 1); // 修炼时间不能小于1秒
+
+        // 立即更新进度条和剩余时间显示
+        updateProgress(progress, timeRemainingElement);
+
+        const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100 + boomerCount * 66;
+        totalGainedCultivation += gainedCultivation; // 累加获得的修为值
+        additionalPlayerCultivation += totalGainedCultivation;
+
+        // 如果还有剩余时间，继续计时
+        if (cultivationTime > 0) {
+            startProgressUpdate(progress, timeRemainingElement, updateProgress);
+        } else {
+            document.body.removeChild(progress.parentElement.parentElement);
+            showInfoBox(`修炼结束，你通过加速额外获得了 ${totalGainedCultivation} 点修为。`);
+            totalGainedCultivation = 0; // 重置累计修为值
+        }
+    } else {
+        showInfoBox("输入数量无效或超出拥有的数量。");
+    }
+}
+
+function startProgressUpdate(progress, timeRemaining, updateProgress) {
     let isCultivationFinished = false;  // 用于标记修炼是否已经结束
 
-    return setInterval(() => {
+    const intervalId = setInterval(() => {
         // 如果修炼已经结束，立即退出
         if (isCultivationFinished) return;
 
         cultivationTime--;
-        updateProgress(progress, timeRemaining, cultivationTime);
+        updateProgress(progress, timeRemaining);
 
         if (cultivationTime <= 0) {
             isCultivationFinished = true;  // 标记修炼结束
 
-            clearInterval(progress.interval);
+            clearInterval(intervalId);  // 停止定时器
 
             // 检查界面元素是否存在
             const cultivationInterface = progress.parentElement.parentElement;
@@ -13273,54 +13322,17 @@ function startProgressUpdate(progress, timeRemaining, cultivationTime, updatePro
             }
 
             // 计算并添加修为值
-            const gainedCultivation = Math.floor(Math.random() * (500 - 100 + 1)) + 100;
-            additionalPlayerCultivation += gainedCultivation;
+            const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
+            totalGainedCultivation += gainedCultivation; // 累加获得的修为值
+            additionalPlayerCultivation += totalGainedCultivation;
 
-            showInfoBox(`修炼结束，你获得了 ${gainedCultivation} 点修为。`);
+            showInfoBox(`修炼结束，本次修炼你获得了 ${totalGainedCultivation} 点修为。`);
+            totalGainedCultivation = 0; // 重置累计修为值
         }
     }, 1000);
 }
 
 
-// 更新剩余时间显示和进度条
-function updateProgress(progress, timeRemaining, cultivationTime) {
-    progress.style.width = `${((60 - cultivationTime) / 60) * 100}%`;
-    updateTimeRemaining(timeRemaining, cultivationTime);
-}
-
-function speedUpCultivation(progress, remainingTime, timeRemainingElement, updateProgress) {
-    const usedBoomers = prompt("请输入愿意花费的仙人醍醐数量：");
-    const boomerCount = parseInt(usedBoomers, 10);
-    const ultraSkillBoomerItem = jinnangItems.find(i => i.name === 'ultraSkillBoomer');
-    
-    if (boomerCount > 0 && boomerCount <= ultraSkillBoomerItem.quantity) {
-        useItem('ultraSkillBoomer', boomerCount);
-        remainingTime -= boomerCount * 10;
-        remainingTime = Math.max(remainingTime, 1); // 修炼时间不能小于1秒
-
-        // 立即更新进度条和剩余时间显示
-        updateProgress(progress, timeRemainingElement, remainingTime);
-
-        const gainedCultivation = Math.floor(Math.random() * (500 - 100 + 1)) + 100 + boomerCount * 100;
-        additionalPlayerCultivation += gainedCultivation;
-
-        // 如果还有剩余时间，继续计时
-        if (remainingTime > 0) {
-            startProgressUpdate(progress, timeRemainingElement, remainingTime, updateProgress);
-        } else {
-            document.body.removeChild(progress.parentElement.parentElement);
-            showInfoBox(`修炼结束，你通过加速获得了 ${gainedCultination} 点修为。`);
-        }
-    } else {
-        showInfoBox("输入数量无效或超出拥有的数量。");
-    }
-}
-
-function updateTimeRemaining(element, time) {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    element.innerText = `剩余时间：${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
         
 function calculatePlayerCultivation(totalScore) {
     let playerCultivation;
@@ -15108,6 +15120,7 @@ function loadGameState() {
         playerCritRate = savedState.playerCritRate;
         playerCritDamage = savedState.playerCritDamage;
         playerCultivation = savedState.playerCultivation;
+        additionalPlayerCultivation = savedState.additionalPlayerCultivation;
         enemyPetCultivation = savedState.enemyPetCultivation;
         enemyCritRate = savedState.enemyCritRate;
         enemyCritDamage = savedState.enemyCritDamage;

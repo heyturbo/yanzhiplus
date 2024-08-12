@@ -4582,7 +4582,7 @@ function gainExp(expToAdd = 0) {
     const gainedExp = expToAdd > 0 
         ? expToAdd 
         : (petLevel >= 200 
-            ? Math.floor(Math.random() * (2288 - 1288 + 1)) + 1288 
+            ? Math.floor(Math.random() * (2288 - 1288 + 1) * expMultiplier) + 1288
             : Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier));
 
     let totalGainedExp = currentExp + gainedExp;
@@ -4830,11 +4830,11 @@ function updatePetInfo() {
         battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense;
         battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed;
 
-        if (ascensionSkill.name && ascensionEnabled) {
+        if (ascensionSkill.name && ascensionEnabled && ascensionSkill.name !== "被封印的技能") {
             battleState.player.originalAscensionSkill = ascensionSkill.name;
         }
 
-        if (secondAscensionSkill.name && reenableAscension) {
+        if (secondAscensionSkill.name && reenableAscension && ascensionSkill.name !== "被封印的技能") {
             battleState.player.originalSecondAscensionSkill = secondAscensionSkill.name;
         }
     }
@@ -4845,6 +4845,10 @@ function updatePetInfo() {
     
     if (playerCritRate > 1) {
         playerCritRate = 1;
+    }
+
+    if (playerCritDamage > 30) {
+        playerCritDamage = 30;
     }
 
     updateUI();
@@ -5003,6 +5007,7 @@ function updateEnemyStatusDisplay() {
 function getPlayerStatus() {
     let status = [];
     if (battleState.player.defensing) status.push("蓄力中");
+    if (battleState.player.shielded) status.push("护盾");
     if (battleState.player.spiritPowerActive) status.push("Blessing!");
     if (battleState.player.divineProtection) status.push("仙气护体");
     if (battleState.player.drunken) status.push("醉酒");
@@ -5102,6 +5107,7 @@ function updateUI() {
     enemyLevel = battleRounds;
     document.getElementById('enemy-level').innerText = enemyLevel;
     updatePetLevel();
+    getShieldStatus();
     updateHealthAndManaDisplay();
 }
 
@@ -5755,7 +5761,7 @@ function performPoison() {
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级 ，毒性大大加强。`, '#C10066');
     }
 
-    const manaCost = Math.floor(maxMana * 0.2);
+    const manaCost = Math.floor(maxMana * 0.4);
     if (battleAttributes.mana < manaCost) {
         logBattleEvent("您的法力值不足，无法使用施毒之法！", 'red');
         return;
@@ -5786,8 +5792,8 @@ function performPoison() {
 } //中毒伤害函数
 
 function handlePoison(skillMultiplier = 1) {
-    const basePoisonDuration = 3000; // 基础持续时间3秒
-    const additionalPoisonDuration = Math.round(playerCultivation / 40000) * 1000; // 计算附加的持续时间，以毫秒为单位
+    const basePoisonDuration = 1000; // 基础持续时间1秒
+    const additionalPoisonDuration = Math.round(playerCultivation / 240000) * 1000; // 计算附加的持续时间，以毫秒为单位
     const totalPoisonDuration = basePoisonDuration + additionalPoisonDuration; // 总持续时间
 
     let remainingDuration = totalPoisonDuration; // 初始化剩余时间
@@ -5811,11 +5817,12 @@ function handlePoison(skillMultiplier = 1) {
 
         if (battleState.enemy.health <= 0) {
             clearInterval(poisonInterval);
+            battleState.enemy.poisoned = false;
             updateEnemyAttributes();
             showNextBattlePrompt(true);
             return;
         }
-    }, 500); // 每秒触发一次
+    }, 100); // 每0.1秒触发一次
 
     setTimeout(() => {
         battleState.enemy.poisoned = false;
@@ -6186,6 +6193,14 @@ function handleSleep() {
 
 
 
+function getShieldStatus() {
+    if (extraShield !== 0) {
+        battleState.player.shielded = true;
+    } else {
+        battleState.player.shielded = false;
+    }
+}
+
 // 【玩家辅助】玩家回血、产盾函数
 function performHeal() {
     if (!attributesFetched) {
@@ -6242,6 +6257,14 @@ function performHeal() {
 
     const healAmount = handleHealingBan(skillMultiplier);
 
+    if (battleAttributes.health + healAmount > maxHealth) {
+        // 溢出部分转化为护盾
+        const overflowAmount = battleAttributes.health + healAmount - maxHealth;
+        const shieldAmount = Math.floor(overflowAmount * 0.01);
+        extraShield += shieldAmount;
+        console.log(`护盾为${extraShield}`);
+    }
+
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
@@ -6253,8 +6276,10 @@ function performHeal() {
     playerTurn = false; // 轮到深渊巨魔回合
     enemyAttack();
     applyAscensionEffects();
+    getShieldStatus();
     updateUI();
 }
+
 
 function handleDivineProtection(selectedSkills, skillLevel) {
     let divineProtectionChance = 0.05;
@@ -6399,6 +6424,7 @@ function performDefense() {
     applyDefenseBonus(selectedSkillName);
     playerTurn = false;
     setTimeout(enemyAttack, 500);
+    getShieldStatus();
 
     applyAscensionEffects();
     updateUI();
@@ -6484,6 +6510,7 @@ function handleDamageReduction(damage) {
     wiseDefenseManaCost = 0;
             
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，飞升技能抵挡 ${totalDamageReduction} 点伤害。目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
+    getShieldStatus();
 }
 
 function handleWiseDefense(damage) {
@@ -6518,10 +6545,11 @@ function handleWiseDefense(damage) {
         wiseDefenseManaCost = manaUsed; //此变量用于外部调用该数值并进行显示
 
         console.log(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`);
+        
 
     }
-
     return finalDamage;
+    getShieldStatus();
 }
 
 function applyDefenseBonus(selectedSkillName) {

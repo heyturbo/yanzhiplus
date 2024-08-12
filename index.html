@@ -5815,15 +5815,16 @@ function handlePoison(skillMultiplier = 1) {
         updateUI();
         updateEnemyStatusDisplay();
 
-        if (battleState.enemy.health <= 0) {
-            clearInterval(poisonInterval);
-            battleState.enemy.poisoned = false;
-            updateEnemyAttributes();
-            showNextBattlePrompt(true);
-            return;
-        }
     }, 100); // 每0.1秒触发一次
-
+    
+    if (battleState.enemy.health <= 0) {
+        clearInterval(poisonInterval);
+        battleState.enemy.poisoned = false;
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    }
+    
     setTimeout(() => {
         battleState.enemy.poisoned = false;
         clearInterval(poisonInterval);

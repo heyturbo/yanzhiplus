@@ -17,6 +17,95 @@
             margin: 0;
             padding: 0;
         }
+        #petOverview {
+            display: none; /* 默认隐藏 */
+            position: absolute;
+            top: 10%;
+            left: 2%;
+            width: 90%;
+            height: 70%;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            overflow-y: scroll;
+            padding: 10px;
+            z-index: 1000;
+            border: 1px solid white;
+        }
+        .close-button {
+            display: flex;
+            top: 10px;
+            right: 10px;
+            width: 100%;
+            background-color: hsl(0deg 0% 100% / 0%);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            padding: 5px 10px;
+            flex-direction: row-reverse;
+        }
+        .pet-container {
+            background-color: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin: 10px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            color: white;
+            border: 1px solid white;
+        }
+        .pet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .pet-header h2 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .pet-status {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+            flex-direction: row;
+        }
+        .pet-status div {
+            width: 30%;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .pet-progress {
+            width: 100%;
+            height: 30px;
+            background-color: #aaa;
+            border: 1px solid white;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        .pet-progress div {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to bottom, #00f, #0cf, #00f);
+        }
+        .pet-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .pet-buttons button {
+            flex: 0.25;
+            padding: 5px;
+            background-color: #0056b3;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            border: 1px solid white;
+        }
+        .pet-buttons button:active {
+            background-color: #004373;
+        }
             /* 防止 "pull-to-refresh" 行为 */
     @media screen and (pointer: coarse) {
     @supports (-webkit-backdrop-filter: blur(1px)) {
@@ -1671,6 +1760,11 @@
             <div id="progressBar"></div>
         </div>
     </div>
+    <div id="petOverview">
+        <!-- 关闭按钮 -->
+        <button class="close-button" onclick="togglePetOverview()">关闭</button>
+        <!-- Pet containers will be dynamically generated here -->
+    </div>
     <div class="core-area-for-skills">
         <div class="buttons">
             <div class="button-row">
@@ -1828,7 +1922,7 @@
                             飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
                         </div>
                         <div class="progress-bar">
-                            <button onclick="infoPingfenpaihang()">🔝</button>评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                            <button onclick="togglePetOverview()">🔝</button>评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
                         </div>
                         <div class="progress-bar">
                             <button onclick="infoXiuwei()">?</button>修为: <span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
@@ -3171,34 +3265,139 @@ function infoFeisheng() {
 function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高");
 }
-function infoPingfenpaihang() {
-    const savedPets = [];
 
-    // 遍历 localStorage 中所有的宠物数据
+let petStates = []; // 全局数组存储每个宠物的状态
+function togglePetOverview() {
+    const petOverview = document.getElementById('petOverview');
+    petOverview.style.display = petOverview.style.display === 'none' ? 'block' : 'none';
+}
+
+function startPetWork() {
+    petStates.forEach((petState, index) => {
+        petState.progressInterval = setInterval(() => {
+            if (petState.mood > 0 && petState.stamina > 0) {
+                const timeFactor = 1 + (100 - petState.mood) / 100; // 心情越低，速度越慢
+                const gainFactor = 1 - (100 - petState.stamina) / 100; // 体力越低，收益越低
+
+                petState.progressBar.style.width = `${Math.min(100, parseFloat(petState.progressBar.style.width) + 1 / timeFactor)}%`;
+
+                if (parseFloat(petState.progressBar.style.width) >= 100) {
+                    petState.progressBar.style.width = '0%';
+                    petState.mood = Math.max(0, petState.mood - 1);
+                    petState.stamina = Math.max(0, petState.stamina - 1);
+
+                    // 更新心情和体力显示
+                    document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
+                    document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
+
+                    // 计算获得的金钱
+                    const goldEarned = Math.floor(petState.goldAmount * gainFactor);
+                    goldAmount += goldEarned;
+                    updateGoldDisplay(goldAmount);
+
+                    if (petState.mood === 0 || petState.stamina === 0) {
+                        clearInterval(petState.progressInterval);
+                    }
+                }
+            }
+        }, 60000 / 100); // 1秒钟刷新进度条1%
+    });
+}
+
+function infoPingfenpaihang() {
+    const allPetData = [];
+
+    // 遍历 localStorage，提取所有保存的宠物数据
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith('petData_')) {
             const petData = JSON.parse(localStorage.getItem(key));
-            savedPets.push({
-                name: key.replace('petData_', ''), // 提取宠物名称
-                skillScore: petData.skillScore || 0 // 读取 skillScore，默认为 0
-            });
+            if (petData && petData.skillScore !== undefined) {
+                allPetData.push({
+                    petName: key.replace('petData_', ''),
+                    skillScore: petData.skillScore,
+                    goldAmount: Math.floor(petData.skillScore * 0.001),
+                });
+            }
         }
     }
 
-    // 根据 skillScore 从高到低排序
-    savedPets.sort((a, b) => b.skillScore - a.skillScore);
+    // 按照 skillScore 从高到低排序
+    allPetData.sort((a, b) => b.skillScore - a.skillScore);
 
-    // 构造显示信息
-    const displayLines = savedPets.map((pet, index) => `${index + 1}. ${pet.name} - 综合评分: ${pet.skillScore}`);
+    // 显示养成界面
+    const petOverview = document.getElementById('petOverview');
+    petOverview.innerHTML = '<button class="close-button" onclick="togglePetOverview()">关闭</button>'; // 清空之前的内容并保留关闭按钮
 
-    // 调用 showInfoBox 进行分行呈现
-    if (displayLines.length > 0) {
-        showInfoBox(displayLines.join('\n'));
+    allPetData.forEach((pet, index) => {
+        const petContainer = document.createElement('div');
+        petContainer.className = 'pet-container';
+
+        // 宠物信息和评分
+        petContainer.innerHTML = `
+            <div class="pet-header">
+                <h2>${index + 1}. ${pet.petName} 评分：${pet.skillScore}</h2>
+            </div>
+            <div class="pet-status">
+                <div>心情: <span id="mood-${index}">100%</span></div>
+                <div>体力: <span id="stamina-${index}">100%</span></div>
+            </div>
+            <div class="pet-progress">
+                <div id="progress-bar-${index}"></div>
+            </div>
+            <div class="pet-buttons">
+                <button onclick="play(${index})">玩耍</button>
+                <button onclick="rest(${index})">休息</button>
+                <button onclick="feed(${index}, ${pet.goldAmount})">喂食</button>
+            </div>
+        `;
+
+        petOverview.appendChild(petContainer);
+
+        // 初始化宠物状态
+        petStates[index] = {
+            mood: 100,
+            stamina: 100,
+            progressBar: document.getElementById(`progress-bar-${index}`),
+            goldAmount: pet.goldAmount,
+            progressInterval: null,
+        };
+    });
+
+    // 开始宠物打工
+    startPetWork();
+}
+
+function play(index) {
+    let mood = petStates[index].mood;
+    mood = Math.min(100, mood + 50);
+    petStates[index].mood = mood;
+    document.getElementById(`mood-${index}`).innerText = `${mood}%`;
+}
+
+function rest(index) {
+    let stamina = petStates[index].stamina;
+    petStates[index].progressBar.style.width = '0%'; // 重置进度条
+    petStates[index].stamina = Math.min(100, stamina + 20);
+    document.getElementById(`stamina-${index}`).innerText = `${stamina}%`;
+
+    setTimeout(() => {
+        petStates[index].stamina = Math.min(100, stamina + 20);
+        document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
+    }, 10000);
+}
+
+function feed(index, goldCost) {
+    if (goldAmount >= 10000) {
+        goldAmount -= 10000;
+        updateGoldDisplay(goldAmount);
+        petStates[index].stamina = 100;
+        document.getElementById(`stamina-${index}`).innerText = `100%`;
     } else {
-        showInfoBox('没有找到任何宠物数据。');
+        alert("金钱不足，无法喂食！");
     }
 }
+
 function infoXiuwei() {
     showInfoBox("\n1.修为主要由宠物等级和综合实力自动计算得来 \n2.修为在战斗中的作用至关重要，主要体现在施加战斗效果、延长施法时间、抵抗敌人控制类效果等 \n3.修为越高，赢得战局的可能性越大 \n4.如果你拥有珍贵的仙人醍醐，可以通过修炼提升修为 \n5.某些专精技能会提升修为计算的系数");
 }  
@@ -3784,6 +3983,7 @@ function storeCurrentPetData() {
             additionalPlayerCultivation: additionalPlayerCultivation,
             petMaxLevel: petMaxLevel,
             petWisdom: petWisdom,
+            petStates: petStates,
             awakened: awakened,
             awakenAttributes: awakenAttributes,
             baseAttributes: baseAttributes,
@@ -14989,6 +15189,7 @@ window.onload = function() {
     updatePetInfo(); // 更新宠物和深渊巨魔宠物的属性
     document.getElementById("fightingDrawer").style.display = "none"; // 默认隐藏战斗抽屉
     checkAwakening(); // 检查宠物觉醒状态
+    infoPingfenpaihang();
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
 }
         
@@ -15108,6 +15309,7 @@ function saveGameState() {
         petAscended: petAscended,
         petMaxLevel: petMaxLevel,
         petWisdom: petWisdom,
+        petStates: petStates,
         awakened: awakened,
         awakenAttributes: awakenAttributes,
         bonusAttributes: bonusAttributes,

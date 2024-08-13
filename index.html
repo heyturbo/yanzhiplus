@@ -3276,7 +3276,7 @@ function infoPingfen() {
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
-let petProgressIntervals = {}; // 全局对象存储每个宠物的打工定时器
+let petProgressIntervals = []; // 全局数组存储每个宠物的进度条定时器
 
 function togglePetOverview() {
     const petOverview = document.getElementById('petOverview');
@@ -3286,51 +3286,6 @@ function togglePetOverview() {
     if (petOverview.style.display === 'block') {
         infoPingfenpaihang();
     }
-}
-
-function startPetWork() {
-    petStates.forEach((petState, index) => {
-        // 先清除已有的定时器，防止重复
-        if (petProgressIntervals[index]) {
-            clearInterval(petProgressIntervals[index]);
-            petProgressIntervals[index] = null;
-        }
-
-        petProgressIntervals[index] = setInterval(() => {
-            if (petState.mood > 0 && petState.stamina > 0) {
-                const timeFactor = 1 + (100 - petState.mood) / 20; // 心情越低，速度越慢
-                const gainFactor = 1 - (100 - petState.stamina) / 100; // 体力越低，收益越低
-                
-                const currentWidth = parseFloat(petState.progressBar.style.width) || 0;
-                petState.progressBar.style.width = `${Math.min(100, currentWidth + 1 / timeFactor)}%`;
-
-                if (parseFloat(petState.progressBar.style.width) >= 100) {
-                    petState.progressBar.style.width = '0%';
-                    petState.mood = Math.max(0, petState.mood - 1);
-                    petState.stamina = Math.max(0, petState.stamina - 1);
-
-                    // 更新心情和体力显示
-                    document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
-                    document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
-                    document.getElementById(`current-gold`).innerText = `${convertPrice(goldAmount)}`;
-
-                    // 计算并更新实际收益显示
-                    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
-                    document.getElementById(`earnings-${index}`).innerText = updatedEarnings;
-
-                    // 计算获得的金钱
-                    const goldEarned = Math.floor(petState.goldAmount * gainFactor);
-                    goldAmount += goldEarned;
-                    updateGoldDisplay(goldAmount);
-
-                    if (petState.mood === 0 || petState.stamina === 0) {
-                        clearInterval(petProgressIntervals[index]);
-                        petProgressIntervals[index] = null; // 标记停止
-                    }
-                }
-            }
-        }, 5000 / 100); // 5秒钟刷新进度条100%
-    });
 }
 
 function infoPingfenpaihang() {
@@ -3412,6 +3367,50 @@ function infoPingfenpaihang() {
     startPetWork();
 }
 
+function startPetWork() {
+    petStates.forEach((petState, index) => {
+        // 先清除已有的定时器，防止重复
+        if (petProgressIntervals[index]) {
+            clearInterval(petProgressIntervals[index]);
+            petProgressIntervals[index] = null;
+        }
+
+        petProgressIntervals[index] = setInterval(() => {
+            if (petState.mood > 0 && petState.stamina > 0) {
+                const timeFactor = 1 + (100 - petState.mood) / 20; // 心情越低，速度越慢
+                const gainFactor = 1 - (100 - petState.stamina) / 100; // 体力越低，收益越低
+                
+                const currentWidth = parseFloat(petState.progressBar.style.width) || 0;
+                petState.progressBar.style.width = `${Math.min(100, currentWidth + 1 / timeFactor)}%`;
+
+                if (parseFloat(petState.progressBar.style.width) >= 100) {
+                    petState.progressBar.style.width = '0%';
+                    petState.mood = Math.max(0, petState.mood - 1);
+                    petState.stamina = Math.max(0, petState.stamina - 1);
+
+                    // 更新心情和体力显示
+                    document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
+                    document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
+
+                    // 计算并更新实际收益显示
+                    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+                    document.getElementById(`earnings-${index}`).innerText = updatedEarnings;
+
+                    // 计算获得的金钱
+                    const goldEarned = Math.floor(petState.goldAmount * gainFactor);
+                    goldAmount += goldEarned;
+                    updateGoldDisplay(goldAmount);
+
+                    if (petState.mood === 0 || petState.stamina === 0) {
+                        clearInterval(petProgressIntervals[index]);
+                        petProgressIntervals[index] = null; // 标记停止
+                    }
+                }
+            }
+        }, 5000 / 100); // 5秒钟刷新进度条100%
+    });
+}
+
 function play(index) {
     let mood = petStates[index].mood;
     mood = Math.min(100, mood + 20);
@@ -3419,8 +3418,8 @@ function play(index) {
     document.getElementById(`mood-${index}`).innerText = `${mood}%`;
     showInfoBox("感觉更有干劲了呢！");
 
-    if (mood > 0 && petStates[index].stamina > 0) {
-        startProgressForPet(index); // 恢复进度条工作
+    if (!petProgressIntervals[index] && mood > 0 && petStates[index].stamina > 0) {
+        startPetWork(); // 恢复进度条工作
     }
 }
 
@@ -3435,8 +3434,8 @@ function rest(index) {
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
         showInfoBox("打个小盹，体力充沛，又可以做快乐的牛马了！");
 
-        if (petStates[index].mood > 0 && petStates[index].stamina > 0) {
-            startProgressForPet(index); // 恢复进度条工作
+        if (!petProgressIntervals[index] && petStates[index].mood > 0 && petStates[index].stamina > 0) {
+            startPetWork(); // 恢复进度条工作
         }
     }, 10000);
 }
@@ -3449,51 +3448,12 @@ function feed(index, goldCost) {
         document.getElementById(`stamina-${index}`).innerText = `100%`;
         showInfoBox("感谢金主爸爸投喂！");
 
-        if (petStates[index].mood > 0 && petStates[index].stamina > 0) {
-            startProgressForPet(index); // 恢复进度条工作
+        if (!petProgressIntervals[index] && petStates[index].mood > 0 && petStates[index].stamina > 0) {
+            startPetWork(); // 恢复进度条工作
         }
     } else {
         showInfoBox("金钱不足，无法喂食！");
     }
-}
-
-// 新增函数，用于单独启动特定宠物的进度条
-function startProgressForPet(index) {
-    const petState = petStates[index];
-
-    petState.progressInterval = setInterval(() => {
-        if (petState.mood > 0 && petState.stamina > 0) {
-            const timeFactor = 1 + (100 - petState.mood) / 20; // 心情越低，速度越慢
-            const gainFactor = 1 - (100 - petState.stamina) / 100; // 体力越低，收益越低
-            
-            const currentWidth = parseFloat(petState.progressBar.style.width) || 0;
-            petState.progressBar.style.width = `${Math.min(100, currentWidth + 1 / timeFactor)}%`;
-
-            if (parseFloat(petState.progressBar.style.width) >= 100) {
-                petState.progressBar.style.width = '0%';
-                petState.mood = Math.max(0, petState.mood - 1);
-                petState.stamina = Math.max(0, petState.stamina - 1);
-
-                // 更新心情和体力显示
-                document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
-                document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
-
-                // 计算并更新实际收益显示
-                const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
-                document.getElementById(`earnings-${index}`).innerText = updatedEarnings;
-
-                // 计算获得的金钱
-                const goldEarned = Math.floor(petState.goldAmount * gainFactor);
-                goldAmount += goldEarned;
-                updateGoldDisplay(goldAmount);
-
-                if (petState.mood === 0 || petState.stamina === 0) {
-                    clearInterval(petState.progressInterval);
-                    petState.progressInterval = null; // 标记停止
-                }
-            }
-        }
-    }, 5000 / 100); // 5秒钟刷新进度条100%
 }
 
 function infoXiuwei() {

@@ -55,8 +55,8 @@
         }
         .pet-header {
             display: flex;
+            flex-direction: column;
             justify-content: space-between;
-            align-items: center;
         }
         .pet-header h2 {
             margin: 0;
@@ -65,18 +65,16 @@
         .pet-status {
             display: flex;
             justify-content: space-around;
-            margin-top: 10px;
+            margin-bottom: 10px;
             flex-direction: row;
         }
         .pet-status div {
-            width: 30%;
-            padding: 10px;
-            border-radius: 5px;
+            width: 50%;
             text-align: center;
         }
         .pet-progress {
             width: 100%;
-            height: 30px;
+            height: 20px;
             background-color: #aaa;
             border: 1px solid white;
             border-radius: 10px;
@@ -3267,16 +3265,24 @@ function infoPingfen() {
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
+
 function togglePetOverview() {
     const petOverview = document.getElementById('petOverview');
     petOverview.style.display = petOverview.style.display === 'none' ? 'block' : 'none';
+
+    // 每次打开时都重新加载并启动打工逻辑
+    if (petOverview.style.display === 'block') {
+        infoPingfenpaihang();
+    }
 }
 
 function startPetWork() {
     petStates.forEach((petState, index) => {
+        if (petState.progressInterval) return; // 防止重复启动
+
         petState.progressInterval = setInterval(() => {
             if (petState.mood > 0 && petState.stamina > 0) {
-                const timeFactor = 1 + (100 - petState.mood) / 100; // 心情越低，速度越慢
+                const timeFactor = 1 + (100 - petState.mood) / 20; // 心情越低，速度越慢
                 const gainFactor = 1 - (100 - petState.stamina) / 100; // 体力越低，收益越低
 
                 petState.progressBar.style.width = `${Math.min(100, parseFloat(petState.progressBar.style.width) + 1 / timeFactor)}%`;
@@ -3290,6 +3296,10 @@ function startPetWork() {
                     document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
                     document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
 
+                    // 计算并更新实际收益显示
+                    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+                    document.getElementById(`earnings-${index}`).innerText = updatedEarnings;
+
                     // 计算获得的金钱
                     const goldEarned = Math.floor(petState.goldAmount * gainFactor);
                     goldAmount += goldEarned;
@@ -3297,10 +3307,11 @@ function startPetWork() {
 
                     if (petState.mood === 0 || petState.stamina === 0) {
                         clearInterval(petState.progressInterval);
+                        petState.progressInterval = null; // 标记停止
                     }
                 }
             }
-        }, 60000 / 100); // 1秒钟刷新进度条1%
+        }, 5000 / 100); // 5秒钟刷新进度条100%
     });
 }
 
@@ -3332,15 +3343,20 @@ function infoPingfenpaihang() {
     allPetData.forEach((pet, index) => {
         const petContainer = document.createElement('div');
         petContainer.className = 'pet-container';
-
+    
+        // 使用默认值100%作为初始stamina的值进行UI显示的计算
+        const initialStamina = 100;
+        const initialEarnings = convertPrice(Math.floor(pet.skillScore * 0.001) * initialStamina * 0.01);
+    
         // 宠物信息和评分
         petContainer.innerHTML = `
             <div class="pet-header">
-                <h2>${index + 1}. ${pet.petName} 评分：${pet.skillScore}</h2>
+                <h2>${index + 1}. ${pet.petName}（评分:${pet.skillScore}）</h2>
+                <p>💰收益：<span id="earnings-${index}">${initialEarnings}</span>金子/次</p>
             </div>
             <div class="pet-status">
-                <div>心情: <span id="mood-${index}">100%</span></div>
-                <div>体力: <span id="stamina-${index}">100%</span></div>
+                <div>😄心情: <span id="mood-${index}">100%</span></div>
+                <div>👊🏻体力: <span id="stamina-${index}">100%</span></div>
             </div>
             <div class="pet-progress">
                 <div id="progress-bar-${index}"></div>
@@ -3351,9 +3367,9 @@ function infoPingfenpaihang() {
                 <button onclick="feed(${index}, ${pet.goldAmount})">喂食</button>
             </div>
         `;
-
+    
         petOverview.appendChild(petContainer);
-
+    
         // 初始化宠物状态
         petStates[index] = {
             mood: 100,
@@ -3362,6 +3378,7 @@ function infoPingfenpaihang() {
             goldAmount: pet.goldAmount,
             progressInterval: null,
         };
+    
     });
 
     // 开始宠物打工
@@ -3373,17 +3390,24 @@ function play(index) {
     mood = Math.min(100, mood + 50);
     petStates[index].mood = mood;
     document.getElementById(`mood-${index}`).innerText = `${mood}%`;
+
+    if (!petStates[index].progressInterval && mood > 0 && petStates[index].stamina > 0) {
+        startPetWork(); // 恢复进度条工作
+    }
 }
 
 function rest(index) {
     let stamina = petStates[index].stamina;
     petStates[index].progressBar.style.width = '0%'; // 重置进度条
-    petStates[index].stamina = Math.min(100, stamina + 20);
     document.getElementById(`stamina-${index}`).innerText = `${stamina}%`;
 
     setTimeout(() => {
         petStates[index].stamina = Math.min(100, stamina + 20);
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
+
+        if (!petStates[index].progressInterval && petStates[index].mood > 0 && petStates[index].stamina > 0) {
+            startPetWork(); // 恢复进度条工作
+        }
     }, 10000);
 }
 
@@ -3393,6 +3417,10 @@ function feed(index, goldCost) {
         updateGoldDisplay(goldAmount);
         petStates[index].stamina = 100;
         document.getElementById(`stamina-${index}`).innerText = `100%`;
+
+        if (!petStates[index].progressInterval && petStates[index].mood > 0 && petStates[index].stamina > 0) {
+            startPetWork(); // 恢复进度条工作
+        }
     } else {
         alert("金钱不足，无法喂食！");
     }
@@ -3983,7 +4011,7 @@ function storeCurrentPetData() {
             additionalPlayerCultivation: additionalPlayerCultivation,
             petMaxLevel: petMaxLevel,
             petWisdom: petWisdom,
-            petStates: petStates,
+            petStates: JSON.stringify(petStates),
             awakened: awakened,
             awakenAttributes: awakenAttributes,
             baseAttributes: baseAttributes,
@@ -15309,7 +15337,7 @@ function saveGameState() {
         petAscended: petAscended,
         petMaxLevel: petMaxLevel,
         petWisdom: petWisdom,
-        petStates: petStates,
+        petStates: JSON.stringify(petStates),
         awakened: awakened,
         awakenAttributes: awakenAttributes,
         bonusAttributes: bonusAttributes,

@@ -10580,7 +10580,29 @@ function closeDescriptionBox() {
 
 function sellItem() {
     if (!selectedItem) {
-        showInfoBox("请先选择需要出售的物品！");
+        // 没有选中物品，提示是否出售所有背包内的道具
+        showInfoBox("你没有选中道具，是否出售所有背包内的道具？", () => {
+            // 用户确认后执行以下代码
+            let totalSoldItems = 0;
+            let totalGoldEarned = 0;
+
+            jinnangItems.forEach(item => {
+                if (item.quantity > 0) {
+                    totalGoldEarned += item.quantity * item.price;
+                    totalSoldItems += item.quantity;
+                    item.quantity = 0; // 将所有物品数量设置为0
+                }
+            });
+
+            if (totalSoldItems > 0) {
+                goldAmount += totalGoldEarned;
+                showInfoBox(`成功出售所有道具，获得${convertPrice(totalGoldEarned)}金子`);
+                updateJinnangItems();
+                updateGoldDisplay(goldAmount);
+            } else {
+                showInfoBox("背包内没有可出售的道具！");
+            }
+        });
         return;
     }
 
@@ -10611,8 +10633,7 @@ function sellItem() {
     } else {
         showInfoBox("请先选择需要出售的物品！");
     }
-}
-//拓展背包
+}//拓展背包
 
 function enlargeCapacity() {
     let cost;

@@ -13117,6 +13117,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 }
 
 let cultivationTime; // 提取共用的时间参数
+let isOngoingCultivate = false;
 
 function upgradePlayerCultivation() {
     // 提示玩家是否进行修炼
@@ -13231,6 +13232,7 @@ function startCultivationProcess() {
         showInfoBox("若取消修炼，宠物的修炼会被终止而无任何收益，且消耗的道具不会被归还，确认请继续", () => {
             document.body.removeChild(cultivationInterface);
             clearInterval(progressInterval); // 清除进度条更新
+            isOngoingCultivate = false;
             showInfoBox("你已停止修炼。");
         });
     });
@@ -13283,7 +13285,7 @@ function speedUpCultivation(progress, timeRemainingElement, updateProgress) {
         // 立即更新进度条和剩余时间显示
         updateProgress(progress, timeRemainingElement);
 
-        const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100 + boomerCount * 66;
+        const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100 + boomerCount * 88;
         totalGainedCultivation += gainedCultivation; // 累加获得的修为值
         additionalPlayerCultivation += totalGainedCultivation;
 
@@ -13292,7 +13294,6 @@ function speedUpCultivation(progress, timeRemainingElement, updateProgress) {
             startProgressUpdate(progress, timeRemainingElement, updateProgress);
         } else {
             document.body.removeChild(progress.parentElement.parentElement);
-            showInfoBox(`修炼结束，你通过加速额外获得了 ${totalGainedCultivation} 点修为。`);
             totalGainedCultivation = 0; // 重置累计修为值
         }
     } else {
@@ -13302,15 +13303,16 @@ function speedUpCultivation(progress, timeRemainingElement, updateProgress) {
 
 function startProgressUpdate(progress, timeRemaining, updateProgress) {
     let isCultivationFinished = false;  // 用于标记修炼是否已经结束
+    isOngoingCultivate = true;
 
     const intervalId = setInterval(() => {
         // 如果修炼已经结束，立即退出
-        if (isCultivationFinished) return;
+        if (isCultivationFinished || !isOngoingCultivate) return;
 
         cultivationTime--;
         updateProgress(progress, timeRemaining);
 
-        if (cultivationTime <= 0) {
+        if (cultivationTime <= 0 && isOngoingCultivate) {
             isCultivationFinished = true;  // 标记修炼结束
 
             clearInterval(intervalId);  // 停止定时器

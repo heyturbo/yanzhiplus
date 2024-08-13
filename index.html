@@ -1793,17 +1793,16 @@
                         等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
                     </div>
                     <div class="progress-bar">
-                        品质: <span id="attribute-tier"></span>
+                        品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
                     </div>
                     <div class="progress-bar">
                         幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
                     </div>
                     <div class="progress-bar">
-                        成长率: <span id="attribute-growth-rate"></span>
+                        成长率: <span id="attribute-growth-rate"></span><button onclick="infoChengzhanglv()">?</button>
                     </div>
-
                     <div class="progress-bar">
-                        潜力点: <span id="remaining-points-display"></span>
+                        潜力点: <span id="remaining-points-display"></span><button onclick="infoQianlidian()">?</button>
                     </div>
                     <div class="progress-bar">
                         耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
@@ -1822,14 +1821,20 @@
                     </div>
                 </div>
                 <div class="secondary-attributes">
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">飞升状态: <span id="ascension-status">未飞升</span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">觉醒状态: <span id="awaken-status">未觉醒</span></div>  
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">宠物评分: <span id="skill-score">0</span></div>
                         <div class="progress-bar">
-                            当前修为: <span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
+                            觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
                         </div>
                         <div class="progress-bar">
-                            悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                            飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
+                        </div>
+                        <div class="progress-bar">
+                            评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                        </div>
+                        <div class="progress-bar">
+                            <button onclick="infoXiuwei()">?</button>修为: <span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            <button onclick="infoWuxing()">?</button>悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                         </div>
                         <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                         <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
@@ -3147,7 +3152,32 @@ function showGuide() {
                             <button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>`;
     document.body.appendChild(messageBox);
 }
-        
+
+function infoPinzhi() {
+    showInfoBox("\n1.品质决定宠物的成长上限\n2.宠物共有普通、优秀、杰出、卓越和完美五种自然品质\n3.当宠物成功觉醒时，品质会跃升为“超凡”");
+}
+function infoChengzhanglv() {
+    showInfoBox("\n1.成长率与品质有关，品质越高，成长率越高，宠物升级时属性的增长也会更显著\n2.宠物变异时成长率会有所变化，一般而言，变异的宠物能够得到更明显的属性提升");
+}
+function infoQianlidian() {
+    showInfoBox("\n1.宠物每提升1级会得到2点供自由分配的潜力点\n2.潜力点用于培养宠物\n3.使用金子培养达到第五次后，每次培养会获得潜力点进行随机分配");
+}        
+function infoJuexing() {
+    showInfoBox("\n1.宠物可以在任何时刻下觉醒\n2.觉醒消耗1颗必要道具“醒悟丹”\n3.觉醒后的宠物会得到20%的属性增长，同时开放战斗精灵、25悟性上限和160等级上限\n4.一般而言，当前宠物属性情况越高，觉醒收益越大");
+}  
+function infoFeisheng() {
+    showInfoBox("\n1.宠物满足160级和24悟性时可以进行飞升\n2.飞升后开放属性专精和飞升技能等系统\n3.宠物等级上限会开放至200级");
+}  
+function infoPingfen() {
+    showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高");
+}     
+function infoXiuwei() {
+    showInfoBox("\n1.修为主要由宠物等级和综合实力自动计算得来 \n2.修为在战斗中的作用至关重要，主要体现在施加战斗效果、延长施法时间、抵抗敌人控制类效果等 \n3.修为越高，赢得战局的可能性越大 \n4.如果你拥有珍贵的仙人醍醐，可以通过修炼提升修为 \n5.某些专精技能会提升修为计算的系数");
+}  
+function infoWuxing() {
+    showInfoBox("\n1.悟性对宠物的成长至关重要 \n2.悟性越高，洗练所得高级技能的概率就越大 \n3.悟性能够给二级属性百分比的加成");
+}  
+ 
 const enemyImages = [
     { status: 'default', name: '深渊巨魔', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
     { status: 'rampaged', name: '狂暴量子态', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
@@ -4208,17 +4238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     //console.log('Options in select:', options);
     //console.log('Keys in pets:', keys);
 
-    keys.forEach(key => {
-        if (!options.includes(key)) {
-            console.warn(`Pet key ${key} is not in select options`);
-        }
-    });
-
-    options.forEach(option => {
-        if (!keys.includes(option)) {
-            console.warn(`Select option ${option} is not a valid pet key`);
-        }
-    });
 });
 
 document.getElementById('buySummonCharmButton').addEventListener('click', () => {
@@ -5174,6 +5193,64 @@ function handleCriticalHit(isCritical) {
     }
 }
 
+function handleDodge() {
+    // 计算速度差值
+    const speedDifference = battleAttributes.speed - battleState.enemy.speed;
+    
+    let dodgeChance;
+    let dodgeTarget; // 闪避目标：玩家或敌人
+    let dodgeElement; // 对应的图片元素：玩家图片或敌人图片
+
+    if (speedDifference > 0) {
+        // 玩家速度更快，计算玩家闪避概率
+        dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过100%
+        dodgeTarget = 'player';
+        dodgeElement = document.getElementById('your-pet-image');
+        console.log(`玩家闪避概率为：${dodgeChance}`);
+    } else if (speedDifference < 0) {
+        // 敌人速度更快，计算敌人闪避概率
+        dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过100%
+        dodgeTarget = 'enemy';
+        dodgeElement = document.getElementById('enemy-image');
+        console.log(`敌人闪避概率为：${dodgeChance}`);
+    } else {
+        // 速度相同，无闪避
+        dodgeChance = 0;
+    }
+
+    // 确定是否触发闪避
+    const dodgeRoll = Math.random();
+    const isDodge = dodgeRoll < dodgeChance;
+    console.log(`闪避随机数为：${dodgeRoll}`);
+
+    if (isDodge) {
+        // 触发闪避
+        logBattleEvent(`${dodgeTarget === 'player' ? '你' : '敌人'}闪避了！！！`, 'white');
+
+        // 应用视觉效果
+        if (dodgeTarget === 'player') {
+            dodgeElement.style.marginRight = '30px';
+            dodgeElement.style.opacity = '0.5';
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
+        } else {
+            dodgeElement.style.marginLeft = '30px';
+            dodgeElement.style.opacity = '0.5';
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
+        }
+
+        // 0.1秒后复原
+        setTimeout(() => {
+            dodgeElement.style.marginRight = '';
+            dodgeElement.style.marginLeft = '';
+            dodgeElement.style.opacity = '';
+        }, 100);
+
+        return true; // 返回 true 表示闪避成功
+    }
+
+    return false; // 返回 false 表示未闪避
+} //触发闪避的函数
+
 
 
 
@@ -5541,6 +5618,11 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         return 0; // 物理攻击无法造成伤害
     }
 
+    // 检查敌人是否闪避
+    if (handleDodge()) {
+        return 0; // 如果敌人闪避成功，物理攻击伤害为0
+    } 
+
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
     let damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
@@ -5580,9 +5662,8 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         updateUI();
     }
 
-    applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1);
     handlePierced(); // 处理穿透效果
-
+    applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1); // 确保正确执行物理攻击效果
     return damage;
 }
 
@@ -6694,13 +6775,17 @@ function enemyAttack() {
     }
 }
 
-function performEnemyPhysicalAttack(isCritical) {
+function performEnemyPhysicalAttack(isCritical) { 
+    // 检查玩家是否闪避
+    if (handleDodge()) {
+        return 0; // 如果玩家闪避成功，物理攻击伤害为0
+    }
+
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
-
-
+    
     if (isCritical) {
         logBattleEvent(`深渊巨魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
     } else {
@@ -6708,12 +6793,6 @@ function performEnemyPhysicalAttack(isCritical) {
     }
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
 
-    if (!battleState.enemy.silenced) {
-        applyEnemyPhysicalEffects(damage);
-    } else {
-        logBattleEvent(`深渊巨魔处于沉默状态，无法施加物理效果。`, 'grey');
-    }
-    
     // 新增规则判断
     if (battleState.player.slaughter) {
         const cultivationDiff = playerCultivation - enemyPetCultivation;
@@ -6733,6 +6812,10 @@ function performEnemyPhysicalAttack(isCritical) {
         }
 
         damage += extraDamage;
+    }
+
+    if (!battleState.enemy.silenced || damage !== 0) {
+        applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
 
     return damage;
@@ -11642,7 +11725,7 @@ function applySpecialization() {
 }
 
 let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
-let trainingMultipliers = [1.1, 1.04, 1.03, 1.02, 1.01]; // 定义每次金子培养的属性提升倍数
+let trainingMultipliers = [1.1, 1.05, 1.04, 1.03, 1.02]; // 定义每次金子培养的属性提升倍数
 let trainingCount = 0; // 初始化已经使用的金子培养次数
 
 function calculateAvailableTrainingCount(petLevel) {
@@ -11663,25 +11746,33 @@ let autoTrainingTimeout = null;
 function startAutoTraining() {
     // 开始以0.1秒频率自动执行trainAttributesAfterFifth
     autoTrainingInterval = setInterval(() => {
-        if (goldAmount <= 0) {
+        if (goldAmount <= 4888) {
             stopAutoTraining();
         } else {
             trainAttributesAfterFifth();
         }
     }, 100);
 
-    // 10秒后停止自动执行
+    // 60秒后停止自动执行
     autoTrainingTimeout = setTimeout(() => {
-        stopAutoTraining();
-    }, 10000);
+        stopAutoTraining(); // 在 60 秒后直接停止
+    }, 60000);
 }
 
 function stopAutoTraining() {
+    // 如果定时器已经被清除，直接返回
+    if (!autoTrainingInterval && !autoTrainingTimeout) {
+        return;
+    }
+
+    // 清除定时器和状态重置
     clearInterval(autoTrainingInterval);
     clearTimeout(autoTrainingTimeout);
+
     autoTrainingInterval = null;
     autoTrainingTimeout = null;
     triggerAutoTrainingCountDown = 0;
+
     showInfoBox("自动培养已停止。");
 }
 
@@ -11690,7 +11781,7 @@ function trainAttributesAfterFifth() {
         showInfoBox("金子不足4两888文，无法培养！");
         return;
     }
-
+    
     triggerAutoTrainingCountDown += 1;
 
     const leftAttributes = onlyDisplayLeftAttributes();
@@ -11731,9 +11822,9 @@ function trainAttributesAfterFifth() {
         const bonusAttribute = bonusAttributes[attribute];
         const currentAttribute = leftAttributes[attribute];
 
-        let growthRange = [1, 6];
-        if (bonusAttribute >= maxAttribute * 0.58) {
-            growthRange = [-1, 5];
+        let growthRange = [1, 5];
+        if (bonusAttribute >= maxAttribute * 0.59) {
+            growthRange = [-1, 3];
         }
 
         const growthValue = Math.floor(Math.random() * (growthRange[1] - growthRange[0] + 1)) + growthRange[0];
@@ -13162,6 +13253,7 @@ function startCultivationProcess() {
     
     // 创建进度条容器
     const progressBar = document.createElement("div");
+    progressBar.innerText = "正在修炼中...";
     progressBar.style = `
         width: 100%;
         height: 40px;
@@ -13172,6 +13264,10 @@ function startCultivationProcess() {
         overflow: hidden;
         position: relative;
         margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px
     `;
     
     // 创建进度条
@@ -13179,7 +13275,7 @@ function startCultivationProcess() {
     progress.style = `
         height: 100%;
         width: 0%;
-        background: linear-gradient(to bottom, #63786E, #94A69E, #63786E);
+        background: linear-gradient(to bottom, #477AD6, #8FF1FD, #477AD6);
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
         position: absolute;
         top: 0;
@@ -13203,7 +13299,7 @@ function startCultivationProcess() {
     const speedUpButton = document.createElement("button");
     speedUpButton.innerText = "加速修炼";
     speedUpButton.style = `
-        background: linear-gradient(to bottom, #007BD3, #004373);
+        background: linear-gradient(to bottom, #007BD3, #034373);
         color: white;
         border: none;
         padding: 10px;
@@ -13220,7 +13316,7 @@ function startCultivationProcess() {
     const stopButton = document.createElement("button");
     stopButton.innerText = "停止修炼";
     stopButton.style = `
-        background: linear-gradient(to bottom, #007BD3, #004373);
+        background: linear-gradient(to bottom, #007BD3, #034373);
         color: white;
         border: none;
         padding: 10px;
@@ -13514,7 +13610,7 @@ function upgradeWisdomTo() {
         highGradePill += 99999;
         goldAmount += 9999999;
         stamps = 500000;
-        jinnangCapacity = 500000;
+        jinnangCapacity = 200000;
         updateStampCount();
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
@@ -13549,7 +13645,6 @@ function upgradeWisdomTo() {
         'nirvanaGem', //定空的灵石
         'glowingSoul',
         'activeSoul',
-        'ultraSkillBoomer', //超级万化灵丹
         'mutationScroll', //灵异秘卷
         'treasureMap', //藏宝图
         'casinoCoverLetter', //赌场介绍信
@@ -13560,7 +13655,8 @@ function upgradeWisdomTo() {
         addItemToJinnang(item, 999);
     }
     addItemToJinnang('earthlyEnergy', 9999);
-    addItemToJinnang('tejiWisdomPill', 99999);
+    addItemToJinnang('tejiWisdomPill', 9999);
+    addItemToJinnang('ultraSkillBoomer', 9999);
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;

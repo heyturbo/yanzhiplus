@@ -3399,6 +3399,7 @@ function play(index) {
 function rest(index) {
     let stamina = petStates[index].stamina;
     petStates[index].progressBar.style.width = '0%'; // 重置进度条
+    petStates[index].stamina = Math.min(100, stamina + 20);
     document.getElementById(`stamina-${index}`).innerText = `${stamina}%`;
 
     setTimeout(() => {
@@ -4067,6 +4068,7 @@ function restorePetData(petName) {
         petAscended = savedPetData.petAscended;
         petMaxLevel = savedPetData.petMaxLevel;
         petWisdom = savedPetData.petWisdom;
+        petStates = JSON.parse(savedPetData.petStates);
         awakened = savedPetData.awakened;
         awakenAttributes = savedPetData.awakenAttributes;
         hallucinated = savedPetData.hallucinated;
@@ -15491,6 +15493,7 @@ function loadGameState() {
         petAscended = savedState.petAscended;
         petMaxLevel = savedState.petMaxLevel;
         petWisdom = savedState.petWisdom;
+        petStates = JSON.parse(savedState.petStates);
         awakened = savedState.awakened;
         hallucinated = savedState.hallucinated;
         hallucinationLevel = savedState.hallucinationLevel;

@@ -1828,7 +1828,7 @@
                             飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
                         </div>
                         <div class="progress-bar">
-                            评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                            <button onclick="infoPingfenpaihang()">🔝</button>评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
                         </div>
                         <div class="progress-bar">
                             <button onclick="infoXiuwei()">?</button>修为: <span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
@@ -3170,7 +3170,35 @@ function infoFeisheng() {
 }  
 function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高");
-}     
+}
+function infoPingfenpaihang() {
+    const savedPets = [];
+
+    // 遍历 localStorage 中所有的宠物数据
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key.startsWith('petData_')) {
+            const petData = JSON.parse(localStorage.getItem(key));
+            savedPets.push({
+                name: key.replace('petData_', ''), // 提取宠物名称
+                skillScore: petData.skillScore || 0 // 读取 skillScore，默认为 0
+            });
+        }
+    }
+
+    // 根据 skillScore 从高到低排序
+    savedPets.sort((a, b) => b.skillScore - a.skillScore);
+
+    // 构造显示信息
+    const displayLines = savedPets.map((pet, index) => `${index + 1}. ${pet.name} - 综合评分: ${pet.skillScore}`);
+
+    // 调用 showInfoBox 进行分行呈现
+    if (displayLines.length > 0) {
+        showInfoBox(displayLines.join('\n'));
+    } else {
+        showInfoBox('没有找到任何宠物数据。');
+    }
+}
 function infoXiuwei() {
     showInfoBox("\n1.修为主要由宠物等级和综合实力自动计算得来 \n2.修为在战斗中的作用至关重要，主要体现在施加战斗效果、延长施法时间、抵抗敌人控制类效果等 \n3.修为越高，赢得战局的可能性越大 \n4.如果你拥有珍贵的仙人醍醐，可以通过修炼提升修为 \n5.某些专精技能会提升修为计算的系数");
 }  
@@ -3746,6 +3774,7 @@ function storeCurrentPetData() {
         });
         const petData = {
             currentPet: JSON.stringify(currentPet),
+            skillScore: skillScore,
             petLevel: petLevel,
             evolutionLevel: evolutionLevel,
             remainingPoints: remainingPoints,
@@ -5193,29 +5222,30 @@ function handleCriticalHit(isCritical) {
     }
 }
 
-function handleDodge() {
-    // 计算速度差值
-    const speedDifference = battleAttributes.speed - battleState.enemy.speed;
-    
-    let dodgeChance;
-    let dodgeTarget; // 闪避目标：玩家或敌人
+function handleDodge(target) {
+    let speedDifference;
+    let dodgeChance = 0; // 默认闪避概率为 0
     let dodgeElement; // 对应的图片元素：玩家图片或敌人图片
 
-    if (speedDifference > 0) {
-        // 玩家速度更快，计算玩家闪避概率
-        dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过100%
-        dodgeTarget = 'player';
+    if (target === 'player') {
+        // 玩家闪避逻辑
+        speedDifference = battleAttributes.speed - battleState.enemy.speed;
+        if (speedDifference > 0) {
+            dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+        }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家闪避概率为：${dodgeChance}`);
-    } else if (speedDifference < 0) {
-        // 敌人速度更快，计算敌人闪避概率
-        dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过100%
-        dodgeTarget = 'enemy';
+    } else if (target === 'enemy') {
+        // 敌人闪避逻辑
+        speedDifference = battleState.enemy.speed - battleAttributes.speed;
+        if (speedDifference > 0) {
+            dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+        }
         dodgeElement = document.getElementById('enemy-image');
         console.log(`敌人闪避概率为：${dodgeChance}`);
     } else {
-        // 速度相同，无闪避
-        dodgeChance = 0;
+        console.error('Invalid target for dodge handling');
+        return false;
     }
 
     // 确定是否触发闪避
@@ -5225,15 +5255,13 @@ function handleDodge() {
 
     if (isDodge) {
         // 触发闪避
-        logBattleEvent(`${dodgeTarget === 'player' ? '你' : '敌人'}闪避了！！！`, 'white');
-
         // 应用视觉效果
-        if (dodgeTarget === 'player') {
-            dodgeElement.style.marginRight = '30px';
+        if (target === 'player') {
+            dodgeElement.style.marginRight = '20px';
             dodgeElement.style.opacity = '0.5';
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         } else {
-            dodgeElement.style.marginLeft = '30px';
+            dodgeElement.style.marginLeft = '20px';
             dodgeElement.style.opacity = '0.5';
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         }
@@ -5249,7 +5277,7 @@ function handleDodge() {
     }
 
     return false; // 返回 false 表示未闪避
-} //触发闪避的函数
+}
 
 
 
@@ -5619,9 +5647,9 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     // 检查敌人是否闪避
-    if (handleDodge()) {
+    if (handleDodge('enemy')) {
         return 0; // 如果敌人闪避成功，物理攻击伤害为0
-    } 
+    }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
@@ -6777,7 +6805,7 @@ function enemyAttack() {
 
 function performEnemyPhysicalAttack(isCritical) { 
     // 检查玩家是否闪避
-    if (handleDodge()) {
+    if (handleDodge('player')) {
         return 0; // 如果玩家闪避成功，物理攻击伤害为0
     }
 
@@ -12199,7 +12227,7 @@ function refreshShop(auto = false) {
         if (isRare) {
             item = getRandomRareItem();
             if (item.name.includes('包裹')) {
-                if (rareBundleCount >= 1) {
+                if (rareBundleCount >= 2) {
                     i--; // 重试生成
                     continue;
                 } else {
@@ -12314,7 +12342,7 @@ function getRandomRareItem() {
         const nonSkillItems = rareItems.filter(item => !item.name.includes('·')); // 过滤掉包含技能的物品
         if (nonSkillItems.length > 0) {
             const item = nonSkillItems[Math.floor(Math.random() * nonSkillItems.length)]; // 随机选择一个非技能物品
-            const quantity = getRandomInt(2, 3); // 生成一个2到3之间的随机数量
+            const quantity = getRandomInt(2, 15); // 生成一个2到3之间的随机数量
             item.name += ` 包裹 (${quantity})`; // 更新物品名称
             item.price *= quantity; // 更新物品价格
             item.url = 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png'; // 更新物品图片URL
@@ -13405,6 +13433,9 @@ function speedUpCultivation(progress, timeRemainingElement, updateProgress) {
         const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100 + boomerCount * 88;
         totalGainedCultivation += gainedCultivation; // 累加获得的修为值
         additionalPlayerCultivation += totalGainedCultivation;
+        if (additionalPlayerCultivation >= 1000000) {
+            additionalPlayerCultivation = 1000000
+        }
 
         // 如果还有剩余时间，继续计时
         if (cultivationTime > 0) {
@@ -13444,8 +13475,12 @@ function startProgressUpdate(progress, timeRemaining, updateProgress) {
             const gainedCultivation = Math.floor(Math.random() * (200 - 100 + 1)) + 100;
             totalGainedCultivation += gainedCultivation; // 累加获得的修为值
             additionalPlayerCultivation += totalGainedCultivation;
-
-            showInfoBox(`修炼结束，本次修炼你获得了 ${totalGainedCultivation} 点修为。`);
+            if (additionalPlayerCultivation >= 1000000) {
+                additionalPlayerCultivation = 1000000
+                showInfoBox(`修炼结束，但你的修为已经通过修炼达到最大值，无法再增加。`);
+            } else {
+                showInfoBox(`修炼结束，本次修炼你获得了 ${totalGainedCultivation} 点修为。`);
+            }
             totalGainedCultivation = 0; // 重置累计修为值
         }
     }, 1000);
@@ -13459,7 +13494,7 @@ function calculatePlayerCultivation(totalScore) {
     if (currentSpecialization === '慧光辉耀') {
         const spec = specializations['慧光辉耀'];
         const multiplier = Math.min(1 + (spec.level * 0.025), 4);
-        playerCultivation = Math.round((totalScore / 128 + additionalPlayerCultivation) * multiplier * Math.pow(1.001, petLevel));
+        playerCultivation = Math.round((totalScore / 128 + additionalPlayerCultivation * 0.5) * multiplier * Math.pow(1.001, petLevel));
     } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
         const spec = specializations[currentSpecialization];
         const multiplier = Math.min(1 + (spec.level * 0.017), 3);
@@ -13546,6 +13581,7 @@ function updateSkillScore(selectedSkills = []) {
 
     // 计算总评分
     const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
+    skillScore = totalScore;
 
     // 计算修为值
     playerCultivation = calculatePlayerCultivation(totalScore);
@@ -13559,7 +13595,6 @@ function updateSkillScore(selectedSkills = []) {
     playerCultivationElement.classList.add("red-text");
 
     // 更新全局 skillScore 变量
-    window.skillScore = totalScore; // 确保 skillScore 是全局变量
     window.petScore = totalScore; // 确保 petScore 是全局变量
 
     // 更新任务列表以反映新的宠物评分
@@ -15062,6 +15097,7 @@ function saveGameState() {
     const gameState = {
         currentPetKey: currentPetKey,
         currentPet: JSON.stringify(currentPet),
+        skillScore: skillScore,
         petsInSelect: petsInSelect,
         currentSpecialization: currentSpecialization,
         petLevel: petLevel,

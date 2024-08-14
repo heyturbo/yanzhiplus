@@ -77,6 +77,9 @@
         .pet-status div {
             width: 50%;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
         }
         .pet-progress {
             width: 100%;
@@ -100,12 +103,12 @@
             justify-content: space-between;
         }
         .pet-buttons button {
-            flex: 0.2;
+            flex: 0.15;
             background: linear-gradient(to top, #115570, #20c3af);
-            border-radius: 10px;
+            border-radius: 5px;
             color: white;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 16px;
             border: 1px solid hsl(0deg 0% 100% / 70%);
             box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.5);
         }
@@ -222,6 +225,7 @@
             display: flex;
             flex-direction: row;
             justify-content: center;
+            align-items: center;
         }
         
         .bottom-bar img {
@@ -350,9 +354,9 @@
             font-size: 16px;
             gap: 5px;
             width: 200px;
+            align-items: center;
         }
         .bottom-bar .info div {
-            margin: 5px 0;
         }
         .description-box {
             margin: 5px 0px;
@@ -1148,7 +1152,7 @@
             font-size: 14px;
             flex: 1;
             display: flex;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 8px;
             line-height: 12px;
             min-height50%: 5;
@@ -1163,7 +1167,7 @@
             max-height: 30%;
             overflow-y: clip;
             font-size: 12px;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 8px;
             width: 97%;
         }
@@ -1937,13 +1941,13 @@
                         <div class="progress-bar">
                             <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                         </div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">物攻: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">物防: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法攻: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法防: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                 </div>
             </div>
             <div class="button-grid">
@@ -3300,7 +3304,7 @@ function infoPingfenpaihang() {
                 allPetData.push({
                     petName: key.replace('petData_', ''),
                     skillScore: petData.skillScore,
-                    goldAmount: Math.floor(petData.skillScore * 0.001314159),
+                    goldAmount: Math.floor(petData.skillScore * 0.00131415926),
                 });
             }
         }
@@ -3330,17 +3334,17 @@ function infoPingfenpaihang() {
         // 宠物信息和评分
         petContainer.innerHTML = `
             <div class="pet-header">
-                <div id="header-container" style="display:flex;flex-direction: column;">
+                <div id="header-container" style="display:flex;flex-direction: column;min-width:70%;">
                     <h2>${index + 1}. ${pet.petName}（评分:${pet.skillScore}）</h2>
                     <div style="margin: 10px;display: flex;justify-content: space-around;">💰能力值：<span id="earnings-${index}">${initialEarnings}</span>金子/次</div>
+                    <div class="pet-status">
+                        <div>😄心情: <span id="mood-${index}">100%</span></div>
+                        <div>👊🏻体力: <span id="stamina-${index}">100%</span></div>
+                    </div>
                 </div>
-                <div id="header-image" style="display:flex;align-items: flex-start;">
-                    <img src="${petImage}" style="width:50px;height:50px;border-radius: 5px;border: 1px solid white;">
+                <div id="header-image" style="display:flex;align-items: center;">
+                    <img src="${petImage}" style="width:80px;height:80px;border-radius: 5px;border: 1px solid white;">
                 </div>
-            </div>
-            <div class="pet-status">
-                <div>😄心情: <span id="mood-${index}">100%</span></div>
-                <div>👊🏻体力: <span id="stamina-${index}">100%</span></div>
             </div>
             <div class="pet-progress">
                 <div id="progress-bar-${index}" class="progress-bar"></div>
@@ -12393,10 +12397,12 @@ function updateGoldDisplay(goldAmount) {
     const ding = Math.floor(goldAmount / 1000000);
 
     goldElement.innerText = `${ding}锭${liang}两${wen}文`;
-    goldElement.style.color = 'orange';
+    goldElement.style.color = 'gold';
     goldElement.style.fontWeight = 'bold';
-    goldElement.style.webkitTextStroke = '1px gold'; // 添加描边效果
-    goldElement.style.textStroke = '1px gold'; // 兼容性处理
+    goldElement.style.background = 'rgb(0, 54, 112)'; // 兼容性处理
+    goldElement.style.border = '1px solid white'; // 兼容性处理
+    goldElement.style.borderRadius = '5px'; // 兼容性处理
+    goldElement.style.padding = '0px 5px'; // 兼容性处理
 }
 
 function toggleShop() {

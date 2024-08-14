@@ -46,7 +46,7 @@
         .pet-container {
             background-image: url(https://pic.imgdb.cn/item/66bb8916d9c307b7e95f8f5a.jpg);
             border-radius: 10px;
-            margin: 10px;
+            margin: 10px 10px 20px 10px;
             padding: 10px;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
             color: white;
@@ -57,6 +57,9 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
+            background: rgb(0 0 0 / 40%);
+            border-radius: 10px;
+            padding: 10px;
             text-shadow: -1px -1px 0 black,  
      1px -1px 0 black,
     -1px  1px 0 black,
@@ -68,10 +71,9 @@
         }
         .pet-status {
             display: flex;
-            justify-content: space-around;
+            justify-content: space-between;
             margin-bottom: 10px;
             flex-direction: row;
-            background: rgba(0, 0, 0, 0.5);
             border-radius: 10px;
         }
         .pet-status div {
@@ -79,7 +81,8 @@
             text-align: center;
             display: flex;
             align-items: center;
-            justify-content: space-around;
+            justify-content: space-between;
+            flex: 0.4;
         }
         .pet-progress {
             width: 100%;
@@ -3289,7 +3292,7 @@ function infoFeisheng() {
     showInfoBox("\n1.宠物满足160级和24悟性时可以进行飞升\n2.飞升后开放属性专精和飞升技能等系统\n3.宠物等级上限会开放至200级");
 }  
 function infoPingfen() {
-    showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励");
+    showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -3356,7 +3359,7 @@ function infoPingfenpaihang() {
             <div class="pet-header">
                 <div id="header-container" style="display:flex;flex-direction: column;min-width:70%;">
                     <h2>${index + 1}. ${pet.petName}（评分:${pet.skillScore}）</h2>
-                    <div style="margin: 10px;display: flex;justify-content: space-around;">💰能力值：<span id="earnings-${index}">${initialEarnings}</span>金子/次</div>
+                    <div style="margin: 10px 0px 10px 0px;display: flex;justify-content: center;">💰能力值：<span id="earnings-${index}">${initialEarnings}金子</span></div>
                     <div class="pet-status">
                         <div>😄心情: <span id="mood-${index}">100%</span></div>
                         <div>👊🏻体力: <span id="stamina-${index}">100%</span></div>
@@ -3401,7 +3404,7 @@ function infoPingfenpaihang() {
             newPetStates[index].progressBar.style.width = '0%'; // 确保进度条初始为0%
             document.getElementById(`mood-${index}`).innerText = `${newPetStates[index].mood}%`;
             document.getElementById(`stamina-${index}`).innerText = `${newPetStates[index].stamina}%`;
-            document.getElementById(`earnings-${index}`).innerText = convertPrice(Math.floor(newPetStates[index].goldAmount * newPetStates[index].stamina * 0.01));
+            document.getElementById(`earnings-${index}`).innerText = `${convertPrice(Math.floor(newPetStates[index].goldAmount * newPetStates[index].stamina * 0.01))}金子`;
             
             // 如果宠物已在委托状态，按钮文本应为“停止”
             if (newPetStates[index].delegationActive) {
@@ -3446,7 +3449,7 @@ function startPetWork() {
 
                     // 计算并更新实际收益显示
                     const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
-                    document.getElementById(`earnings-${index}`).innerText = updatedEarnings;
+                    document.getElementById(`earnings-${index}`).innerText = `${updatedEarnings}金子`;
 
                     // 计算获得的金钱
                     const goldEarned = Math.floor(petState.goldAmount * gainFactor);
@@ -3471,22 +3474,37 @@ function play(index) {
     // 随机获得(-10, 30)之间的值
     const moodChange = Math.floor(Math.random() * 41) - 10;
 
-    // 更新心情值，确保范围在0到100之间
+    // 更新心情值,确保范围在0到100之间
     mood = Math.min(100, Math.max(0, mood + moodChange));
     petStates[index].mood = mood;
     document.getElementById(`mood-${index}`).innerText = `${mood}%`;
 
     // 显示对应的文字事件
     if (moodChange === -10) {
-        showInfoBox(`你尝试和${petName}玩填字游戏，但它表现出明显的意兴阑珊，场面一度冷冰冰。`);
-    } else if (moodChange >= -9 && moodChange <= 0) {
-        showInfoBox(`${petName}似乎对你的表演并不买账，心情变得有些低落。`);
-    } else if (moodChange >= 1 && moodChange <= 10) {
-        showInfoBox(`${petName}稍微露出了些许笑容，似乎对你的玩笑感到了一点点兴趣。`);
-    } else if (moodChange >= 11 && moodChange <= 20) {
-        showInfoBox(`你和${petName}玩了一会儿飞盘，它似乎玩得很开心，心情有所提升。`);
-    } else if (moodChange >= 21 && moodChange <= 30) {
-        showInfoBox(`${petName}对你刚才的互动表现得极为兴奋，似乎你是它最好的朋友，心情值大幅提升！`);
+        showInfoBox(`你准备了${petName}最喜欢的美食,但它只是尝了一口就走开了,看起来没有胃口。`);
+    } else if (moodChange >= -9 && moodChange <= -5) {
+        showInfoBox(`你邀请${petName}一起看了一部新上映的电影,但它似乎对情节不太感兴趣,中途还打了几个哈欠。`);
+    } else if (moodChange >= -4 && moodChange <= 0) {
+        showInfoBox(`你和${petName}一起散步,聊了聊最近的生活,但它的回应有些冷淡,心情没有明显改善。`);
+    } else if (moodChange >= 1 && moodChange <= 5) {
+        showInfoBox(`你和${petName}一起欣赏了一场音乐会,它听到熟悉的旋律时,脸上露出了微笑。`);
+    } else if (moodChange >= 6 && moodChange <= 10) {
+        showInfoBox(`你带${petName}去了它最喜欢的公园,陪它玩了一会儿飞盘,它看起来很开心。`);
+    } else if (moodChange >= 11 && moodChange <= 15) {
+        showInfoBox(`你和${petName}一起做了一顿美味的晚餐,它吃得非常满足,心情明显好转。`);
+    } else if (moodChange >= 16 && moodChange <= 20) {
+        showInfoBox(`你和${petName}一起回顾了你们的旅行照片,它对那些美好的回忆感到非常怀念和高兴。`);
+    } else if (moodChange >= 21 && moodChange <= 25) {
+        showInfoBox(`你和${petName}一起参加了一个有趣的绘画活动,它非常投入,画出了一幅令人印象深刻的作品。`);
+    } else if (moodChange >= 26 && moodChange <= 30) {
+        showInfoBox(`你和${petName}一起参加了一场激动人心的球赛,当你们支持的队伍获胜时,它兴奋得跳了起来,心情极佳!`);
+    }
+
+    // 额外的判断逻辑
+    if (mood <= 20) {
+        showInfoBox(`${petName}最近似乎有些闷闷不乐,也许你们可以尝试一些新的活动,如烹饪课或者瑜伽课,给生活增添一些乐趣。`);
+    } else if (mood >= 80) {
+        showInfoBox(`${petName}最近心情非常好,它非常享受和你在一起的每一刻,无论是一起探索新的餐厅,还是在家中观看你们都喜欢的经典电影。`);
     }
 
     // 恢复进度条工作
@@ -3563,7 +3581,7 @@ function delegate(index) {
 
     if (delegationActive) {
         if (cultivationPoints <= 0) {
-            showInfoBox(`调兵遣将实乃耗费心智之事，你需要通过修炼（修为处的加号）提升修行点数才能为${petName}开启委托功能`);
+            showInfoBox(`调兵遣将实乃耗费心智之事，你需要在圣天使的属性面板内，通过修炼（修为处的加号）提升修行点数才能为${petName}开启委托功能`);
             petStates[index].delegationActive = false;
             return;
         }
@@ -3650,7 +3668,7 @@ function handleDelegation(index) {
 }
         
 function infoXiuwei() {
-    showInfoBox("\n1.修为主要由宠物等级和综合实力自动计算得来 \n2.修为在战斗中的作用至关重要，主要体现在施加战斗效果、延长施法时间、抵抗敌人控制类效果等 \n3.修为越高，赢得战局的可能性越大 \n4.如果你拥有珍贵的仙人醍醐，可以通过修炼提升修为 \n5.某些专精技能会提升修为计算的系数");
+    showInfoBox(`\n1.修为主要由宠物等级和综合实力自动计算得来 \n2.修为在战斗中的作用至关重要，主要体现在施加战斗效果、延长施法时间、抵抗敌人控制类效果等 \n3.修为越高，赢得战局的可能性越大 \n4.如果你拥有珍贵的仙人醍醐，可以通过修炼提升修为 \n5.通过修炼提升的修为值可以作为宠物打工时委托使用的修行点数 \n6.${currentPet.name}的修为值为${playerCultivation}，其中修炼修为值为${additionalPlayerCultivation}`);
 }  
 function infoWuxing() {
     showInfoBox("\n1.悟性对宠物的成长至关重要 \n2.悟性越高，洗练所得高级技能的概率就越大 \n3.悟性能够给二级属性百分比的加成");
@@ -4177,18 +4195,24 @@ let summonedPet = null;
 let currentPetKey = 'xiaojin';
 let currentPet = pets[currentPetKey]; // 初始化当前宠物
 
-//删除宠物数据
+// 删除宠物数据
 function deletePetData(petName) {
     const key = `petData_${petName}`;
     if (localStorage.getItem(key) !== null) {
         localStorage.removeItem(key);
         console.log(`Data for pet ${petName} has been deleted.`);
+        
+        const petSelect = document.getElementById('pet-select');
+        const optionToRemove = Array.from(petSelect.options).find(option => option.text === petName);
+        if (optionToRemove) {
+            petSelect.removeChild(optionToRemove);
+        }
     } else {
         console.log(`No data found for pet ${petName}.`);
     }
 }
 
-//删档函数
+// 删档函数
 function deleteAllPetData() {
     showInfoBox('你确定删除其他宠物数据吗？操作不可恢复！', () => {
         const keysToRemove = [];
@@ -4198,7 +4222,19 @@ function deleteAllPetData() {
                 keysToRemove.push(key);
             }
         }
-        keysToRemove.forEach(key => localStorage.removeItem(key));
+        keysToRemove.forEach(key => {
+            const petName = key.replace('petData_', '');
+            if (petName !== currentPet.name) {
+                localStorage.removeItem(key);
+                
+                const petSelect = document.getElementById('pet-select');
+                const optionToRemove = Array.from(petSelect.options).find(option => option.text === petName);
+                if (optionToRemove) {
+                    petSelect.removeChild(optionToRemove);
+                }
+            }
+        });
+        
         // 检查 localStorage 中是否存在 'gameState' 数据
         if (localStorage.getItem('gameState') !== null) {
             localStorage.removeItem('gameState');
@@ -4206,8 +4242,9 @@ function deleteAllPetData() {
         } else {
             console.log('gameState 不存在');
         }
+        
         showInfoBox('除当前宠物外，其他宠物数据均已删除！');
-        console.log(`Deleted ${keysToRemove.length} pet data entries.`);
+        console.log(`Deleted ${keysToRemove.length - 1} pet data entries.`);
     });
 }
         
@@ -12555,7 +12592,7 @@ function updateGoldDisplay(goldAmount) {
     const ding = Math.floor(goldAmount / 1000000);
 
     goldElement.innerText = `${ding}锭${liang}两${wen}文`;
-    goldElement.style.color = 'gold';
+    goldElement.style.color = 'white';
     goldElement.style.fontWeight = 'bold';
     goldElement.style.background = 'rgb(0, 54, 112)'; // 兼容性处理
     goldElement.style.border = '1px solid white'; // 兼容性处理
@@ -13339,6 +13376,7 @@ function resetPet() {
     currentWisdom = 0;
     petAscended = false;
     petMaxLevel = 149;
+    additionalPlayerCultivation = 0;
     lockArms();
     removeArmsAttributes();
     petWisdom = currentWisdom;
@@ -13715,7 +13753,7 @@ let isOngoingCultivate = false;
 
 function upgradePlayerCultivation() {
     // 提示玩家是否进行修炼
-    showInfoBox("\n- 你可以使用1个仙人醍醐进行修炼，修炼时间为1分钟 \n- 修炼结束后会获得一定数量的修为，确认请继续", () => {
+    showInfoBox("\n1.你可以使用1个仙人醍醐进行修炼，修炼时间为1分钟 \n2.修炼结束后会获得一定数量的修为，确认请继续", () => {
         // 确认修炼
         const ultraSkillBoomerItem = jinnangItems.find(i => i.name === 'ultraSkillBoomer');
         if (ultraSkillBoomerItem.quantity > 0) {
@@ -13934,7 +13972,7 @@ function startProgressUpdate(progress, timeRemaining, updateProgress) {
                 additionalPlayerCultivation = 1000000
                 showInfoBox(`修炼结束，但你的修为已经通过修炼达到最大值，无法再增加。`);
             } else {
-                showInfoBox(`修炼结束，本次修炼你获得了 ${totalGainedCultivation} 点修为。`);
+                showInfoBox(`修炼结束，可以点击修为按钮查看修行结果。`);
             }
             totalGainedCultivation = 0; // 重置累计修为值
         }

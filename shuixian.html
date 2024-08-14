@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>水仙教通灵模拟器</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+    }
+    
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .asset {
+    font-size: 20px;
+    font-weight: bold;
+    color: gold;
+    }
+    
+    .container {
+      max-width: 800px;
+      gap: 20px;
+      display: flex;
+      min-height: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      flex-direction: column;
+    }
+    .button-container {
+      display: flex;
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+
+    .result-container {
+      flex-di
+      font-size: 20px;
+      padding: 20px;
+      flex-direction: column;
+      align-items: center;
+      display: flex;
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 20px;
+      font-size: 20px;
+      height: 150px;
+      justify-content: space-between;
+      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.4);
+    }
+    
+    .special {
+      color: red;
+      font-weight: bold;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: gold;
+      font-size: 48px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      text-align: center;
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>水仙教通灵</h1>
+    <div class="asset">资产: <span id="asset">2000</span></div>
+    <div class="button-container">
+      <button id="tonglingBtn">通灵</button>
+      <button id="resetBtn">复位</button>
+    </div>
+    <div class="result-container">
+    <div class="result" id="result"></div>
+    </div>
+    <div id="countInfo">
+      <p>已通灵<span class="special" id="tonglingCount">0</span>次</p>
+      <p>您已消耗价值<span class="special" id="tonglingCost">0</span>元的水仙教通灵</p>
+    </div>
+    <div id="bountyInfo"></div>
+  </div>
+  
+  <div class="overlay" id="overlay">三速欧皇降临!</div>
+  
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modalText"></p>
+      <button id="confirmBtn">确定</button>
+      <button id="cancelBtn">取消</button>
+    </div>
+  </div>
+
+  <script>
+    const resultElement = document.getElementById('result');
+    const assetElement = document.getElementById('asset');
+    const tonglingCountElement = document.getElementById('tonglingCount');
+    const tonglingCostElement = document.getElementById('tonglingCost');
+    const bountyInfoElement = document.getElementById('bountyInfo');
+    const overlayElement = document.getElementById('overlay');
+
+    let asset = 2000;
+    let tonglingCount = 0;
+    let currentBounty = null;
+    let isEuropeKing = false;
+    let merchantEvent = false;
+    let merchantCost = 0;
+    let merchantCount = 0;
+    let merchantPrice = 0;
+    let merchantSavings = 0;
+
+    const items = [
+      { range: [90, 180], name: '敏捷' },
+      { range: [90, 180], name: '信仰' },
+      { range: [90, 180], name: '耐力' },
+      { range: [18, 36], name: '‰ HP上限' },
+      { range: [18, 36], name: '‰ MP 上限' },
+      { range: [18, 36], name: '‰ 法术防' },
+      { range: [18, 36], name: '‰ 防御' },
+      { range: [51, 102], name: '速度' },
+      { range: [3, 4], name: '‰ 速度' },
+      { range: [764, 1296], name: '恢复' },
+      { range: [236, 488], name: '法术暴击' },
+      { range: [236, 488], name: '法术暴击抵抗' },
+      { range: [236, 488], name: '法术闪避' },
+      { range: [236, 488], name: '忽视法术闪避' },
+      { range: [236, 488], name: '法术命中' },
+      { range: [236, 488], name: '物理暴击' },
+      { range: [236, 488], name: '物理暴击抵抗' },
+      { range: [236, 488], name: '物理闪避' },
+      { range: [236, 488], name: '忽视物理闪避' },
+      { range: [236, 488], name: '物理命中' },
+      { range: [51, 76], name: '每回合怒气' },
+    ];
+
+    function getRandomItem() {
+      const item = items[Math.floor(Math.random() * items.length)];
+      const value = Math.floor(Math.random() * (item.range[1] - item.range[0] + 1)) + item.range[0];
+      return `+${value} ${item.name}`;
+    }
+
+    function getRandomCount() {
+      const rand = Math.random();
+      if (rand < 0.1) return 1;
+      if (rand < 0.3) return 2;
+      if (rand < 0.6) return 3;
+      if (rand < 0.8) return 4;
+      return 5;
+    }
+
+    function checkEuropeKing(resultArray) {
+      let sum = 0;
+      for (const result of resultArray) {
+        if (result.includes('‰ 速度')) {
+          sum += parseInt(result.match(/\d+/)[0]) * 45;
+        } else if (result.includes('速度')) {
+          sum += parseInt(result.match(/\d+/)[0]) * 0.5;
+        } else if (result.includes('敏捷')) {
+          sum += parseInt(result.match(/\d+/)[0]);
+        }
+      }
+      return sum >= 361;
+    }
+
+    function showOverlay() {
+      overlayElement.classList.add('show');
+      setTimeout(() => {
+        overlayElement.classList.remove('show');
+      }, 1000);
+    }
+
+    function checkBounty(resultArray) {
+      if (currentBounty) {
+        let sum = 0;
+        for (const result of resultArray) {
+          if (result.includes('‰ 速度')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 45;
+          } else if (result.includes('速度')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.5;
+          } else if (result.includes('敏捷')) {
+            sum += parseInt(result.match(/\d+/)[0]);
+          }
+        }
+        if (sum >= currentBounty.target) {
+          bountyInfoElement.innerHTML = `
+            <p>恭喜你完成了悬赏!</p>
+            <button id="claimBtn">领取赏金</button>
+          `;
+          document.getElementById('claimBtn').addEventListener('click', () => {
+            asset += currentBounty.reward;
+            assetElement.textContent = asset;
+            currentBounty = null;
+            bountyInfoElement.innerHTML = '';
+          });
+        }
+      }
+    }
+
+    function generateBounty() {
+      const target = Math.floor(Math.random() * 401) + 200;
+      const reward = 10000 + 25 * (target - 580);
+      currentBounty = { target, reward };
+      bountyInfoElement.innerHTML = `
+        <p>有一个新的悬赏通灵，赏金${reward}元，是否接受?</p>
+        <div class="button-container">
+        <button id="acceptBtn">接受</button>
+        <button id="declineBtn">拒绝</button>
+        </div>
+      `;
+      document.getElementById('acceptBtn').addEventListener('click', () => {
+        bountyInfoElement.innerHTML = `
+          <p>你需要帮助神秘玩家洗出${target}点敏捷，如放弃则支付1000元违约金</p>
+          <button id="giveUpBtn">放弃</button>
+        `;
+        document.getElementById('giveUpBtn').addEventListener('click', () => {
+          asset -= 1000;
+          assetElement.textContent = asset;
+          currentBounty = null;
+          bountyInfoElement.innerHTML = '';
+        });
+      });
+      document.getElementById('declineBtn').addEventListener('click', () => {
+        currentBounty = null;
+        bountyInfoElement.innerHTML = '';
+      });
+    }
+
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modalText');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const closeBtn = document.getElementsByClassName('close')[0];
+
+    closeBtn.addEventListener('click', closeModal);
+    confirmBtn.addEventListener('click', confirmModal);
+    cancelBtn.addEventListener('click', cancelModal);
+
+    function openModal(text) {
+      modalText.textContent = text;
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    function confirmModal() {
+      closeModal();
+      if (merchantEvent) {
+        if (asset >= merchantCost) {
+          asset -= merchantCost;
+          assetElement.textContent = asset.toFixed(2);
+          tonglingBtn.click();
+        } else {
+          openModal('收手吧，赌海无涯');
+        }
+      } else {
+        tonglingBtn.click();
+      }
+    }
+
+    function cancelModal() {
+      closeModal();
+    }
+
+    function generateMerchantEvent() {
+      const cost = Math.floor(Math.random() * 100) + 1;
+      const count = cost * 10;
+      const price = Math.floor(Math.random() * 4) + 3;
+
+      merchantEvent = true;
+      merchantCost = cost;
+      merchantCount = count;
+      merchantPrice = price;
+      merchantSavings = 0;
+
+      bountyInfoElement.innerHTML = `
+        <p>一位知名商人路过此处，眼见你捉襟见肘，只需要${cost}的手续费，就能优惠卖你${price}元的通灵${count}个，是否需要？</p>
+        <button id="acceptMerchantBtn">交易</button>
+        <button id="declineMerchantBtn">下次吧</button>
+      `;
+
+      document.getElementById('acceptMerchantBtn').addEventListener('click', () => {
+        if (asset >= cost) {
+          asset -= cost;
+          assetElement.textContent = asset.toFixed(2);
+          bountyInfoElement.innerHTML = '';
+        } else {
+          openModal('收手吧，赌海无涯');
+          merchantEvent = false;
+          bountyInfoElement.innerHTML = '';
+        }
+      });
+
+      document.getElementById('declineMerchantBtn').addEventListener('click', () => {
+        merchantEvent = false;
+        bountyInfoElement.innerHTML = '';
+      });
+    }
+
+    document.getElementById('tonglingBtn').addEventListener('click', () => {
+      if (asset >= (merchantEvent ? merchantPrice : 6.5)) {
+        asset -= merchantEvent ? merchantPrice : 6.5;
+        assetElement.textContent = asset.toFixed(2);
+        tonglingCount++;
+        tonglingCountElement.textContent = tonglingCount;
+        tonglingCostElement.textContent = `${(tonglingCount * 6.5).toFixed(2)}${merchantEvent ? `（商人已为你节省了${merchantSavings.toFixed(2)}元）` : ''}`;
+
+        if (merchantEvent) {
+          merchantCount--;
+          merchantSavings += 6.5 - merchantPrice;
+          if (merchantCount === 0) {
+            merchantEvent = false;
+          }
+        }
+
+        const count = getRandomCount();
+        const resultArray = [];
+        for (let i = 0; i < count; i++) {
+          resultArray.push(getRandomItem());
+        }
+        resultElement.innerHTML = resultArray.join('<br>');
+
+        if (checkEuropeKing(resultArray)) {
+          isEuropeKing = true;
+          openModal('如此好运，说走就走吗？');
+        } else {
+          checkBounty(resultArray);
+        }
+
+        if (!currentBounty && (Math.random() < 0.15 || (isEuropeKing && Math.random() < 0.88))) {
+          isEuropeKing = false;
+          generateBounty();
+        }
+
+        if (tonglingCount % 50 === 0 && Math.random() < 0.15) {
+          generateMerchantEvent();
+        }
+      } else {
+        alert('资产不足，无法通灵!');
+      }
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (currentBounty) {
+        if (confirm('神秘玩家还在等你领赏金，确定不洗了吗?')) {
+          currentBounty = null;
+          bountyInfoElement.innerHTML = '';
+          reset();
+        }
+      } else {
+        reset();
+      }
+    });
+
+    function reset() {
+      asset = 2000;
+      assetElement.textContent = asset;
+      tonglingCount = 0;
+      tonglingCountElement.textContent = tonglingCount;
+      tonglingCostElement.textContent = '0';
+      resultElement.innerHTML = '';
+    }
+  </script>
+</body>
+</html>

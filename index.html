@@ -115,6 +115,7 @@
         .pet-buttons button:active {
             background-color: #004373;
         }
+        
             /* 防止 "pull-to-refresh" 行为 */
     @media screen and (pointer: coarse) {
     @supports (-webkit-backdrop-filter: blur(1px)) {
@@ -1931,13 +1932,13 @@
                             飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
                         </div>
                         <div class="progress-bar">
-                            <button onclick="togglePetOverview()">💝</button>评分: <span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                            <button onclick="togglePetOverview()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
                         </div>
                         <div class="progress-bar">
-                            <button onclick="infoXiuwei()">?</button>修为: <span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
+                            <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
                         </div>
                         <div class="progress-bar">
-                            <button onclick="infoWuxing()">?</button>悟性: <span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                            <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                         </div>
                         <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                         <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
@@ -3272,7 +3273,7 @@ function infoFeisheng() {
     showInfoBox("\n1.宠物满足160级和24悟性时可以进行飞升\n2.飞升后开放属性专精和飞升技能等系统\n3.宠物等级上限会开放至200级");
 }  
 function infoPingfen() {
-    showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高");
+    showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -3290,6 +3291,7 @@ function togglePetOverview() {
 
 function infoPingfenpaihang() {
     const allPetData = [];
+    const newPetStates = []; // 新的宠物状态数组
 
     // 遍历 localStorage，提取所有保存的宠物数据
     for (let i = 0; i < localStorage.length; i++) {
@@ -3300,7 +3302,7 @@ function infoPingfenpaihang() {
                 allPetData.push({
                     petName: key.replace('petData_', ''),
                     skillScore: petData.skillScore,
-                    goldAmount: Math.floor(petData.skillScore * 0.001),
+                    goldAmount: Math.floor(petData.skillScore * 0.001314159),
                 });
             }
         }
@@ -3317,16 +3319,16 @@ function infoPingfenpaihang() {
     allPetData.forEach((pet, index) => {
         const petContainer = document.createElement('div');
         petContainer.className = 'pet-container';
-    
+
         // 使用默认值100%作为初始stamina的值进行UI显示的计算
         const initialStamina = 100;
         const initialEarnings = convertPrice(Math.floor(pet.skillScore * 0.001) * initialStamina * 0.01);
-    
+
         // 宠物信息和评分
         petContainer.innerHTML = `
             <div class="pet-header">
                 <h2>${index + 1}. ${pet.petName}（评分:${pet.skillScore}）</h2>
-                <p>💰收益：<span id="earnings-${index}">${initialEarnings}</span>金子/次</p>
+                <div style="margin: 10px;display: flex;justify-content: space-around;">💰打工收益：<span id="earnings-${index}">${initialEarnings}</span>金子/次</div>
             </div>
             <div class="pet-status">
                 <div>😄心情: <span id="mood-${index}">100%</span></div>
@@ -3341,12 +3343,14 @@ function infoPingfenpaihang() {
                 <button onclick="feed(${index}, ${pet.goldAmount})">喂食</button>
             </div>
         `;
-    
+
         petOverview.appendChild(petContainer);
-    
+
         // 初始化或恢复宠物状态
-        if (!petStates[index]) {
-            petStates[index] = {
+        const existingState = petStates.find(state => state.petName === pet.petName);
+        if (!existingState) {
+            newPetStates[index] = {
+                petName: pet.petName,
                 mood: 100,
                 stamina: 100,
                 progressBar: document.getElementById(`progress-bar-${index}`),
@@ -3355,13 +3359,19 @@ function infoPingfenpaihang() {
             };
         } else {
             // 恢复进度条元素并更新其状态
-            petStates[index].progressBar = document.getElementById(`progress-bar-${index}`);
-            petStates[index].progressBar.style.width = '0%'; // 确保进度条初始为0%
-            document.getElementById(`mood-${index}`).innerText = `${petStates[index].mood}%`;
-            document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
-            document.getElementById(`earnings-${index}`).innerText = convertPrice(Math.floor(petStates[index].goldAmount * petStates[index].stamina * 0.01));
+            newPetStates[index] = {
+                ...existingState,
+                progressBar: document.getElementById(`progress-bar-${index}`),
+            };
+            newPetStates[index].progressBar.style.width = '0%'; // 确保进度条初始为0%
+            document.getElementById(`mood-${index}`).innerText = `${newPetStates[index].mood}%`;
+            document.getElementById(`stamina-${index}`).innerText = `${newPetStates[index].stamina}%`;
+            document.getElementById(`earnings-${index}`).innerText = convertPrice(Math.floor(newPetStates[index].goldAmount * newPetStates[index].stamina * 0.01));
         }
     });
+
+    // 用新的状态数组替换全局的 petStates
+    petStates = newPetStates;
 
     // 开始宠物打工
     startPetWork();
@@ -3391,6 +3401,7 @@ function startPetWork() {
                     // 更新心情和体力显示
                     document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
                     document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
+                    document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
 
                     // 计算并更新实际收益显示
                     const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
@@ -3425,27 +3436,38 @@ function play(index) {
 
 function rest(index) {
     let stamina = petStates[index].stamina;
+
+    // 暂停进度条
+    if (petProgressIntervals[index]) {
+        clearInterval(petProgressIntervals[index]);
+        petProgressIntervals[index] = null;
+    }
+
     petStates[index].progressBar.style.width = '0%'; // 重置进度条
     petStates[index].stamina = Math.min(100, stamina + 20);
     document.getElementById(`stamina-${index}`).innerText = `${stamina}%`;
+    showInfoBox("休息中…");
 
     setTimeout(() => {
         petStates[index].stamina = Math.min(100, stamina + 20);
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
         showInfoBox("打个小盹，体力充沛，又可以做快乐的牛马了！");
 
-        if (!petProgressIntervals[index] && petStates[index].mood > 0 && petStates[index].stamina > 0) {
-            startPetWork(); // 恢复进度条工作
+        // 休息结束后，检查体力和心情，如果大于0则恢复进度条
+        if (petStates[index].mood > 0 && petStates[index].stamina > 0) {
+            startPetWork(); // 重新启动进度条
         }
-    }, 10000);
+    }, 10000); // 10秒的休息时间
 }
+
 
 function feed(index, goldCost) {
     if (goldAmount >= 10000) {
         goldAmount -= 10000;
         updateGoldDisplay(goldAmount);
-        petStates[index].stamina = 100;
-        document.getElementById(`stamina-${index}`).innerText = `100%`;
+        document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
+        petStates[index].stamina = Math.min(100, petStates[index].stamina + 50);
+        document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
         showInfoBox("感谢金主爸爸投喂！");
 
         if (!petProgressIntervals[index] && petStates[index].mood > 0 && petStates[index].stamina > 0) {
@@ -3640,7 +3662,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     // 创建提示框元素
     const infoBox = document.createElement('div');
     infoBox.style.position = 'fixed';
-    infoBox.style.top = '30%';
+    infoBox.style.top = '50%';
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
     infoBox.style.width = '85%'; // 增加宽度
@@ -13859,6 +13881,7 @@ function updateSkillScore(selectedSkills = []) {
     // 更新任务列表以反映新的宠物评分
     updateTaskList();
     updateTitle();
+    storeCurrentPetData();
 }
 
 let blessGiftClaimed = false;
@@ -15250,6 +15273,9 @@ window.onload = function() {
     checkAwakening(); // 检查宠物觉醒状态
     infoPingfenpaihang();
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
+    document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
+    document.getElementById("bless-gift-button").addEventListener("click", blessGift);
+    document.getElementById("open-tenth-treasure-button").addEventListener("click", openTenthTreasure);
 }
         
 function hideImageBox(imageBox, clickHandler) {
@@ -15318,26 +15344,6 @@ function updateTitle() {
     const titleElement = document.getElementById('personal-honor');
     titleElement.innerText = titles[currentTitleIndex];
 }
-
-// 绑定按钮点击事件自动战斗
-document.getElementById('autoBattleButton').addEventListener('click', autoBattle);
-
-// 绑定 blessGift 按钮的点击事件
-document.getElementById("bless-gift-button").addEventListener("click", blessGift);
-
-// 绑定“开启十次”按钮的点击事件
-document.getElementById("open-tenth-treasure-button").addEventListener("click", openTenthTreasure);
-
-// 添加警示闪烁的关键帧动画
-const style = document.createElement('style');
-style.innerHTML = `
-    @keyframes warning-blink {
-        0% { box-shadow: 0 0 5px ${warningColor}; }
-        50% { box-shadow: none; }
-        100% { box-shadow: 0 0 5px ${warningColor}; }
-    }
-`;
-document.head.appendChild(style);
 
 // 保存游戏
 function saveGameState() {

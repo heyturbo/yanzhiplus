@@ -3193,6 +3193,21 @@ const biographies = {
     ]
 };
 
+let wakeLock = null;
+
+async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => {
+      console.log('Screen Wake Lock released');
+    });
+    console.log('Screen Wake Lock acquired');
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+}
+
+requestWakeLock();
         
 function showGuide() {
     const messageBox = document.createElement('div');

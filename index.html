@@ -3328,7 +3328,7 @@ function infoPingfenpaihang() {
         petContainer.innerHTML = `
             <div class="pet-header">
                 <h2>${index + 1}. ${pet.petName}（评分:${pet.skillScore}）</h2>
-                <div style="margin: 10px;display: flex;justify-content: space-around;">💰打工收益：<span id="earnings-${index}">${initialEarnings}</span>金子/次</div>
+                <div style="margin: 10px;display: flex;justify-content: space-around;">💰能力值：<span id="earnings-${index}">${initialEarnings}</span>金子/次</div>
             </div>
             <div class="pet-status">
                 <div>😄心情: <span id="mood-${index}">100%</span></div>
@@ -3401,7 +3401,6 @@ function startPetWork() {
                     // 更新心情和体力显示
                     document.getElementById(`mood-${index}`).innerText = `${petState.mood}%`;
                     document.getElementById(`stamina-${index}`).innerText = `${petState.stamina}%`;
-                    document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
 
                     // 计算并更新实际收益显示
                     const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
@@ -3411,6 +3410,7 @@ function startPetWork() {
                     const goldEarned = Math.floor(petState.goldAmount * gainFactor);
                     goldAmount += goldEarned;
                     updateGoldDisplay(goldAmount);
+                    document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
 
                     if (petState.mood === 0 || petState.stamina === 0) {
                         clearInterval(petProgressIntervals[index]);

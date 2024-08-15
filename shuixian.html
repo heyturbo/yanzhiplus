@@ -22,7 +22,7 @@
     }
     
     .asset {
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     color: gold;
     }
@@ -135,6 +135,7 @@
       display: flex;
       flex-direction: row;
       justify-content: space-evenly;
+      background: rgba(0, 0, 0, 0.4);
     }
   </style>
 </head>
@@ -142,11 +143,11 @@
   <div class="container">
     <h1  style="color: white; margin:0;">水仙教通灵</h1>
     <div class="info-container">
-      <div id="countInfo" style="background: rgba(0, 0, 0, 0.1);color: white;border-radius: 20px;width:100%;">
+      <div id="countInfo" style="color: white;border-radius: 20px;width: 100%;margin: 0px 0px 0px 20px;display: flex;flex-direction: column;align-items: flex-start;">
         <p>已通灵<span class="special" id="tonglingCount">0</span>次</p>
         <p>已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
       </div>
-      <div id="shuixian" style="margin-left: 20px;">
+      <div id="shuixian" style="margin-left: 20px;padding: 10px;width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: space-around;">
         <img src="https://pic.imgdb.cn/item/66bdbaddd9c307b7e942f6de.png">
         <div class="asset">资产: <span id="asset">0</span></div>
       </div>
@@ -155,13 +156,12 @@
       <button onclick="deductGold()">换汇</button>
       <button id="tonglingBtn">通灵</button>
       <button onclick="exchangeGold()">提款</button>
-      
     </div>
     <div class="result-container">
     <div class="result" id="result"></div>
     </div>
 
-    <div id="bountyInfo"></div>
+    <div id="bountyInfo" style="background: rgba(0, 0, 0, 0.1);border-radius: 20px;"></div>
   </div>
   
   <div class="overlay" id="overlay">三速欧皇降临!</div>
@@ -296,95 +296,125 @@
     });
     
     function generateBounty() {
-      const target = Math.floor(Math.random() * 201) + 250;
-      const reward = target * 15;
-      currentBounty = { target, reward };
-      bountyInfoElement.innerHTML = `
-        <p style="color: #172a46;font-weight: bold;">有一个新的悬赏通灵，赏金${reward}元，是否接受?</p>
-        <div class="button-container">
-          <button id="acceptBtn">接受</button>
-          <button id="declineBtn">拒绝</button>
-          <button id="descripBtn">说明</button>
-        </div>
-      `;
+        // 随机选择 target 范围
+        let target;
+        let reward;
+        const randomChoice = Math.random();
     
-      document.getElementById('acceptBtn').addEventListener('click', () => {
+        if (randomChoice < 0.20) {
+            // 20% 概率：[181, 299]
+            target = Math.floor(Math.random() * (299 - 181 + 1)) + 181;
+            reward = Math.floor(Math.random() * (600 - 280 + 1)) + 280;  // 随机在[280,600]内取值
+        } else if (randomChoice < 0.70) {
+            // 50% 概率：[300, 359]
+            target = Math.floor(Math.random() * (359 - 300 + 1)) + 300;
+            reward = target * 5;  // target * 5
+        } else if (randomChoice < 0.90) {
+            // 20% 概率：[360, 440]
+            target = Math.floor(Math.random() * (440 - 360 + 1)) + 360;
+            reward = target * (Math.floor(Math.random() * (15 - 10 + 1)) + 10);  // target * [10~15]
+        } else if (randomChoice < 0.95) {
+            // 5% 概率：[441, 500]
+            target = Math.floor(Math.random() * (500 - 441 + 1)) + 441;
+            reward = target * 15;  // target * 15
+        } else if (randomChoice < 0.99) {
+            // 4% 概率：[501, 530]
+            target = Math.floor(Math.random() * (530 - 501 + 1)) + 501;
+            reward = target * (Math.floor(Math.random() * (25 - 20 + 1)) + 20);  // target * [20~25]
+        } else {
+            // 1% 概率：[531, 540]
+            target = Math.floor(Math.random() * (540 - 531 + 1)) + 531;
+            reward = target * 30 + 5000;  // target * 30 + 5000
+        }
+    
+        // 设置当前的悬赏任务
+        currentBounty = { target, reward };
         bountyInfoElement.innerHTML = `
-          <p style="color: #172a46;font-weight: bold;">你需要帮助神秘玩家洗出${target}点敏捷，如放弃则支付1000元违约金</p>
-          <div class="button-container">
-          <button id="giveUpBtn">放弃</button>
-          <button id="autoBtn">代洗</button>
-          </div>
+            <p style="color: #fefefe;font-weight: bold;">有一个新的悬赏通灵，赏金${reward}元，是否接受?</p>
+            <div class="button-container">
+              <button id="acceptBtn">接受</button>
+              <button id="declineBtn">拒绝</button>
+              <button id="descripBtn">说明</button>
+            </div>
         `;
     
-        let autoWashInterval = null;
+        document.getElementById('acceptBtn').addEventListener('click', () => {
+            bountyInfoElement.innerHTML = `
+                <p style="color: #fefefe;font-weight: bold;">你需要帮助神秘玩家洗出${target}点敏捷，如放弃则支付1000元违约金</p>
+                <div class="button-container">
+                <button id="giveUpBtn">放弃</button>
+                <button id="autoBtn">代洗</button>
+                </div>
+            `;
     
-        document.getElementById('giveUpBtn').addEventListener('click', () => {
-          asset -= 1000;
-          assetElement.textContent = asset;
-          currentBounty = null;
-          bountyInfoElement.innerHTML = '';
-          if (autoWashInterval) {
-            clearInterval(autoWashInterval);
-            autoWashInterval = null;
-          }
-        });
+            let autoWashInterval = null;
     
-        document.getElementById('autoBtn').addEventListener('click', () => {
-          if (autoWashInterval) {
-            clearInterval(autoWashInterval);
-            autoWashInterval = null;
-          } else {
-            autoWashInterval = setInterval(() => {
-              if (asset < (merchantEvent ? merchantPrice : 6.5)) {
-                clearInterval(autoWashInterval);
-                autoWashInterval = null;
-                alert:("资产不足，代洗已停止");
-                return;
-              }
-              document.getElementById('tonglingBtn').click();
-    
-              const resultArray = resultElement.innerHTML.split('<br>');
-              let sum = 0;
-              for (const result of resultArray) {
-                if (result.includes('‰ 速度')) {
-                  sum += parseInt(result.match(/\d+/)[0]) * 45;
-                } else if (result.includes('速度')) {
-                  sum += parseInt(result.match(/\d+/)[0]) * 0.5;
-                } else if (result.includes('敏捷')) {
-                  sum += parseInt(result.match(/\d+/)[0]) * 1;
+            document.getElementById('giveUpBtn').addEventListener('click', () => {
+                asset -= 1000;
+                assetElement.textContent = asset;
+                currentBounty = null;
+                bountyInfoElement.innerHTML = '';
+                if (autoWashInterval) {
+                    clearInterval(autoWashInterval);
+                    autoWashInterval = null;
                 }
-              }
+            });
     
-              if (sum >= currentBounty.target) {
-                clearInterval(autoWashInterval);
-                autoWashInterval = null;
-                bountyInfoElement.innerHTML = `
-                  <p style="color: #172a46;font-weight: bold;">恭喜你完成了悬赏!</p>
-                  <div class="button-container">
-                  <button id="claimBtn">领取赏金</button>
-                  </div>
-                `;
-                document.getElementById('claimBtn').addEventListener('click', () => {
-                  asset += currentBounty.reward;
-                  assetElement.textContent = asset;
-                  currentBounty = null;
-                  bountyInfoElement.innerHTML = '';
-                });
-              }
-            }, 100); // 每0.1秒执行一次
-          }
+            document.getElementById('autoBtn').addEventListener('click', () => {
+                if (autoWashInterval) {
+                    clearInterval(autoWashInterval);
+                    autoWashInterval = null;
+                } else {
+                    autoWashInterval = setInterval(() => {
+                        if (asset < (merchantEvent ? merchantPrice : 6.5)) {
+                            clearInterval(autoWashInterval);
+                            autoWashInterval = null;
+                            alert("资产不足，代洗已停止");
+                            return;
+                        }
+                        document.getElementById('tonglingBtn').click();
+    
+                        const resultArray = resultElement.innerHTML.split('<br>');
+                        let sum = 0;
+                        for (const result of resultArray) {
+                            if (result.includes('‰ 速度')) {
+                                sum += parseInt(result.match(/\d+/)[0]) * 45;
+                            } else if (result.includes('速度')) {
+                                sum += parseInt(result.match(/\d+/)[0]) * 0.5;
+                            } else if (result.includes('敏捷')) {
+                                sum += parseInt(result.match(/\d+/)[0]) * 1;
+                            }
+                        }
+    
+                        if (sum >= currentBounty.target) {
+                            clearInterval(autoWashInterval);
+                            autoWashInterval = null;
+                            bountyInfoElement.innerHTML = `
+                                <p style="color: #fefefe;font-weight: bold;">恭喜你完成了悬赏!</p>
+                                <div class="button-container">
+                                <button id="claimBtn">领取赏金</button>
+                                </div>
+                            `;
+                            document.getElementById('claimBtn').addEventListener('click', () => {
+                                asset += currentBounty.reward;
+                                assetElement.textContent = asset;
+                                currentBounty = null;
+                                bountyInfoElement.innerHTML = '';
+                            });
+                        }
+                    }, 100); // 每0.1秒执行一次
+                }
+            });
         });
-      });
     
-      document.getElementById('declineBtn').addEventListener('click', () => {
-        currentBounty = null;
-        bountyInfoElement.innerHTML = '';
-      });
+        document.getElementById('declineBtn').addEventListener('click', () => {
+            currentBounty = null;
+            bountyInfoElement.innerHTML = '';
+        });
     
-      document.getElementById('descripBtn').addEventListener('click', () => {
-        openModal("\n1. 悬赏奖金越高，难度越大 \n2. 敏捷的换算方式：\n 每1 ‰速度 = 45敏捷；每2速度 = 1敏捷");
-      });
+        document.getElementById('descripBtn').addEventListener('click', () => {
+            openModal("\n1. 悬赏奖金越高，难度越大 \n2. 敏捷的换算方式：\n 每1 ‰速度 = 45敏捷；每2速度 = 1敏捷");
+        });
     }
     
     function checkBounty(resultArray) {
@@ -402,7 +432,7 @@
         console.log(`当前敏捷共计${sum}`);
         if (sum >= currentBounty.target) {
           bountyInfoElement.innerHTML = `
-            <p style="color: #172a46;font-weight: bold;">恭喜你完成了悬赏!</p>
+            <p style="color: #fefefe;font-weight: bold;">恭喜你完成了悬赏!</p>
             <div class="button-container">
             <button id="claimBtn">领取赏金</button>
             </div>
@@ -467,7 +497,7 @@
       merchantSavings = 0;
 
       bountyInfoElement.innerHTML = `
-        <p style="color: #172a46;font-weight: bold;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
+        <p style="color: #fefefe;font-weight: bold;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
         <div class="button-container">
         <button id="acceptMerchantBtn">交易</button>
         <button id="declineMerchantBtn">离开</button>
@@ -507,7 +537,7 @@
     
     function exchangeGold() {
         if (asset > 0) {
-            const goldToAdd = Math.round(asset * 2) * 1000;
+            const goldToAdd = Math.round(asset / 6.5 * 20) * 1000;
             asset = 0;
             document.getElementById('asset').innerText = asset;
             window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');

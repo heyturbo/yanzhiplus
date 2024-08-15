@@ -204,28 +204,6 @@
       { range: [236, 488], name: '物理命中' },
       { range: [51, 76], name: '每回合怒气' },
     ];
-
-  function deductGold() {
-      window.parent.postMessage({ type: 'deductGold' }, 'http://tianfuxilian.top');
-  }
-  
-  window.addEventListener('message', function(event) {
-      if (event.origin !== 'http://tianfuxilian.top') return;
-  
-      if (event.data.type === 'success') {
-          asset += 650;
-          document.getElementById('asset').innerText = asset;
-      }
-  });
-  
-  function exchangeGold() {
-      if (asset > 0) {
-          const goldToAdd = Math.round(asset * 2) * 1000;
-          asset = 0;
-          document.getElementById('asset').innerText = asset;
-          window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
-      }
-  }
     
     function getRandomItem() {
       const item = items[Math.floor(Math.random() * items.length)];
@@ -250,7 +228,7 @@
         } else if (result.includes('速度')) {
           sum += parseInt(result.match(/\d+/)[0]) * 0.5;
         } else if (result.includes('敏捷')) {
-          sum += parseInt(result.match(/\d+/)[0]);
+          sum += parseInt(result.match(/\d+/)[0]) * 1;
         }
       }
       return sum >= 361;
@@ -262,43 +240,17 @@
         overlayElement.classList.remove('show');
       }, 1000);
     }
-
-    function checkBounty(resultArray) {
-      if (currentBounty) {
-        let sum = 0;
-        for (const result of resultArray) {
-          if (result.includes('‰ 速度')) {
-            sum += parseInt(result.match(/\d+/)[0]) * 45;
-          } else if (result.includes('速度')) {
-            sum += parseInt(result.match(/\d+/)[0]) * 0.5;
-          } else if (result.includes('敏捷')) {
-            sum += parseInt(result.match(/\d+/)[0]);
-          }
-        }
-        if (sum >= currentBounty.target) {
-          bountyInfoElement.innerHTML = `
-            <p>恭喜你完成了悬赏!</p>
-            <button id="claimBtn">领取赏金</button>
-          `;
-          document.getElementById('claimBtn').addEventListener('click', () => {
-            asset += currentBounty.reward;
-            assetElement.textContent = asset;
-            currentBounty = null;
-            bountyInfoElement.innerHTML = '';
-          });
-        }
-      }
-    }
-
+    
     function generateBounty() {
-      const target = Math.floor(Math.random() * 401) + 200;
-      const reward = 10000 + 25 * (target - 580);
+      const target = Math.floor(Math.random() * 201) + 250;
+      const reward = target * 15;
       currentBounty = { target, reward };
       bountyInfoElement.innerHTML = `
         <p>有一个新的悬赏通灵，赏金${reward}元，是否接受?</p>
         <div class="button-container">
         <button id="acceptBtn">接受</button>
         <button id="declineBtn">拒绝</button>
+        <button id="descripBtn">说明</button>
         </div>
       `;
       document.getElementById('acceptBtn').addEventListener('click', () => {
@@ -317,6 +269,36 @@
         currentBounty = null;
         bountyInfoElement.innerHTML = '';
       });
+      document.getElementById('descripBtn').addEventListener('click', () => {
+      openModal("\n1. 悬赏奖金越高，难度越大 \n2. 敏捷的换算方式：\n 每1 ‰速度 = 45敏捷；每2速度 = 1敏捷");
+      });
+    }
+    
+    function checkBounty(resultArray) {
+      if (currentBounty) {
+        let sum = 0;
+        for (const result of resultArray) {
+          if (result.includes('‰ 速度')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 45;
+          } else if (result.includes('速度')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.5;
+          } else if (result.includes('敏捷')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 1;
+          }
+        }
+        if (sum >= currentBounty.target) {
+          bountyInfoElement.innerHTML = `
+            <p>恭喜你完成了悬赏!</p>
+            <button id="claimBtn">领取赏金</button>
+          `;
+          document.getElementById('claimBtn').addEventListener('click', () => {
+            asset += currentBounty.reward;
+            assetElement.textContent = asset;
+            currentBounty = null;
+            bountyInfoElement.innerHTML = '';
+          });
+        }
+      }
     }
 
     const modal = document.getElementById('modal');
@@ -369,9 +351,9 @@
       merchantSavings = 0;
 
       bountyInfoElement.innerHTML = `
-        <p>一位知名商人路过此处，眼见你捉襟见肘，只需要${cost}的手续费，就能优惠卖你${price}元的通灵${count}个，是否需要？</p>
+        <p>只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
         <button id="acceptMerchantBtn">交易</button>
-        <button id="declineMerchantBtn">下次吧</button>
+        <button id="declineMerchantBtn">离开</button>
       `;
 
       document.getElementById('acceptMerchantBtn').addEventListener('click', () => {
@@ -417,7 +399,7 @@
 
         if (checkEuropeKing(resultArray)) {
           isEuropeKing = true;
-          openModal('如此好运，说走就走吗？');
+          alert('如此好运，说走就走吗？');
         } else {
           checkBounty(resultArray);
         }
@@ -427,7 +409,7 @@
           generateBounty();
         }
 
-        if (tonglingCount % 50 === 0 && Math.random() < 0.15) {
+        if (tonglingCount % 50 === 0 && Math.random() < 0.15 && !currentBounty) {
           generateMerchantEvent();
         }
       } else {
@@ -435,6 +417,28 @@
       }
     });
 
+    function deductGold() {
+        window.parent.postMessage({ type: 'deductGold' }, 'http://tianfuxilian.top');
+    }
+    
+    window.addEventListener('message', function(event) {
+        if (event.origin !== 'http://tianfuxilian.top') return;
+    
+        if (event.data.type === 'success') {
+            asset += 650;
+            document.getElementById('asset').innerText = asset;
+        }
+    });
+    
+    function exchangeGold() {
+        if (asset > 0) {
+            const goldToAdd = Math.round(asset * 2) * 1000;
+            asset = 0;
+            document.getElementById('asset').innerText = asset;
+            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
+        }
+    }
+    
     function reset() {
       asset = 0;
       assetElement.textContent = asset;

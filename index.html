@@ -269,12 +269,12 @@
         }
         .button-row {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0px 10px;
             margin: 0px 0px;
-            padding: 0px;
             flex-direction: row;
             flex-wrap: wrap;
+            justify-items: center;
         }
         
         .button-row button {
@@ -331,6 +331,14 @@
         
         #summonButton {
             background-image: url('https://pic.imgdb.cn/item/667eec26d9c307b7e95150b5.png');
+        }
+        
+        #divineButton {
+            background-image: url('https://pic.imgdb.cn/item/66bdfe39d9c307b7e998dba2.png');
+        }
+        
+        #workButton {
+            background-image: url('https://pic.imgdb.cn/item/66bdfe39d9c307b7e998db6b.png');
         }
         .core-area .skills {
             display: grid;
@@ -1790,7 +1798,7 @@
         <!-- Pet containers will be dynamically generated here -->
     </div>
     <div class="core-area-for-skills">
-        <div class="buttons">
+        <div class="buttons" style="width: 100%;">
             <div class="button-row">
                 <button id="guideButton" onclick="showGuide()">玩法</button>
                 <button id="missionButton" onclick="showMissionPanel()">任务</button>
@@ -1802,6 +1810,8 @@
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
                 <button id="fightingButton" onclick="toggleFightingDrawer()">战斗</button>
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
+                <button id="divineButton" onclick="divinePage()">通灵</button>
+                <button id="workButton" onclick="workPage()">打工</button>
             </div>
         </div>
     </div>
@@ -3245,6 +3255,10 @@ function closeFileB() {
     loadFileB();
 }
 
+function divinePage() {
+    loadFileB();
+}
+        
 window.addEventListener('message', function(event) {
     if (event.origin !== 'http://tianfuxilian.top') return;
 
@@ -3372,6 +3386,10 @@ function togglePetOverview() {
     }
 }
 
+function workPage() {
+    togglePetOverview();
+}
+        
 function infoPingfenpaihang() {
     storeCurrentPetData();
     const allPetData = [];

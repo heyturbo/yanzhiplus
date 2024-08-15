@@ -3248,13 +3248,18 @@ function closeFileB() {
 window.addEventListener('message', function(event) {
     if (event.origin !== 'http://tianfuxilian.top') return;
 
-    if (event.data.type === 'deductGold' && goldAmount >= 1300000) {
-        goldAmount -= 1300000;
+    if (event.data.type === 'deductGold' && goldAmount >= 2000000) {
+        goldAmount -= 2000000;
         updateGoldDisplay(goldAmount);
-        showInfoBox(`成功花费${convertPrice(1300000)}金兑换650元通灵资产！`);
+        showInfoBox(`成功花费${convertPrice(2000000)}金兑换100个养元水（通灵资产650元）！`);
+        event.source.postMessage({ type: 'success' }, 'http://tianfuxilian.top');
+    } else if (event.data.type === 'deductGold' && goldAmount >= 200000) {
+        goldAmount -= 200000;
+        updateGoldDisplay(goldAmount);
+        showInfoBox(`成功花费${convertPrice(200000)}金兑换10个养元水（通灵资产65元）！`);
         event.source.postMessage({ type: 'success' }, 'http://tianfuxilian.top');
     } else if (event.data.type === 'deductGold') {
-        showInfoBox("每次换汇需要消耗1.3锭金子，你的金子不足！");
+        showInfoBox("每次换汇至少需要200两金子，你的金子不足！");
         event.source.postMessage({ type: 'failure' }, 'http://tianfuxilian.top');
     }
     
@@ -13309,6 +13314,7 @@ function deal() {
     }
     const petSelect = document.getElementById("pet-select");
     const selectedPetKey = petSelect.value;
+    const petToDelete = currentPet.name;
     // 从下拉菜单中移除当前宠物
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
     console.log(`出售的是:${selectedPetKey}`);
@@ -13316,6 +13322,7 @@ function deal() {
         optionToRemove.remove();
         deletePetData(selectedPetKey);
         resetPet();
+        deletePetData(petToDelete);
     }
 
     // 设置默认选择第一个宠物

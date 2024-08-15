@@ -3246,16 +3246,16 @@ function closeFileB() {
 }
 
 window.addEventListener('message', function(event) {
-    if (event.origin !== 'http://8.137.96.151') return;
+    if (event.origin !== 'http://tianfuxilian.top') return;
 
     if (event.data.type === 'deductGold' && goldAmount >= 1300000) {
         goldAmount -= 1300000;
         updateGoldDisplay(goldAmount);
         showInfoBox(`成功花费${convertPrice(1300000)}金兑换650元通灵资产！`);
-        event.source.postMessage({ type: 'success' }, 'http://8.137.96.151');
+        event.source.postMessage({ type: 'success' }, 'http://tianfuxilian.top');
     } else if (event.data.type === 'deductGold') {
         showInfoBox("每次换汇需要消耗1.3锭金子，你的金子不足！");
-        event.source.postMessage({ type: 'failure' }, 'http://8.137.96.151');
+        event.source.postMessage({ type: 'failure' }, 'http://tianfuxilian.top');
     }
     
     if (event.data.type === 'exchangeGold') {

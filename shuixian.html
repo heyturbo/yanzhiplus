@@ -205,27 +205,27 @@
       { range: [51, 76], name: '每回合怒气' },
     ];
 
-    function deductGold() {
-        window.parent.postMessage('deductGold', '*');
-    }
-    
-    window.addEventListener('message', function(event) {
-        if (event.origin !== 'null') return;
-    
-        if (event.data === 'success') {
-            asset += 650;
-            document.getElementById('asset').innerText = asset;
-        }
-    });
-
-    function exchangeGold() {
-        if (asset > 0) {
-            const goldToAdd = Math.round(asset * 2) * 1000;
-            asset = 0;
-            document.getElementById('asset').innerText = asset;
-            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, '*');
-        }
-    }
+  function deductGold() {
+      window.parent.postMessage({ type: 'deductGold' }, 'http://8.137.96.151');
+  }
+  
+  window.addEventListener('message', function(event) {
+      if (event.origin !== 'http://8.137.96.151') return;
+  
+      if (event.data.type === 'success') {
+          asset += 650;
+          document.getElementById('asset').innerText = asset;
+      }
+  });
+  
+  function exchangeGold() {
+      if (asset > 0) {
+          const goldToAdd = Math.round(asset * 2) * 1000;
+          asset = 0;
+          document.getElementById('asset').innerText = asset;
+          window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://8.137.96.151');
+      }
+  }
     
     function getRandomItem() {
       const item = items[Math.floor(Math.random() * items.length)];

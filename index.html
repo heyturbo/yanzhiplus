@@ -269,12 +269,12 @@
         }
         .button-row {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 0px 10px;
             margin: 0px 0px;
-            padding: 0px;
             flex-direction: row;
             flex-wrap: wrap;
+            justify-items: center;
         }
         
         .button-row button {
@@ -331,6 +331,14 @@
         
         #summonButton {
             background-image: url('https://pic.imgdb.cn/item/667eec26d9c307b7e95150b5.png');
+        }
+        
+        #divineButton {
+            background-image: url('https://pic.imgdb.cn/item/66bdfe39d9c307b7e998dba2.png');
+        }
+        
+        #workButton {
+            background-image: url('https://pic.imgdb.cn/item/66bdfe39d9c307b7e998db6b.png');
         }
         .core-area .skills {
             display: grid;
@@ -1790,7 +1798,7 @@
         <!-- Pet containers will be dynamically generated here -->
     </div>
     <div class="core-area-for-skills">
-        <div class="buttons">
+        <div class="buttons" style="width: 100%;">
             <div class="button-row">
                 <button id="guideButton" onclick="showGuide()">玩法</button>
                 <button id="missionButton" onclick="showMissionPanel()">任务</button>
@@ -1802,6 +1810,8 @@
                 <button id="jinnangButton" onclick="toggleJinnangDrawer()">锦囊</button>
                 <button id="fightingButton" onclick="toggleFightingDrawer()">战斗</button>
                 <button id="lotteryButton" onclick="toggleLotteryDrawer()">彩票</button>
+                <button id="divineButton" onclick="divinePage()">通灵</button>
+                <button id="workButton" onclick="workPage()">打工</button>
             </div>
         </div>
     </div>
@@ -3245,16 +3255,25 @@ function closeFileB() {
     loadFileB();
 }
 
+function divinePage() {
+    loadFileB();
+}
+        
 window.addEventListener('message', function(event) {
     if (event.origin !== 'http://tianfuxilian.top') return;
 
-    if (event.data.type === 'deductGold' && goldAmount >= 1300000) {
-        goldAmount -= 1300000;
+    if (event.data.type === 'deductGold' && goldAmount >= 2000000) {
+        goldAmount -= 2000000;
         updateGoldDisplay(goldAmount);
-        showInfoBox(`成功花费${convertPrice(1300000)}金兑换650元通灵资产！`);
-        event.source.postMessage({ type: 'success' }, 'http://tianfuxilian.top');
+        showInfoBox(`成功花费${convertPrice(2000000)}金兑换100个养元水（通灵资产650元）！`);
+        event.source.postMessage({ type: 'success(650)' }, 'http://tianfuxilian.top');
+    } else if (event.data.type === 'deductGold' && goldAmount >= 200000) {
+        goldAmount -= 200000;
+        updateGoldDisplay(goldAmount);
+        showInfoBox(`成功花费${convertPrice(200000)}金兑换10个养元水（通灵资产65元）！`);
+        event.source.postMessage({ type: 'success(65)' }, 'http://tianfuxilian.top');
     } else if (event.data.type === 'deductGold') {
-        showInfoBox("每次换汇需要消耗1.3锭金子，你的金子不足！");
+        showInfoBox("每次换汇至少需要200两金子，你的金子不足！");
         event.source.postMessage({ type: 'failure' }, 'http://tianfuxilian.top');
     }
     
@@ -3367,6 +3386,10 @@ function togglePetOverview() {
     }
 }
 
+function workPage() {
+    togglePetOverview();
+}
+        
 function infoPingfenpaihang() {
     storeCurrentPetData();
     const allPetData = [];
@@ -13309,6 +13332,7 @@ function deal() {
     }
     const petSelect = document.getElementById("pet-select");
     const selectedPetKey = petSelect.value;
+    const petToDelete = currentPet.name;
     // 从下拉菜单中移除当前宠物
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
     console.log(`出售的是:${selectedPetKey}`);
@@ -13316,6 +13340,7 @@ function deal() {
         optionToRemove.remove();
         deletePetData(selectedPetKey);
         resetPet();
+        deletePetData(petToDelete);
     }
 
     // 设置默认选择第一个宠物

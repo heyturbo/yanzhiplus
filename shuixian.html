@@ -206,11 +206,11 @@
     ];
 
     function deductGold() {
-        window.parent.postMessage('deductGold', 'http://tianfuxilian.top');
+        window.parent.postMessage('deductGold', '*');
     }
     
     window.addEventListener('message', function(event) {
-        if (event.origin !== 'http://tianfuxilian.top') return;
+        if (event.origin !== 'null') return;
     
         if (event.data === 'success') {
             asset += 650;
@@ -223,7 +223,7 @@
             const goldToAdd = Math.round(asset * 2) * 1000;
             asset = 0;
             document.getElementById('asset').innerText = asset;
-            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
+            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, '*');
         }
     }
     

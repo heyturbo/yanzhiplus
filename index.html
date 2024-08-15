@@ -1997,7 +1997,7 @@
         </div>
     </div>
     <div id="iframeContainer">
-        <button onclick="closeFileB()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;">关闭</button>
+        <button onclick="closeFileB()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;color:white;">X</button>
         <iframe id="iframe" style="padding: 10px;z-index: 1;border: none;width: 95%;height: 100%;position: absolute;flex: 1;left: 50%;top: 50%;transform: translate(-50%, -50%);border-radius: 20px;display: flex;flex-direction: row;justify-content: flex-end; background-color:rgb(0 0 0 / 40%);font-size: 16px;"></iframe>
     </div>
     <div class="treasure-drawer" id="treasure-drawer">
@@ -3252,16 +3252,12 @@ window.addEventListener('message', function(event) {
         goldAmount -= 1300000;
         updateGoldDisplay(goldAmount);
         showInfoBox(`成功花费${convertPrice(1300000)}金兑换650元通灵资产！`);
-        event.source.postMessage('success', 'http://tianfuxilian.top');
+        event.source.postMessage('success', '*');
     } else {
         showInfoBox("每次换汇需要消耗1.3锭金子，你的金子不足！");
-        event.source.postMessage('failure', 'http://tianfuxilian.top');
+        event.source.postMessage('failure', '*');
     }
-});
-
-window.addEventListener('message', function(event) {
-    if (event.origin !== 'http://tianfuxilian.top') return;
-
+    
     if (event.data.type === 'exchangeGold') {
         const shouxufei = Math.round(event.data.amount * 0.12);
         goldAmount += (event.data.amount - shouxufei);

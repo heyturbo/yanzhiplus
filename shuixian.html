@@ -15,7 +15,7 @@
       margin: 10px;
       border-radius: 5px;
       border: none;
-      background-color: #4CAF50;
+      background-color: #217365;
       color: white;
       cursor: pointer;
       flex: 1;
@@ -38,10 +38,12 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       flex-direction: column;
+      background-image: url(https://pic.imgdb.cn/item/66bd8132d9c307b7e9eaaa14.webp);
+      background-size: cover;
     }
     .button-container {
       display: flex;
-      background-color: white;
+      background-color: rgba(0, 0, 0, 0.4);
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       flex-direction: row;
@@ -55,12 +57,13 @@
       flex-direction: column;
       align-items: center;
       display: flex;
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.4);
       border-radius: 20px;
       font-size: 20px;
       height: 150px;
       justify-content: space-between;
       box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.4);
+      color: white;
     }
     
     .special {
@@ -131,16 +134,18 @@
 </head>
 <body>
   <div class="container">
-    <h1>水仙教通灵</h1>
-    <div class="asset">资产: <span id="asset">2000</span></div>
+    <h1  style="color: white;">水仙教通灵</h1>
+    <div class="asset">资产: <span id="asset">0</span></div>
     <div class="button-container">
+      <button onclick="deductGold()">换汇</button>
       <button id="tonglingBtn">通灵</button>
-      <button id="resetBtn">复位</button>
+      <button onclick="exchangeGold()">提款</button>
+      
     </div>
     <div class="result-container">
     <div class="result" id="result"></div>
     </div>
-    <div id="countInfo">
+    <div id="countInfo" style="background: rgba(0, 0, 0, 0.1);color: white;border-radius: 20px;">
       <p>已通灵<span class="special" id="tonglingCount">0</span>次</p>
       <p>您已消耗价值<span class="special" id="tonglingCost">0</span>元的水仙教通灵</p>
     </div>
@@ -166,7 +171,7 @@
     const bountyInfoElement = document.getElementById('bountyInfo');
     const overlayElement = document.getElementById('overlay');
 
-    let asset = 2000;
+    let asset = 0;
     let tonglingCount = 0;
     let currentBounty = null;
     let isEuropeKing = false;
@@ -200,6 +205,28 @@
       { range: [51, 76], name: '每回合怒气' },
     ];
 
+    function deductGold() {
+        window.parent.postMessage('deductGold', '*');
+    }
+    
+    window.addEventListener('message', function(event) {
+        if (event.origin !== 'null') return;
+    
+        if (event.data === 'success') {
+            asset += 650;
+            document.getElementById('asset').innerText = asset;
+        }
+    });
+
+    function exchangeGold() {
+        if (asset > 0) {
+            const goldToAdd = Math.round(asset * 2) * 1000;
+            asset = 0;
+            document.getElementById('asset').innerText = asset;
+            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, '*');
+        }
+    }
+    
     function getRandomItem() {
       const item = items[Math.floor(Math.random() * items.length)];
       const value = Math.floor(Math.random() * (item.range[1] - item.range[0] + 1)) + item.range[0];
@@ -408,20 +435,8 @@
       }
     });
 
-    document.getElementById('resetBtn').addEventListener('click', () => {
-      if (currentBounty) {
-        if (confirm('神秘玩家还在等你领赏金，确定不洗了吗?')) {
-          currentBounty = null;
-          bountyInfoElement.innerHTML = '';
-          reset();
-        }
-      } else {
-        reset();
-      }
-    });
-
     function reset() {
-      asset = 2000;
+      asset = 0;
       assetElement.textContent = asset;
       tonglingCount = 0;
       tonglingCountElement.textContent = tonglingCount;

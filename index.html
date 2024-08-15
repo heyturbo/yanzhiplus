@@ -3536,30 +3536,56 @@ function play(index) {
     document.getElementById(`mood-${index}`).innerText = `${mood}%`;
 
     // 显示对应的文字事件
-    if (moodChange === -10) {
-        showInfoBox(`你准备了${petName}最喜欢的美食,但它只是尝了一口就走开了,看起来没有胃口。`);
-    } else if (moodChange >= -9 && moodChange <= -5) {
-        showInfoBox(`你邀请${petName}一起看了一部新上映的电影,但它似乎对情节不太感兴趣,中途还打了几个哈欠。`);
-    } else if (moodChange >= -4 && moodChange <= 0) {
-        showInfoBox(`你和${petName}一起散步,聊了聊最近的生活,但它的回应有些冷淡,心情没有明显改善。`);
-    } else if (moodChange >= 1 && moodChange <= 5) {
-        showInfoBox(`你和${petName}一起欣赏了一场音乐会,它听到熟悉的旋律时,脸上露出了微笑。`);
-    } else if (moodChange >= 6 && moodChange <= 10) {
-        showInfoBox(`你带${petName}去了它最喜欢的公园,陪它玩了一会儿飞盘,它看起来很开心。`);
-    } else if (moodChange >= 11 && moodChange <= 15) {
-        showInfoBox(`你和${petName}一起做了一顿美味的晚餐,它吃得非常满足,心情明显好转。`);
-    } else if (moodChange >= 16 && moodChange <= 20) {
-        showInfoBox(`你和${petName}一起回顾了你们的旅行照片,它对那些美好的回忆感到非常怀念和高兴。`);
-    } else if (moodChange >= 21 && moodChange <= 25) {
-        showInfoBox(`你和${petName}一起参加了一个有趣的绘画活动,它非常投入,画出了一幅令人印象深刻的作品。`);
-    } else if (moodChange >= 26 && moodChange <= 30) {
-        showInfoBox(`你和${petName}一起参加了一场激动人心的球赛,当你们支持的队伍获胜时,它兴奋得跳了起来,心情极佳!`);
-    }
+    const moodEvents = {
+        '-10': `你准备了${petName}最喜欢的美食,但它只是尝了一口就走开了,看起来没有胃口。`,
+        '-9': `你试图和${petName}玩耍，但它似乎不感兴趣，只想静静待着。`,
+        '-8': `${petName}今天有点烦躁，也许需要一些安静的时间。`,
+        '-7': `${petName}看起来有些无精打采，可能需要更多的关注。`,
+        '-6': `${petName}对你提供的玩具没什么兴趣，似乎有些心不在焉。`,
+        '-5': `你邀请${petName}一起看了一部新上映的电影,但它似乎对情节不太感兴趣,中途还打了几个哈欠。`,
+        '-4': `${petName}稍微有点不开心，但还是愿意和你待在一起。`,
+        '-3': `${petName}似乎有点疲惫，可能需要休息。`,
+        '-2': `${petName}对新的活动有些犹豫，不过还是参与了。`,
+        '-1': `${petName}有点沉默，不过一会儿应该会好些。`,
+        '0': `${petName}的心情没有变化，但至少没有变坏。`,
+        '1': `你和${petName}一起欣赏了一场音乐会,它听到熟悉的旋律时,脸上露出了微笑。`,
+        '2': `${petName}对你的新发型表示赞赏，心情稍微好了一些。`,
+        '3': `${petName}非常享受今天的阳光，心情变得更好。`,
+        '4': `${petName}和你一起在公园散步，似乎很开心。`,
+        '5': `${petName}对你为它准备的小惊喜感到很高兴。`,
+        '6': `你带${petName}去了它最喜欢的公园,陪它玩了一会儿飞盘,它看起来很开心。`,
+        '7': `${petName}尝试了一些新的食物，并且非常喜欢。`,
+        '8': `${petName}在你给它的新床上睡得很好，心情很好。`,
+        '9': `${petName}享受了一次特别的护理，显得非常满意。`,
+        '10': `${petName}在你的陪伴下感到很放松，心情明显好转。`,
+        '11': `你和${petName}一起做了一顿美味的晚餐,它吃得非常满足,心情明显好转。`,
+        '12': `${petName}和你一起看了一部搞笑电影，笑得合不拢嘴。`,
+        '13': `${petName}在和朋友玩耍后，显得非常高兴。`,
+        '14': `${petName}收到了它最喜欢的玩具，心情大好。`,
+        '15': `${petName}对新的学习项目表现出极大的兴趣，心情愉悦。`,
+        '16': `你和${petName}一起回顾了你们的旅行照片,它对那些美好的回忆感到非常怀念和高兴。`,
+        '17': `${petName}在与你的游戏中赢了一局，显得非常自信。`,
+        '18': `${petName}今天的训练非常顺利，心情非常好。`,
+        '19': `${petName}在阳台上悠闲地晒太阳，心情很放松。`,
+        '20': `${petName}得到了很多赞美，心情非常好。`,
+        '21': `你和${petName}一起参加了一个有趣的绘画活动,它非常投入,画出了一幅令人印象深刻的作品。`,
+        '22': `${petName}在和你一起的时光中感到无比快乐。`,
+        '23': `${petName}在公园里结识了新朋友，心情极佳。`,
+        '24': `${petName}得到了它最爱的零食，开心极了。`,
+        '25': `${petName}在运动会上表现出色，心情飞扬。`,
+        '26': `你和${petName}一起参加了一场激动人心的球赛,当你们支持的队伍获胜时,它兴奋得跳了起来,心情极佳!`,
+        '27': `${petName}被你抱了很久，心情特别好。`,
+        '28': `${petName}看到你为它准备的新家，非常激动。`,
+        '29': `${petName}和你一起度过了最美好的一天，心情无比愉悦。`,
+        '30': `${petName}享受了一次完美的旅行，心情极好！`
+    };
+
+    showInfoBox(moodEvents[moodChange.toString()]);
 
     // 额外的判断逻辑
     if (mood <= 20) {
         showInfoBox(`${petName}最近似乎有些闷闷不乐,也许你们可以尝试一些新的活动,如烹饪课或者瑜伽课,给生活增添一些乐趣。`);
-    } else if (mood >= 80) {
+    } else if (mood >= 100) {
         showInfoBox(`${petName}最近心情非常好,它非常享受和你在一起的每一刻,无论是一起探索新的餐厅,还是在家中观看你们都喜欢的经典电影。`);
     }
 
@@ -3582,12 +3608,12 @@ function rest(index) {
     petStates[index].progressBar.style.width = '0%'; // 重置进度条
     petStates[index].stamina = Math.min(100, stamina + 10);
     document.getElementById(`stamina-${index}`).innerText = `${stamina}%`;
-    showInfoBox(`${petName}正在休息中，请勿离开…`);
+    showInfoBox(`${petName}不舍地拉住你的衣角：我就睡一小会儿，不可以离开哦…`);
 
     setTimeout(() => {
         petStates[index].stamina = Math.min(100, stamina + 10);
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
-        showInfoBox("打个小盹，体力充沛，又可以做快乐的牛马了！");
+        showInfoBox(`${petName}睁开眼睛，看到你在身边，顿时充满了干劲`);
 
         // 休息结束后，检查体力和心情，如果大于0则恢复进度条
         if (petStates[index].mood > 0 && petStates[index].stamina > 0) {
@@ -3597,6 +3623,7 @@ function rest(index) {
 }
 
 function feed(index) {
+    const petName = petStates[index].petName;
     const workSalary = petStates[index].goldAmount;
     const currentStamina = petStates[index].stamina;
     
@@ -3611,7 +3638,7 @@ function feed(index) {
         document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
         petStates[index].stamina = Math.min(100, petStates[index].stamina + 50);
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
-        showInfoBox(`花费${convertPrice(feedCost)}金子点了一桌大餐，感谢金主爸爸投喂！`);
+        showInfoBox(`${petName}缠着你要吃大餐，你为此花费了${convertPrice(feedCost)}金子`);
 
         if (!petProgressIntervals[index] && petStates[index].mood > 0 && petStates[index].stamina > 0) {
             startPetWork(); // 恢复进度条工作
@@ -3637,7 +3664,7 @@ function delegate(index) {
 
     if (delegationActive) {
         if (cultivationPoints <= 0) {
-            showInfoBox(`调兵遣将实乃耗费心智之事，你需要在圣天使的属性面板内，通过修炼（修为处的加号）提升修行点数才能为${petName}开启委托功能`);
+            showInfoBox(`调兵遣将实乃耗费心智之事，你需要在${petName}的属性面板内，通过修炼（修为处的加号）提升修行点数才能为${petName}开启委托功能`);
             petStates[index].delegationActive = false;
             return;
         }

@@ -80,9 +80,9 @@
             width: 50%;
             text-align: center;
             display: flex;
-            align-items: center;
             justify-content: space-between;
             flex: 0.4;
+            align-items: center;
         }
         .pet-progress {
             width: 100%;
@@ -3598,6 +3598,11 @@ function play(index) {
 function rest(index) {
     const petName = petStates[index].petName;
     let stamina = petStates[index].stamina;
+    
+    if (petStates[index].delegationActive) {
+        showInfoBox(`${petName}正在委托代管中，不需要休息~`)
+        return;
+    }
 
     // 暂停进度条
     if (petProgressIntervals[index]) {
@@ -3613,13 +3618,13 @@ function rest(index) {
     setTimeout(() => {
         petStates[index].stamina = Math.min(100, stamina + 10);
         document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
-        showInfoBox("睁开眼睛，看到你在身边，顿时充满了干劲");
+        showInfoBox(`${petName}睁开眼睛，看到你在身边，顿时充满了干劲`);
 
         // 休息结束后，检查体力和心情，如果大于0则恢复进度条
         if (petStates[index].mood > 0 && petStates[index].stamina > 0) {
             startPetWork(); // 重新启动进度条
         }
-    }, 10000); // 10秒的休息时间
+    }, 5000); // 5秒的休息时间
 }
 
 function feed(index) {
@@ -3747,7 +3752,7 @@ function handleDelegation(index) {
         if (petStates[index].mood > 0 && petStates[index].stamina > 0 && !petProgressIntervals[index]) {
             startPetWork();
         }
-    }, 10000); // 每10秒检查一次
+    }, 1000); // 每1秒检查一次
 }
         
 function infoXiuwei() {

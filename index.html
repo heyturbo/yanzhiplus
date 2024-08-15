@@ -121,7 +121,7 @@
         #iframeContainer {
             display: none;
             width: 100%;
-            height: 70%;
+            height: 80%;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -1997,7 +1997,8 @@
         </div>
     </div>
     <div id="iframeContainer">
-        <iframe id="iframe" width="100%" height="100%" frameborder="0"></iframe>
+        <button onclick="closeFileB()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;">关闭</button>
+        <iframe id="iframe" style="padding: 10px;z-index: 1;border: none;width: 95%;height: 100%;position: absolute;flex: 1;left: 50%;top: 50%;transform: translate(-50%, -50%);border-radius: 20px;display: flex;flex-direction: row;justify-content: flex-end;rgb(0 0 0 / 40%)color: white;font-size: 16px;"></iframe>
     </div>
     <div class="treasure-drawer" id="treasure-drawer">
         <div class="drawer-toggle" onclick="toggleTreasureDrawer()">宝箱</div>
@@ -3231,13 +3232,43 @@ function loadFileB() {
     const iframe = document.getElementById('iframe');
     
     if (iframeContainer.style.display === "block") {
-        iframe.src = "";
+        iframe.src = "shuixian.html";
         iframeContainer.style.display = "none";
     } else {
         iframe.src = "shuixian.html";
         iframeContainer.style.display = "block";
+        showInfoBox("\n1.此界面只用于模拟《天书奇谈》中通灵系统，通灵结果仅供娱乐，不参与属性计算 \n2.通灵系统对金钱消耗巨大，酌情试玩 \n3. 每次关闭此界面会清空尚未兑换的资产，请及时处置")
     }
 }
+
+function closeFileB() {
+    loadFileB();
+}
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== 'null') return;
+
+    if (event.data === 'deductGold' && goldAmount >= 1300000) {
+        goldAmount -= 1300000;
+        updateGoldDisplay(goldAmount);
+        showInfoBox(`成功花费${convertPrice(1300000)}金兑换650元通灵资产！`);
+        event.source.postMessage('success', '*');
+    } else {
+        showInfoBox("每次换汇需要消耗1.3锭金子，你的金子不足！");
+        event.source.postMessage('failure', '*');
+    }
+});
+
+window.addEventListener('message', function(event) {
+    if (event.origin !== 'null') return;
+
+    if (event.data.type === 'exchangeGold') {
+        const shouxufei = Math.round(event.data.amount * 0.12);
+        goldAmount += (event.data.amount - shouxufei);
+        updateGoldDisplay(goldAmount);
+        showInfoBox(`你成功兑换了${convertPrice(event.data.amount - shouxufei)}金子！（已扣除手续费${convertPrice(shouxufei)}）`);
+    }
+});
         
 function showGuide() {
     const messageBox = document.createElement('div');
@@ -3379,7 +3410,7 @@ function infoPingfenpaihang() {
 
         // 使用默认值100%作为初始stamina的值进行UI显示的计算
         const initialStamina = 100;
-        const initialEarnings = convertPrice(Math.floor(pet.skillScore * 0.001) * initialStamina * 0.01);
+        const initialEarnings = convertPrice(Math.floor(pet.skillScore * 0.00131415926) * initialStamina * 0.01);
 
         // 宠物信息和评分
         petContainer.innerHTML = `
@@ -3411,28 +3442,30 @@ function infoPingfenpaihang() {
 
         // 初始化或恢复宠物状态
         const existingState = petStates.find(state => state.petName === pet.petName);
+        const updatedGoldAmount = Math.floor(pet.skillScore * 0.00131415926); // 根据最新的 skillScore 计算 goldAmount
         if (!existingState) {
             newPetStates[index] = {
                 petName: pet.petName,
                 mood: 100,
                 stamina: 100,
                 progressBar: document.getElementById(`progress-bar-${index}`),
-                goldAmount: pet.goldAmount,
+                goldAmount: updatedGoldAmount, // 使用更新后的 goldAmount
                 progressInterval: null,
                 delegationActive: false,
                 delegationInterval: null
             };
         } else {
-            // 恢复进度条元素并更新其状态
+            // 恢复进度条元素并更新其状态，并重新计算 goldAmount
             newPetStates[index] = {
                 ...existingState,
+                goldAmount: updatedGoldAmount, // 更新 goldAmount
                 progressBar: document.getElementById(`progress-bar-${index}`),
             };
             newPetStates[index].progressBar.style.width = '0%'; // 确保进度条初始为0%
             document.getElementById(`mood-${index}`).innerText = `${newPetStates[index].mood}%`;
             document.getElementById(`stamina-${index}`).innerText = `${newPetStates[index].stamina}%`;
             document.getElementById(`earnings-${index}`).innerText = `${convertPrice(Math.floor(newPetStates[index].goldAmount * newPetStates[index].stamina * 0.01))}金子`;
-            
+
             // 如果宠物已在委托状态，按钮文本应为“停止”
             if (newPetStates[index].delegationActive) {
                 document.getElementById(`delegate-button-${index}`).innerText = "停止";

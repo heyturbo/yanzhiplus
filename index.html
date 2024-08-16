@@ -3313,10 +3313,10 @@ function handleDeductGold(event) {
         goldAmount -= amount;
         updateGoldDisplay(goldAmount);
         showInfoBox(`成功花费${convertPrice(amount)}金兑换${amount >= 2000000 ? 100 : 10}个养元水！`);
-        event.source.postMessage({ type: `success`, gold: goldAmount }, event.origin);
+        event.source.postMessage({ type: `success`, gold: goldAmount }, 'http://tianfuxilian.top');
     } else {
         showInfoBox("每次换汇至少需要200两金子，你的金子不足！");
-        event.source.postMessage({ type: 'failure' }, event.origin);
+        event.source.postMessage({ type: 'failure' }, 'http://tianfuxilian.top');
     }
 }
 

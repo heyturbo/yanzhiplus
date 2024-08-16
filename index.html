@@ -128,6 +128,39 @@
             transform: translate(-50%, -50%);
             z-index: 9999;
         }
+    .item-text-container {
+        margin-left: 5px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        font-size: 12px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+        background-repeat: repeat;
+        background-size: contain;
+        padding: 1px;
+        border: 1px solid black;
+        width:100%;
+        gap:2px;
+    }
+
+    .item-text-top {
+        padding: 2px;
+        background: #393226;
+        color: #DD9C35;
+        border: 1px solid #514D41;
+        width:95%;
+    }
+    
+    .item-text-bottom {
+        padding: 2px;
+        background: #393226;
+        color:rgb(255 255 255 / 90%);
+        border: 1px solid #514D41;
+        width:95%;
+    }
+        
             /* 防止 "pull-to-refresh" 行为 */
     @media screen and (pointer: coarse) {
     @supports (-webkit-backdrop-filter: blur(1px)) {
@@ -227,7 +260,8 @@
             margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 90%);
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             border-radius: 10px;
             flex-direction: row;
@@ -373,7 +407,7 @@
             flex-direction: column;
             justify-content: space-between;
             margin: 5px;
-            font-size: 16px;
+            font-size: 14px;
             gap: 5px;
             width: 200px;
             align-items: center;
@@ -439,8 +473,7 @@
             width: 180px;
             height: 180px;
             border-radius: 10px;
-            padding: 0px 5px;
-            margin: 5px 0px;
+            box-shadow: 0px 0px 2px 0px #003670;
         }
         .info-card {
             display: none;
@@ -470,11 +503,6 @@
             border-radius: 5px;
         }
         .progress-bar {
-            width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 10px;
         }
         .progress-bar div {
             height: 20px;
@@ -482,7 +510,6 @@
             text-align: right;
             padding-right: 5px;
             color: white;
-            border-radius: 5px;
         }
         .quality-drawer {
             position: fixed;
@@ -500,33 +527,39 @@
         .drawer-toggle {
             padding: 5px;
             text-align: center;
-            background-color: #0a8c00;
-            color: white;
+            background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
+            background-repeat: repeat;
+            background-size: contain;
+            color: #E3A73B;
             cursor: pointer;
-            border-radius: 10px 10px 0 0;
+            box-shadow: inset 0px 1px 2px 0px #E3A73B;
+            border: 1px solid black;
         }
         .quality-info {
             display: none;
-            padding: 10px;
         }
         .quality-info.open {
             display: block;
             \: repeat;
+            background: #B07638;
+            padding: 4px;
+            box-shadow: inset 0px 0px 3px 1px #92341C;
+            border: 1px solid black;
         }
         .quality-info .progress-bar {
             width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 5px;
+            background-color: #30482C;
             overflow: hidden;
             margin-bottom: 10px;
             font-size: 14px;
+            color: #EFEFF0;
+            box-shadow: inset 0px 0px 2px 2px #111919;
         }
         .quality-info .progress-bar div {
             height: 10px;
-            background: linear-gradient(to bottom, #055a00, #4caf50b3, #055a00);
+            background: linear-gradient(to bottom, #34773D, #34773D, #69E055, #69E055, #34773D, #34773D);
             text-align: right;
             color: white;
-            border-radius: 5px;
         }
         /* 商店抽屉的样式优化 */
         .shop-drawer {
@@ -544,29 +577,38 @@
         }
         .shop-info {
             display: none;
-            padding: 10px;
+            padding: 4px;
         }
         .shop-info.open {
             display: block;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
         }
         .shop-items {
             display: grid;
             margin: 0px;
             font-size: 12px;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             align-items: stretch;
-            gap: 5px;
+            gap: 2px;
         }
         .shop-item {
             text-align: center;
             cursor: pointer;
-            border: 2px solid #fff0;
-            border-radius: 5px;
+            border: 1px solid rgb(136 80 18);
             di's'padding: disp;
+            di'speak: dis';
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            padding: 4px;
+            align-items: center;
         }
         .shop-item.selected {
-            border-color: #0a8c00;
-            /* background-color: #fff; */
+            border-color: rgb(255 255 255 / 90%);
+            box-shadow: 0px 0px 0px 1px red;
         }
         .shop-bar {
             display: flex;
@@ -576,27 +618,30 @@
             flex-wrap: wrap;
         }
         .shop-bar button {
-            padding: 5px 10px;
-            background-color: #0a8c00;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
             font-size: 14px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 0px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .quality-info button:active {
             background-color: #074b02;
         }
         .quality-info button {
-            /* padding: 2px 10px; */
-            margin: 5px;
-            /* height: 66%; */
-            background-color: #088c01;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
             font-size: 12px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 2px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            margin: 2px;
         }
         .shop-bar button:active {
             background-color: #064701;
@@ -607,26 +652,30 @@
             font-size: 12px;
         }
         .shop-timer button {
-            padding: 5px 10px;
-            background-color: #088c01;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
             font-size: 14px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 0px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .shop-timer button:active {
             background-color: #064701;
         }
         .attribute-info button {
-            padding: 0px 5px;
             margin: 0px 2px;
-            background-color: #0a8c00;
-            color: white;
-            border: none;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
+            font-size: 12px;
             border-radius: 5px;
+            color: #F9DE9B;
+            padding: 0px 6px;
             cursor: pointer;
-            font-size: 14px;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .attribute-info button:active {
             background-color: #064701;
@@ -648,21 +697,27 @@
         }
         .attribute-info {
             display: none;
-            padding: 10px;
+            padding: 4px;
         }
         .attribute-info.open {
             display: block;
+            background: #B07638;
+            padding: 4px;
+            box-shadow: inset 0px 0px 3px 1px #92341C;
+            border: 1px solid black;
         }
         .attribute-info .progress-bar {
             width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 5px;
             overflow: hidden;
             display: flex;
             margin-bottom: 0px;
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            color: white;
+            background: rgb(57, 87, 89);
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            padding: 2px 4px;
         }
         .attribute-info .progress-bar div {
             height: 20px;
@@ -682,28 +737,27 @@
             min-height: 300px;
             background-image: url(https://pic.imgdb.cn/item/66a89fd8d9c307b7e9f8bbf3.gif);
             background-size: cover;
+            margin-bottom: 10px;
+            margin-top: 5px;
         }
         .progress-bars {
             display: flex;
             gap: 5px; /* 调整每个条目之间的间距 */
             flex-direction: column;
             justify-content: space-between;
-            min-width: 130px;
-            background-color: hsl(0deg 0% 100% / 70%);
+            min-width: 150px;
             padding: 10px;
-            border-radius: 10px;
         }
         .secondary-attributes {
-            display: flex;
-            flex-direction: column;
+            
              /* 调整每个条目之间的间距 */
-            min-width: 130px;
-            gap: 5px;
-            padding: 10px;
-            background-color: hsl(0deg 0% 100% / 70%);
-            border-radius: 10px;
             flex-wrap: nowrap;
-            align-items: stretch;
+            display: flex;
+            gap: 5px;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 150px;
+            padding: 10px;
         }
         .image-frame {
             display: flex;
@@ -742,13 +796,15 @@
             display: flex;
              /* 使两个子容器分布在容器的两边 */
             gap: 2px; /* 调整两列之间的间距 */
+            padding: 2px;
+            justify-content: space-between;
         }
         
         .quality-details {
             display: grid;
-            grid-template-columns: repeat(3, 2fr);
+            grid-template-columns: repeat(3, 1fr);
             padding: 0px 0px 10px 0px;
-            gap: 5px 0px; /* 调整每个条目之间的间距 */
+            gap: 5px 5px; /* 调整每个条目之间的间距 */
             font-size: 14px;
             align-items: flex-start;
         }
@@ -762,13 +818,20 @@
             gap: 10px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
             justify-items: stretch;
-            padding: 10px 0px;
         }
         .button-grid button {
-            padding: 8px 0px;
-            width: 90%;
-            font-size: 12px; /* 调整按钮字体大小 */
+            
+             /* 调整按钮字体大小 */
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
+            font-size: 12px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 6px 2px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .treasure-drawer {
             position: fixed;
@@ -820,13 +883,15 @@
             margin-bottom: 15px;
         }
         .treasure-action button {
-            padding: 5px 10px;
-            background-color: #088c01;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
             font-size: 14px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 0px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
         }
         .treasure-action button:active {
             background-color: #064701;
@@ -867,7 +932,7 @@
             height: 40px;
         }
         .red-text {
-            color: #088c01;
+            color: #0bd200;
         }
         .gold-text {
             color: #fb3c2e;
@@ -1420,13 +1485,13 @@
         }
 
         .saveAndLoadGameState {
-            border: 2px solid orange;
-            background-color: gold;
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
             font-size: 14px;
             border-radius: 5px;
-            font-weight: bold;
-            color: #725d2e;
-            padding: 5px;
+            color: #F9DE9B;
+            padding: 2px 8px;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
         }
@@ -1576,7 +1641,16 @@
     font-size: 14px;
     width: 100%;
 }
-
+.drawer-container {
+    padding: 2px;
+    border-radius: 2px;
+    background-color: #DFBF6E;
+    color: #92341c;
+    background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+    background-repeat: repeat;
+    background-size: auto;
+    border: 1px solid black;
+}
 /* 通用弹出面板样式 */
 .mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
     position: fixed;
@@ -1768,7 +1842,7 @@
     padding: 5px;
     margin-bottom: 10px;
 }
-
+    
 .drug-grid-container {
     height: 240px;
     overflow-y: scroll;
@@ -1872,133 +1946,139 @@
     <div class="quality-drawer" id="quality-drawer">
         <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
         <div class="quality-info" id="quality-info">
-            <div class="quality-container">
-                <div class="quality-details">
-                    <div>名称: <span id="quality-name">小金牛</span></div>
-                    <div>品质: <span id="quality-tier">普通</span></div>
-                    <div>成长率: <span id="quality-growth-rate">100%</span></div>
-                    <div>变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
-                    <div>进化等级: <span id="evolution-level">0</span></div>
-                    <div>当前悟性: <span id="current-wisdom">0</span></div>
+            <div class="drawer-container">
+                <div class="quality-container">
+                    <div class="quality-details">
+                        <div>名称: <span id="quality-name">小金牛</span></div>
+                        <div>品质: <span id="quality-tier">普通</span></div>
+                        <div>成长率: <span id="quality-growth-rate">100%</span></div>
+                        <div>变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
+                        <div>进化等级: <span id="evolution-level">0</span></div>
+                        <div>当前悟性: <span id="current-wisdom">0</span></div>
+                    </div>
                 </div>
-            </div>
-            <div class="progress-bar">
-                耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
-                <div id="endurance-bar" style="width: 50%"></div>
-            </div>
-            <div class="progress-bar">
-                强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
-                <div id="strength-bar" style="width: 50%"></div>
-            </div>
-            <div class="progress-bar">
-                信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
-                <div id="faith-bar" style="width: 50%"></div>
-            </div>
-            <div class="progress-bar">
-                敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
-                <div id="agility-bar" style="width: 50%"></div>
-            </div>
-            <div class="progress-bar">
-                智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
-                <div id="intelligence-bar" style="width: 50%"></div>
-            </div>
-                <div class="button-grid">
-                    <button onclick="rebornPet()">普通还童</button>
-                    <button onclick="trainQuality()">一键还童</button>
-                    <button onclick="useGoldenRebornPill()">还童金丹</button>
-                    <button onclick="useBingpoRebornPill()">冰魄还童</button>
-                    <button onclick="mutatePet()">变异宠物</button>
-                    <button onclick="enhanceQuality()">更新资质</button>
-                    <button onclick="evolvePet()">进化宠物</button>
-                    <button onclick="awakenPet()">觉醒宠物</button>
-                    <button onclick="hallucinatePet()">幻化提升</button> 
-                    <button onclick="jumpToAttribute()">查看属性</button>
+                <div class="progress-bar">
+                    耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
+                    <div id="endurance-bar" style="width: 50%"></div>
                 </div>
-            <div id="message-box" class="message-box">
-                <span id="message-text"></span>
-                <button onclick="closeMessage()">关闭</button>
+                <div class="progress-bar">
+                    强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
+                    <div id="strength-bar" style="width: 50%"></div>
+                </div>
+                <div class="progress-bar">
+                    信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
+                    <div id="faith-bar" style="width: 50%"></div>
+                </div>
+                <div class="progress-bar">
+                    敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
+                    <div id="agility-bar" style="width: 50%"></div>
+                </div>
+                <div class="progress-bar">
+                    智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
+                    <div id="intelligence-bar" style="width: 50%"></div>
+                </div>
+                    <div class="button-grid">
+                        <button onclick="rebornPet()">普通还童</button>
+                        <button onclick="trainQuality()">一键还童</button>
+                        <button onclick="useGoldenRebornPill()">还童金丹</button>
+                        <button onclick="useBingpoRebornPill()">冰魄还童</button>
+                        <button onclick="mutatePet()">变异宠物</button>
+                        <button onclick="enhanceQuality()">更新资质</button>
+                        <button onclick="evolvePet()">进化宠物</button>
+                        <button onclick="awakenPet()">觉醒宠物</button>
+                        <button onclick="hallucinatePet()">幻化提升</button> 
+                        <button onclick="jumpToAttribute()">查看属性</button>
+                    </div>
+                <div id="message-box" class="message-box">
+                    <span id="message-text"></span>
+                    <button onclick="closeMessage()">关闭</button>
+                </div>
             </div>
         </div>
     </div>
     <div class="attribute-drawer" id="attribute-drawer">
         <div class="drawer-toggle" onclick="toggleAttributeDrawer()">属性</div>
         <div class="attribute-info" id="attribute-info">
-            <div class="attributes-container">
-                <div class="progress-bars">
-                    <div class="progress-bar">
-                        等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
+            <div class="drawer-container">
+                <div class="attributes-container">
+                    <div class="progress-bars">
+                        <div class="progress-bar">
+                            等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
+                        </div>
+                        <div class="progress-bar">
+                            幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            成长率: <span id="attribute-growth-rate"></span><button onclick="infoChengzhanglv()">?</button>
+                        </div>
+                        <div class="progress-bar">
+                            潜力点: <span id="remaining-points-display"></span><button onclick="infoQianlidian()">?</button>
+                        </div>
+                        <div class="progress-bar">
+                            耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            智力: <span id="attribute-intelligence"></span><span id="bonusAttribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            强壮: <span id="attribute-strength"></span><span id="bonusAttribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            敏捷: <span id="attribute-agility"></span><span id="bonusAttribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">+</button>
+                        </div>
+                        <div class="progress-bar">
+                            信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
+                        </div>
                     </div>
-                    <div class="progress-bar">
-                        品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
-                    </div>
-                    <div class="progress-bar">
-                        幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        成长率: <span id="attribute-growth-rate"></span><button onclick="infoChengzhanglv()">?</button>
-                    </div>
-                    <div class="progress-bar">
-                        潜力点: <span id="remaining-points-display"></span><button onclick="infoQianlidian()">?</button>
-                    </div>
-                    <div class="progress-bar">
-                        耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        智力: <span id="attribute-intelligence"></span><span id="bonusAttribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        强壮: <span id="attribute-strength"></span><span id="bonusAttribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        敏捷: <span id="attribute-agility"></span><span id="bonusAttribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">+</button>
-                    </div>
-                    <div class="progress-bar">
-                        信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
+                    <div class="secondary-attributes">
+                            <div class="progress-bar">
+                                觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                <button onclick="togglePetOverview()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                            </div>
+                            <div style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;">
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color:white;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color:white;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻击: <span style="color:white;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防御: <span style="color:white;" id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻击: <span style="color:white;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防御: <span style="color:white;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度: <span style="color:white;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                            </div>
                     </div>
                 </div>
-                <div class="secondary-attributes">
-                        <div class="progress-bar">
-                            觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            <button onclick="togglePetOverview()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
-                        </div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻击: <span id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防御: <span id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻击: <span id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防御: <span id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-                        <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度: <span id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                <div class="button-grid">
+                    <button onclick="trainAttributes()">金子培养</button>
+                    <button onclick="trainSkills()">洗练技能</button>
+                    <button onclick="upgradeWisdomTo()">一键提悟</button>
+                    <button onclick="useSupremeWisdomPill()">超级提悟</button>
+                    <button onclick="ascend()">飞升突破</button>
+                    <button onclick="transformPet()">属性专精</button>
+                    <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
+                    <button onclick="petCollection()">宠物图鉴</button>
+                    <button onclick="showBiography()">解锁传记</button>
+                    <button onclick="jumpToQuality()">查看资质</button>
                 </div>
-            </div>
-            <div class="button-grid">
-                <button onclick="trainAttributes()">金子培养</button>
-                <button onclick="trainSkills()">洗练技能</button>
-                <button onclick="upgradeWisdomTo()">一键提悟</button>
-                <button onclick="useSupremeWisdomPill()">超级提悟</button>
-                <button onclick="ascend()">飞升突破</button>
-                <button onclick="transformPet()">属性专精</button>
-                <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
-                <button onclick="petCollection()">宠物图鉴</button>
-                <button onclick="showBiography()">解锁传记</button>
-                <button onclick="jumpToQuality()">查看资质</button>
             </div>
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
         <div class="drawer-toggle" onclick="toggleShop()">商店</div>
         <div class="shop-info" id="shop-info">
-            <div id="shop-info-container" style="background-image: url(https://pic.imgdb.cn/item/66a5dab8d9c307b7e975074b.webp);background-size: cover;background-position: center;">
+            <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;">
                 <div class="shop-items" id="shop-items">
                     <!-- 商店商品展示区 -->
                 </div>
@@ -2301,14 +2381,17 @@
 </div>
     <div class="bottom-bar">
         <div class="pet-image">
-            <img id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
+            <img style="width: 180px;height: 180px;" id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
         </div>
-        <div class="info">
-            <div>宠物名称: <span id="pet-name">小金牛</span></div>
-            <div>玩家称号: <span id="personal-honor">初来乍到</span></div>
-            <div>游戏时长: <span id="game-timer">00:00</span></div>
-            <div>金子: <span id="gold-amount">50000</span></div> <!-- 新增剩余金子显示 -->
-            <div id="loadContainer" style="display:flex; justify-content: space-between; width: 100%;">
+        <div class="info" style="display: flex;flex-direction: column;">
+            <div id="gold-container" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;">
+                <div style="background: #B19768;padding: 2px;margin-right: 4px;color: white;box-shadow: inset 0px 0px 2px 1px #E3D8B9;text-shadow: -1px -1px 0 #693331, 1px -1px 0 #693331, -1px 1px 0 #693331, 1px 1px 0 #693331;">金子: </div>
+                <span id="gold-amount">50000</span>
+            </div> 
+            <div>宠物名称： <span id="pet-name">小金牛</span></div>
+            <div>玩家称号： <span id="personal-honor">初来乍到</span></div>
+            <div>游戏时长： <span id="game-timer">00:00</span></div>
+            <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
                 <button class="saveAndLoadGameState" onclick="deleteAllPetData()">删档</button>
@@ -12781,7 +12864,7 @@ function bonusAttributesDisplay() {
                  spanElement.style.color = "red";
             } else {
                 spanElement.innerText = `(+${bonusValue})`;
-                spanElement.style.color = "black";
+                spanElement.style.color = "white";
             }
         }
     });
@@ -12971,11 +13054,9 @@ function updateGoldDisplay(goldAmount) {
 
     goldElement.innerText = `${ding}锭${liang}两${wen}文`;
     goldElement.style.color = 'white';
-    goldElement.style.fontWeight = 'bold';
-    goldElement.style.background = 'rgb(0, 54, 112)'; // 兼容性处理
-    goldElement.style.border = '1px solid white'; // 兼容性处理
-    goldElement.style.borderRadius = '5px'; // 兼容性处理
-    goldElement.style.padding = '0px 5px'; // 兼容性处理
+    goldElement.style.background = '#395759'; // 兼容性处理
+    goldElement.style.boxShadow = 'rgb(30, 46, 47) 0px 0px 5px 2px inset'; // 兼容性处理
+    goldElement.style.padding = '2px 4px'; // 兼容性处理
 }
 
 function toggleShop() {
@@ -13069,7 +13150,7 @@ function refreshShop(auto = false) {
             itemDiv.classList.add('shop-item');
             itemDiv.dataset.name = item.name;
             itemDiv.dataset.price = item.price;
-            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="height: 45px; width: 45px"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
+            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;"><div class="item-text-container"><div class="item-text-top">${item.name}</div><div class="item-text-bottom">${convertPrice(item.price)} 金</div></div>`;
             itemDiv.addEventListener('click', () => {
                 document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
                 itemDiv.classList.add('selected');
@@ -13119,7 +13200,7 @@ function refreshShop(auto = false) {
         itemDiv.classList.add('shop-item');
         itemDiv.dataset.name = item.name;
         itemDiv.dataset.price = item.price;
-        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name} style="height: 45px; width: 45px"><div>${item.name}</div><div>${convertPrice(item.price)} 金子</div>`;
+        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;"><div class="item-text-container"><div class="item-text-top">${item.name}</div><div class="item-text-bottom">${convertPrice(item.price)} 金</div></div>`;
         itemDiv.addEventListener('click', () => {
             document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
             itemDiv.classList.add('selected');

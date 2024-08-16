@@ -134,7 +134,6 @@
         flex-direction: column;
         justify-content: space-between;
         font-size: 12px;
-        flex-wrap: wrap;
         align-items: flex-start;
         background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
         background-repeat: repeat;
@@ -143,6 +142,7 @@
         border: 1px solid black;
         width:100%;
         gap:2px;
+        max-height: 45px;
     }
 
     .item-text-top {
@@ -151,6 +151,8 @@
         color: #DD9C35;
         border: 1px solid #514D41;
         width:95%;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
     
     .item-text-bottom {
@@ -430,6 +432,17 @@
             border-radius: 10px;
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
             text-align: center;
+        }
+        .jinnang-description-box {
+            gap: 4px;
+            display: flex;
+            flex-direction: column;
+            background: rgb(57, 87, 89);
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            color: rgb(255 255 255 / 90%);
+            padding: 2px;
+            min-height: 60px;
+            align-items: center;
         }
         .pet-selector {
             width: 90%;
@@ -909,23 +922,32 @@
         }
         .jinnang-drawer.open {
             transform: translateY(0);
+            display: block;
+            background: #6f391c;
+            padding: 2px;
+            border-radius: 2px;
+            /* color: #92341c; */
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
         }
         .jinnang-info {
-            padding: 10px;
+            padding: 5px;
             justify-items: center;
-            background-image: url(https://pic.imgdb.cn/item/66a4b934d9c307b7e98c69fc.gif);
-            background-size: cover;
         }
         .jinnang-info.open {
             display: block;
         }
         .jinnang-reward {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px 0px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px 2px;
             justify-content: center;
             margin-top: 5px;
             font-size: 12px;
+            justify-items: stretch;
+            align-items: center;
         }
         .jinnang-reward img {
             width: 40px;
@@ -2142,7 +2164,7 @@
                 <div class="jinnang-reward" id="jinnang-reward"></div>
             </div>
         </div>
-        <div id="jinnang-description" class="treasure-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
+        <div id="jinnang-description" class="jinnang-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
         <div class="treasure-action">
             <button onclick="sellItem()">出售道具</button>
             <div id="jinnang-capacity">背包容量：0/5000</div>
@@ -2875,7 +2897,7 @@
                 }
             },
             liguo: {
-                name: 'Guolin·Li',
+                name: '李国麟',
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg',
                 skills: [
@@ -11692,13 +11714,17 @@ function updateJinnangItems() {
             itemDiv.className = 'jinnang-item';
             itemDiv.style.position = 'relative'; // 为了定位描述框
             itemDiv.style.display = 'flex'; 
-            itemDiv.style.flexDirection = 'column'; 
+            itemDiv.style.flexDirection = 'row'; 
             itemDiv.style.alignItems = 'center'; 
             itemDiv.style.justifyContent = 'space-between'; 
+            itemDiv.style.padding = '4px'; 
+            itemDiv.style.boxShadow ='rgb(131, 74, 15) 0px 0px 0px 2px inset';
             itemDiv.innerHTML = `
-                <img src="${item.url}" alt="${item.name}">
-                <div>${item.displayName}</div>
-                <div>${item.quantity}</div>
+                <img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;">
+                <div class="item-text-container">
+                <div class="item-text-top">${item.displayName}</div>
+                <div class="item-text-bottom">${item.quantity}个</div>
+                </div>
             `;
 
             // 添加点击事件监听器
@@ -11707,16 +11733,14 @@ function updateJinnangItems() {
 
                 // 移除之前选中项的视觉提示
                 if (selectedItem) {
-                    selectedItem.style.border = '';
-                    selectedItem.style.borderRadius = '';
-                    selectedItem.style.padding = '';
+                selectedItem.style.border = '';
+                selectedItem.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 2px inset';
                 }
 
                 // 添加当前选中项的视觉提示
                 selectedItem = itemDiv;
-                selectedItem.style.border = '2px solid green';
-                selectedItem.style.borderRadius = '10px';
-                selectedItem.style.padding = '5px';
+                selectedItem.style.border = '1px solid white';
+                selectedItem.style.boxShadow = 'red 0px 0px 0px 2px inset';
 
                 // 将 item 存储到 selectedItem 的 dataset 中，以便出售时使用
                 selectedItem.dataset.itemName = item.name;
@@ -13307,167 +13331,81 @@ function getRandomRareItem() {
 function buyItem() {
     const selectedItem = document.querySelector('.shop-item.selected');
     if (!selectedItem) {
-        showInfoBox("请选择一个商品进行购买！");
-        return;
+        return showInfoBox("请选择一个商品进行购买！");
     }
 
     const price = parseInt(selectedItem.dataset.price, 10);
     const itemName = selectedItem.dataset.name;
 
     if (goldAmount < price) {
-        showInfoBox("金子不够，购买失败！");
-        return;
+        return showInfoBox("金子不够，购买失败！");
     }
 
-    // 处理包裹类型物品
-    if (itemName.includes('包裹')) {
-        const [itemBaseName, quantityStr] = itemName.split(' 包裹 (');
-        const itemQuantity = parseInt(quantityStr.replace(')', ''), 10);
+    const isPackage = itemName.includes('包裹');
+    const itemBaseName = isPackage ? itemName.split(' 包裹 (')[0] : itemName;
+    const itemQuantity = isPackage ? parseInt(itemName.split(' 包裹 (')[1].replace(')', ''), 10) : 1;
 
-        switch (itemBaseName) {
-            case '高级悟性丹':
-                highGradePill += itemQuantity;
-                break;
-            case '万化灵丹':
-                transmutationPill += itemQuantity;
-                break;
-            case '冰魄还童丹':
-                bingpoRebornPill += itemQuantity;
-                break;
-            case '神兽还童丹':
-                rebornPill += itemQuantity;
-                break;
-            case '资质重生丹':
-                qualityPill += itemQuantity;
-                break;
-            case '灵异金丹':
-                miraculousPill += itemQuantity;
-                break;
-            case '特级悟性丹':
-                for (let i = 0; i < itemQuantity; i++) {
-                    addItemToJinnang('tejiWisdomPill');
-                }
-                break;
-            case '精灵精炼石':
-                for (let i = 0; i < itemQuantity; i++) {
-                    addItemToJinnang('spiritRefreshStone');
-                }
-                break;
-            case '精灵觉醒石':
-                for (let i = 0; i < itemQuantity; i++) {
-                    addItemToJinnang('spiritAwakenStone');
-                }
-                break;
-            case '天地灵气':
-                for (let i = 0; i < itemQuantity; i++) {
-                    addItemToJinnang('earthlyEnergy');
-                }
-                break;
-            case '仙人醍醐':
-                for (let i = 0; i < itemQuantity; i++) {
-                    addItemToJinnang('ultraSkillBoomer');
-                }
-                break;
-            case '还童金丹':
-                goldenRebornPill += itemQuantity;
-                break;
-            default:
-                showInfoBox("未知包裹类型，购买失败！");
-                return;
-        }
-        updateTopBarItems(); // 更新顶部bar道具数量
-        updateJinnangItems(); // 更新锦囊内的道具数量显示
-    } else {
-        // 处理非包裹类型物品
+    const itemHandlers = {
+        '高级悟性丹': () => highGradePill += itemQuantity,
+        '万化灵丹': () => transmutationPill += itemQuantity,
+        '冰魄还童丹': () => bingpoRebornPill += itemQuantity,
+        '神兽还童丹': () => rebornPill += itemQuantity,
+        '资质重生丹': () => qualityPill += itemQuantity,
+        '灵异金丹': () => miraculousPill += itemQuantity,
+        '特级悟性丹': () => addItemToJinnang('tejiWisdomPill', itemQuantity),
+        '精灵精炼石': () => addItemToJinnang('spiritRefreshStone', itemQuantity),
+        '精灵觉醒石': () => addItemToJinnang('spiritAwakenStone', itemQuantity),
+        '天地灵气': () => addItemToJinnang('earthlyEnergy', itemQuantity),
+        '仙人醍醐': () => addItemToJinnang('ultraSkillBoomer', itemQuantity),
+        '还童金丹': () => goldenRebornPill += itemQuantity
+    };
+
+    if (itemHandlers[itemBaseName]) {
+        itemHandlers[itemBaseName]();
+    } else if (!isPackage) {
         const [petName, skillName] = itemName.split('·');
         if (skillName) {
-            // 检查技能数量上限
-            const skillsArea = document.getElementById('skills-area');
-            if (skillsArea.children.length >= 12) {
-                showInfoBox("您的宠物已经达到技能上限，无法购买！");
-                return;
+            if (document.getElementById('skills-area').children.length >= 12) {
+                return showInfoBox("您的宠物已经达到技能上限，无法购买！");
             }
-
             if (petName !== currentPet.name) {
-                showInfoBox("您的当前宠物不会此技能，购买失败！");
-                return;
+                return showInfoBox("您的当前宠物不会此技能，购买失败！");
             }
-
             if (document.getElementById('skills-area').innerText.includes(skillName)) {
-                showInfoBox("您的当前宠物已经拥有此技能，购买失败！");
-                return;
+                return showInfoBox("您的当前宠物已经拥有此技能，购买失败！");
             }
-
-            const skill = currentPet.skills.find(skill => skill.name === skillName);
-            if (skill) {
-                const skillDiv = document.createElement("div");
-                skillDiv.innerText = `${skill.name} (${skill.rarity})`;
-                skillDiv.onclick = () => {
-                    // 确认是否删除技能并调用 deleteSkill 函数
-                    deleteSkill(skill, skillDiv, document.getElementById("skills-area"));
-                };
-                skillDiv.classList.add(skill.rarity.toLowerCase() + '-skill');
-                document.getElementById("skills-area").appendChild(skillDiv);
-            
-                const currentSkills = Array.from(document.querySelectorAll("#skills-area div"))
-                    .map(div => {
-                        const [name, rarity] = div.innerText.split(" (");
-                        return { name, rarity: rarity.replace(")", "") };
-                    });
-                updateSkillScore(currentSkills);
-                updateTitle();
-            }
+            addSkillToPet(skillName);
         } else {
-            switch (itemName) {
-                case '高级悟性丹':
-                    highGradePill++;
-                    break;
-                case '万化灵丹':
-                    transmutationPill++;
-                    break;
-                case '冰魄还童丹':
-                    bingpoRebornPill++;
-                    break;
-                case '神兽还童丹':
-                    rebornPill++;
-                    break;
-                case '资质重生丹':
-                    qualityPill++;
-                    break;
-                case '灵异金丹':
-                    miraculousPill++;
-                    break;
-                case '特级悟性丹':
-                    addItemToJinnang('tejiWisdomPill'); // 更新锦囊
-                    break;
-                case '精灵精炼石':
-                    addItemToJinnang('spiritRefreshStone'); // 更新锦囊
-                    break;
-                case '精灵觉醒石':
-                    addItemToJinnang('spiritAwakenStone'); // 更新锦囊
-                    break;
-                case '天地灵气':
-                    addItemToJinnang('earthlyEnergy'); // 更新锦囊
-                    break;
-                case '仙人醍醐':
-                    addItemToJinnang('ultraSkillBoomer'); // 更新锦囊
-                    break;
-                case '还童金丹':
-                    goldenRebornPill++;
-                    break;
-                default:
-                    showInfoBox("未知道具类型，购买失败！");
-                    return;
-            }
-            updateTopBarItems();
-            updateJinnangItems(); // 更新锦囊内的道具数量显示
+            return showInfoBox("未知道具类型，购买失败！");
         }
+    } else {
+        return showInfoBox("未知包裹类型，购买失败！");
     }
 
-    // 扣除金子并更新显示
+    updateTopBarItems();
+    updateJinnangItems();
     goldAmount -= price;
     updateGoldDisplay(goldAmount);
     selectedItem.remove();
+}
+
+function addSkillToPet(skillName) {
+    const skill = currentPet.skills.find(skill => skill.name === skillName);
+    if (skill) {
+        const skillDiv = document.createElement("div");
+        skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+        skillDiv.onclick = () => deleteSkill(skill, skillDiv, document.getElementById("skills-area"));
+        skillDiv.classList.add(skill.rarity.toLowerCase() + '-skill');
+        document.getElementById("skills-area").appendChild(skillDiv);
+    
+        const currentSkills = Array.from(document.querySelectorAll("#skills-area div"))
+            .map(div => {
+                const [name, rarity] = div.innerText.split(" (");
+                return { name, rarity: rarity.replace(")", "") };
+            });
+        updateSkillScore(currentSkills);
+        updateTitle();
+    }
 }
 
 // 初始化商店和倒计时

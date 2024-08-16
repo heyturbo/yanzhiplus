@@ -2015,7 +2015,8 @@
         </div>
     </div>
     <div id="iframeContainer">
-        <button onclick="closeFileB()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;color:white;">X</button>
+        <button onclick="openDivineZiwei()" style="padding: 10px;position: absolute;z-index: 1000;right: 80%;border: none;background: #ffffff00;font-weight: bold;font-size: 24px;color:white;">紫薇</button>
+        <button onclick="closeDivineShuixian()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;font-size: 24px;color:white;">X</button>
         <iframe id="iframe" style="padding: 10px;z-index: 1;border: none;width: 95%;height: 100%;position: absolute;flex: 1;left: 50%;top: 50%;transform: translate(-50%, -50%);border-radius: 20px;display: flex;flex-direction: row;justify-content: flex-end; background-color:rgb(0 0 0 / 40%);font-size: 16px;"></iframe>
     </div>
     <div class="treasure-drawer" id="treasure-drawer">
@@ -2050,7 +2051,7 @@
                 <button onclick="openTreasure()">开启宝箱</button>
                 <button onclick="openTenthTreasure()">十连开启</button>
                 <button onclick="collectTreasure()">取出道具</button>
-                <button onclick="loadFileB()">模拟通灵</button>
+                <button onclick="openDivineShuixian()">模拟通灵</button>
             </div>
         </div>
     </div>
@@ -3282,7 +3283,7 @@ async function requestWakeLock() {
 
 requestWakeLock();
 
-function loadFileB() {
+function openDivineShuixian() {
     const iframeContainer = document.getElementById('iframeContainer');
     const iframe = document.getElementById('iframe');
     
@@ -3296,8 +3297,16 @@ function loadFileB() {
     }
 }
 
+function openDivineZiwei() {
+    const iframeContainer = document.getElementById('iframeContainer');
+    const iframe = document.getElementById('iframe');
+
+    iframe.src = "ziweimoniq.html";
+    iframeContainer.style.display = "block";
+}
+
 function divinePage() {
-    loadFileB();
+    openDivineShuixian();
 }
         
 function handleDeductGold(amount, successMessage, successValue, failureMessage, event) {
@@ -3319,8 +3328,8 @@ function handleExchangeGold(amount, event) {
     showInfoBox(`你成功兑换了${convertPrice(amount - shouxufei)}金子！（已扣除手续费${convertPrice(shouxufei)}）`);
 }
 
-function closeFileB() {
-    loadFileB();
+function closeDivineShuixian() {
+    openDivineShuixian();
 }
 
 // window.addEventListener监听
@@ -3333,7 +3342,7 @@ window.addEventListener('message', function(event) {
         } else if (goldAmount >= 200000) {
             handleDeductGold(200000, `成功花费${convertPrice(200000)}金兑换10个养元水（通灵资产65元）！`, 65, "每次换汇至少需要200两金子，你的金子不足！", event);
         } else {
-            handleDeductGold(0, "", 0, "每次换汇至少需要200两金子，你的金子不足！", event);
+            handleDeductGold(0, "每次换汇至少需要200两金子，你的金子不足！", 0, "每次换汇至少需要200两金子，你的金子不足！", event);
         }
     }
 
@@ -3608,7 +3617,7 @@ function startPetWork() {
 function play(index) {
     const petName = petStates[index].petName;
     let mood = petStates[index].mood;
-
+    
     // 随机获得(-10, 30)之间的值
     const moodChange = Math.floor(Math.random() * 41) - 10;
 
@@ -3671,7 +3680,7 @@ function play(index) {
         showInfoBox(`${petName}最近心情非常好,它非常享受和你在一起的每一刻,无论是一起探索新的餐厅,还是在家中观看你们都喜欢的经典电影。`);
     }
     
-    petStates[index].stamina = Math.max(0, stamina - 10);
+    petStates[index].stamina = Math.max(0, petStates[index].stamina - Math.abs(moodChange));
     document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
     
     // 恢复进度条工作
@@ -3974,7 +3983,7 @@ function handleDelegation(index) {
                 additionalPlayerCultivation -= Math.abs(moodChange);
                 localStorage.setItem(petDataKey, JSON.stringify(petData));
                 document.getElementById(`mood-${index}`).innerText = `${petStates[index].mood}%`; 
-                petStates[index].stamina = Math.max(0, stamina - 2);
+                petStates[index].stamina = Math.max(0, petStates[index].stamina - Math.abs(moodChange));
                 document.getElementById(`stamina-${index}`).innerText = `${petStates[index].stamina}%`;
             } else {
                 showInfoBox("修行点数不足，无法继续自动提升心情！");

@@ -3302,49 +3302,42 @@ function divinePage() {
 
 function closeFileB() {
     loadFileB();
-    handleExchangeGold(event);
 }
         
-// 处理“deductGold”事件，将本地的goldAmount传递到另一个HTML页面
-function handleDeductGold(event) {
-    const { amount } = event.data;
-    
+function handleDeductGold(amount, successMessage, successValue, failureMessage, event) {
     if (goldAmount >= amount) {
         goldAmount -= amount;
         updateGoldDisplay(goldAmount);
-        showInfoBox(`成功花费${convertPrice(amount)}金兑换${amount >= 2000000 ? 100 : 10}个养元水！`);
-        event.source.postMessage({ type: `success`, gold: goldAmount }, 'http://tianfuxilian.top');
+        showInfoBox(successMessage);
+        event.source.postMessage({ type: `success(${successValue})` }, event.origin);
     } else {
-        showInfoBox("每次换汇至少需要200两金子，你的金子不足！");
-        event.source.postMessage({ type: 'failure' }, 'http://tianfuxilian.top');
+        showInfoBox(failureMessage);
+        event.source.postMessage({ type: 'failure' }, event.origin);
     }
 }
 
-// 处理“exchangeGold”事件，接收来自另一个HTML页面的amount并更新本地goldAmount
-function handleExchangeGold(event) {
-    const { amount } = event.data;
-    
+function handleExchangeGold(amount, event) {
     const shouxufei = Math.round(amount * 0.12);
     goldAmount += (amount - shouxufei);
     updateGoldDisplay(goldAmount);
     showInfoBox(`你成功兑换了${convertPrice(amount - shouxufei)}金子！（已扣除手续费${convertPrice(shouxufei)}）`);
 }
 
-// 监听来自其他HTML页面的postMessage事件
 window.addEventListener('message', function(event) {
     if (event.origin !== 'http://tianfuxilian.top') return;
 
-    switch (event.data.type) {
-        case 'deductGold':
-            handleDeductGold(event);
-            break;
+    if (event.data.type === 'deductGold') {
+        if (goldAmount >= 2000000) {
+            handleDeductGold(2000000, `成功花费${convertPrice(2000000)}金兑换100个养元水（通灵资产650元）！`, 650, "每次换汇至少需要200两金子，你的金子不足！", event);
+        } else if (goldAmount >= 200000) {
+            handleDeductGold(200000, `成功花费${convertPrice(200000)}金兑换10个养元水（通灵资产65元）！`, 65, "每次换汇至少需要200两金子，你的金子不足！", event);
+        } else {
+            handleDeductGold(0, "", 0, "每次换汇至少需要200两金子，你的金子不足！", event);
+        }
+    }
 
-        case 'exchangeGold':
-            handleExchangeGold(event);
-            break;
-
-        default:
-            console.warn(`Unhandled message type: ${event.data.type}`);
+    if (event.data.type === 'exchangeGold') {
+        handleExchangeGold(event.data.amount, event);
     }
 });
         

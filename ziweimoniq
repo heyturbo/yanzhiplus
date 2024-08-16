@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>紫薇通灵模拟器</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url('https://gd-hbimg.huaban.com/6f357ce95a2a5ff23d7f28154fcb5c6597d976de8c61-qQLa5Y_fw1200webp');
+            background-size: cover;
+            font-family: '黑体', sans-serif;
+            text-align: center;
+        }
+        button {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        #result {
+            margin-top: 20px;
+            border: 1px solid black;
+            background-color: white;
+            font-size: 20px;
+            text-align: center;
+            padding: 15px;
+            height: 150px;
+            overflow-y: auto;
+        }
+        .red-bold {
+            color: red;
+            font-weight: bold;
+        }
+        .special-message {
+            font-size: 24px;
+            font-style: italic;
+            font-weight: bold;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>紫薇通灵模拟器</h1>
+    <button onclick="deductGold()">换汇</button>
+    <button onclick="performDivination()">通灵</button>
+    <button onclick="exchangeGold()">提款</button>
+    <div id="result"></div>
+    <div id="counter">已通灵0次</div>
+    <div>剩余资产:<span id="asset">0</span>元</div>
+    <div id="cost">您已消耗价值0元的紫薇教通灵</div>
+    <div id="specialMessage"></div>
+
+    <script>
+        let asset = 0;
+        let divinationCount = 0;
+        let divinationCost = 0;
+        const attributes = [
+            "敏捷:90-180", "信仰:90-180", "耐力:90-180", "‰HP上限:18-36", "‰法术攻击:18-36",
+            "物理攻击:700-1300", "法术攻击:700-1300", "‰物理攻击:18-36", "恢复:900-1555",
+            "法术暴击:200-500", "法术暴击抵抗:200-500", "法术闪避:200-500", "忽视法术闪避:200-500",
+            "法术命中:200-500", "物理暴击:200-500", "物理暴击抵抗:200-500", "物理闪避:200-500",
+            "忽视物理闪避:200-500", "物理命中:200-500", "每回合回复怒气:51-75", "‰MP上限:18-36", 
+            "生命值:700-1300","‰MP上限:18-36","法力值:700-1300","忽视物理防御:700-1300","忽视法术防御:700-1300"
+            
+        ];
+
+        function getRandomResult() {
+            const results = [];
+            const counts = [1, 2, 3, 4, 5];
+            const probabilities = [0.1, 0.2, 0.3, 0.35, 0.05];
+            const resultCount = counts[weightedRandom(probabilities)];
+            for (let i = 0; i < resultCount; i++) {
+                const attr = attributes[Math.floor(Math.random() * attributes.length)];
+                const parts = attr.split(':');
+                const range = parts[1].split('-').map(Number);
+                const value = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+                results.push(`+ ${value} ${parts[0]}`); 
+            }
+            return results;
+        }
+
+        function weightedRandom(probabilities) {
+            const rand = Math.random();
+            let sum = 0;
+            for (let i = 0; i < probabilities.length; i++) {
+                sum += probabilities[i];
+                if (rand <= sum) return i;
+            }
+        }
+
+        function performDivination() {
+            if (asset <= 6.5) {
+                alert("金钱已耗尽");
+                return;
+            }
+            
+            const results = getRandomResult();
+            const resultElement = document.getElementById('result');
+            resultElement.innerHTML = results.join('<br>');
+        
+            divinationCount++;
+            divinationCost = 6.5 * divinationCount;
+            asset -= 6.5;
+            
+            document.getElementById('counter').innerHTML = `已通灵<span class="red-bold">${divinationCount}</span>次`;
+            document.getElementById('cost').innerHTML = `您已消耗价值<span class="red-bold">${divinationCost.toFixed(2)}</span>元的紫薇教通灵`;
+            document.getElementById('asset').innerHTML = asset.toFixed(2);
+        
+            checkSpecialMessage(results);
+        }
+
+        function checkSpecialMessage(results) {
+            const specialAttributes = ['敏捷', '‰物理攻击', '‰法术攻击', '‰HP上限'];
+            const countMap = {};
+            results.forEach(result => {
+                const attribute = result.split(' ')[1];
+                if (specialAttributes.includes(attribute)) {
+                    if (!countMap[attribute]) countMap[attribute] = { count: 0, totalValue: 0 };
+                    countMap[attribute].count++;
+                    countMap[attribute].totalValue += parseInt(result.split(' ')[0], 10);
+                }
+            });
+
+            const specialMessageElement = document.getElementById('specialMessage');
+            specialMessageElement.innerHTML = '';
+            for (const attr in countMap) {
+                if (countMap[attr].count >= 2) {
+                    specialMessageElement.innerHTML = '出货啦！';
+                    if (attr === '敏捷' && countMap[attr].totalValue > 300 ||
+                        (attr.includes('‰') && countMap[attr].totalValue > 59)) {
+                        if (confirm(`您上一次已出大货，确认要换掉吗？（点击取消可返回上一次通灵结果）`)) {
+                            performDivination();
+                            return;
+                        }
+                    }
+                }
+            }
+        }
+
+        function resetDivination() {
+            divinationCount = 0;
+            divinationCost = 0;
+            document.getElementById('counter').innerHTML = `已通灵0次`;
+            document.getElementById('cost').innerHTML = `您已消耗价值0元的紫薇教通灵`;
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('specialMessage').innerHTML = '';
+        }
+
+        function deductGold() {
+            window.parent.postMessage({ type: 'deductGold' }, 'http://tianfuxilian.top');
+        }
+        
+        window.addEventListener('message', function(event) {
+            if (event.origin !== 'http://tianfuxilian.top') return;
+        
+            if (event.data.type === 'success(650)') {
+                asset += 650;
+                document.getElementById('asset').innerText = asset;
+            } else if (event.data.type === 'success(65)') {
+                asset += 65;
+                document.getElementById('asset').innerText = asset;
+            }
+        });
+        
+        function exchangeGold() {
+            if (asset > 0) {
+                const goldToAdd = Math.round(asset / 6.5 * 20) * 1000;
+                asset = 0;
+                document.getElementById('asset').innerText = asset;
+                window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
+            }
+        }
+        
+    </script>
+</body>
+</html>

@@ -2015,7 +2015,7 @@
         </div>
     </div>
     <div id="iframeContainer">
-        <button onclick="openDivineZiwei()" style="padding: 6px;position: absolute;z-index: 1000;right: 78%;top: 4%;border: none;background: #195b80;border-radius: 10px;box-shadow: 0px 0px 10px 0 black;font-weight: bold;font-size: 18px;color:white;">紫薇</button>
+        <button id="openDivineZiwei" onclick="openDivineZiwei()" style="padding: 6px;position: absolute;z-index: 1000;right: 78%;top: 4%;border: none;background: #195b80;border-radius: 10px;box-shadow: 0px 0px 10px 0 black;font-weight: bold;font-size: 18px;color:white;">紫薇</button>
         <button onclick="closeDivineShuixian()" style="padding: 10px;position: absolute;z-index: 1000;right: 8%;border: none;background: #ffffff00;font-weight: bold;font-size: 24px;color:white;">X</button>
         <iframe id="iframe" style="padding: 10px;z-index: 1;border: none;width: 95%;height: 100%;position: absolute;flex: 1;left: 50%;top: 50%;transform: translate(-50%, -50%);border-radius: 20px;display: flex;flex-direction: row;justify-content: flex-end; background-color:rgb(0 0 0 / 40%);font-size: 16px;"></iframe>
     </div>
@@ -3370,16 +3370,17 @@ function showGuide() {
         font-size: 14px;
     `;
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
-                            <p>欢迎大侠试玩养宠模拟器！当前是V16</p>
+                            <p>欢迎大侠试玩养宠模拟器！当前是V18</p>
+                            <p>- 增加通灵悬赏、打工系统
                             <p>- 优化、加强神器系统；</p>
                             <p>- 增加大量技能效果，可通过神器开启；</p>
                             <p>- 调整某些战斗时会发生的bug；</p>
                             <p>- 优化新手礼包内容，可在商店界面直接领取；</p>
                             <p>- 优化首页道具显示，现在可以点击数字贩卖了；</p>
                             <p>- 优化部分显示效果；</p>
-                            <p>如果大侠未接触过某网页游戏的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
-                            <p>养宠模拟器可以让大侠通过各种操作，如还童、洗练、变异等，来让您的宠物变得更强。</p>
-                            <p>❗️❗️❗️重要提示：大侠可以通过页面下拉栏选择不同宠物进行培养。但请注意，一旦切换其他宠物，系统将丢失此前宠物的所有信息。如果你没有想好优先培养哪只宠物，请先不要进行任何操作！</p>
+                            <p>如果大侠未接触过《天书奇谈》的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。</p>
+                            <p>以下引导已经过时，请酌情参考。新版引导正在完善中。</p>
+                            <p>你的终极目标：培养出最强宠物（资质5爆、SS技能全收集且加持所有属性增益系统（比如武装、专精等），进而战胜强大的毁灭心魔并进入无限回廊！</p>
                             <p>玩法按钮：点击引导按钮可弹出本提示框，供大侠查看各种功能。</p>
                             <p>资质按钮：点击后，会弹出当前宠物的资质界面。宠物的资质决定了当前宠物的总体品质。宠物资质由品质、成长率和资质值组成。资质也会影响宠物的评分，资质值越高，评分越高。</p>
                             <p>资质内部有多个功能</p>
@@ -3410,7 +3411,7 @@ function showGuide() {
                             <p>商店面板中，你可以进行宠物出售的操作，当宠物评分不足10000时，将无法出售。</p>
                             <p>当你点击出售按钮时，系统会根据你当前宠物评分的1/50进行出价，成功出售后，当前宠物各项属性会归零，同时得到等量金子。</p>
                             <p>宝箱按钮：玩家可以在宝箱界面花费金子打开各种宝箱，获得奇珍异宝和神秘道具！</p>
-                            <p>宝库按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
+                            <p>背包按钮：除页面顶部道具外，玩家通过宝箱获得的各种稀有道具会存放在此处。</p>
                             <p>💁请大侠尽情探索，本游戏还会继续更新功能，敬请期待！</p>
                             <button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>`;
     document.body.appendChild(messageBox);

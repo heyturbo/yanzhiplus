@@ -2897,7 +2897,7 @@
                 }
             },
             liguo: {
-                name: '李国麟',
+                name: 'Guolin·Li',
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg',
                 skills: [
@@ -11492,6 +11492,7 @@ let jinnangItems = [
     { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e29d9c307b7e9648ba5.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
     { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可进行一次免费十连任意宝箱' },
     { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可免费投注一次500倍以内的彩券' },
+    { name: 'liguolin', displayName: '李国麟的爱', url: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg', price: 0, quantity: 0, description: '如梦幻泡影，如红莲火焰，如从未拥有，如从未失去' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -13408,6 +13409,36 @@ function addSkillToPet(skillName) {
     }
 }
 
+function fulfillPetSkill() {
+    const maxSkills = 12;
+    const currentSkills = document.querySelectorAll("#skills-area div").length;
+
+    if (currentSkills >= maxSkills) {
+        showInfoBox("您的宠物已经达到技能上限，无法添加更多技能！");
+        return;
+    }
+
+    const missingSkills = getMissingSkills(currentPet.skills);
+    const skillsToAdd = Math.min(missingSkills.length, maxSkills - currentSkills);
+
+    for (let i = 0; i < skillsToAdd; i++) {
+        addSkillToPet(missingSkills[i].name);
+    }
+
+    if (skillsToAdd > 0) {
+        showInfoBox(`成功为宠物添加${skillsToAdd}个技能，当前技能已满！`);
+    } else {
+        showInfoBox("没有找到可添加的技能，或所有技能已添加！");
+    }
+}
+
+function getMissingSkills(allSkills) {
+    const currentSkillNames = Array.from(document.querySelectorAll("#skills-area div"))
+        .map(div => div.innerText.split(" (")[0]);
+
+    return allSkills.filter(skill => !currentSkillNames.includes(skill.name));
+}
+        
 // 初始化商店和倒计时
 document.addEventListener('DOMContentLoaded', initShop);
 
@@ -13986,7 +14017,18 @@ function upgradeWisdom() {
 
 function trainSkills() {
     const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
-
+    const liguolin = jinnangItems.find(item => item.name === 'liguolin');
+    
+    if (liguolin && liguolin.quantity > 0 && currentPet.name === "Guolin·Li") {
+        showInfoBox("你是否愿意接纳他的爱？", 
+            () => {
+                showInfoBox("To my best love in my life");
+                fulfillPetSkill();
+            }
+        ); // 关闭 showInfoBox 的括号
+        return;
+    }
+    
     if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
         showInfoBox("你拥有极为珍贵的仙人醍醐，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
         () => {
@@ -14547,6 +14589,12 @@ function blessGift() {
 function upgradeWisdomTo() {
     const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后,你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
     if (target === null) return;
+
+    if (target === "liguolin" && currentPet.name === 'Guolin·Li') {
+        addItemToJinnang('liguolin',1);
+        showInfoBox("你终将会得到梦寐以求的东西（请检查你的背包）");
+        return;
+    }
 
     if (target === "11111") {
         transmutationPill += 999;

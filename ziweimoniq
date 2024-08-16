@@ -144,7 +144,7 @@
     <h1  style="color: white; margin:0;">紫薇教通灵</h1>
     <div class="info-container">
       <div id="countInfo" style="color: white;border-radius: 20px;width: 100%;margin: 0px 0px 0px 20px;display: flex;flex-direction: column;align-items: flex-start;">
-        <p>已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="goldDeduction">0</span>金</p>
+        <p>已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
         <p>已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
       </div>
       <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: space-around;">
@@ -263,6 +263,7 @@
       }, 1000);
     }
 
+    //通灵按钮
     document.getElementById('tonglingBtn').addEventListener('click', () => {
       if (asset >= (merchantEvent ? merchantPrice : 6.5)) {
         asset -= merchantEvent ? merchantPrice : 6.5;

@@ -1,177 +1,624 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>紫薇通灵模拟器</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background-image: url('https://gd-hbimg.huaban.com/6f357ce95a2a5ff23d7f28154fcb5c6597d976de8c61-qQLa5Y_fw1200webp');
-            background-size: cover;
-            font-family: '黑体', sans-serif;
-            text-align: center;
-        }
-        button {
-            font-size: 24px;
-            font-weight: bold;
-            margin: 10px;
-            border-radius: 10px;
-        }
-        #result {
-            margin-top: 20px;
-            border: 1px solid black;
-            background-color: white;
-            font-size: 20px;
-            text-align: center;
-            padding: 15px;
-            height: 150px;
-            overflow-y: auto;
-        }
-        .red-bold {
-            color: red;
-            font-weight: bold;
-        }
-        .special-message {
-            font-size: 24px;
-            font-style: italic;
-            font-weight: bold;
-            color: red;
-        }
-    </style>
+  <title>紫薇通灵模拟器</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      background-color: #285374;
+    }
+    
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #217365;
+      color: white;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .asset {
+    font-size: 16px;
+    font-weight: bold;
+    color: gold;
+    }
+    
+    .container {
+      max-width: 800px;
+      display: flex;
+      gap: 20px;
+      min-height: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px 0px rgb(0 0 0 / 40%);
+      flex-direction: column;
+      background-image: url(https://pic.imgdb.cn/item/66befa62d9c307b7e95c8f06.webp);
+      background-size: cover;
+    }
+    .button-container {
+      display: flex;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      flex-direction: row;
+      justify-content: space-evenly;
+    }
+
+    .result-container {
+      flex-di
+      font-size: 20px;
+      padding: 20px;
+      flex-direction: column;
+      align-items: center;
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 20px;
+      font-size: 20px;
+      height: 150px;
+      justify-content: space-between;
+      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.4);
+      color: white;
+    }
+    
+    .special {
+      color: red;
+      font-weight: bold;
+    }
+    
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: gold;
+      font-size: 48px;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s;
+    }
+    
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      text-align: center;
+    }
+    
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .info-container {
+      border-radius:20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      background: rgba(0, 0, 0, 0.4);
+    }
+  </style>
 </head>
 <body>
-    <h1>紫薇通灵模拟器</h1>
-    <button onclick="deductGold()">换汇</button>
-    <button onclick="performDivination()">通灵</button>
-    <button onclick="exchangeGold()">提款</button>
-    <div id="result"></div>
-    <div id="counter">已通灵0次</div>
-    <div>剩余资产:<span id="asset">0</span>元</div>
-    <div id="cost">您已消耗价值0元的紫薇教通灵</div>
-    <div id="specialMessage"></div>
+  <div class="container">
+    <h1  style="color: white; margin:0;">紫薇教通灵</h1>
+    <div class="info-container">
+      <div id="countInfo" style="color: white;border-radius: 20px;width: 100%;margin: 0px 0px 0px 20px;display: flex;flex-direction: column;align-items: flex-start;">
+        <p>已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="goldDeduction">0</span>金</p>
+        <p>已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
+      </div>
+      <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: space-around;">
+        <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png">
+        <div class="asset">资产: <span id="asset">0</span></div>
+      </div>
+    </div>
+    <div class="button-container">
+      <button onclick="deductGold()">换汇</button>
+      <button id="tonglingBtn">通灵</button>
+      <button onclick="exchangeGold()">提款</button>
+    </div>
+    <div class="result-container">
+    <div class="result" id="result"></div>
+    </div>
 
-    <script>
-        let asset = 0;
-        let divinationCount = 0;
-        let divinationCost = 0;
-        const attributes = [
-            "敏捷:90-180", "信仰:90-180", "耐力:90-180", "‰HP上限:18-36", "‰法术攻击:18-36",
-            "物理攻击:700-1300", "法术攻击:700-1300", "‰物理攻击:18-36", "恢复:900-1555",
-            "法术暴击:200-500", "法术暴击抵抗:200-500", "法术闪避:200-500", "忽视法术闪避:200-500",
-            "法术命中:200-500", "物理暴击:200-500", "物理暴击抵抗:200-500", "物理闪避:200-500",
-            "忽视物理闪避:200-500", "物理命中:200-500", "每回合回复怒气:51-75", "‰MP上限:18-36", 
-            "生命值:700-1300","‰MP上限:18-36","法力值:700-1300","忽视物理防御:700-1300","忽视法术防御:700-1300"
-            
-        ];
+    <div id="bountyInfo" style="background: rgba(0, 0, 0, 0.1);border-radius: 20px;"></div>
+  </div>
+  
+  <div class="overlay" id="overlay">三速欧皇降临!</div>
+  
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <p id="modalText"></p>
+      <button id="confirmBtn">确定</button>
+      <button id="cancelBtn">取消</button>
+    </div>
+  </div>
 
-        function getRandomResult() {
-            const results = [];
-            const counts = [1, 2, 3, 4, 5];
-            const probabilities = [0.1, 0.2, 0.3, 0.35, 0.05];
-            const resultCount = counts[weightedRandom(probabilities)];
-            for (let i = 0; i < resultCount; i++) {
-                const attr = attributes[Math.floor(Math.random() * attributes.length)];
-                const parts = attr.split(':');
-                const range = parts[1].split('-').map(Number);
-                const value = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
-                results.push(`+ ${value} ${parts[0]}`); 
-            }
-            return results;
+  <script>
+    const resultElement = document.getElementById('result');
+    const assetElement = document.getElementById('asset');
+    const tonglingCountElement = document.getElementById('tonglingCount');
+    const tonglingCostElement = document.getElementById('tonglingCost');
+    const bountyInfoElement = document.getElementById('bountyInfo');
+    const overlayElement = document.getElementById('overlay');
+    const goldDeductionElement = document.getElementById('goldDeduction');
+
+    let asset = 0;
+    let tonglingCount = 0;
+    let currentBounty = null;
+    let isEuropeKing = false;
+    let merchantEvent = false;
+    let merchantCost = 0;
+    let merchantCount = 0;
+    let merchantPrice = 0;
+    let merchantSavings = 0;
+    let autoWashInterval = null;
+    let goldDeduction = 0;
+
+    const items = [
+      { range: [90, 180], name: '敏捷' },
+      { range: [90, 180], name: '信仰' },
+      { range: [90, 180], name: '耐力' },
+      { range: [18, 36], name: '‰ HP上限' },
+      { range: [736, 1132], name: '生命值上限' },
+      { range: [18, 36], name: '‰ MP上限' },
+      { range: [736, 1132], name: '法力值上限' },
+      { range: [18, 36], name: '‰ 法术防' },
+      { range: [18, 36], name: '‰ 防御' },
+      { range: [18, 36], name: '‰ 物理攻击' },
+      { range: [736, 1132], name: '物理攻击' },
+      { range: [18, 36], name: '‰ 法术攻击' },
+      { range: [736, 1132], name: '法术攻击' },
+      { range: [764, 1296], name: '恢复' },
+      { range: [236, 488], name: '法术暴击' },
+      { range: [236, 488], name: '法术暴击抵抗' },
+      { range: [236, 488], name: '忽视目标物防' },
+      { range: [236, 488], name: '忽视目标法防' },
+      { range: [236, 488], name: '法术闪避' },
+      { range: [236, 488], name: '忽视法术闪避' },
+      { range: [236, 488], name: '法术命中' },
+      { range: [236, 488], name: '物理暴击' },
+      { range: [236, 488], name: '物理暴击抵抗' },
+      { range: [236, 488], name: '物理闪避' },
+      { range: [236, 488], name: '忽视物理闪避' },
+      { range: [236, 488], name: '物理命中' },
+      { range: [51, 76], name: '每回合怒气' },
+      { range: [51, 76], name: '韧性' },
+    ];
+    
+    function getRandomItem() {
+      const item = items[Math.floor(Math.random() * items.length)];
+      const value = Math.floor(Math.random() * (item.range[1] - item.range[0] + 1)) + item.range[0];
+      return `+${value} ${item.name}`;
+    }
+
+    function getRandomCount() {
+      const rand = Math.random();
+      if (rand < 0.1) return 1;
+      if (rand < 0.3) return 2;
+      if (rand < 0.6) return 3;
+      if (rand < 0.95) return 4;
+      return 5;
+    }
+
+    function checkEuropeKing(resultArray) {
+      let sum = 0;
+      for (const result of resultArray) {
+        if (result.includes('耐力')) {
+          sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+        } else if (result.includes('信仰')) {
+          sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+        } else if (result.includes('敏捷')) {
+          sum += parseInt(result.match(/\d+/)[0]) * 1;
+        }
+      }
+      return sum >= 361;
+    }
+
+    function showOverlay() {
+      overlayElement.classList.add('show');
+      setTimeout(() => {
+        overlayElement.classList.remove('show');
+      }, 1000);
+    }
+
+    document.getElementById('tonglingBtn').addEventListener('click', () => {
+      if (asset >= (merchantEvent ? merchantPrice : 6.5)) {
+        asset -= merchantEvent ? merchantPrice : 6.5;
+        assetElement.textContent = asset.toFixed(2);
+        tonglingCount++;
+        tonglingCountElement.textContent = tonglingCount;
+        tonglingCostElement.textContent = `${(tonglingCount * 6.5).toFixed(2)}${merchantEvent ? `（商人已为你节省了${merchantSavings.toFixed(2)}元）` : ''}`;
+
+        if (merchantEvent) {
+          merchantCount--;
+          merchantSavings += 6.5 - merchantPrice;
+          if (merchantCount === 0) {
+            merchantEvent = false;
+          }
         }
 
-        function weightedRandom(probabilities) {
-            const rand = Math.random();
-            let sum = 0;
-            for (let i = 0; i < probabilities.length; i++) {
-                sum += probabilities[i];
-                if (rand <= sum) return i;
-            }
+        const count = getRandomCount();
+        const resultArray = [];
+        for (let i = 0; i < count; i++) {
+          resultArray.push(getRandomItem());
         }
-
-        function performDivination() {
-            if (asset <= 6.5) {
-                alert("金钱已耗尽");
-                return;
-            }
-            
-            const results = getRandomResult();
-            const resultElement = document.getElementById('result');
-            resultElement.innerHTML = results.join('<br>');
+        resultElement.innerHTML = resultArray.join('<br>');
         
-            divinationCount++;
-            divinationCost = 6.5 * divinationCount;
-            asset -= 6.5;
-            
-            document.getElementById('counter').innerHTML = `已通灵<span class="red-bold">${divinationCount}</span>次`;
-            document.getElementById('cost').innerHTML = `您已消耗价值<span class="red-bold">${divinationCost.toFixed(2)}</span>元的紫薇教通灵`;
-            document.getElementById('asset').innerHTML = asset.toFixed(2);
-        
-            checkSpecialMessage(results);
+        if (!autoWashInterval) {
+          checkBounty(resultArray);
         }
 
-        function checkSpecialMessage(results) {
-            const specialAttributes = ['敏捷', '‰物理攻击', '‰法术攻击', '‰HP上限'];
-            const countMap = {};
-            results.forEach(result => {
-                const attribute = result.split(' ')[1];
-                if (specialAttributes.includes(attribute)) {
-                    if (!countMap[attribute]) countMap[attribute] = { count: 0, totalValue: 0 };
-                    countMap[attribute].count++;
-                    countMap[attribute].totalValue += parseInt(result.split(' ')[0], 10);
+        if (checkEuropeKing(resultArray)) {
+          isEuropeKing = true;
+          alert('如此好运，说走就走吗？');
+        }
+
+        if (!currentBounty && (Math.random() < 0.15 || (isEuropeKing && Math.random() < 0.88))) {
+          isEuropeKing = false;
+          generateBounty();
+        }
+
+        if (tonglingCount % 50 === 0 && Math.random() < 0.15 && !currentBounty) {
+          generateMerchantEvent();
+        }
+      } else {
+        alert('资产不足，无法通灵!');
+      }
+    });
+    
+function generateTargetAndRewardForAgility() {
+    let target, reward;
+    const randomChoice = Math.random();
+
+    if (randomChoice < 0.20) {
+        target = Math.floor(Math.random() * (299 - 181 + 1)) + 181;
+        reward = Math.floor(Math.random() * (600 - 280 + 1)) + 480;
+    } else if (randomChoice < 0.70) {
+        target = Math.floor(Math.random() * (359 - 300 + 1)) + 300;
+        reward = target * 5;
+    } else if (randomChoice < 0.90) {
+        target = Math.floor(Math.random() * (440 - 360 + 1)) + 360;
+        reward = target * (Math.floor(Math.random() * (15 - 10 + 1)) + 10);
+    } else if (randomChoice < 0.95) {
+        target = Math.floor(Math.random() * (500 - 441 + 1)) + 441;
+        reward = target * 15;
+    } else {
+        target = Math.floor(Math.random() * (530 - 501 + 1)) + 531;
+        reward = target * 30 + 5000;
+    }
+
+    return { target, reward };
+}
+
+function generateTargetAndRewardForAttackOrHp(bountyType) {
+    let target, reward;
+    const randomChoice = Math.random();
+    const range = randomChoice < 0.95 ? [40, 60] : [37, 180];
+    
+    target = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+    
+    if (target <= 50) {
+        reward = target * (bountyType === 'HP' ? 10 : 15) + 1000;
+    } else {
+        reward = target * (bountyType === 'HP' ? 20 : 30) + 3000;
+    }
+
+    return { target, reward };
+}
+
+function generateBounty() {
+    let target, reward, bountyType;
+    const bountyChoice = Math.random();
+
+    if (bountyChoice < 0.33) {
+        ({ target, reward } = generateTargetAndRewardForAgility());
+        bountyType = '敏捷';
+    } else if (bountyChoice < 0.66) {
+        ({ target, reward } = generateTargetAndRewardForAttackOrHp('Attack'));
+        bountyType = Math.random() < 0.5 ? '‰ 物理攻击' : '‰ 法术攻击';
+    } else {
+        ({ target, reward } = generateTargetAndRewardForAttackOrHp('HP'));
+        bountyType = '‰ HP上限';
+    }
+
+    currentBounty = { target, reward, bountyType };
+    bountyInfoElement.innerHTML = `
+        <p style="color: #fefefe;font-weight: bold;">有一个新的悬赏通灵，目标: ${target} ${bountyType}, 赏金${reward}元，是否接受?</p>
+        <div class="button-container">
+            <button id="acceptBtn">接受</button>
+            <button id="declineBtn">拒绝</button>
+            <button id="descripBtn">说明</button>
+        </div>
+    `;
+
+    document.getElementById('acceptBtn').addEventListener('click', () => handleAcceptBounty(target, bountyType, reward));
+    document.getElementById('declineBtn').addEventListener('click', () => {
+        currentBounty = null;
+        bountyInfoElement.innerHTML = '';
+    });
+    document.getElementById('descripBtn').addEventListener('click', () => {
+        openModal("\n1. 悬赏奖金越高，难度越大 \n2. 不同类型的悬赏有不同的奖励和目标。");
+    });
+}
+
+function handleAcceptBounty(target, bountyType, reward) {
+    bountyInfoElement.innerHTML = `
+        <p style="color: #fefefe;font-weight: bold;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${reward * 0.1}元违约金</p>
+        <div class="button-container">
+            <button id="giveUpBtn">放弃</button>
+            <button id="autoBtn">代洗</button>
+        </div>
+    `;
+
+    handleGiveUp(reward);
+    handleAutoWash(target, bountyType);
+}
+
+function handleGiveUp(reward) {
+    document.getElementById('giveUpBtn').addEventListener('click', () => {
+        const penalty = reward * 0.1;
+        asset -= penalty;
+        assetElement.textContent = asset;
+        currentBounty = null;
+        bountyInfoElement.innerHTML = '';
+    });
+}
+
+function handleAutoWash(target, bountyType) {
+
+    document.getElementById('autoBtn').addEventListener('click', () => {
+        if (autoWashInterval) {
+            clearInterval(autoWashInterval);
+            autoWashInterval = null;
+        } else {
+            autoWashInterval = setInterval(() => {
+                if (asset < (merchantEvent ? merchantPrice : 6.5)) {
+                    clearInterval(autoWashInterval);
+                    autoWashInterval = null;
+                    alert("资产不足，代洗已停止");
+                    return;
                 }
-            });
+                document.getElementById('tonglingBtn').click();
 
-            const specialMessageElement = document.getElementById('specialMessage');
-            specialMessageElement.innerHTML = '';
-            for (const attr in countMap) {
-                if (countMap[attr].count >= 2) {
-                    specialMessageElement.innerHTML = '出货啦！';
-                    if (attr === '敏捷' && countMap[attr].totalValue > 300 ||
-                        (attr.includes('‰') && countMap[attr].totalValue > 59)) {
-                        if (confirm(`您上一次已出大货，确认要换掉吗？（点击取消可返回上一次通灵结果）`)) {
-                            performDivination();
-                            return;
-                        }
-                    }
-                }
-            }
+                const resultArray = resultElement.innerHTML.split('<br>');
+                checkBountyCompletion(resultArray, target, autoWashInterval, bountyType);
+            }, 100); // 每0.1秒执行一次
         }
+    });
+}
 
-        function resetDivination() {
-            divinationCount = 0;
-            divinationCost = 0;
-            document.getElementById('counter').innerHTML = `已通灵0次`;
-            document.getElementById('cost').innerHTML = `您已消耗价值0元的紫薇教通灵`;
-            document.getElementById('result').innerHTML = '';
-            document.getElementById('specialMessage').innerHTML = '';
+function checkBountyCompletion(resultArray, target, autoWashInterval, bountyType) {
+    let sum = 0;
+    for (const result of resultArray) {
+        if (result.includes('耐力') && bountyType === '敏捷') {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+        } else if (result.includes('信仰') && bountyType === '敏捷') {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+        } else if (result.includes(bountyType)) {
+            sum += parseInt(result.match(/\d+/)[0]);
         }
+    }
 
-        function deductGold() {
-            window.parent.postMessage({ type: 'deductGold' }, 'http://tianfuxilian.top');
-        }
-        
-        window.addEventListener('message', function(event) {
-            if (event.origin !== 'http://tianfuxilian.top') return;
-        
-            if (event.data.type === 'success(650)') {
-                asset += 650;
-                document.getElementById('asset').innerText = asset;
-            } else if (event.data.type === 'success(65)') {
-                asset += 65;
-                document.getElementById('asset').innerText = asset;
-            }
+    if (sum >= target) {
+        clearInterval(autoWashInterval);
+        bountyInfoElement.innerHTML = `
+            <p style="color: #fefefe;font-weight: bold;">当前${bountyType}为${sum}，恭喜你完成了悬赏!</p>
+            <div class="button-container">
+                <button id="claimBtn">领取赏金</button>
+            </div>
+        `;
+        document.getElementById('claimBtn').addEventListener('click', () => {
+            asset += currentBounty.reward;
+            assetElement.textContent = asset;
+            currentBounty = null;
+            bountyInfoElement.innerHTML = '';
         });
-        
-        function exchangeGold() {
-            if (asset > 0) {
-                const goldToAdd = Math.round(asset / 6.5 * 20) * 1000;
-                asset = 0;
-                document.getElementById('asset').innerText = asset;
-                window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
-            }
+    }
+}
+    
+    function checkBounty(resultArray) {
+      if (currentBounty) {
+        let sum = 0;
+        for (const result of resultArray) {
+          if (result.includes('耐力')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+          } else if (result.includes('信仰')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
+          } else if (result.includes('敏捷')) {
+            sum += parseInt(result.match(/\d+/)[0]) * 1;
+          }
         }
-        
-    </script>
+        console.log(`当前敏捷共计${sum}`);
+        if (sum >= currentBounty.target) {
+          bountyInfoElement.innerHTML = `
+            <p style="color: #fefefe;font-weight: bold;">当前敏捷换算为${sum}，恭喜你完成了悬赏!</p>
+            <div class="button-container">
+            <button id="claimBtn">领取赏金</button>
+            </div>
+          `;
+          document.getElementById('claimBtn').addEventListener('click', () => {
+            asset += currentBounty.reward;
+            assetElement.textContent = asset;
+            currentBounty = null;
+            bountyInfoElement.innerHTML = '';
+          });
+        }
+      }
+    }
+
+    const modal = document.getElementById('modal');
+    const modalText = document.getElementById('modalText');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const closeBtn = document.getElementsByClassName('close')[0];
+
+    closeBtn.addEventListener('click', closeModal);
+    confirmBtn.addEventListener('click', confirmModal);
+    cancelBtn.addEventListener('click', cancelModal);
+
+    function openModal(text) {
+      modalText.textContent = text;
+      modal.style.display = 'block';
+    }
+
+    function closeModal() {
+      modal.style.display = 'none';
+    }
+
+    function confirmModal() {
+      closeModal();
+      if (merchantEvent) {
+        if (asset >= merchantCost) {
+          asset -= merchantCost;
+          assetElement.textContent = asset.toFixed(2);
+          tonglingBtn.click();
+        } else {
+          openModal('收手吧，赌海无涯');
+        }
+      } else {
+        tonglingBtn.click();
+      }
+    }
+
+    function cancelModal() {
+      closeModal();
+    }
+
+    function generateMerchantEvent() {
+      const cost = Math.floor(Math.random() * 100) + 1;
+      const count = cost * 10;
+      const price = Math.floor(Math.random() * 4) + 3;
+
+      merchantEvent = true;
+      merchantCost = cost;
+      merchantCount = count;
+      merchantPrice = price;
+      merchantSavings = 0;
+
+      bountyInfoElement.innerHTML = `
+        <p style="color: #fefefe;font-weight: bold;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
+        <div class="button-container">
+        <button id="acceptMerchantBtn">交易</button>
+        <button id="declineMerchantBtn">离开</button>
+        </div>
+      `;
+
+      document.getElementById('acceptMerchantBtn').addEventListener('click', () => {
+        if (asset >= cost) {
+          asset -= cost;
+          assetElement.textContent = asset.toFixed(2);
+          bountyInfoElement.innerHTML = '';
+        } else {
+          openModal('收手吧，赌海无涯');
+          merchantEvent = false;
+          bountyInfoElement.innerHTML = '';
+        }
+      });
+
+      document.getElementById('declineMerchantBtn').addEventListener('click', () => {
+        merchantEvent = false;
+        bountyInfoElement.innerHTML = '';
+      });
+    }
+
+    function convertPrice(price) {
+        let ding = Math.floor(price / 1000000);
+        price %= 1000000;
+        let liang = Math.floor(price / 1000);
+        let wen = price % 1000;
+    
+        let result = '';
+        if (ding > 0) {
+            result += `${ding}锭 `;
+        }
+        if (liang > 0) {
+            result += `${liang}两 `;
+        }
+        if (wen > 0 || result === '') {
+            result += `${wen}文`;
+        }
+        return result.trim();
+    }
+    
+    function deductGold() {
+        window.parent.postMessage({ type: 'deductGold' }, 'http://tianfuxilian.top');
+    }
+    
+    window.addEventListener('message', function(event) {
+        if (event.origin !== 'http://tianfuxilian.top') return;
+    
+        if (event.data.type === 'success(650)') {
+            asset += 650;
+            deductionGold += 2000;
+            document.getElementById('asset').innerText = asset;
+            document.getElementById('deductionGold').innerText = `convertPrice(deductionGold)`;
+        } else if (event.data.type === 'success(65)') {
+            asset += 65;
+            deductionGold += 200;
+            document.getElementById('asset').innerText = asset;
+            document.getElementById('deductionGold').innerText = `convertPrice(deductionGold)`;
+        }
+    });
+    
+    function exchangeGold() {
+        if (asset > 0) {
+            const goldToAdd = Math.round(asset / 6.5 * 20) * 1000;
+            asset = 0;
+            document.getElementById('asset').innerText = asset;
+            window.parent.postMessage({ type: 'exchangeGold', amount: goldToAdd }, 'http://tianfuxilian.top');
+        }
+    }
+    
+    function reset() {
+      asset = 0;
+      assetElement.textContent = asset;
+      tonglingCount = 0;
+      tonglingCountElement.textContent = tonglingCount;
+      tonglingCostElement.textContent = '0';
+      resultElement.innerHTML = '';
+    }
+  </script>
 </body>
 </html>

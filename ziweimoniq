@@ -398,12 +398,13 @@ function handleAcceptBounty(target, bountyType, reward) {
 }
 
 function handleGiveUp(reward) {
-    if (autoWashInterval) {
-        clearInterval(autoWashInterval);
-        autoWashInterval = null;
-    }
   
     document.getElementById('giveUpBtn').addEventListener('click', () => {
+        if (autoWashInterval) {
+            clearInterval(autoWashInterval);
+            autoWashInterval = null;
+        }
+      
         const penalty = reward * 0.1;
         asset -= penalty;
         assetElement.textContent = asset;

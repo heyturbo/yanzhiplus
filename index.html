@@ -129,7 +129,7 @@
             z-index: 9999;
         }
     .item-text-container {
-        margin-left: 5px;
+        margin-left: 2px;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -441,7 +441,7 @@
             box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
             color: rgb(255 255 255 / 90%);
             padding: 2px;
-            min-height: 60px;
+            min-height: 80px;
             align-items: center;
         }
         .pet-selector {
@@ -629,6 +629,7 @@
             margin-top: 20px;
             flex-direction: row;
             flex-wrap: wrap;
+            margin-bottom: 10px;
         }
         .shop-bar button {
             border: 1px solid #6F391C;
@@ -914,19 +915,18 @@
             position: fixed;
             bottom: 0;
             width: 100%;
-            background-color: #fff;
+            background-color: #e0b352;
             box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-            border-radius: 10px 10px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s;
+            align-content: center;
         }
         .jinnang-drawer.open {
             transform: translateY(0);
-            display: block;
             background: #6f391c;
             padding: 2px;
             border-radius: 2px;
-            /* color: #92341c; */
+            color: #92341c;
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
             background-repeat: repeat;
             background-size: auto;
@@ -1675,22 +1675,9 @@
 }
 /* 通用弹出面板样式 */
 .mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    height: 400px;
-    width: 85%;
-    transform: translate(-50%, -50%);
-    background-image: url(https://pic.imgdb.cn/item/66a4d128d9c307b7e9a1dcd3.gif);
-    background-size: cover;
-    border: 1px solid floralwhite;
-    color: #fff;
-    padding: 20px;
+    height: 500px;
     z-index: 1000;
-    overflow-y: scroll;
-    font-size: 14px;
-    border-radius: 10px;
-    display: none;
+    /* display: none; */
 
 /* 召唤面板特定样式 */
 .summon-popup-panel {
@@ -1716,7 +1703,6 @@
     background-color: rgba(0, 0, 0, 0.8);
     margin-bottom: 20px;
     margin-top: 20px;
-    border-radius: 50px;
     flex-direction: column;
 }
 
@@ -1764,10 +1750,13 @@
 
 .shop-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px 2px;
+    justify-content: center;
+    margin-top: 5px;
     font-size: 12px;
-    flex-wrap: wrap;
-    flex-direction: row;
+    justify-items: stretch;
+    align-items: center;
 }
 
 .shop-item {
@@ -1829,7 +1818,7 @@
         }
 
         .petArms-red-text {
-            color: red;
+    color: red;
         }
 
         .petArms-item {
@@ -1881,6 +1870,20 @@
     flex-grow: 1;
 }
 
+   ;
+    background: #6f391c;
+    padding: 2px;
+    border-radius: 2px;
+    color: #92341c;
+    background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+    background-repeat: repeat;
+    background-size: auto;
+    border: 1px solid black;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 360px;
    </style>
 </head>
 <body>
@@ -2160,7 +2163,7 @@
     <div class="jinnang-drawer" id="jinnang-drawer">
         <div class="drawer-toggle" onclick="toggleJinnangDrawer()">背包</div>
         <div class="jinnang-info" id="jinnang-info">
-            <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll;">
+            <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll; margin-bottom:10px">
                 <div class="jinnang-reward" id="jinnang-reward"></div>
             </div>
         </div>
@@ -2367,40 +2370,45 @@
             </div>            
         </div>
     </div>
-<div id="missionPanel" class="mission-popup-panel" style="display:none;">
-    <h3>任务面板</h3>
-    <button id="closeMissionPanel" class="mission-close-button">关闭</button>
-    <ul id="taskList">
-        <!-- 任务列表 -->
-    </ul>
-</div>
-<div id="summonPanel" class="summon-popup-panel" style="display:none;">
-    <h3>召唤面板</h3>
-    <button id="closeSummonPanel" class="summon-close-button">关闭</button>
-    <div id="summonArea" class="summon-area">
-        <!-- 召唤区域 -->
+    <div id="missionPanel" class="mission-popup-panel" style="display:none;">
+        <div class="drawer-toggle">任务</div>
+        <h3>任务面板</h3>
+        <button id="closeMissionPanel" class="treasure-action button">关闭</button>
+        <ul id="taskList">
+            <!-- 任务列表 -->
+        </ul>
     </div>
-    <div class="summon-button-area">
-        <button id="summonExecuteButton" class="summon-button">召唤</button>
-        <button id="claimButton" class="summon-button">领取</button>
-        <button id="exchangeButton" class="summon-button">兑换</button>
-        <button id="openPetShopButton" class="summon-button">商店</button>
-    </div>
-</div>
-
-<div id="petShop" class="pet-shop-popup-panel" style="display:none;">
-    <h3>宠物商店（可下划）</h3>
-    <button id="closePetShop" class="pet-shop-close-button">关闭</button>
-    <div id="petShopItemsContainer" style="max-height:300px; overflow-y:scroll">
-        <div id="shopItems" class="shop-grid">
-            <!-- 商店物品列表 -->
+    <div id="summonPanel" class="summon-popup-panel" style="display:none;">
+        <div class="drawer-toggle">召唤</div>
+        <h3>召唤面板</h3>
+        <div class="treasure-action">
+        <button id="closeSummonPanel" class="treasure-action button">关闭</button>
+        </div>
+        <div id="summonArea" class="summon-area">
+            <!-- 召唤区域 -->
+        </div>
+        <div class="treasure-action">
+            <button id="summonExecuteButton" class="treasure-action button">召唤</button>
+            <button id="claimButton" class="treasure-action button">领取</button>
+            <button id="exchangeButton" class="treasure-action button">兑换</button>
+            <button id="openPetShopButton" class="treasure-action button">商店</button>
         </div>
     </div>
-    <div class="pet-shop-actions">
-        <button id="buySummonCharmButton" class="pet-shop-button">购买灵符（当前印花: <span id="currentStampCount">1000</span>）</button>
-
+    <div id="petShop" class="pet-shop-popup-panel" style="display:none;">
+        <div class="drawer-toggle">宠物商店</div>
+        <h3>宠物商店（可下划）</h3>
+        <div class="treasure-action">
+        <button id="closePetShop" class="treasure-action button">关闭</button>
+        </div>
+        <div id="petShopItemsContainer" style="max-height:300px; overflow-y:scroll">
+            <div id="shopItems" class="shop-grid">
+                <!-- 商店物品列表 -->
+            </div>
+        </div>
+        <div class="treasure-action">
+            <button id="buySummonCharmButton" class="treasure-action button">购买灵符（当前印花: <span id="currentStampCount">1000</span>）</button>
+        </div>
     </div>
-</div>
     <div class="bottom-bar">
         <div class="pet-image">
             <img style="width: 180px;height: 180px;" id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
@@ -3551,10 +3559,12 @@ function togglePetOverview() {
     // 每次打开时都重新加载并启动打工逻辑
     if (petOverview.style.display === 'block') {
         infoPingfenpaihang();
-        console.log("打开养成界面，恢复当前宠物数据");
-    }
-    if (petOverview.style.display === 'none') {
         storeCurrentPetData();
+        saveGameState();
+        console.log("打开养成界面，保存当前宠物数据");
+    } else if (petOverview.style.display === 'none') {
+        storeCurrentPetData();
+        saveGameState();
         console.log("关闭养成界面，保存当前宠物数据");
     }
 }
@@ -3564,7 +3574,6 @@ function workPage() {
 }
         
 function infoPingfenpaihang() {
-    storeCurrentPetData();
     const allPetData = [];
     const newPetStates = []; // 新的宠物状态数组
 
@@ -4747,6 +4756,7 @@ function storeCurrentPetData() {
         });
         const petData = {
             currentPet: JSON.stringify(currentPet),
+            petProgressIntervals: JSON.stringify(petProgressIntervals),
             skillScore: skillScore,
             petLevel: petLevel,
             evolutionLevel: evolutionLevel,
@@ -4814,6 +4824,7 @@ function restorePetData(petName) {
         petMaxLevel = savedPetData.petMaxLevel;
         petWisdom = savedPetData.petWisdom;
         petStates = JSON.parse(savedPetData.petStates);
+        petProgressIntervals = JSON.parse(savedPetData.petProgressIntervals);
         awakened = savedPetData.awakened;
         awakenAttributes = savedPetData.awakenAttributes;
         hallucinated = savedPetData.hallucinated;
@@ -11719,7 +11730,8 @@ function updateJinnangItems() {
             itemDiv.style.alignItems = 'center'; 
             itemDiv.style.justifyContent = 'space-between'; 
             itemDiv.style.padding = '4px'; 
-            itemDiv.style.boxShadow ='rgb(131, 74, 15) 0px 0px 0px 2px inset';
+            itemDiv.style.boxShadow ='rgb(131, 74, 15) 0px 0px 0px 1px inset';
+            itemDiv.style.border ='1px solid rgb(131,74,15)';
             itemDiv.innerHTML = `
                 <img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;">
                 <div class="item-text-container">
@@ -11734,14 +11746,14 @@ function updateJinnangItems() {
 
                 // 移除之前选中项的视觉提示
                 if (selectedItem) {
-                selectedItem.style.border = '';
-                selectedItem.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 2px inset';
+                selectedItem.style.border = '1px solid rgb(131,74,15)';
+                selectedItem.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 1px inset';
                 }
 
                 // 添加当前选中项的视觉提示
                 selectedItem = itemDiv;
                 selectedItem.style.border = '1px solid white';
-                selectedItem.style.boxShadow = 'red 0px 0px 0px 2px inset';
+                selectedItem.style.boxShadow = 'red 0px 0px 0px 1px inset';
 
                 // 将 item 存储到 selectedItem 的 dataset 中，以便出售时使用
                 selectedItem.dataset.itemName = item.name;
@@ -13114,12 +13126,11 @@ function startShopTimer() {
 }
 
 // 页面加载完成后初始化商店
-
 let refreshCount = 0; // 全局计数器，记录刷新次数
+
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 100) {
-        showInfoBox("您的金子不足，无法刷新！");
-        return;
+        return showInfoBox("您的金子不足，无法刷新！");
     }
 
     if (!auto) {
@@ -13132,202 +13143,147 @@ function refreshShop(auto = false) {
 
     refreshCount++; // 更新刷新计数器
 
-    // 特殊刷新逻辑：第20次刷新时，展示24个技能商品
     if (refreshCount === 20) {
-        refreshCount = 0; // 重置计数器
-
-        let ssSkills = [];
-        let sSkills = [];
-        let allSSSkills = [];
-        let allSSkills = [];
-
-        // 收集所有SS技能和S技能
-        for (let petKey in pets) {
-            let pet = pets[petKey];
-            pet.skills.forEach(skill => {
-                if (skill.rarity === 'SS') {
-                    allSSSkills.push({
-                        name: `${pet.name}·${skill.name}`,
-                        url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
-                        price: getRandomInt(21688, 35988)
-                    });
-                }
-                if (skill.rarity === 'S') {
-                    allSSkills.push({
-                        name: `${pet.name}·${skill.name}`,
-                        url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                        price: getRandomInt(11288, 21988)
-                    });
-                }
-            });
-        }
-
-        // 随机选择12个SS技能和12个S技能
-        for (let i = 0; i < 12; i++) {
-            ssSkills.push(allSSSkills.splice(Math.floor(Math.random() * allSSSkills.length), 1)[0]);
-            sSkills.push(allSSkills.splice(Math.floor(Math.random() * allSSkills.length), 1)[0]);
-        }
-
-        // 将SS技能和S技能添加到商店
-        let specialItems = ssSkills.concat(sSkills);
-        specialItems.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.classList.add('shop-item');
-            itemDiv.dataset.name = item.name;
-            itemDiv.dataset.price = item.price;
-            itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;"><div class="item-text-container"><div class="item-text-top">${item.name}</div><div class="item-text-bottom">${convertPrice(item.price)} 金</div></div>`;
-            itemDiv.addEventListener('click', () => {
-                document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
-                itemDiv.classList.add('selected');
-            });
-            shopItems.appendChild(itemDiv);
-        });
+        refreshCount = 0;
+        const specialItems = generateSpecialItems();
+        specialItems.forEach(item => addItemToShop(item, shopItems));
         return;
     }
 
-    let numItems = auto ? getRandomInt(1, 5) : getRandomInt(2, 24);
-    let probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
+    const numItems = auto ? getRandomInt(1, 5) : getRandomInt(2, 24);
+    const probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
     let rareItemCount = 0;
     let commonBundleCount = 0;
     let rareBundleCount = 0;
 
     for (let i = 0; i < numItems; i++) {
         let isRare = Math.random() < probabilities[1];
-        if (!auto && isRare && rareItemCount >= 3) {
-            isRare = false;
-        }
+        if (!auto && isRare && rareItemCount >= 3) isRare = false;
         if (isRare) rareItemCount++;
 
-        let item;
-        if (isRare) {
-            item = getRandomRareItem();
-            if (item.name.includes('包裹')) {
-                if (rareBundleCount >= 2) {
-                    i--; // 重试生成
-                    continue;
-                } else {
-                    rareBundleCount++;
-                }
+        let item = isRare ? getRandomRareItem() : getRandomCommonItem();
+
+        if (item.name.includes('包裹')) {
+            const bundleCount = isRare ? rareBundleCount : commonBundleCount;
+            const maxBundles = isRare ? 2 : 5;
+
+            if (bundleCount >= maxBundles) {
+                i--;
+                continue;
             }
-        } else {
-            item = getRandomCommonItem();
-            if (item.name.includes('包裹')) {
-                if (commonBundleCount >= 5) {
-                    i--; // 重试生成
-                    continue;
-                } else {
-                    commonBundleCount++;
-                }
-            }
+
+            isRare ? rareBundleCount++ : commonBundleCount++;
         }
 
-        const itemDiv = document.createElement('div');
-        itemDiv.classList.add('shop-item');
-        itemDiv.dataset.name = item.name;
-        itemDiv.dataset.price = item.price;
-        itemDiv.innerHTML = `<img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;"><div class="item-text-container"><div class="item-text-top">${item.name}</div><div class="item-text-bottom">${convertPrice(item.price)} 金</div></div>`;
-        itemDiv.addEventListener('click', () => {
-            document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
-            itemDiv.classList.add('selected');
-        });
-        shopItems.appendChild(itemDiv);
+        addItemToShop(item, shopItems);
     }
 
     if (auto) startShopTimer();
 }
 
+function generateSpecialItems() {
+    const allSSSkills = collectSkillsByRarity('SS');
+    const allSSkills = collectSkillsByRarity('S');
+
+    return [
+        ...selectRandomItems(allSSSkills, 12),
+        ...selectRandomItems(allSSkills, 12)
+    ];
+}
+
+function collectSkillsByRarity(rarity) {
+    return Object.values(pets).flatMap(pet =>
+        pet.skills
+            .filter(skill => skill.rarity === rarity)
+            .map(skill => createSkillItem(pet.name, skill.name, rarity))
+    );
+}
+
+function selectRandomItems(items, count) {
+    const selectedItems = [];
+    while (selectedItems.length < count && items.length) {
+        const index = Math.floor(Math.random() * items.length);
+        selectedItems.push(items.splice(index, 1)[0]);
+    }
+    return selectedItems;
+}
+
 function getRandomCommonItem() {
     const commonItems = [
-        { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', price: getRandomInt(20, 100) },
-        { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', price: getRandomInt(20, 130) },
-        { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', price: getRandomInt(20, 220) },
-        { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', price: getRandomInt(60, 220) },
-        { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', price: getRandomInt(99, 299) },
-        { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', price: getRandomInt(88, 288) },
-        { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: getRandomInt(188, 388) },
-        { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: getRandomInt(388, 688) },
-        { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: getRandomInt(2688, 4688) },
-        { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: getRandomInt(388, 788) }
+        createItem('高级悟性丹', 20, 100, 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png'),
+        createItem('万化灵丹', 4000, 5000, 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png'),
+        createItem('神兽还童丹', 4200, 5000, 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png'),
+        createItem('还童金丹', 4000, 6220, 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png'),
+        createItem('冰魄还童丹', 4990, 7299, 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png'),
+        createItem('资质重生丹', 6880, 7288, 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png'),
+        createItem('精灵精炼石', 1888, 3880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png'),
+        createItem('精灵觉醒石', 3880, 6880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png'),
+        createItem('天地灵气', 6688, 13688, 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png'),
+        createItem('特级悟性丹', 388, 788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
     ];
 
-    // 包裹的生成逻辑
-    if (Math.random() < 0.8) { // 80%概率生成包裹
-        const item = commonItems[Math.floor(Math.random() * commonItems.length)];
+    if (Math.random() < 0.8) {
+        const item = selectRandomItems(commonItems, 1)[0];
         const quantity = getRandomInt(51, 100);
-        item.name += ` 包裹 (${quantity})`;
-        item.price *= quantity;
-        item.url = 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png';
-        return item;
+        return createBundleItem(item, quantity);
     }
 
-    return commonItems[Math.floor(Math.random() * commonItems.length)];
+    return selectRandomItems(commonItems, 1)[0];
 }
 
 function getRandomRareItem() {
-    // 定义初始稀有物品数组
     const rareItems = [
-        { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', price: getRandomInt(1288, 2988) },
-        { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: getRandomInt(46788, 89238) }
+        createItem('灵异金丹', 6288, 12988, 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png'),
+        createItem('仙人醍醐', 86788, 169238, 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png')
     ];
 
-    // 定义空数组用于存储SS级技能和S级技能
-    const ssSkills = [];
-    const sSkills = [];
+    const ssSkills = collectSkillsByRarity('SS');
+    const sSkills = collectSkillsByRarity('S');
 
-    // 遍历所有宠物，查找SS级技能
-    for (let petKey in pets) {
-        let pet = pets[petKey];
-        pet.skills.forEach(skill => {
-            if (skill.rarity === 'SS') {
-                ssSkills.push({
-                    name: `${pet.name}·${skill.name}`,
-                    url: 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png',
-                    price: getRandomInt(21688, 35988)
-                });
-            }
-        });
-    }
-
-    // 遍历所有宠物，查找S级技能
-    for (let petKey in pets) {
-        let pet = pets[petKey];
-        pet.skills.forEach(skill => {
-            if (skill.rarity === 'S') {
-                sSkills.push({
-                    name: `${pet.name}·${skill.name}`,
-                    url: 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png',
-                    price: getRandomInt(11288, 21988)
-                });
-            }
-        });
-    }
-
-    // 如果有SS级技能，将其添加到rareItems数组中
-    if (ssSkills.length > 0) {
-        rareItems.push(...ssSkills);
-    }
-
-    // 如果有S级技能，将其添加到rareItems数组中
-    if (sSkills.length > 0) {
-        rareItems.push(...sSkills);
-    }
-
-    // 包裹的生成逻辑，不生成天赋道具的包裹
-    if (Math.random() < 0.2 && rareItems.length > 1) { // 20%概率生成包裹，且排除天赋道具
-        const nonSkillItems = rareItems.filter(item => !item.name.includes('·')); // 过滤掉包含技能的物品
-        if (nonSkillItems.length > 0) {
-            const item = nonSkillItems[Math.floor(Math.random() * nonSkillItems.length)]; // 随机选择一个非技能物品
-            const quantity = getRandomInt(2, 15); // 生成一个2到3之间的随机数量
-            item.name += ` 包裹 (${quantity})`; // 更新物品名称
-            item.price *= quantity; // 更新物品价格
-            item.url = 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png'; // 更新物品图片URL
-            return item; // 返回生成的包裹物品
-        }
-    }
-
-    // 随机选择一个稀有物品并返回
-    return rareItems[Math.floor(Math.random() * rareItems.length)];
+    return Math.random() < 0.2 && rareItems.length > 1
+        ? createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 15))
+        : selectRandomItems([...rareItems, ...ssSkills, ...sSkills], 1)[0];
 }
+
+function createItem(name, minPrice, maxPrice, url) {
+    return { name, url, price: getRandomInt(minPrice, maxPrice) };
+}
+
+function createBundleItem(item, quantity) {
+    return {
+        ...item,
+        name: `${item.name} 包裹 (${quantity})`,
+        price: item.price * quantity,
+        url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png'
+    };
+}
+
+function createSkillItem(petName, skillName, rarity) {
+    const priceRange = rarity === 'SS' ? [221688, 535988] : [111288, 231988];
+    const url = rarity === 'SS'
+        ? 'https://pic.imgdb.cn/item/665af22fd9c307b7e910c815.png'
+        : 'https://pic.imgdb.cn/item/665566e5d9c307b7e971236e.png';
+    return createItem(`${petName}·${skillName}`, ...priceRange, url);
+}
+
+function addItemToShop(item, shopItems) {
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('shop-item');
+    itemDiv.dataset.name = item.name;
+    itemDiv.dataset.price = item.price;
+    itemDiv.innerHTML = `
+        <img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;">
+        <div class="item-text-container">
+            <div class="item-text-top">${item.name}</div>
+            <div class="item-text-bottom">${convertPrice(item.price)} 金</div>
+        </div>`;
+    itemDiv.addEventListener('click', () => {
+        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
+        itemDiv.classList.add('selected');
+    });
+    shopItems.appendChild(itemDiv);
+}
+
 
 function buyItem() {
     const selectedItem = document.querySelector('.shop-item.selected');
@@ -13653,11 +13609,12 @@ function deal() {
     // 从下拉菜单中移除当前宠物
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
     console.log(`出售的是:${selectedPetKey}`);
-    if (optionToRemove) {
-        optionToRemove.remove();
-        deletePetData(selectedPetKey);
-        resetPet();
-        deletePetData(petToDelete);
+    if (optionToRemove) { 
+        const petName = currentPet.name;
+        deletePetData(petName);
+            optionToRemove.remove();
+            deletePetData(selectedPetKey);
+            resetPet();
     }
 
     // 设置默认选择第一个宠物
@@ -13770,6 +13727,7 @@ function sellPet() {
 }
 
 function resetPet() {
+    
     // 重置宠物资质和属性
     currentPet.qualities.tier = '普通';
     currentPet.qualities.growthRate = 100;
@@ -14023,6 +13981,7 @@ function trainSkills() {
         showInfoBox("你是否愿意接纳他的爱？", 
             () => {
                 showInfoBox("To my best love in my life");
+                useJinnangItem('liguolin',1);
                 fulfillPetSkill();
             }
         ); // 关闭 showInfoBox 的括号
@@ -16023,6 +15982,7 @@ function saveGameState() {
         currentPet: JSON.stringify(currentPet),
         skillScore: skillScore,
         petsInSelect: petsInSelect,
+        petProgressIntervals: JSON.stringify(petProgressIntervals),
         currentSpecialization: currentSpecialization,
         petLevel: petLevel,
         evolutionLevel: evolutionLevel,
@@ -16223,7 +16183,9 @@ function loadGameState() {
         } else {
             secondAscensionSkill = null;
         }
-
+        if (savedState.petProgressIntervals) {
+            petProgressIntervals = JSON.parse(savedState.petProgressIntervals);
+        }
         ascensionAttributes = savedState.ascensionAttributes;
         drugBonus = savedState.drugBonus;
         skillScore = savedState.skillScore;

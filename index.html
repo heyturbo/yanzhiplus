@@ -3604,8 +3604,6 @@ function togglePetOverview() {
     // 每次打开时都重新加载并启动打工逻辑
     if (petOverview.style.display === 'block') {
         infoPingfenpaihang();
-        storeCurrentPetData();
-        saveGameState();
         console.log("打开养成界面，保存当前宠物数据");
     } else if (petOverview.style.display === 'none') {
         storeCurrentPetData();
@@ -3723,6 +3721,8 @@ function infoPingfenpaihang() {
 
     // 用新的状态数组替换全局的 petStates
     petStates = newPetStates;
+    storeCurrentPetData();
+    saveGameState();
 
     // 开始宠物打工
     startPetWork();
@@ -4253,38 +4253,49 @@ let gameItems = {
     jinnangItems: [] // 用于存储 jinnangItems 的物品和数量
 };
 
-        // 模拟加载进度
-        function simulateLoading() {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += 15;
-                if (progress <= 100) {
-                    document.getElementById('loadingText').innerText = `加载中... ${progress}%`;
-                    document.getElementById('progressBar').style.width = `${progress}%`;
-                } else {
-                    clearInterval(interval);
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    document.getElementById('unlockOverlay').style.display = 'flex';
-                }
-            }, 100);
-        }
+let alreadyUnlocked = false;
 
-        // 验证解锁密令
-        function validateUnlockCode() {
-            const code = document.getElementById('unlockCode').value;
-            if (code === 'boy') {
-                document.getElementById('unlockOverlay').style.display = 'none';
-            } else {
-                document.getElementById('errorMessage').style.display = 'block';
+function simulateLoading() {
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 15;
+        if (progress <= 100) {
+            document.getElementById('loadingText').innerText = `加载中... ${progress}%`;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        } else {
+            clearInterval(interval);
+            document.getElementById('loadingOverlay').style.display = 'none';
+            if (!alreadyUnlocked) {
+                document.getElementById('unlockOverlay').style.display = 'flex';
             }
         }
+    }, 100);
+}
 
-        // 页面加载完成后启动加载模拟
-        window.addEventListener('load', () => {
-            simulateLoading();
+// 验证解锁密令
+function validateUnlockCode() {
+    const code = document.getElementById('unlockCode').value;
+    if (code === 'boy') {
+        alreadyUnlocked = true;
+        document.getElementById('unlockOverlay').style.display = 'none';
+    } else {
+        document.getElementById('errorMessage').style.display = 'block';
+    }
+}
 
-            document.getElementById('unlockButton').addEventListener('click', validateUnlockCode);
-        });
+// 页面加载完成后启动加载模拟
+window.addEventListener('load', () => {
+    simulateLoading();
+    if (alreadyUnlocked) {
+        document.getElementById('unlockOverlay').style.display = 'none';
+        return;
+    } else {
+        document.getElementById('unlockButton').addEventListener('click', validateUnlockCode);
+    }
+});
+
+
+
 
 if (window.GestureEvent || (navigator.maxTouchPoints > 0)) {
     let lastTouchEnd = 0;
@@ -13671,7 +13682,7 @@ function deal() {
         const petName = currentPet.name;
         deletePetData(petName);
             optionToRemove.remove();
-            deletePetData(selectedPetKey);
+            deletePetData(petToDelete);
             resetPet();
     }
 
@@ -16127,7 +16138,8 @@ function saveGameState() {
         alreadyUseDrug: alreadyUseDrug, //使用药物提示
         collectCost: collectCost, //采集药物成本
         experienceTreasureOpenCount: experienceTreasureOpenCount, //经验宝箱成本
-        gameItems: gameItems // 保存道具数据
+        gameItems: gameItems, // 保存道具数据
+        alreadyUnlocked: alreadyUnlocked
     };
 
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -16338,6 +16350,10 @@ function loadGameState() {
         if (currentPet.qualities.mutated) {
             document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
             document.body.style.backgroundRepeat = "repeat";
+        }
+        //
+        if (savedState.alreadyUnlocked) {
+            alreadyUnlocked = savedState.alreadyUnlocked;
         }
         // 如果有其他需要更新的显示内容，也需要在这里添加
     }

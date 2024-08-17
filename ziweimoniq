@@ -237,7 +237,7 @@
       const rand = Math.random();
       if (rand < 0.1) return 1;
       if (rand < 0.3) return 2;
-      if (rand < 0.6) return 3;
+      if (rand < 0.7) return 3;
       if (rand < 0.95) return 4;
       return 5;
     }
@@ -327,7 +327,7 @@ function generateTargetAndRewardForAgility() {
         reward = target * 15;
     } else {
         target = Math.floor(Math.random() * (530 - 501 + 1)) + 531;
-        reward = target * 30 + 5000;
+        reward = target * 30 + 1000;
     }
 
     return { target, reward };
@@ -341,9 +341,9 @@ function generateTargetAndRewardForAttackOrHp(bountyType) {
     target = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
     
     if (target <= 50) {
-        reward = target * (bountyType === 'HP' ? 10 : 15) + 1000;
+        reward = target * (bountyType === 'HP' ? 5 : 15) + 1000;
     } else {
-        reward = target * (bountyType === 'HP' ? 20 : 30) + 3000;
+        reward = target * (bountyType === 'HP' ? 5 : 30) + 2000;
     }
 
     return { target, reward };
@@ -386,7 +386,7 @@ function generateBounty() {
 
 function handleAcceptBounty(target, bountyType, reward) {
     bountyInfoElement.innerHTML = `
-        <p style="color: #fefefe;font-weight: bold;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${reward * 0.1}元违约金</p>
+        <p style="color: #fefefe;font-weight: bold;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${Math.round(reward * 0.85)}元违约金</p>
         <div class="button-container">
             <button id="giveUpBtn">放弃</button>
             <button id="autoBtn">代洗</button>
@@ -405,7 +405,7 @@ function handleGiveUp(reward) {
             autoWashInterval = null;
         }
       
-        const penalty = reward * 0.1;
+        const penalty = Math.round(reward * 0.85);
         asset -= penalty;
         assetElement.textContent = asset;
         currentBounty = null;

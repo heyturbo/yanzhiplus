@@ -162,6 +162,23 @@
         border: 1px solid #514D41;
         width:95%;
     }
+
+    .general-window-background {
+        display: block;
+        z-index: 1000;
+        background: #6f391c;
+        border-radius: 2px;
+        color: #92341c;
+        background-repeat: repeat;
+        background-size: auto;
+        border: 1px solid black;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 360px;
+        padding: 1px;
+    }
         
             /* 防止 "pull-to-refresh" 行为 */
     @media screen and (pointer: coarse) {
@@ -427,11 +444,15 @@
         }
         .treasure-description-box {
             margin: 5px 5px;
-            padding: 20px;
-            background-color: rgb(255 255 255 / 90%);
-            border-radius: 10px;
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            background: rgb(57, 87, 89);
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            color: rgb(255 255 255 / 90%);
+            padding: 2px;
+            min-height: 80px;
+            align-items: center;
         }
         .jinnang-description-box {
             gap: 4px;
@@ -859,6 +880,10 @@
         }
         .treasure-drawer.open {
             transform: translateY(0);
+            display: block;
+            background: #B07638;
+            box-shadow: inset 0px 0px 3px 1px #92341C;
+            border: 1px solid black;
         }
         .treasure-info {
             display: none;
@@ -866,25 +891,35 @@
         }
         .treasure-info.open {
             display: block;
+            padding: 2px;
+            border-radius: 2px;
+            background-color: #DFBF6E;
+            color: #92341c;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
         }
         .treasure-bar {
             display: flex;
             justify-content: space-around;
-            margin-bottom: 30px;
+            margin: 5px;
+            border: 1px solid black;
+            padding: 4px;
         }
         .reward-box {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             background-color: #f1f0f0;
             background-image: url(https://pic.imgdb.cn/item/66a3499ed9c307b7e9501161.png);
-            background-size: contain;
+            background-size: cover;
             background-position: center;
-            border-radius: 10px;
             text-align: center;
             justify-content: center;
             margin: 15px 5px;
             padding: 40px 30px 30px 30px;
             min-height: 220px;
+            border: 1px solid black;
         }
         .reward-box img {
             width: 45px;
@@ -1708,8 +1743,8 @@
 
 .summon-area
     img {
-    max-width: 95%;
-    max-height: 95%;
+    max-width: 300px;
+    max-height: 240px;
 }
 
 .stamp-quantity {
@@ -1750,7 +1785,7 @@
 
 .shop-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 2px 2px;
     justify-content: center;
     margin-top: 5px;
@@ -1872,7 +1907,7 @@
 
    ;
     background: #6f391c;
-    padding: 2px;
+    padding: 4px;
     border-radius: 2px;
     color: #92341c;
     background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
@@ -2226,8 +2261,8 @@
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
                     <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
-                    <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 12px; background-color: gray; border-radius: 5px;" id="exp-bar-container">
-                        <div style="position: absolute; left: 0; top: 0; height: 100%; width: 0; background: linear-gradient(to bottom, #4B0082, #9370DB, #4B0082); border-radius: 5px;" id="exp-bar"></div>
+                    <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
+                        <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130)); border-radius: 5px;" id="exp-bar"></div>
                         <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
                     </div>
                     <div id="player-status" class="status-display"></div>
@@ -2370,43 +2405,47 @@
             </div>            
         </div>
     </div>
-    <div id="missionPanel" class="mission-popup-panel" style="display:none;">
+    <div id="missionPanel" class="general-window-background" style="display:none;">
         <div class="drawer-toggle">任务</div>
-        <h3>任务面板</h3>
-        <button id="closeMissionPanel" class="treasure-action button">关闭</button>
-        <ul id="taskList">
-            <!-- 任务列表 -->
-        </ul>
-    </div>
-    <div id="summonPanel" class="summon-popup-panel" style="display:none;">
-        <div class="drawer-toggle">召唤</div>
-        <h3>召唤面板</h3>
-        <div class="treasure-action">
-        <button id="closeSummonPanel" class="treasure-action button">关闭</button>
-        </div>
-        <div id="summonArea" class="summon-area">
-            <!-- 召唤区域 -->
-        </div>
-        <div class="treasure-action">
-            <button id="summonExecuteButton" class="treasure-action button">召唤</button>
-            <button id="claimButton" class="treasure-action button">领取</button>
-            <button id="exchangeButton" class="treasure-action button">兑换</button>
-            <button id="openPetShopButton" class="treasure-action button">商店</button>
-        </div>
-    </div>
-    <div id="petShop" class="pet-shop-popup-panel" style="display:none;">
-        <div class="drawer-toggle">宠物商店</div>
-        <h3>宠物商店（可下划）</h3>
-        <div class="treasure-action">
-        <button id="closePetShop" class="treasure-action button">关闭</button>
-        </div>
-        <div id="petShopItemsContainer" style="max-height:300px; overflow-y:scroll">
-            <div id="shopItems" class="shop-grid">
-                <!-- 商店物品列表 -->
+        <div id="mission-container" style="padding: 4px;border-radius: 2px;background-color: #DFBF6E;color: #92341c;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
+            <h3>任务面板</h3>
+            <ul id="taskList">
+                <!-- 任务列表 -->
+            </ul>
+            <div class="treasure-action button">
+                <button id="closeMissionPanel" style="margin-top: 20%;position: relative;">关闭窗口</button>
             </div>
         </div>
-        <div class="treasure-action">
-            <button id="buySummonCharmButton" class="treasure-action button">购买灵符（当前印花: <span id="currentStampCount">1000</span>）</button>
+    </div>
+    <div id="summonPanel" class="general-window-background" style="display:none;">
+        <div class="drawer-toggle">召唤</div>
+        <div id="summon-container" style="padding: 4px;border-radius: 2px;background-color: #DFBF6E;color: #92341c;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
+            <h3>召唤面板</h3>
+            <div id="summonArea" style="height: 240px;display: flex;align-items: center;justify-content: space-around;padding: 10px;background-color: rgba(0, 0, 0, 0.8);margin-bottom: 20px;margin-top: 20px;flex-direction: column;background-image: url(https://pic.imgdb.cn/item/66c043bfd9c307b7e9dccda0.png);background-size: cover;">
+                <!-- 召唤区域 -->
+            </div>
+            <div class="treasure-action">
+                <button id="summonExecuteButton" class="treasure-action button">召唤</button>
+                <button id="claimButton" class="treasure-action button">领取</button>
+                <button id="exchangeButton" class="treasure-action button">兑换</button>
+                <button id="openPetShopButton" class="treasure-action button">商店</button>
+                <button id="closeSummonPanel" class="treasure-action button">关闭</button>
+            </div>
+        </div>
+    </div>
+    <div id="petShop" class="general-window-background" style="display:none;">
+        <div class="drawer-toggle">宠物商店</div>
+        <div id="pet-shop-container" style="padding: 4px;border-radius: 2px;background-color: #DFBF6E;color: #92341c;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
+            <h3>宠物商店（可下划）当前印花: <span id="currentStampCount">1000</span></h3>
+            <div id="petShopItemsContainer" style="max-height:300px; overflow-y:scroll">
+                <div id="shopItems"  style="display: grid;grid-template-columns: repeat(2, 1fr);gap: 2px 2px;justify-content: center;margin-top: 5px;font-size: 12px;justify-items: stretch;align-items: center;">
+                    <!-- 商店物品列表 -->
+                </div>
+            </div>
+            <div class="treasure-action">
+                <button id="buySummonCharmButton" class="treasure-action button">购买灵符</button>
+                <button id="closePetShop" class="treasure-action button">关闭商店</button>
+            </div>
         </div>
     </div>
     <div class="bottom-bar">
@@ -3468,20 +3507,26 @@ window.addEventListener('message', function(event) {
 function showGuide() {
     const messageBox = document.createElement('div');
     messageBox.style = `
-        width: 90%; 
-        height: 65%; 
-        padding: 10px; 
-        background: white; 
-        border: 1px solid black; 
-        border-radius:10px;
-        position: fixed; 
-        top: 50%; 
-        left: 50%; 
-        transform: translate(-50%, -50%); 
+        width: 90%;
+        height: 65%;
+        background: white;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         z-index: 1000;
-        overflow: auto; 
+        overflow: auto;
         font-size: 14px;
+        padding: 10px;
+        border-radius: 2px;
+        background-color: #DFBF6E;
+        color: #92341c;
+        background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+        background-repeat: repeat;
+        background-size: auto;
+        border: 1px solid black;
     `;
+    
     messageBox.innerHTML =  `<button onclick="document.body.removeChild(this.parentNode)">关闭引导</button>
                             <p>欢迎大侠试玩养宠模拟器！当前是V18</p>
                             <p>- 增加通灵悬赏、打工系统
@@ -4336,7 +4381,7 @@ preloadImages(imageUrls);
 
 let currentInfoBox = null;
 
-function showInfoBox(message, onConfirm, onCancel) {
+function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     // 如果已经有一个信息框存在，先关闭它
     if (currentInfoBox) {
         document.body.removeChild(currentInfoBox);
@@ -4349,23 +4394,28 @@ function showInfoBox(message, onConfirm, onCancel) {
     infoBox.style.top = '50%';
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
-    infoBox.style.width = '85%'; // 增加宽度
-    infoBox.style.maxWidth = '300px'; // 限制最大宽度
-    infoBox.style.maxHeight = '50%'; // 限制最大高度
-    infoBox.style.overflowY = 'auto'; // 添加垂直滚动条
-    infoBox.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
-    infoBox.style.color = 'white';
-    infoBox.style.border = '1px solid white';
-    infoBox.style.borderRadius = '10px';
-    infoBox.style.padding = '10px';
+    infoBox.style.width = '85%';
+    infoBox.style.maxWidth = '300px';
+    infoBox.style.maxHeight = '50%';
+    infoBox.style.overflowY = 'auto';
     infoBox.style.zIndex = '9999';
     infoBox.style.fontSize = '14px';
+    infoBox.style.padding = '10px 20px';
+    infoBox.style.backgroundColor = '#DFBF6E';
+    infoBox.style.color = textColor; // 使用可选参数设置文本颜色
+    infoBox.style.fontWeight = '500';
+    infoBox.style.backgroundImage = 'url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png)';
+    infoBox.style.backgroundRepeat = 'repeat';
+    infoBox.style.backgroundSize = 'auto';
+    infoBox.style.boxShadow = '0px 0px 0px 1px rgb(30, 46, 47), inset 0 0 0px 1px #6f391c';
+    infoBox.style.border = '1px solid #EBAC3B';
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
-    messageElement.style.margin = '0';
+    messageElement.style.margin = '0px';
     messageElement.style.padding = '20px';
     messageElement.style.wordBreak = 'break-word';
+    messageElement.style.textAlign = 'center';
     messageElement.innerText = message;
     infoBox.appendChild(messageElement);
 
@@ -4378,15 +4428,23 @@ function showInfoBox(message, onConfirm, onCancel) {
     buttonContainer.style.justifyContent = 'space-around';
     infoBox.appendChild(buttonContainer);
 
+    // 统一按钮样式
+    const buttonStyle = `
+        background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+        box-shadow: inset 0px 0px 2px 1px #87431F;
+        font-size: 14px;
+        border-radius: 5px;
+        color: #F9DE9B;
+        padding: 0px 14px;
+        cursor: pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+        border: 1px solid #6f391c;
+    `;
+
     // 创建确认按钮
     const confirmButton = document.createElement('button');
     confirmButton.innerText = '确认';
-    confirmButton.style.padding = '8px 16px';
-    confirmButton.style.backgroundColor = '#4CAF50';
-    confirmButton.style.color = 'white';
-    confirmButton.style.border = 'none';
-    confirmButton.style.borderRadius = '4px';
-    confirmButton.style.cursor = 'pointer';
+    confirmButton.style.cssText = buttonStyle;
     confirmButton.addEventListener('click', () => {
         document.body.removeChild(infoBox);
         currentInfoBox = null;
@@ -4399,12 +4457,7 @@ function showInfoBox(message, onConfirm, onCancel) {
     // 创建取消按钮
     const cancelButton = document.createElement('button');
     cancelButton.innerText = '取消';
-    cancelButton.style.padding = '8px 16px';
-    cancelButton.style.backgroundColor = '#f44336';
-    cancelButton.style.color = 'white';
-    cancelButton.style.border = 'none';
-    cancelButton.style.borderRadius = '4px';
-    cancelButton.style.cursor = 'pointer';
+    cancelButton.style.cssText = buttonStyle;
     cancelButton.addEventListener('click', () => {
         document.body.removeChild(infoBox);
         currentInfoBox = null;
@@ -5067,11 +5120,11 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
         // 显示加载图片
         if (summonedRank !== 'SSR'){
             document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/66a4d223d9c307b7e9a2c147.gif" alt="加载中" id="loadingGif">
+            <img src="https://pic.imgdb.cn/item/66a4d223d9c307b7e9a2c147.gif" alt="加载中" id="loadingGif" style="width: 75%;height: 90%;border: 2px solid white;">
         `;
         } else{
             document.getElementById('summonArea').innerHTML = `
-            <img src="https://pic.imgdb.cn/item/66a4f555d9c307b7e9c33849.gif" alt="加载中" id="loadingGif">
+            <img src="https://pic.imgdb.cn/item/66a4f555d9c307b7e9c33849.gif" alt="加载中" id="loadingGif" style="width: 75%;height: 90%;border: 2px solid white;">
         `;
         }
 
@@ -5081,8 +5134,8 @@ document.getElementById('summonExecuteButton').addEventListener('click', () => {
         loadingGif.onload = () => {
             setTimeout(() => {
                 document.getElementById('summonArea').innerHTML = `
-                    <img src="${summonedPet.image}" alt="${summonedPet.name}">
-                    <div>${summonedPet.name} (${summonedPet.rank})</div>
+                    <img src="${summonedPet.image}" alt="${summonedPet.name}" style="width: 75%;height: 90%;border: 2px solid white;">
+                    <div style="color:white;">${summonedPet.name} (${summonedPet.rank})</div>
                 `;
                 showInfoBox(`你召唤了${summonedPet.name} (${summonedPet.rank})`);
             }, 1000);
@@ -5193,9 +5246,11 @@ function showPetShop() {
             const petDiv = document.createElement('div');
             petDiv.className = 'shop-item';
             petDiv.innerHTML = `
-                <img src="https://pic.imgdb.cn/item/666d688ed9c307b7e903ce17.png" alt="${pet.name}" style="height: 45px; width: 45px">
-                <div>${pet.name} (${pet.rank})</div>
-                <div>价格: ${price}印花</div>
+                <img src="https://pic.imgdb.cn/item/666d688ed9c307b7e903ce17.png" alt="${pet.name}" style="border: 1px solid black;height: 45px; width: 45px">
+                <div class="item-text-container">
+                <div class="item-text-top">${pet.name} (${pet.rank})</div>
+                <div class="item-text-bottom">价格: ${price}印花</div>
+                </div>
             `;
             petDiv.addEventListener('click', () => {
                 showInfoBox(`你确定要花费${price}印花购买${pet.name} (${pet.rank})吗?`, () => {
@@ -5437,17 +5492,11 @@ const effectCooldowns = {
 
 
 
-// 【战斗信息】战斗关键组件和信息函数
+
 function startBattle() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
         return;
-    }
-
-    // 检查全局变量 firstStartBattle 的状态
-    if (!firstStartBattle) {
-        logBattleEvent("模拟回合制，为了防止作弊，每秒玩家会固定掉血1%，请及时操作！");
-        firstStartBattle = true;
     }
 
     onBattleState = true;
@@ -5458,11 +5507,38 @@ function startBattle() {
     if (!playerTurn) {
         setTimeout(enemyAttack, 500); // 延迟0.5秒后毁灭心魔先攻
     }
+
+    if (!firstStartBattle) {
+        logBattleEvent("模拟回合制，为了防止作弊，每秒玩家会固定掉血1%，请及时操作！");
+        firstStartBattle = true;
+    }
+    
+    // 开始自动触发型事件
+    battleInterval = setInterval(() => {
+        if (onBattleState) {
+            if (battleAttributes.health <= 0) {
+                showNextBattlePrompt(false); // 玩家失败，传递失败状态
+                
+            } else if (battleRounds >= 151) {
+                battleAttributes.health -= Math.round(maxHealth * 0.017);
+            } else {
+                battleAttributes.health -= Math.round(maxHealth * 0.01);
+            }
+            updateUI();
+            divineWeaponManager.applyNirvanaGemEffects();  
+            handleSpiritHeal(); //精灵治愈
+            handleSpiritPower(); //精灵增益
+            handleSpiritAttack(); //精灵助攻
+        } else {
+            console.log('尚未开始战斗');
+        }
+    }, 1000);
 }
 
+
 function stopBattle() {
-    clearInterval(battleInterval);
     onBattleState = false;
+    clearInterval(battleInterval); // 战斗结束，停止定时器
     logBattleEvent("战斗停止。");
 }
 
@@ -6164,13 +6240,13 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
 
     let gradientColor;
     if (type === 'health') {
-        gradientColor = 'linear-gradient(to bottom, #800000, #FF0000, #800000)';
+        gradientColor = 'linear-gradient(to bottom, #7E2723, #9F322C, #CB5D5A, #CB5D5A, #9F322C, #7E2723)';
     } else if (type === 'mana') {
-        gradientColor = 'linear-gradient(to bottom, #0000CD, #00BFFF, #0000CD)';
+        gradientColor = 'linear-gradient(to bottom, #394F89, #405CB2, #5C81EE, #5C81EE, #405CB2, #394F89)';
     }
 
     currentElement.innerHTML = `
-        <div style="width: 100%; background-color: #888; border-radius: 5px; overflow: hidden; position: relative;">
+        <div style="width: 100%; background-color: #35472C; overflow: hidden; position: relative; border: 1px solid black;">
             <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background: ${gradientColor}; text-align: center; color: white; font-weight: bold; transition: width 0.5s ease-in-out;">
                 <span style="text-stroke: 1px black;">${currentValue}/${maxValue}</span>
             </div>
@@ -10469,25 +10545,7 @@ const divineWeaponManager = new DivineWeaponManager();
 
 
 
-// 【战斗组件】自动触发型事件
-setInterval(() => {
-    if (attributesFetched) {
-        if (battleAttributes.health <= 0 && onBattleState){
-            showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        } else if (onBattleState && battleRounds >= 151){
-            battleAttributes.health -= Math.round(maxHealth * 0.017);
-        } else if (onBattleState){
-            battleAttributes.health -= Math.round(maxHealth * 0.01);
-        }
-        updateUI();
-    } else {
-        console.log('尚未开始战斗');
-    }        
-    divineWeaponManager.applyNirvanaGemEffects();  
-    handleSpiritHeal(); //精灵治愈
-    handleSpiritPower(); //精灵增益
-    handleSpiritAttack(); //精灵助攻
-}, 1000);
+
         
 
 
@@ -15702,7 +15760,7 @@ function completeTask(taskId) {
         return;
     }
 
-    if (taskSeries === 'skillScore' && window.skillScore >= task.target) {
+    if (taskSeries === 'skillScore' && skillScore >= task.target) {
         task.completed = true;
         stamps += task.reward;
         showInfoBox(`任务完成，获得${task.reward}印花！`);
@@ -15754,6 +15812,11 @@ function updateTaskList() {
     const taskList = document.getElementById('taskList');
     taskList.innerHTML = '';
 
+    // 设置 taskList 样式
+    taskList.style.gap = '20px';
+    taskList.style.display = 'flex';
+    taskList.style.flexDirection = 'column';
+
     Object.keys(tasks).forEach(series => {
         const seriesTasks = tasks[series];
         const currentTask = seriesTasks.find(task => !task.completed);
@@ -15762,29 +15825,53 @@ function updateTaskList() {
             const taskItem = document.createElement('li');
             taskItem.innerText = currentTask.description;
 
-            if (series === 'skillScore' && window.skillScore >= currentTask.target) {
+            // 设置 taskItem 样式
+            taskItem.style.display = 'flex';
+            taskItem.style.width = '100%';
+            taskItem.style.height = '45px';
+            taskItem.style.flexDirection = 'row';
+            taskItem.style.justifyContent = 'flex-start';
+            taskItem.style.alignItems = 'center';
+
+            const createButtonContainer = () => {
+                const buttonContainer = document.createElement('div');
+                buttonContainer.classList.add('treasure-action');
+                return buttonContainer;
+            };
+
+            const createSubmitButton = () => {
                 const submitButton = document.createElement('button');
                 submitButton.innerText = '提交';
+
+                // 设置 submitButton 样式
+                submitButton.style.margin = '0';
+                submitButton.style.display = 'flex';
+                submitButton.style.justifyContent = 'space-between';
+                submitButton.style.flexDirection = 'row';
+                submitButton.style.marginLeft = '20px';
+
                 submitButton.addEventListener('click', () => completeTask(currentTask.id));
-                taskItem.appendChild(submitButton);
+                return submitButton;
+            };
+
+            const appendButtonToTaskItem = () => {
+                const buttonContainer = createButtonContainer();
+                const submitButton = createSubmitButton();
+                buttonContainer.appendChild(submitButton); // 将 submitButton 添加到 buttonContainer
+                taskItem.appendChild(buttonContainer); // 将 buttonContainer 添加到 taskItem
+            };
+
+            if (series === 'skillScore' && skillScore >= currentTask.target) {
+                appendButtonToTaskItem();
             } else if (series === 'petLevel' && petLevel >= currentTask.target) {
-                const submitButton = document.createElement('button');
-                submitButton.innerText = '提交';
-                submitButton.addEventListener('click', () => completeTask(currentTask.id));
-                taskItem.appendChild(submitButton);
+                appendButtonToTaskItem();
             } else if (series === 'goldAmount' && goldAmount >= currentTask.target) {
-                const submitButton = document.createElement('button');
-                submitButton.innerText = '提交';
-                submitButton.addEventListener('click', () => completeTask(currentTask.id));
-                taskItem.appendChild(submitButton);
+                appendButtonToTaskItem();
             } else if (series === 'battleRounds' && battleRounds >= currentTask.target) {
-                const submitButton = document.createElement('button');
-                submitButton.innerText = '提交';
-                submitButton.addEventListener('click', () => completeTask(currentTask.id));
-                taskItem.appendChild(submitButton);
+                appendButtonToTaskItem();
             } else {
                 if (series === 'skillScore') {
-                    taskItem.innerText += ` - 进度: ${window.skillScore}/${currentTask.target}`;
+                    taskItem.innerText += ` - 进度: ${skillScore}/${currentTask.target}`;
                 } else if (series === 'petLevel') {
                     taskItem.innerText += ` - 进度: ${petLevel}/${currentTask.target}`;
                 } else if (series === 'goldAmount') {

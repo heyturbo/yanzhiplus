@@ -791,8 +791,9 @@
             gap: 5px;
             flex-direction: column;
             justify-content: space-between;
-            width: 150px;
+            width: 170px;
             padding: 10px;
+            align-items: center;
         }
         .image-frame {
             display: flex;
@@ -855,8 +856,6 @@
             justify-items: stretch;
         }
         .button-grid button {
-            
-             /* 调整按钮字体大小 */
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
             border: 1px solid #6F391C;
             background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
@@ -945,6 +944,122 @@
         .treasure-action button:active {
             background-color: #064701;
         }
+        .transform-pet-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .transform-pet-modal {
+            width: 85%;
+            height: auto;
+            overflow-y: auto;
+            position: relative;
+            border-radius: 2px;
+            background-color: #DFBF6E;
+            color: #92341c;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
+            padding: 2px;
+        }
+        
+        .transform-pet-title {
+            text-align: center;
+            padding: 5px;
+            background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
+            background-repeat: repeat;
+            background-size: contain;
+            color: #E3A73B;
+            cursor: pointer;
+            box-shadow: inset 0px -1px 2px 0px #E3A73B, 0px -1px 5px 1px #8D5325;
+            border: 1px solid black;
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .transform-pet-close-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-size: 24px;
+            color: white;
+            background: linear-gradient(to bottom, #DBBA89,#84522C,#7C3411,#AC4B1D,#C85E24);
+            width: 25px;
+            height: 25px;
+            text-align: center;
+            border-radius: 2px;
+            border: 1px solid #977025;
+            box-shadow: 0px 0px 0px 1px #321C0C,inset 0px 0px 0px 1px #321C0C;
+        }
+        
+        .transform-pet-specializations {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            padding: 10px 10px;
+            box-shadow: 0px 0px 5px 1px #8D5325;
+        }
+        
+        .transform-pet-spec {
+            display: flex;
+            flex-flow: row;
+            align-items: center;
+            color: #92341c;
+            border: 1px solid #634A23;
+        }
+        
+        .transform-pet-spec-icon {
+            width: 50px;
+            height: 50px;
+            margin-right: 5px;
+            margin-left: 5px;
+            border: 1px solid #634A23;
+        }
+        
+        .transform-pet-spec-info {
+            text-align: left;
+            flex-grow: 1;
+            font-size: 14px;
+            height: 100%;
+            border-left: 1px solid #634A23;
+            padding: 5px;
+            width: 100%;
+        }
+        
+        .transform-pet-spec-description {
+            font-size: 14px;
+        }
+        
+        .transform-pet-buttons {
+            display: flex;
+            gap: 10px 0px;
+            justify-content: space-between;
+            flex-direction: row;
+        }
+        
+        .transform-pet-button {
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 4px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        
         /* 锦囊抽屉样式 */
         .jinnang-drawer {
             position: fixed;
@@ -4400,13 +4515,12 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     infoBox.style.top = '50%';
     infoBox.style.left = '50%';
     infoBox.style.transform = 'translate(-50%, -50%)';
-    infoBox.style.width = '85%';
-    infoBox.style.maxWidth = '300px';
+    infoBox.style.width = '300px';
     infoBox.style.maxHeight = '50%';
     infoBox.style.overflowY = 'auto';
     infoBox.style.zIndex = '9999';
     infoBox.style.fontSize = '14px';
-    infoBox.style.padding = '10px 20px';
+    infoBox.style.padding = '10px 20px 5px 20px';
     infoBox.style.backgroundColor = '#DFBF6E';
     infoBox.style.color = textColor; // 使用可选参数设置文本颜色
     infoBox.style.fontWeight = '500';
@@ -4419,7 +4533,7 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     // 创建消息文本元素
     const messageElement = document.createElement('p');
     messageElement.style.margin = '0px';
-    messageElement.style.padding = '20px';
+    messageElement.style.marginTop = '15px';
     messageElement.style.wordBreak = 'break-word';
     messageElement.style.textAlign = 'center';
     messageElement.innerText = message;
@@ -4431,7 +4545,8 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     buttonContainer.style.textAlign = 'right';
     buttonContainer.style.display = 'flex';
     buttonContainer.style.flexDirection = 'row';
-    buttonContainer.style.justifyContent = 'space-around';
+    buttonContainer.style.justifyContent = 'center';
+    buttonContainer.style.gap = '20px';
     infoBox.appendChild(buttonContainer);
 
     // 统一按钮样式
@@ -5949,14 +6064,14 @@ function updatePetInfo() {
 
 function initializeEnemyPet() {
     enemyPet = {
-        health: 18,
-        mana: 13,
-        physicalAttack: 2,
-        physicalDefense: 1,
-        magicAttack: 2,
-        magicDefense: 3,
-        speed: 6,
-        cultivation: 0
+        health: 13,
+        mana: 7,
+        physicalAttack: 9,
+        physicalDefense: 3,
+        magicAttack: 5,
+        magicDefense: 1,
+        speed: 7,
+        cultivation: 12
     };
 
     enemyMaxHealth = enemyPet.health;
@@ -5971,25 +6086,14 @@ function initializeEnemyPet() {
 
 function updateEnemyAttributes() {
     const maxValues = {
-        health: 800000000,
+        health: 500000000,
         mana: 200000000,
-        physicalAttack: 2800000,
+        physicalAttack: 2200000,
         physicalDefense: 550000,
-        magicAttack: 2200000,
+        magicAttack: 1800000,
         magicDefense: 450000,
         speed: 108020,
-        cultivation: 600000
-    };
-
-    const increasePerRound = {
-        health: 6000,
-        mana: 3200,
-        physicalAttack: 700,
-        physicalDefense: 620,
-        magicAttack: 650,
-        magicDefense: 610,
-        speed: 150,
-        cultivation: 1600
+        cultivation: 640000
     };
 
     const increasePerRoundAfter150 = {
@@ -6000,41 +6104,56 @@ function updateEnemyAttributes() {
         magicAttack: 350,
         magicDefense: 300,
         speed: 20,
-        cultivation: 100
+        cultivation: 30
     };
 
     function calculateAttributeValue(attribute, initialValue) {
-        if (battleRounds <= 100) {
-            const initialIncrease = 0.1 * increasePerRound[attribute];
-            const remainingRounds = battleRounds;
-            const maxValueAt100 = maxValues[attribute] * 0.02;
-            const remainingIncrease = maxValueAt100 - (initialValue + initialIncrease);
-            return Math.min(maxValues[attribute], initialValue + initialIncrease + remainingIncrease * (remainingRounds / 1000));
-        } else if (battleRounds <= 130) {
-            const initialIncrease = 100 * increasePerRound[attribute];
-            const remainingRounds = battleRounds - 100;
-            const maxValueAt130 = maxValues[attribute] * 0.6;
-            const remainingIncrease = maxValueAt130 - (initialValue + initialIncrease);
-            return Math.min(maxValues[attribute], initialValue + initialIncrease + remainingIncrease * (remainingRounds / 30));
-        } else if (battleRounds <= 140) {
-            const maxValueAt130 = maxValues[attribute] * 0.6;
-            const remainingRounds = battleRounds - 130;
-            const maxValueAt140 = maxValues[attribute] * 0.8;
-            const remainingIncrease = maxValueAt140 - maxValueAt130;
-            return Math.min(maxValues[attribute], maxValueAt130 + remainingIncrease * (remainingRounds / 10));
-        } else if (battleRounds <= 150) {
-            const maxValueAt140 = maxValues[attribute] * 0.8;
-            const remainingRounds = battleRounds - 140;
-            const remainingIncrease = maxValues[attribute] - maxValueAt140;
-            return Math.min(maxValues[attribute], maxValueAt140 + remainingIncrease * (remainingRounds / 10));
+        let newValue = 0;
+
+        if (battleRounds <= 10) {
+            // 1-10轮，每轮固定增加 300 * battleRounds
+            newValue = initialValue + 150;
+        } else if (battleRounds <= 30) {
+            // 11-30轮，每轮固定增加 1588 * battleRounds
+            const randomMultiplier = Math.floor(Math.random() * 3) + 2;
+            newValue = initialValue + (768 * randomMultiplier);
+        } else if (battleRounds <= 60) {
+            // 31-60轮，每轮固定增加 9000 * battleRounds
+            const randomMultiplier = Math.floor(Math.random() * 3) + 2;
+            newValue = initialValue + (1266 * randomMultiplier);
+        } else if (battleRounds <= 80) {
+            // 61-80轮，增长为 maxValue * (0.0001 ~ 0.0003) * battleRounds 的随机值
+            const multiplier = 0.0003 + Math.random() * 0.0006;
+            newValue = initialValue + maxValues[attribute] * multiplier;
+        } else if (battleRounds <= 99) {
+            // 81-99轮，增长为 maxValue * (0.0003 ~ 0.0005) * battleRounds 的随机值
+            const multiplier = 0.0006 + Math.random() * 0.0012;
+            newValue = initialValue + maxValues[attribute] * multiplier;
+        } else if (battleRounds === 100) {
+            // 100轮，等同 maxValue * 0.1
+            newValue = maxValues[attribute] * 0.1;
+        } else if (battleRounds <= 149) {
+            // 101-149轮，增长等同于 (maxValue - maxValueAt100) / 150 * battleRounds
+            const maxValueAt100 = maxValues[attribute] * 0.1;
+            const increasePerRound = (maxValues[attribute] - maxValueAt100) / 150;
+            newValue = increasePerRound * battleRounds;
+        } else if (battleRounds === 150) {
+            // 150轮，等同 maxValue
+            newValue = maxValues[attribute];
         } else {
+            // 150轮之后，按现有逻辑增长
             const maxValueAt150 = maxValues[attribute];
             const roundsAfter150 = battleRounds - 150;
             const randomMultiplier = Math.floor(Math.random() * (150 - 2 + 1)) + 2;
             const increaseAfter150 = roundsAfter150 * (increasePerRoundAfter150[attribute] * randomMultiplier);
-            const attributeValue = maxValueAt150 + increaseAfter150;
-            return attributeValue;
+            newValue = maxValueAt150 + increaseAfter150;
         }
+        
+        if (battleRounds <= 150) {
+            newValue = Math.min(newValue, maxValues[attribute]);
+        }
+
+        return newValue;
     }
 
     enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
@@ -6054,6 +6173,7 @@ function updateEnemyAttributes() {
     storeEnemyInitialState();
     handleRampaged();
 }
+
 
 function storeEnemyInitialState() {
     enemyInitialState = JSON.parse(JSON.stringify(enemyPet));
@@ -12523,7 +12643,6 @@ function updateSecondaryAttributes() {
 }
 
 function transformPet() {
-    // 检查当前页面是否已有 transformPet 界面，如果有，先移除
     const existingOverlay = document.getElementById('transformPetOverlay');
     if (existingOverlay) {
         document.body.removeChild(existingOverlay);
@@ -12536,71 +12655,37 @@ function transformPet() {
 
     const overlay = document.createElement('div');
     overlay.id = 'transformPetOverlay';
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
-    overlay.style.display = 'flex';
-    overlay.style.justifyContent = 'center';
-    overlay.style.alignItems = 'center';
-    overlay.style.zIndex = '1000';
+    overlay.className = 'transform-pet-overlay';
 
     const modal = document.createElement('div');
-    modal.style.width = '85%';
-    modal.style.height = '75%';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    modal.style.color = 'white';
-    modal.style.border = '1px solid #ddd';
-    modal.style.borderRadius = '10px';
-    modal.style.padding = '20px';
-    modal.style.overflowY = 'auto';
-    modal.style.position = 'relative';
+    modal.className = 'transform-pet-modal';
 
     const title = document.createElement('h2');
     title.innerText = '属性专精';
-    title.style.textAlign = 'center';
+    title.className = 'transform-pet-title';
     modal.appendChild(title);
 
     const closeButton = document.createElement('span');
     closeButton.innerText = 'X';
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.right = '10px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.fontSize = '24px';
-    closeButton.style.color = 'white';
+    closeButton.className = 'transform-pet-close-button';
     closeButton.onclick = () => document.body.removeChild(overlay);
     modal.appendChild(closeButton);
 
     const specializationsDiv = document.createElement('div');
-    specializationsDiv.style.display = 'flex';
-    specializationsDiv.style.flexDirection = 'column';
-    specializationsDiv.style.gap = '10px';
+    specializationsDiv.className = 'transform-pet-specializations';
 
     Object.keys(specializations).forEach(key => {
         const spec = specializations[key];
         const specDiv = document.createElement('div');
-        specDiv.style.border = '1px solid white';
-        specDiv.style.borderRadius = '5px';
-        specDiv.style.padding = '10px';
-        specDiv.style.display = 'flex';
-        specDiv.style.flexDirection = 'row';
-        specDiv.style.flexWrap = 'nowrap';
-        specDiv.style.alignItems = 'center';
+        specDiv.className = 'transform-pet-spec';
 
         const specIcon = document.createElement('img');
         specIcon.src = spec.url;
-        specIcon.style.width = '50px';
-        specIcon.style.height = '50px';
-        specIcon.style.marginRight = '15px';
+        specIcon.className = 'transform-pet-spec-icon';
         specDiv.appendChild(specIcon);
 
         const specInfoDiv = document.createElement('div');
-        specInfoDiv.style.textAlign = 'left';
-        specInfoDiv.style.flexGrow = '1';
-        specInfoDiv.style.fontSize = '14px';
+        specInfoDiv.className = 'transform-pet-spec-info';
 
         const specTitle = document.createElement('h3');
         specTitle.innerText = `专精：${key} Lv${spec.level}`;
@@ -12608,104 +12693,112 @@ function transformPet() {
         specInfoDiv.appendChild(specTitle);
 
         const specDescription = document.createElement('p');
+        specDescription.className = 'transform-pet-spec-description';
         specDescription.innerText = getSpecDescription(key);
         specInfoDiv.appendChild(specDescription);
 
-        specDiv.appendChild(specInfoDiv);
+        // 添加进度条容器
+        const progressBarContainer = document.createElement('div');
+        progressBarContainer.style = `
+            width: 100%;
+            background-color: rgb(48, 72, 44);
+            overflow: hidden;
+            font-size: 14px;
+            color: rgb(239, 239, 240);
+            box-shadow: rgb(17, 25, 25) 0px 0px 2px 2px inset;
+            margin: 0px 0px 5px 0px;
+            height: 14px;
+            border: 1px solid #634A23;
+        `;
+
+        const progressBar = document.createElement('div');
+        const progressPercentage = (spec.level / 300) * 100; // 300为假定的最大等级
+        progressBar.style = `
+            height: 100%;
+            background: linear-gradient(to bottom, #34773D, #34773D, #69E055, #69E055, #34773D, #34773D);
+            width: ${progressPercentage}%;
+        `;
+        progressBarContainer.appendChild(progressBar);
+        specInfoDiv.appendChild(progressBarContainer);
 
         const buttonsDiv = document.createElement('div');
-        buttonsDiv.style.display = 'flex';
-        buttonsDiv.style.flexDirection = 'row-reverse';
-        buttonsDiv.style.flexWrap = 'wrap';
-        buttonsDiv.style.gap = '10px 0px';
+        buttonsDiv.className = 'transform-pet-buttons';
+        buttonsDiv.id = `${key}-buttons`; // 为每个按钮组设置唯一ID
 
-        const openButton = document.createElement('button');
-        openButton.innerText = currentSpecialization === key ? '已开' : '开启';
-        openButton.style.fontSize = '14px';
-        openButton.style.cursor = 'pointer';
-        openButton.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
-        openButton.style.color = currentSpecialization === key ? 'white' : 'black';
-        openButton.style.borderColor = 'white';
-        openButton.style.borderRadius = '5px';
-        openButton.onclick = () => {
-            if (currentSpecialization === key) {
-                showInfoBox("你已经开启过本专精了！");
-                refreshSpecializationUI();
-            } else if (currentSpecialization) {
-                showInfoBox("你只能同时开启一个专精，请先关闭当前专精后再开启其他专精！");
-                refreshSpecializationUI();
-            } else {
-                if (useItem('infiniteGem', 1)) {
-                    handleSpecializationChange(key);
-                    showInfoBox(`在无限宝石的指引下，你的宠物选择了${key}专精！`);
-                    refreshSpecializationUI();
-                    transformPet();
-                } else {
-                    showInfoBox("您还没有无限宝石，此道具可通过开启奇馈宝箱概率获得。");
-                }
-            }
-            refreshSpecializationUI();
+        const createButton = (text, handler) => {
+            const button = document.createElement('button');
+            button.innerText = text;
+            button.className = 'transform-pet-button';
+            button.onclick = handler;
+            return button;
         };
+
+        const openButton = createButton(
+            currentSpecialization === key ? '已开' : '开启',
+            () => {
+                if (currentSpecialization === key) {
+                    showInfoBox("你已经开启过本专精了！");
+                } else if (currentSpecialization) {
+                    showInfoBox("你只能同时开启一个专精，请先关闭当前专精后再开启其他专精！");
+                } else {
+                    if (useItem('infiniteGem', 1)) {
+                        handleSpecializationChange(key);
+                        showInfoBox(`在无限宝石的指引下，你的宠物选择了${key}专精！`);
+                    } else {
+                        showInfoBox("您还没有无限宝石，此道具可通过开启奇馈宝箱概率获得。");
+                    }
+                }
+                refreshSpecializationUI();
+            }
+        );
         buttonsDiv.appendChild(openButton);
 
-        const closeSpecButton = document.createElement('button');
-        closeSpecButton.innerText = '关闭';
-        closeSpecButton.style.fontSize = '14px';
-        closeSpecButton.style.cursor = 'pointer';
-        closeSpecButton.style.borderColor = 'white';
-        closeSpecButton.style.borderRadius = '5px';
-        closeSpecButton.onclick = () => {
-            if (currentSpecialization !== key) {
-                showInfoBox("本专精尚未启用！");
-                refreshSpecializationUI();
-            } else {
-                if (useItem('ignoranceWater', 1)) {
-                    handleSpecializationChange(null);
-                    showInfoBox("清心酿使你的宠物忘记了历年所学，返璞归真");
-                    transformPet();
-                    refreshSpecializationUI();
+        const closeSpecButton = createButton(
+            '关闭',
+            () => {
+                if (currentSpecialization !== key) {
+                    showInfoBox("本专精尚未启用！");
                 } else {
-                    showInfoBox("您还没有清心酿，此道具可通过开启奇馈宝箱概率获得。");
+                    if (useItem('ignoranceWater', 1)) {
+                        handleSpecializationChange(null);
+                        showInfoBox("清心酿使你的宠物忘记了历年所学，返璞归真");
+                    } else {
+                        showInfoBox("您还没有清心酿，此道具可通过开启奇馈宝箱概率获得。");
+                    }
                 }
+                refreshSpecializationUI();
             }
-            refreshSpecializationUI();
-        };
+        );
         buttonsDiv.appendChild(closeSpecButton);
 
-        const upgradeButton = document.createElement('button');
-        upgradeButton.innerText = '升级';
-        upgradeButton.style.fontSize = '14px';
-        upgradeButton.style.cursor = 'pointer';
-        upgradeButton.style.borderColor = 'white';
-        upgradeButton.style.borderRadius = '5px';
-        upgradeButton.onclick = () => {
-            if (currentSpecialization !== key) {
-                showInfoBox("未开启此专精！");
+        const upgradeButton = createButton(
+            '升级',
+            () => {
+                if (currentSpecialization !== key) {
+                    showInfoBox("未开启此专精！");
+                } else {
+                    upgradeSpecialization(key);
+                }
                 refreshSpecializationUI();
-            } else {
-                upgradeSpecialization(key);
             }
-        };
+        );
         buttonsDiv.appendChild(upgradeButton);
 
-        // 添加升满按钮
-        const upgradeToMaxButton = document.createElement('button');
-        upgradeToMaxButton.innerText = '升满';
-        upgradeToMaxButton.style.fontSize = '14px';
-        upgradeToMaxButton.style.cursor = 'pointer';
-        upgradeToMaxButton.style.borderColor = 'white';
-        upgradeToMaxButton.style.borderRadius = '5px';
-        upgradeToMaxButton.onclick = () => {
-            if (currentSpecialization !== key) {
-                showInfoBox("未开启此专精！");
+        const upgradeToMaxButton = createButton(
+            '升满',
+            () => {
+                if (currentSpecialization !== key) {
+                    showInfoBox("未开启此专精！");
+                } else {
+                    upgradeToMax(key);
+                }
                 refreshSpecializationUI();
-            } else {
-                upgradeToMax(key);
             }
-        };
+        );
         buttonsDiv.appendChild(upgradeToMaxButton);
 
-        specDiv.appendChild(buttonsDiv);
+        specInfoDiv.appendChild(buttonsDiv); // 按钮组放置在进度条下方
+        specDiv.appendChild(specInfoDiv);
         specializationsDiv.appendChild(specDiv);
     });
 
@@ -12718,12 +12811,16 @@ function refreshSpecializationUI() {
     Object.keys(specializations).forEach(key => {
         const spec = specializations[key];
         document.getElementById(`${key}-title`).innerText = `专精：${key} Lv${spec.level}`;
+
+        // 更新进度条
+        const progressBar = document.querySelector(`#${key}-buttons`).previousElementSibling.firstChild;
+        const progressPercentage = (spec.level / 300) * 100; // 300为假定的最大等级
+        progressBar.style.width = `${progressPercentage}%`;
+
         const buttons = document.querySelectorAll(`#${key}-buttons button`);
         buttons.forEach(button => {
             if (button.innerText === '开启' || button.innerText === '已开') {
                 button.innerText = currentSpecialization === key ? '已开' : '开启';
-                button.style.backgroundColor = currentSpecialization === key ? 'green' : 'white';
-                button.style.color = currentSpecialization === key ? 'white' : 'black';
             }
         });
     });
@@ -12749,11 +12846,11 @@ function handleSpecializationChange(newSpec) {
 
 function upgradeSpecialization(key) {
     const spec = specializations[key];
-    if (spec.level >= 120) {
+    if (spec.level >= 300) {
         showInfoBox("专精等级已达上限！");
         return;
     }
-    let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200);
+    let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 5000 : spec.level * 200 + 200);
     if (goldAmount >= upgradeCost) {
         goldAmount -= upgradeCost;
         spec.level++;
@@ -12773,8 +12870,8 @@ function upgradeToMax(key) {
     let projectedGold = goldAmount;
 
     // 计算玩家当前金币能升级到的最大等级以及所需总费用
-    while (tempLevel < 120 && projectedGold >= (tempLevel >= 100 ? (tempLevel - 99) * 20000 : tempLevel * 200 + 200)) {
-        let upgradeCost = (tempLevel >= 100 ? (tempLevel - 99) * 20000 : tempLevel * 200 + 200);
+    while (tempLevel < 300 && projectedGold >= (tempLevel >= 100 ? (tempLevel - 99) * 5000 : tempLevel * 200 + 200)) {
+        let upgradeCost = (tempLevel >= 100 ? (tempLevel - 99) * 5000 : tempLevel * 200 + 200);
         totalCost += upgradeCost;
         projectedGold -= upgradeCost;
         tempLevel++;
@@ -12782,7 +12879,7 @@ function upgradeToMax(key) {
 
     // 提示玩家确认
     showInfoBox(`确定花费共计${convertPrice(totalCost)}金子将${key}升级到Lv${tempLevel}吗？`, () => {
-        while (spec.level < 120 && goldAmount >= (spec.level >= 100 ? (spec.level - 99) * 20000 : spec.level * 200 + 200)) {
+        while (spec.level < 300 && goldAmount >= (spec.level >= 100 ? (spec.level - 99) * 5000 : spec.level * 200 + 200)) {
             upgradeSpecialization(key);
         }
         refreshSpecializationUI();
@@ -12819,7 +12916,7 @@ let autoTrainingTimeout = null;
 function startAutoTraining() {
     // 开始以0.1秒频率自动执行trainAttributesAfterFifth
     autoTrainingInterval = setInterval(() => {
-        if (goldAmount <= 4888) {
+        if (goldAmount <= 5000) {
             stopAutoTraining();
         } else {
             trainAttributesAfterFifth();
@@ -12850,8 +12947,8 @@ function stopAutoTraining() {
 }
 
 function trainAttributesAfterFifth() {
-    if (goldAmount < 4888) {
-        showInfoBox("金子不足4两888文，无法培养！");
+    if (goldAmount < 5000) {
+        showInfoBox("金子不足5两，无法培养！");
         return;
     }
     
@@ -12907,11 +13004,11 @@ function trainAttributesAfterFifth() {
         results.push(`${i + 1}. ${attributeMap(attribute)}: ${growthValue > 0 ? '+' : ''}${growthValue}`);
     }
 
-    goldAmount -= 4888;
+    goldAmount -= 5000;
     updateGoldDisplay(goldAmount);
     updateAttributePanel();
 
-    showInfoBox(`本次花费4两888文金子培养，结果为：\n${results.join('\n')}`);
+    showInfoBox(`金培消耗5两金：\n${results.join('\n')}`);
 
     // 如果触发自动执行条件且尚未开始自动执行
     if (triggerAutoTrainingCountDown >= 5 && !autoTrainingInterval) {
@@ -14019,7 +14116,7 @@ function trainSkills() {
         showInfoBox("你是否愿意接纳他的爱？", 
             () => {
                 showInfoBox("To my best love in my life");
-                useJinnangItem('liguolin',1);
+                useItem('liguolin',1);
                 fulfillPetSkill();
             }
         ); // 关闭 showInfoBox 的括号
@@ -14813,7 +14910,7 @@ let baseAttributes = {
 };
         
 function calculateAttribute(currentValue, growthRate, level) {
-    return Math.floor((currentValue / 2000) * growthRate * 4 * level);
+    return Math.floor((currentValue / 2000) * growthRate * level + 5);
 }
 
 function calculateCurrentAttributes() {

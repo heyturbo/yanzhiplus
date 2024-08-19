@@ -262,7 +262,7 @@
         
         .top-bar div {
             display: flex;
-            font-size: 14px;
+            font-size: 12px;
             color: #5d4201;
             align-items: center;
             flex-direction: column;
@@ -271,6 +271,7 @@
         .top-bar img {
             width: 40px;
             height: 40px;
+            border: 1px solid #6f391c;
         }
         
         /* 底部栏样式 */
@@ -449,10 +450,11 @@
             padding: 10px 20px 0px 20px;
             margin: 0px 5px;
             min-height: 80px;
-            border: 1px solid black;
-            color: #92341c;
-            font-size: 14px;
             align-items: stretch;
+            border: 1px solid #834a0f;
+            box-shadow: 0px 0px 0px 1px #7e5a2f;
+            color: black;
+            font-size: 16px;
         }
         .jinnang-description-box {
             gap: 4px;
@@ -462,8 +464,9 @@
             margin: 0px 5px;
             min-height: 80px;
             align-items: stretch;
-            border: 1px solid black;
-            color: #92341c;
+            border: 1px solid #834a0f;
+            box-shadow: 0px 0px 0px 1px #7e5a2f;
+            color: black;
             font-size: 14px;
         }
         .pet-selector {
@@ -908,6 +911,7 @@
             margin: 5px;
             border: 1px solid black;
             padding: 4px;
+            box-shadow: 0px 0px 0px 1px #7e5a2f;
         }
         .reward-box {
             display: grid;
@@ -922,6 +926,7 @@
             padding: 40px 30px 30px 30px;
             min-height: 220px;
             border: 1px solid black;
+            box-shadow: 0px 0px 0px 1px #7e5a2f;
         }
         .reward-box img {
             width: 45px;
@@ -2396,7 +2401,8 @@
                     <p>修为: <span id="your-pet-cultivation"></span></p>
                     <p>暴击: <span id="player-crit-rate"></span></p>
                     <p>暴击伤害: <span id="player-crit-damage"></span></p>
-
+                    <p>物理闪避: <span id="player-physical-dodge-rate"></span></p>
+                    <p>法术闪避: <span id="player-magic-dodge-rate"></span></p>
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
@@ -2419,6 +2425,8 @@
                     <p>修为: <span id="enemy-pet-cultivation"></span></p>
                     <p>暴击: <span id="enemy-crit-rate"></span></p>
                     <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
+                    <p>物理闪避: <span id="enemy-physical-dodge-rate"></span></p>
+                    <p>法术闪避: <span id="enemy-magic-dodge-rate"></span></p>
                     </div>
                 </div>
             </div>
@@ -4325,7 +4333,7 @@ function infoWuxing() {
  
 const enemyImages = [
     { status: 'default', name: '毁灭心魔', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
-    { status: 'rampaged', name: '「狂」毁灭心魔', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
+    { status: 'rampaged', name: '狂暴的心魔', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
     { status: 'mao', name: '上古心魔', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' },
     { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
     { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
@@ -4530,7 +4538,6 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     infoBox.style.width = '80%';
     infoBox.style.maxHeight = '80%';
     infoBox.style.minHeight = '10%';
-    infoBox.style.overflowY = 'auto';
     infoBox.style.zIndex = '9999';
     infoBox.style.fontSize = '14px';
     infoBox.style.padding = '10px 20px 5px 20px';
@@ -4547,6 +4554,8 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     messageElement.style.margin = '0px';
     messageElement.style.marginTop = '15px';
     messageElement.style.wordBreak = 'auto-phrase';
+    messageElement.style.maxHeight = '600px';
+    messageElement.style.overflowY = 'scroll';
     messageElement.innerText = message;
     infoBox.appendChild(messageElement);
 
@@ -6106,6 +6115,7 @@ function initializeEnemyPet() {
         battleState.enemy = { ...enemyPet };
     }
     storeEnemyInitialState();
+    handleRampaged();
 }
 
 function updateEnemyAttributes() {
@@ -6345,6 +6355,7 @@ function updateUI() {
     updatePetLevel();
     getShieldStatus();
     updateHealthAndManaDisplay();
+    calculateAndDisplayDodgeRate();
 }
 
 function updateHealthAndManaDisplay() {
@@ -6404,6 +6415,36 @@ function handleCriticalHit(isCritical) {
     }
 }
 
+function calculateAndDisplayDodgeRate() {
+    let speedDifference;
+    let cultivationDifference;
+
+    let playerPhysicalDodgeElement = document.getElementById('player-physical-dodge-rate');
+    let playerMagicDodgeElement = document.getElementById('player-magic-dodge-rate');
+    let enemyPhysicalDodgeElement = document.getElementById('enemy-physical-dodge-rate');
+    let enemyMagicDodgeElement = document.getElementById('enemy-magic-dodge-rate');
+
+    // 计算速度差异导致的物理闪避率
+    speedDifference = battleAttributes.speed - battleState.enemy.speed;
+    if (speedDifference > 0) {
+        playerPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        enemyPhysicalDodgeElement.innerText = '0%';
+    } else {
+        enemyPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        playerPhysicalDodgeElement.innerText = '0%';
+    }
+
+    // 计算修为差异导致的魔法闪避率
+    cultivationDifference = playerCultivation - enemyPetCultivation;
+    if (cultivationDifference > 0) {
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        enemyMagicDodgeElement.innerText = '0%';
+    } else {
+        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        playerMagicDodgeElement.innerText = '0%';
+    }
+}
+        
 function handleDodge(target) {
     let speedDifference;
     let dodgeChance = 0; // 默认闪避概率为 0
@@ -6461,7 +6502,61 @@ function handleDodge(target) {
     return false; // 返回 false 表示未闪避
 }
 
+function handleMagicDodge(target) {
+    let cultivationDifference;
+    let dodgeChance = 0; // 默认闪避概率为 0
+    let dodgeElement; // 对应的图片元素：玩家图片或敌人图片
 
+    if (target === 'player') {
+        // 玩家魔法闪避逻辑
+        cultivationDifference = playerCultivation - enemyPetCultivation;
+        if (cultivationDifference > 0) {
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+        }
+        dodgeElement = document.getElementById('your-pet-image');
+        console.log(`玩家魔法闪避概率为：${dodgeChance}`);
+    } else if (target === 'enemy') {
+        // 敌人魔法闪避逻辑
+        cultivationDifference = enemyPetCultivation - playerCultivation;
+        if (cultivationDifference > 0) {
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+        }
+        dodgeElement = document.getElementById('enemy-image');
+        console.log(`敌人魔法闪避概率为：${dodgeChance}`);
+    } else {
+        console.error('Invalid target for magic dodge handling');
+        return false;
+    }
+
+    // 确定是否触发闪避
+    const dodgeRoll = Math.random();
+    const isDodge = dodgeRoll < dodgeChance;
+    console.log(`魔法闪避随机数为：${dodgeRoll}`);
+
+    if (isDodge) {
+        // 触发闪避，应用视觉效果
+        if (target === 'player') {
+            dodgeElement.style.marginRight = '20px';
+            dodgeElement.style.opacity = '0.5';
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
+        } else {
+            dodgeElement.style.marginLeft = '20px';
+            dodgeElement.style.opacity = '0.5';
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
+        }
+
+        // 0.1秒后复原
+        setTimeout(() => {
+            dodgeElement.style.marginRight = '';
+            dodgeElement.style.marginLeft = '';
+            dodgeElement.style.opacity = '';
+        }, 100);
+
+        return true; // 返回 true 表示闪避成功
+    }
+
+    return false; // 返回 false 表示未闪避
+}
 
 
 // 【玩家战斗】玩家伤害函数（物理/物理效果、法术/法术效果）
@@ -6881,7 +6976,10 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     let damage;
     let isCritical = checkCriticalHit(playerCritRate);
 
-
+    if (handleMagicDodge('enemy')) {
+        return 0;
+    }
+    
     // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
@@ -6932,6 +7030,10 @@ function performIndependentMagicAttack() {
         return;
     }
 
+    if (handleMagicDodge('enemy')) {
+        return 0;
+    }
+    
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -7972,7 +8074,6 @@ function enemyAttack() {
     handleDamageReduction(damage);
     handleReflectAndHeal(damage);
     handleResurrection(damage);
-    handleRampaged();
     
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
@@ -8037,6 +8138,10 @@ function performEnemyMagicalAttack(isCritical) {
         return 0;
     }
 
+    if (handleMagicDodge('player')) {
+        return 0;
+    }
+    
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
     let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
@@ -8517,7 +8622,7 @@ function handleRampaged() {
         console.log('Enemy is rampaged.');
     } else if (battleRounds <= 150 && battleRounds % 10 === 0) {
         enemyCritRate = 1;
-        enemyCritDamage = 2.2;
+        enemyCritDamage = 2.5;
         battleState.enemy.rampaged = true;
         changeEnemyImage("rampaged");
         setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
@@ -8530,8 +8635,8 @@ function handleRampaged() {
         setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b8ec.webp');
         console.log('Enemy is rampaged.');
     } else {
-        enemyCritRate = 0.6;
-        enemyCritDamage = 1.8;
+        enemyCritRate = Math.random() * (1 - 0.01) + 0.01;
+        enemyCritDamage = Math.random() * (3 - 1.5) + 1.5;
         battleState.enemy.rampaged = false;
         changeEnemyImage(battleRounds > 150 ? "realShape" : "default");
         setBackgroundImage(battleRounds > 150 ? 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b907.webp' : 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b92d.webp');
@@ -9359,8 +9464,8 @@ document.getElementById('enhance-spirit').addEventListener('click', () => {
             newMultiplier = (Math.random() * (4.15 - 4.11) + 4.11).toFixed(2);
         }
 
-        // 检查新倍数是否高于3.80
-        if (parseFloat(newMultiplier) > 3.80) {
+        // 检查新倍数是否高于3.90
+        if (parseFloat(newMultiplier) > 3.90) {
             const confirmMessage = "您的精灵增幅已经到了一个比较高的层次，确定继续吗？";
             showInfoBox(confirmMessage, () => {
                 spiritMultiplier = parseFloat(newMultiplier);
@@ -13375,8 +13480,8 @@ function getRandomCommonItem() {
         createItem('精灵精炼石', 1888, 3880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png'),
         createItem('精灵觉醒石', 3880, 6880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png'),
         createItem('天地灵气', 6688, 13688, 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png'),
-        createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png'),
-        createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png'),
+        createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png'),
+        createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png'),
         createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
     ];
 
@@ -13768,17 +13873,15 @@ function deal() {
     const petToDelete = currentPet.name;
     // 从下拉菜单中移除当前宠物
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
-    console.log(`出售的是:${selectedPetKey}`);
-    if (optionToRemove) { 
-        const petName = currentPet.name;
-        deletePetData(petName);
-        optionToRemove.remove();
-    }
-    // 设置默认选择第一个宠物
-    if (petSelect.options.length > 0) {
-        petSelect.value = petSelect.options[0].value;
-        changePet(true); // 更新宠物信息,跳过确认提示
-    }
+        console.log(`出售的是:${selectedPetKey}`);
+        if (optionToRemove) { 
+            optionToRemove.remove();        
+        }
+        // 设置默认选择第一个宠物
+        if (petSelect.options.length > 0) {
+            petSelect.value = petSelect.options[0].value;
+            changePet(true); // 更新宠物信息,跳过确认提示
+        }
     updateDisplayContent();
     goldAmount += currentOffer;
     updateGoldDisplay(goldAmount);
@@ -13788,6 +13891,8 @@ function deal() {
     merchants.forEach(merchant => merchant.reset());
     hasDealed = true;
     closeMerchantModal();
+    
+    saveGameState();
 }
 
 

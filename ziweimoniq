@@ -6,49 +6,79 @@
     body {
       text-align: center;
       font-family: Arial, sans-serif;
-      background-color: #285374;
+      background-color: #000000;
     }
     
     button {
-      padding: 10px 20px;
-      font-size: 16px;
       margin: 10px;
-      border-radius: 5px;
-      border: none;
-      background-color: #47301d;
-      color: white;
+      flex: 0.25;
+      border: 1px solid #6F391C;
+      background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+      box-shadow: inset 0px 0px 2px 1px #87431F;
+      font-size: 14px;
+      border-radius: 6px;
+      color: #F9DE9B;
+      padding: 4px 6px;
       cursor: pointer;
-      flex: 1;
-      border: 1px solid #888;
+      transition: transform 0.1s, box-shadow 0.1s;
     }
     
     .asset {
     font-size: 16px;
     font-weight: bold;
-    color: gold;
+    color: rgb(255 0 0);
     }
     
     .container {
-      max-width: 800px;
       display: flex;
       gap: 20px;
-      min-height: 800px;
       margin: 0 auto;
-      background-color: white;
+      background-color: #e3b859;
       padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px 0px rgb(0 0 0 / 40%);
+      box-shadow: inset 0 0 5px 1px #6f391c;
       flex-direction: column;
-      background-image: url(https://pic.imgdb.cn/item/66befa62d9c307b7e95c8f06.webp);
-      background-size: cover;
+      background-image: url(https://pic.imgdb.cn/item/66c2fdcdd9c307b7e9ccc165.png);
+      background-size: contain;
+      background-repeat: no-repeat;
+      height: 600px;
+      width: 360px;
+      top: 50%;
+      left: 50%;
+      position: fixed;
+      transform: translate(-50%, -50%);
+      justify-content: space-between;
+      border: 1px solid #6f391c;
+    }
+    .toggle-container {
+        padding: 5px;
+        text-align: center;
+        background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
+        background-repeat: repeat;
+        background-size: contain;
+        color: #E3A73B;
+        cursor: pointer;
+        box-shadow: inset 0px 1px 2px 0px #E3A73B;
+        border: 1px solid black;
+        top: -35px;
+        left: -1px;
+        width: 390px;
+        position: fixed;
     }
     .button-container {
       display: flex;
-      background-color: rgba(0, 0, 0, 0.4);
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       flex-direction: row;
       justify-content: space-evenly;
+    }
+    .tongling-button-container {
+      display: flex;
+      border-radius: 10px;
+      flex-direction: row;
+      justify-content: space-evenly;
+      position: fixed;
+      top: 72%;
+      left: 0%;
+      width: 100%;
     }
 
     .result-container {
@@ -58,13 +88,15 @@
       flex-direction: column;
       align-items: center;
       display: flex;
-      background: rgba(0, 0, 0, 0.4);
       border-radius: 20px;
       font-size: 20px;
       height: 150px;
       justify-content: space-between;
-      box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.4);
-      color: white;
+      color: rgba(0, 0, 0, 0.8);
+      position: fixed;
+      width: 320px;
+      top: 40%;
+      left: 5%;
     }
     
     .special {
@@ -132,28 +164,34 @@
       cursor: pointer;
     }
     .info-container {
-      border-radius:20px;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-evenly;
-      background: rgba(0, 0, 0, 0.4);
+      position: fixed;
+      top: 26%;
+      left: 3%;
+      height: 63px;
+      width: 200px;
+      overflow: hidden;
+      text-align: center;
+      color: white;
+      background: rgb(57, 87, 89);
+      box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+      padding: 2px 4px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1  style="color: white; margin:0;">紫薇教通灵</h1>
+    <div class="toggle-container">紫薇教通灵</div>
+    <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 26%;left: 56%;">
+    <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
+      <div class="asset">资产: <span id="asset">0</span></div>
+    </div>
     <div class="info-container">
-      <div id="countInfo" style="color: white;width: 100%;margin: 0px 0px 0px 10px;display: flex;flex-direction: column;align-items: flex-start;">
-        <p>已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
-        <p>已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
-      </div>
-      <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 50%;display: flex;flex-direction: column;align-items: center;justify-content: space-around;">
-        <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png">
-        <div class="asset">资产: <span id="asset">0</span></div>
+      <div id="countInfo" style="color: white;display: flex;flex-direction: column;align-items: center;gap: 5px;">
+        <p style="margin: 0;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
+        <p style="margin: 0;">已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
       </div>
     </div>
-    <div class="button-container">
+    <div class="tongling-button-container">
       <button onclick="deductGold()">换汇</button>
       <button id="tonglingBtn">通灵</button>
       <button onclick="exchangeGold()">提款</button>
@@ -161,8 +199,7 @@
     <div class="result-container">
     <div class="result" id="result"></div>
     </div>
-
-    <div id="bountyInfo" style="background: rgba(0, 0, 0, 0.1);border-radius: 20px;"></div>
+    <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 95%;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
   </div>
   
   <div class="overlay" id="overlay">三速欧皇降临!</div>
@@ -195,6 +232,7 @@
     let merchantSavings = 0;
     let autoWashInterval = null;
     let deductionGold = 0;
+    let acceptBounty = false;
 
     const items = [
       { range: [90, 180], name: '敏捷' },
@@ -352,6 +390,7 @@ function generateTargetAndRewardForAttackOrHp(bountyType) {
 function generateBounty() {
     let target, reward, bountyType;
     const bountyChoice = Math.random();
+  
 
     if (bountyChoice < 0.33) {
         ({ target, reward } = generateTargetAndRewardForAgility());
@@ -363,10 +402,11 @@ function generateBounty() {
         ({ target, reward } = generateTargetAndRewardForAttackOrHp('HP'));
         bountyType = '‰ HP上限';
     }
+    console.log(`${bountyType}`);
 
     currentBounty = { target, reward, bountyType };
     bountyInfoElement.innerHTML = `
-        <p style="color: #fefefe;font-weight: bold;">有一个新的悬赏通灵，目标: ${target} ${bountyType}, 赏金${reward}元，是否接受?</p>
+        <p style="color: red;font-weight: bold;margin-bottom: 0;">有一个新的悬赏通灵，目标: ${target} ${bountyType}, 赏金${reward}元，是否接受?</p>
         <div class="button-container">
             <button id="acceptBtn">接受</button>
             <button id="declineBtn">拒绝</button>
@@ -377,6 +417,7 @@ function generateBounty() {
     document.getElementById('acceptBtn').addEventListener('click', () => handleAcceptBounty(target, bountyType, reward));
     document.getElementById('declineBtn').addEventListener('click', () => {
         currentBounty = null;
+        acceptBounty = false;
         bountyInfoElement.innerHTML = '';
     });
     document.getElementById('descripBtn').addEventListener('click', () => {
@@ -385,8 +426,9 @@ function generateBounty() {
 }
 
 function handleAcceptBounty(target, bountyType, reward) {
+    acceptBounty = true;
     bountyInfoElement.innerHTML = `
-        <p style="color: #fefefe;font-weight: bold;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${Math.round(reward * 0.85)}元违约金</p>
+        <p style="color: red;font-weight: bold;margin-bottom: 0;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${Math.round(reward * 0.85)}元违约金</p>
         <div class="button-container">
             <button id="giveUpBtn">放弃</button>
             <button id="autoBtn">代洗</button>
@@ -409,6 +451,7 @@ function handleGiveUp(reward) {
         asset -= penalty;
         assetElement.textContent = asset;
         currentBounty = null;
+        acceptBounty = false;
         bountyInfoElement.innerHTML = '';
     });
 }
@@ -437,6 +480,11 @@ function handleAutoWash(target, bountyType) {
 }
 
 function checkBountyCompletion(resultArray, target, autoWashInterval, bountyType) {
+    if (!acceptBounty) {
+      return;
+      console.log('没有接受悬赏，不计算悬赏金额');
+    };
+
     let sum = 0;
     for (const result of resultArray) {
         if (result.includes('耐力') && bountyType === '敏捷') {
@@ -451,7 +499,7 @@ function checkBountyCompletion(resultArray, target, autoWashInterval, bountyType
     if (sum >= target) {
         clearInterval(autoWashInterval);
         bountyInfoElement.innerHTML = `
-            <p style="color: #fefefe;font-weight: bold;">当前${bountyType}为${sum}，恭喜你完成了悬赏!</p>
+            <p style="color: red;font-weight: bold;margin-bottom: 0;">当前${bountyType}为${sum}，恭喜你完成了悬赏!</p>
             <div class="button-container">
                 <button id="claimBtn">领取赏金</button>
             </div>
@@ -460,40 +508,74 @@ function checkBountyCompletion(resultArray, target, autoWashInterval, bountyType
             asset += currentBounty.reward;
             assetElement.textContent = asset;
             currentBounty = null;
+            acceptBounty = false;
             bountyInfoElement.innerHTML = '';
         });
     }
 }
     
-    function checkBounty(resultArray) {
-      if (currentBounty) {
-        let sum = 0;
-        for (const result of resultArray) {
-          if (result.includes('耐力')) {
-            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
-          } else if (result.includes('信仰')) {
-            sum += parseInt(result.match(/\d+/)[0]) * 0.1;
-          } else if (result.includes('敏捷')) {
-            sum += parseInt(result.match(/\d+/)[0]) * 1;
-          }
-        }
-        console.log(`当前敏捷共计${sum}`);
-        if (sum >= currentBounty.target) {
-          bountyInfoElement.innerHTML = `
-            <p style="color: #fefefe;font-weight: bold;">当前敏捷换算为${sum}，恭喜你完成了悬赏!</p>
-            <div class="button-container">
-            <button id="claimBtn">领取赏金</button>
-            </div>
-          `;
-          document.getElementById('claimBtn').addEventListener('click', () => {
-            asset += currentBounty.reward;
-            assetElement.textContent = asset;
-            currentBounty = null;
-            bountyInfoElement.innerHTML = '';
-          });
-        }
-      }
+// 定义处理不同 bountyType 的策略
+const bountyHandlers = {
+  '敏捷': (result) => {
+    if (result.includes('耐力') || result.includes('信仰')) {
+      return parseInt(result.match(/\d+/)[0]) * 0.1;
+    } else if (result.includes('敏捷')) {
+      return parseInt(result.match(/\d+/)[0]) * 1;
     }
+    return 0;
+  },
+  '‰ 物理攻击': (result) => {
+    if (result.includes('‰ 物理攻击')) {
+      return parseInt(result.match(/\d+/)[0]);
+    }
+    return 0;
+  },
+  '‰ 法术攻击': (result) => {
+    if (result.includes('‰ 法术攻击')) {
+      return parseInt(result.match(/\d+/)[0]);
+    }
+    return 0;
+  },
+  '‰ HP上限': (result) => {
+    if (result.includes('‰ HP上限')) {
+      return parseInt(result.match(/\d+/)[0]);
+    }
+    return 0;
+  }
+  // 可以在这里添加更多的 bountyType 处理逻辑
+};
+
+function checkBounty(resultArray) {
+  if (currentBounty && acceptBounty) {
+    const handler = bountyHandlers[currentBounty.bountyType];
+    
+    if (handler) {
+      let sum = 0;
+      for (const result of resultArray) {
+        sum += handler(result);
+      }
+
+      console.log(`当前${currentBounty.bountyType}共计${sum}`);
+      if (sum >= currentBounty.target) {
+        bountyInfoElement.innerHTML = `
+          <p style="color: red;font-weight: bold;margin-bottom: 0;">当前${currentBounty.bountyType}换算为${sum}，恭喜你完成了悬赏!</p>
+          <div class="button-container">
+          <button id="claimBtn">领取赏金</button>
+          </div>
+        `;
+        document.getElementById('claimBtn').addEventListener('click', () => {
+          asset += currentBounty.reward;
+          assetElement.textContent = asset;
+          currentBounty = null;
+          acceptBounty = false;
+          bountyInfoElement.innerHTML = '';
+        });
+      }
+    } else {
+      console.error(`未处理的 bountyType: ${currentBounty.bountyType}`);
+    }
+  }
+}
 
     const modal = document.getElementById('modal');
     const modalText = document.getElementById('modalText');
@@ -545,7 +627,7 @@ function checkBountyCompletion(resultArray, target, autoWashInterval, bountyType
       merchantSavings = 0;
 
       bountyInfoElement.innerHTML = `
-        <p style="color: #fefefe;font-weight: bold;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
+        <p style="color: lightgreen;font-weight: bold;margin-bottom: 0;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
         <div class="button-container">
         <button id="acceptMerchantBtn">交易</button>
         <button id="declineMerchantBtn">离开</button>

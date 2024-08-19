@@ -140,27 +140,29 @@
         background-size: contain;
         padding: 1px;
         border: 1px solid black;
-        width:100%;
-        gap:2px;
-        max-height: 45px;
+        width: 100%;
+        height: 43px;
     }
 
     .item-text-top {
-        padding: 2px;
+        padding: 0px;
         background: #393226;
         color: #DD9C35;
-        border: 1px solid #514D41;
-        width:95%;
+        box-shadow: 0px 0px 0px 1px #514D41;
+        width: 100%;
+        height: 21px;
         text-overflow: ellipsis;
         overflow: hidden;
+        text-align: left;
     }
     
     .item-text-bottom {
-        padding: 2px;
         background: #393226;
         color:rgb(255 255 255 / 90%);
-        border: 1px solid #514D41;
-        width:95%;
+        box-shadow: 0px 0px 0px 1px #514D41;
+        height: 18px;
+        width: 100%;
+        text-align: left;
     }
 
     .general-window-background {
@@ -966,9 +968,8 @@
         }
         
         .transform-pet-modal {
-            width: 85%;
-            height: auto;
-            overflow-y: auto;
+            width: 90%;
+            height: 80%;
             position: relative;
             border-radius: 2px;
             background-color: #DFBF6E;
@@ -977,7 +978,8 @@
             background-repeat: repeat;
             background-size: auto;
             border: 1px solid black;
-            padding: 0px 0px 5px 0px;
+            padding: 0px 1px 0px 1px;
+            box-shadow: inset 0px 0px 2px 1px #92341c;
         }
         
         .transform-pet-title {
@@ -999,11 +1001,11 @@
             top: 3px;
             right: 5px;
             cursor: pointer;
-            font-size: 24px;
+            font-size: 18px;
             color: white;
             background: linear-gradient(to bottom, #DBBA89,#84522C,#7C3411,#AC4B1D,#C85E24);
-            width: 25px;
-            height: 25px;
+            width: 22px;
+            height: 22px;
             text-align: center;
             border-radius: 2px;
             border: 1px solid #977025;
@@ -1013,17 +1015,21 @@
         .transform-pet-specializations {
             display: flex;
             flex-direction: column;
-            height: auto;
-            padding: 10px 20px;
-            box-shadow: 0px 0px 5px 1px #8D5325;
+            margin: 2px 2px 2px 2px;
+            overflow-y: scroll;
+            box-shadow: inset 0px 0px 0px 2px #6f391c;
+            width: 100%;
         }
         
         .transform-pet-spec {
             display: flex;
             flex-flow: row;
-            align-items: center;
             color: #92341c;
-            border: 1px solid #634A23;
+            border-bottom: 2px solid #6f391c;
+            flex-direction: row;
+            width: 100%;
+            align-content: space-around;
+            flex-wrap: wrap;
         }
         
         .transform-pet-spec-icon {
@@ -1039,9 +1045,14 @@
             flex-grow: 1;
             font-size: 14px;
             height: 100%;
-            border-left: 1px solid #634A23;
-            padding: 5px;
+            padding: 10px;
             width: 100%;
+            display: flex;
+            gap: 0px 20px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            align-items: center;
         }
         
         .transform-pet-spec-description {
@@ -1053,6 +1064,8 @@
             gap: 10px 0px;
             justify-content: space-between;
             flex-direction: row;
+            width: 100%;
+            margin: 10px;
         }
         
         .transform-pet-button {
@@ -1573,9 +1586,10 @@
     opacity: 0;
     transform: scale(0);
     transition: opacity 0.3s, transform 0.3s;
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+    z-index: 9999;
 }
 
 .general-visual-effect {
@@ -1601,12 +1615,14 @@
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    opacity: 0.9;
 }
 
 #enemyEffect {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
+    opacity: 0.9;
 }
 
 .show-effect {
@@ -4664,6 +4680,7 @@ function petCollection() {
     collectionPanel.style.backgroundRepeat = 'repeat';
     collectionPanel.style.backgroundSize = 'auto';
     collectionPanel.style.border = '1px solid black';
+    collectionPanel.style.boxShadow = 'inset 0px 0px 2px 2px #6f391c';
     document.body.appendChild(collectionPanel);
     
     // 创建关闭按钮
@@ -4713,7 +4730,7 @@ function petCollection() {
     collectionContent.style.overflowY = 'scroll';
     collectionContent.style.border = '1px solid #6f391c';
     collectionContent.style.borderRadius = '2px';
-    collectionContent.style.margin = '10px 10px 20px 10px';
+    collectionContent.style.margin = '10px 10px 20px';
 
     Object.keys(pets).forEach(petKey => {
         const pet = pets[petKey];
@@ -4724,14 +4741,14 @@ function petCollection() {
         petDiv.style.justifyContent = 'space-between';
         petDiv.style.alignItems = 'center';
         petDiv.style.padding = '5px';
-        petDiv.style.boxShadow = '0px 0px 0px 0.5px #6f391c';
 
         const img = document.createElement('img');
         img.src = 'https://pic.imgdb.cn/item/666f3435d9c307b7e92b5bf9.png'; // 默认图标
         img.alt = pet.name;
         img.style.width = '40px';
         img.style.height = '40px';
-        img.style.border = '1px solid #6f391c';
+        img.style.border = '10px solid transparent';
+        img.style.borderImage = 'url(https://pic.imgdb.cn/item/66c2f34cd9c307b7e9be06c0.png) 40 round';
 
         const nameDiv = document.createElement('div');
         nameDiv.innerText = pet.name;
@@ -4868,7 +4885,7 @@ function updateCollectionBonus() {
     const magicalAttackBonus = Math.round(collectedPetCount * 0.01 * 100);
     const physicalDefenseBonus = Math.round(collectedPetCount * 0.035 * 100);
     const magicalDefenseBonus = Math.round(collectedPetCount * 0.035 * 100);
-    const speedBonus = Math.round(collectedPetCount * 0.001 * 100);
+    const speedBonus = Math.round(collectedPetCount * 0.005 * 100);
 
     bonusInfoDiv.innerHTML = `
         <div>收录数量: ${collectedPetCount}</div>
@@ -4957,54 +4974,52 @@ function storeCurrentPetData() {
                 rarity: rarity.slice(0, -1) // 去掉最后一个字符 ')'
             };
         });
-        const petData = {
-            currentPet: JSON.stringify(currentPet),
-            
-            skillScore: skillScore,
-            petLevel: petLevel,
-            evolutionLevel: evolutionLevel,
-            remainingPoints: remainingPoints,
-            trainingCount: trainingCount,
-            currentWisdom: currentWisdom,
-            petAscended: petAscended,
-            additionalPlayerCultivation: additionalPlayerCultivation,
-            petMaxLevel: petMaxLevel,
-            petWisdom: petWisdom,
-            petStates: JSON.stringify(petStates),
-            awakened: awakened,
-            awakenAttributes: awakenAttributes,
-            baseAttributes: baseAttributes,
-            hallucinated: hallucinated,
-            hallucinationLevel: hallucinationLevel,
-            experienceTreasureOpenCount: experienceTreasureOpenCount,
-            armsOpened: armsOpened,
-            armsAttributes: JSON.stringify(armsAttributes),
-            currentExp: currentExp,
-            maxExp: maxExp,
-            playerCritRate: playerCritRate,
-            playerCritDamage: playerCritDamage,
-            playerCultivation: playerCultivation,
-            enemyPetCultivation: enemyPetCultivation,
-            enemyCritRate: enemyCritRate,
-            enemyCritDamage: enemyCritDamage,
-            ascensionEnabled: ascensionEnabled,
-            poisonSkillActivated: poisonSkillActivated,
-            specializations: specializations,
-            currentSpecialization: currentSpecialization,
-            spiritLevel: spiritLevel,
-            spiritMultiplier: spiritMultiplier,
-            reenableAscension: reenableAscension,
-            bonusAttributes: bonusAttributes,
-            ascensionSkill: ascensionSkill ? getSkillFromName(ascensionSkill.name, ascensionSkill.level) : null,
-            secondAscensionSkill: secondAscensionSkill ? getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level) : null,
-            ascensionAttributes: ascensionAttributes,
-            drugBonus: drugBonus,
-            alreadyUseDrug: alreadyUseDrug,
-            divinedWeaponStatus: divinedWeaponStatus,
-            divineWeapons: divineWeaponManager.getWeaponData(),
-            skillScore: skillScore,
-            existingSkills: existingSkills, // 存储技能数据
-        };
+    const petData = {
+        additionalPlayerCultivation: additionalPlayerCultivation,
+        alreadyUseDrug: alreadyUseDrug,
+        armsAttributes: JSON.stringify(armsAttributes),
+        armsOpened: armsOpened,
+        ascensionAttributes: ascensionAttributes,
+        ascensionEnabled: ascensionEnabled,
+        ascensionSkill: ascensionSkill ? getSkillFromName(ascensionSkill.name, ascensionSkill.level) : null,
+        awakenAttributes: awakenAttributes,
+        awakened: awakened,
+        baseAttributes: baseAttributes,
+        bonusAttributes: bonusAttributes,
+        currentExp: currentExp,
+        currentPet: JSON.stringify(currentPet),
+        currentSpecialization: currentSpecialization,
+        currentWisdom: currentWisdom,
+        divineWeapons: divineWeaponManager.getWeaponData(),
+        divinedWeaponStatus: divinedWeaponStatus,
+        drugBonus: drugBonus,
+        enemyCritDamage: enemyCritDamage,
+        enemyCritRate: enemyCritRate,
+        enemyPetCultivation: enemyPetCultivation,
+        evolutionLevel: evolutionLevel,
+        existingSkills: existingSkills, // 存储技能数据
+        experienceTreasureOpenCount: experienceTreasureOpenCount,
+        hallucinated: hallucinated,
+        hallucinationLevel: hallucinationLevel,
+        maxExp: maxExp,
+        petAscended: petAscended,
+        petLevel: petLevel,
+        petMaxLevel: petMaxLevel,
+        petStates: JSON.stringify(petStates),
+        petWisdom: petWisdom,
+        playerCritDamage: playerCritDamage,
+        playerCritRate: playerCritRate,
+        playerCultivation: playerCultivation,
+        poisonSkillActivated: poisonSkillActivated,
+        reenableAscension: reenableAscension,
+        remainingPoints: remainingPoints,
+        secondAscensionSkill: secondAscensionSkill ? getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level) : null,
+        skillScore: skillScore,
+        specializations: specializations,
+        spiritLevel: spiritLevel,
+        spiritMultiplier: spiritMultiplier,
+        trainingCount: trainingCount,
+    };
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
 }
@@ -11825,8 +11840,9 @@ function addItemToJinnang(itemName, quantity = 1) {
         }
     }
 
-    updateJinnangItems();
+    updateJinnangItems(); // 保持调用顺序不变
 }
+
 
 // 合并后的 useItem 函数
 function useItem(itemName, quantity = 1) {
@@ -11991,11 +12007,15 @@ let selectedItem = null; // 在函数外部定义selectedItem
 function updateJinnangItems() {
     const jinnangReward = document.getElementById('jinnang-reward');
     jinnangReward.innerHTML = ''; // 清空现有内容
+
     if (isNaN(jinnangCapacity)) {
-        jinnangCapacity = 5000;
+        jinnangCapacity = 2000;
     }
 
-    jinnangItems.forEach(item => {
+    // 按照每个item的quantity降序排列，确保最近增加的物品显示在前面
+    const sortedItems = [...jinnangItems].sort((a, b) => b.quantity - a.quantity);
+
+    sortedItems.forEach(item => {
         if (item.quantity > 0) {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'jinnang-item';
@@ -12005,8 +12025,8 @@ function updateJinnangItems() {
             itemDiv.style.alignItems = 'center'; 
             itemDiv.style.justifyContent = 'space-between'; 
             itemDiv.style.padding = '4px'; 
-            itemDiv.style.boxShadow ='rgb(131, 74, 15) 0px 0px 0px 1px inset';
-            itemDiv.style.border ='1px solid rgb(131,74,15)';
+            itemDiv.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 1px inset';
+            itemDiv.style.border = '1px solid rgb(131,74,15)';
             itemDiv.innerHTML = `
                 <img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;">
                 <div class="item-text-container">
@@ -12021,8 +12041,8 @@ function updateJinnangItems() {
 
                 // 移除之前选中项的视觉提示
                 if (selectedItem) {
-                selectedItem.style.border = '1px solid rgb(131,74,15)';
-                selectedItem.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 1px inset';
+                    selectedItem.style.border = '1px solid rgb(131,74,15)';
+                    selectedItem.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 1px inset';
                 }
 
                 // 添加当前选中项的视觉提示
@@ -12037,8 +12057,10 @@ function updateJinnangItems() {
             jinnangReward.appendChild(itemDiv);
         }
     });
+
     updateJinnangCapacityDisplay();
 }
+
         
 // 更新顶栏道具数量
 function updateTopBarItems() {
@@ -12361,8 +12383,8 @@ function showPetArmsWindow() {
     const closeButton = document.createElement('button');
     closeButton.innerText = 'X';
     closeButton.style = `position: absolute;
-                        top: 6px;
-                        right: 2px;
+                        top: 4px;
+                        right: 4px;
                         ${topButtonStyle}`;
     closeButton.addEventListener('click', closePetArmsWindow);
     newArmsWindow.appendChild(closeButton);
@@ -12370,8 +12392,8 @@ function showPetArmsWindow() {
     const infoButton = document.createElement('button');
     infoButton.innerText = '?';
     infoButton.style = `position: absolute;
-                        top: 6px;
-                        right: auto;
+                        top: 4px;
+                        left: 4px;
                         ${topButtonStyle}`;
     infoButton.addEventListener('click', showInfo);
     newArmsWindow.appendChild(infoButton);
@@ -12383,11 +12405,13 @@ function showPetArmsWindow() {
                         gap: 10px;
                         padding: 20px;
                         background-color: #DFBF6E;
-                        color: #92341c;
+                        box-shadow: inset 0px 0px 0px 1px #6f391c;
+                        color: black;
                         background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
                         background-repeat: repeat;
                         background-size: auto;
                         height: 100%;`;
+    
 
     const attributeMap = {
         physicalAttack: '物攻',
@@ -12696,7 +12720,7 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     const magicalAttackBonus = 1 + collectedPetCount * 0.01;
     const physicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
-    const speedBonus = 1 + collectedPetCount * 0.001;
+    const speedBonus = 1 + collectedPetCount * 0.005;
     
     baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus);
     baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus);
@@ -12823,13 +12847,13 @@ function transformPet() {
         const specDiv = document.createElement('div');
         specDiv.className = 'transform-pet-spec';
 
+        const specInfoDiv = document.createElement('div');
+        specInfoDiv.className = 'transform-pet-spec-info';
+
         const specIcon = document.createElement('img');
         specIcon.src = spec.url;
         specIcon.className = 'transform-pet-spec-icon';
-        specDiv.appendChild(specIcon);
-
-        const specInfoDiv = document.createElement('div');
-        specInfoDiv.className = 'transform-pet-spec-info';
+        specInfoDiv.appendChild(specIcon);
 
         const specTitle = document.createElement('h3');
         specTitle.innerText = `专精：${key} Lv${spec.level}`;
@@ -13411,7 +13435,7 @@ function refreshShop(auto = false) {
         return;
     }
 
-    const numItems = auto ? getRandomInt(1, 5) : getRandomInt(2, 24);
+    const numItems = auto ? getRandomInt(1, 8) : getRandomInt(2, 36);
     const probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
     let rareItemCount = 0;
     let commonBundleCount = 0;
@@ -13426,7 +13450,7 @@ function refreshShop(auto = false) {
 
         if (item.name.includes('包裹')) {
             const bundleCount = isRare ? rareBundleCount : commonBundleCount;
-            const maxBundles = isRare ? 2 : 5;
+            const maxBundles = isRare ? 4 : 8;
 
             if (bundleCount >= maxBundles) {
                 i--;
@@ -13447,8 +13471,8 @@ function generateSpecialItems() {
     const allSSkills = collectSkillsByRarity('S');
 
     return [
-        ...selectRandomItems(allSSSkills, 12),
-        ...selectRandomItems(allSSkills, 12)
+        ...selectRandomItems(allSSSkills, 18),
+        ...selectRandomItems(allSSkills, 18)
     ];
 }
 
@@ -13488,7 +13512,7 @@ function getRandomCommonItem() {
     if (Math.random() < 0.8) {
         const item = selectRandomItems(commonItems, 1)[0];
         const quantity = getRandomInt(51, 100);
-        return createBundleItem(item, quantity);
+        return createBundleItem(item, quantity, false);
     }
 
     return selectRandomItems(commonItems, 1)[0];
@@ -13504,7 +13528,7 @@ function getRandomRareItem() {
     const sSkills = collectSkillsByRarity('S');
 
     return Math.random() < 0.2 && rareItems.length > 1
-        ? createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 15))
+        ? createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 15), true)
         : selectRandomItems([...rareItems, ...ssSkills, ...sSkills], 1)[0];
 }
 
@@ -13512,12 +13536,16 @@ function createItem(name, minPrice, maxPrice, url) {
     return { name, url, price: getRandomInt(minPrice, maxPrice) };
 }
 
-function createBundleItem(item, quantity) {
+function createBundleItem(item, quantity, rare = false) {
+    const url = rare 
+        ? 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa85b.png' 
+        : 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png';
+
     return {
         ...item,
         name: `${item.name} 包裹 (${quantity})`,
         price: item.price * quantity,
-        url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png'
+        url: url
     };
 }
 
@@ -13991,159 +14019,141 @@ function sellPet() {
 }
 
 function resetPet() {
-    
+
     // 重置宠物资质和属性
     currentPet.qualities.tier = '普通';
     currentPet.qualities.growthRate = 100;
     currentPet.qualities.mutated = false;
 
     // 重置当前资质为最小值
-    currentPet.qualities.endurance.current = currentPet.qualities.endurance.min;
-    currentPet.qualities.strength.current = currentPet.qualities.strength.min;
-    currentPet.qualities.faith.current = currentPet.qualities.faith.min;
     currentPet.qualities.agility.current = currentPet.qualities.agility.min;
+    currentPet.qualities.endurance.current = currentPet.qualities.endurance.min;
+    currentPet.qualities.faith.current = currentPet.qualities.faith.min;
     currentPet.qualities.intelligence.current = currentPet.qualities.intelligence.min;
+    currentPet.qualities.strength.current = currentPet.qualities.strength.min;
 
     // 重置基础属性为初始值，调用calculateAttribute
     baseAttributes = {
-        endurance: calculateAttribute(currentPet.qualities.endurance.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        intelligence: calculateAttribute(currentPet.qualities.intelligence.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        strength: calculateAttribute(currentPet.qualities.strength.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
         agility: calculateAttribute(currentPet.qualities.agility.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
-        faith: calculateAttribute(currentPet.qualities.faith.min, currentPet.qualities.growthRate / 100, petLevel, 0, false)
+        endurance: calculateAttribute(currentPet.qualities.endurance.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        faith: calculateAttribute(currentPet.qualities.faith.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        intelligence: calculateAttribute(currentPet.qualities.intelligence.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
+        strength: calculateAttribute(currentPet.qualities.strength.min, currentPet.qualities.growthRate / 100, petLevel, 0, false)
     };
 
     // 初始化等级和其他基础属性
-    restoreEnemyState();
-    defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
-    updatePetInfo();
-    currentSpecialization = null;
-    
-    petLevel = 1;
-    divinedWeaponStatus = false;
-    evolutionLevel = 0;
-    growthRate = 1;
-    remainingPoints = 0;
-    trainingCount = 0;
-    currentWisdom = 0;
-    petAscended = false;
-    petMaxLevel = 149;
     additionalPlayerCultivation = 0;
-    lockArms();
-    removeArmsAttributes();
-    petWisdom = currentWisdom;
-    awakened = false;
-    hallucinated = false;
-    hallucinationLevel = 0;
-    experienceTreasureOpenCount = 0;
-    armsOpened = false;// 武装上锁
-    currentExp = 0; // 当前经验值
-    maxExp = 208; // 经验值上限
-    playerCritRate = 0.1; // 10%
-    playerCritDamage = 1.5; // 150%
-    enemyCritRate = 0.6; // 60%
-    enemyCritDamage = 1.8; // 180%
-    ascensionEnabled = false; //飞升之术关闭
-    poisonSkillActivated = false; //施毒之术关闭
-    spiritLevel = 1;
-    spiritMultiplier = 1.00;
-    reenableAscension = false;//第二个飞升之术关闭
-    bonusAttributes = {
-    endurance: 0,
-    intelligence: 0,
-    strength: 0,
-    agility: 0,
-    faith: 0
-    };
-    awakenAttributes = {
-    endurance: 0,
-    intelligence: 0,
-    strength: 0,
-    agility: 0,
-    faith: 0
-    };
-    baseAttributes = {
-    endurance: 0,
-    intelligence: 0,
-    strength: 0,
-    agility: 0,
-    faith: 0
-    };
-    ascensionSkill = {
-    name: '未开启',
-    level: 1,
-    effect: '未开启飞升技能'
-    };//第一个飞升技能为空
-    secondAscensionSkill = {
-    name: '未开启',
-    level: 1,
-    effect: '未开启飞升技能'
-    };//第二个飞升技能为空
+    armsOpened = false; // 武装上锁
     ascensionAttributes = {
-    health: 0,
-    mana: 0,
-    physicalAttack: 0,
-    physicalDefense: 0,
-    magicAttack: 0,
-    magicDefense: 0,
-    speed: 0
+        health: 0,
+        mana: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        speed: 0
     };
-    //药品增幅buff清空
-    drugBonus = {
-    health: 0,
-    mana: 0,
-    physicalAttack: 0,
-    physicalDefense: 0,
-    magicAttack: 0,
-    magicDefense: 0,
-    speed: 0
+    ascensionEnabled = false; // 飞升之术关闭
+    ascensionSkill = {
+        name: '未开启',
+        level: 1,
+        effect: '未开启飞升技能'
+    }; // 第一个飞升技能为空
+    awakenAttributes = {
+        agility: 0,
+        endurance: 0,
+        faith: 0,
+        intelligence: 0,
+        strength: 0
     };
+    awakened = false;
+    bonusAttributes = {
+        agility: 0,
+        endurance: 0,
+        faith: 0,
+        intelligence: 0,
+        strength: 0
+    };
+    currentExp = 0; // 当前经验值
+    currentSpecialization = null;
+    currentWisdom = 0;
+    defaultImageUrl = "https://pic.imgdb.cn/item/665d02afd9c307b7e903151b.png";
+    divinedWeaponStatus = false;
     document.body.style.backgroundImage = "";
     document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
-
-    // 隐藏第二飞升技能面板
-    const secondSkillBox = document.getElementById('second-ascension-skill');
-    secondSkillBox.style.display = 'none';
-
-    // 更新显示的资质和属性值
-    setInnerText("tier", currentPet.qualities.tier);
-    setInnerText("growth-rate", currentPet.qualities.growthRate);
-    setInnerText("mutated", currentPet.qualities.mutated ? "是" : "否");
-    setInnerText("endurance-current", currentPet.qualities.endurance.current);
-    setInnerText("strength-current", currentPet.qualities.strength.current);
-    setInnerText("faith-current", currentPet.qualities.faith.current);
+    drugBonus = {
+        health: 0,
+        mana: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        speed: 0
+    }; // 药品增幅buff清空
+    enemyCritDamage = 1.8; // 180%
+    enemyCritRate = 0.6; // 60%
+    evolutionLevel = 0;
+    experienceTreasureOpenCount = 0;
+    growthRate = 1;
+    hallucinated = false;
+    hallucinationLevel = 0;
+    lockArms();
+    maxExp = 208; // 经验值上限
+    petAscended = false;
+    petLevel = 1;
+    petMaxLevel = 149;
+    petWisdom = currentWisdom;
+    playerCritDamage = 1.5; // 150%
+    playerCritRate = 0.1; // 10%
+    poisonSkillActivated = false; // 施毒之术关闭
+    reenableAscension = false; // 第二个飞升之术关闭
+    remainingPoints = 0;
+    removeArmsAttributes();
+    restoreEnemyState();
+    secondAscensionSkill = {
+        name: '未开启',
+        level: 1,
+        effect: '未开启飞升技能'
+    }; // 第二个飞升技能为空
     setInnerText("agility-current", currentPet.qualities.agility.current);
-    setInnerText("intelligence-current", currentPet.qualities.intelligence.current);
+    setInnerText("attribute-agility", baseAttributes.agility);
     setInnerText("attribute-endurance", baseAttributes.endurance);
+    setInnerText("attribute-faith", baseAttributes.faith);
     setInnerText("attribute-intelligence", baseAttributes.intelligence);
     setInnerText("attribute-strength", baseAttributes.strength);
-    setInnerText("attribute-agility", baseAttributes.agility);
-    setInnerText("attribute-faith", baseAttributes.faith);
-
-    // 初始化评分
-    skillScore = 0;
+    setInnerText("current-wisdom", 0);
+    setInnerText("endurance-current", currentPet.qualities.endurance.current);
+    setInnerText("evolution-level", evolutionLevel);
+    setInnerText("faith-current", currentPet.qualities.faith.current);
+    setInnerText("growth-rate", currentPet.qualities.growthRate);
+    setInnerText("intelligence-current", currentPet.qualities.intelligence.current);
+    setInnerText("mutated", currentPet.qualities.mutated ? "是" : "否");
+    setInnerText("pet-level", petLevel);
     setInnerText("skill-score", skillScore);
-
-    // 清空技能区域
+    setInnerText("strength-current", currentPet.qualities.strength.current);
+    setInnerText("tier", currentPet.qualities.tier);
+    setInnerText("train-count", 0);
+    skillScore = 0; // 初始化评分
+    spiritLevel = 1;
+    spiritMultiplier = 1.00;
+    trainingCount: 0;
+    const secondSkillBox = document.getElementById('second-ascension-skill');
+    secondSkillBox.style.display = 'none'; // 隐藏第二飞升技能面板
     const skillsArea = document.getElementById("skills-area");
     if (skillsArea) {
-        skillsArea.innerHTML = "";
+        skillsArea.innerHTML = ""; // 清空技能区域
     }
-
+    
+    
     // 更新显示的各项数值
-    setInnerText("current-wisdom", 0);
-    setInnerText("train-count", 0);
-    setInnerText("pet-level", petLevel);
-    setInnerText("evolution-level", evolutionLevel);
-
-    // 确保属性面板在所有属性重置和计算后更新
-    updateQualityCard();
-    updateAttributePanel();
-    updateTopBarItems();
-    updateAscensionStatus();
-    updateAscensionDisplay();
-    updateAwakenStatus();
     updateAscensionButton();
+    updateAscensionDisplay();
+    updateAscensionStatus();
+    updateAttributePanel();
+    updateAwakenStatus();
+    updatePetInfo();
+    updateQualityCard();
+    updateTopBarItems();
 }
 
 function setInnerText(id, value) {
@@ -14259,7 +14269,7 @@ function trainSkills() {
                 const maxSkills = Math.min(12, currentPet.skills.length);
                 const skillNum = Math.min(Math.floor(Math.random() * 3) + 10, currentPet.skills.length); // 10到12个技能，且不超过现有技能数量
                 const selectedSkills = [];
-
+                
                 while (selectedSkills.length < skillNum) {
                     const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
                     if (!selectedSkills.includes(randomSkill)) {
@@ -14386,21 +14396,11 @@ function updateSkillsArea(selectedSkills) {
 }
 
 function deleteSkill(skill, skillDiv, skillsArea) {
-    const messageBox = document.createElement('div');
     const skillDescrip = skill.description;
-    messageBox.style = "padding: 5px; font-size: 14px; border-radius: 10px; background: rgb(255 255 255 / 90%); border: 1px solid black; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;";
-    messageBox.innerHTML = `
-        <p>描述：${skillDescrip}</p>
-        <p>是否删除？</p>
-        <button id="confirm-delete">删除</button>
-        <button onclick="document.body.removeChild(this.parentNode)">取消</button>
-    `;
-
-    document.body.appendChild(messageBox);
-
-    document.getElementById("confirm-delete").onclick = () => {
+    
+    // 定义确认删除技能的回调函数
+    function onConfirm() {
         skillsArea.removeChild(skillDiv);
-        document.body.removeChild(messageBox);
 
         // 获取当前技能列表并更新评分
         const remainingSkills = Array.from(skillsArea.children).map(div => {
@@ -14408,8 +14408,20 @@ function deleteSkill(skill, skillDiv, skillsArea) {
             return { name, rarity: rarity.replace(')', '') };
         });
         updateSkillScore(remainingSkills);
-    };
+    }
 
+    // 定义取消删除技能的回调函数
+    function onCancel() {
+        console.log('取消删除技能');
+    }
+
+    // 显示信息框，传入回调函数
+    showInfoBox(
+        `技能描述：${skillDescrip}。点击确认可删除此技能`,
+        onConfirm,
+        onCancel,
+        'red' // 可选的颜色参数
+    );
 }
 
 let cultivationTime; // 提取共用的时间参数

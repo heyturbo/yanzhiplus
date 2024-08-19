@@ -40,8 +40,8 @@
       background-image: url(https://pic.imgdb.cn/item/66c2fdcdd9c307b7e9ccc165.png);
       background-size: contain;
       background-repeat: no-repeat;
-      height: 360px;
-      width: 240px;
+      height: 540px;
+      width: 320px;
       top: 50%;
       left: 50%;
       position: absolute;
@@ -61,7 +61,7 @@
         border: 1px solid black;
         top: -35px;
         left: -1px;
-        width: 271px;
+        width: 350px;
         position: absolute;
     }
     .button-container {
@@ -88,14 +88,14 @@
       flex-direction: column;
       align-items: center;
       display: flex;
-      font-size: 14px;
-      height: 90px;
+      font-size: 16px;
+      height: 120px;
       justify-content: space-between;
       color: rgba(0, 0, 0, 0.8);
       position: fixed;
-      width: 200px;
+      width: 240px;
       top: 43%;
-      left: 10%;
+      left: 14%;
     }
     
     .special {
@@ -164,9 +164,9 @@
     }
     .info-container {
       position: fixed;
-      top: 28%;
-      left: 3%;
-      height: 50px;
+      top: 25%;
+      left: 6%;
+      height: 62px;
       width: 135px;
       overflow: hidden;
       text-align: center;
@@ -180,25 +180,25 @@
 <body>
     <div class="container">
       <div class="toggle-container">紫薇教通灵</div>
-      <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 26%;left: 56%;">
-      <div id="ziwei" style="margin-left: 10px;padding: 0px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
-        <div class="asset">资产: <span id="asset">0</span></div>
+      <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 25%;left: 55%;">
+      <div id="ziwei" style="margin-left: 10px;padding: 0px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 4%;left: 70%;">
+        <div class="asset">资产: <span id="asset">3250</span></div>
       </div>
       <div class="info-container">
-        <div id="countInfo" style="color: white;display: flex;flex-direction: column;align-items: center;gap: 5px;">
-          <p style="margin: 0; font-size:12px;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
+        <div id="countInfo" style="color: white;display: flex;flex-direction: row;gap: 10px;flex-wrap: wrap;justify-content: center;align-content: center;align-items: center;">
+          <p style="margin: 0; font-size:12px;">已通灵<span class="special" id="tonglingCount">0</span>次</p>
           <p style="margin: 0; font-size:12px;">已消耗<span class="special" id="tonglingCost">0</span>的养水</p>
         </div>
       </div>
       <div class="tongling-button-container">
-        <button onclick="deductGold()">换汇</button>
+        <button onclick="reset()">重置</button>
         <button id="tonglingBtn">通灵</button>
-        <button onclick="exchangeGold()">提款</button>
+
       </div>
       <div class="result-container">
       <div class="result" id="result"></div>
       </div>
-      <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 260px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
+      <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 4px;padding: 5px;width: 341px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 0px 5px 1px #6f391c;"></div>
     </div>
     
     <div class="overlay" id="overlay">三速欧皇降临!</div>
@@ -220,7 +220,7 @@
     const bountyInfoElement = document.getElementById('bountyInfo');
     const overlayElement = document.getElementById('overlay');
 
-    let asset = 0;
+    let asset = 3250;
     let tonglingCount = 0;
     let currentBounty = null;
     let isEuropeKing = false;
@@ -704,8 +704,10 @@ function checkBounty(resultArray) {
     }
     
     function reset() {
-      asset = 0;
+      asset = 3250;
       assetElement.textContent = asset;
+      currentBounty = null;
+      acceptBounty = false;
       tonglingCount = 0;
       tonglingCountElement.textContent = tonglingCount;
       tonglingCostElement.textContent = '0';

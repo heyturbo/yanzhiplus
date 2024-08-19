@@ -40,8 +40,8 @@
       background-image: url(https://pic.imgdb.cn/item/66c2fdcdd9c307b7e9ccc165.png);
       background-size: contain;
       background-repeat: no-repeat;
-      height: 600px;
-      width: 360px;
+      height: 360px;
+      width: 240px;
       top: 50%;
       left: 50%;
       position: absolute;
@@ -61,8 +61,8 @@
         border: 1px solid black;
         top: -35px;
         left: -1px;
-        width: 390px;
-        position: fixed;
+        width: 271px;
+        position: absolute;
     }
     .button-container {
       display: flex;
@@ -76,7 +76,7 @@
       flex-direction: row;
       justify-content: space-evenly;
       position: fixed;
-      top: 72%;
+      top: 69%;
       left: 0%;
       width: 100%;
     }
@@ -84,18 +84,18 @@
     .result-container {
       flex-di
       font-size: 20px;
-      padding: 20px;
+      padding: 10px;
       flex-direction: column;
       align-items: center;
       display: flex;
-      font-size: 20px;
-      height: 150px;
+      font-size: 14px;
+      height: 90px;
       justify-content: space-between;
       color: rgba(0, 0, 0, 0.8);
       position: fixed;
-      width: 320px;
-      top: 40%;
-      left: 5%;
+      width: 200px;
+      top: 43%;
+      left: 10%;
     }
     
     .special {
@@ -164,10 +164,10 @@
     }
     .info-container {
       position: fixed;
-      top: 26%;
+      top: 28%;
       left: 3%;
-      height: 63px;
-      width: 200px;
+      height: 50px;
+      width: 135px;
       overflow: hidden;
       text-align: center;
       color: white;
@@ -181,13 +181,13 @@
     <div class="container">
       <div class="toggle-container">紫薇教通灵</div>
       <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 26%;left: 56%;">
-      <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
+      <div id="ziwei" style="margin-left: 10px;padding: 0px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
         <div class="asset">资产: <span id="asset">0</span></div>
       </div>
       <div class="info-container">
         <div id="countInfo" style="color: white;display: flex;flex-direction: column;align-items: center;gap: 5px;">
-          <p style="margin: 0;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
-          <p style="margin: 0;">已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
+          <p style="margin: 0; font-size:12px;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
+          <p style="margin: 0; font-size:12px;">已消耗<span class="special" id="tonglingCost">0</span>的养水</p>
         </div>
       </div>
       <div class="tongling-button-container">
@@ -198,7 +198,7 @@
       <div class="result-container">
       <div class="result" id="result"></div>
       </div>
-      <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 95%;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
+      <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 260px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
     </div>
     
     <div class="overlay" id="overlay">三速欧皇降临!</div>
@@ -302,50 +302,54 @@
 
     //通灵按钮
     document.getElementById('tonglingBtn').addEventListener('click', () => {
-      if (asset >= (merchantEvent ? merchantPrice : 6.5)) {
-        asset -= merchantEvent ? merchantPrice : 6.5;
-        assetElement.textContent = asset.toFixed(2);
-        tonglingCount++;
-        tonglingCountElement.textContent = tonglingCount;
-        tonglingCostElement.textContent = `${(tonglingCount * 6.5).toFixed(2)}${merchantEvent ? `（商人已为你节省了${merchantSavings.toFixed(2)}元）` : ''}`;
-
-        if (merchantEvent) {
-          merchantCount--;
-          merchantSavings += 6.5 - merchantPrice;
-          if (merchantCount === 0) {
-            merchantEvent = false;
-          }
-        }
-
-        const count = getRandomCount();
-        const resultArray = [];
-        for (let i = 0; i < count; i++) {
-          resultArray.push(getRandomItem());
-        }
-        resultElement.innerHTML = resultArray.join('<br>');
-        
-        if (!autoWashInterval) {
-          checkBounty(resultArray);
-        }
-
-        if (checkEuropeKing(resultArray)) {
-          isEuropeKing = true;
-          alert('好像洗出了不得了的东西');
-        }
-
-        if (!currentBounty && (Math.random() < 0.15 || (isEuropeKing && Math.random() < 0.88))) {
-          isEuropeKing = false;
-          generateBounty();
-        }
-
-        if (tonglingCount % 50 === 0 && Math.random() < 0.15 && !currentBounty) {
-          generateMerchantEvent();
-        }
-      } else {
-        alert('资产不足，无法通灵!');
-      }
+      tonglingAction();
     });
+
+function tonglingAction() {
+    if (asset >= (merchantEvent ? merchantPrice : 6.5)) {
+    asset -= merchantEvent ? merchantPrice : 6.5;
+    assetElement.textContent = asset.toFixed(2);
+    tonglingCount++;
+    tonglingCountElement.textContent = tonglingCount;
+    tonglingCostElement.textContent = `${(tonglingCount * 6.5).toFixed(2)}${merchantEvent ? `（商人已为你节省了${merchantSavings.toFixed(2)}）` : ''}`;
+
+    if (merchantEvent) {
+      merchantCount--;
+      merchantSavings += 6.5 - merchantPrice;
+      if (merchantCount === 0) {
+        merchantEvent = false;
+      }
+    }
+
+    const count = getRandomCount();
+    const resultArray = [];
+    for (let i = 0; i < count; i++) {
+      resultArray.push(getRandomItem());
+    }
+    resultElement.innerHTML = resultArray.join('<br>');
     
+    if (!autoWashInterval) {
+      checkBounty(resultArray);
+    }
+
+    if (checkEuropeKing(resultArray)) {
+      isEuropeKing = true;
+      alert('好像洗出了不得了的东西');
+    }
+
+    if (!currentBounty && (Math.random() < 0.15 || (isEuropeKing && Math.random() < 0.88))) {
+      isEuropeKing = false;
+      generateBounty();
+    }
+
+    if (tonglingCount % 50 === 0 && Math.random() < 0.15 && !currentBounty) {
+      generateMerchantEvent();
+    }
+  } else {
+    alert('资产不足，无法通灵!');
+  }
+}
+
 function generateTargetAndRewardForAgility() {
     let target, reward;
     const randomChoice = Math.random();
@@ -405,7 +409,7 @@ function generateBounty() {
 
     currentBounty = { target, reward, bountyType };
     bountyInfoElement.innerHTML = `
-        <p style="color: red;font-weight: bold;margin-bottom: 0;">有一个新的悬赏通灵，目标: ${target} ${bountyType}, 赏金${reward}元，是否接受?</p>
+        <p style="color: red;font-weight: bold;margin-bottom: 0;">有一个新的悬赏通灵，目标: ${target} ${bountyType}, 赏金${reward}，是否接受?</p>
         <div class="button-container">
             <button id="acceptBtn">接受</button>
             <button id="declineBtn">拒绝</button>
@@ -427,7 +431,7 @@ function generateBounty() {
 function handleAcceptBounty(target, bountyType, reward) {
     acceptBounty = true;
     bountyInfoElement.innerHTML = `
-        <p style="color: red;font-weight: bold;margin-bottom: 0;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${Math.round(reward * 0.85)}元违约金</p>
+        <p style="color: red;font-weight: bold;margin-bottom: 0;">你需要帮助神秘玩家达到${target}点${bountyType}，如放弃则支付${Math.round(reward * 0.85)}违约金</p>
         <div class="button-container">
             <button id="giveUpBtn">放弃</button>
             <button id="autoBtn">代洗</button>
@@ -626,7 +630,7 @@ function checkBounty(resultArray) {
       merchantSavings = 0;
 
       bountyInfoElement.innerHTML = `
-        <p style="color: lightgreen;font-weight: bold;margin-bottom: 0;">只需要${cost}的手续费，就能优惠买到${price}元的通灵${count}个，是否需要？</p>
+        <p style="color: lightgreen;font-weight: bold;margin-bottom: 0;">只需要${cost}的手续费，就能优惠买到${price}的通灵${count}个，是否需要？</p>
         <div class="button-container">
         <button id="acceptMerchantBtn">交易</button>
         <button id="declineMerchantBtn">离开</button>

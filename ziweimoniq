@@ -44,10 +44,10 @@
       width: 360px;
       top: 50%;
       left: 50%;
-      position: fixed;
+      position: absolute;
       transform: translate(-50%, -50%);
-      justify-content: space-between;
       border: 1px solid #6f391c;
+      justify-content: space-between;
     }
     .toggle-container {
         padding: 5px;
@@ -88,7 +88,6 @@
       flex-direction: column;
       align-items: center;
       display: flex;
-      border-radius: 20px;
       font-size: 20px;
       height: 150px;
       justify-content: space-between;
@@ -179,39 +178,39 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="toggle-container">紫薇教通灵</div>
-    <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 26%;left: 56%;">
-    <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
-      <div class="asset">资产: <span id="asset">0</span></div>
+    <div class="container">
+      <div class="toggle-container">紫薇教通灵</div>
+      <img src="https://pic.imgdb.cn/item/66bef9e9d9c307b7e95c217e.png" style="position: fixed;height: 65px;width: 65px;border: 1px solid #47301d;top: 26%;left: 56%;">
+      <div id="ziwei" style="margin-left: 20px;padding: 10px;width: 72px;height: 63px;display: flex;flex-direction: column;align-items: center;justify-content: space-around;position: fixed;top: 3%;left: 70%;">
+        <div class="asset">资产: <span id="asset">0</span></div>
+      </div>
+      <div class="info-container">
+        <div id="countInfo" style="color: white;display: flex;flex-direction: column;align-items: center;gap: 5px;">
+          <p style="margin: 0;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
+          <p style="margin: 0;">已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
+        </div>
+      </div>
+      <div class="tongling-button-container">
+        <button onclick="deductGold()">换汇</button>
+        <button id="tonglingBtn">通灵</button>
+        <button onclick="exchangeGold()">提款</button>
+      </div>
+      <div class="result-container">
+      <div class="result" id="result"></div>
+      </div>
+      <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 95%;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
     </div>
-    <div class="info-container">
-      <div id="countInfo" style="color: white;display: flex;flex-direction: column;align-items: center;gap: 5px;">
-        <p style="margin: 0;">已通灵<span class="special" id="tonglingCount">0</span>次 已换汇<span id="deductionGold">0</span>金</p>
-        <p style="margin: 0;">已消耗<span class="special" id="tonglingCost">0</span>元的养元水</p>
+    
+    <div class="overlay" id="overlay">三速欧皇降临!</div>
+    
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="modalText"></p>
+        <button id="confirmBtn">确定</button>
+        <button id="cancelBtn">取消</button>
       </div>
     </div>
-    <div class="tongling-button-container">
-      <button onclick="deductGold()">换汇</button>
-      <button id="tonglingBtn">通灵</button>
-      <button onclick="exchangeGold()">提款</button>
-    </div>
-    <div class="result-container">
-    <div class="result" id="result"></div>
-    </div>
-    <div id="bountyInfo" style="height: 100px;color: black;position: fixed;top: 80%;left: 0px;padding: 10px;width: 95%;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;box-shadow: inset 0 5px 5px 0px #6f391c;"></div>
-  </div>
-  
-  <div class="overlay" id="overlay">三速欧皇降临!</div>
-  
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <p id="modalText"></p>
-      <button id="confirmBtn">确定</button>
-      <button id="cancelBtn">取消</button>
-    </div>
-  </div>
 
   <script>
     const resultElement = document.getElementById('result');
@@ -331,7 +330,7 @@
 
         if (checkEuropeKing(resultArray)) {
           isEuropeKing = true;
-          alert('如此好运，说走就走吗？');
+          alert('好像洗出了不得了的东西');
         }
 
         if (!currentBounty && (Math.random() < 0.15 || (isEuropeKing && Math.random() < 0.88))) {

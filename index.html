@@ -1705,6 +1705,10 @@
             padding: 20px;
             border: 1px solid #888;
             width: 85%;
+            top: 25%;
+            left: 50%;
+            position: absolute;
+            transform: translate(-50%, -50%);
         }
         
         .ascension-close {
@@ -1786,11 +1790,12 @@
     height: 500px;
     flex-direction: column;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-evenly;
     gap: 10px;
-    top: 5%;
+    top: 50%;
     position: absolute;
-    left: 5%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .drug-modal .use-button,
@@ -2332,7 +2337,7 @@
         </div>
     </div>
     <div class="jinnang-drawer" id="jinnang-drawer">
-        <div class="drawer-toggle" onclick="toggleJinnangDrawer()">背包</div>
+        <div class="drawer-toggle" onclick="toggleJinnangDrawer()"><span id="jinnang-capacity">2000</span></div>
         <div class="jinnang-info" id="jinnang-info">
             <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll; margin-bottom:10px">
                 <div class="jinnang-reward" id="jinnang-reward"></div>
@@ -2341,7 +2346,8 @@
         <div id="jinnang-description" class="jinnang-description-box">点击可以查看其描述或出售，每个物品的售价因其稀有程度而有所不同。</div>
         <div class="treasure-action">
             <button onclick="sellItem()">出售道具</button>
-            <div id="jinnang-capacity">背包容量：0/5000</div>
+            <button onclick="useAssignedItem()">使用道具</button>
+            <button onclick="deleteItems()">丢弃道具</button>
             <button onclick="enlargeCapacity()">拓展背包</button>
         </div>
     </div>
@@ -4981,6 +4987,7 @@ function storeCurrentPetData() {
         ascensionSkill: ascensionSkill ? getSkillFromName(ascensionSkill.name, ascensionSkill.level) : null,
         awakenAttributes: awakenAttributes,
         awakened: awakened,
+        additionalAttributes: additionalAttributes,
         baseAttributes: baseAttributes,
         bonusAttributes: bonusAttributes,
         currentExp: currentExp,
@@ -5061,6 +5068,7 @@ function restorePetData(petName) {
         spiritMultiplier = savedPetData.spiritMultiplier;
         reenableAscension = savedPetData.reenableAscension;
         bonusAttributes = savedPetData.bonusAttributes;
+        additionalAttributes = savedPetData.additionalAttributes;
         ascensionAttributes = savedPetData.ascensionAttributes;
         drugBonus = savedPetData.drugBonus;
         divinedWeaponStatus = savedPetData.divinedWeaponStatus;
@@ -5548,10 +5556,10 @@ const ascensionSkills = {
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
     settlement: [
-        { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${1000 + 250 * level}文`, baseValue: 1000, increment: level => 250 * level },
+        { name: '财源滚滚', effect: level => `战斗胜利后金子奖励额外增加${convertPrice(10000 + 2500 * level)}文`, baseValue: 10000, increment: level => 2500 * level },
         { name: '焉知非福', effect: level => `战斗失败后，下一轮获得持续${3 + 1 * level}秒的仙气护体`, baseValue: 3, increment: level => 1 * level },
-        { name: '举一反三', effect: level => `战斗胜利时获得的经验值增加${30 + 5 * level}%`, baseValue: 30, increment: level => 5 * level },
-        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${50 + 50 * level}文金子的安慰金`, baseValue: 50, increment: level => 50 * level }
+        { name: '举一反三', effect: level => `战斗胜利时获得的经验值增加${300 + 50 * level}%`, baseValue: 300, increment: level => 50 * level },
+        { name: '金牌调解', effect: level => `战斗失败时不扣除金子，并获得${convertPrice(500 + 500 * level)}文金子的安慰金`, baseValue: 500, increment: level => 500 * level }
     ]
 }; //飞升之术技能列表
 let reenableAscension = false;
@@ -6245,7 +6253,6 @@ function getEnemyStatus() {
     if (battleState.enemy.silenced) status.push("沉默");
     if (battleState.enemy.poisoned) status.push("中毒");
     if (battleState.enemy.stunned) status.push("眩晕");
-    if (battleState.enemy.sleeping) status.push("沉睡");
     if (battleState.enemy.intimidated) status.push("恐吓");
     if (battleState.enemy.benumbed) status.push("麻痹");
     if (battleState.enemy.dazed) status.push("混乱");
@@ -7306,7 +7313,11 @@ function applyPhysicalAttackEffects() {
             }, 1000 + cultivationBonus * 1000); // 恐吓持续1秒
             break;
         case '穿透':
-            handlePiercedEffect(cultivationBonus);
+            if (!battleState.enemy.pierced) {
+                handlePiercedEffect(cultivationBonus);
+            } else {
+                console.log('穿透效果持续中');
+            }
             break;
         case '麻痹':
             if (!battleState.enemy.benumbed) {
@@ -7413,10 +7424,8 @@ function applyMagicAttackEffects(damage) {
 
 //具体的效果函数（分离后）
 function handlePiercedEffect(cultivationBonus) {
-    if (battleState.enemy.pierced) return;
 
     battleState.enemy.pierced = true;
-    pierceDamageContainer.totalPierceDamage = 0; // 重置总穿透伤害
     logBattleEvent("毁灭心魔被施加穿透效果，每次造成伤害时会附加真实伤害。穿透效果结束后会给予毁灭心魔致命的余波伤害。", '#ADFF2F');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c43c.gif');
     updateEnemyStatusDisplay();
@@ -7429,12 +7438,6 @@ function handlePiercedEffect(cultivationBonus) {
         pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
         updateUI();
         showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
-
-        if (battleState.enemy.health <= 0) {
-            updateEnemyAttributes();
-            showNextBattlePrompt(true);
-            return;
-        }
         updateEnemyStatusDisplay();
     }, 3000 + cultivationBonus * 1000); // 穿透效果持续3秒
 }
@@ -7579,28 +7582,42 @@ function handleSleep() {
         return; // 如果已经处于睡眠状态，直接返回
     }
 
+    const enemyHealthAtSleep = battleState.enemy.health; // 记录进入沉睡状态时的敌人生命值
+    console.log(`睡眠时刻的敌人生命值为${enemyHealthAtSleep}`);
     battleState.enemy.sleep = true;
     logBattleEvent(`🧚🏻‍♀️对方在精灵的低语里陷入沉睡`, "pink");
 
-    const sleepDuration = 4200; // 沉睡持续时间3秒
-    const healInterval = 700; // 每0.3秒回血
+    const sleepDuration = 10000; // 沉睡持续时间10秒
+    const healInterval = 500; // 每0.5秒回血
 
     const healTimer = setInterval(() => {
         if (!battleState.enemy.sleep) {
             clearInterval(healTimer);
             return;
         }
-        battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + Math.round(enemyMaxHealth * 0.01));
-        updateUI();
+        battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + Math.round(enemyMaxHealth * 0.005));
+        updateUI(); // 更新 UI
     }, healInterval);
 
-    setTimeout(() => {
+    const sleepTimer = setTimeout(() => {
         clearInterval(healTimer);
         battleState.enemy.sleep = false;
         logBattleEvent(`敌人从沉睡中醒来了。`, "pink");
         updateUI();
     }, sleepDuration);
-} //特殊战斗效果函数，由精灵触发
+
+    // 监听敌人的生命值变化，提前解除沉睡状态
+    const monitorHealth = setInterval(() => {
+        if (battleState.enemy.health < enemyHealthAtSleep) {
+            clearInterval(healTimer);
+            clearTimeout(sleepTimer);
+            clearInterval(monitorHealth); // 停止监测
+            battleState.enemy.sleep = false;
+            logBattleEvent(`敌人被攻击惊醒。`, "pink");
+            updateUI();
+        }
+    }, 100); // 每0.1秒检测一次
+}//特殊战斗效果函数，由精灵触发
 
 
 
@@ -8043,7 +8060,6 @@ function enemyAttack() {
 
     if (handleDazed()) return;
     if (handleStunned()) return;
-    
     if (battleState.enemy.sleep) {
         return;
     }
@@ -9732,7 +9748,7 @@ function updateAscensionDisplay() {
 function checkSecondAscensionEnabled() {
     const secondSkillBox = document.getElementById('second-ascension-skill');
     
-    if (!reenableAscension) {
+    if (!reenableAscension || !ascensionEnabled) {
         const errorShowUpSecondAscensionSkill = secondAscensionSkill ? secondAscensionSkill.name : null;
         secondSkillBox.style.display = 'none';
         
@@ -9743,9 +9759,10 @@ function checkSecondAscensionEnabled() {
         }
         
         return false;
+    } else {
+        secondSkillBox.style.display = 'block';
+        return true;
     }
-    
-    return true;
 } //调用检查函数
 document.getElementById('reenable-ascension').addEventListener('click', () => {
     // 检查第一个飞升技能是否未打开
@@ -9768,6 +9785,7 @@ document.getElementById('reenable-ascension').addEventListener('click', () => {
     } else {
         showInfoBox('您已经开启过第二个飞升之术了！');
     }
+    checkSecondAscensionEnabled();
 
 }); //开启第二个飞升之术
 
@@ -9851,7 +9869,7 @@ function applyAscensionBonus() {
     initialAttributes = applySingleAscensionBonus(ascensionSkill, initialAttributes);
 
     // 应用第二个技能增益
-    if (secondAscensionSkill.name && !checkSecondAscensionEnabled()) {
+    if (secondAscensionSkill.name && checkSecondAscensionEnabled()) {
         initialAttributes = applySingleAscensionBonus(secondAscensionSkill, initialAttributes);
     }
 
@@ -10246,7 +10264,7 @@ function jumpByTenRounds() {
             updateEnemyAttributes();
             gainExp();
             currentExp = initialExp
-            updateExpBar
+            updateExpBar();
             logBattleEvent(`你跳过了${roundsToAdd}轮，当前是${battleRounds}轮`, 'pink');
             updatePetInfo();
             updateUI();
@@ -11517,7 +11535,7 @@ function updateTreasureDescription(type) {
                 description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '至尊仙葫':
-                description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
+                description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，修为灵丹、举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
                 break;
         }
     }
@@ -11560,6 +11578,13 @@ function collectTreasure() {
         '天地灵气礼包（10）': () => addItemToJinnang('earthlyEnergy', 10),
         '特级悟性丹': 'tejiWisdomPill',
         '特级悟性丹礼包（10）': () => addItemToJinnang('tejiWisdomPill', 10),
+        '修为灵丹*3（蓝）': () => addItemToJinnang('cultivationPill200', 3),
+        '修为灵丹*3（橙）': () => addItemToJinnang('cultivationPill500', 3),
+        '小金袋（88两）':'tinyBag',
+        '金玉满堂福袋': 'redEnvelope',
+        '修为灵丹（蓝）': 'cultivationPill200',
+        '修为灵丹（橙）': 'cultivationPill500',
+        '庆典蛋糕': 'celebrationCake',
         '仙人醍醐': 'ultraSkillBoomer',
         '灵异秘卷': 'mutationScroll'
     };
@@ -11726,18 +11751,25 @@ function getRandomReward(type) {
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 49 },
+            { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 48 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '至尊仙葫': [
-            { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 5 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 20 },
-            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 10 },
-            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 10 },
-            { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 10 },
-            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 33 },
-            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 10 },           
-            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 2 }
+            { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 13 },
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 10 },
+            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 8 },
+            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 13 },
+            { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 8 },
+            { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 20 },
+            { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 9 },           
+            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 9 },
+            { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 3 },
+            { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 2 },
+            { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 2 },
+            { name: '修为灵丹*3（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 1 },
+            { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 1 },
+            { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 1 }
         ]
     };
     return selectReward(rewards[type]);
@@ -11791,6 +11823,12 @@ let jinnangItems = [
     { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可进行一次免费十连任意宝箱' },
     { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可免费投注一次500倍以内的彩券' },
     { name: 'liguolin', displayName: '李国麟的爱', url: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg', price: 0, quantity: 0, description: '如梦幻泡影，如红莲火焰，如从未拥有，如从未失去' },
+    { name: 'redEnvelope', displayName: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 0, quantity: 0, description: '直接使用，珠光宝气的袋子，开启后随机获得666文~188两金子' },
+    { name: 'tinyBag', displayName: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', price: 88, quantity: 0, description: '直接使用，装满金币的袋子，能卖个不错的价钱' },
+    { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升2000点修炼修为' },
+    { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升5000点修炼修为' },
+    { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
+    { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加全属性50点' },
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -12058,6 +12096,123 @@ function updateJinnangItems() {
     updateJinnangCapacityDisplay();
 }
 
+function useAssignedItem() {
+    // 检查是否选中了道具
+    if (!selectedItem || !selectedItem.dataset.itemName) {
+        showInfoBox("请先选择一个道具。");
+        return;
+    }
+
+    const itemName = selectedItem.dataset.itemName;
+
+    // 检查是否属于可以直接使用的道具项
+    if (!['celebrationCake', 'cultivationPill200', 'cultivationPill500', 'tinyBag', 'redEnvelope'].includes(itemName)) {
+        showInfoBox("该道具无法直接在背包内使用。");
+        return;
+    }
+
+    // 如果道具可以使用，则执行相应操作
+    if (useItem(itemName)) {
+        switch (itemName) {
+            case 'celebrationCake':
+                const attributeMap = {
+                    endurance: "耐力",
+                    intelligence: "智力",
+                    strength: "强壮",
+                    agility: "敏捷",
+                    faith: "信仰"
+                };
+                const attributeKeys = Object.keys(additionalAttributes); // 获取属性名数组
+                const randomAttribute = attributeKeys[Math.floor(Math.random() * attributeKeys.length)];
+                additionalAttributes[randomAttribute] += 50;
+                const attributeNameInChinese = attributeMap[randomAttribute]; // 获取中文名称
+                updateAttributePanel();
+                showInfoBox(`美味蛋糕下肚，您的${attributeNameInChinese}增加了50点。`);
+                break;
+
+            case 'cultivationPill200':
+                if (additionalPlayerCultivation >= 1000000){
+                    additionalPlayerCultivation = 1000000;
+                    showInfoBox("由于你的修炼修为达到最大值，使用此道具没有任何效果",null,null,'red');
+                } else {
+                    additionalPlayerCultivation += 200;
+                    showInfoBox(`您的修为增加了200点，当前修炼修为值为${additionalPlayerCultivation}`);
+                }
+                break;
+
+            case 'cultivationPill500':
+                if (additionalPlayerCultivation >= 1000000){
+                    additionalPlayerCultivation = 1000000;
+                    showInfoBox("由于你的修炼修为达到最大值，使用此道具没有任何效果",null,null,'red');
+                } else {
+                    additionalPlayerCultivation += 500;
+                    showInfoBox(`您的修为增加了500点，当前修炼修为值为${additionalPlayerCultivation}`);
+                }
+                break;
+
+            case 'tinyBag':
+                goldAmount += 88000;
+                updateGoldDisplay(goldAmount);
+                showInfoBox("您获得了88两金子。");
+                break;
+
+            case 'redEnvelope':
+                const randomGold = Math.floor(Math.random() * (188800 - 666 + 1)) + 666;
+                goldAmount += randomGold;
+                updateGoldDisplay(goldAmount);
+                showInfoBox(`您获得了${convertPrice(randomGold)}两金子。`);
+                break;
+
+            default:
+                showInfoBox("该道具无法直接在背包内使用。");
+                return;
+        }
+
+        updateJinnangItems(); // 更新锦囊内容显示
+    } else {
+        showInfoBox("道具使用失败，请重试。");
+    }
+}
+
+function deleteItems() {
+    if (!selectedItem) {
+        // 没有选中物品，提示是否删除所有背包内的道具
+        showInfoBox("你没有选中道具，是否删除所有背包内的道具？", () => {
+            // 用户确认后执行以下代码
+            let totalDeletedItems = 0;
+
+            jinnangItems.forEach(item => {
+                if (item.quantity > 0) {
+                    totalDeletedItems += item.quantity;
+                    item.quantity = 0; // 将所有物品数量设置为0
+                }
+            });
+
+            if (totalDeletedItems > 0) {
+                showInfoBox(`成功删除所有道具。`, null, null, 'green');
+                updateJinnangItems();
+            } else {
+                showInfoBox("背包内没有可删除的道具！");
+            }
+        }, null, 'red');
+        return;
+    }
+
+    const itemName = selectedItem.dataset.itemName;
+    const itemIndex = jinnangItems.findIndex(i => i.name === itemName);
+
+    if (itemIndex !== -1) {
+        // 确认删除特定数量的道具
+        showInfoBox(`您确定要删除所有的 ${jinnangItems[itemIndex].displayName} 吗？`, () => {
+            jinnangItems[itemIndex].quantity = 0; // 将选中物品的数量设置为0
+            showInfoBox(`${jinnangItems[itemIndex].displayName} 已成功删除。`, null, null, 'green');
+
+            updateJinnangItems();
+        }, null, 'red');
+    } else {
+        showInfoBox("请先选择需要删除的物品！");
+    }
+}
         
 // 更新顶栏道具数量
 function updateTopBarItems() {
@@ -13518,7 +13673,8 @@ function getRandomCommonItem() {
 function getRandomRareItem() {
     const rareItems = [
         createItem('灵异金丹', 6288, 12988, 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png'),
-        createItem('仙人醍醐', 86788, 169238, 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png')
+        createItem('仙人醍醐', 86788, 169238, 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png'),
+        createItem('修为灵丹（蓝）', 86788, 109238, 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png')
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -13578,9 +13734,14 @@ function buyItem() {
     if (!selectedItem) {
         return showInfoBox("请选择一个商品进行购买！");
     }
-
-    const price = parseInt(selectedItem.dataset.price, 10);
+    
+    let price = parseInt(selectedItem.dataset.price, 10);
     const itemName = selectedItem.dataset.name;
+    const eightyDiscountCard = jinnangItems.find(i => i.name === 'eightyDiscountCard');
+    
+    if (eightyDiscountCard && eightyDiscountCard.quantity > 0) {
+        price = Math.round(price * 0.8);
+    }
 
     if (goldAmount < price) {
         return showInfoBox("金子不够，购买失败！");
@@ -13604,6 +13765,7 @@ function buyItem() {
         '仙人醍醐': () => addItemToJinnang('ultraSkillBoomer', itemQuantity),
         '聚灵丹': () => addItemToJinnang('hailMonsterPill', itemQuantity),
         '唤妖符': () => addItemToJinnang('hailMonsterAmulet', itemQuantity),
+        '修为灵丹（蓝）': () => addItemToJinnang('cultivationPill200', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -13629,6 +13791,8 @@ function buyItem() {
         return showInfoBox("未知包裹类型，购买失败！");
     }
 
+
+    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}`);
     updateTopBarItems();
     updateJinnangItems();
     goldAmount -= price;
@@ -14057,6 +14221,13 @@ function resetPet() {
         effect: '未开启飞升技能'
     }; // 第一个飞升技能为空
     awakenAttributes = {
+        agility: 0,
+        endurance: 0,
+        faith: 0,
+        intelligence: 0,
+        strength: 0
+    };
+    additionalAttributes = {
         agility: 0,
         endurance: 0,
         faith: 0,
@@ -15031,6 +15202,14 @@ let awakenAttributes = {
     faith: 0
 };
 
+let additionalAttributes = {
+    endurance: 0,
+    intelligence: 0,
+    strength: 0,
+    agility: 0,
+    faith: 0
+};
+        
 let bonusAttributes = {
     endurance: 0,
     intelligence: 0,
@@ -15056,11 +15235,11 @@ function calculateCurrentAttributes() {
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
 
     const attributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance + additionalAttributes.endurance,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence + additionalAttributes.intelligence,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength + additionalAttributes.strength,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility + additionalAttributes.agility,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith + additionalAttributes.faith
     };
 
     return attributes;
@@ -15072,11 +15251,11 @@ function onlyDisplayLeftAttributes() {
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
 
     const leftAttributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance + additionalAttributes.endurance,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence + additionalAttributes.intelligence,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength + additionalAttributes.strength,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility + additionalAttributes.agility,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith + additionalAttributes.faith
     };
 
     return leftAttributes;
@@ -15103,7 +15282,6 @@ function updateAttributePanel() {
     document.getElementById("attribute-growth-rate").innerText = growthRateDisplay;
     document.getElementById("attribute-wisdom").innerText = currentWisdom;
 
-    updatePrimaryAttributes(totalAttributes);
     updateSecondaryAttributes(totalAttributes, currentWisdom);
 
 
@@ -15116,14 +15294,6 @@ function updateAttributePanel() {
 
     updateRemainingPointsDisplay();
     bonusAttributesDisplay();
-}
-    
-function updatePrimaryAttributes(totalAttributes) {
-    document.getElementById("attribute-endurance").innerText = Math.round(totalAttributes.endurance);
-    document.getElementById("attribute-intelligence").innerText = Math.round(totalAttributes.intelligence);
-    document.getElementById("attribute-strength").innerText = Math.round(totalAttributes.strength);
-    document.getElementById("attribute-agility").innerText = Math.round(totalAttributes.agility);
-    document.getElementById("attribute-faith").innerText = Math.round(totalAttributes.faith);
 }
 
 function calculateGrowthRateDisplayAndValue(qualities) {
@@ -15138,10 +15308,6 @@ function calculateGrowthRateDisplayAndValue(qualities) {
         growthRate = qualities.growthRate / 100;
         growthRateDisplay = `${Math.round(growthRate * 100)}%`;
     }
-
-    //console.log("Growth Rate:", growthRate);
-    //console.log("Growth Rate Display:", growthRateDisplay);
-
     return { growthRateDisplay, growthRate };
 }
         
@@ -15984,9 +16150,21 @@ function completeTask(taskId) {
         stamps += task.reward;
         showInfoBox(`任务完成，获得${task.reward}印花！`);
     } else if (taskSeries === 'goldAmount' && goldAmount >= task.target) {
-        task.completed = true;
-        addItemToJinnang('summonCharmPaper', task.reward);
-        showInfoBox(`任务完成，获得${task.reward}张召唤灵符！`);
+        if (task.id === 15 ) {
+            task.completed = true;
+            const dazheka = jinnangItems.find(item => item.name === 'eightyDiscountCard');
+            if (!dazheka || dazheka.quantity < 1) {
+                addItemToJinnang('eightyDiscountCard',1);
+                showInfoBox(`腰缠万贯更要精打细算，已送上一张8折卡，买东西时可自动抵用，保管好哦~`);
+            } else {
+                addItemToJinnang('redEnvelope',5);
+                showInfoBox(`祝你名利双收，5个福袋祝你好运~`);
+            }
+        } else {
+            task.completed = true;
+            addItemToJinnang('summonCharmPaper', task.reward);
+            showInfoBox(`任务完成，获得${task.reward}张召唤灵符！`);
+        }
     } else if (taskSeries === 'battleRounds' && battleRounds >= task.target) {
         if (task.id >= 16 && task.id <= 18) {
             task.completed = true;
@@ -16327,7 +16505,7 @@ function saveGameState() {
         petAscended: petAscended,
         petMaxLevel: petMaxLevel,
         petWisdom: petWisdom,
-        
+        additionalAttributes: additionalAttributes,
         awakened: awakened,
         awakenAttributes: awakenAttributes,
         bonusAttributes: bonusAttributes,
@@ -16482,7 +16660,6 @@ function loadGameState() {
         petAscended = savedState.petAscended;
         petMaxLevel = savedState.petMaxLevel;
         petWisdom = savedState.petWisdom;
-        
         awakened = savedState.awakened;
         hallucinated = savedState.hallucinated;
         hallucinationLevel = savedState.hallucinationLevel;
@@ -16542,6 +16719,9 @@ function loadGameState() {
         }
         if (savedState.specializations) {
             specializations = savedState.specializations;
+        }
+        if (savedState.additionalAttributes) {
+            additionalAttributes = savedState.additionalAttributes;
         }
         if (savedState.currentSpecialization !== undefined) {
             currentSpecialization = savedState.currentSpecialization;
@@ -16610,6 +16790,7 @@ function updateDisplayContent() {
     updateAwakenStatus();
     updateAscensionButton();
     restoreEnemyState();
+    checkSecondAscensionEnabled();
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
     updateExpBar();
 

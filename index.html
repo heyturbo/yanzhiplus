@@ -11827,7 +11827,7 @@ let jinnangItems = [
     { name: 'tinyBag', displayName: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', price: 88, quantity: 0, description: '直接使用，装满金币的袋子，能卖个不错的价钱' },
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升2000点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升5000点修炼修为' },
-    { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
+    { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加全属性50点' },
 ];
 
@@ -12136,7 +12136,7 @@ function useAssignedItem() {
                     showInfoBox("由于你的修炼修为达到最大值，使用此道具没有任何效果",null,null,'red');
                 } else {
                     additionalPlayerCultivation += 200;
-                    showInfoBox(`您的修为增加了200点，当前修炼修为值为${additionalPlayerCultivation}`);
+                    showInfoBox(`${currentPet.name}的修为增加了200点，当前修炼修为值为${additionalPlayerCultivation}`);
                 }
                 break;
 
@@ -12146,7 +12146,7 @@ function useAssignedItem() {
                     showInfoBox("由于你的修炼修为达到最大值，使用此道具没有任何效果",null,null,'red');
                 } else {
                     additionalPlayerCultivation += 500;
-                    showInfoBox(`您的修为增加了500点，当前修炼修为值为${additionalPlayerCultivation}`);
+                    showInfoBox(`${currentPet.name}的修为增加了500点，当前修炼修为值为${additionalPlayerCultivation}`);
                 }
                 break;
 

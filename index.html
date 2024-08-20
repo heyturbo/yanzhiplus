@@ -181,36 +181,138 @@
         width: 360px;
         padding: 1px;
     }
+
+#wuxing-open-button {
+    margin: 20px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#wuxing-display {
+    display: none; /* 默认隐藏 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid white;
+    color: white;
+    width: 90%;
+    padding: 10px;
+    border-radius: 10px;
+    height: 700px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
+#wuxing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#wuxing-container, #equipped-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 0px;
+    max-height: 240px;
+    justify-items: center;
+    align-content: space-around;
+    background: rgb(255 255 255 / 20%);
+    border: 1px solid white;
+    padding: 10px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+}
+
+.wuxing-item {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    background-size: cover;
+    cursor: pointer;
+    font-size: 10px;
+    border: 1px solid white; /* 默认边框颜色 */
+    box-shadow: 0px 0px 0px 1px black;
+}
+
+.wuxing-item.equipped {
+    filter: brightness(50%); /* 装备后变暗 */
+}
+
+.red-border {
+    border-color: red;
+}
+
+.green-border {
+    border-color: green;
+}
+
+.blue-border {
+    border-color: blue;
+}
+
+.orange-border {
+    border-color: orange;
+}
+
+.purple-border {
+    border-color: purple;
+}
+
+.wuxing-info {
+    position: absolute;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    width: 45px;
+    text-align: center;
+    height: 20px;
+    font-size: 8px;
+}
+
+#amulet-details {
+    margin-top: 20px;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding: 10px;
+    height: 240px;
+    overflow-y: auto;
+}
         
-            /* 防止 "pull-to-refresh" 行为 */
-    @media screen and (pointer: coarse) {
-    @supports (-webkit-backdrop-filter: blur(1px)) {
-        /* Safari 16+ */
-        @supports (overscroll-behavior-y: none) {
-            html {
-                min-height: 100.3%;
-    overscroll-behavior-y: none;
+        /* 防止 "pull-to-refresh" 行为 */
+        @media screen and (pointer: coarse) {
+        @supports (-webkit-backdrop-filter: blur(1px)) {
+            /* Safari 16+ */
+            @supports (overscroll-behavior-y: none) {
+                html {
+                    min-height: 100.3%;
+        overscroll-behavior-y: none;
+                }
             }
-        }
-        /* Safari 9-15 */
-    @supports (not (overscroll-behavior-y: none)) {
-            html {
-                height: 100%;
-    overflow: hidden;
-            }
-            body {
-    margin: 0px;
-    max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+            /* Safari 9-15 */
+        @supports (not (overscroll-behavior-y: none)) {
+                html {
+                    height: 100%;
+        overflow: hidden;
+                }
+                body {
+        margin: 0px;
+        max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+                }
             }
         }
     }
-}
-/* Chrome 63+ */
-    body {
-    overscroll-behavior-y: none;
-}
+        /* Chrome 63+ */
+            body {
+            overscroll-behavior-y: none;
+        }
         /* styles.css */
         #loadingOverlay, #unlockOverlay {
             position: fixed;
@@ -2080,6 +2182,17 @@
         <button class="close-button" onclick="togglePetOverview()">关闭</button>
         <!-- Pet containers will be dynamically generated here -->
     </div>
+    <!-- 五行符管理界面 -->
+    <div id="wuxing-display" style="display: flex;flex-direction: column;justify-content: space-between;">
+        <div id="wuxing-header">
+            <h3>五行符管理器</h3>
+            <p id="wuxing-fragments">五行碎片: 0</p>
+            <button id="wuxing-close-button">关闭</button>
+        </div>
+        <div id="wuxing-container"></div>
+        <div id="equipped-container"></div>
+        <div id="amulet-details"></div>
+    </div>
     <div class="core-area-for-skills">
         <div class="buttons" style="width: 100%;">
             <div class="button-row">
@@ -2306,23 +2419,27 @@
             <div class="treasure-bar">
             <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <img src="https://pic.imgdb.cn/item/66bf56dad9c307b7e9cc0f91.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('经验宝箱')">
-                <div>经验宝箱</div>
+                <div style="font-size: 14px;">经验宝箱</div>
             </div>
             <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <img src="https://pic.imgdb.cn/item/66bf56d9d9c307b7e9cc0f80.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('奇馈宝箱')">
-                <div>奇馈宝箱</div>
+                <div style="font-size: 14px;">奇馈宝箱</div>
             </div>
             <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <img src="https://pic.imgdb.cn/item/66bf56d9d9c307b7e9cc0f6c.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('灵魂宝箱')">
-                <div>灵魂宝箱</div>
+                <div style="font-size: 14px;">灵魂宝箱</div>
             </div>
             <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <img src="https://pic.imgdb.cn/item/66bf56d9d9c307b7e9cc0f5d.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('武神仙葫')">
-                <div>武神仙葫</div>
+                <div style="font-size: 14px;">武神仙葫</div>
+            </div>
+            <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
+                <img src="https://pic.imgdb.cn/item/66c4cb80d9c307b7e92a8dd2.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('五行仙葫')">
+                <div style="font-size: 14px;">五行仙葫</div>
             </div>
             <div style= "display: flex; flex-direction: column; align-items: center; gap: 10px;">
                 <img src="https://pic.imgdb.cn/item/66bf56d9d9c307b7e9cc0f3b.png" style="width:45px;height:45px;border: 1px solid black;" onclick="selectTreasure('至尊仙葫')">
-                <div>至尊仙葫</div>
+                <div style="font-size: 14px;">至尊仙葫</div>
             </div>
             </div>
             <div id="treasure-reward" class="reward-box"></div>
@@ -2609,6 +2726,7 @@
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
                 <button class="saveAndLoadGameState" onclick="deleteAllPetData()">删档</button>
+                <button class="saveAndLoadGameState" onclick="openWuxingDisplay()">五行</button>
             </div>
         </div>
     </div>    
@@ -5068,7 +5186,6 @@ function restorePetData(petName) {
         spiritMultiplier = savedPetData.spiritMultiplier;
         reenableAscension = savedPetData.reenableAscension;
         bonusAttributes = savedPetData.bonusAttributes;
-        additionalAttributes = savedPetData.additionalAttributes;
         ascensionAttributes = savedPetData.ascensionAttributes;
         drugBonus = savedPetData.drugBonus;
         divinedWeaponStatus = savedPetData.divinedWeaponStatus;
@@ -5086,6 +5203,11 @@ function restorePetData(petName) {
         if (awakened && savedPetData.awakenAttributes) {
             awakenAttributes = savedPetData.awakenAttributes;
         }
+        
+        if (savedPetData.additionalAttributes) {
+            additionalAttributes = savedPetData.additionalAttributes;
+        }
+        
         if (savedPetData.specializations) {
             specializations = savedPetData.specializations;
         }
@@ -5134,6 +5256,19 @@ function restorePetData(petName) {
     }
 }
 
+function testButton() {
+    showInfoBox(
+        "仅供游戏异常时调试使用（如切换宠物失败或加载异常），请勿随意点击，因为这可能会造成数据丢失",
+        () => { // onConfirm 回调
+            resetPet();
+            restorePetData();
+        },
+        () => { // onCancel 回调
+            return;
+        }
+    );
+}
+        
 // 修改changePet函数
 function handlePetChange(selectedPetKey, petSelectId) {
     if (autoBattleInterval !== null) {
@@ -10944,7 +11079,484 @@ function clearPlayerEffect() {
 
 const divineWeaponManager = new DivineWeaponManager();
 
+// 五行符测试模块
+let wuxingFragments = 0;  // 分解后获得的碎片数量
+let wuxingStates = [];  // 存储所有五行符的状态
+const MAX_LEVEL = 100;  // 强化等级上限
 
+const wuxingTypeMap = {
+    goldAmulet: '金符',
+    woodAmulet: '木符',
+    waterAmulet: '水符',
+    fireAmulet: '火符',
+    earthAmulet: '土符'
+};
+
+const wuxingColorMap = {
+    red: '红色',
+    green: '绿色',
+    blue: '蓝色',
+    orange: '橙色',
+    purple: '紫色'
+};
+
+const wuxingBonusMap = {
+    health: 'HP',
+    mana: 'MP',
+    physicalAttack: '物攻',
+    magicAttack: '法攻',
+    physicalDefense: '物防',
+    magicDefense: '法防',
+    speed: '速度'
+};
+
+document.getElementById('wuxing-close-button').addEventListener('click', closeWuxingDisplay);
+document.getElementById('wuxing-display').style.display = 'none';
+
+function openWuxingDisplay() {
+    document.getElementById('wuxing-display').style.display = 'block';
+    updateWuxingDisplay();
+}
+
+function closeWuxingDisplay() {
+    document.getElementById('wuxing-display').style.display = 'none';
+}
+
+function addAmuletToManager(amuletType, color, level = 1) {
+    const wuxingName = `${amuletType}(${color})`;
+
+    const uniqueTag = `${wuxingName}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const newAmulet = {
+        tag: uniqueTag,
+        name: wuxingName,
+        color: color,
+        level: level,
+        drugBonus: initializeDrugBonus(color, level),
+        additionalValues: generateAdditionalValues(color),
+        equipped: false
+    };
+
+    wuxingStates.push(newAmulet);
+    updateWuxingDisplay();
+}
+
+function initializeDrugBonus(color, level) {
+    const bonus = {
+        physicalAttack: 0,
+        magicAttack: 0,
+        physicalDefense: 0,
+        mana: 0,
+        health: 0,
+        magicDefense: 0,
+        speed: 0
+    };
+
+    const increment = {
+        red: { physicalAttack: 300, magicAttack: 300 },
+        green: { physicalDefense: 2500 },
+        blue: { mana: 1000 },
+        orange: { health: 1500 },
+        purple: { magicDefense: 2500 }
+    };
+
+    for (let i = 1; i <= level; i++) {
+        Object.keys(bonus).forEach(key => {
+            if (color === 'red' && (key === 'physicalAttack' || key === 'magicAttack')) {
+                // 只随机选择物理攻击或法术攻击之一
+                if (Math.random() < 0.5) {
+                    if (key === 'physicalAttack') {
+                        bonus.physicalAttack += increment.red.physicalAttack;
+                    } else if (key === 'magicAttack') {
+                        bonus.magicAttack += increment.red.magicAttack;
+                    }
+                }
+            } else if (increment[color] && increment[color][key]) {
+                bonus[key] += increment[color][key];
+            }
+        });
+    }
+
+    return bonus;
+}
+
+
+function generateAdditionalValues(color) {
+    const additionalValues = [];
+    const attributes = ['physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'];
+
+    if (color === 'green') {
+        attributes.push('speed');
+    }
+
+    const numOfValues = Math.floor(Math.random() * 5) + 1;
+    for (let i = 0; i < numOfValues; i++) {
+        const randomAttribute = attributes[Math.floor(Math.random() * attributes.length)];
+        const randomValue = Math.floor(Math.random() * 201) + 800;
+        additionalValues.push({ attribute: randomAttribute, value: randomValue });
+    }
+
+    return additionalValues;
+}
+
+function updateWuxingDisplay() {
+    const wuxingContainer = document.getElementById('wuxing-container');
+    const equippedContainer = document.getElementById('equipped-container');
+    const fragmentsDisplay = document.getElementById('wuxing-fragments');
+
+    wuxingContainer.innerHTML = '';
+    equippedContainer.innerHTML = '';
+    fragmentsDisplay.innerText = `五行碎片: ${wuxingFragments}`;
+
+    let selectedAmulet = null; // 用于记录当前选中的五行符
+
+    wuxingStates.forEach(amulet => {
+        const amuletElement = document.createElement('div');
+        amuletElement.className = `wuxing-item ${amulet.color}-border`;
+
+        if (amulet.equipped) {
+            amuletElement.classList.add('equipped');
+        }
+
+        if (amulet.level > 1) {
+            amuletElement.style.boxShadow = '0px 0px 5px 5px white';
+        }
+
+        amuletElement.style.backgroundImage = `url(${getAmuletImageURL(amulet.name)})`;
+
+        const amuletInfo = document.createElement('div');
+        amuletInfo.className = 'wuxing-info';
+        amuletInfo.innerText = `${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})`;
+
+        amuletElement.appendChild(amuletInfo);
+
+        amuletElement.addEventListener('click', () => {
+            if (selectedAmulet) {
+                // 重置上一个被选中五行符的样式
+                selectedAmulet.style.boxShadow = selectedAmulet.originalBoxShadow || '';
+            }
+
+            // 记录当前选中的五行符
+            selectedAmulet = amuletElement;
+            selectedAmulet.originalBoxShadow = amuletElement.style.boxShadow; // 保存原始的 boxShadow
+
+            // 应用新的选中样式
+            selectedAmulet.style.boxShadow = '0px 0px 0px 2px white';
+
+            displayAmuletDetails(amulet);
+        });
+
+        wuxingContainer.appendChild(amuletElement);
+
+        if (amulet.equipped) {
+            const equippedElement = amuletElement.cloneNode(true);
+            equippedElement.addEventListener('click', () => displayAmuletDetails(amulet));
+            equippedContainer.appendChild(equippedElement);
+        }
+    });
+
+    applyWuxingEffects();
+}
+
+function displayAmuletDetails(amulet) {
+    const detailsContainer = document.getElementById('amulet-details');
+    detailsContainer.innerHTML = `
+        <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})</h3>
+        <p>等级: ${amulet.level}</p>
+        <p>主条目: ${Object.entries(amulet.drugBonus)
+            .filter(([key, value]) => value > 0)
+            .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
+        <p>副条目: ${amulet.additionalValues.map(v => `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
+    `;
+
+    const wuxingButtonContainer = document.createElement('div');
+    wuxingButtonContainer.style.display = 'flex';
+    wuxingButtonContainer.style.gap = '20px';
+    wuxingButtonContainer.style.justifyContent = 'center';
+
+    const enhanceButton = document.createElement('button');
+    enhanceButton.innerText = '强化';
+    enhanceButton.onclick = () => enhanceAmulet(amulet.tag);
+
+    const decomposeButton = document.createElement('button');
+    decomposeButton.innerText = '分解';
+    decomposeButton.onclick = () => decomposeAmulet(amulet.tag);
+
+    const equipButton = document.createElement('button');
+    equipButton.innerText = '装备';
+    equipButton.onclick = () => equipAmulet(amulet.tag);
+
+    const unequipButton = document.createElement('button');
+    unequipButton.innerText = '撤下';
+    unequipButton.onclick = () => unequipAmulet(amulet.tag);
+
+    if (amulet.equipped) {
+        enhanceButton.disabled = true;
+        decomposeButton.disabled = true;
+        unequipButton.disabled = false;
+    } else {
+        unequipButton.disabled = true;
+    }
+
+    wuxingButtonContainer.appendChild(enhanceButton);
+    wuxingButtonContainer.appendChild(decomposeButton);
+    wuxingButtonContainer.appendChild(equipButton);
+    wuxingButtonContainer.appendChild(unequipButton);
+
+    detailsContainer.appendChild(wuxingButtonContainer);
+}
+
+function unequipAmulet(tag) {
+    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
+
+    if (amulet && amulet.equipped) {
+        applyAmuletBonus(amulet, false);
+
+        amulet.equipped = false;
+
+        updateWuxingDisplay();
+    } else {
+        showInfoBox("无法撤下该五行符。", null, null, 'red');
+    }
+}
+
+
+function applyAmuletBonus(amulet, apply = true) {
+    // 应用主条目（drugBonus）
+    Object.keys(amulet.drugBonus).forEach(key => {
+        drugBonus[key] += apply ? amulet.drugBonus[key] : -amulet.drugBonus[key];
+    });
+
+    // 应用副条目（additionalValues）
+    amulet.additionalValues.forEach(additional => {
+        const key = additional.attribute;
+        const value = additional.value;
+        drugBonus[key] += apply ? value : -value;
+    });
+
+    updateUI();
+}
+
+
+function decomposeAmulet(tag) {
+    const amuletIndex = wuxingStates.findIndex(amulet => amulet.tag === tag);
+
+    if (amuletIndex !== -1) {
+        const amulet = wuxingStates[amuletIndex];
+        const fragmentsGained = amulet.level * 475;
+        wuxingFragments += fragmentsGained;
+        wuxingStates.splice(amuletIndex, 1);
+        showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
+        updateWuxingDisplay();
+    } else {
+        showInfoBox("找不到指定的五行符。", null, null, 'red');
+    }
+}
+
+function enhanceAmulet(tag) {
+    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
+
+    if (amulet) {
+        if (amulet.level >= MAX_LEVEL) {
+            showInfoBox("已达强化等级上限，无法继续强化。", null, null, 'red');
+            return;
+        }
+
+        if (wuxingFragments >= 625 && currentExp >= 20000) {
+            wuxingFragments -= 625;
+            currentExp -= 20000;
+            amulet.level += 1;
+            amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
+
+            if (amulet.level % 5 === 0) {
+                handleAdditionalValuesEnhancement(amulet);
+            }
+
+            showInfoBox(`消耗20000经验和625个五行碎片，成功强化至 ${amulet.level} 级。`, null, null, 'green');
+            updateWuxingDisplay();
+            displayAmuletDetails(amulet);
+        } else {
+            showInfoBox("强化所需资源不足。", null, null, 'red');
+        }
+    }
+}
+
+function handleAdditionalValuesEnhancement(amulet) {
+    if (amulet.additionalValues.length < 5) {
+        const addNewValue = Math.random() < 0.3;
+        if (addNewValue) {
+            const newAdditionalValue = generateAdditionalValues(amulet.color).pop();
+            amulet.additionalValues.push(newAdditionalValue);
+        } else {
+            const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
+            const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2); // 生成 1.2 到 2.5 之间的随机数
+            amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+        }
+    } else {
+        const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
+        const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2); // 生成 1.2 到 2.5 之间的随机数
+        amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+    }
+}
+
+function equipAmulet(tag) {
+    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
+
+    if (!amulet) {
+        showInfoBox("找不到指定的五行符。", null, null, 'red');
+        return;
+    }
+
+    const equippedSameType = wuxingStates.some(a => a.color === amulet.color && a.equipped);
+
+    if (equippedSameType) {
+        showInfoBox(`已经装备了一张 ${wuxingColorMap[amulet.color]} 的五行符。`, null, null, 'red');
+    } else {
+        amulet.equipped = true;
+        applyAmuletBonus(amulet);
+        updateWuxingDisplay();
+    }
+}
+
+function applyWuxingEffects() {
+    const effects = {};
+    const equippedAmulets = wuxingStates.filter(amulet => amulet.equipped);
+
+    equippedAmulets.forEach(amulet => {
+        const type = amulet.name.split('(')[0];
+        effects[type] = (effects[type] || 0) + 1;
+    });
+
+    if (effects.goldAmulet) handleGoldAmuletEffect(effects.goldAmulet);
+    if (effects.woodAmulet) handleWoodAmuletEffect(effects.woodAmulet);
+    if (effects.waterAmulet) handleWaterAmuletEffect(effects.waterAmulet);
+    if (effects.fireAmulet) handleFireAmuletEffect(effects.fireAmulet);
+    if (effects.earthAmulet) handleEarthAmuletEffect(effects.earthAmulet);
+    console.log(`当前效果是${effects}`);
+}
+
+function handleGoldAmuletEffect(count) {
+    const reflectPercentage = [0, 2, 5, 7, 12, 20][count];
+    // Apply reflection effect based on `reflectPercentage`
+}
+
+function handleWoodAmuletEffect(count) {
+    const healBoostPercentage = [0, 2, 5, 7, 12, 20][count];
+    // Apply healing boost effect based on `healBoostPercentage`
+}
+
+function handleWaterAmuletEffect(count) {
+    const extraAttackProbability = [0, 2, 5, 7, 12, 20][count];
+    // Apply extra attack probability effect based on `extraAttackProbability`
+}
+
+function handleFireAmuletEffect(count) {
+    const damageBoostPercentage = [0, 2, 5, 7, 12, 20][count];
+    // Apply damage boost effect based on `damageBoostPercentage`
+}
+
+function handleEarthAmuletEffect(count) {
+    const damageReductionPercentage = [0, 2, 5, 7, 12, 20][count];
+    // Apply damage reduction effect based on `damageReductionPercentage`
+}
+
+
+function getAmuletImageURL(name) {
+    const imageMap = {
+        // 金符
+        'goldAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'goldAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'goldAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'goldAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'goldAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+
+        // 木符
+        'woodAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'woodAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'woodAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'woodAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'woodAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+
+        // 水符
+        'waterAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'waterAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'waterAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'waterAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'waterAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+
+        // 火符
+        'fireAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'fireAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'fireAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'fireAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'fireAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+
+        // 土符
+        'earthAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'earthAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'earthAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'earthAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'earthAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+    };
+    return imageMap[name];
+}
+
+
+
+
+        
+
+            
+
+
+            
+
+            
+            
+            
+
+
+        
+            
+//let wuxingFragments = 0;
+//let wuxingStates = [];
+//function wuxingManager()
+    // 五行管理器用于管理五行符的分解、强化和装备状态
+    // 五行符界面由带有wuxing-前缀的元素名和样式名组成，如<div class="wuxing-container" style="wuxing-container"></div>
+    // 五行符会遍历jinnang内带有'wuxingfu'字段的物品，简单来说为const wuxingfuItem = jinnangItems.find(item.name.includes'wuxingfu')，且在五行符界面的物品区显示
+    // 玩家点击五行符时，会调用showInfoBox函数查看此五行符的名称、等级、能力值和附加值信息
+    // 显示图标为对应JinnangItems数组内的url，直接筛选遍历即可，格式为45px*45px
+    // 五行符有五类：金符、木符、水符、火符和土符，每一类五行符有5个颜色，分别为红、绿、橙、蓝和紫
+    // 分解：玩家选中五行符可以进行分解，每张五行符分解后可得分解碎片625张，初始0张,这是一个全局变量wuxingFragments
+    // 强化：强化功能可以对选定五行符进行强化。每张五行符的强化状态是独立存放于全局变量wuxingStates中的，五行符可以强化到20级，初始1级。具体规则：
+            //1. 每次强化需要消耗625张分解碎片和20000currentExp用于提升一级，每级提升时会增加五行符的能力值和附加值，当五行符等级到达5的倍数时会触发额外强化事件
+            //2. 每种颜色的五行符的能力值不同，但都是增加已有变量drugBonus，这是一个对象列表。初始状态下：
+                //2.1. 红色为增加300drugBonus.physicalAttack和500drugBonus.magicAttack，每提升一级，增加300值
+                //2.2. 绿色为增加500drugBonus.physicalDefense，每提升一级，增加500值
+                //2.3. 蓝色为增加2000drugBonus.mana，每提升一级，增加2000值
+                //2.4. 橙色为增加3000drugBonus.health，每提升一级，增加3000值
+                //2.5. 紫色为增加500drugBonus.magicDefense，每提升一级，增加500值
+            //3. 附加值为每张五行符独立附带的额外奖励值，当系统首次从jinnang遍历到某张五行符时，会随机生成1到5条附加值，一经生成便作为变量储存于wuxingStates中便于后续逻辑执行
+            //4. 每张五行符可能会附带的附加值为除上述提到的drugBonus中外还有drugBonus.speed一共六项中的任意1~5项，请特别注意，只有绿色的五行符可能出现drugBonus.speed
+            //5. 附加值初始的取值范围为[200,400]，当首次取值后作为变量储存在wuxingStates。
+            //3. 五行符每当强化到5的倍数等级，可能会：
+                //3.1. 如果五行符附加值少于5项，则有30%概率增加1项并确定其随机值，70%概率给现有随机一项附加值进行提升，提升幅度为当前值的50%
+                //3.2. 如果五行符附加值到达上限5项，则100%给现有随机一项附加值进行提升，提升幅度为当前值的50%
+    // 分解：玩家如果不满意五行符的强化成果，可以选中五行符后点击分解按钮进行分解。分解后可以获得等同当前所选五行符等级 * 475的分解碎片，但经验不予返还
+    // 装备：五行符只有装备后才能提升对应能力值和附加值的玩家属性。每种颜色的五行符玩家只能装备1个，意味着玩家无论有多少五行符，最多只能同时附加5张所装备的五行符提供的能力值和附加值
+    //此函数用于实现上述管理五行符的功能。但除了上述功能外，此函数还需要传递参数wuxingType和combinationValue用于触发和实现下一个函数function handleWuxingEffects
+
+
+//function handleWuxingEffects() {//
+    // 当玩家通过function wuxingManager装备五行符后会向此函数传递wuxingType和combinationValue两个参数，这两个参数用于处理一些特殊的战斗效果
+    // 无论颜色，每当玩家装备1种五行符，wuxingType会计为1类，最多计入5类。同一类五行符的数量每增加一张，则该类五行符的combinationValue为增加5。每一类五行符对应不同的战场效果，而combinationValue决定了效果触发的概率或幅度
+    // wuxingType: 
+        //1. 金符用于反弹敌人的伤害，可以在此case分离并调用函数handleGoldAmuletEffect，反弹幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
+        //2. 木符用于增加治疗量，可以在此case分离并调用函数handleWoodAmuletEffect，增加恢复的幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
+        //3. 水符用于增加额外发动攻击的概率，可以在此case分离并调用函数handleWaterAmuletEffect，额外攻击敌人的概率视combinationValue从少至多分别为2%/5%/7%/12%/20%
+        //4. 火符用于增加此次玩家攻击技能输出的伤害值，可以在此case分离并调用函数handleFireAmuletEffect，额外伤害值的增加幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
+        //5. 土符用于减少玩家每次承受来自敌人攻击的伤害值，可以在此case分离并调用函数handleEarthAmuletEffect，额外伤害值的增加幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
+    // 此函数完全依赖前一个函数传递的参数工作，因此不必依赖过多的全局变量
 
 
 
@@ -11639,6 +12251,9 @@ function updateTreasureDescription(type) {
             case '武神仙葫':
                 description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
+            case '五行仙葫':
+                description = "五行仙葫！";
+                break;
             case '至尊仙葫':
                 description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，修为灵丹、举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
                 break;
@@ -11694,7 +12309,32 @@ function collectTreasure() {
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
-        '高级神兽丹': 'advancedSkillPill'
+        '高级神兽丹': 'advancedSkillPill',
+        '金符（红）': () => addAmuletToManager('goldAmulet', 'red', 1),
+        '金符（紫）': () => addAmuletToManager('goldAmulet', 'purple', 1),
+        '金符（橙）': () => addAmuletToManager('goldAmulet', 'orange', 1),
+        '金符（蓝）': () => addAmuletToManager('goldAmulet', 'blue', 1),
+        '金符（绿）': () => addAmuletToManager('goldAmulet', 'green', 1),
+        '木符（红）': () => addAmuletToManager('woodAmulet', 'red', 1),
+        '木符（紫）': () => addAmuletToManager('woodAmulet', 'purple', 1),
+        '木符（橙）': () => addAmuletToManager('woodAmulet', 'orange', 1),
+        '木符（蓝）': () => addAmuletToManager('woodAmulet', 'blue', 1),
+        '木符（绿）': () => addAmuletToManager('woodAmulet', 'green', 1),
+        '水符（红）': () => addAmuletToManager('waterAmulet', 'red', 1),
+        '水符（紫）': () => addAmuletToManager('waterAmulet', 'purple', 1),
+        '水符（橙）': () => addAmuletToManager('waterAmulet', 'orange', 1),
+        '水符（蓝）': () => addAmuletToManager('waterAmulet', 'blue', 1),
+        '水符（绿）': () => addAmuletToManager('waterAmulet', 'green', 1),
+        '火符（红）': () => addAmuletToManager('fireAmulet', 'red', 1),
+        '火符（紫）': () => addAmuletToManager('fireAmulet', 'purple', 1),
+        '火符（橙）': () => addAmuletToManager('fireAmulet', 'orange', 1),
+        '火符（蓝）': () => addAmuletToManager('fireAmulet', 'blue', 1),
+        '火符（绿）': () => addAmuletToManager('fireAmulet', 'green', 1),
+        '土符（红）': () => addAmuletToManager('earthAmulet', 'red', 1),
+        '土符（紫）': () => addAmuletToManager('earthAmulet', 'purple', 1),
+        '土符（橙）': () => addAmuletToManager('earthAmulet', 'orange', 1),
+        '土符（蓝）': () => addAmuletToManager('earthAmulet', 'blue', 1),
+        '土符（绿）': () => addAmuletToManager('earthAmulet', 'green', 1)
     };
 
     for (const reward of rewards) {
@@ -11817,6 +12457,8 @@ function getTreasureCost(type) {
             return 2000;
         case '武神仙葫':
             return 6800;
+        case '五行仙葫':
+            return 16800;
         case '至尊仙葫':
             return 18800;
     }
@@ -11864,6 +12506,33 @@ function getRandomReward(type) {
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 48 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
+        ],
+        '五行仙葫': [
+            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },

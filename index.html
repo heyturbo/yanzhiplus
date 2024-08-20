@@ -11692,7 +11692,9 @@ function collectTreasure() {
         '庆典蛋糕': 'celebrationCake',
         '仙人醍醐': 'ultraSkillBoomer',
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
-        '灵异秘卷': 'mutationScroll'
+        '灵异秘卷': 'mutationScroll',
+        '装满的药材箱': 'drugBox',
+        '高级神兽丹': 'advancedSkillPill'
     };
 
     for (const reward of rewards) {
@@ -11835,10 +11837,12 @@ function getRandomReward(type) {
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
-            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.5 },
+            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.4 },
             { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 3.5 },
             { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.8 },
-            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.2 }
+            { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 },
+            { name: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', chance: 0.1 },
+            { name: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 0.1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -11936,6 +11940,8 @@ let jinnangItems = [
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
+    { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 1, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
+    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 1, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材。' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -12244,9 +12250,33 @@ const itemEffects = {
         showSummonPanel();
         setTimeout(handleSummonPet, 0);
     },
-    liguolin: () => useLiguolin()
+    liguolin: () => useLiguolin(),
+    advancedSkillPill: () => fulfillPetSkill(),
+    drugBox: () => getRandomDrug(10,20)
 };
 
+function getRandomDrug(minNum, maxNum) {
+    // 在指定范围内生成一个随机药物数量
+    const drugQuantity = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
+
+    // 药材的键名数组
+    const drugKeys = Object.keys(drugInventory);
+    
+    // 记录获得的药材信息
+    let drugsObtained = '';
+
+    for (let i = 0; i < drugQuantity; i++) {
+        const randomDrug = drugKeys[Math.floor(Math.random() * drugKeys.length)];
+        drugInventory[randomDrug].quantity += 1;
+
+        // 记录每个获得的药材名
+        drugsObtained += `${randomDrug} `;
+    }
+
+    // 一次性显示获得的所有药材
+    showInfoBox(`你获得了 ${drugsObtained.trim()}`, 'pink');
+}
+            
 function useLiguolin() {
     if (currentPet.name === "Guolin·Li") {
         showInfoBox("你是否愿意接纳他的爱？", 
@@ -13677,12 +13707,12 @@ function startShopTimer() {
 let refreshCount = 0; // 全局计数器，记录刷新次数
 
 function refreshShop(auto = false) {
-    if (!auto && goldAmount < 100) {
-        return showInfoBox("您的金子不足，无法刷新！");
+    if (!auto && goldAmount < 1000) {
+        return showInfoBox("您的金子不足1两，无法刷新！");
     }
 
     if (!auto) {
-        goldAmount -= 100;
+        goldAmount -= 1000;
         updateGoldDisplay(goldAmount);
     }
 

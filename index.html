@@ -198,35 +198,46 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.8);
-    border: 1px solid white;
     color: white;
     width: 90%;
-    padding: 10px;
-    border-radius: 10px;
-    height: 700px;
+    max-height: 640px;
     overflow-y: auto;
     z-index: 9999;
+    background: #B07638;
+    padding: 2px;
+    box-shadow: inset 0px 0px 3px 1px #92341C;
+    border: 1px solid black;
 }
 
 #wuxing-header {
     display: flex;
-    justify-content: space-between;
+    padding: 5px;
+    gap: 60px;
+    justify-content: space-around;
     align-items: center;
+    text-align: center;
+    background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
+    background-repeat: repeat;
+    background-size: contain;
+    color: #E3A73B;
+    cursor: pointer;
+    box-shadow: inset 0px 1px 2px 0px #E3A73B;
+    border: 1px solid black;
 }
 
 #wuxing-container, #equipped-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 10px 0px;
-    max-height: 240px;
+    gap: 10px 5px;
+    max-height: 200px;
     justify-items: center;
     align-content: space-around;
-    background: rgb(255 255 255 / 20%);
-    border: 1px solid white;
+    border: 1px solid #87431f;
     padding: 10px;
     overflow-y: scroll;
-    margin-bottom: 20px;
+    border-radius: 2px;
+    margin: 5px;
+    min-height: 50px;
 }
 
 .wuxing-item {
@@ -277,11 +288,14 @@
 
 #amulet-details {
     margin-top: 20px;
-    border: 1px solid white;
-    border-radius: 10px;
+    border: 1px solid #87431f;
     padding: 10px;
-    height: 240px;
-    overflow-y: auto;
+    height: 220px;
+    margin-bottom: 20px;
+    border-radius: 2px;
+    line-height: 18px;
+    background: rgb(0 0 0 / 20%);
+    color: #ffffff;
 }
         
         /* 防止 "pull-to-refresh" 行为 */
@@ -1054,6 +1068,26 @@
             transition: transform 0.1s, box-shadow 0.1s;
         }
         .treasure-action button:active {
+            background-color: #064701;
+        }
+        .wuxing-action {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        .wuxing-action button {
+            border: 1px solid #6F391C;
+            background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+            box-shadow: inset 0px 0px 2px 1px #87431F;
+            font-size: 14px;
+            border-radius: 5px;
+            color: #F9DE9B;
+            padding: 4px 6px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            flex: 0.2;
+        }
+        .wuxing-action button:active {
             background-color: #064701;
         }
         .transform-pet-overlay {
@@ -2185,13 +2219,15 @@
     <!-- 五行符管理界面 -->
     <div id="wuxing-display" style="display: flex;flex-direction: column;justify-content: space-between;">
         <div id="wuxing-header">
-            <h3>五行符管理器</h3>
-            <p id="wuxing-fragments">五行碎片: 0</p>
-            <button id="wuxing-close-button">关闭</button>
+            <h3 style="margin:0;">五行符管理器</h3>
+            <p style="margin:0;" id="wuxing-fragments">五行碎片: 0</p>
+            <button style="background: transparent;color: white;" id="wuxing-close-button">X</button>
         </div>
-        <div id="wuxing-container"></div>
-        <div id="equipped-container"></div>
-        <div id="amulet-details"></div>
+        <div class="drawer-container"id="wuxingguanli-container">
+            <div id="wuxing-container"></div>
+            <div id="equipped-container"></div>
+            <div id="amulet-details"></div>
+        </div>
     </div>
     <div class="core-area-for-skills">
         <div class="buttons" style="width: 100%;">
@@ -5114,6 +5150,7 @@ function storeCurrentPetData() {
         currentWisdom: currentWisdom,
         divineWeapons: divineWeaponManager.getWeaponData(),
         divinedWeaponStatus: divinedWeaponStatus,
+        drugBonus0: drugBonus0,
         drugBonus: drugBonus,
         enemyCritDamage: enemyCritDamage,
         enemyCritRate: enemyCritRate,
@@ -5141,6 +5178,7 @@ function storeCurrentPetData() {
         spiritLevel: spiritLevel,
         spiritMultiplier: spiritMultiplier,
         trainingCount: trainingCount,
+        wuxingStates: JSON.stringify(wuxingStates),
     };
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
@@ -5187,7 +5225,6 @@ function restorePetData(petName) {
         reenableAscension = savedPetData.reenableAscension;
         bonusAttributes = savedPetData.bonusAttributes;
         ascensionAttributes = savedPetData.ascensionAttributes;
-        drugBonus = savedPetData.drugBonus;
         divinedWeaponStatus = savedPetData.divinedWeaponStatus;
         alreadyUseDrug = savedPetData.alreadyUseDrug;
         skillScore = savedPetData.skillScore;
@@ -5206,6 +5243,18 @@ function restorePetData(petName) {
         
         if (savedPetData.additionalAttributes) {
             additionalAttributes = savedPetData.additionalAttributes;
+        }
+
+        if (savedPetData.drugBonus0) {
+            drugBonus0 = savedPetData.drugBonus0;
+        }
+
+        if (savedPetData.drugBonus) {
+            drugBonus = savedPetData.drugBonus;
+        }
+
+        if (savedPetData.wuxingStates) {
+            wuxingStates = JSON.parse(savedPetData.wuxingStates);
         }
         
         if (savedPetData.specializations) {
@@ -5643,6 +5692,15 @@ let drugInventory = {
 };
 let collectCost = 100; // 初始采集花费
 let activeBuffs = {};
+let drugBonus0 = {
+    health: 0,
+    mana: 0,
+    physicalAttack: 0,
+    physicalDefense: 0,
+    magicAttack: 0,
+    magicDefense: 0,
+    speed: 0
+};
 let drugBonus = {
     health: 0,
     mana: 0,
@@ -6222,13 +6280,13 @@ function updatePetInfo() {
     if (!battleState) {
         battleState = {
             player: {
-                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus.health,
-                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus.mana,
-                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus.physicalAttack,
-                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus.physicalDefense,
-                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack,
-                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed
+                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.healt + drugBonus0.health + drugBonus.health,
+                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus0.mana + drugBonus.mana,
+                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack + drugBonus.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus0.physicalDefense + drugBonus.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack + drugBonus.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense + drugBonus.magicDefense,
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus0.speed + drugBonus.speed
             },
             enemy: { ...enemyPet }
         };
@@ -6240,13 +6298,13 @@ function updatePetInfo() {
             battleState.player.originalSecondAscensionSkill = secondAscensionSkill.name;
         }
     } else {
-        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus.health;
-        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus.mana;
-        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus.physicalAttack;
-        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus.physicalDefense;
-        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus.magicAttack;
-        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus.magicDefense;
-        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus.speed;
+        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus0.health + drugBonus.health;
+        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus0.mana + drugBonus.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack + drugBonus.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus0.magicAttack + drugBonus.magicAttack;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack + drugBonus.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense + drugBonus.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus0.speed + drugBonus.speed;
 
         if (ascensionSkill.name && ascensionEnabled && ascensionSkill.name !== "被封印的技能") {
             battleState.player.originalAscensionSkill = ascensionSkill.name;
@@ -6293,7 +6351,7 @@ function initializeEnemyPet() {
         battleState.enemy = { ...enemyPet };
     }
     storeEnemyInitialState();
-    handleRampaged();
+
 }
 
 function updateEnemyAttributes() {
@@ -8990,7 +9048,7 @@ function useSelectedDrug() {
 
         switch (selectedDrug) {
             case "长生泉":
-                applyDrugBonus("health", 20000);
+                applyDrugBonus0("health", 20000);
                 updatePetInfo();
                 logBattleEvent(`使用长生泉，你如获新生。`, 'gold');
                 break;
@@ -9141,25 +9199,25 @@ function useSelectedDrug() {
                 logBattleEvent(`使用天山雪莲，恢复了 ${Math.floor(maxMana * 0.2)} 点法力值。`, 'gold');
                 break;
             case "普通药材":
-                applyDrugBonus("speed", 100);
+                applyDrugBonus0("speed", 100);
                 break;
             case "上等药材":
-                applyDrugBonus("physicalAttack", 300);
+                applyDrugBonus0("physicalAttack", 300);
                 break;
             case "极品药材":
-                applyDrugBonus("physicalDefense", 3000);
+                applyDrugBonus0("physicalDefense", 3000);
                 break;
             case "珍贵药材":
-                applyDrugBonus("magicDefense", 8000);
+                applyDrugBonus0("magicDefense", 8000);
                 break;
             case "完美药材":
-                applyDrugBonus("magicAttack", 4000);
+                applyDrugBonus0("magicAttack", 4000);
                 break;
             case "冰莲絮":
-                applyDrugBonus("health", 5000);
+                applyDrugBonus0("health", 5000);
                 break;
             case "晗灵果":
-                applyDrugBonus("mana", 5000);
+                applyDrugBonus0("mana", 5000);
                 break;
         }
         updateUI();
@@ -9296,15 +9354,15 @@ function applyTimedBuff(drugName, applyEffect, duration) {
     }, duration);
 }
 
-function applyDrugBonus(type, bonus) {
+function applyDrugBonus0(type, bonus) {
     if (!battleState || !battleState.player) {
         console.error("Battle state or player state is not initialized");
         return;
     }
 
     // 更新 drugBonus 对象
-    if (drugBonus.hasOwnProperty(type)) {
-        drugBonus[type] += bonus;
+    if (drugBonus0.hasOwnProperty(type)) {
+        drugBonus0[type] += bonus;
     } else {
         console.error("Invalid drug type");
         return;
@@ -11160,16 +11218,19 @@ function initializeDrugBonus(color, level) {
         purple: { magicDefense: 2500 }
     };
 
+    let selectedBonus = null;
+
+    if (color === 'red') {
+        // 随机选择一个 bonus 类型（物理攻击或法术攻击）
+        selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
+    }
+
     for (let i = 1; i <= level; i++) {
         Object.keys(bonus).forEach(key => {
-            if (color === 'red' && (key === 'physicalAttack' || key === 'magicAttack')) {
-                // 只随机选择物理攻击或法术攻击之一
-                if (Math.random() < 0.5) {
-                    if (key === 'physicalAttack') {
-                        bonus.physicalAttack += increment.red.physicalAttack;
-                    } else if (key === 'magicAttack') {
-                        bonus.magicAttack += increment.red.magicAttack;
-                    }
+            if (color === 'red') {
+                // 仅增加 selectedBonus 指定的属性
+                if (key === selectedBonus) {
+                    bonus[key] += increment.red[key];
                 }
             } else if (increment[color] && increment[color][key]) {
                 bonus[key] += increment[color][key];
@@ -11179,6 +11240,8 @@ function initializeDrugBonus(color, level) {
 
     return bonus;
 }
+
+
 
 
 function generateAdditionalValues(color) {
@@ -11261,15 +11324,18 @@ function updateWuxingDisplay() {
 function displayAmuletDetails(amulet) {
     const detailsContainer = document.getElementById('amulet-details');
     detailsContainer.innerHTML = `
-        <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})</h3>
-        <p>等级: ${amulet.level}</p>
-        <p>主条目: ${Object.entries(amulet.drugBonus)
-            .filter(([key, value]) => value > 0)
-            .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
-        <p>副条目: ${amulet.additionalValues.map(v => `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
+        <div id="text-container" style="height: 160px;margin-bottom: 10px;">
+            <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})</h3>
+            <p>等级: ${amulet.level}</p>
+            <p>主条目: ${Object.entries(amulet.drugBonus)
+                .filter(([key, value]) => value > 0)
+                .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
+            <p>副条目: ${amulet.additionalValues.map(v => `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
+        </div>
     `;
 
     const wuxingButtonContainer = document.createElement('div');
+    wuxingButtonContainer.className = 'wuxing-action';
     wuxingButtonContainer.style.display = 'flex';
     wuxingButtonContainer.style.gap = '20px';
     wuxingButtonContainer.style.justifyContent = 'center';
@@ -11293,6 +11359,7 @@ function displayAmuletDetails(amulet) {
     if (amulet.equipped) {
         enhanceButton.disabled = true;
         decomposeButton.disabled = true;
+        equipButton.disabled = true;
         unequipButton.disabled = false;
     } else {
         unequipButton.disabled = true;
@@ -11316,7 +11383,7 @@ function unequipAmulet(tag) {
 
         updateWuxingDisplay();
     } else {
-        showInfoBox("无法撤下该五行符。", null, null, 'red');
+        showInfoBox("请确保选中已装备的五行符。", null, null, 'red');
     }
 }
 
@@ -11349,7 +11416,7 @@ function decomposeAmulet(tag) {
         showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
         updateWuxingDisplay();
     } else {
-        showInfoBox("找不到指定的五行符。", null, null, 'red');
+        showInfoBox("找不到指定的五行符，请确保五行符未装备", null, null, 'red');
     }
 }
 
@@ -11366,6 +11433,8 @@ function enhanceAmulet(tag) {
             wuxingFragments -= 625;
             currentExp -= 20000;
             amulet.level += 1;
+
+            // 调用 initializeDrugBonus 增强 drugBonus
             amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
 
             if (amulet.level % 5 === 0) {
@@ -11380,6 +11449,8 @@ function enhanceAmulet(tag) {
         }
     }
 }
+
+
 
 function handleAdditionalValuesEnhancement(amulet) {
     if (amulet.additionalValues.length < 5) {
@@ -11501,7 +11572,12 @@ function getAmuletImageURL(name) {
     return imageMap[name];
 }
 
-
+function addWuxingFragments(amount) {
+    const fragmentsElement = document.getElementById("wuxing-fragments");
+    wuxingFragments += amount;
+    fragmentsElement.innerText = wuxingFragments;
+    showInfoBox(`你获得了${amount}张五行符碎片，当前分解碎片数量为${wuxingFragments}。`,null,null,'black');
+}
 
 
         
@@ -12117,6 +12193,22 @@ function increasePetLevel(levels) {
 
 let absorbCount = 0; // 跟踪连续使用次数
 
+function directlyAbsorbExperience(amount) {
+    if (currentExp < maxExp) {
+        currentExp += amount;
+
+        // 确保 currentExp 不超过 maxExp
+        if (currentExp > maxExp) {
+            currentExp = maxExp;
+        }
+
+        showInfoBox(`你获得了${amount}点经验，当前经验为${currentExp}`, null, null, 'green');
+    } else {
+        showInfoBox('当前已到经验上限，需要通过战斗刷新升级。本次吸纳经验没有获得任何收益！', null, null, 'red');
+    }
+    updateExpBar(); // 调用 updateExpBar 函数
+}
+        
 function absorbExperience() {
     absorbCount++;
 
@@ -12252,7 +12344,7 @@ function updateTreasureDescription(type) {
                 description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '五行仙葫':
-                description = "五行仙葫！";
+                description = "至尊五行仙葫，每次开启30两金，您可能获得珍贵的五行符和分解材料！";
                 break;
             case '至尊仙葫':
                 description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，修为灵丹、举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
@@ -12310,6 +12402,11 @@ function collectTreasure() {
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
         '高级神兽丹': 'advancedSkillPill',
+        '一等分解符': 'firstFragments',
+        '二等分解符': 'secondFragments',
+        '三等分解符': 'thirdFragments',
+        '四等分解符': 'fourthFragments',
+        '五等分解符': 'fifthFragments',
         '金符（红）': () => addAmuletToManager('goldAmulet', 'red', 1),
         '金符（紫）': () => addAmuletToManager('goldAmulet', 'purple', 1),
         '金符（橙）': () => addAmuletToManager('goldAmulet', 'orange', 1),
@@ -12508,31 +12605,36 @@ function getRandomReward(type) {
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
+            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 5 },
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 60 },
+            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 25 },
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 5 },
+            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
@@ -12609,8 +12711,13 @@ let jinnangItems = [
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
-    { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 1, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
-    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 1, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材。' }
+    { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
+    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材。' },
+    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -12921,7 +13028,14 @@ const itemEffects = {
     },
     liguolin: () => useLiguolin(),
     advancedSkillPill: () => fulfillPetSkill(),
-    drugBox: () => getRandomDrug(10,20)
+    drugBox: () => getRandomDrug(10,20),
+    advancedExperienceBook: () => directlyAbsorbExperience(30000),
+    normalExperienceBook: () => directlyAbsorbExperience(10000),
+    firstFragments: () => addWuxingFragments(625),
+    secondFragments: () => addWuxingFragments(125),
+    thirdFragments: () => addWuxingFragments(25),
+    fourthFragments: () => addWuxingFragments(5),
+    fifthFragments: () => addWuxingFragments(1)
 };
 
 function getRandomDrug(minNum, maxNum) {
@@ -15059,6 +15173,15 @@ function resetPet() {
     divinedWeaponStatus = false;
     document.body.style.backgroundImage = "";
     document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
+    drugBonus0 = {
+        health: 0,
+        mana: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        speed: 0
+    }; // 药品增幅buff清空
     drugBonus = {
         health: 0,
         mana: 0,
@@ -15652,13 +15775,13 @@ function updateSkillScore(selectedSkills = []) {
     const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
     // 计算药物附加值
-    const drugHealth = drugBonus.health;
-    const drugMana = drugBonus.mana;
-    const drugPhysicalAttack = drugBonus.physicalAttack;
-    const drugPhysicalDefense = drugBonus.physicalDefense;
-    const drugMagicAttack = drugBonus.magicAttack;
-    const drugMagicDefense = drugBonus.magicDefense;
-    const drugSpeed = drugBonus.speed;
+    const drugHealth = drugBonus.health + drugBonus0.health;
+    const drugMana = drugBonus.mana + drugBonus0.mana;
+    const drugPhysicalAttack = drugBonus.physicalAttack + drugBonus0.physicalAttack;
+    const drugPhysicalDefense = drugBonus.physicalDefense + drugBonus0.physicalDefense;
+    const drugMagicAttack = drugBonus.magicAttack + drugBonus0.magicAttack;
+    const drugMagicDefense = drugBonus.magicDefense + drugBonus0.magicDefense;
+    const drugSpeed = drugBonus.speed + drugBonus0.speed;
 
     const drugAttributeScore = Math.round((drugHealth + drugMana + drugPhysicalAttack + drugPhysicalDefense + drugMagicAttack + drugMagicDefense + drugSpeed) * 0.56);
     
@@ -17136,13 +17259,15 @@ function showImageBox() {
 // 初始化检查觉醒状态
 window.onload = function() {
     // 加载游戏状态
-    if (localStorage.gameState) {
+    if (localStorage.gameState || localStorage.petData) {
         loadGameState();
-    }
-    
+        initializeEnemyPet();
+        handleRampaged();
+        updateEnemyAttributes();
+    } else {     
     // 初始化敌方宠物
     initializeEnemyPet();
-    updateEnemyAttributes();
+    }
     
     // 更新 UI
     updateQualityCard();
@@ -17309,7 +17434,9 @@ function saveGameState() {
         ascensionSkill: getSkillFromName(ascensionSkill.name, ascensionSkill.level),
         secondAscensionSkill: getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level),
         ascensionAttributes: ascensionAttributes,
+        drugBonus0: drugBonus0,
         drugBonus: drugBonus,
+        wuxingStates: JSON.stringify(wuxingStates),
         skillScore: skillScore,
         specializations: specializations,
         currentSpecialization: currentSpecialization,
@@ -17433,6 +17560,7 @@ function loadGameState() {
         trainingCount = savedState.trainingCount;
         currentWisdom = savedState.currentWisdom;
         petAscended = savedState.petAscended;
+        ascensionAttributes = savedState.ascensionAttributes;
         petMaxLevel = savedState.petMaxLevel;
         petWisdom = savedState.petWisdom;
         awakened = savedState.awakened;
@@ -17475,8 +17603,17 @@ function loadGameState() {
         if (JSON.stringify(savedState.petStates)) {
             petStates = JSON.parse(savedState.petStates);
         }
-        ascensionAttributes = savedState.ascensionAttributes;
-        drugBonus = savedState.drugBonus;
+       
+        if (savedState.drugBonus0) {
+            drugBonus = savedState.drugBonus0;
+        }
+        if (savedState.drugBonus) {
+            drugBonus = savedState.drugBonus;
+        }
+        if (savedState.wuxingStates) {
+            wuxingStates = JSON.parse(savedState.wuxingStates);
+        }
+        
         skillScore = savedState.skillScore;
         blessGiftClaimed = savedState.blessGiftClaimed;
         enemyPet = savedState.enemyPet;

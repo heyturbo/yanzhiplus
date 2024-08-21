@@ -2219,7 +2219,7 @@
     <!-- 五行符管理界面 -->
     <div id="wuxing-display" style="display: flex;flex-direction: column;justify-content: space-between;">
         <div id="wuxing-header">
-            <h3 style="margin:0;">五行符管理器</h3>
+            <h3 style="margin:0;" onclick="infoWuxingFu()">五行玩法</h3>
             <p style="margin:0;" id="wuxing-fragments">五行碎片: 0</p>
             <button style="background: transparent;color: white;" id="wuxing-close-button">X</button>
         </div>
@@ -2501,6 +2501,7 @@
             <button onclick="sellItem()">出售道具</button>
             <button onclick="useAssignedItem()">使用道具</button>
             <button onclick="deleteItems()">丢弃道具</button>
+            <button onclick="openWuxingDisplay()">五行面板</button>
             <button onclick="enlargeCapacity()">拓展背包</button>
         </div>
     </div>
@@ -2762,7 +2763,6 @@
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
                 <button class="saveAndLoadGameState" onclick="deleteAllPetData()">删档</button>
-                <button class="saveAndLoadGameState" onclick="openWuxingDisplay()">五行</button>
             </div>
         </div>
     </div>    
@@ -3867,6 +3867,9 @@ function infoFeisheng() {
 }  
 function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
+}
+function infoWuxingFu() {
+    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化消耗625碎片和20000经验值\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多，其战斗效果越强大");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -5178,7 +5181,8 @@ function storeCurrentPetData() {
         spiritLevel: spiritLevel,
         spiritMultiplier: spiritMultiplier,
         trainingCount: trainingCount,
-        wuxingStates: JSON.stringify(wuxingStates),
+        //wuxingStates: JSON.stringify(wuxingStates),
+        wuxingPetStates: JSON.stringify(wuxingPetStates),
     };
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
@@ -5253,8 +5257,12 @@ function restorePetData(petName) {
             drugBonus = savedPetData.drugBonus;
         }
 
-        if (savedPetData.wuxingStates) {
-            wuxingStates = JSON.parse(savedPetData.wuxingStates);
+        //if (savedPetData.wuxingStates) {
+            //wuxingStates = JSON.parse(savedPetData.wuxingStates);
+        //}
+        
+        if (savedPetData.wuxingPetStates) {
+            wuxingPetStates = JSON.parse(savedPetData.wuxingPetStates);
         }
         
         if (savedPetData.specializations) {
@@ -5303,6 +5311,7 @@ function restorePetData(petName) {
         }
         updateDisplayContent();
     }
+    updateWuxingBonusState();
 }
 
 function testButton() {
@@ -5735,7 +5744,7 @@ const ascensionSkills = {
         { name: '力劈华山', effect: level => `额外提供${50000 + level * 3500}点物理攻击力`, baseValue: 50000, increment: level => level * 3500 },
         { name: '慈悲心怀', effect: level => `额外提供${500000 + level * 20000}点生命值和${200000 + level * 20000}点法力值`, baseValue: 500000, increment: level => 20000 * level },
         { name: '势如破竹', effect: level => `额外提供${20000 + 3000 * level}点速度和${40000 + 3000 * level}点法术攻击力`, baseValue: 20000, increment: level => 3000 * level },
-        { name: '固若金汤', effect: level => `额外提供${2000000 + 200000 * level}点物理防御和${2000000 + 200000 * level}点法术防御`, baseValue: 2000000, increment: level => 200000 * level },
+        { name: '固若金汤', effect: level => `额外提供${500000 + 50000 * level}点物理防御和${500000 + 50000 * level}点法术防御`, baseValue: 500000, increment: level => 50000 * level },
         { name: '未开启', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 },
         { name: '被封印的技能', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 }
     ],
@@ -6639,8 +6648,19 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
 
 //总伤害计算函数
 function calculateDamage(baseDamage, isCritical, critDamage) {
+    const activeEffects = applyWuxingEffects();
+    let fireEffect;
+
+    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        fireEffect = Math.floor(baseDamage * damageBoostPercentage);
+        baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
+        logBattleEvent(`火符效果触发！伤害增加了 ${fireEffect}点。`, 'red');
+    }
+
     return isCritical ? Math.floor(baseDamage * critDamage) : baseDamage;
 }
+
 
 function checkCriticalHit(critRate) {
     return Math.random() < critRate;
@@ -7138,12 +7158,14 @@ function performAttack(type) {
             performAttack('physical');
             return;
         }
-        damageResult = result.damage;
-        //console.log(`performAttack中本次伤害输出为${result.damage}。`)
+        damageResult = result.finalDamage;
     }
 
     handleCriticalAndDrunken(damageResult);
     applyDefenseBonusEffect(); // 处理防御后的增益效果
+
+    // 调用水符效果函数
+    handleWaterAmuletEffect(attackType, damageResult);
 
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
@@ -7156,6 +7178,7 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
+
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 检查玩家是否处于失明状态
@@ -7171,38 +7194,40 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
-    let damage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
+    let baseDamage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
-    // 判断是否触发"斩龙一式"
+    // 应用各种效果和状态修正伤害
     if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
-        damage = Math.floor(damage * 1.6); // 增加60%伤害
+        baseDamage = Math.floor(baseDamage * 1.6); // 增加60%伤害
     }
 
-    // 检查玩家是否处于嘲讽状态
     if (battleState.player.taunt) {
-        damage = Math.floor(damage * 2); // 增加200%伤害
+        baseDamage = Math.floor(baseDamage * 2); // 增加200%伤害
         logBattleEvent("怒意激发了你的斗志，嘲讽下你的物理伤害提升至200%！", 'red');
     }
 
     let isCritical = checkCriticalHit(playerCritRate);
-    damage = calculateDamage(damage, isCritical, playerCritDamage);
-    if (battleState.enemy.revived) {
-        damage = Math.floor(0.1 * damage);
-    }
-    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
 
-    // 根据是否暴击来记录日志
+    // 在所有效果应用后计算最终伤害
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+
+    if (battleState.enemy.revived) {
+        finalDamage = Math.floor(0.1 * finalDamage);
+    }
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
+
+    // 记录日志
     if (isCritical) {
-        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${damage} 点物理伤害！`, 'red');
+        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${finalDamage} 点物理伤害！`, 'red');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
-        logBattleEvent(`⚔️【玩家攻击】你造成了 ${damage} 点物理伤害。`, 'white');
+        logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点物理伤害。`, 'white');
     }
 
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
         const bloodSuckPercentage = (ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).increment((ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).level) / 100;
-        const healAmount = Math.floor(damage * bloodSuckPercentage);
+        const healAmount = Math.floor(finalDamage * bloodSuckPercentage);
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
         logBattleEvent(`吸血魔刃触发,吸取了 ${healAmount} 点生命值。`, 'red');
         updateUI();
@@ -7213,18 +7238,15 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
     
     applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1); // 确保正确执行物理攻击效果
-    return damage;
+    return finalDamage;
 }
 
-function performMagicalAttack(skillMultiplier, isSkillUsed) {
-    let damage;
-    let isCritical = checkCriticalHit(playerCritRate);
 
+function performMagicalAttack(skillMultiplier, isSkillUsed) {
     if (handleMagicDodge('enemy')) {
         return 0;
     }
     
-    // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
         manaCostMultiplier = 500;
@@ -7237,27 +7259,31 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-    damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
-    damage = calculateDamage(damage, isCritical, playerCritDamage);
-        if (battleState.enemy.revived) {
-            damage = Math.floor(0.1 * damage);
-        }
-    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+    let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
 
+    let isCritical = checkCriticalHit(playerCritRate);
+
+    // 在所有效果应用后计算最终伤害
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+
+    if (battleState.enemy.revived) {
+        finalDamage = Math.floor(0.1 * finalDamage);
+    }
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
 
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
-    // 根据是否暴击来记录日志
+    // 记录日志
     if (isCritical) {
-        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值！`, 'red');
+        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${finalDamage} 点法术伤害，消耗了 ${manaCost} 点法力值！`, 'red');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     } else {
-        logBattleEvent(`⚔️【玩家攻击】你进行了法术攻击，造成了 ${damage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+        logBattleEvent(`⚔️【玩家攻击】你进行了法术攻击，造成了 ${finalDamage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     }
 
-    applyMagicAttackEffects(damage, isSkillUsed ? skillMultiplier : 1);
+    applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
     
     if (battleState.enemy.pierced) {
         handlePierced(); // 处理穿透效果
@@ -7268,19 +7294,15 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         performIndependentMagicAttack();
     }
 
-    return { damage, retryPhysical: false };
+    return { damage: finalDamage, retryPhysical: false };
 }
 
-function performIndependentMagicAttack() {
-    if (!battleState || !battleState.enemy) {
-        console.error("战斗状态未初始化");
-        return;
-    }
 
+function performIndependentMagicAttack() {
     if (handleMagicDodge('enemy')) {
         return 0;
     }
-    
+
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -7302,7 +7324,6 @@ function performIndependentMagicAttack() {
         logBattleEvent("⚔️【玩家攻击】触发法术精通，但没有可用的法术攻击技能，使用普通法术攻击。",'wheat');
     }
 
-    // 检查玩家是否处于法术迟钝状态
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
         manaCostMultiplier = 500;
@@ -7311,34 +7332,35 @@ function performIndependentMagicAttack() {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
-    let damage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
+    let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
-    damage = calculateDamage(damage, isCritical, playerCritDamage);
-        if (battleState.enemy.revived) {
-            damage = Math.floor(0.1 * damage);
-        }
-    battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-    
 
-    // 根据是否暴击来记录日志
+    // 在所有效果应用后计算最终伤害
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+
+    if (battleState.enemy.revived) {
+        finalDamage = Math.floor(0.1 * finalDamage);
+    }
+    battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
+
+    // 记录日志
     if (isCritical) {
-        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${damage} 点伤害。`, 'red');
+        logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${finalDamage} 点伤害。`, 'red');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
-        logBattleEvent(`⚔️【玩家攻击】你造成了 ${damage} 点伤害。`, 'wheat');
+        logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点伤害。`, 'wheat');
     }
 
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
-    applyMagicAttackEffects(damage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
+    applyMagicAttackEffects(finalDamage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
     if (battleState.enemy.pierced) {
         handlePierced(); // 处理穿透效果
     }
-    
 
     // 处理醉酒效果
-    if (battleState.player.drunken && damage > 0) {
-        const drunkenDamage = Math.floor(damage * 0.1);
+    if (battleState.player.drunken && finalDamage > 0) {
+        const drunkenDamage = Math.floor(finalDamage * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
         logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
     }
@@ -8017,22 +8039,35 @@ function handleDivineProtection(selectedSkills, skillLevel) {
 }
 
 function handleReflectAndHeal(damage) {
+    // 确保 damage 是有效的数字
+    if (isNaN(damage) || damage <= 0) {
+        console.error("Invalid damage value:", damage);
+        return;
+    }
+
+    // 处理以牙还牙技能的反弹逻辑
     if (ascensionSkill.name === '以牙还牙' || secondAscensionSkill.name === '以牙还牙') {
         const baseReflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const randomAddition = Math.random() * 0.15;
         const reflectPercentage = baseReflectPercentage + randomAddition;
-        const reflectDamage = Math.floor(damage * reflectPercentage);
-        if (isNaN(reflectDamage)) {
-            reflectDamage = 0;
-            console.error("Reflect damage is NaN, setting to 0.");
+
+        if (!isNaN(reflectPercentage) && reflectPercentage > 0) {
+            let reflectDamage = Math.floor(damage * reflectPercentage);
+            if (isNaN(reflectDamage)) {
+                reflectDamage = 0;
+                console.error("Reflect damage is NaN, setting to 0.");
+            }
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
+            logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`, 'red');
+            console.log(`Current reflectPercentage is ${reflectPercentage}`);
+        } else {
+            console.error("Invalid reflectPercentage:", reflectPercentage);
         }
-        battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
-        logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`, 'red');
-        console.log(`Current relfectPercentage is ${reflectPercentage}`);
     }
 
+    // 处理反弹状态的逻辑
     if (battleState.player.reflecting) {
-        const reflectDamage = Math.floor(damage * (battleState.player.reflectPercentage / 100));
+        let reflectDamage = Math.floor(damage * (battleState.player.reflectPercentage / 100));
         if (isNaN(reflectDamage)) {
             reflectDamage = 0;
             console.error("Reflect damage is NaN, setting to 0.");
@@ -8041,8 +8076,26 @@ function handleReflectAndHeal(damage) {
         logBattleEvent(`反弹状态触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`);
     }
 
+    // 处理金符效果的反弹逻辑
+    const activeEffects = applyWuxingEffects();
+    if (activeEffects.goldAmulet && activeEffects.goldAmulet > 0) {
+        const goldReflectPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.goldAmulet];
+        if (!isNaN(goldReflectPercentage) && goldReflectPercentage > 0) {
+            let reflectDamage = Math.floor(damage * goldReflectPercentage);
+            if (isNaN(reflectDamage)) {
+                reflectDamage = 0;
+                console.error("Reflect damage is NaN, setting to 0.");
+            }
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
+            logBattleEvent(`金符效果触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`, 'gold');
+        } else {
+            console.error("Invalid goldReflectPercentage:", goldReflectPercentage);
+        }
+    }
+
+    // 处理仙气护体的治疗逻辑
     if (battleState.player.divineProtection) {
-        const healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (0.12 - 0.08) + 0.2));
+        let healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (0.12 - 0.08) + 0.2));
         if (isNaN(healAmount)) {
             healAmount = 0;
             console.error("Heal amount is NaN, setting to 0.");
@@ -8051,7 +8104,7 @@ function handleReflectAndHeal(damage) {
         logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c7d.gif');
     }
-} //处理仙气（包含反弹逻辑）
+}//处理仙气（包含反弹逻辑）
 
 function handleResurrection(damage) {
     if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
@@ -8138,7 +8191,12 @@ function handleDamageReduction(damage) {
     let shieldReduction = 0;
     let defenseReduction = 0;
     let finalDamage = damage;
+    let earthReduction;
 
+    // 获取当前生效的五行符效果
+    const activeEffects = applyWuxingEffects();
+
+    // 检查是否触发“无我之境”
     if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
         damage = 0;
         logBattleEvent("遁入无我之境！", 'silver');
@@ -8151,6 +8209,7 @@ function handleDamageReduction(damage) {
         console.error("Damage is NaN, setting to 0.");
     }
 
+    // 处理护盾的伤害吸收
     if (extraShield > 0) {
         const shieldBefore = extraShield;
         damage -= extraShield;
@@ -8163,6 +8222,7 @@ function handleDamageReduction(damage) {
         shieldReduction = shieldBefore - extraShield;
     }
 
+    // 飞升技能的伤害减免处理
     const damageReductionPercentage = battleState.player.damageReductionPercentage / 100;
     if (damageReductionPercentage > 0) {
         const reduction = Math.floor(damage * damageReductionPercentage);
@@ -8170,32 +8230,45 @@ function handleDamageReduction(damage) {
         totalDamageReduction += reduction;
     }
 
+    // 防御状态下的伤害减免处理
     if (battleState.player.defending) {
         const defenseReductionPercentage = battleState.player.defenseReduction;
         const reduction = Math.floor(damage * defenseReductionPercentage);
-        
+
         if (defenseReductionPercentage > 1) {
-            extraShield += Math.floor(damage * (defenseReductionPercentage - 1));        
+            extraShield += Math.floor(damage * (defenseReductionPercentage - 1));
         }
-        
+
         damage -= reduction;
         defenseReduction += reduction;
         battleState.player.defending = false;
     }
 
+    // 处理土符效果的伤害减免
+    if (activeEffects.earthAmulet && activeEffects.earthAmulet > 0) {
+        const earthReductionPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.earthAmulet];
+        const earthReduction = Math.floor(damage * earthReductionPercentage);
+        damage -= earthReduction;
+        totalDamageReduction += earthReduction;
+        logBattleEvent(`土符效果触发！你减少了 ${earthReduction}点所受的伤害。`, 'brown');
+    }
+
+    // 计算最终伤害并更新玩家血量
     finalDamage = damage;
-    const rightBattleAttributesHealth = battleAttributes.health
+    const rightBattleAttributesHealth = battleAttributes.health;
     battleAttributes.health = Math.max(0, battleAttributes.health - finalDamage);
     if (battleAttributes.health > rightBattleAttributesHealth) {
-    battleAttributes.health = rightBattleAttributesHealth;
+        battleAttributes.health = rightBattleAttributesHealth;
     }
-    
+
+    // 记录最终的伤害减免和伤害值
     const finalDamageReduction = shieldReduction + defenseReduction + totalDamageReduction + (isNaN(wiseDefense) ? 0 : wiseDefense);
 
     const formattedFinalDamageReduction = isNaN(finalDamageReduction) ? 0 : finalDamageReduction;
     const formattedFinalDamage = isNaN(finalDamage) ? 0 : finalDamage;
     const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
-    
+
+    // 打印战斗日志并更新UI
     if (formattedFinalDamage >= 0) {
         if (wiseDefenseManaCost != 0) {
             logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
@@ -8210,10 +8283,12 @@ function handleDamageReduction(damage) {
         }
     }
     wiseDefenseManaCost = 0;
-            
-    console.log(`护盾抵挡了 ${shieldReduction} 点伤害，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，飞升技能抵挡 ${totalDamageReduction} 点伤害。目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
+
+    console.log(`护盾抵挡了 ${shieldReduction} 点伤害，土符抵挡了${totalDamageReduction}，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
     getShieldStatus();
 }
+
+
 
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -8336,11 +8411,11 @@ function enemyAttack() {
     if (battleState.enemy.sleep) {
         return;
     }
-    
+
     const enemyHealthPercentage = battleState.enemy.health / enemyMaxHealth;
     const enemyManaPercentage = battleState.enemy.mana / enemyMaxMana;
     const healProbability = enemyHealthPercentage < 0.3 ? 0.7 : 0.1;
-    
+
     if (Math.random() < healProbability) {
         enemyHeal();
         return;
@@ -8350,14 +8425,14 @@ function enemyAttack() {
         updateUI();
         return;
     }
-    
+
     let damage;
     let isCritical = checkCriticalHit(enemyCritRate);
-    
+
     if (battleState.enemy.intimidated) {
         isCritical = false;
     }
-    
+
     const attackType = Math.random() < 0.5 ? 'physical' : 'magical';
     if (attackType === 'physical') {
         damage = performEnemyPhysicalAttack(isCritical);
@@ -8367,15 +8442,30 @@ function enemyAttack() {
         logBattleEvent("毁灭心魔被沉默，无法进行法术攻击。", 'white');
         return;
     }
-    
+
+    // 检查 damage 是否有效
+    if (isNaN(damage) || damage <= 0) {
+        console.error("Invalid damage value before reduction:", damage);
+        return;
+    }
+
+    // 首先处理伤害减免
+    damage = handleDamageReduction(damage);
+
+    // 然后计算最终伤害，包括暴击和其他修正
+    damage = calculateDamage(damage, isCritical, enemyCritDamage);
+
+    // 再处理防御和护盾
     damage = handleWiseDefense(damage);
-    handleManaRecover();
+
+    // 处理燃烧效果
     handleBurnt();
-    handleCriticalHit(isCritical);
-    handleDamageReduction(damage);
-    handleReflectAndHeal(damage);
+
+    // 处理复活效果
     handleResurrection(damage);
-    
+    handleManaRecover();
+
+    // 检查玩家和敌人的血量，更新战斗状态
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
     } else if (battleState.enemy.health <= 0) {
@@ -8386,6 +8476,7 @@ function enemyAttack() {
         playerTurn = true;
     }
 }
+
 
 function performEnemyPhysicalAttack(isCritical) { 
     // 检查玩家是否闪避
@@ -8429,7 +8520,7 @@ function performEnemyPhysicalAttack(isCritical) {
     if (!battleState.enemy.silenced || damage !== 0) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
-
+    handleReflectAndHeal(damage);
     return damage;
 }
 
@@ -8461,7 +8552,7 @@ function performEnemyMagicalAttack(isCritical) {
 
     // 应用毁灭心魔法术效果
     applyEnemyMagicEffects(damage);
-
+    handleReflectAndHeal(damage);
     return damage;
 }
 
@@ -8832,7 +8923,19 @@ function handleHealingBan(skillMultiplier) {
         return 0;
     }
 
-    return Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (0.12 - 0.08) + 0.08) * skillMultiplier);
+    let baseHealing = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (0.12 - 0.08) + 0.08) * skillMultiplier);
+    let woodEffect;
+    const activeEffects = applyWuxingEffects();
+
+    // 应用木符效果增加治疗量
+    if (activeEffects.woodAmulet && activeEffects.woodAmulet > 0) {
+        const healBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.woodAmulet];
+        woodEffect = Math.floor(baseHealing * healBoostPercentage);
+        baseHealing = Math.floor(baseHealing * (1 + healBoostPercentage));
+        logBattleEvent(`木符效果触发！治疗量增加了 ${woodEffect}。`, 'aqua');
+    }
+
+    return baseHealing;
 } //处理计算回复量和禁疗状态
 
 function handleSoulCapture() {
@@ -10165,7 +10268,7 @@ function applySingleAscensionBonus(skill, attributes) {
             break;
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
-            attributes.magicDefense += 2000000 + skill.increment(skill.level);
+            attributes.magicDefense += 500000 + skill.increment(skill.level);
             break;
         // 其他技能增益逻辑...
     }
@@ -11140,6 +11243,7 @@ const divineWeaponManager = new DivineWeaponManager();
 // 五行符测试模块
 let wuxingFragments = 0;  // 分解后获得的碎片数量
 let wuxingStates = [];  // 存储所有五行符的状态
+let wuxingPetStates = [];  // 存储每个宠物的五行符装备状态
 const MAX_LEVEL = 100;  // 强化等级上限
 
 const wuxingTypeMap = {
@@ -11174,12 +11278,14 @@ document.getElementById('wuxing-display').style.display = 'none';
 function openWuxingDisplay() {
     document.getElementById('wuxing-display').style.display = 'block';
     updateWuxingDisplay();
+    updateWuxingBonusState();
 }
 
 function closeWuxingDisplay() {
     document.getElementById('wuxing-display').style.display = 'none';
 }
 
+// 初始化五行符管理器
 function addAmuletToManager(amuletType, color, level = 1) {
     const wuxingName = `${amuletType}(${color})`;
 
@@ -11191,14 +11297,25 @@ function addAmuletToManager(amuletType, color, level = 1) {
         color: color,
         level: level,
         drugBonus: initializeDrugBonus(color, level),
-        additionalValues: generateAdditionalValues(color),
-        equipped: false
+        additionalValues: generateAdditionalValues(color)
     };
 
+    // 将新五行符添加到全局管理器
     wuxingStates.push(newAmulet);
+
+    // 初始化该五行符的宠物状态为未装备
+    wuxingPetStates.push({
+        tag: uniqueTag,
+        equipped: false,
+        color: color,
+        currentPetName: null
+    });
+
     updateWuxingDisplay();
 }
 
+
+// 初始化主条目加成
 function initializeDrugBonus(color, level) {
     const bonus = {
         physicalAttack: 0,
@@ -11221,14 +11338,12 @@ function initializeDrugBonus(color, level) {
     let selectedBonus = null;
 
     if (color === 'red') {
-        // 随机选择一个 bonus 类型（物理攻击或法术攻击）
         selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
     }
 
     for (let i = 1; i <= level; i++) {
         Object.keys(bonus).forEach(key => {
             if (color === 'red') {
-                // 仅增加 selectedBonus 指定的属性
                 if (key === selectedBonus) {
                     bonus[key] += increment.red[key];
                 }
@@ -11241,9 +11356,7 @@ function initializeDrugBonus(color, level) {
     return bonus;
 }
 
-
-
-
+// 生成副条目
 function generateAdditionalValues(color) {
     const additionalValues = [];
     const attributes = ['physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'];
@@ -11261,23 +11374,24 @@ function generateAdditionalValues(color) {
 
     return additionalValues;
 }
-
+ 
+// 更新显示界面
 function updateWuxingDisplay() {
     const wuxingContainer = document.getElementById('wuxing-container');
     const equippedContainer = document.getElementById('equipped-container');
     const fragmentsDisplay = document.getElementById('wuxing-fragments');
+    let selectedAmulet = null; // 用于记录当前选中的五行符
 
     wuxingContainer.innerHTML = '';
     equippedContainer.innerHTML = '';
     fragmentsDisplay.innerText = `五行碎片: ${wuxingFragments}`;
 
-    let selectedAmulet = null; // 用于记录当前选中的五行符
-
     wuxingStates.forEach(amulet => {
         const amuletElement = document.createElement('div');
         amuletElement.className = `wuxing-item ${amulet.color}-border`;
 
-        if (amulet.equipped) {
+        const petAmulet = wuxingPetStates.find(a => a.tag === amulet.tag);
+        if (petAmulet && petAmulet.equipped) {
             amuletElement.classList.add('equipped');
         }
 
@@ -11311,16 +11425,26 @@ function updateWuxingDisplay() {
 
         wuxingContainer.appendChild(amuletElement);
 
-        if (amulet.equipped) {
+        // 如果该五行符被当前宠物装备，显示在装备区
+        if (petAmulet && petAmulet.equipped && petAmulet.currentPetName === currentPet.name) {
             const equippedElement = amuletElement.cloneNode(true);
             equippedElement.addEventListener('click', () => displayAmuletDetails(amulet));
             equippedContainer.appendChild(equippedElement);
         }
+        // 如果被装备但装备者不是当前宠物，则不克隆元素
+        else if (petAmulet && petAmulet.equipped && petAmulet.currentPetName !== currentPet.name) {
+            // 不进行克隆操作，也不显示在装备区
+            // 这里可以添加任何你想要处理的逻辑，比如提示信息或标记
+            console.log(`${amulet.name} 被 ${petAmulet.currentPetName} 装备，无法装备在当前宠物上`);
+        }
     });
-
-    applyWuxingEffects();
+    updateAttributePanel();
+    console.log(drugBonus);
 }
 
+
+
+// 显示五行符详细信息
 function displayAmuletDetails(amulet) {
     const detailsContainer = document.getElementById('amulet-details');
     detailsContainer.innerHTML = `
@@ -11356,7 +11480,8 @@ function displayAmuletDetails(amulet) {
     unequipButton.innerText = '撤下';
     unequipButton.onclick = () => unequipAmulet(amulet.tag);
 
-    if (amulet.equipped) {
+    const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
+    if (petAmulet && petAmulet.equipped) {
         enhanceButton.disabled = true;
         decomposeButton.disabled = true;
         equipButton.disabled = true;
@@ -11373,53 +11498,167 @@ function displayAmuletDetails(amulet) {
     detailsContainer.appendChild(wuxingButtonContainer);
 }
 
-function unequipAmulet(tag) {
-    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
-
-    if (amulet && amulet.equipped) {
-        applyAmuletBonus(amulet, false);
-
-        amulet.equipped = false;
-
-        updateWuxingDisplay();
-    } else {
-        showInfoBox("请确保选中已装备的五行符。", null, null, 'red');
-    }
-}
-
-
+// 应用五行符增益
 function applyAmuletBonus(amulet, apply = true) {
-    // 应用主条目（drugBonus）
     Object.keys(amulet.drugBonus).forEach(key => {
-        drugBonus[key] += apply ? amulet.drugBonus[key] : -amulet.drugBonus[key];
+        if (apply) {
+            drugBonus[key] += amulet.drugBonus[key];
+        } else {
+            drugBonus[key] -= amulet.drugBonus[key];
+            // 确保 drugBonus 不小于 0
+            if (drugBonus[key] < 0) {
+                drugBonus[key] = 0;
+            }
+        }
     });
 
-    // 应用副条目（additionalValues）
     amulet.additionalValues.forEach(additional => {
         const key = additional.attribute;
         const value = additional.value;
-        drugBonus[key] += apply ? value : -value;
+        if (apply) {
+            drugBonus[key] += value;
+        } else {
+            drugBonus[key] -= value;
+            // 确保 drugBonus 不小于 0
+            if (drugBonus[key] < 0) {
+                drugBonus[key] = 0;
+            }
+        }
     });
 
     updateUI();
 }
 
+function updateWuxingBonusState() {
+    // 清空当前的 drugBonus
+    Object.keys(drugBonus).forEach(key => {
+        drugBonus[key] = 0;
+    });
 
+    // 遍历当前宠物已装备的五行符
+    wuxingPetStates.forEach(petAmuletState => {
+        if (petAmuletState.equipped && petAmuletState.currentPetName === currentPet.name) {
+            const amulet = wuxingStates.find(amulet => amulet.tag === petAmuletState.tag);
+            if (amulet) {
+                applyAmuletBonus(amulet, true);  // 重新应用增益
+            }
+        }
+    });
+
+    updateUI();  // 更新界面以反映最新的增益值
+}
+
+        
+// 分解五行符
 function decomposeAmulet(tag) {
+    const detailsContainer = document.getElementById('amulet-details');
     const amuletIndex = wuxingStates.findIndex(amulet => amulet.tag === tag);
 
     if (amuletIndex !== -1) {
         const amulet = wuxingStates[amuletIndex];
         const fragmentsGained = amulet.level * 475;
         wuxingFragments += fragmentsGained;
+
+        // 从 wuxingStates 中移除五行符
         wuxingStates.splice(amuletIndex, 1);
+
+        // 从 wuxingPetStates 中移除与该五行符关联的状态
+        const petAmuletIndex = wuxingPetStates.findIndex(a => a.tag === tag);
+        if (petAmuletIndex !== -1) {
+            wuxingPetStates.splice(petAmuletIndex, 1);
+        }
+
         showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
+        detailsContainer.innerHTML = '';
         updateWuxingDisplay();
     } else {
         showInfoBox("找不到指定的五行符，请确保五行符未装备", null, null, 'red');
     }
 }
 
+
+function equipAmulet(tag) {
+    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
+
+    if (!amulet) {
+        showInfoBox("找不到指定的五行符。", null, null, 'red');
+        return;
+    }
+
+    // 检查当前宠物是否已经装备了相同颜色的五行符
+    const equippedSameType = wuxingPetStates.some(a => a.color === amulet.color && a.equipped && a.currentPetName === currentPet.name);
+
+    if (equippedSameType) {
+        showInfoBox(`已经装备了一张 ${wuxingColorMap[amulet.color]} 的五行符。`, null, null, 'red');
+        return;
+    }
+
+    const existingAmuletState = wuxingPetStates.find(a => a.tag === tag);
+
+    if (existingAmuletState && existingAmuletState.equipped) {
+        if (existingAmuletState.currentPetName !== currentPet.name) {
+            showInfoBox(`该五行符已经被 ${existingAmuletState.currentPetName} 装备。`, null, null, 'red');
+        } else {
+            showInfoBox(`该五行符已经装备在当前宠物上。`, null, null, 'green');
+        }
+        return;
+    }
+
+    // 更新 wuxingPetStates 中的装备状态
+    if (existingAmuletState) {
+        existingAmuletState.equipped = true;
+        existingAmuletState.currentPetName = currentPet.name;
+    } else {
+        wuxingPetStates.push({
+            tag: tag,
+            equipped: true,
+            color: amulet.color, // 保存颜色信息以便后续判断
+            currentPetName: currentPet.name
+        });
+    }
+
+    // 更新 wuxingStates 中的装备状态
+    amulet.equipped = true;
+    amulet.currentPetName = currentPet.name;
+
+    console.log(wuxingPetStates);
+    console.log(wuxingStates);
+    console.log(drugBonus);
+
+    applyAmuletBonus(amulet, true);
+    updateWuxingDisplay();
+}
+
+
+function unequipAmulet(tag) {
+    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
+
+    if (!amulet) {
+        showInfoBox("找不到指定的五行符。", null, null, 'red');
+        return;
+    }
+
+    const amuletState = wuxingPetStates.find(a => a.tag === tag);
+
+    if (amuletState && amuletState.equipped) {
+        applyAmuletBonus(amulet, false);
+
+        // 更新 wuxingPetStates 中的装备状态
+        amuletState.equipped = false;
+        amuletState.currentPetName = null;
+
+        // 更新 wuxingStates 中的装备状态
+        amulet.equipped = false;
+        amulet.currentPetName = null;
+
+        updateWuxingDisplay();
+        console.log(drugBonus);
+    } else {
+        showInfoBox("请确保选中已装备的五行符。", null, null, 'red');
+    }
+}
+
+// 强化五行符
 function enhanceAmulet(tag) {
     const amulet = wuxingStates.find(amulet => amulet.tag === tag);
 
@@ -11434,7 +11673,6 @@ function enhanceAmulet(tag) {
             currentExp -= 20000;
             amulet.level += 1;
 
-            // 调用 initializeDrugBonus 增强 drugBonus
             amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
 
             if (amulet.level % 5 === 0) {
@@ -11450,8 +11688,7 @@ function enhanceAmulet(tag) {
     }
 }
 
-
-
+// 处理额外值强化
 function handleAdditionalValuesEnhancement(amulet) {
     if (amulet.additionalValues.length < 5) {
         const addNewValue = Math.random() < 0.3;
@@ -11460,114 +11697,101 @@ function handleAdditionalValuesEnhancement(amulet) {
             amulet.additionalValues.push(newAdditionalValue);
         } else {
             const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-            const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2); // 生成 1.2 到 2.5 之间的随机数
+            const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
             amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
         }
     } else {
         const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-        const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2); // 生成 1.2 到 2.5 之间的随机数
+        const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
         amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
     }
 }
 
-function equipAmulet(tag) {
-    const amulet = wuxingStates.find(amulet => amulet.tag === tag);
-
-    if (!amulet) {
-        showInfoBox("找不到指定的五行符。", null, null, 'red');
-        return;
-    }
-
-    const equippedSameType = wuxingStates.some(a => a.color === amulet.color && a.equipped);
-
-    if (equippedSameType) {
-        showInfoBox(`已经装备了一张 ${wuxingColorMap[amulet.color]} 的五行符。`, null, null, 'red');
-    } else {
-        amulet.equipped = true;
-        applyAmuletBonus(amulet);
-        updateWuxingDisplay();
-    }
-}
-
 function applyWuxingEffects() {
-    const effects = {};
-    const equippedAmulets = wuxingStates.filter(amulet => amulet.equipped);
+    const effects = {
+        goldAmulet: 0,
+        woodAmulet: 0,
+        waterAmulet: 0,
+        fireAmulet: 0,
+        earthAmulet: 0,
+    };
 
-    equippedAmulets.forEach(amulet => {
-        const type = amulet.name.split('(')[0];
-        effects[type] = (effects[type] || 0) + 1;
+    // 遍历 wuxingPetStates 中 equipped 为 true 且 currentPetName 为当前宠物的五行符
+    wuxingPetStates.forEach(state => {
+        //console.log(`Checking amulet: ${state.tag}, Equipped: ${state.equipped}, Current Pet: ${state.currentPetName}`);
+
+        if (state.equipped && state.currentPetName === currentPet.name) {
+            const amuletType = state.tag.split('(')[0];
+            //console.log(`Amulet type detected: ${amuletType}`);
+
+            if (effects.hasOwnProperty(amuletType)) {
+                effects[amuletType]++;
+                
+            }
+        }
     });
 
-    if (effects.goldAmulet) handleGoldAmuletEffect(effects.goldAmulet);
-    if (effects.woodAmulet) handleWoodAmuletEffect(effects.woodAmulet);
-    if (effects.waterAmulet) handleWaterAmuletEffect(effects.waterAmulet);
-    if (effects.fireAmulet) handleFireAmuletEffect(effects.fireAmulet);
-    if (effects.earthAmulet) handleEarthAmuletEffect(effects.earthAmulet);
-    console.log(`当前效果是${effects}`);
+    // 返回所有生效的五行符效果类型及其等级
+    const activeEffects = {};
+    Object.keys(effects).forEach(type => {
+        if (effects[type] > 0) {
+            activeEffects[type] = effects[type];
+            
+        }
+    });
+
+    return activeEffects; // 返回包含所有生效效果的对象
 }
 
-function handleGoldAmuletEffect(count) {
-    const reflectPercentage = [0, 2, 5, 7, 12, 20][count];
-    // Apply reflection effect based on `reflectPercentage`
-}
+function handleWaterAmuletEffect(attackType, damage) {
+    const activeEffects = applyWuxingEffects();
 
-function handleWoodAmuletEffect(count) {
-    const healBoostPercentage = [0, 2, 5, 7, 12, 20][count];
-    // Apply healing boost effect based on `healBoostPercentage`
-}
+    if (activeEffects.waterAmulet && activeEffects.waterAmulet > 0) {
+        const extraAttackProbability = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.waterAmulet];
 
-function handleWaterAmuletEffect(count) {
-    const extraAttackProbability = [0, 2, 5, 7, 12, 20][count];
-    // Apply extra attack probability effect based on `extraAttackProbability`
+        if (Math.random() < extraAttackProbability) {
+            logBattleEvent(`水符效果触了再动！`, 'aqua');
+            performAttack(attackType); // 再次执行相同类型的攻击
+        }
+    }
 }
-
-function handleFireAmuletEffect(count) {
-    const damageBoostPercentage = [0, 2, 5, 7, 12, 20][count];
-    // Apply damage boost effect based on `damageBoostPercentage`
-}
-
-function handleEarthAmuletEffect(count) {
-    const damageReductionPercentage = [0, 2, 5, 7, 12, 20][count];
-    // Apply damage reduction effect based on `damageReductionPercentage`
-}
-
 
 function getAmuletImageURL(name) {
     const imageMap = {
         // 金符
-        'goldAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'goldAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'goldAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'goldAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'goldAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'goldAmulet(red)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png',
+        'goldAmulet(purple)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png',
+        'goldAmulet(orange)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png',
+        'goldAmulet(blue)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png',
+        'goldAmulet(green)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png',
 
         // 木符
-        'woodAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'woodAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'woodAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'woodAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'woodAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'woodAmulet(red)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png',
+        'woodAmulet(purple)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png',
+        'woodAmulet(orange)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png',
+        'woodAmulet(blue)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png',
+        'woodAmulet(green)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png',
 
         // 水符
-        'waterAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'waterAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'waterAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'waterAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'waterAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'waterAmulet(red)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png',
+        'waterAmulet(purple)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png',
+        'waterAmulet(orange)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png',
+        'waterAmulet(blue)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png',
+        'waterAmulet(green)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png',
 
         // 火符
-        'fireAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'fireAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'fireAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'fireAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'fireAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'fireAmulet(red)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png',
+        'fireAmulet(purple)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png',
+        'fireAmulet(orange)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png',
+        'fireAmulet(blue)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png',
+        'fireAmulet(green)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png',
 
         // 土符
-        'earthAmulet(red)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'earthAmulet(purple)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'earthAmulet(orange)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'earthAmulet(blue)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
-        'earthAmulet(green)': 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png',
+        'earthAmulet(red)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png',
+        'earthAmulet(purple)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png',
+        'earthAmulet(orange)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png',
+        'earthAmulet(blue)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png',
+        'earthAmulet(green)': 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png',
     };
     return imageMap[name];
 }
@@ -11577,67 +11801,7 @@ function addWuxingFragments(amount) {
     wuxingFragments += amount;
     fragmentsElement.innerText = wuxingFragments;
     showInfoBox(`你获得了${amount}张五行符碎片，当前分解碎片数量为${wuxingFragments}。`,null,null,'black');
-}
-
-
-        
-
-            
-
-
-            
-
-            
-            
-            
-
-
-        
-            
-//let wuxingFragments = 0;
-//let wuxingStates = [];
-//function wuxingManager()
-    // 五行管理器用于管理五行符的分解、强化和装备状态
-    // 五行符界面由带有wuxing-前缀的元素名和样式名组成，如<div class="wuxing-container" style="wuxing-container"></div>
-    // 五行符会遍历jinnang内带有'wuxingfu'字段的物品，简单来说为const wuxingfuItem = jinnangItems.find(item.name.includes'wuxingfu')，且在五行符界面的物品区显示
-    // 玩家点击五行符时，会调用showInfoBox函数查看此五行符的名称、等级、能力值和附加值信息
-    // 显示图标为对应JinnangItems数组内的url，直接筛选遍历即可，格式为45px*45px
-    // 五行符有五类：金符、木符、水符、火符和土符，每一类五行符有5个颜色，分别为红、绿、橙、蓝和紫
-    // 分解：玩家选中五行符可以进行分解，每张五行符分解后可得分解碎片625张，初始0张,这是一个全局变量wuxingFragments
-    // 强化：强化功能可以对选定五行符进行强化。每张五行符的强化状态是独立存放于全局变量wuxingStates中的，五行符可以强化到20级，初始1级。具体规则：
-            //1. 每次强化需要消耗625张分解碎片和20000currentExp用于提升一级，每级提升时会增加五行符的能力值和附加值，当五行符等级到达5的倍数时会触发额外强化事件
-            //2. 每种颜色的五行符的能力值不同，但都是增加已有变量drugBonus，这是一个对象列表。初始状态下：
-                //2.1. 红色为增加300drugBonus.physicalAttack和500drugBonus.magicAttack，每提升一级，增加300值
-                //2.2. 绿色为增加500drugBonus.physicalDefense，每提升一级，增加500值
-                //2.3. 蓝色为增加2000drugBonus.mana，每提升一级，增加2000值
-                //2.4. 橙色为增加3000drugBonus.health，每提升一级，增加3000值
-                //2.5. 紫色为增加500drugBonus.magicDefense，每提升一级，增加500值
-            //3. 附加值为每张五行符独立附带的额外奖励值，当系统首次从jinnang遍历到某张五行符时，会随机生成1到5条附加值，一经生成便作为变量储存于wuxingStates中便于后续逻辑执行
-            //4. 每张五行符可能会附带的附加值为除上述提到的drugBonus中外还有drugBonus.speed一共六项中的任意1~5项，请特别注意，只有绿色的五行符可能出现drugBonus.speed
-            //5. 附加值初始的取值范围为[200,400]，当首次取值后作为变量储存在wuxingStates。
-            //3. 五行符每当强化到5的倍数等级，可能会：
-                //3.1. 如果五行符附加值少于5项，则有30%概率增加1项并确定其随机值，70%概率给现有随机一项附加值进行提升，提升幅度为当前值的50%
-                //3.2. 如果五行符附加值到达上限5项，则100%给现有随机一项附加值进行提升，提升幅度为当前值的50%
-    // 分解：玩家如果不满意五行符的强化成果，可以选中五行符后点击分解按钮进行分解。分解后可以获得等同当前所选五行符等级 * 475的分解碎片，但经验不予返还
-    // 装备：五行符只有装备后才能提升对应能力值和附加值的玩家属性。每种颜色的五行符玩家只能装备1个，意味着玩家无论有多少五行符，最多只能同时附加5张所装备的五行符提供的能力值和附加值
-    //此函数用于实现上述管理五行符的功能。但除了上述功能外，此函数还需要传递参数wuxingType和combinationValue用于触发和实现下一个函数function handleWuxingEffects
-
-
-//function handleWuxingEffects() {//
-    // 当玩家通过function wuxingManager装备五行符后会向此函数传递wuxingType和combinationValue两个参数，这两个参数用于处理一些特殊的战斗效果
-    // 无论颜色，每当玩家装备1种五行符，wuxingType会计为1类，最多计入5类。同一类五行符的数量每增加一张，则该类五行符的combinationValue为增加5。每一类五行符对应不同的战场效果，而combinationValue决定了效果触发的概率或幅度
-    // wuxingType: 
-        //1. 金符用于反弹敌人的伤害，可以在此case分离并调用函数handleGoldAmuletEffect，反弹幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
-        //2. 木符用于增加治疗量，可以在此case分离并调用函数handleWoodAmuletEffect，增加恢复的幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
-        //3. 水符用于增加额外发动攻击的概率，可以在此case分离并调用函数handleWaterAmuletEffect，额外攻击敌人的概率视combinationValue从少至多分别为2%/5%/7%/12%/20%
-        //4. 火符用于增加此次玩家攻击技能输出的伤害值，可以在此case分离并调用函数handleFireAmuletEffect，额外伤害值的增加幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
-        //5. 土符用于减少玩家每次承受来自敌人攻击的伤害值，可以在此case分离并调用函数handleEarthAmuletEffect，额外伤害值的增加幅度视combinationValue从少至多分别为2%/5%/7%/12%/20%
-    // 此函数完全依赖前一个函数传递的参数工作，因此不必依赖过多的全局变量
-
-
-
-        
-
+}        
 
 // lottery.js
 let lotteryPrizePool = "无上限奖池";
@@ -12605,36 +12769,36 @@ function getRandomReward(type) {
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 4 },
-            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 5 },
-            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 60 },
-            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 25 },
-            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 5 },
-            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
-            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c4ccc6d9c307b7e92d30ad.png', chance: 0.04 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 4 },
+            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 5 },
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 60 },
+            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 25 },
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 5 },
+            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
+            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
+            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
+            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
+            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
+            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
+            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
+            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
+            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
+            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
+            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
+            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
+            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
+            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
+            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
+            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
+            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
+            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
+            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
+            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
+            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
+            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
+            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
+            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
+            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 }
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
@@ -12713,11 +12877,11 @@ let jinnangItems = [
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材。' },
-    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' }
+    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
+    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -13807,13 +13971,13 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const speedBonus = 1 + collectedPetCount * 0.005;
     
-    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus);
-    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus);
-    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus);
-    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus);
-    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus);
-    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus);
-    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus);
+    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health;
+    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana;
+    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack;
+    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus) + drugBonus.magicAttack;
+    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus) + drugBonus.physicalDefense;
+    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense;
+    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed;
 
     // 累加武装增益值
     Object.keys(armsAttributes).forEach(key => {
@@ -17426,6 +17590,7 @@ function saveGameState() {
         enemyPetCultivation: enemyPetCultivation,
         enemyCritRate: enemyCritRate,
         enemyCritDamage: enemyCritDamage,
+        wuxingFragments: wuxingFragments,
         ascensionEnabled: ascensionEnabled,
         poisonSkillActivated: poisonSkillActivated,
         spiritLevel: spiritLevel,
@@ -17437,6 +17602,7 @@ function saveGameState() {
         drugBonus0: drugBonus0,
         drugBonus: drugBonus,
         wuxingStates: JSON.stringify(wuxingStates),
+        wuxingPetStates: JSON.stringify(wuxingPetStates),
         skillScore: skillScore,
         specializations: specializations,
         currentSpecialization: currentSpecialization,
@@ -17456,7 +17622,7 @@ function saveGameState() {
         collectCost: collectCost, //采集药物成本
         experienceTreasureOpenCount: experienceTreasureOpenCount, //经验宝箱成本
         gameItems: gameItems, // 保存道具数据
-        alreadyUnlocked: alreadyUnlocked
+        alreadyUnlocked: alreadyUnlocked,
     };
 
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -17613,7 +17779,12 @@ function loadGameState() {
         if (savedState.wuxingStates) {
             wuxingStates = JSON.parse(savedState.wuxingStates);
         }
-        
+        if (savedState.wuxingPetStates) {
+            wuxingPetStates = JSON.parse(savedState.wuxingPetStates);
+        }
+        if (savedState.wuxingFragments) {
+            wuxingFragments = savedState.wuxingFragments;
+        }
         skillScore = savedState.skillScore;
         blessGiftClaimed = savedState.blessGiftClaimed;
         enemyPet = savedState.enemyPet;
@@ -17688,6 +17859,7 @@ function loadGameState() {
         // 如果有其他需要更新的显示内容，也需要在这里添加
     }
     alreadyLoadGameState = true;
+    updateWuxingBonusState();
     console.log("读档成功！");
 }
 

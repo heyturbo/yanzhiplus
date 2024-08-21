@@ -1591,7 +1591,7 @@
             display: block;
             unicode-bidi: isolate;
             overflow-y: auto;
-            max-height: 60%;
+            max-height: 70%;
             line-height: 20px;
         }
 
@@ -5157,7 +5157,7 @@ function storeCurrentPetData() {
         divineWeapons: divineWeaponManager.getWeaponData(),
         divinedWeaponStatus: divinedWeaponStatus,
         drugBonus0: drugBonus0,
-        drugBonus: drugBonus,
+        
         enemyCritDamage: enemyCritDamage,
         enemyCritRate: enemyCritRate,
         enemyPetCultivation: enemyPetCultivation,
@@ -5184,8 +5184,8 @@ function storeCurrentPetData() {
         spiritLevel: spiritLevel,
         spiritMultiplier: spiritMultiplier,
         trainingCount: trainingCount,
-        //wuxingStates: JSON.stringify(wuxingStates),
-        wuxingPetStates: JSON.stringify(wuxingPetStates),
+        
+
     };
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
@@ -5256,18 +5256,6 @@ function restorePetData(petName) {
             drugBonus0 = savedPetData.drugBonus0;
         }
 
-        if (savedPetData.drugBonus) {
-            drugBonus = savedPetData.drugBonus;
-        }
-
-        //if (savedPetData.wuxingStates) {
-            //wuxingStates = JSON.parse(savedPetData.wuxingStates);
-        //}
-        
-        if (savedPetData.wuxingPetStates) {
-            wuxingPetStates = JSON.parse(savedPetData.wuxingPetStates);
-        }
-        
         if (savedPetData.specializations) {
             specializations = savedPetData.specializations;
         }
@@ -11261,7 +11249,6 @@ const divineWeaponManager = new DivineWeaponManager();
 // 五行符测试模块
 let wuxingFragments = 0;  // 分解后获得的碎片数量
 let wuxingStates = [];  // 存储所有五行符的状态
-let wuxingPetStates = [];  // 存储每个宠物的五行符装备状态
 const MAX_LEVEL = 100;  // 强化等级上限
 
 const wuxingTypeMap = {
@@ -11290,6 +11277,28 @@ const wuxingBonusMap = {
     speed: '速度'
 };
 
+// 初始化五行符管理器
+function addAmuletToManager(amuletType, color, level = 1) {
+    const wuxingName = `${amuletType}(${color})`;
+    const uniqueTag = `${wuxingName}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+
+    const newAmulet = {
+        tag: uniqueTag,
+        name: wuxingName,
+        color: color,
+        level: level,
+        drugBonus: initializeDrugBonus(color, level),
+        additionalValues: generateAdditionalValues(color),
+        equipped: false,
+        currentPetName: null
+    };
+
+    // 将新五行符添加到全局管理器
+    wuxingStates.push(newAmulet);
+    updateWuxingDisplay();
+}
+
+
 document.getElementById('wuxing-close-button').addEventListener('click', closeWuxingDisplay);
 document.getElementById('wuxing-display').style.display = 'none';
 
@@ -11304,35 +11313,6 @@ function closeWuxingDisplay() {
 }
 
 // 初始化五行符管理器
-function addAmuletToManager(amuletType, color, level = 1) {
-    const wuxingName = `${amuletType}(${color})`;
-
-    const uniqueTag = `${wuxingName}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-    const newAmulet = {
-        tag: uniqueTag,
-        name: wuxingName,
-        color: color,
-        level: level,
-        drugBonus: initializeDrugBonus(color, level),
-        additionalValues: generateAdditionalValues(color)
-    };
-
-    // 将新五行符添加到全局管理器
-    wuxingStates.push(newAmulet);
-
-    // 初始化该五行符的宠物状态为未装备
-    wuxingPetStates.push({
-        tag: uniqueTag,
-        equipped: false,
-        color: color,
-        currentPetName: null
-    });
-
-    updateWuxingDisplay();
-}
-
-
 // 初始化主条目加成
 function initializeDrugBonus(color, level, selectedBonus = null) {
     const bonus = {
@@ -11405,7 +11385,7 @@ function updateWuxingDisplay() {
         const amuletElement = document.createElement('div');
         amuletElement.className = `wuxing-item ${amulet.color}-border`;
 
-        const petAmulet = wuxingPetStates.find(a => a.tag === amulet.tag);
+        const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
         if (petAmulet && petAmulet.equipped) {
             amuletElement.classList.add('equipped');
         }
@@ -11497,9 +11477,7 @@ function displayAmuletDetails(amulet) {
 
     const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
     if (petAmulet && petAmulet.equipped) {
-        enhanceButton.disabled = true;
-        decomposeButton.disabled = true;
-        equipButton.disabled = true;
+
         unequipButton.disabled = false;
     } else {
         unequipButton.disabled = true;
@@ -11551,7 +11529,7 @@ function updateWuxingBonusState() {
     });
 
     // 遍历当前宠物已装备的五行符
-    wuxingPetStates.forEach(petAmuletState => {
+    wuxingStates.forEach(petAmuletState => {
         if (petAmuletState.equipped && petAmuletState.currentPetName === currentPet.name) {
             const amulet = wuxingStates.find(amulet => amulet.tag === petAmuletState.tag);
             if (amulet) {
@@ -11566,7 +11544,6 @@ function updateWuxingBonusState() {
         
 // 分解五行符
 function decomposeAmulet(tag) {
-    const detailsContainer = document.getElementById('amulet-details');
     const amuletIndex = wuxingStates.findIndex(amulet => amulet.tag === tag);
 
     if (amuletIndex === -1) {
@@ -11574,22 +11551,19 @@ function decomposeAmulet(tag) {
         return;
     }
 
+    const amulet = wuxingStates[amuletIndex];
+
+    if (amulet.equipped) {
+        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，无法分解。`, null, null, 'red');
+        return;
+    }
+
     const confirmDecomposition = () => {
-        const amulet = wuxingStates[amuletIndex];
         const fragmentsGained = amulet.level * 475;
         wuxingFragments += fragmentsGained;
 
-        // 从 wuxingStates 中移除五行符
         wuxingStates.splice(amuletIndex, 1);
-
-        // 从 wuxingPetStates 中移除与该五行符关联的状态
-        const petAmuletIndex = wuxingPetStates.findIndex(a => a.tag === tag);
-        if (petAmuletIndex !== -1) {
-            wuxingPetStates.splice(petAmuletIndex, 1);
-        }
-
         showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
-        detailsContainer.innerHTML = '';
         updateWuxingDisplay();
     };
 
@@ -11597,12 +11571,7 @@ function decomposeAmulet(tag) {
         showInfoBox("分解操作已取消。", null, null, 'black');
     };
 
-    showInfoBox(
-        "你确定要分解此五行符吗？该操作不可恢复。",
-        confirmDecomposition,
-        cancelDecomposition,
-        'red'
-    );
+    showInfoBox("你确定要分解此五行符吗？该操作不可恢复。", confirmDecomposition, cancelDecomposition, 'red');
 }
 
 
@@ -11614,50 +11583,28 @@ function equipAmulet(tag) {
         return;
     }
 
-    // 检查当前宠物是否已经装备了相同颜色的五行符
-    const equippedSameType = wuxingPetStates.some(a => a.color === amulet.color && a.equipped && a.currentPetName === currentPet.name);
-
-    if (equippedSameType) {
-        showInfoBox(`已经装备了一张 ${wuxingColorMap[amulet.color]} 的五行符。`, null, null, 'red');
-        return;
-    }
-
-    const existingAmuletState = wuxingPetStates.find(a => a.tag === tag);
-
-    if (existingAmuletState && existingAmuletState.equipped) {
-        if (existingAmuletState.currentPetName !== currentPet.name) {
-            showInfoBox(`该五行符已经被 ${existingAmuletState.currentPetName} 装备。`, null, null, 'red');
+    if (amulet.equipped) {
+        if (amulet.currentPetName !== currentPet.name) {
+            showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备。`, null, null, 'red');
         } else {
             showInfoBox(`该五行符已经装备在当前宠物上。`, null, null, 'green');
         }
         return;
     }
 
-    // 更新 wuxingPetStates 中的装备状态
-    if (existingAmuletState) {
-        existingAmuletState.equipped = true;
-        existingAmuletState.currentPetName = currentPet.name;
-    } else {
-        wuxingPetStates.push({
-            tag: tag,
-            equipped: true,
-            color: amulet.color, // 保存颜色信息以便后续判断
-            currentPetName: currentPet.name
-        });
+    const equippedSameType = wuxingStates.some(a => a.color === amulet.color && a.equipped && a.currentPetName === currentPet.name);
+
+    if (equippedSameType) {
+        showInfoBox(`已经装备了一张 ${wuxingColorMap[amulet.color]} 的五行符。`, null, null, 'red');
+        return;
     }
 
-    // 更新 wuxingStates 中的装备状态
     amulet.equipped = true;
     amulet.currentPetName = currentPet.name;
-
-    console.log(wuxingPetStates);
-    console.log(wuxingStates);
-    console.log(drugBonus);
 
     applyAmuletBonus(amulet, true);
     updateWuxingDisplay();
 }
-
 
 function unequipAmulet(tag) {
     const amulet = wuxingStates.find(amulet => amulet.tag === tag);
@@ -11667,29 +11614,21 @@ function unequipAmulet(tag) {
         return;
     }
 
-    const amuletState = wuxingPetStates.find(a => a.tag === tag);
-
-    if (amuletState) {
-        if (amuletState.equipped && amuletState.currentPetName !== currentPet.name) {
-            showInfoBox(`该五行符已经被 ${amuletState.currentPetName} 装备，无法卸下。`, null, null, 'red');
-            return;
-        } else if (amuletState.equipped && amuletState.currentPetName === currentPet.name) {
-            applyAmuletBonus(amulet, false);
-
-            // 更新 wuxingPetStates 中的装备状态
-            amuletState.equipped = false;
-            amuletState.currentPetName = null;
-
-            // 更新 wuxingStates 中的装备状态
-            amulet.equipped = false;
-            amulet.currentPetName = null;
-
-            updateWuxingDisplay();
-            console.log(drugBonus);
-        }
-    } else {
-        showInfoBox("请确保选中已装备的五行符。", null, null, 'red');
+    if (!amulet.equipped) {
+        showInfoBox("该五行符未被装备。", null, null, 'red');
+        return;
     }
+
+    if (amulet.currentPetName !== currentPet.name) {
+        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，无法卸下。`, null, null, 'red');
+        return;
+    }
+
+    applyAmuletBonus(amulet, false);
+    amulet.equipped = false;
+    amulet.currentPetName = null;
+
+    updateWuxingDisplay();
 }
 
 // 强化五行符
@@ -11762,27 +11701,19 @@ function applyWuxingEffects() {
         earthAmulet: 0,
     };
 
-    // 遍历 wuxingPetStates 中 equipped 为 true 且 currentPetName 为当前宠物的五行符
-    wuxingPetStates.forEach(state => {
-        //console.log(`Checking amulet: ${state.tag}, Equipped: ${state.equipped}, Current Pet: ${state.currentPetName}`);
-
+    wuxingStates.forEach(state => {
         if (state.equipped && state.currentPetName === currentPet.name) {
             const amuletType = state.tag.split('(')[0];
-            //console.log(`Amulet type detected: ${amuletType}`);
-
             if (effects.hasOwnProperty(amuletType)) {
                 effects[amuletType]++;
-                
             }
         }
     });
 
-    // 返回所有生效的五行符效果类型及其等级
     const activeEffects = {};
     Object.keys(effects).forEach(type => {
         if (effects[type] > 0) {
             activeEffects[type] = effects[type];
-            
         }
     });
 
@@ -17664,7 +17595,7 @@ function saveGameState() {
         drugBonus0: drugBonus0,
         drugBonus: drugBonus,
         wuxingStates: JSON.stringify(wuxingStates),
-        wuxingPetStates: JSON.stringify(wuxingPetStates),
+        
         skillScore: skillScore,
         specializations: specializations,
         currentSpecialization: currentSpecialization,
@@ -17841,9 +17772,7 @@ function loadGameState() {
         if (savedState.wuxingStates) {
             wuxingStates = JSON.parse(savedState.wuxingStates);
         }
-        if (savedState.wuxingPetStates) {
-            wuxingPetStates = JSON.parse(savedState.wuxingPetStates);
-        }
+
         if (savedState.wuxingFragments) {
             wuxingFragments = savedState.wuxingFragments;
         }

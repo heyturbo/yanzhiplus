@@ -238,6 +238,7 @@
     border-radius: 2px;
     margin: 5px;
     min-height: 50px;
+    margin-top: 5px;
 }
 
 .wuxing-item {
@@ -3871,7 +3872,7 @@ function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
 }
 function infoWuxingFu() {
-    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化消耗625碎片和20000经验值\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多，其战斗效果越强大");
+    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化消耗625碎片和20000经验值\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多，其战斗效果越强大");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -5120,7 +5121,7 @@ function deleteAllPetData() {
             console.log('gameState 不存在');
         }
         
-        showInfoBox('除当前宠物外，其他宠物数据均已删除！');
+        showInfoBox('除当前宠物外，其他宠物数据均已删除！如果你需要删除所有数据，请不要进行任何操作，直接刷新本页面完成初始化。如果你需要保留当前宠物的数据，你可以点击存档。');
         console.log(`Deleted ${keysToRemove.length - 1} pet data entries.`);
     });
 }
@@ -7339,7 +7340,7 @@ function performIndependentMagicAttack() {
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
         manaCostMultiplier = 500;
-        logBattleEvent("毁灭心魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'blue');
+        logBattleEvent("毁灭心魔令你对法术的操控更迟钝了，你耗费了更多的法力值！", 'grey');
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -11328,7 +11329,7 @@ function addAmuletToManager(amuletType, color, level = 1) {
 
 
 // 初始化主条目加成
-function initializeDrugBonus(color, level) {
+function initializeDrugBonus(color, level, selectedBonus = null) {
     const bonus = {
         physicalAttack: 0,
         magicAttack: 0,
@@ -11347,22 +11348,19 @@ function initializeDrugBonus(color, level) {
         purple: { magicDefense: 2500 }
     };
 
-    let selectedBonus = null;
-
-    if (color === 'red') {
-        selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
-    }
-
-    for (let i = 1; i <= level; i++) {
-        Object.keys(bonus).forEach(key => {
-            if (color === 'red') {
-                if (key === selectedBonus) {
-                    bonus[key] += increment.red[key];
+    // 使用传入的 selectedBonus 或者重新生成的 selectedBonus 来确定 red amulet 的 bonus
+    if (color === 'red' && selectedBonus) {
+        for (let i = 1; i <= level; i++) {
+            bonus[selectedBonus] += increment.red[selectedBonus];
+        }
+    } else {
+        for (let i = 1; i <= level; i++) {
+            Object.keys(bonus).forEach(key => {
+                if (increment[color] && increment[color][key]) {
+                    bonus[key] += increment[color][key];
                 }
-            } else if (increment[color] && increment[color][key]) {
-                bonus[key] += increment[color][key];
-            }
-        });
+            });
+        }
     }
 
     return bonus;
@@ -11408,7 +11406,7 @@ function updateWuxingDisplay() {
         }
 
         if (amulet.level > 1) {
-            amuletElement.style.boxShadow = '0px 0px 5px 5px white';
+            amuletElement.style.boxShadow = `0px 0px 5px 5px ${amulet.color}`;
         }
 
         amuletElement.style.backgroundImage = `url(${getAmuletImageURL(amulet.name)})`;
@@ -11430,7 +11428,7 @@ function updateWuxingDisplay() {
             selectedAmulet.originalBoxShadow = amuletElement.style.boxShadow; // 保存原始的 boxShadow
 
             // 应用新的选中样式
-            selectedAmulet.style.boxShadow = '0px 0px 0px 2px white';
+            selectedAmulet.style.boxShadow = '0px 0px 0px 4px red';
 
             displayAmuletDetails(amulet);
         });
@@ -11489,7 +11487,7 @@ function displayAmuletDetails(amulet) {
     equipButton.onclick = () => equipAmulet(amulet.tag);
 
     const unequipButton = document.createElement('button');
-    unequipButton.innerText = '撤下';
+    unequipButton.innerText = '卸下';
     unequipButton.onclick = () => unequipAmulet(amulet.tag);
 
     const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
@@ -11685,7 +11683,18 @@ function enhanceAmulet(tag) {
             currentExp -= 20000;
             amulet.level += 1;
 
-            amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
+            // 针对 red amulet 的特殊处理逻辑
+            if (amulet.color === 'red') {
+                // 确保只在第一次强化时确定增益类型
+                if (!amulet.selectedBonus) {
+                    amulet.selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
+                }
+                // 根据 selectedBonus 增强对应的属性
+                amulet.drugBonus[amulet.selectedBonus] += 300;
+            } else {
+                // 非 red amulet 继续使用 initializeDrugBonus 函数
+                amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
+            }
 
             if (amulet.level % 5 === 0) {
                 handleAdditionalValuesEnhancement(amulet);
@@ -11699,6 +11708,7 @@ function enhanceAmulet(tag) {
         }
     }
 }
+
 
 // 处理额外值强化
 function handleAdditionalValuesEnhancement(amulet) {
@@ -12577,6 +12587,7 @@ function collectTreasure() {
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
+        '华贵的药材箱': 'fancyDrugBox',
         '高级神兽丹': 'advancedSkillPill',
         '一等分解符': 'firstFragments',
         '二等分解符': 'secondFragments',
@@ -12826,7 +12837,8 @@ function getRandomReward(type) {
             { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 0.2 },
             { name: '修为灵丹*3（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 0.1 },
             { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 1 },
-            { name: '高级经验书*6', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 8 },
+            { name: '高级经验书*6', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 6 },
+            { name: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 2 },
             { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 1 }
         ]
     };
@@ -12888,7 +12900,8 @@ let jinnangItems = [
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
-    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材。' },
+    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
+    { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
     { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
     { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
     { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
@@ -13203,8 +13216,10 @@ const itemEffects = {
         setTimeout(handleSummonPet, 0);
     },
     liguolin: () => useLiguolin(),
+    mutationScroll: () => useMutationScroll(),
     advancedSkillPill: () => fulfillPetSkill(),
     drugBox: () => getRandomDrug(10,20),
+    fancyDrugBox: () => getRandomDrug(20,40),
     advancedExperienceBook: () => directlyAbsorbExperience(30000),
     normalExperienceBook: () => directlyAbsorbExperience(10000),
     firstFragments: () => addWuxingFragments(625),
@@ -14429,9 +14444,16 @@ function trainAttributesAfterFifth() {
 
         const growthValue = Math.floor(Math.random() * (growthRange[1] - growthRange[0] + 1)) + growthRange[0];
         const newBonusValue = Math.min(bonusAttribute + growthValue, maxAttribute);
+        const attributeMap = {
+            endurance: "耐力",
+            intelligence: "智力",
+            strength: "强壮",
+            agility: "敏捷",
+            faith: "信仰"
+        };
 
         bonusAttributes[attribute] = Math.max(newBonusValue, 0);
-        results.push(`${i + 1}. ${attributeMap(attribute)}: ${growthValue > 0 ? '+' : ''}${growthValue}`);
+        results.push(`${i + 1}. ${attributeMap[attribute]}: ${growthValue > 0 ? '+' : ''}${growthValue}`);
     }
 
     goldAmount -= 5000;

@@ -6653,7 +6653,13 @@ function calculateDamage(baseDamage, isCritical, critDamage) {
     const activeEffects = applyWuxingEffects();
     let fireEffect = 0;
 
-    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+    // 首先计算暴击伤害
+    if (isCritical) {
+        baseDamage = Math.floor(baseDamage * critDamage);
+    }
+
+    // 仅当 playerTurn 为 true 时，应用火符效果
+    if (playerTurn && activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
         const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
         fireEffect = Math.floor(baseDamage * damageBoostPercentage);
         baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
@@ -6663,8 +6669,9 @@ function calculateDamage(baseDamage, isCritical, critDamage) {
         } 
     }
 
-    return isCritical ? Math.floor(baseDamage * critDamage) : baseDamage;
+    return baseDamage;
 }
+
 
 
 function checkCriticalHit(critRate) {

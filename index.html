@@ -2437,7 +2437,7 @@
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
                 <button onclick="sellPet()">宠物市场</button>
-                <button onclick="blessGift()">新手礼包</button>
+                <button onclick="claimBlessGift()">新手礼包</button>
                 <div class="shop-timer">
                     <span id="shop-timer">05:00</span>
                     <button onclick="refreshShop()">刷新商品</button>
@@ -5824,7 +5824,7 @@ let poisonSkillActivated = false;
 let enemyPhysicalAttackCount = 0; // 在函数外部定义变量怪物杀戮状态下的攻击次数
 let extraShield = 0; //额外盾量
 let wiseDefense = 0; //此变量用于外部调用该数值并进行显示
-let wiseDefenseManaCost = 0; //此变量用于外部调用该数值并进行显示
+let wiseDefenseManaCost; //此变量用于外部调用该数值并进行显示
 let firstStartBattle = false;
 let onBattleState;
 let divinedWeaponStatus = false;
@@ -8063,13 +8063,23 @@ function handleReflectAndHeal(damage) {
         const baseReflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
         const randomAddition = Math.random() * 0.15;
         const reflectPercentage = baseReflectPercentage + randomAddition;
-
+    
         if (!isNaN(reflectPercentage) && reflectPercentage > 0) {
             let reflectDamage = Math.floor(damage * reflectPercentage);
+    
             if (isNaN(reflectDamage)) {
                 reflectDamage = 0;
                 console.error("Reflect damage is NaN, setting to 0.");
             }
+    
+            // 计算反弹伤害的最大值
+            const maxReflectDamage = Math.round((battleAttributes.physicalAttack + battleAttributes.magicAttack) * 5);
+    
+            // 确保反弹伤害不超过最大值
+            if (reflectDamage > maxReflectDamage) {
+                reflectDamage = maxReflectDamage;
+            }
+    
             battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
             logBattleEvent(`以牙还牙触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`, 'red');
             console.log(`Current reflectPercentage is ${reflectPercentage}`);
@@ -8204,31 +8214,33 @@ function handleDamageReduction(damage) {
     let shieldReduction = 0;
     let defenseReduction = 0;
     let finalDamage = damage;
-    let earthReduction;
 
     // 获取当前生效的五行符效果
     const activeEffects = applyWuxingEffects();
 
+    // 处理智慧守护的减伤逻辑
+    finalDamage = handleWiseDefense(finalDamage);
+
     // 检查是否触发“无我之境”
     if ((ascensionSkill.name === '无我之境' || secondAscensionSkill.name === '无我之境') && Math.random() < battleState.player.invincibilityChance) {
-        damage = 0;
+        finalDamage = 0;
         logBattleEvent("遁入无我之境！", 'silver');
         showBattleOverlay("https://pic.imgdb.cn/item/66b86c3ad9c307b7e93202e9.gif", 3000, 0.8);
         return;
     }
 
-    if (isNaN(damage)) {
-        damage = 0;
+    if (isNaN(finalDamage)) {
+        finalDamage = 0;
         console.error("Damage is NaN, setting to 0.");
     }
 
     // 处理护盾的伤害吸收
     if (extraShield > 0) {
         const shieldBefore = extraShield;
-        damage -= extraShield;
-        if (damage < 0) {
-            extraShield = -damage;
-            damage = 0;
+        finalDamage -= extraShield;
+        if (finalDamage < 0) {
+            extraShield = -finalDamage;
+            finalDamage = 0;
         } else {
             extraShield = 0;
         }
@@ -8238,21 +8250,21 @@ function handleDamageReduction(damage) {
     // 飞升技能的伤害减免处理
     const damageReductionPercentage = battleState.player.damageReductionPercentage / 100;
     if (damageReductionPercentage > 0) {
-        const reduction = Math.floor(damage * damageReductionPercentage);
-        damage -= reduction;
+        const reduction = Math.floor(finalDamage * damageReductionPercentage);
+        finalDamage -= reduction;
         totalDamageReduction += reduction;
     }
 
     // 防御状态下的伤害减免处理
     if (battleState.player.defending) {
         const defenseReductionPercentage = battleState.player.defenseReduction;
-        const reduction = Math.floor(damage * defenseReductionPercentage);
+        const reduction = Math.floor(finalDamage * defenseReductionPercentage);
 
         if (defenseReductionPercentage > 1) {
-            extraShield += Math.floor(damage * (defenseReductionPercentage - 1));
+            extraShield += Math.floor(finalDamage * (defenseReductionPercentage - 1));
         }
 
-        damage -= reduction;
+        finalDamage -= reduction;
         defenseReduction += reduction;
         battleState.player.defending = false;
     }
@@ -8260,14 +8272,13 @@ function handleDamageReduction(damage) {
     // 处理土符效果的伤害减免
     if (activeEffects.earthAmulet && activeEffects.earthAmulet > 0) {
         const earthReductionPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.earthAmulet];
-        const earthReduction = Math.floor(damage * earthReductionPercentage);
-        damage -= earthReduction;
+        const earthReduction = Math.floor(finalDamage * earthReductionPercentage);
+        finalDamage -= earthReduction;
         totalDamageReduction += earthReduction;
         logBattleEvent(`土符效果触发！你减少了 ${earthReduction}点所受的伤害。`, 'brown');
     }
 
     // 计算最终伤害并更新玩家血量
-    finalDamage = damage;
     const rightBattleAttributesHealth = battleAttributes.health;
     battleAttributes.health = Math.max(0, battleAttributes.health - finalDamage);
     if (battleAttributes.health > rightBattleAttributesHealth) {
@@ -8286,7 +8297,7 @@ function handleDamageReduction(damage) {
         if (wiseDefenseManaCost != 0) {
             logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
         } else {
-            logBattleEvent(`格挡为你减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
+            logBattleEvent(`格挡减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
         }
     } else {
         if (wiseDefenseManaCost != 0) {
@@ -8300,8 +8311,6 @@ function handleDamageReduction(damage) {
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，土符抵挡了${totalDamageReduction}，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
     getShieldStatus();
 }
-
-
 
 function handleWiseDefense(damage) {
     const shSkills = [];
@@ -8335,12 +8344,11 @@ function handleWiseDefense(damage) {
         wiseDefenseManaCost = manaUsed; //此变量用于外部调用该数值并进行显示
 
         console.log(`${shSkill.name} ${skillLevel}级消耗 ${manaUsed} 点法力值。`);
-        
-
     }
+
     return finalDamage;
-    getShieldStatus();
 }
+
 
 function applyDefenseBonus(selectedSkillName) {
     if (!battleState.player.defenseBonusCount) {
@@ -8467,9 +8475,6 @@ function enemyAttack() {
 
     // 然后计算最终伤害，包括暴击和其他修正
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
-
-    // 再处理防御和护盾
-    damage = handleWiseDefense(damage);
 
     // 处理燃烧效果
     handleBurnt();
@@ -11564,7 +11569,12 @@ function decomposeAmulet(tag) {
     const detailsContainer = document.getElementById('amulet-details');
     const amuletIndex = wuxingStates.findIndex(amulet => amulet.tag === tag);
 
-    if (amuletIndex !== -1) {
+    if (amuletIndex === -1) {
+        showInfoBox("找不到指定的五行符，请确保五行符未装备", null, null, 'red');
+        return;
+    }
+
+    const confirmDecomposition = () => {
         const amulet = wuxingStates[amuletIndex];
         const fragmentsGained = amulet.level * 475;
         wuxingFragments += fragmentsGained;
@@ -11581,9 +11591,18 @@ function decomposeAmulet(tag) {
         showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
         detailsContainer.innerHTML = '';
         updateWuxingDisplay();
-    } else {
-        showInfoBox("找不到指定的五行符，请确保五行符未装备", null, null, 'red');
-    }
+    };
+
+    const cancelDecomposition = () => {
+        showInfoBox("分解操作已取消。", null, null, 'black');
+    };
+
+    showInfoBox(
+        "你确定要分解此五行符吗？该操作不可恢复。",
+        confirmDecomposition,
+        cancelDecomposition,
+        'red'
+    );
 }
 
 
@@ -11650,19 +11669,24 @@ function unequipAmulet(tag) {
 
     const amuletState = wuxingPetStates.find(a => a.tag === tag);
 
-    if (amuletState && amuletState.equipped) {
-        applyAmuletBonus(amulet, false);
+    if (amuletState) {
+        if (amuletState.equipped && amuletState.currentPetName !== currentPet.name) {
+            showInfoBox(`该五行符已经被 ${amuletState.currentPetName} 装备，无法卸下。`, null, null, 'red');
+            return;
+        } else if (amuletState.equipped && amuletState.currentPetName === currentPet.name) {
+            applyAmuletBonus(amulet, false);
 
-        // 更新 wuxingPetStates 中的装备状态
-        amuletState.equipped = false;
-        amuletState.currentPetName = null;
+            // 更新 wuxingPetStates 中的装备状态
+            amuletState.equipped = false;
+            amuletState.currentPetName = null;
 
-        // 更新 wuxingStates 中的装备状态
-        amulet.equipped = false;
-        amulet.currentPetName = null;
+            // 更新 wuxingStates 中的装备状态
+            amulet.equipped = false;
+            amulet.currentPetName = null;
 
-        updateWuxingDisplay();
-        console.log(drugBonus);
+            updateWuxingDisplay();
+            console.log(drugBonus);
+        }
     } else {
         showInfoBox("请确保选中已装备的五行符。", null, null, 'red');
     }
@@ -12861,6 +12885,7 @@ let jinnangCapacity = 2000;
 let jinnangItems = [
     { name: 'hailMonsterPill', displayName: '聚灵丹', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png', price: 50, quantity: 5, description: '可在战斗界面开启自动战斗功能，每次开启消耗一个' },
     { name: 'hailMonsterAmulet', displayName: '唤妖符', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png', price: 50, quantity: 5, description: '可战斗界面跳过10轮，轮次越高，敌人越强大，谨慎使用' },
+    { name: 'blessGift', displayName: '新手福袋', url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png', price: 1, quantity: 0, description: '新手时期的嘉奖，要合理分配哦' },
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
@@ -13201,6 +13226,7 @@ const itemEffects = {
     },
     cultivationPill200: () => increaseCultivation(200),
     cultivationPill500: () => increaseCultivation(500),
+    blessGift: () => getBlessGift(),
     tinyBag: () => {
         goldAmount += 88000;
         updateGoldDisplay(goldAmount);
@@ -14646,6 +14672,12 @@ let goldAmount = 500000; // 初始金子数量
 function updateGoldDisplay(goldAmount) {
     const goldElement = document.getElementById('gold-amount');
 
+    // 确保 goldAmount 不超过 999,999,999
+    if (goldAmount > 999999999) {
+        goldAmount = 999999999;
+        showInfoBox('你的金子数已越界！',null,null,'red');
+    }
+
     const wen = goldAmount % 1000;
     const liang = Math.floor(goldAmount / 1000) % 1000;
     const ding = Math.floor(goldAmount / 1000000);
@@ -16042,7 +16074,16 @@ function updateSkillScore(selectedSkills = []) {
 
 let blessGiftClaimed = false;
 
-function blessGift() {
+function claimBlessGift() {
+    if (!blessGiftClaimed) {
+        addItemToJinnang('blessGift',1);
+        showInfoBox('获得新手礼包，请前往背包检查！');
+    } else {
+        showInfoBox('新手礼包只能领取一次！');
+    }
+}
+        
+function getBlessGift() {
     if (!blessGiftClaimed) {
         transmutationPill += 200;
         rebornPill += 200;
@@ -16051,7 +16092,7 @@ function blessGift() {
         miraculousPill += 10;
         qualityPill += 200;
         highGradePill += 500;
-        goldAmount += 1000000;
+        goldAmount += 1500000;
         updateGoldDisplay(goldAmount);
         document.getElementById("quality-pill").innerText = qualityPill;
         document.getElementById("high-grade-pill").innerText = highGradePill;
@@ -16078,13 +16119,17 @@ function blessGift() {
         addItemToJinnang('treasureMap', 10);
         addItemToJinnang('casinoCoverLetter', 10);
         addItemToJinnang('summonCharmPaper', 20);
-        blessGiftClaimed = true;
+        addItemToJinnang('celebrationCake', 5);
+        addItemToJinnang('advancedSkillPill', 1);
+        addItemToJinnang('redEnvelope', 2);
+        addItemToJinnang('cultivationPill200', 5);
         updateJinnangItems();
-        showInfoBox("您获得了1000两金子和新手大礼包！其他物品请检查你的背包！", null, () => {
+        blessGiftClaimed = true;
+        showInfoBox("您获得了1500两金子和新手大礼包！其他物品请检查你的背包！", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
     } else {
-        showInfoBox("你已经领取过新手礼包了!", null, () => {
+        showInfoBox("你已经开启过新手礼包了!", null, () => {
             // 在确认回调函数中执行其他逻辑
         });
     }

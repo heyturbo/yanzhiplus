@@ -3804,7 +3804,9 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V18
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V20.0.1
+                            \n- 上线五行符系统，新系统可能不稳定
+                            \n- 重构大量战斗系统代码，战斗系统更加稳定
                             \n- 增加通灵悬赏、打工系统
                             \n- 优化、加强神器系统；
                             \n- 增加大量技能效果，可通过神器开启；
@@ -5820,8 +5822,8 @@ let pierceDamageContainer = {
 let poisonSkillActivated = false;
 let enemyPhysicalAttackCount = 0; // 在函数外部定义变量怪物杀戮状态下的攻击次数
 let extraShield = 0; //额外盾量
-let wiseDefense; //此变量用于外部调用该数值并进行显示
-let wiseDefenseManaCost; //此变量用于外部调用该数值并进行显示
+let wiseDefense = 0; //此变量用于外部调用该数值并进行显示
+let wiseDefenseManaCost = 0; //此变量用于外部调用该数值并进行显示
 let firstStartBattle = false;
 let onBattleState;
 let divinedWeaponStatus = false;
@@ -6649,13 +6651,16 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
 //总伤害计算函数
 function calculateDamage(baseDamage, isCritical, critDamage) {
     const activeEffects = applyWuxingEffects();
-    let fireEffect;
+    let fireEffect = 0;
 
     if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
         const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
         fireEffect = Math.floor(baseDamage * damageBoostPercentage);
         baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
-        logBattleEvent(`火符效果触发！伤害增加了 ${fireEffect}点。`, 'red');
+
+        if (!isNaN(fireEffect) && fireEffect > 0) {
+            logBattleEvent(`火符效果触发！伤害增加了 ${fireEffect} 点。`, 'red');
+        } 
     }
 
     return isCritical ? Math.floor(baseDamage * critDamage) : baseDamage;

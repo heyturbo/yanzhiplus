@@ -16078,61 +16078,46 @@ function claimBlessGift() {
     if (!blessGiftClaimed) {
         addItemToJinnang('blessGift',1);
         showInfoBox('获得新手礼包，请前往背包检查！');
+        blessGiftClaimed = true;
     } else {
         showInfoBox('新手礼包只能领取一次！');
     }
 }
         
 function getBlessGift() {
-    if (!blessGiftClaimed) {
-        transmutationPill += 200;
-        rebornPill += 200;
-        bingpoRebornPill += 200;
-        goldenRebornPill += 200;
-        miraculousPill += 10;
-        qualityPill += 200;
-        highGradePill += 500;
-        goldAmount += 1500000;
-        updateGoldDisplay(goldAmount);
-        document.getElementById("quality-pill").innerText = qualityPill;
-        document.getElementById("high-grade-pill").innerText = highGradePill;
-        document.getElementById("miraculous-pill").innerText = miraculousPill;
-        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
-        document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
-        document.getElementById("transmutation-pill").innerText = transmutationPill;
-        document.getElementById("reborn-pill").innerText = rebornPill;
+    transmutationPill += 200;
+    rebornPill += 200;
+    bingpoRebornPill += 200;
+    goldenRebornPill += 200;
+    miraculousPill += 10;
+    qualityPill += 200;
+    highGradePill += 500;
+    goldAmount += 1500000;
+    updateGoldDisplay(goldAmount);
 
-        const itemsToIncrease = [
-            'coagulateStone', // 凝魄石
-            'seperateStone', // 离魂石
-            'radiantSoul',
-            'heartStone', // 心鉴之石
-            'shakingSoul',
-            'glowingSoul',
-            'activeSoul',
-            'jumpingSoul'
-        ];
-
-        for (const item of itemsToIncrease) {
-            addItemToJinnang(item, 50);
-        }
-        addItemToJinnang('treasureMap', 10);
-        addItemToJinnang('casinoCoverLetter', 10);
-        addItemToJinnang('summonCharmPaper', 20);
-        addItemToJinnang('celebrationCake', 5);
-        addItemToJinnang('advancedSkillPill', 1);
-        addItemToJinnang('redEnvelope', 2);
-        addItemToJinnang('cultivationPill200', 5);
-        updateJinnangItems();
-        blessGiftClaimed = true;
-        showInfoBox("您获得了1500两金子和新手大礼包！其他物品请检查你的背包！", null, () => {
-            // 在确认回调函数中执行其他逻辑
-        });
-    } else {
-        showInfoBox("你已经开启过新手礼包了!", null, () => {
-            // 在确认回调函数中执行其他逻辑
-        });
+    const itemsToIncrease = [
+        'coagulateStone', // 凝魄石
+        'seperateStone', // 离魂石
+        'radiantSoul',
+        'heartStone', // 心鉴之石
+        'shakingSoul',
+        'glowingSoul',
+        'activeSoul',
+        'jumpingSoul'
+    ];
+    for (const item of itemsToIncrease) {
+        addItemToJinnang(item, 50);
     }
+    addItemToJinnang('treasureMap', 10);
+    addItemToJinnang('casinoCoverLetter', 10);
+    addItemToJinnang('summonCharmPaper', 20);
+    addItemToJinnang('celebrationCake', 5);
+    addItemToJinnang('advancedSkillPill', 1);
+    addItemToJinnang('redEnvelope', 2);
+    addItemToJinnang('cultivationPill200', 5);
+    updateJinnangItems();
+    updateTopBarItems();
+    showInfoBox("您获得了1500两金子和新手大礼包！其他物品请检查你的背包！");
 }
 
 function upgradeWisdomTo() {
@@ -16158,13 +16143,7 @@ function upgradeWisdomTo() {
         jinnangCapacity = 200000;
         updateStampCount();
         updateGoldDisplay(goldAmount);
-        document.getElementById("quality-pill").innerText = qualityPill;
-        document.getElementById("high-grade-pill").innerText = highGradePill;
-        document.getElementById("miraculous-pill").innerText = miraculousPill;
-        document.getElementById("golden-reborn-pill").innerText = goldenRebornPill;
-        document.getElementById("bingpo-reborn-pill").innerText = bingpoRebornPill;
-        document.getElementById("transmutation-pill").innerText = transmutationPill;
-        document.getElementById("reborn-pill").innerText = rebornPill;
+        updateTopBarItems();
 
     const itemsToIncrease = [
         'normalExperienceBook',

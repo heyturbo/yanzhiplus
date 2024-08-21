@@ -12768,7 +12768,7 @@ function getRandomReward(type) {
             { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.8 },
             { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 },
             { name: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', chance: 0.1 },
-            { name: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 0.1 }
+            { name: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', chance: 0.1 }
         ],
         '灵魂宝箱': [
             { name: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', chance: 30 },
@@ -12900,8 +12900,9 @@ let jinnangItems = [
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
-    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
+    { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
     { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
+    { name: 'fragmentsPackage', displayName: '分解符礼包', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png', price: 200, quantity: 0, description: '直接使用，打开可获得100个五行符分解碎片' },
     { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
     { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
     { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
@@ -13222,6 +13223,7 @@ const itemEffects = {
     fancyDrugBox: () => getRandomDrug(20,40),
     advancedExperienceBook: () => directlyAbsorbExperience(30000),
     normalExperienceBook: () => directlyAbsorbExperience(10000),
+    fragmentsPackage: () => addWuxingFragments(100),
     firstFragments: () => addWuxingFragments(625),
     secondFragments: () => addWuxingFragments(125),
     thirdFragments: () => addWuxingFragments(25),
@@ -14778,6 +14780,7 @@ function getRandomCommonItem() {
         createItem('精灵精炼石', 1888, 3880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png'),
         createItem('精灵觉醒石', 3880, 6880, 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png'),
         createItem('天地灵气', 6688, 13688, 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png'),
+        createItem('分解符礼包', 18888, 38880, 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png'),
         createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png'),
         createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png'),
         createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
@@ -14888,6 +14891,7 @@ function buyItem() {
         '聚灵丹': () => addItemToJinnang('hailMonsterPill', itemQuantity),
         '唤妖符': () => addItemToJinnang('hailMonsterAmulet', itemQuantity),
         '修为灵丹（蓝）': () => addItemToJinnang('cultivationPill200', itemQuantity),
+        '分解符礼包': () => addItemToJinnang('fragmentsPackage', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 

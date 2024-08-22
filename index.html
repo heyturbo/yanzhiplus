@@ -200,7 +200,7 @@
     transform: translate(-50%, -50%);
     color: white;
     width: 90%;
-    max-height: 640px;
+    max-height: 660px;
     overflow-y: auto;
     z-index: 9999;
     background: #B07638;
@@ -225,7 +225,7 @@
     border: 1px solid black;
 }
 
-#wuxing-container, #equipped-container {
+#wuxing-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px 5px;
@@ -239,8 +239,32 @@
     margin: 5px;
     min-height: 50px;
     margin-top: 5px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+    border-image: url(https://pic.imgdb.cn/item/66c2f34cd9c307b7e9be06c0.png) 40 / 1 / 0 round;
 }
 
+#equipped-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 5px;
+    max-height: 200px;
+    justify-items: center;
+    align-content: space-around;
+    border: 1px solid #87431f;
+    padding: 10px;
+    overflow-y: scroll;
+    border-radius: 2px;
+    margin: 5px;
+    min-height: 50px;
+    margin-top: 5px;
+    border-width: 10px;
+    border-style: solid;
+    border-color: transparent;
+    border-image: url(https://pic.imgdb.cn/item/66c2f34cd9c307b7e9be06c0.png) 40 / 1 / 0 round;
+}
+        
 .wuxing-item {
     position: relative;
     width: 45px;
@@ -288,7 +312,6 @@
 }
 
 #amulet-details {
-    margin-top: 20px;
     border: 1px solid #87431f;
     padding: 10px;
     height: 220px;
@@ -2220,7 +2243,7 @@
     <!-- 五行符管理界面 -->
     <div id="wuxing-display" style="display: flex;flex-direction: column;justify-content: space-between;">
         <div id="wuxing-header">
-            <h3 style="margin:0;" onclick="infoWuxingFu()">五行玩法</h3>
+            <h3 style="margin:0;" onclick="infoWuxingFu()">玩法指南</h3>
             <p style="margin:0;" id="wuxing-fragments">五行碎片: 0</p>
             <button style="background: transparent;color: white;" id="wuxing-close-button">X</button>
         </div>
@@ -12416,19 +12439,8 @@ function increasePetLevel(levels) {
 let absorbCount = 0; // 跟踪连续使用次数
 
 function directlyAbsorbExperience(amount) {
-    if (currentExp < maxExp) {
-        currentExp += amount;
-
-        // 确保 currentExp 不超过 maxExp
-        if (currentExp > maxExp) {
-            currentExp = maxExp;
-        }
-
-        showInfoBox(`你获得了${amount}点经验，当前经验为${currentExp}`, null, null, 'green');
-    } else {
-        showInfoBox('当前已到经验上限，需要通过战斗刷新升级。本次吸纳经验没有获得任何收益！', null, null, 'red');
-    }
-    updateExpBar(); // 调用 updateExpBar 函数
+    gainExp(amount);
+    showInfoBox(`你获得了${amount}点经验，当前经验为${currentExp}/${maxExp}`, null, null, 'green');
 }
         
 function absorbExperience() {
@@ -12441,7 +12453,7 @@ function absorbExperience() {
         showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
             // 玩家选择确认，进入自动使用循环
             while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
-                if (petLevel >= petMaxLevel) {
+                if (petLevel >= 200) {
                     showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
                     break;
                 }

@@ -5206,7 +5206,6 @@ function storeCurrentPetData() {
         divineWeapons: divineWeaponManager.getWeaponData(),
         divinedWeaponStatus: divinedWeaponStatus,
         drugBonus0: drugBonus0,
-        
         enemyCritDamage: enemyCritDamage,
         enemyCritRate: enemyCritRate,
         enemyPetCultivation: enemyPetCultivation,
@@ -5233,8 +5232,6 @@ function storeCurrentPetData() {
         spiritLevel: spiritLevel,
         spiritMultiplier: spiritMultiplier,
         trainingCount: trainingCount,
-        
-
     };
         localStorage.setItem(`petData_${currentPet.name}`, JSON.stringify(petData));
     }
@@ -5448,6 +5445,7 @@ document.getElementById('closeSummonPanel').addEventListener('click', () => {
 });
 
 document.getElementById('closePetShop').addEventListener('click', () => {
+    document.getElementById('summonPanel').style.display = 'none';
     document.getElementById('petShop').style.display = 'none';
 });
 
@@ -6029,9 +6027,9 @@ function resetBuffState(playerWon) {
 
         if (drugProbability < 0.1) {
             drugTier = 0;
-        } else if (drugProbability < 0.25) {
+        } else if (drugProbability < 0.29) {
             drugTier = 1;
-        } else if (drugProbability < 0.5) {
+        } else if (drugProbability < 0.6) {
             drugTier = 2;
         } else {
             drugTier = 3;
@@ -6050,9 +6048,9 @@ function resetBuffState(playerWon) {
                 
                 if (extraDrugProbability < 0.1) {
                     extraDrugTier = 0;
-                } else if (extraDrugProbability < 0.25) {
+                } else if (extraDrugProbability < 0.29) {
                     extraDrugTier = 1;
-                } else if (extraDrugProbability < 0.5) {
+                } else if (extraDrugProbability < 0.6) {
                     extraDrugTier = 2;
                 } else {
                     extraDrugTier = 3;
@@ -6122,7 +6120,7 @@ function gainExp(expToAdd = 0) {
         totalGainedExp -= maxExp; // 保存多余的经验值
 
         // 当宠物等级为200时，不再增长 maxExp，并且退出循环
-        if (petLevel == 200) {
+        if (petLevel === 200) {
             maxExp = 99999999999999999999; // 设置 maxExp 为 99999999999999999999
             logBattleEvent("宠物已达到最高等级，经验值上限被设为最大值。", "pink");
             break; // 退出循环
@@ -7238,7 +7236,7 @@ function updateDamageValue(damage, enemy = false) {
     const damageElement = enemy ? enemyDamageValueElement : playerDamageValueElement;
 
     // 安全检查：确保 damage 不是 NaN
-    if (!isNaN(damage) && damage !== 0) {
+    if (!isNaN(damage) && damage >= 0) {
         // 设置显示的伤害值
         damageElement.innerText = `-${damage}`;
     
@@ -9023,6 +9021,10 @@ function handleHealingBan(skillMultiplier) {
 } //处理计算回复量和禁疗状态
 
 function handleSoulCapture() {
+    if (battleState.player.soulCapture) {
+        return;
+    }
+    
     battleState.player.soulCapture = true;
     battleAttributes.physicalAttack *= 0.5;
     battleAttributes.magicAttack *= 0.5;
@@ -12507,7 +12509,7 @@ function absorbExperience() {
         showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
             // 玩家选择确认，进入自动使用循环
             while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
-                if (petLevel >= petMaxLevel) {
+                if (petLevel >= petMaxLevel || petLevel === 200) {
                     showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
                     break;
                 }
@@ -13958,29 +13960,29 @@ function forgeArm(key, infoDiv, useGold = true) {
         if (rand < 0.9) {
             newValue = Math.floor(100 + Math.random() * 0.3 * (
                 attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-                attribute === "magicAttack" ? 58999 :
-                attribute === "speed" ? 8899 :
-                attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-                73999
+                attribute === "magicAttack" ? 38999 :
+                attribute === "speed" ? 18899 :
+                attribute === "health" || attribute === "mana" ? 266666 : // 更新生命值和法力值的范围
+                53999
             ));
         } else {
             newValue = Math.floor(100 + Math.random() * (
                 attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-                attribute === "magicAttack" ? 58999 :
-                attribute === "speed" ? 8899 :
-                attribute === "health" || attribute === "mana" ? 366666 : // 更新生命值和法力值的范围
-                73999
+                attribute === "magicAttack" ? 38999 :
+                attribute === "speed" ? 18899 :
+                attribute === "health" || attribute === "mana" ? 266666 : // 更新生命值和法力值的范围
+                53999
             ));
         }
     } else {
         const maxRanges = {
             physicalDefense: 87998,
             magicDefense: 87998,
-            magicAttack: 58999,
-            speed: 8899,
-            health: 366666,
-            mana: 366666,
-            default: 73999
+            magicAttack: 38999,
+            speed: 18899,
+            health: 266666,
+            mana: 266666,
+            default: 53999
         };
 
         const maxRange = maxRanges[attribute] || maxRanges.default;
@@ -15420,7 +15422,15 @@ function sellPet() {
     }
 
     showInfoBox("\n1. 你的宠物会被运送至市场供商人出价，无论市场估价结果如何，宠物都会被出售。\n2.请注意首页下拉栏显示名称与你想出售的宠物一致，否则将错误地出售其他宠物！", () => {
-        showMerchantModal();
+        // 检查是否有五行符被当前宠物装备，遍历全局变量
+        const petAmulet = wuxingStates.find(a => a.equipped && a.currentPetName === currentPet.name);
+        
+        if (petAmulet) {
+            showInfoBox('宠物身上还有没取下来的五行符！', null, null, 'red');
+            return;
+        } else {
+            showMerchantModal();
+        }
     });
 }
 
@@ -16441,7 +16451,7 @@ let baseAttributes = {
 };
         
 function calculateAttribute(currentValue, growthRate, level) {
-    return Math.floor((currentValue / 2000) * growthRate * level + 5);
+    return Math.floor((currentValue / 2000) * growthRate * level);
 }
 
 function calculateCurrentAttributes() {

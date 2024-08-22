@@ -5330,9 +5330,9 @@ function handlePetChange(selectedPetKey, petSelectId) {
 
     const selectedPet = pets[selectedPetKey];
     if (selectedPet) {
-        saveGameState(); //存储总体游戏数据
         storeCurrentPetData(); // 存储当前宠物数据
-
+        saveGameState(); //存储总体游戏数据
+        
         currentPetKey = selectedPetKey;
         currentPet = selectedPet; // 将当前宠物设为选择的宠物
 
@@ -11391,7 +11391,7 @@ function updateWuxingDisplay() {
         }
 
         if (amulet.level > 1) {
-            amuletElement.style.boxShadow = `0px 0px 5px 5px ${amulet.color}`;
+            amuletElement.style.boxShadow = `0px 0px 5px 2px ${amulet.color}`;
         }
 
         amuletElement.style.backgroundImage = `url(${getAmuletImageURL(amulet.name)})`;
@@ -12482,10 +12482,10 @@ function updateTreasureDescription(type) {
                 description = "神秘莫测的宝箱，单次开启花费2两金子，您可能获得宠物进化所需的各种灵魂！";
                 break;
             case '武神仙葫':
-                description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
+                description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得庆典蛋糕、精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '五行仙葫':
-                description = "至尊五行仙葫，每次开启30两金，您可能获得珍贵的五行符和分解材料！";
+                description = "至尊五行仙葫，每次开启30两金，您可能获得珍贵的五行符和分解符材料！";
                 break;
             case '至尊仙葫':
                 description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，修为灵丹、举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
@@ -12747,36 +12747,36 @@ function getRandomReward(type) {
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 4 },
-            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 5 },
-            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 60 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 2 },
+            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 15 },
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 50 },
             { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 25 },
-            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 5 },
-            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
-            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
-            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
-            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
-            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
-            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
-            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
-            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
-            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
-            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
-            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
-            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
-            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
-            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
-            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
-            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
-            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
-            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
-            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
-            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 },
-            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.04 },
-            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.04 },
-            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.04 },
-            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.04 },
-            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.04 }
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 6 },
+            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
+            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
+            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
+            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
+            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
+            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
+            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
+            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
+            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
+            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
+            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
+            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
+            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
+            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
+            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
+            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
+            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
+            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
+            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
+            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
+            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
+            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
+            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
+            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
+            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 }
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },

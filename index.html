@@ -3805,10 +3805,11 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V20.0.1
-                            \n- 上线五行符系统，新系统可能不稳定
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V20.0.2
+                            \n- 五行符系统优化，升级上限开放至100级且提升仙葫概率
+                            \n- 上线五行符系统，新系统可能不稳定，选择性尝试
                             \n- 重构大量战斗系统代码，战斗系统更加稳定
-                            \n- 增加通灵悬赏、打工系统
+                            \n- 优化通灵悬赏、打工系统
                             \n- 优化、加强神器系统；
                             \n- 增加大量技能效果，可通过神器开启；
                             \n- 调整某些战斗时会发生的bug；
@@ -11375,7 +11376,7 @@ function generateAdditionalValues(color) {
                 const remainingAttributes = attributes.filter(attr => !additionalValues.some(a => a.attribute === attr));
                 if (remainingAttributes.length > 0) {
                     const nonPercentageAttribute = remainingAttributes[Math.floor(Math.random() * remainingAttributes.length)];
-                    const randomValue = Math.floor(Math.random() * 201) + 800;
+                    const randomValue = Math.floor(Math.random() * 301) + 300;
                     additionalValues.push({ attribute: nonPercentageAttribute, value: randomValue });
                 }
             } else {
@@ -11384,7 +11385,7 @@ function generateAdditionalValues(color) {
                 percentageCount++; // 增加千分比属性计数
             }
         } else {
-            const randomValue = Math.floor(Math.random() * 201) + 800;
+            const randomValue = Math.floor(Math.random() * 301) + 300;
             additionalValues.push({ attribute: randomAttribute, value: randomValue });
         }
     }
@@ -11719,30 +11720,57 @@ function enhanceAmulet(tag) {
 
 // 处理额外值强化
 function handleAdditionalValuesEnhancement(amulet) {
-    const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
+    const enhancementMultiplier = 1.1 + Math.random() * (1.3 - 1.1);
+
+    // 获取已存在的属性集合，防止生成相同的属性条目
+    const existingAttributes = new Set(
+        amulet.additionalValues.map(value => value.attribute.replace('‰', ''))
+    );
 
     if (amulet.additionalValues.length < 5) {
         const addNewValue = Math.random() < 0.3;
-        if (addNewValue) {
-            const newAdditionalValue = generateAdditionalValues(amulet.color).pop();
-            amulet.additionalValues.push(newAdditionalValue);
-        } else {
-            const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-            const enhancementValue = amulet.additionalValues[randomIndex].attribute.startsWith('‰')
-                ? Math.floor(Math.random() * (7 - 5 + 1)) + 5
-                : Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
 
-            amulet.additionalValues[randomIndex].value += enhancementValue;
+        if (addNewValue) {
+            let newAdditionalValue;
+            let attempts = 0;
+
+            do {
+                newAdditionalValue = generateAdditionalValues(amulet.color).pop();
+                attempts++;
+            } while (existingAttributes.has(newAdditionalValue.attribute.replace('‰', '')) && attempts < 10);
+
+            if (!existingAttributes.has(newAdditionalValue.attribute.replace('‰', ''))) {
+                amulet.additionalValues.push(newAdditionalValue);
+            } else {
+                // 如果无法添加新属性，则提升现有属性
+                enhanceExistingAttribute(amulet, enhancementMultiplier);
+            }
+        } else {
+            // 提升现有属性
+            enhanceExistingAttribute(amulet, enhancementMultiplier);
         }
     } else {
-        const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-        const enhancementValue = amulet.additionalValues[randomIndex].attribute.startsWith('‰')
-            ? Math.floor(Math.random() * (7 - 5 + 1)) + 5
-            : Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+        // 如果已有5个属性，则直接提升现有属性
+        enhanceExistingAttribute(amulet, enhancementMultiplier);
+    }
+}
 
+// 提升现有属性的函数
+function enhanceExistingAttribute(amulet, enhancementMultiplier) {
+    const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
+
+    // 判断是千分比属性还是具体数值属性
+    if (amulet.additionalValues[randomIndex].attribute.startsWith('‰')) {
+        // 千分比属性，增加固定的5~7‰
+        const enhancementValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5;
+        amulet.additionalValues[randomIndex].value += enhancementValue;
+    } else {
+        // 具体数值属性，按随机1.1~1.3倍增加
+        const enhancementValue = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
         amulet.additionalValues[randomIndex].value += enhancementValue;
     }
 }
+
 
 
 function applyWuxingEffects() {
@@ -12912,11 +12940,12 @@ let jinnangItems = [
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
     { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
     { name: 'fragmentsPackage', displayName: '分解符礼包', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png', price: 200, quantity: 0, description: '直接使用，打开可获得100个五行符分解碎片' },
-    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' },
-    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成。' }
+    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -13238,7 +13267,15 @@ const itemEffects = {
     secondFragments: () => addWuxingFragments(125),
     thirdFragments: () => addWuxingFragments(25),
     fourthFragments: () => addWuxingFragments(5),
-    fifthFragments: () => addWuxingFragments(1)
+    fifthFragments: () => addWuxingFragments(1),
+    goldAmuletPackage: () => {
+        addAmuletToManager('goldAmulet', 'red', 1);
+        addAmuletToManager('goldAmulet', 'purple', 1);
+        addAmuletToManager('goldAmulet', 'orange', 1);
+        addAmuletToManager('goldAmulet', 'blue', 1);
+        addAmuletToManager('goldAmulet', 'green', 1);
+        showInfoBox('你获得金符（红）金符（紫）金符（橙）金符（蓝）金符（绿），请在五行面板中查看！')
+    }
 };
 
 function getRandomDrug(minNum, maxNum) {
@@ -16087,7 +16124,9 @@ function getBlessGift() {
         'shakingSoul',
         'glowingSoul',
         'activeSoul',
-        'jumpingSoul'
+        'jumpingSoul',
+        'hailMonsterPill',
+        'hailMonsterAmulet',
     ];
     for (const item of itemsToIncrease) {
         addItemToJinnang(item, 50);
@@ -16098,6 +16137,7 @@ function getBlessGift() {
     addItemToJinnang('celebrationCake', 5);
     addItemToJinnang('advancedSkillPill', 1);
     addItemToJinnang('redEnvelope', 2);
+    addItemToJinnang('goldAmuletPackage', 1);
     addItemToJinnang('cultivationPill200', 5);
     updateJinnangItems();
     updateTopBarItems();

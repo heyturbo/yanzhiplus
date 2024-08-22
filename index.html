@@ -1598,6 +1598,26 @@
             flex-direction: column;
         }
         
+        .player-damage-display {
+            color: red;
+            position: absolute;
+            top: 12%;
+            left: 73%;
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+        }
+
+        .enemy-damage-display {
+            color: red;
+            position: absolute;
+            top: 12%;
+            left: 24%;
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+        }
+        
         .battle-system-log {
             border: 1px solid #ccc;
             padding: 5px;
@@ -1925,6 +1945,9 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+
+        
 .drug-modal .modal {
     display: none;
     position: fixed;
@@ -2578,6 +2601,7 @@
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
                     <div style="display: flex; justify-content: center;">
                         <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;">
+                        <div class="enemy-damage-display" id="enemy-damage-display"><span id="enemy-damage-value"></span></div>
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
                     <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
@@ -2605,7 +2629,8 @@
                 <div class="battle-system-enemy-info">
                     <h2><span id="enemy-name">毁灭心魔</span> lv<span id="enemy-level">1</span></h2>
                     <div style="display: flex;justify-content: center;">
-                    <img id="enemy-image" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="毁灭心魔" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;">
+                        <img id="enemy-image" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="毁灭心魔" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;">
+                        <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></div>
                     <div style="margin-bottom: 5px">法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></div>
@@ -7204,6 +7229,28 @@ function performAttack(type) {
     applyAscensionEffects();
 }
 
+function updateDamageValue(damage, enemy = false) {
+    // 获取玩家和敌人的 DOM 元素
+    const playerDamageValueElement = document.getElementById('player-damage-value');
+    const enemyDamageValueElement = document.getElementById('enemy-damage-value');
+    
+    // 根据 enemy 参数决定显示在哪个元素上
+    const damageElement = enemy ? enemyDamageValueElement : playerDamageValueElement;
+
+    // 安全检查：确保 damage 不是 NaN
+    if (!isNaN(damage) && damage !== 0) {
+        // 设置显示的伤害值
+        damageElement.innerText = `-${damage}`;
+    
+        // 在 100 毫秒后清空显示的伤害值
+        setTimeout(() => {
+            damageElement.innerText = '';
+        }, 200);
+    } else {
+        console.error("Invalid damage value: NaN");
+        return;
+    }
+}
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 检查玩家是否处于失明状态
@@ -7248,6 +7295,8 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     } else {
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点物理伤害。`, 'white');
     }
+
+    updateDamageValue(finalDamage); // 显示玩家伤害
 
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
@@ -7307,7 +7356,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         logBattleEvent(`⚔️【玩家攻击】你进行了法术攻击，造成了 ${finalDamage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     }
-
+    updateDamageValue(finalDamage); // 显示玩家伤害
     applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
     
     if (battleState.enemy.pierced) {
@@ -7375,7 +7424,7 @@ function performIndependentMagicAttack() {
     } else {
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点伤害。`, 'wheat');
     }
-
+    updateDamageValue(finalDamage); // 显示玩家伤害
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
     applyMagicAttackEffects(finalDamage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
@@ -7471,7 +7520,7 @@ function performPoison() {
         handlePierced(); // 处理穿透效果
     }
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
-
+    updateDamageValue(poisonDamage); // 显示玩家伤害
     let poisonChance = 0.3;
     if (useItem('poisonPowder')) {
         poisonChance = 0.7;
@@ -8524,6 +8573,7 @@ function performEnemyPhysicalAttack(isCritical) {
     } else {
         logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
     }
+    
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
 
     // 新增规则判断
@@ -8550,6 +8600,8 @@ function performEnemyPhysicalAttack(isCritical) {
     if (!battleState.enemy.silenced || damage !== 0) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
+    
+    updateDamageValue(damage, true); // 显示敌人伤害
     handleReflectAndHeal(damage);
     return damage;
 }
@@ -8578,6 +8630,8 @@ function performEnemyMagicalAttack(isCritical) {
     } else {
         logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
+
+    updateDamageValue(damage, true); // 显示敌人伤害
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
 
     // 应用毁灭心魔法术效果
@@ -12440,7 +12494,7 @@ let absorbCount = 0; // 跟踪连续使用次数
 
 function directlyAbsorbExperience(amount) {
     gainExp(amount);
-    showInfoBox(`你获得了${amount}点经验，当前经验为${currentExp}/${maxExp}`, null, null, 'green');
+    showInfoBox(`你获得了${amount}点经验，当前为${petLevel}级，当前经验为${currentExp}/${maxExp}`, null, null, 'green');
 }
         
 function absorbExperience() {

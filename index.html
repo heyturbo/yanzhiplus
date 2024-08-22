@@ -12453,7 +12453,7 @@ function absorbExperience() {
         showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
             // 玩家选择确认，进入自动使用循环
             while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
-                if (petLevel >= 200) {
+                if (petLevel >= petMaxLevel) {
                     showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
                     break;
                 }

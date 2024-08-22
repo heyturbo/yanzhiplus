@@ -11355,20 +11355,43 @@ function initializeDrugBonus(color, level, selectedBonus = null) {
 function generateAdditionalValues(color) {
     const additionalValues = [];
     const attributes = ['physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'];
+    const percentageAttributes = attributes.map(attr => `‰${attr}`);
+    let percentageCount = 0;  // 用于跟踪千分比属性的数量
 
     if (color === 'green') {
         attributes.push('speed');
     }
 
+    const allAttributes = attributes.concat(percentageAttributes);
     const numOfValues = Math.floor(Math.random() * 5) + 1;
+
     for (let i = 0; i < numOfValues; i++) {
-        const randomAttribute = attributes[Math.floor(Math.random() * attributes.length)];
-        const randomValue = Math.floor(Math.random() * 201) + 800;
-        additionalValues.push({ attribute: randomAttribute, value: randomValue });
+        const randomAttribute = allAttributes[Math.floor(Math.random() * allAttributes.length)];
+        
+        // 检查是否已经生成了两条千分比属性
+        if (randomAttribute.startsWith('‰')) {
+            if (percentageCount >= 2) {
+                // 如果已达到两条千分比属性限制，重新选择一个非千分比属性
+                const remainingAttributes = attributes.filter(attr => !additionalValues.some(a => a.attribute === attr));
+                if (remainingAttributes.length > 0) {
+                    const nonPercentageAttribute = remainingAttributes[Math.floor(Math.random() * remainingAttributes.length)];
+                    const randomValue = Math.floor(Math.random() * 201) + 800;
+                    additionalValues.push({ attribute: nonPercentageAttribute, value: randomValue });
+                }
+            } else {
+                const randomValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5; // 生成5‰到7‰之间的随机值
+                additionalValues.push({ attribute: randomAttribute, value: randomValue });
+                percentageCount++; // 增加千分比属性计数
+            }
+        } else {
+            const randomValue = Math.floor(Math.random() * 201) + 800;
+            additionalValues.push({ attribute: randomAttribute, value: randomValue });
+        }
     }
 
     return additionalValues;
 }
+
  
 // 更新显示界面
 function updateWuxingDisplay() {
@@ -11449,7 +11472,10 @@ function displayAmuletDetails(amulet) {
             <p>主条目: ${Object.entries(amulet.drugBonus)
                 .filter(([key, value]) => value > 0)
                 .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
-            <p>副条目: ${amulet.additionalValues.map(v => `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
+            <p>副条目: ${amulet.additionalValues.map(v => 
+                v.attribute.startsWith('‰')
+                ? `${v.value}‰ ${wuxingBonusMap[v.attribute.replace('‰', '')]}`
+                : `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
         </div>
     `;
 
@@ -11493,12 +11519,14 @@ function displayAmuletDetails(amulet) {
 
 // 应用五行符增益
 function applyAmuletBonus(amulet, apply = true) {
+    const currentAttributes = calculateCurrentAttributes();
+    const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
+
     Object.keys(amulet.drugBonus).forEach(key => {
         if (apply) {
             drugBonus[key] += amulet.drugBonus[key];
         } else {
             drugBonus[key] -= amulet.drugBonus[key];
-            // 确保 drugBonus 不小于 0
             if (drugBonus[key] < 0) {
                 drugBonus[key] = 0;
             }
@@ -11508,19 +11536,35 @@ function applyAmuletBonus(amulet, apply = true) {
     amulet.additionalValues.forEach(additional => {
         const key = additional.attribute;
         const value = additional.value;
-        if (apply) {
-            drugBonus[key] += value;
+
+        if (key.startsWith('‰')) {
+            const baseAttribute = key.replace('‰', '');
+            const multiplier = value / 1000;  // Convert ‰ to percentage
+            const additionalValue = Math.floor(secondaryAttributes[baseAttribute] * multiplier);
+
+            if (apply) {
+                drugBonus[baseAttribute] += additionalValue;
+            } else {
+                drugBonus[baseAttribute] -= additionalValue;
+                if (drugBonus[baseAttribute] < 0) {
+                    drugBonus[baseAttribute] = 0;
+                }
+            }
         } else {
-            drugBonus[key] -= value;
-            // 确保 drugBonus 不小于 0
-            if (drugBonus[key] < 0) {
-                drugBonus[key] = 0;
+            if (apply) {
+                drugBonus[key] += value;
+            } else {
+                drugBonus[key] -= value;
+                if (drugBonus[key] < 0) {
+                    drugBonus[key] = 0;
+                }
             }
         }
     });
 
     updateUI();
 }
+
 
 function updateWuxingBonusState() {
     // 清空当前的 drugBonus
@@ -11675,6 +11719,8 @@ function enhanceAmulet(tag) {
 
 // 处理额外值强化
 function handleAdditionalValuesEnhancement(amulet) {
+    const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
+
     if (amulet.additionalValues.length < 5) {
         const addNewValue = Math.random() < 0.3;
         if (addNewValue) {
@@ -11682,15 +11728,22 @@ function handleAdditionalValuesEnhancement(amulet) {
             amulet.additionalValues.push(newAdditionalValue);
         } else {
             const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-            const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
-            amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+            const enhancementValue = amulet.additionalValues[randomIndex].attribute.startsWith('‰')
+                ? Math.floor(Math.random() * (7 - 5 + 1)) + 5
+                : Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+
+            amulet.additionalValues[randomIndex].value += enhancementValue;
         }
     } else {
         const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
-        const enhancementMultiplier = 1.2 + Math.random() * (2.5 - 1.2);
-        amulet.additionalValues[randomIndex].value = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+        const enhancementValue = amulet.additionalValues[randomIndex].attribute.startsWith('‰')
+            ? Math.floor(Math.random() * (7 - 5 + 1)) + 5
+            : Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
+
+        amulet.additionalValues[randomIndex].value += enhancementValue;
     }
 }
+
 
 function applyWuxingEffects() {
     const effects = {

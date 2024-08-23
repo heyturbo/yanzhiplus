@@ -2271,8 +2271,8 @@
             <button style="background: transparent;color: white;" id="wuxing-close-button">X</button>
         </div>
         <div class="drawer-container"id="wuxingguanli-container">
-            <div id="wuxing-container"></div>
             <div id="equipped-container"></div>
+            <div id="wuxing-container"></div>
             <div id="amulet-details"></div>
         </div>
     </div>
@@ -5711,12 +5711,12 @@ document.getElementById('closeMissionPanel').addEventListener('click', () => {
 let selectedDrug = null;
 let alreadyUseDrug = false;
 let drugInventory = {
-    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后永久增加20000生命值，且恢复至满状态" },
+    "长生泉": { quantity: 2, url: "https://pic.imgdb.cn/item/666c0289d9c307b7e9ae8abd.png", tier: 0, description: "橙色品阶，长生不老之泉，饮用后永久增加5000生命值，且恢复至满状态" },
     "忘忧水": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png", tier: 3, description: "绿色品阶，每1.5秒恢复1%生命值值，持续3秒，可叠加生效" },
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，每1.5秒恢复2%法力值，持续3秒，可叠加生效" },
-    "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高10%暴击率" },
+    "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高1%暴击率" },
     "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，20秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高10%暴击伤害" },
+    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高2.5%暴击伤害" },
     "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，20秒内暴击率提高50%" },
     "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，20秒内增加150%物理攻击力。" },
     "延寿露": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },
@@ -5725,17 +5725,17 @@ let drugInventory = {
     "见手青": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b565.png", tier: 0, description: "橙色品阶，投喂敌人后敌人会中毒，能力下降50%，直至本轮胜利" },
     "沉檀凝香": { quantity: 5, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b538.png", tier: 1, description: "紫色品阶，恢复10%生命值并有几率清除玩家的异常状态" },
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
-    "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加5000点生命值" },
-    "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加5000点法力值" },
+    "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加2000点生命值" },
+    "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加2000点法力值" },
     "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得50000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
-    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，永久增加100点速度，收集3个可以合成1个绿色品阶的药品" },
-    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，永久增加300点物理攻击力，收集3个可以合成1个蓝色品阶的药品" },
-    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，永久增加3000点物理防御力，收集3个可以合成1个紫色品阶的药品" },
-    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，永久增加8000点法术防御力，收集3个可以合成1个橙色品阶的药品" },
-    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，永久增加4000点法术攻击力，收集2个可以炼制出随机药品" }
+    "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，恢复1000点生命值和法力值，收集3个可以合成1个绿色品阶的药品" },
+    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，永久增加100点速度，收集3个可以合成1个蓝色品阶的药品" },
+    "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，永久增加500点生命值和法力值，收集3个可以合成1个紫色品阶的药品" },
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，永久增加594物理防御和法术防御，收集3个可以合成1个橙色品阶的药品" },
+    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，永久增加772点物理攻击和法术攻击，收集2个可以炼制出随机药品" }
 };
 let collectCost = 100; // 初始采集花费
 let activeBuffs = {};
@@ -5779,23 +5779,23 @@ let ascensionAttributes = {
 };
 const ascensionSkills = {
     attribute: [
-        { name: '力劈华山', effect: level => `额外提供${50000 + level * 3500}点物理攻击力`, baseValue: 50000, increment: level => level * 3500 },
-        { name: '慈悲心怀', effect: level => `额外提供${500000 + level * 20000}点生命值和${200000 + level * 20000}点法力值`, baseValue: 500000, increment: level => 20000 * level },
-        { name: '势如破竹', effect: level => `额外提供${20000 + 3000 * level}点速度和${40000 + 3000 * level}点法术攻击力`, baseValue: 20000, increment: level => 3000 * level },
-        { name: '固若金汤', effect: level => `额外提供${500000 + 50000 * level}点物理防御和${500000 + 50000 * level}点法术防御`, baseValue: 500000, increment: level => 50000 * level },
+        { name: '力劈华山', effect: level => `额外提供${3000 + level * 350}点物理攻击力`, baseValue: 3000, increment: level => level * 350 },
+        { name: '慈悲心怀', effect: level => `额外提供${100000 + level * 8000}点生命值和${100000 + level * 8000}点法力值`, baseValue: 100000, increment: level => 8000 * level },
+        { name: '势如破竹', effect: level => `额外提供${24000 + 300 * level}点速度和${24000 + 300 * level}点法术攻击力`, baseValue: 24000, increment: level => 300 * level },
+        { name: '固若金汤', effect: level => `额外提供${100000 + 5000 * level}点物理防御和${100000 + 5000 * level}点法术防御`, baseValue: 100000, increment: level => 5000 * level },
         { name: '未开启', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 },
         { name: '被封印的技能', effect: level => "未开启飞升技能", baseValue: 0, increment: level => level * 0 }
     ],
     combat: [
         { name: '魔龙之力', effect: level => `每回合恢复${10 + 1 * level}%的生命值`, baseValue: 10, increment: level => 1 * level },
-        { name: '斩龙一式', effect: level => `当毁灭心魔生命值在${87 - 3 * (level - 1)}%以上时，对毁灭心魔的物理攻击伤害增加60%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
-        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${13.5 + 3.5 * (level - 1)}%概率额外给毁灭心魔附加等同于玩家物理攻击力1000%的伤害。`, baseValue: 13.5, increment: level => 13.5 + 3.5 * (level - 1) },
+        { name: '斩龙一式', effect: level => `当毁灭心魔生命值在${87 - 3 * (level - 1)}%以上时，对毁灭心魔的物理攻击伤害增加40%`, baseValue: 90, increment: level => 90 - 3 * (level - 1) },
+        { name: '灵魂穿刺', effect: level => `当玩家暴击时,有${10 + 1.5 * level}%概率额外给毁灭心魔附加等同于玩家物理攻击力1000%的伤害。`, baseValue: 10, increment: level => 10 + 1.5 * level,
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${21 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
         { name: '以牙还牙', effect: level => `反弹本次承受伤害的${45 + 2 * level}%~${60 + 2 * level}%`, baseValue: 35, increment: level => 2 * level },
         { name: '铜墙铁壁', effect: level => `承受伤害降低${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
-        { name: '法术精通', effect: level => `每次使用法术攻击时，有${60 + 2 * level}%概率再次施放一次法术伤害`, baseValue: 60, increment: level => 2 * level },
+        { name: '法术精通', effect: level => `每次使用法术攻击时，有${30 + 2 * level}%概率再次施放一次法术伤害`, baseValue: 30, increment: level => 2 * level },
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
     settlement: [
@@ -7294,12 +7294,12 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     // 应用各种效果和状态修正伤害
     if ((ascensionSkill.name === '斩龙一式' || secondAscensionSkill.name === '斩龙一式') && battleState.enemy.health / enemyMaxHealth > battleState.player.whiteNightThreshold) {
-        baseDamage = Math.floor(baseDamage * 1.6); // 增加60%伤害
+        baseDamage = Math.floor(baseDamage * 1.4); // 增加60%伤害
     }
 
     if (battleState.player.taunt) {
-        baseDamage = Math.floor(baseDamage * 2); // 增加200%伤害
-        logBattleEvent("怒意激发了你的斗志，嘲讽下你的物理伤害提升至200%！", 'red');
+        baseDamage = Math.floor(baseDamage * 1.2); // 增加20%伤害
+        logBattleEvent("怒意激发了你的斗志，嘲讽下你的物理伤害提升20%！", 'red');
     }
 
     let isCritical = checkCriticalHit(playerCritRate);
@@ -8564,8 +8564,6 @@ function enemyAttack() {
 
     // 处理燃烧效果
     handleBurnt();
-
-    handleReflectAndHeal(damage);
     // 处理复活效果
     handleResurrection(damage);
     handleManaRecover();
@@ -8627,7 +8625,7 @@ function performEnemyPhysicalAttack(isCritical) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
     
-
+     handleReflectAndHeal(damage);
     return damage;
 }
 
@@ -8660,6 +8658,7 @@ function performEnemyMagicalAttack(isCritical) {
 
     // 应用毁灭心魔法术效果
     applyEnemyMagicEffects(damage);
+    handleReflectAndHeal(damage);
     return damage;
 }
 
@@ -9261,7 +9260,7 @@ function useSelectedDrug() {
 
         switch (selectedDrug) {
             case "长生泉":
-                applyDrugBonus0("health", 20000);
+                applyDrugBonus0("health", 5000);
                 updatePetInfo();
                 logBattleEvent(`使用长生泉，你如获新生。`, 'gold');
                 break;
@@ -9396,12 +9395,12 @@ function useSelectedDrug() {
                 handleMushroom();
                 break;
             case "狂暴之魂":
-                playerCritRate = Math.min(1.0, playerCritRate + 0.10); // 最大100%
-                logBattleEvent(`使用狂暴之魂，暴击率永久提高10%。`, 'gold');
+                playerCritRate = Math.min(1.0, playerCritRate + 0.01); // 最大100%
+                logBattleEvent(`使用狂暴之魂，暴击率永久提高1%。`, 'gold');
                 break;
             case "慧心糖果":
-                playerCritDamage = Math.min(30.0, playerCritDamage + 0.10); // 最大3000%
-                logBattleEvent(`使用慧心糖果，暴击伤害永久提高10%。`, 'gold');
+                playerCritDamage = Math.min(30.0, playerCritDamage + 0.025); // 最大3000%
+                logBattleEvent(`使用慧心糖果，暴击伤害永久提高2.5%。`, 'gold');
                 break;
             case "延寿露":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + Math.floor(maxHealth * 0.2));
@@ -9412,25 +9411,29 @@ function useSelectedDrug() {
                 logBattleEvent(`使用天山雪莲，恢复了 ${Math.floor(maxMana * 0.2)} 点法力值。`, 'gold');
                 break;
             case "普通药材":
-                applyDrugBonus0("speed", 100);
+                battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 1000);
+                battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 1000);
                 break;
             case "上等药材":
-                applyDrugBonus0("physicalAttack", 300);
+                applyDrugBonus0("speed", 100);
                 break;
             case "极品药材":
-                applyDrugBonus0("physicalDefense", 3000);
+                applyDrugBonus0("health", 500);
+                applyDrugBonus0("mana", 500);
                 break;
             case "珍贵药材":
-                applyDrugBonus0("magicDefense", 8000);
+                applyDrugBonus0("physicalDefense", 594);
+                applyDrugBonus0("magicDefense", 594);
                 break;
             case "完美药材":
-                applyDrugBonus0("magicAttack", 4000);
+                applyDrugBonus0("physicalAttack", 772);
+                applyDrugBonus0("magicAttack", 772);
                 break;
             case "冰莲絮":
-                applyDrugBonus0("health", 5000);
+                applyDrugBonus0("health", 2000);
                 break;
             case "晗灵果":
-                applyDrugBonus0("mana", 5000);
+                applyDrugBonus0("mana", 2000);
                 break;
         }
         updateUI();
@@ -9781,12 +9784,12 @@ function getBaseSpiritAttributes() {
         };
     } else {
         return {
-            health: 41,
-            mana: 19,
-            physicalAttack: 6,
-            physicalDefense: 13,
-            magicAttack: 5.8,
-            magicDefense: 12.7,
+            health: 11,
+            mana: 9,
+            physicalAttack: 2,
+            physicalDefense: 2.1,
+            magicAttack: 1.9,
+            magicDefense: 2.05,
             speed: 1
         };
     }
@@ -9949,13 +9952,13 @@ document.getElementById('auto-level-up-spirit').addEventListener('click', () => 
 function getCurrentSpiritAttributes() {
     const baseAttributes = getBaseSpiritAttributes();
     return {
-        health: Math.floor(baseAttributes.health * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        mana: Math.floor(baseAttributes.mana * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        physicalAttack: Math.floor(baseAttributes.physicalAttack * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        physicalDefense: Math.floor(baseAttributes.physicalDefense * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        magicAttack: Math.floor(baseAttributes.magicAttack * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        magicDefense: Math.floor(baseAttributes.magicDefense * Math.pow(1.1, spiritLevel) * spiritMultiplier),
-        speed: Math.floor(baseAttributes.speed * Math.pow(1.1, spiritLevel) * spiritMultiplier)
+        health: Math.floor(baseAttributes.health * Math.pow(1.09, spiritLevel) * spiritMultiplier),
+        mana: Math.floor(baseAttributes.mana * Math.pow(1.09, spiritLevel) * spiritMultiplier),
+        physicalAttack: Math.floor(baseAttributes.physicalAttack * Math.pow(1.08, spiritLevel) * spiritMultiplier),
+        physicalDefense: Math.floor(baseAttributes.physicalDefense * Math.pow(1.08, spiritLevel) * spiritMultiplier),
+        magicAttack: Math.floor(baseAttributes.magicAttack * Math.pow(1.08, spiritLevel) * spiritMultiplier),
+        magicDefense: Math.floor(baseAttributes.magicDefense * Math.pow(1.08, spiritLevel) * spiritMultiplier),
+        speed: Math.floor(baseAttributes.speed * Math.pow(1.08, spiritLevel) * spiritMultiplier)
     };
 } // 计算精灵当前等级和倍数提供的属性增益
 
@@ -10007,7 +10010,7 @@ function handleSpiritHeal() {
 
     if (Math.random() * 100 < triggerProbability) {
         const spiritAttributes = getCurrentSpiritAttributes();
-        const healValue = Math.round((Math.random() * (1.8 - 0.9) + 0.9) * spiritAttributes.magicAttack * spiritMultiplier * 0.5);
+        const healValue = Math.round((Math.random() * (1.8 - 0.9) + 0.9) * spiritAttributes.magicAttack * spiritMultiplier * 2.5);
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
@@ -10030,13 +10033,13 @@ function handleSpiritPower() {
 
         const spiritAttributes = getCurrentSpiritAttributes();
         const attributeBoost = {
-            health: Math.round(spiritAttributes.health / 10),
-            mana: Math.round(spiritAttributes.mana / 8),
-            physicalAttack: Math.round(spiritAttributes.physicalAttack / 5),
-            physicalDefense: Math.round(spiritAttributes.physicalDefense / 3),
-            magicAttack: Math.round(spiritAttributes.magicAttack / 5),
-            magicDefense: Math.round(spiritAttributes.magicDefense / 3),
-            speed: Math.round(spiritAttributes.speed / 3)
+            health: Math.round(spiritAttributes.health / 2),
+            mana: Math.round(spiritAttributes.mana / 1.5),
+            physicalAttack: Math.round(spiritAttributes.physicalAttack / 1.5),
+            physicalDefense: Math.round(spiritAttributes.physicalDefense / 1.2),
+            magicAttack: Math.round(spiritAttributes.magicAttack / 1.5),
+            magicDefense: Math.round(spiritAttributes.magicDefense / 1.3),
+            speed: Math.round(spiritAttributes.speed / 1.3)
         };
 
         // Apply the boost
@@ -10071,7 +10074,7 @@ function handleSpiritAttack() {
 
     if (Math.random() * 100 < triggerProbability) {
         const spiritAttributes = getCurrentSpiritAttributes();
-        const attackValue = Math.round((Math.random() * (2.4 - 1.8) + 1.8) * spiritAttributes.magicAttack * spiritMultiplier);
+        const attackValue = Math.round((Math.random() * (2.4 - 1.8) + 1.8) * spiritAttributes.magicAttack * spiritMultiplier * playerCritDamage);
         battleState.enemy.health = Math.max(battleState.enemy.health - attackValue, 0);
 
         logBattleEvent(`🧚🏻‍♀️Attack from your best teammate！敌人受到来自精灵的${attackValue}点助攻伤害！`, "pink");
@@ -10370,15 +10373,15 @@ function applySingleAscensionBonus(skill, attributes) {
             break;
         case '慈悲心怀':
             attributes.health += skill.baseValue + skill.increment(skill.level);
-            attributes.mana += 200000 + skill.increment(skill.level);
+            attributes.mana += 10000 + skill.increment(skill.level);
             break;
         case '势如破竹':
             attributes.speed += skill.baseValue + skill.increment(skill.level);
-            attributes.magicAttack += 40000 + skill.increment(skill.level);
+            attributes.magicAttack += 24000 + skill.increment(skill.level);
             break;
         case '固若金汤':
             attributes.physicalDefense += skill.baseValue + skill.increment(skill.level);
-            attributes.magicDefense += 500000 + skill.increment(skill.level);
+            attributes.magicDefense += 100000 + skill.increment(skill.level);
             break;
         // 其他技能增益逻辑...
     }
@@ -11377,7 +11380,9 @@ const wuxingBonusMap = {
     magicAttack: '法攻',
     physicalDefense: '物防',
     magicDefense: '法防',
-    speed: '速度'
+    speed: '速度',
+    WXplayerCritRate: '%暴击率',
+    WXplayerCritDamage: '%暴击伤害'
 };
 
 // 初始化五行符管理器
@@ -11436,7 +11441,6 @@ function initializeDrugBonus(color, level, selectedBonus = null) {
         purple: { magicDefense: 2500 }
     };
 
-    // 使用传入的 selectedBonus 或者重新生成的 selectedBonus 来确定 red amulet 的 bonus
     if (color === 'red' && selectedBonus) {
         for (let i = 1; i <= level; i++) {
             bonus[selectedBonus] += increment.red[selectedBonus];
@@ -11453,47 +11457,64 @@ function initializeDrugBonus(color, level, selectedBonus = null) {
 
     return bonus;
 }
-
+        
 // 生成副条目
 function generateAdditionalValues(color) {
     const additionalValues = [];
-    const attributes = ['physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'];
+    const attributes = [
+        'physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'
+    ];
+    const critAttributes = ['WXplayerCritRate', 'WXplayerCritDamage'];
     const percentageAttributes = attributes.map(attr => `‰${attr}`);
-    let percentageCount = 0;  // 用于跟踪千分比属性的数量
+    let percentageCount = 0;
+    let critRateExists = false;
+    let critDamageExists = false;
 
     if (color === 'green') {
         attributes.push('speed');
     }
 
-    const allAttributes = attributes.concat(percentageAttributes);
+    const allAttributes = attributes.concat(percentageAttributes).concat(critAttributes);
     const numOfValues = Math.floor(Math.random() * 5) + 1;
 
     for (let i = 0; i < numOfValues; i++) {
-        const randomAttribute = allAttributes[Math.floor(Math.random() * allAttributes.length)];
-        
-        // 检查是否已经生成了两条千分比属性
-        if (randomAttribute.startsWith('‰')) {
-            if (percentageCount >= 2) {
-                // 如果已达到两条千分比属性限制，重新选择一个非千分比属性
-                const remainingAttributes = attributes.filter(attr => !additionalValues.some(a => a.attribute === attr));
-                if (remainingAttributes.length > 0) {
-                    const nonPercentageAttribute = remainingAttributes[Math.floor(Math.random() * remainingAttributes.length)];
-                    const randomValue = Math.floor(Math.random() * 301) + 300;
-                    additionalValues.push({ attribute: nonPercentageAttribute, value: randomValue });
-                }
-            } else {
-                const randomValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5; // 生成5‰到7‰之间的随机值
-                additionalValues.push({ attribute: randomAttribute, value: randomValue });
-                percentageCount++; // 增加千分比属性计数
+        let randomAttribute = allAttributes[Math.floor(Math.random() * allAttributes.length)];
+
+        // 确保每种暴击属性最多生成一条
+        if (randomAttribute === 'WXplayerCritRate' && critRateExists) continue;
+        if (randomAttribute === 'WXplayerCritDamage' && critDamageExists) continue;
+
+        // 限制千分比属性数量，不生成千分比形式的暴击率和暴击伤害
+        if (randomAttribute.startsWith('‰') && percentageCount >= 2) {
+            const remainingAttributes = attributes.filter(attr => !additionalValues.some(a => a.attribute === attr));
+            if (remainingAttributes.length > 0) {
+                randomAttribute = remainingAttributes[Math.floor(Math.random() * remainingAttributes.length)];
             }
+        }
+
+        if (randomAttribute === 'WXplayerCritRate') {
+            const randomValue = Math.floor(Math.random() * (7 - 5 + 1) + 5); // 生成5~7之间的随机整数
+            additionalValues.push({ attribute: randomAttribute, value: randomValue }); // 显示为整数百分比值
+            critRateExists = true;
+        } else if (randomAttribute === 'WXplayerCritDamage') {
+            const randomValue = Math.floor(Math.random() * (7 - 5 + 1) + 5); // 生成5~7之间的随机整数
+            additionalValues.push({ attribute: randomAttribute, value: randomValue }); // 显示为整数百分比值
+            critDamageExists = true;
+        } else if (randomAttribute.startsWith('‰')) {
+            const randomValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5;
+            additionalValues.push({ attribute: randomAttribute, value: randomValue });
+            percentageCount++;
         } else {
             const randomValue = Math.floor(Math.random() * 301) + 300;
             additionalValues.push({ attribute: randomAttribute, value: randomValue });
         }
+
+        if (critRateExists && critDamageExists) break;
     }
 
     return additionalValues;
 }
+
 
  
 // 更新显示界面
@@ -11621,10 +11642,63 @@ function displayAmuletDetails(amulet) {
 }
 
 // 应用五行符增益
+function resetWuxingCritBonuses() {
+    wuxingStates.forEach(petAmuletState => {
+        if (petAmuletState.equipped && petAmuletState.currentPetName === currentPet.name) {
+            const amulet = wuxingStates.find(amulet => amulet.tag === petAmuletState.tag);
+            if (amulet) {
+                amulet.additionalValues.forEach(additional => {
+                    if (additional.attribute === 'WXplayerCritRate') {
+                        playerCritRate -= additional.value / 100;
+                    } else if (additional.attribute === 'WXplayerCritDamage') {
+                        playerCritDamage -= additional.value / 100;
+                    }
+                });
+            }
+        }
+    });
+}
+
+function applyAdditionalValueBonus(additional, secondaryAttributes, apply = true) {
+    const key = additional.attribute;
+    const value = additional.value;
+
+    if (key.startsWith('‰')) {
+        const baseAttribute = key.replace('‰', '');
+        const multiplier = value / 1000;  // Convert ‰ to percentage
+        const additionalValue = Math.floor(secondaryAttributes[baseAttribute] * multiplier);
+
+        if (apply) {
+            drugBonus[baseAttribute] += additionalValue;
+        } else {
+            drugBonus[baseAttribute] -= additionalValue;
+            if (drugBonus[baseAttribute] < 0) {
+                drugBonus[baseAttribute] = 0;
+            }
+        }
+    } else if (key === 'WXplayerCritRate') {
+        playerCritRate += apply ? value / 100 : -value / 100;
+        if (playerCritRate < 0) playerCritRate = 0;
+    } else if (key === 'WXplayerCritDamage') {
+        playerCritDamage += apply ? value / 100 : -value / 100;
+        if (playerCritDamage < 0) playerCritDamage = 0;
+    } else {
+        if (apply) {
+            drugBonus[key] += value;
+        } else {
+            drugBonus[key] -= value;
+            if (drugBonus[key] < 0) {
+                drugBonus[key] = 0;
+            }
+        }
+    }
+}
+
 function applyAmuletBonus(amulet, apply = true) {
     const currentAttributes = calculateCurrentAttributes();
     const secondaryAttributes = calculateSecondaryAttributes(currentAttributes, currentWisdom);
 
+    // 处理 drugBonus
     Object.keys(amulet.drugBonus).forEach(key => {
         if (apply) {
             drugBonus[key] += amulet.drugBonus[key];
@@ -11636,57 +11710,36 @@ function applyAmuletBonus(amulet, apply = true) {
         }
     });
 
+    // 处理 additionalValues
     amulet.additionalValues.forEach(additional => {
-        const key = additional.attribute;
-        const value = additional.value;
-
-        if (key.startsWith('‰')) {
-            const baseAttribute = key.replace('‰', '');
-            const multiplier = value / 1000;  // Convert ‰ to percentage
-            const additionalValue = Math.floor(secondaryAttributes[baseAttribute] * multiplier);
-
-            if (apply) {
-                drugBonus[baseAttribute] += additionalValue;
-            } else {
-                drugBonus[baseAttribute] -= additionalValue;
-                if (drugBonus[baseAttribute] < 0) {
-                    drugBonus[baseAttribute] = 0;
-                }
-            }
-        } else {
-            if (apply) {
-                drugBonus[key] += value;
-            } else {
-                drugBonus[key] -= value;
-                if (drugBonus[key] < 0) {
-                    drugBonus[key] = 0;
-                }
-            }
-        }
+        applyAdditionalValueBonus(additional, secondaryAttributes, apply);
     });
 
     updateUI();
 }
 
-
 function updateWuxingBonusState() {
-    // 清空当前的 drugBonus
+    // 清空 drugBonus
     Object.keys(drugBonus).forEach(key => {
         drugBonus[key] = 0;
     });
 
-    // 遍历当前宠物已装备的五行符
+    // 仅移除当前五行符提供的暴击率和暴击伤害增益
+    resetWuxingCritBonuses();
+
+    // 重新应用当前宠物已装备的五行符的增益
     wuxingStates.forEach(petAmuletState => {
         if (petAmuletState.equipped && petAmuletState.currentPetName === currentPet.name) {
             const amulet = wuxingStates.find(amulet => amulet.tag === petAmuletState.tag);
             if (amulet) {
-                applyAmuletBonus(amulet, true);  // 重新应用增益
+                applyAmuletBonus(amulet, true);
             }
         }
     });
 
     updateUI();  // 更新界面以反映最新的增益值
 }
+
 
         
 // 分解五行符
@@ -11767,7 +11820,7 @@ function unequipAmulet(tag) {
     }
 
     if (amulet.currentPetName !== currentPet.name) {
-        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，无法卸下。`, null, null, 'red');
+        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要至装备宠物处卸下。`, null, null, 'red');
         return;
     }
 
@@ -11782,40 +11835,48 @@ function unequipAmulet(tag) {
 function enhanceAmulet(tag) {
     const amulet = wuxingStates.find(amulet => amulet.tag === tag);
 
-    if (amulet) {
-        if (amulet.level >= MAX_LEVEL) {
-            showInfoBox("已达强化等级上限，无法继续强化。", null, null, 'red');
-            return;
-        }
+    if (!amulet) {
+        showInfoBox("找不到指定的五行符。", null, null, 'red');
+        return;
+    }
 
-        if (wuxingFragments >= 625 && currentExp >= 20000) {
-            wuxingFragments -= 625;
-            currentExp -= 20000;
-            amulet.level += 1;
+    if (amulet.equipped) {
+        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要卸下后强化。`, null, null, 'red');
+        return;
+    }
 
-            // 针对 red amulet 的特殊处理逻辑
-            if (amulet.color === 'red') {
-                // 确保只在第一次强化时确定增益类型
-                if (!amulet.selectedBonus) {
-                    amulet.selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
-                }
-                // 根据 selectedBonus 增强对应的属性
-                amulet.drugBonus[amulet.selectedBonus] += 300;
-            } else {
-                // 非 red amulet 继续使用 initializeDrugBonus 函数
-                amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
+    if (amulet.level >= MAX_LEVEL) {
+        showInfoBox("已达强化等级上限，无法继续强化。", null, null, 'red');
+        return;
+    }
+
+    if (wuxingFragments >= 625 && currentExp >= 20000) {
+        wuxingFragments -= 625;
+        currentExp -= 20000;
+        amulet.level += 1;
+
+        // 针对 red amulet 的特殊处理逻辑
+        if (amulet.color === 'red') {
+            // 确保只在第一次强化时确定增益类型
+            if (!amulet.selectedBonus) {
+                amulet.selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
             }
-
-            if (amulet.level % 5 === 0) {
-                handleAdditionalValuesEnhancement(amulet);
-            }
-
-            showInfoBox(`消耗20000经验和625个五行碎片，成功强化至 ${amulet.level} 级。`, null, null, 'green');
-            updateWuxingDisplay();
-            displayAmuletDetails(amulet);
+            // 根据 selectedBonus 增强对应的属性
+            amulet.drugBonus[amulet.selectedBonus] += 300;
         } else {
-            showInfoBox("强化所需资源不足。", null, null, 'red');
+            // 非 red amulet 继续使用 initializeDrugBonus 函数
+            amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
         }
+
+        if (amulet.level % 5 === 0) {
+            handleAdditionalValuesEnhancement(amulet);
+        }
+
+        showInfoBox(`消耗20000经验和625个五行碎片，成功强化至 ${amulet.level} 级。`, null, null, 'green');
+        updateWuxingDisplay();
+        displayAmuletDetails(amulet);
+    } else {
+        showInfoBox("强化所需资源不足。", null, null, 'red');
     }
 }
 
@@ -11844,35 +11905,34 @@ function handleAdditionalValuesEnhancement(amulet) {
             if (!existingAttributes.has(newAdditionalValue.attribute.replace('‰', ''))) {
                 amulet.additionalValues.push(newAdditionalValue);
             } else {
-                // 如果无法添加新属性，则提升现有属性
                 enhanceExistingAttribute(amulet, enhancementMultiplier);
             }
         } else {
-            // 提升现有属性
             enhanceExistingAttribute(amulet, enhancementMultiplier);
         }
     } else {
-        // 如果已有5个属性，则直接提升现有属性
         enhanceExistingAttribute(amulet, enhancementMultiplier);
     }
 }
 
-// 提升现有属性的函数
 function enhanceExistingAttribute(amulet, enhancementMultiplier) {
     const randomIndex = Math.floor(Math.random() * amulet.additionalValues.length);
+    const attribute = amulet.additionalValues[randomIndex].attribute;
 
-    // 判断是千分比属性还是具体数值属性
-    if (amulet.additionalValues[randomIndex].attribute.startsWith('‰')) {
-        // 千分比属性，增加固定的5~7‰
+    if (attribute === 'WXplayerCritRate' || attribute === 'WXplayerCritDamage') {
+        // 增加暴击率或暴击伤害，增加值为5到7（整数百分比）
+        const enhancementValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5;
+        amulet.additionalValues[randomIndex].value += enhancementValue;
+    } else if (attribute.startsWith('‰')) {
+        // 增加千分比属性，增加值为5‰到7‰
         const enhancementValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5;
         amulet.additionalValues[randomIndex].value += enhancementValue;
     } else {
-        // 具体数值属性，按随机1.1~1.3倍增加
+        // 增加具体数值属性，按当前值的1.1到1.3倍增加
         const enhancementValue = Math.floor(amulet.additionalValues[randomIndex].value * enhancementMultiplier);
         amulet.additionalValues[randomIndex].value += enhancementValue;
     }
 }
-
 
 
 function applyWuxingEffects() {
@@ -14060,8 +14120,8 @@ function removeArmsAttributes() {
 let currentSpecialization = null;
 let specializations = {
     慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.1, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
-    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.3, levelIncrement: 0.06, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
-    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.8, levelIncrement: 0.08, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.05, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.05, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {

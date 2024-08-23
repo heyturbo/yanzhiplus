@@ -7172,6 +7172,8 @@ function selectSkillAndCalculateMultiplier(type) {
     return { skillMultiplier, isSkillUsed };
 } 
         
+let waterAmuletTriggered = false; // 新增标志变量
+
 function performAttack(type) {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -7212,8 +7214,9 @@ function performAttack(type) {
     handleCriticalAndDrunken(damageResult);
     applyDefenseBonusEffect(); // 处理防御后的增益效果
 
-    // 检查并处理水符效果
-    if (checkWaterAmuletChance()) {
+    // 检查并处理水符效果，防止多次触发
+    if (!waterAmuletTriggered && checkWaterAmuletChance()) {
+        waterAmuletTriggered = true;
         handleWaterAmuletEffect(attackType, damageResult);
         return; // 如果水符触发，避免敌方回合
     }
@@ -7228,6 +7231,9 @@ function performAttack(type) {
     setTimeout(enemyAttack, 500);
     updateUI();
     applyAscensionEffects();
+
+    // 重置标志变量
+    waterAmuletTriggered = false;
 }
 
 function checkWaterAmuletChance() {
@@ -7246,7 +7252,6 @@ function handleWaterAmuletEffect(attackType, damage) {
     logBattleEvent("水符效果触发，奖励回合发动！", 'aqua');
     performAttack(attackType); // 再次执行相同类型的攻击
 }
-
 
 function updateDamageValue(damage, enemy = false) {
     // 获取玩家和敌人的 DOM 元素
@@ -8387,6 +8392,7 @@ function handleDamageReduction(damage) {
         }
     }
     wiseDefenseManaCost = 0;
+    updateDamageValue(formattedFinalDamage, true); // 显示敌人伤害
 
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，土符抵挡了${totalDamageReduction}，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
     getShieldStatus();
@@ -8558,7 +8564,7 @@ function enemyAttack() {
 
     // 处理燃烧效果
     handleBurnt();
-    updateDamageValue(damage, true); // 显示敌人伤害
+
     handleReflectAndHeal(damage);
     // 处理复活效果
     handleResurrection(damage);

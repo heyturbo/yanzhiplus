@@ -8392,6 +8392,7 @@ function handleDamageReduction(damage) {
         }
     }
     wiseDefenseManaCost = 0;
+    handleReflectAndHeal(formattedFinalDamage);
     updateDamageValue(formattedFinalDamage, true); // 显示敌人伤害
 
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，土符抵挡了${totalDamageReduction}，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
@@ -8564,7 +8565,6 @@ function enemyAttack() {
 
     // 处理燃烧效果
     handleBurnt();
-    // 处理复活效果
     handleResurrection(damage);
     handleManaRecover();
 
@@ -8625,7 +8625,7 @@ function performEnemyPhysicalAttack(isCritical) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
     
-     handleReflectAndHeal(damage);
+     
     return damage;
 }
 
@@ -8658,7 +8658,7 @@ function performEnemyMagicalAttack(isCritical) {
 
     // 应用毁灭心魔法术效果
     applyEnemyMagicEffects(damage);
-    handleReflectAndHeal(damage);
+    
     return damage;
 }
 
@@ -11716,6 +11716,7 @@ function applyAmuletBonus(amulet, apply = true) {
     });
 
     updateUI();
+    updateAttributePanel();
 }
 
 function updateWuxingBonusState() {
@@ -13463,6 +13464,8 @@ function increaseCultivation(amount) {
 }
 
 // 使用道具函数
+let useAssignedItemCount = 0;
+
 function useAssignedItem() {
     if (!selectedItem || !selectedItem.dataset.itemName) {
         showInfoBox("请先选择一个道具。");
@@ -13470,6 +13473,23 @@ function useAssignedItem() {
     }
 
     const itemName = selectedItem.dataset.itemName;
+
+    // 技术逻辑：检查是否已使用该道具超过10次
+    useAssignedItemCount++;
+    if (useAssignedItemCount >= 5) {
+        showInfoBox(
+            `您已经使用${useAssignedItemCount}次此道具}。是否要全部使用？`,
+            () => {
+                useAllItems(itemName);  // 确认使用全部道具
+                useAssignedItemCount = 0;  // 重置计数器
+            },
+            () => {
+                useAssignedItemCount = 0;  // 取消后重置计数器
+            },
+            'red'
+        );
+        return;  // 暂停后续处理，等待玩家确认
+    }
 
     // 检查道具是否在映射表中
     if (itemEffects[itemName]) {
@@ -13482,6 +13502,14 @@ function useAssignedItem() {
     } else {
         showInfoBox("该道具无法直接在背包内使用。");
     }
+}
+
+function useAllItems(itemName) {
+    // 这里实现批量使用道具的逻辑
+    while (useItem(itemName)) {
+        itemEffects[itemName](); // 执行对应道具的效果
+    }
+    updateJinnangItems(); // 更新锦囊内容显示
 }
 
 

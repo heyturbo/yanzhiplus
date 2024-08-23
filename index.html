@@ -315,7 +315,6 @@
     border: 1px solid #87431f;
     padding: 10px;
     height: 220px;
-    margin-bottom: 20px;
     border-radius: 2px;
     line-height: 18px;
     background: rgb(0 0 0 / 20%);
@@ -5793,8 +5792,8 @@ const ascensionSkills = {
         { name: '吸血魔刃', effect: level => `当玩家使用物理攻击时，会吸收等同伤害值${11 + 1 * (level - 1)}%的生命值，每级提升1%`, baseValue: 11, increment: level => 11 + 1 * (level - 1) },
         { name: '无我之境', effect: level => `当玩家受击时，有${21 + 1 * (level - 1)}%概率进入无我之境，免受一切伤害。持续时间5秒`, baseValue: 20, increment: level => 20 + 1 * (level - 1) },
         { name: '向死而生', effect: level => `受到致命伤害时，消耗法力值上限${60 - 2 * level}%的法力让自己血量变为1`, baseValue: 60, increment: level => -2 * level },
-        { name: '以牙还牙', effect: level => `反弹本次承受伤害的${45 + 2 * level}%~${60 + 2 * level}%`, baseValue: 35, increment: level => 2 * level },
-        { name: '铜墙铁壁', effect: level => `承受伤害降低${25 + 2.5 * level}%`, baseValue: 25, increment: level => 2.5 * level },
+        { name: '以牙还牙', effect: level => `反弹本次承受伤害的${45 + 2 * level}%~${60 + 2 * level}%`, baseValue: 45, increment: level => 2 * level },
+        { name: '铜墙铁壁', effect: level => `承受伤害降低${20 + 1.5 * level}%`, baseValue: 20, increment: level => 1.5 * level },
         { name: '法术精通', effect: level => `每次使用法术攻击时，有${30 + 2 * level}%概率再次施放一次法术伤害`, baseValue: 30, increment: level => 2 * level },
         { name: '天降甘霖', effect: level => `使用治疗时，触发仙气护体的概率增加至50%，并且仙气护体持续时间增加至${6 + 0.1 * level}秒`, baseValue: 6, increment: level => 0.1 * level }
     ],
@@ -5810,7 +5809,7 @@ let ascensionEnabled = false;
 // 战斗精灵属性
 let spiritLevel = 1;
 let spiritMultiplier = 1.00;
-const maxSpiritLevel = 100;
+const maxSpiritLevel = 120;
 const minSpiritMultiplier = 0.01;
 const maxSpiritMultiplier = 4.15;
 let spiritPowerActive = false;
@@ -6365,14 +6364,6 @@ function updatePetInfo() {
     battleAttributes = { ...battleState.player };
     maxHealth = battleAttributes.health;
     maxMana = battleAttributes.mana;
-    
-    if (playerCritRate > 1) {
-        playerCritRate = 1;
-    }
-
-    if (playerCritDamage > 30) {
-        playerCritDamage = 30;
-    }
 
     updateUI();
     attributesFetched = true;
@@ -6410,7 +6401,7 @@ function updateEnemyAttributes() {
         magicAttack: 1800000,
         magicDefense: 450000,
         speed: 108020,
-        cultivation: 640000
+        cultivation: 360000
     };
 
     const increasePerRoundAfter150 = {
@@ -6429,7 +6420,8 @@ function updateEnemyAttributes() {
 
         if (battleRounds <= 45) {
             // 1-10轮，每轮固定增加 300 * battleRounds
-            newValue = initialValue + 150;
+            const randomMultiplier = Math.floor(Math.random() * (100 - 2 + 1)) + battleRounds;
+            newValue = initialValue + (7 * randomMultiplier);
         } else if (battleRounds <= 70) {
             // 11-30轮，每轮固定增加 1588 * battleRounds
             const randomMultiplier = Math.floor(Math.random() * 3) + 2;
@@ -6701,7 +6693,7 @@ function calculateDamage(baseDamage, isCritical, critDamage) {
         baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
 
         if (!isNaN(fireEffect) && fireEffect > 0) {
-            logBattleEvent(`火符效果触发！伤害增加了 ${fireEffect} 点。`, 'red');
+            logBattleEvent(`🔴奥义·火符易伤！伤害增加了 ${fireEffect} 点。`, '#431508');
         } 
     }
 
@@ -7249,7 +7241,7 @@ function checkWaterAmuletChance() {
 }
         
 function handleWaterAmuletEffect(attackType, damage) {
-    logBattleEvent("水符效果触发，奖励回合发动！", 'aqua');
+    logBattleEvent("🔵奥义·水之再动！！", 'aqua');
     performAttack(attackType); // 再次执行相同类型的攻击
 }
 
@@ -8195,7 +8187,7 @@ function handleReflectAndHeal(damage) {
                 console.error("Reflect damage is NaN, setting to 0.");
             }
             battleState.enemy.health = Math.max(0, battleState.enemy.health - reflectDamage);
-            logBattleEvent(`金符效果触发，反弹了 ${reflectDamage} 点伤害给毁灭心魔。`, 'gold');
+            logBattleEvent(`🟡奥义·金之境界！反弹了 ${reflectDamage} 点伤害。`, 'gold');
         } else {
             console.error("Invalid goldReflectPercentage:", goldReflectPercentage);
         }
@@ -8360,7 +8352,7 @@ function handleDamageReduction(damage) {
         const earthReduction = Math.floor(finalDamage * earthReductionPercentage);
         finalDamage -= earthReduction;
         totalDamageReduction += earthReduction;
-        logBattleEvent(`土符效果触发！你减少了 ${earthReduction}点所受的伤害。`, 'brown');
+        logBattleEvent(`🟤奥义·土之庇护！你减少了 ${earthReduction}点所受的伤害。`, 'brown');
     }
 
     // 计算最终伤害并更新玩家血量
@@ -8586,16 +8578,16 @@ function performEnemyPhysicalAttack(isCritical) {
     if (handleDodge('player')) {
         return 0; // 如果玩家闪避成功，物理攻击伤害为0
     }
-
+   
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     
     if (isCritical) {
-        logBattleEvent(`⚔️【敌人攻击】毁灭心魔发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
+        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放物理技能·黑暗血刃并发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
     } else {
-        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
+        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放物理技能·黑暗血刃，造成了 ${damage} 点伤害。`, 'white');
     }
     
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
@@ -8625,7 +8617,7 @@ function performEnemyPhysicalAttack(isCritical) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
     
-     
+    
     return damage;
 }
 
@@ -8648,10 +8640,10 @@ function performEnemyMagicalAttack(isCritical) {
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
-        logBattleEvent(`⚔️【敌人攻击】毁灭心魔发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'red');
+        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放法术技能·嗜血魔咒并发起暴击，造成了 ${damage} 的猛烈伤害！消耗了 ${manaCost} 点法力值。`, 'red');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
-        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
+        logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放法术技能·嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
 
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
@@ -9038,7 +9030,7 @@ function handleHealingBan(skillMultiplier) {
         const healBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.woodAmulet];
         woodEffect = Math.floor(baseHealing * healBoostPercentage);
         baseHealing = Math.floor(baseHealing * (1 + healBoostPercentage));
-        logBattleEvent(`木符效果触发！治疗量增加了 ${woodEffect}。`, 'aqua');
+        logBattleEvent(`🟢奥义·木之春意！治疗量增加了 ${woodEffect}。`, 'aqua');
     }
 
     return baseHealing;
@@ -9813,7 +9805,7 @@ document.getElementById('close-spirit-modal').addEventListener('click', () => {
 }); // 关闭战斗精灵界面
 
 document.getElementById('level-up-spirit').addEventListener('click', () => {
-    if (spiritLevel >= maxSpiritLevel) {
+    if (spiritLevel >= 100) {
         showMessage('战斗精灵已达到最大等级！', 'error');
         return;
     }
@@ -12758,6 +12750,7 @@ function collectTreasure() {
         '修为灵丹（蓝）': 'cultivationPill200',
         '修为灵丹（橙）': 'cultivationPill500',
         '庆典蛋糕': 'celebrationCake',
+        '杨枝甘露': 'spiritWine',
         '仙人醍醐': 'ultraSkillBoomer',
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
         '灵异秘卷': 'mutationScroll',
@@ -12956,14 +12949,15 @@ function getRandomReward(type) {
             { name: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', chance: 10 },
             { name: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', chance: 15 },
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
-            { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 1 },
-            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5 },
+            { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 0.5 },
+            { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5.5 },
             { name: '毒粉礼包（10）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 48 },
+            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c8aecdd9c307b7e9e18bb9.png', chance: 1 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 47 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
@@ -13002,19 +12996,19 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 10 },
             { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 8 },
-            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 13 },
+            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 15 },
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 8 },
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 20 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 9 },           
             { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 9 },
-            { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 5.7 },
-            { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 1 },
+            { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 6 },
+            { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 2 },
             { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 0.2 },
             { name: '修为灵丹*3（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 0.1 },
-            { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 1 },
+            { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 0.5 },
             { name: '高级经验书*6', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 6 },
-            { name: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 2 },
-            { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 1 }
+            { name: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 0.1 },
+            { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 0.1 }
         ]
     };
     return selectReward(rewards[type]);
@@ -13084,7 +13078,8 @@ let jinnangItems = [
     { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' }
+    { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
+    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c8aecdd9c307b7e9e18bb9.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -13414,6 +13409,31 @@ const itemEffects = {
         addAmuletToManager('goldAmulet', 'blue', 1);
         addAmuletToManager('goldAmulet', 'green', 1);
         showInfoBox('你获得金符（红）金符（紫）金符（橙）金符（蓝）金符（绿），请在五行面板中查看！')
+    },
+    spiritWine: () => {
+        if (spiritLevel >= 120) {
+            showInfoBox('你的精灵等级已达到最大级，无法继续使用此道具。', null, null, 'red');
+            return;
+        }
+    
+        if (spiritLevel < 100) {
+            showInfoBox(
+                '你的精灵未满100级，建议使用精炼石提升等级。如需继续使用，请点击确认。',
+                () => {
+                    spiritLevel += 2;
+                    showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
+                },
+                () => {
+                    jinnangItems[51].quantity += 1;
+                    updateJinnangItems();
+                },
+                'yellow'
+            );
+        } else {
+            // 精灵等级在100到119之间时直接提升等级
+            spiritLevel += 2;
+            showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
+        }
     }
 };
 
@@ -13463,8 +13483,8 @@ function increaseCultivation(amount) {
     }
 }
 
-// 使用道具函数
 let useAssignedItemCount = 0;
+let lastUsedItemName = null;
 
 function useAssignedItem() {
     if (!selectedItem || !selectedItem.dataset.itemName) {
@@ -13474,14 +13494,23 @@ function useAssignedItem() {
 
     const itemName = selectedItem.dataset.itemName;
 
-    // 技术逻辑：检查是否已使用该道具超过10次
+    // 检查是否更换了道具
+    if (itemName !== lastUsedItemName) {
+        useAssignedItemCount = 0; // 重置计数器
+        lastUsedItemName = itemName; // 更新最近使用的道具名称
+    }
+
+    // 增加计数器
     useAssignedItemCount++;
+
+    // 如果连续使用同一个道具超过5次，提示是否全部使用
     if (useAssignedItemCount >= 5) {
         showInfoBox(
-            `您已经使用${useAssignedItemCount}次此道具}。是否要全部使用？`,
+            `您已经连续使用${useAssignedItemCount}次${itemName}。是否要全部使用？`,
             () => {
                 useAllItems(itemName);  // 确认使用全部道具
                 useAssignedItemCount = 0;  // 重置计数器
+                lastUsedItemName = null;  // 重置最近使用的道具名称
             },
             () => {
                 useAssignedItemCount = 0;  // 取消后重置计数器
@@ -13497,7 +13526,7 @@ function useAssignedItem() {
             itemEffects[itemName](); // 执行对应道具的效果
             updateJinnangItems(); // 更新锦囊内容显示
         } else {
-            showInfoBox("道具使用失败，请重试。");
+            showInfoBox("道具已耗尽。");
         }
     } else {
         showInfoBox("该道具无法直接在背包内使用。");

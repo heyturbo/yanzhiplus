@@ -7188,7 +7188,7 @@ function performAttack(type) {
         return;
     }
 
-    let attackType = type; //标志变量
+    let attackType = type; // 标志变量
     // 检查 taunt 状态并执行物理攻击
     if (battleState.player.taunt) {
         attackType = 'physical';
@@ -7212,9 +7212,12 @@ function performAttack(type) {
     handleCriticalAndDrunken(damageResult);
     applyDefenseBonusEffect(); // 处理防御后的增益效果
 
-    // 调用水符效果函数
-    handleWaterAmuletEffect(attackType, damageResult);
-
+    // 检查并处理水符效果
+    if (checkWaterAmuletChance()) {
+        handleWaterAmuletEffect(attackType, damageResult);
+        return; // 如果水符触发，避免敌方回合
+    }
+    
     if (battleState.enemy.health <= 0) {
         updateEnemyAttributes();
         showNextBattlePrompt(true);
@@ -7226,6 +7229,24 @@ function performAttack(type) {
     updateUI();
     applyAscensionEffects();
 }
+
+function checkWaterAmuletChance() {
+    const activeEffects = applyWuxingEffects();
+
+    if (activeEffects.waterAmulet && activeEffects.waterAmulet > 0) {
+        const extraAttackProbability = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.waterAmulet];
+        if (Math.random() < extraAttackProbability) {
+            return true; 
+        }
+    }
+    return false;
+}
+        
+function handleWaterAmuletEffect(attackType, damage) {
+    logBattleEvent("水符效果触发，奖励回合发动！", 'aqua');
+    performAttack(attackType); // 再次执行相同类型的攻击
+}
+
 
 function updateDamageValue(damage, enemy = false) {
     // 获取玩家和敌人的 DOM 元素
@@ -8537,7 +8558,8 @@ function enemyAttack() {
 
     // 处理燃烧效果
     handleBurnt();
-
+    updateDamageValue(damage, true); // 显示敌人伤害
+    handleReflectAndHeal(damage);
     // 处理复活效果
     handleResurrection(damage);
     handleManaRecover();
@@ -8599,8 +8621,7 @@ function performEnemyPhysicalAttack(isCritical) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
     
-    updateDamageValue(damage, true); // 显示敌人伤害
-    handleReflectAndHeal(damage);
+
     return damage;
 }
 
@@ -8629,12 +8650,10 @@ function performEnemyMagicalAttack(isCritical) {
         logBattleEvent(`⚔️【敌人攻击】毁灭心魔施放嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
 
-    updateDamageValue(damage, true); // 显示敌人伤害
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
 
     // 应用毁灭心魔法术效果
     applyEnemyMagicEffects(damage);
-    handleReflectAndHeal(damage);
     return damage;
 }
 
@@ -9030,13 +9049,12 @@ function handleSoulCapture() {
     battleAttributes.magicAttack *= 0.5;
     logBattleEvent("你受到了摄魂效果，攻击力大幅下降。", '#B94FFF');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66742cffd9c307b7e931d5ee.gif');
-    effectCooldowns.soulCapture = true;
     updatePlayerStatusDisplay();
+    
     setTimeout(() => {
         battleState.player.soulCapture = false;
-        battleAttributes.physicalAttack *= 2;
-        battleAttributes.magicAttack *= 2;
-        effectCooldowns.soulCapture = false;
+        battleAttributes.physicalAttack = battleState.player.physicalAttack;
+        battleAttributes.magicAttack = battleState.player.magicAttack;
         updateUI();
         updatePlayerStatusDisplay();
     }, 5000); // 摄魂效果持续5秒
@@ -11147,9 +11165,8 @@ class DivineWeaponManager {
                 case 'spellSlow':
                     break;
                 case 'soulCapture':
-                    battleAttributes.physicalAttack *= 2;
-                    battleAttributes.magicAttack *= 2;
-                    effectCooldowns.soulCapture = false;
+                    battleAttributes.physicalAttack = battleState.player.physicalAttack;
+                    battleAttributes.magicAttack = battleState.player.magicAttack;
                     updateUI();
                     updatePlayerStatusDisplay();
                     break;
@@ -11261,8 +11278,8 @@ function clearEnemyEffect() {
                     break;
                 case 'soulCapture':
                     // 清除摄魂效果，恢复攻击力
-                    battleAttributes.physicalAttack *= 2;
-                    battleAttributes.magicAttack *= 2;
+                    battleAttributes.physicalAttack = battleState.player.physicalAttack;
+                    battleAttributes.magicAttack = battleState.player.magicAttack;
                     updateUI();
                     updatePlayerStatusDisplay();
                     break;
@@ -11878,19 +11895,6 @@ function applyWuxingEffects() {
     });
 
     return activeEffects; // 返回包含所有生效效果的对象
-}
-
-function handleWaterAmuletEffect(attackType, damage) {
-    const activeEffects = applyWuxingEffects();
-
-    if (activeEffects.waterAmulet && activeEffects.waterAmulet > 0) {
-        const extraAttackProbability = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.waterAmulet];
-
-        if (Math.random() < extraAttackProbability) {
-            logBattleEvent(`水符效果触了再动！`, 'aqua');
-            performAttack(attackType); // 再次执行相同类型的攻击
-        }
-    }
 }
 
 function getAmuletImageURL(name) {

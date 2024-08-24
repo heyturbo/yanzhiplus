@@ -681,6 +681,14 @@
             color: white;
             border-radius: 5px;
         }
+
+        .quality-bar-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+        
         .progress-bar {
         }
         .progress-bar div {
@@ -729,8 +737,8 @@
             width: 100%;
             background-color: #30482C;
             overflow: hidden;
-            margin-bottom: 10px;
             font-size: 14px;
+            height: 100%;
             color: #EFEFF0;
             box-shadow: inset 0px 0px 2px 2px #111919;
         }
@@ -2271,6 +2279,7 @@
         </div>
         <div class="drawer-container"id="wuxingguanli-container">
             <div id="equipped-container"></div>
+            <div id="applied-effects" style="width: 100%;text-align: center;font-size: 12px;font-weight: bold;">当前无五行符效果生效</div>
             <div id="wuxing-container"></div>
             <div id="amulet-details"></div>
         </div>
@@ -2353,25 +2362,40 @@
                         <div>当前悟性: <span id="current-wisdom">0</span></div>
                     </div>
                 </div>
-                <div class="progress-bar">
-                    耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
-                    <div id="endurance-bar" style="width: 50%"></div>
+                <div class="quality-bar-container">
+                    <div class="progress-bar">
+                        耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
+                        <div id="endurance-bar" style="width: 50%;"></div>
+                    </div>
+                    <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-1">
                 </div>
-                <div class="progress-bar">
-                    智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
-                    <div id="intelligence-bar" style="width: 50%"></div>
+                <div class="quality-bar-container">
+                    <div class="progress-bar">
+                        智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
+                        <div id="intelligence-bar" style="width: 50%;"></div>
+                    </div>
+                    <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-2">
                 </div>
-                <div class="progress-bar">
-                    强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
-                    <div id="strength-bar" style="width: 50%"></div>
+                <div class="quality-bar-container">
+                    <div class="progress-bar">
+                        强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
+                        <div id="strength-bar" style="width: 50%;"></div>
+                    </div>
+                    <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-3">
                 </div>
-                <div class="progress-bar">
-                    敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
-                    <div id="agility-bar" style="width: 50%"></div>
+                <div class="quality-bar-container">
+                    <div class="progress-bar">
+                        敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
+                        <div id="agility-bar" style="width: 50%;"></div>
+                    </div>
+                    <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-4">
                 </div>
-                <div class="progress-bar">
-                    信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
-                    <div id="faith-bar" style="width: 50%"></div>
+                <div class="quality-bar-container">
+                    <div class="progress-bar">
+                        信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
+                        <div id="faith-bar" style="width: 50%;"></div>
+                    </div>
+                    <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-5">
                 </div>
                 <div class="button-grid">
                     <button onclick="rebornPet()">普通还童</button>
@@ -3920,7 +3944,7 @@ function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
 }
 function infoWuxingFu() {
-    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化消耗625碎片和20000经验值\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多，其战斗效果越强大");
+    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高/品质越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化根据品质消耗1/5/25/125/625碎片和经验值，品质越高，强化所得属性越好\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多/装备的五行符品质越好，其五行符强度越高，战斗效果越强大");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -4177,7 +4201,24 @@ function play(petName) {
         '29': `${petName}和你一起度过了最美好的一天，心情无比愉悦。`,
         '30': `${petName}享受了一次完美的旅行，心情极好！`
     };
-    showInfoBox(moodEvents[moodChange.toString()]);
+
+    let infoMessage = moodEvents[moodChange.toString()];
+
+    // 物品奖励逻辑
+    if (moodChange > 0) {
+        const rewardProbability = Math.random() * 100;
+        if (rewardProbability < moodChange) {
+            // 从 jinnangItems 中随机选择一个物品
+            const randomIndex = Math.floor(Math.random() * jinnangItems.length);
+            const selectedItem = jinnangItems[randomIndex];
+            selectedItem.quantity += 1;
+            
+            // 更新消息内容
+            infoMessage += ` 在这次亲密的玩耍中，你们还惊喜地收获了一个${selectedItem.displayName}！`;
+        }
+    }
+
+    showInfoBox(infoMessage);
 
     if (mood <= 20) {
         showInfoBox(`${petName}最近似乎有些闷闷不乐,也许你们可以尝试一些新的活动,如烹饪课或者瑜伽课,给生活增添一些乐趣。`);
@@ -4193,6 +4234,7 @@ function play(petName) {
     }
 }
 
+        
 function rest(petName) {
     const petState = petStates.find(state => state.petName === petName);
     if (!petState) return;
@@ -5202,6 +5244,7 @@ function storeCurrentPetData() {
         currentPet: JSON.stringify(currentPet),
         currentSpecialization: currentSpecialization,
         currentWisdom: currentWisdom,
+        consumedPillCount: consumedPillCount,
         divineWeapons: divineWeaponManager.getWeaponData(),
         divinedWeaponStatus: divinedWeaponStatus,
         drugBonus0: drugBonus0,
@@ -5223,6 +5266,7 @@ function storeCurrentPetData() {
         playerCritRate: playerCritRate,
         playerCultivation: playerCultivation,
         poisonSkillActivated: poisonSkillActivated,
+        qualityPillCount: qualityPillCount,
         reenableAscension: reenableAscension,
         remainingPoints: remainingPoints,
         secondAscensionSkill: secondAscensionSkill ? getSkillFromName(secondAscensionSkill.name, secondAscensionSkill.level) : null,
@@ -5300,7 +5344,15 @@ function restorePetData(petName) {
         if (savedPetData.drugBonus0) {
             drugBonus0 = savedPetData.drugBonus0;
         }
-
+        
+        if (savedPetData.qualityPillCount) {
+            qualityPillCount = savedPetData.qualityPillCount;
+        }
+        
+        if (savedPetData.consumedPillCount) {
+            consumedPillCount = savedPetData.consumedPillCount;
+        }
+        
         if (savedPetData.specializations) {
             specializations = savedPetData.specializations;
         }
@@ -7281,7 +7333,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
@@ -7349,7 +7401,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
 
@@ -7423,7 +7475,7 @@ function performIndependentMagicAttack() {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
@@ -8583,7 +8635,7 @@ function performEnemyPhysicalAttack(isCritical) {
     }
    
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.floor(playerCultivation / 520000);
+    const cultivationFactor = Math.max(0.5, Math.floor(playerCultivation / 520000));
     const effectiveDefense = Math.floor(battleAttributes.physicalDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -8636,7 +8688,7 @@ function performEnemyMagicalAttack(isCritical) {
     }
     
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.floor(playerCultivation / 520000);
+    const cultivationFactor = Math.max(0.5, Math.floor(playerCultivation / 520000));
     const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -9033,7 +9085,7 @@ function handleHealingBan(skillMultiplier) {
     // 应用木符效果增加治疗量
     if (activeEffects.woodAmulet && activeEffects.woodAmulet > 0) {
         const healBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.woodAmulet];
-        woodEffect = Math.floor(baseHealing * healBoostPercentage);
+        const woodEffect = Math.floor(baseHealing * healBoostPercentage);
         baseHealing = Math.floor(baseHealing * (1 + healBoostPercentage));
         logBattleEvent(`🟢奥义·木之春意！治疗量增加了 ${woodEffect}。`, 'aqua');
     }
@@ -10678,6 +10730,7 @@ function autoBattle() {
                 battleState.player.torn,
                 battleState.player.taunt,
                 battleState.player.spellSlow,
+                battleState.player.suppressed,
                 battleState.player.slaughter
             ];
             const activeDebuffs = debuffStates.filter(Boolean).length;
@@ -10709,7 +10762,7 @@ function autoBattle() {
                     performAttack('physical');
                 }
             }
-        }, 400);
+        }, 350);
         
     } else {
         showInfoBox('聚灵丹数量不足，无法开启自动战斗！',null,null,'red');
@@ -11387,13 +11440,17 @@ function addAmuletToManager(amuletType, color, level = 1) {
     const wuxingName = `${amuletType}(${color})`;
     const uniqueTag = `${wuxingName}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
+    // 随机生成 rank，概率均等
+    const rank = Math.ceil(Math.random() * 5);  // 1 - 5等
+
     const newAmulet = {
         tag: uniqueTag,
         name: wuxingName,
         color: color,
         level: level,
-        drugBonus: initializeDrugBonus(color, level),
-        additionalValues: generateAdditionalValues(color),
+        rank: rank,  // 新增rank属性
+        drugBonus: initializeDrugBonus(color, level, rank),
+        additionalValues: generateAdditionalValues(color, rank),
         equipped: false,
         currentPetName: null
     };
@@ -11402,7 +11459,6 @@ function addAmuletToManager(amuletType, color, level = 1) {
     wuxingStates.push(newAmulet);
     updateWuxingDisplay();
 }
-
 
 document.getElementById('wuxing-close-button').addEventListener('click', closeWuxingDisplay);
 document.getElementById('wuxing-display').style.display = 'none';
@@ -11419,7 +11475,8 @@ function closeWuxingDisplay() {
 
 // 初始化五行符管理器
 // 初始化主条目加成
-function initializeDrugBonus(color, level, selectedBonus = null) {
+function initializeDrugBonus(color, level, rank, selectedBonus = null) {
+    const rankMultiplier = [1, 0.8, 0.6, 0.4, 0.2][rank - 1];  // 根据 rank 调整倍率
     const bonus = {
         physicalAttack: 0,
         magicAttack: 0,
@@ -11440,13 +11497,13 @@ function initializeDrugBonus(color, level, selectedBonus = null) {
 
     if (color === 'red' && selectedBonus) {
         for (let i = 1; i <= level; i++) {
-            bonus[selectedBonus] += increment.red[selectedBonus];
+            bonus[selectedBonus] += Math.floor(increment.red[selectedBonus] * rankMultiplier);
         }
     } else {
         for (let i = 1; i <= level; i++) {
             Object.keys(bonus).forEach(key => {
                 if (increment[color] && increment[color][key]) {
-                    bonus[key] += increment[color][key];
+                    bonus[key] += Math.floor(increment[color][key] * rankMultiplier);
                 }
             });
         }
@@ -11454,9 +11511,11 @@ function initializeDrugBonus(color, level, selectedBonus = null) {
 
     return bonus;
 }
+
         
 // 生成副条目
-function generateAdditionalValues(color) {
+function generateAdditionalValues(color, rank) {
+    const rankMultiplier = [1, 0.8, 0.6, 0.4, 0.2][rank - 1];  // 根据rank调整倍率
     const additionalValues = [];
     const attributes = [
         'physicalAttack', 'magicAttack', 'physicalDefense', 'mana', 'health', 'magicDefense'
@@ -11490,19 +11549,19 @@ function generateAdditionalValues(color) {
         }
 
         if (randomAttribute === 'WXplayerCritRate') {
-            const randomValue = Math.floor(Math.random() * (7 - 5 + 1) + 5); // 生成5~7之间的随机整数
-            additionalValues.push({ attribute: randomAttribute, value: randomValue }); // 显示为整数百分比值
+            const randomValue = Math.floor((Math.random() * (7 - 5 + 1) + 5) * rankMultiplier);
+            additionalValues.push({ attribute: randomAttribute, value: randomValue });
             critRateExists = true;
         } else if (randomAttribute === 'WXplayerCritDamage') {
-            const randomValue = Math.floor(Math.random() * (7 - 5 + 1) + 5); // 生成5~7之间的随机整数
-            additionalValues.push({ attribute: randomAttribute, value: randomValue }); // 显示为整数百分比值
+            const randomValue = Math.floor((Math.random() * (7 - 5 + 1) + 5) * rankMultiplier);
+            additionalValues.push({ attribute: randomAttribute, value: randomValue });
             critDamageExists = true;
         } else if (randomAttribute.startsWith('‰')) {
-            const randomValue = Math.floor(Math.random() * (7 - 5 + 1)) + 5;
+            const randomValue = Math.floor((Math.random() * (7 - 5 + 1) + 5) * rankMultiplier);
             additionalValues.push({ attribute: randomAttribute, value: randomValue });
             percentageCount++;
         } else {
-            const randomValue = Math.floor(Math.random() * 301) + 300;
+            const randomValue = Math.floor((Math.random() * 301 + 300) * rankMultiplier);
             additionalValues.push({ attribute: randomAttribute, value: randomValue });
         }
 
@@ -11512,13 +11571,13 @@ function generateAdditionalValues(color) {
     return additionalValues;
 }
 
-
  
 // 更新显示界面
 function updateWuxingDisplay() {
     const wuxingContainer = document.getElementById('wuxing-container');
     const equippedContainer = document.getElementById('equipped-container');
     const fragmentsDisplay = document.getElementById('wuxing-fragments');
+    const rankNames = ['一等', '二等', '三等', '四等', '五等'];
     let selectedAmulet = null; // 用于记录当前选中的五行符
 
     wuxingContainer.innerHTML = '';
@@ -11542,7 +11601,7 @@ function updateWuxingDisplay() {
 
         const amuletInfo = document.createElement('div');
         amuletInfo.className = 'wuxing-info';
-        amuletInfo.innerText = `${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})`;
+        amuletInfo.innerText = `${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})`;
 
         amuletElement.appendChild(amuletInfo);
 
@@ -11550,6 +11609,7 @@ function updateWuxingDisplay() {
             if (selectedAmulet) {
                 // 重置上一个被选中五行符的样式
                 selectedAmulet.style.boxShadow = selectedAmulet.originalBoxShadow || '';
+                ensureAmuletRank(amulet);
             }
 
             // 记录当前选中的五行符
@@ -11578,17 +11638,55 @@ function updateWuxingDisplay() {
         }
     });
     updateAttributePanel();
+    updateAppliedEffectsDisplay();
     console.log(drugBonus);
 }
 
+function ensureAmuletRank(amulet) {
+    if (!amulet.rank) {
+        amulet.rank = 1;  // 默认设为一等
+    }
+}
 
+function updateAppliedEffectsDisplay() {
+    // 获取装备生效的五行符效果
+    const activeEffects = applyWuxingEffects();
+    
+    // 获取applied-effects元素
+    const effectsContainer = document.getElementById('applied-effects');
+    
+    // 清空当前内容
+    effectsContainer.innerHTML = '';
+    
+    // 检查是否存在生效的五行符效果
+    if (Object.keys(activeEffects).length === 0) {
+        effectsContainer.innerText = '无生效的五行符效果';
+        return;
+    }
+    
+    // 创建一个数组来存储显示的效果字符串
+    const effectsList = [];
+    
+    // 根据生效的效果类型和强度生成描述字符串
+    Object.keys(activeEffects).forEach(effectType => {
+        const effectLevel = activeEffects[effectType];
+        const effectName = wuxingTypeMap[effectType];
+        const effectDisplayText = `${effectName}: 强度${effectLevel}级`;
+        effectsList.push(effectDisplayText);
+    });
+    
+    // 将效果字符串连接为一个字符串，以逗号隔开，并插入到页面元素中
+    effectsContainer.innerText = effectsList.join(', ');
+}
 
+        
 // 显示五行符详细信息
 function displayAmuletDetails(amulet) {
+    const rankNames = ['一等', '二等', '三等', '四等', '五等'];
     const detailsContainer = document.getElementById('amulet-details');
     detailsContainer.innerHTML = `
         <div id="text-container" style="height: 160px;margin-bottom: 10px;">
-            <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${wuxingColorMap[amulet.color]})</h3>
+            <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})</h3>
             <p>等级: ${amulet.level}</p>
             <p>主条目: ${Object.entries(amulet.drugBonus)
                 .filter(([key, value]) => value > 0)
@@ -11599,7 +11697,7 @@ function displayAmuletDetails(amulet) {
                 : `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
         </div>
     `;
-
+    
     const wuxingButtonContainer = document.createElement('div');
     wuxingButtonContainer.className = 'wuxing-action';
     wuxingButtonContainer.style.display = 'flex';
@@ -11762,10 +11860,12 @@ function decomposeAmulet(tag) {
     }
 
     const confirmDecomposition = () => {
-        const fragmentsGained = amulet.level * 475;
-        wuxingFragments += fragmentsGained;
+        const rankMultiplier = [475, 95, 20, 5, 1][amulet.rank - 1];  // 根据 rank 计算分解碎片基数
+        const fragmentsGained = amulet.level * rankMultiplier;  // 根据等级计算总分解碎片数量
 
+        wuxingFragments += fragmentsGained;
         wuxingStates.splice(amuletIndex, 1);
+
         showInfoBox(`分解成功！你获得了 ${fragmentsGained} 个五行碎片。`, null, null, 'green');
         updateWuxingDisplay();
     };
@@ -11792,7 +11892,9 @@ function wipeOffAmulet() {
         amuletsToWipe.forEach(amulet => {
             const amuletIndex = wuxingStates.indexOf(amulet);
             if (amuletIndex !== -1) {
-                const fragmentsGained = amulet.level * 475;
+                const rankMultiplier = [475, 95, 20, 5, 1][amulet.rank - 1];  // 根据 rank 计算分解碎片基数
+                const fragmentsGained = amulet.level * rankMultiplier;  // 根据等级计算总分解碎片数量
+
                 totalFragmentsGained += fragmentsGained;
                 totalAmuletsWiped += 1;
 
@@ -11869,6 +11971,23 @@ function unequipAmulet(tag) {
 }
 
 // 强化五行符
+function getRankCost(rank) {
+    switch (rank) {
+        case 1:
+            return { exp: 20000, fragments: 625 };
+        case 2:
+            return { exp: 18000, fragments: 125 };
+        case 3:
+            return { exp: 15000, fragments: 25 };
+        case 4:
+            return { exp: 12000, fragments: 5 };
+        case 5:
+            return { exp: 10000, fragments: 1 };
+        default:
+            return { exp: 20000, fragments: 625 };  // 默认一等成本
+    }
+}
+
 function enhanceAmulet(tag) {
     const amulet = wuxingStates.find(amulet => amulet.tag === tag);
 
@@ -11887,29 +12006,37 @@ function enhanceAmulet(tag) {
         return;
     }
 
-    if (wuxingFragments >= 625 && currentExp >= 20000) {
-        wuxingFragments -= 625;
-        currentExp -= 20000;
+    // 确保五行符有rank属性
+    ensureAmuletRank(amulet);
+
+    // 获取对应rank的强化成本
+    const { exp, fragments } = getRankCost(amulet.rank);
+
+    if (wuxingFragments >= fragments && currentExp >= exp) {
+        wuxingFragments -= fragments;
+        currentExp -= exp;
         amulet.level += 1;
 
-        // 针对 red amulet 的特殊处理逻辑
+        // 按照rank进行相应的提升
+        const rankMultiplier = [1, 0.8, 0.6, 0.4, 0.2][amulet.rank - 1];
+        
         if (amulet.color === 'red') {
-            // 确保只在第一次强化时确定增益类型
             if (!amulet.selectedBonus) {
                 amulet.selectedBonus = Math.random() < 0.5 ? 'physicalAttack' : 'magicAttack';
             }
-            // 根据 selectedBonus 增强对应的属性
-            amulet.drugBonus[amulet.selectedBonus] += 300;
+            amulet.drugBonus[amulet.selectedBonus] += Math.floor(300 * rankMultiplier);
         } else {
-            // 非 red amulet 继续使用 initializeDrugBonus 函数
-            amulet.drugBonus = initializeDrugBonus(amulet.color, amulet.level);
+            const newDrugBonus = initializeDrugBonus(amulet.color, amulet.level, amulet.rank, amulet.selectedBonus);
+            Object.keys(amulet.drugBonus).forEach(key => {
+                amulet.drugBonus[key] = newDrugBonus[key];
+            });
         }
 
         if (amulet.level % 5 === 0) {
             handleAdditionalValuesEnhancement(amulet);
         }
 
-        showInfoBox(`消耗20000经验和625个五行碎片，成功强化至 ${amulet.level} 级。`, null, null, 'green');
+        showInfoBox(`消耗${exp}经验和${fragments}个五行碎片，成功强化至 ${amulet.level} 级。`, null, null, 'green');
         updateWuxingDisplay();
         displayAmuletDetails(amulet);
     } else {
@@ -11981,24 +12108,36 @@ function applyWuxingEffects() {
         earthAmulet: 0,
     };
 
+    // 计算每种五行符的效果指数
     wuxingStates.forEach(state => {
         if (state.equipped && state.currentPetName === currentPet.name) {
             const amuletType = state.tag.split('(')[0];
             if (effects.hasOwnProperty(amuletType)) {
-                effects[amuletType]++;
+                effects[amuletType] += [5, 4, 3, 2, 1][state.rank - 1];  // 根据 rank 调整效果指数
             }
         }
     });
 
+    // 根据效果指数确定效果强度
     const activeEffects = {};
     Object.keys(effects).forEach(type => {
-        if (effects[type] > 0) {
-            activeEffects[type] = effects[type];
+        const effectValue = effects[type];
+        if (effectValue >= 25) {
+            activeEffects[type] = 5;  // 1级效果
+        } else if (effectValue >= 20) {
+            activeEffects[type] = 4;  // 2级效果
+        } else if (effectValue >= 15) {
+            activeEffects[type] = 3;  // 3级效果
+        } else if (effectValue >= 10) {
+            activeEffects[type] = 2;  // 4级效果
+        } else if (effectValue >= 5) {
+            activeEffects[type] = 1;  // 5级效果
         }
     });
 
-    return activeEffects; // 返回包含所有生效效果的对象
+    return activeEffects;  // 返回包含所有生效效果的对象
 }
+
 
 function getAmuletImageURL(name) {
     const imageMap = {
@@ -12549,6 +12688,78 @@ function increaseRandomQuality(increaseValue) {
     updateQualityCard();
 }
 
+let qualityPillCount = 0;
+let consumedPillCount = 0;
+
+// 更新资质显示以包含pillBonus，并更新qualityPillCount相关的UI
+function updateQualityDisplayWithPillBonus() {
+    const pillElements = [
+        document.getElementById("quality-pill-1"),
+        document.getElementById("quality-pill-2"),
+        document.getElementById("quality-pill-3"),
+        document.getElementById("quality-pill-4"),
+        document.getElementById("quality-pill-5")
+    ];
+
+    // 更新 qualityPill 图标状态
+    if (qualityPillCount > 0) {
+        pillElements.forEach(pill => {
+            pill.style.opacity = "1"; // 清除变暗效果
+            pill.innerHTML = `<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; font-weight: bold;">${qualityPillCount}</span>`;
+        });
+        
+    } else {
+        pillElements.forEach(pill => {
+            pill.style.opacity = "0.3"; // 应用变暗效果
+            pill.innerHTML = ""; // 清除之前的文字
+        });
+        removeQualityDisplayPillBonus();
+    }
+
+    // 更新资质显示，添加pillBonus提示
+    const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    attributes.forEach(attribute => {
+        const element = document.getElementById(`${attribute}-current`);
+        const pillBonusDisplay = document.createElement("span");
+        pillBonusDisplay.id = `${attribute}-pill-bonus`;
+        pillBonusDisplay.style.color = "green";
+        pillBonusDisplay.style.fontWeight = "bold";
+        pillBonusDisplay.textContent = ` +1240`;
+        element.appendChild(pillBonusDisplay);
+    });
+
+    updateQualityCard(); // 更新资质卡片显示
+}
+
+// 移除资质显示中的pillBonus，并恢复qualityPillCount相关的UI
+function removeQualityDisplayPillBonus() {
+    const pillElements = [
+        document.getElementById("quality-pill-1"),
+        document.getElementById("quality-pill-2"),
+        document.getElementById("quality-pill-3"),
+        document.getElementById("quality-pill-4"),
+        document.getElementById("quality-pill-5")
+    ];
+
+    // 恢复 qualityPill 图标状态
+    pillElements.forEach(pill => {
+        pill.style.opacity = "0.3"; // 应用变暗效果
+        pill.innerHTML = ""; // 清除之前的文字
+    });
+
+    // 移除资质显示中的pillBonus
+    const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
+    attributes.forEach(attribute => {
+        const pillBonusDisplay = document.getElementById(`${attribute}-pill-bonus`);
+        if (pillBonusDisplay) {
+            pillBonusDisplay.remove();
+        }
+    });
+
+    updateQualityCard(); // 更新资质卡片显示
+}
+
+        
 function useSupremeWisdomPill() {
     if (!currentPet || !currentPet.qualities) { // 添加检查
         console.warn("当前宠物未被正确初始化。");
@@ -12592,6 +12803,14 @@ function increasePetLevel(levels) {
 
     const actualLevelsIncreased = petLevel - oldLevel;
     remainingPoints += actualLevelsIncreased * 2; // 每提升1级增加2个可分配点数
+
+    // 每次等级提升时，消耗 qualityPillCount
+    for (let i = 0; i < actualLevelsIncreased; i++) {
+        if (qualityPillCount > 0) {
+            qualityPillCount -= 1;
+            consumedPillCount += 1; // 累加已消耗的 Pill Count
+        }
+    }
 
     updatePetLevel();
     updateAttributePanel();
@@ -13000,7 +13219,7 @@ function getRandomReward(type) {
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
-            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c8aecdd9c307b7e9e18bb9.png', chance: 1 },
+            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c9b575d9c307b7e93d964c.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 47 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
@@ -13123,7 +13342,9 @@ let jinnangItems = [
     { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
-    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c8aecdd9c307b7e9e18bb9.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' }
+    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c9b575d9c307b7e93d964c.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
+    { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
+    { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -13454,33 +13675,43 @@ const itemEffects = {
         addAmuletToManager('goldAmulet', 'green', 1);
         showInfoBox('你获得金符（红）金符（紫）金符（橙）金符（蓝）金符（绿），请在五行面板中查看！')
     },
-    spiritWine: () => {
-        if (spiritLevel >= 120) {
-            showInfoBox('你的精灵等级已达到最大级，无法继续使用此道具。', null, null, 'red');
-            return;
+    spiritWine: () => useSpiritWine(),
+    qualityEnhancePill: () => {
+        if (!isNaN(qualityPillCount)){
+            qualityPillCount += 1;
+            updateQualityDisplayWithPillBonus();
+            showInfoBox(`成功应用资质仙丹，宠物升级时会享受额外的资质加成！当前仙丹总数为${qualityPillCount}，宠物等级每提升一级会减少一颗`);
         }
-    
-        if (spiritLevel < 100) {
-            showInfoBox(
-                '你的精灵未满100级，建议使用精炼石提升等级。如需继续使用，请点击确认。',
-                () => {
-                    spiritLevel += 2;
-                    showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
-                },
-                () => {
-                    jinnangItems[51].quantity += 1;
-                    updateJinnangItems();
-                },
-                'yellow'
-            );
-        } else {
-            // 精灵等级在100到119之间时直接提升等级
-            spiritLevel += 2;
-            showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
-        }
+        
     }
 };
 
+function useSpiritWine() {
+     if (spiritLevel >= 120) {
+        showInfoBox('你的精灵等级已达到最大级，无法继续使用此道具。', null, null, 'red');
+        return;
+    }
+
+    if (spiritLevel < 100) {
+        showInfoBox(
+            '你的精灵未满100级，建议使用精炼石提升等级。如需继续使用，请点击确认。',
+            () => {
+                spiritLevel += 2;
+                showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
+            },
+            () => {
+                jinnangItems[51].quantity += 1;
+                updateJinnangItems();
+            },
+            'yellow'
+        );
+    } else {
+        // 精灵等级在100到119之间时直接提升等级
+        spiritLevel += 2;
+        showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
+    }
+}
+        
 function getRandomDrug(minNum, maxNum) {
     // 在指定范围内生成一个随机药物数量
     const drugQuantity = Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum;
@@ -13550,7 +13781,7 @@ function useAssignedItem() {
     // 如果连续使用同一个道具超过5次，提示是否全部使用
     if (useAssignedItemCount >= 5) {
         showInfoBox(
-            `您已经连续使用${useAssignedItemCount}次${itemName}。是否要全部使用？`,
+            `您已经连续使用${useAssignedItemCount}次此道具。是否要全部使用？`,
             () => {
                 useAllItems(itemName);  // 确认使用全部道具
                 useAssignedItemCount = 0;  // 重置计数器
@@ -13558,6 +13789,7 @@ function useAssignedItem() {
             },
             () => {
                 useAssignedItemCount = 0;  // 取消后重置计数器
+                lastUsedItemName = null;
             },
             'red'
         );
@@ -14582,18 +14814,44 @@ function upgradeSpecialization(key) {
         showInfoBox("专精等级已达上限！");
         return;
     }
+
     let upgradeCost = (spec.level >= 100 ? (spec.level - 99) * 5000 : spec.level * 200 + 200);
-    if (goldAmount >= upgradeCost) {
-        goldAmount -= upgradeCost;
-        spec.level++;
-        updateGoldDisplay(goldAmount);
-        showInfoBox(`你花费了${convertPrice(upgradeCost)}金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
+
+    if (spec.level >= 100) {
+        // 优先尝试使用塔草
+        if (useItem('towerGrass', 1)) {
+            spec.level++;
+            showInfoBox(`你消耗一颗融会贯通，将专精${key}已升级Lv${spec.level}！`);
+        } else if (goldAmount >= upgradeCost) {
+            // 若无法使用塔草，尝试使用金子
+            goldAmount -= upgradeCost;
+            spec.level++;
+            updateGoldDisplay(goldAmount);
+            showInfoBox(`你花费了${convertPrice(upgradeCost)}金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
+        } else if (useItem('towerGrass', 1)) {
+            // 如果金子不足，再次尝试使用塔草
+            spec.level++;
+            showInfoBox(`金子不足，但你消耗一颗融会贯通，将专精${key}已升级Lv${spec.level}！`);
+        } else {
+            // 两者都无法使用时提示
+            showInfoBox(`金子或融会贯通不足，无法升级专精${key}。`);
+        }
     } else {
-        showInfoBox(`升级所需金子不足，需要${convertPrice(upgradeCost)}金子。`);
+        // 低于100级的情况，直接使用金子升级
+        if (goldAmount >= upgradeCost) {
+            goldAmount -= upgradeCost;
+            spec.level++;
+            updateGoldDisplay(goldAmount);
+            showInfoBox(`你花费了${convertPrice(upgradeCost)}金子，将专精${key}已升级至Lv${spec.level}！（如果需要持续升级，无需关闭本窗口即可继续操作）`);
+        } else {
+            showInfoBox(`升级所需金子不足，需要${convertPrice(upgradeCost)}金子。`);
+        }
     }
+
     refreshSpecializationUI();
     updateSkillScore();
 }
+
 
 function upgradeToMax(key) {
     const spec = specializations[key];
@@ -15091,7 +15349,9 @@ function getRandomRareItem() {
     const rareItems = [
         createItem('灵异金丹', 6288, 12988, 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png'),
         createItem('仙人醍醐', 86788, 169238, 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png'),
-        createItem('修为灵丹（蓝）', 86788, 109238, 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png')
+        createItem('修为灵丹（蓝）', 86788, 109238, 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png'),
+        createItem('宠物资质仙丹', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png'),
+        createItem('融会贯通', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png'),
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -15184,6 +15444,8 @@ function buyItem() {
         '唤妖符': () => addItemToJinnang('hailMonsterAmulet', itemQuantity),
         '修为灵丹（蓝）': () => addItemToJinnang('cultivationPill200', itemQuantity),
         '分解符礼包': () => addItemToJinnang('fragmentsPackage', itemQuantity),
+        '宠物资质仙丹': () => addItemToJinnang('qualityEnhancePill', itemQuantity),
+        '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -16620,7 +16882,15 @@ let baseAttributes = {
     agility: 0,
     faith: 0
 };
-        
+
+// 根据 qualityPillCount 计算并返回累积的 pillBonus
+function calculateQualityByPill() {
+    if (consumedPillCount > 0) {
+        return Math.floor((1240 / 2000) * currentPet.qualities.growthRate/100) * consumedPillCount;
+    }
+    return 0;
+}
+
 function calculateAttribute(currentValue, growthRate, level) {
     return Math.floor((currentValue / 2000) * growthRate * level);
 }
@@ -16628,29 +16898,32 @@ function calculateAttribute(currentValue, growthRate, level) {
 function calculateCurrentAttributes() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
     const attributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance + additionalAttributes.endurance,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence + additionalAttributes.intelligence,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength + additionalAttributes.strength,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility + additionalAttributes.agility,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith + additionalAttributes.faith
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance + additionalAttributes.endurance + pillBonus,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence + additionalAttributes.intelligence + pillBonus,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength + additionalAttributes.strength + pillBonus,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility + additionalAttributes.agility + pillBonus,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith + additionalAttributes.faith + pillBonus
     };
 
     return attributes;
 }
 
+
 //所谓的leftAttributes就是指支持培养的属性值
 function attributesForTraning() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
     const leftAttributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance + pillBonus,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence + pillBonus,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength + pillBonus,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility + pillBonus,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith + pillBonus
     };
 
     return leftAttributes;
@@ -16660,15 +16933,16 @@ function updateAttributePanel() {
     const pet = currentPet;
     const qualities = pet.qualities;
     const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
     const currentAttributes = attributesForTraning();
     // 此数组用于更新显示属性左边的总值
     const totalAttributes = {
-        endurance: currentAttributes.endurance + additionalAttributes.endurance,
-        intelligence: currentAttributes.intelligence + additionalAttributes.intelligence,
-        strength: currentAttributes.strength + additionalAttributes.strength,
-        agility: currentAttributes.agility + additionalAttributes.agility,
-        faith: currentAttributes.faith + additionalAttributes.faith
+        endurance: currentAttributes.endurance + additionalAttributes.endurance + pillBonus,
+        intelligence: currentAttributes.intelligence + additionalAttributes.intelligence + pillBonus,
+        strength: currentAttributes.strength + additionalAttributes.strength + pillBonus,
+        agility: currentAttributes.agility + additionalAttributes.agility + pillBonus,
+        faith: currentAttributes.faith + additionalAttributes.faith + pillBonus
     };
 
     //console.log("Total Attributes:", totalAttributes);
@@ -17894,6 +18168,7 @@ function saveGameState() {
         petsInSelect: petsInSelect,
         petStates: JSON.stringify(petStates),
         currentSpecialization: currentSpecialization,
+        consumedPillCount: consumedPillCount,
         petLevel: petLevel,
         evolutionLevel: evolutionLevel,
         remainingPoints: remainingPoints,
@@ -17919,6 +18194,7 @@ function saveGameState() {
         playerCritRate: playerCritRate,
         playerCritDamage: playerCritDamage,
         playerCultivation: playerCultivation,
+        qualityPillCount: qualityPillCount,
         additionalPlayerCultivation: additionalPlayerCultivation,
         enemyPetCultivation: enemyPetCultivation,
         enemyCritRate: enemyCritRate,
@@ -17935,7 +18211,6 @@ function saveGameState() {
         drugBonus0: drugBonus0,
         drugBonus: drugBonus,
         wuxingStates: JSON.stringify(wuxingStates),
-        
         skillScore: skillScore,
         specializations: specializations,
         currentSpecialization: currentSpecialization,
@@ -18102,7 +18377,13 @@ function loadGameState() {
         if (JSON.stringify(savedState.petStates)) {
             petStates = JSON.parse(savedState.petStates);
         }
-       
+        if (savedState.qualityPillCount) {
+            qualityPillCount = savedState.qualityPillCount;
+        } //这是资质仙丹的数值
+        if (savedState.consumedPillCount) {
+            consumedPillCount = savedState.consumedPillCount;
+        } //这是资质仙丹的数值
+        
         if (savedState.drugBonus0) {
             drugBonus = savedState.drugBonus0;
         }

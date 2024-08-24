@@ -6693,7 +6693,7 @@ function calculateDamage(baseDamage, isCritical, critDamage) {
         baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
 
         if (!isNaN(fireEffect) && fireEffect > 0) {
-            logBattleEvent(`🔴奥义·火符易伤！伤害增加了 ${fireEffect} 点。`, '#431508');
+            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
         } 
     }
 
@@ -7281,7 +7281,8 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor / 2);
+    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
     // 应用各种效果和状态修正伤害
@@ -7348,7 +7349,8 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
+    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
 
     let isCritical = checkCriticalHit(playerCritRate);
@@ -7421,7 +7423,8 @@ function performIndependentMagicAttack() {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor / 2);
+    const cultivationFactor = Math.floor(enemyPetCultivation / 520000);
+    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
 
@@ -8580,7 +8583,8 @@ function performEnemyPhysicalAttack(isCritical) {
     }
    
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    let effectiveDefense = battleAttributes.physicalDefense * defenseFactor / 2;
+    const cultivationFactor = Math.floor(playerCultivation / 520000);
+    const effectiveDefense = Math.floor(battleAttributes.physicalDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     
@@ -8632,7 +8636,8 @@ function performEnemyMagicalAttack(isCritical) {
     }
     
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor / 2);
+    const cultivationFactor = Math.floor(playerCultivation / 520000);
+    const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
@@ -11616,7 +11621,11 @@ function displayAmuletDetails(amulet) {
     const unequipButton = document.createElement('button');
     unequipButton.innerText = '卸下';
     unequipButton.onclick = () => unequipAmulet(amulet.tag);
-
+    
+    const wipeOffButton = document.createElement('button');
+    wipeOffButton.innerText = '清空';
+    wipeOffButton.onclick = () => wipeOffAmulet();
+    
     const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
     if (petAmulet && petAmulet.equipped) {
 
@@ -11629,6 +11638,7 @@ function displayAmuletDetails(amulet) {
     wuxingButtonContainer.appendChild(decomposeButton);
     wuxingButtonContainer.appendChild(equipButton);
     wuxingButtonContainer.appendChild(unequipButton);
+    wuxingButtonContainer.appendChild(wipeOffButton);
 
     detailsContainer.appendChild(wuxingButtonContainer);
 }
@@ -11767,6 +11777,40 @@ function decomposeAmulet(tag) {
     showInfoBox("你确定要分解此五行符吗？该操作不可恢复。", confirmDecomposition, cancelDecomposition, 'red');
 }
 
+function wipeOffAmulet() {
+    const amuletsToWipe = wuxingStates.filter(amulet => !amulet.equipped && amulet.currentPetName === null && amulet.level === 1);
+
+    if (amuletsToWipe.length === 0) {
+        showInfoBox("没有找到符合条件的五行符。", null, null, 'red');
+        return;
+    }
+
+    const confirmWipeOff = () => {
+        let totalFragmentsGained = 0;
+        let totalAmuletsWiped = 0;
+
+        amuletsToWipe.forEach(amulet => {
+            const amuletIndex = wuxingStates.indexOf(amulet);
+            if (amuletIndex !== -1) {
+                const fragmentsGained = amulet.level * 475;
+                totalFragmentsGained += fragmentsGained;
+                totalAmuletsWiped += 1;
+
+                wuxingStates.splice(amuletIndex, 1); // 从列表中移除五行符
+            }
+        });
+
+        wuxingFragments += totalFragmentsGained;
+        showInfoBox(`成功分解了 ${totalAmuletsWiped} 张五行符，获得了 ${totalFragmentsGained} 个五行碎片。`, null, null, 'green');
+        updateWuxingDisplay();
+    };
+
+    const cancelWipeOff = () => {
+        showInfoBox("清除操作已取消。", null, null, 'black');
+    };
+
+    showInfoBox("你确定要清除所有未装备且等级为1的五行符吗？该操作不可恢复。", confirmWipeOff, cancelWipeOff, 'red');
+}
 
 function equipAmulet(tag) {
     const amulet = wuxingStates.find(amulet => amulet.tag === tag);

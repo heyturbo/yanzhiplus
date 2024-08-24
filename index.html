@@ -687,7 +687,19 @@
             flex-direction: row;
             align-items: center;
             gap: 5px;
+            position: relative;
         }
+        #quality-pill-num-1, #quality-pill-num-2, #quality-pill-num-3, #quality-pill-num-4, #quality-pill-num-5 {
+            position: absolute;
+            top: 10px;
+            left: 95%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            pointer-events: none; /* 确保数字不会干扰鼠标事件 */
+        }
+        
         
         .progress-bar {
         }
@@ -2364,37 +2376,42 @@
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
-                        耐力: <span id="endurance-current">1100</span> / <span id="endurance-max">2200</span>
+                        耐力: <span id="endurance-current">1100</span><span id="endurance-pill-bonus"></span> / <span id="endurance-max">2200</span>
                         <div id="endurance-bar" style="width: 50%;"></div>
                     </div>
+                    <div id="quality-pill-num-1">0</div>
                     <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-1">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
-                        智力: <span id="intelligence-current">1150</span> / <span id="intelligence-max">2250</span>
+                        智力: <span id="intelligence-current">1150</span><span id="intelligence-pill-bonus"></span> / <span id="intelligence-max">2250</span>
                         <div id="intelligence-bar" style="width: 50%;"></div>
                     </div>
+                    <div id="quality-pill-num-2">0</div>
                     <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-2">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
-                        强壮: <span id="strength-current">1150</span> / <span id="strength-max">2250</span>
+                        强壮: <span id="strength-current">1150</span><span id="strength-pill-bonus"></span> / <span id="strength-max">2250</span>
                         <div id="strength-bar" style="width: 50%;"></div>
                     </div>
+                    <div id="quality-pill-num-3">0</div>
                     <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-3">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
-                        敏捷: <span id="agility-current">1100</span> / <span id="agility-max">2200</span>
+                        敏捷: <span id="agility-current">1100</span><span id="agility-pill-bonus"></span> / <span id="agility-max">2200</span>
                         <div id="agility-bar" style="width: 50%;"></div>
                     </div>
+                    <div id="quality-pill-num-4">0</div>
                     <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-4">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
-                        信仰: <span id="faith-current">1150</span> / <span id="faith-max">2250</span>
+                        信仰: <span id="faith-current">1150</span><span id="faith-pill-bonus"></span> / <span id="faith-max">2250</span>
                         <div id="faith-bar" style="width: 50%;"></div>
                     </div>
+                    <div id="quality-pill-num-5">0</div>
                     <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-5">
                 </div>
                 <div class="button-grid">
@@ -11660,7 +11677,7 @@ function updateAppliedEffectsDisplay() {
     
     // 检查是否存在生效的五行符效果
     if (Object.keys(activeEffects).length === 0) {
-        effectsContainer.innerText = '无生效的五行符效果';
+        effectsContainer.innerText = '目前没有生效的五行符效果';
         return;
     }
     
@@ -12701,60 +12718,54 @@ function updateQualityDisplayWithPillBonus() {
         document.getElementById("quality-pill-5")
     ];
 
-    // 更新 qualityPill 图标状态
-    if (qualityPillCount > 0) {
-        pillElements.forEach(pill => {
-            pill.style.opacity = "1"; // 清除变暗效果
-            pill.innerHTML = `<span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 16px; font-weight: bold;">${qualityPillCount}</span>`;
-        });
-        
-    } else {
-        pillElements.forEach(pill => {
-            pill.style.opacity = "0.3"; // 应用变暗效果
-            pill.innerHTML = ""; // 清除之前的文字
-        });
-        removeQualityDisplayPillBonus();
-    }
-
-    // 更新资质显示，添加pillBonus提示
-    const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
-    attributes.forEach(attribute => {
-        const element = document.getElementById(`${attribute}-current`);
-        const pillBonusDisplay = document.createElement("span");
-        pillBonusDisplay.id = `${attribute}-pill-bonus`;
-        pillBonusDisplay.style.color = "green";
-        pillBonusDisplay.style.fontWeight = "bold";
-        pillBonusDisplay.textContent = ` +1240`;
-        element.appendChild(pillBonusDisplay);
-    });
-
-    updateQualityCard(); // 更新资质卡片显示
-}
-
-// 移除资质显示中的pillBonus，并恢复qualityPillCount相关的UI
-function removeQualityDisplayPillBonus() {
-    const pillElements = [
-        document.getElementById("quality-pill-1"),
-        document.getElementById("quality-pill-2"),
-        document.getElementById("quality-pill-3"),
-        document.getElementById("quality-pill-4"),
-        document.getElementById("quality-pill-5")
+    const pillNumElements = [
+        document.getElementById("quality-pill-num-1"),
+        document.getElementById("quality-pill-num-2"),
+        document.getElementById("quality-pill-num-3"),
+        document.getElementById("quality-pill-num-4"),
+        document.getElementById("quality-pill-num-5")
     ];
 
-    // 恢复 qualityPill 图标状态
-    pillElements.forEach(pill => {
-        pill.style.opacity = "0.3"; // 应用变暗效果
-        pill.innerHTML = ""; // 清除之前的文字
-    });
-
-    // 移除资质显示中的pillBonus
     const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
-    attributes.forEach(attribute => {
-        const pillBonusDisplay = document.getElementById(`${attribute}-pill-bonus`);
-        if (pillBonusDisplay) {
-            pillBonusDisplay.remove();
-        }
-    });
+
+    if (qualityPillCount > 0) {
+        // 显示 pillBonus 提示
+        attributes.forEach(attribute => {
+            const pillBonusElement = document.getElementById(`${attribute}-pill-bonus`);
+            pillBonusElement.textContent = ` +1240`;
+            pillBonusElement.style.color = "green";
+            pillBonusElement.style.fontWeight = "bold";
+        });
+
+        // 更新 qualityPill 图标状态和数字显示
+        pillElements.forEach((pill) => {
+            pill.style.opacity = "1"; // 清除变暗效果
+        });
+        pillNumElements.forEach((pillNum) => {
+            pillNum.style.position = "absolute";
+            pillNum.style.top = "10px";
+            pillNum.style.left = "95%";
+            pillNum.style.transform = "translateX(-50%)";
+            pillNum.style.color = "white";
+            pillNum.style.fontSize = "16px";
+            pillNum.style.fontWeight = "bold";
+            pillNum.textContent = qualityPillCount;
+        });
+    } else {
+        // 当 qualityPillCount 为 0 时，清除 pillBonus 提示
+        attributes.forEach(attribute => {
+            const pillBonusElement = document.getElementById(`${attribute}-pill-bonus`);
+            pillBonusElement.textContent = ""; // 清除内容
+        });
+
+        // 恢复图标变暗状态并清除数字显示
+        pillElements.forEach(pill => {
+            pill.style.opacity = "0.5"; // 应用变暗效果
+        });
+        pillNumElements.forEach((pillNum) => {
+            pillNum.textContent = "0";
+        });
+    }
 
     updateQualityCard(); // 更新资质卡片显示
 }
@@ -12811,6 +12822,8 @@ function increasePetLevel(levels) {
             consumedPillCount += 1; // 累加已消耗的 Pill Count
         }
     }
+    
+    updateQualityDisplayWithPillBonus(); // 更新界面显示
 
     updatePetLevel();
     updateAttributePanel();
@@ -13219,7 +13232,7 @@ function getRandomReward(type) {
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
-            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c9b575d9c307b7e93d964c.png', chance: 1 },
+            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66ca04ddd9c307b7e9b2664e.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 47 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
@@ -13342,7 +13355,7 @@ let jinnangItems = [
     { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
-    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66c9b575d9c307b7e93d964c.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
+    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66ca04ddd9c307b7e9b2664e.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];

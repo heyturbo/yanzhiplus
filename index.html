@@ -13344,7 +13344,7 @@ let jinnangItems = [
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升200点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
-    { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性50点' },
+    { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性30点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
     { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
@@ -13641,8 +13641,8 @@ const itemEffects = {
         const attributeNameInChinese = attributeMap[randomAttribute];
         
         if (additionalAttributes[randomAttribute] <= 1000) {
-            additionalAttributes[randomAttribute] += 50;
-            showInfoBox(`美味蛋糕下肚，您的${attributeNameInChinese}增加了50点。`);
+            additionalAttributes[randomAttribute] += 30;
+            showInfoBox(`美味蛋糕下肚，您的${attributeNameInChinese}增加了30点。`);
         } else {
             additionalAttributes[randomAttribute] += 1000;
             showInfoBox(`蛋糕虽好，吃太多也会发胖哦！${attributeNameInChinese}已经提升至最大值了。`);
@@ -16932,11 +16932,11 @@ function attributesForTraning() {
     const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
     const leftAttributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel)+ awakenAttributes.endurance + pillBonus,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel)+ awakenAttributes.intelligence + pillBonus,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel)+ awakenAttributes.strength + pillBonus,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel)+ awakenAttributes.agility + pillBonus,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel)+ awakenAttributes.faith + pillBonus
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + additionalAttributes.endurance + pillBonus,
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + additionalAttributes.intelligence + pillBonus,
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + additionalAttributes.strength + pillBonus,
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + additionalAttributes.agility + pillBonus,
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + additionalAttributes.faith + pillBonus
     };
 
     return leftAttributes;
@@ -16951,11 +16951,11 @@ function updateAttributePanel() {
     const currentAttributes = attributesForTraning();
     // 此数组用于更新显示属性左边的总值
     const totalAttributes = {
-        endurance: currentAttributes.endurance + additionalAttributes.endurance + pillBonus,
-        intelligence: currentAttributes.intelligence + additionalAttributes.intelligence + pillBonus,
-        strength: currentAttributes.strength + additionalAttributes.strength + pillBonus,
-        agility: currentAttributes.agility + additionalAttributes.agility + pillBonus,
-        faith: currentAttributes.faith + additionalAttributes.faith + pillBonus
+        endurance: currentAttributes.endurance + awakenAttributes.endurance,
+        intelligence: currentAttributes.intelligence + awakenAttributes.intelligence,
+        strength: currentAttributes.strength + awakenAttributes.strength,
+        agility: currentAttributes.agility + awakenAttributes.agility,
+        faith: currentAttributes.faith + awakenAttributes.faith
     };
 
     //console.log("Total Attributes:", totalAttributes);

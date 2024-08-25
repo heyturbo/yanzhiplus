@@ -12543,10 +12543,10 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
         showInfoBox('当前没有奖金可以领取！');
     } else {
         goldAmount += Math.round(pendingPrize * 0.8);
+        showInfoBox(`你领取了${convertPrice(Math.round(pendingPrize * 0.8))}奖金！其中手续费为${convertPrice(Math.round(pendingPrize * 0.2))}`);
         updateGoldDisplay(goldAmount);
         pendingPrize = 0;
         document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
-        showInfoBox(`你领取了${convertPrice(Math.round(pendingPrize * 0.8))}奖金！其中手续费为${convertPrice(Math.round(pendingPrize * 0.2))}`)
         updateLotteryDisplay();
     }
 });

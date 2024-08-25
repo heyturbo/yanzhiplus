@@ -229,7 +229,7 @@
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 10px 5px;
-    max-height: 200px;
+    max-height: 240px;
     justify-items: center;
     align-content: space-around;
     border: 1px solid #87431f;
@@ -314,7 +314,7 @@
 #amulet-details {
     border: 1px solid #87431f;
     padding: 10px;
-    height: 220px;
+    height: 180px;
     border-radius: 2px;
     line-height: 18px;
     background: rgb(0 0 0 / 20%);
@@ -11635,7 +11635,7 @@ function updateWuxingDisplay() {
             selectedAmulet.originalBoxShadow = amuletElement.style.boxShadow; // 保存原始的 boxShadow
 
             // 应用新的选中样式
-            selectedAmulet.style.boxShadow = '0px 0px 0px 4px red';
+            selectedAmulet.style.boxShadow = '0px 0px 0px 4px white';
 
             displayAmuletDetails(amulet);
         });
@@ -11703,13 +11703,13 @@ function displayAmuletDetails(amulet) {
     const rankNames = ['一等', '二等', '三等', '四等', '五等'];
     const detailsContainer = document.getElementById('amulet-details');
     detailsContainer.innerHTML = `
-        <div id="text-container" style="height: 160px;margin-bottom: 10px;">
-            <h3 style="color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})</h3>
-            <p>等级: ${amulet.level}</p>
-            <p>主条目: ${Object.entries(amulet.drugBonus)
+        <div id="text-container" style="height: 120px;margin-bottom: 30px;line-height: 28px;">
+            <h3 style="margin:0;color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})</h3>
+            <p style="margin:0;">等级: ${amulet.level}</p>
+            <p style="margin:0;">主条目: ${Object.entries(amulet.drugBonus)
                 .filter(([key, value]) => value > 0)
                 .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
-            <p>副条目: ${amulet.additionalValues.map(v => 
+            <p style="margin:0;">副条目: ${amulet.additionalValues.map(v => 
                 v.attribute.startsWith('‰')
                 ? `${v.value}‰ ${wuxingBonusMap[v.attribute.replace('‰', '')]}`
                 : `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>

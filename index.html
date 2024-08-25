@@ -4623,6 +4623,7 @@ const enemyImages = [
     { status: 'mao', name: '上古心魔', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' },
     { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
     { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
+    { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
 ];
 
 function changeEnemyImage(status) {
@@ -5808,10 +5809,10 @@ let drugInventory = {
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
     "普通药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b38.png", tier: 4, description: "白色品阶，恢复1000点生命值和法力值，收集3个可以合成1个绿色品阶的药品" },
-    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，永久增加50点速度，收集3个可以合成1个蓝色品阶的药品" },
+    "上等药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b15.png", tier: 3, description: "绿色品阶，永久增加20点速度，收集3个可以合成1个蓝色品阶的药品" },
     "极品药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0b0c.png", tier: 2, description: "蓝色品阶，永久增加500点生命值和法力值，收集3个可以合成1个紫色品阶的药品" },
-    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，永久增加594物理防御和法术防御，收集3个可以合成1个橙色品阶的药品" },
-    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，永久增加772点物理攻击和法术攻击，收集2个可以炼制出随机药品" }
+    "珍贵药材": { quantity: 0, url: "https://pic.imgdb.cn/item/6699fa28d9c307b7e9ad0af3.png", tier: 1, description: "紫色品阶，永久增加100物理防御和法术防御，收集3个可以合成1个橙色品阶的药品" },
+    "完美药材": { quantity: 0, url: "https://pic.imgdb.cn/item/669a6459d9c307b7e91b9003.png", tier: 0, description: "橙色品阶，永久增加100点物理攻击和法术攻击，收集2个可以炼制出随机药品" }
 };
 let collectCost = 100; // 初始采集花费
 let activeBuffs = {};
@@ -6351,13 +6352,7 @@ function toggleFightingDrawer() {
     syncBattlePetSelect();
 }
 
-//进入战斗界面更新双方关键信息
-function updatePetInfo() {
-    if (!currentPet) {
-        console.error("currentPet is not initialized");
-        return;
-    }
-
+function calculateSkillAttributes() {
     const skillsArea = document.getElementById("skills-area");
     let skillAttributes = {
         health: 0,
@@ -6379,13 +6374,22 @@ function updatePetInfo() {
                 const levelMultiplier = 1 + 0.1 * (skillLevel - 1);
                 skillAttributes.health += Math.round(2168 * levelMultiplier);
                 skillAttributes.mana += Math.round(531 * levelMultiplier);
-                skillAttributes.physicalAttack += Math.round(728 * levelMultiplier);
-                skillAttributes.physicalDefense += Math.round(364 * levelMultiplier);
-                skillAttributes.magicAttack += Math.round(678 * levelMultiplier);
+                skillAttributes.physicalAttack += Math.round(128 * levelMultiplier);
+                skillAttributes.physicalDefense += Math.round(84 * levelMultiplier);
+                skillAttributes.magicAttack += Math.round(278 * levelMultiplier);
                 skillAttributes.magicDefense += Math.round(339 * levelMultiplier);
-                skillAttributes.speed += Math.round(211 * levelMultiplier);
+                skillAttributes.speed += Math.round(11 * levelMultiplier);
             }
         });
+    }
+    return skillAttributes;
+}
+        
+//进入战斗界面更新双方关键信息
+function updatePetInfo() {
+    if (!currentPet) {
+        console.error("currentPet is not initialized");
+        return;
     }
 
     const currentAttributes = calculateCurrentAttributes();
@@ -6399,17 +6403,18 @@ function updatePetInfo() {
 
     const secondaryAttributes = calculateSecondaryAttributes(totalAttributes, currentWisdom);
     const spiritAttributes = getCurrentSpiritAttributes();
+    
 
     if (!battleState) {
         battleState = {
             player: {
-                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.healt + drugBonus0.health + drugBonus.health,
-                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus0.mana + drugBonus.mana,
-                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack + drugBonus.physicalAttack,
-                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus0.physicalDefense + drugBonus.physicalDefense,
-                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack + drugBonus.magicAttack,
-                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense + drugBonus.magicDefense,
-                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus0.speed + drugBonus.speed
+                health: secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health,
+                mana: secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana,
+                physicalAttack: secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack,
+                physicalDefense: secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense,
+                magicAttack: secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack,
+                magicDefense: secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense,
+                speed: secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed
             },
             enemy: { ...enemyPet }
         };
@@ -6421,13 +6426,13 @@ function updatePetInfo() {
             battleState.player.originalSecondAscensionSkill = secondAscensionSkill.name;
         }
     } else {
-        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health + skillAttributes.health + drugBonus0.health + drugBonus.health;
-        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana + skillAttributes.mana + drugBonus0.mana + drugBonus.mana;
-        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack + drugBonus.physicalAttack;
-        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense + skillAttributes.physicalDefense + drugBonus0.magicAttack + drugBonus.magicAttack;
-        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack + drugBonus.magicAttack;
-        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense + drugBonus.magicDefense;
-        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed + skillAttributes.speed + drugBonus0.speed + drugBonus.speed;
+        battleState.player.health = secondaryAttributes.health + spiritAttributes.health + ascensionAttributes.health;
+        battleState.player.mana = secondaryAttributes.mana + spiritAttributes.mana + ascensionAttributes.mana;
+        battleState.player.physicalAttack = secondaryAttributes.physicalAttack + spiritAttributes.physicalAttack + ascensionAttributes.physicalAttack;
+        battleState.player.physicalDefense = secondaryAttributes.physicalDefense + spiritAttributes.physicalDefense + ascensionAttributes.physicalDefense;
+        battleState.player.magicAttack = secondaryAttributes.magicAttack + spiritAttributes.magicAttack + ascensionAttributes.magicAttack;
+        battleState.player.magicDefense = secondaryAttributes.magicDefense + spiritAttributes.magicDefense + ascensionAttributes.magicDefense;
+        battleState.player.speed = secondaryAttributes.speed + spiritAttributes.speed + ascensionAttributes.speed;
 
         if (ascensionSkill.name && ascensionEnabled && ascensionSkill.name !== "被封印的技能") {
             battleState.player.originalAscensionSkill = ascensionSkill.name;
@@ -6446,6 +6451,41 @@ function updatePetInfo() {
     attributesFetched = true;
 }
 
+function summonPracticeEnemy() {
+    showInfoBox(
+        '你可以召唤战力树桩来测试战斗力',
+        () => {
+            enemyPet = {
+                health: 5000000000,
+                mana: 5000000000,
+                physicalAttack: 50000,
+                physicalDefense: 100000,
+                magicAttack: 50000,
+                magicDefense: 100000,
+                speed: 10000,
+                cultivation: 240000
+            };
+        
+            enemyMaxHealth = enemyPet.health;
+            enemyMaxMana = enemyPet.mana;
+            enemyPetCultivation = enemyPet.cultivation;
+        
+            enemyCritRate = 0.8;
+            enemyCritDamage = 2.5;
+            changeEnemyImage("practiceEnemy");
+            setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
+            document.getElementById('enemy-level').innerText = 'Lv100';
+            updateUI();
+        
+            battleState.enemy = { ...enemyPet };
+            storeEnemyInitialState();
+        },
+        () => {
+            return;
+        }
+    );
+}
+        
 function initializeEnemyPet() {
     enemyPet = {
         health: 13,
@@ -9489,19 +9529,19 @@ function useSelectedDrug() {
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 1000);
                 break;
             case "上等药材":
-                applyDrugBonus0("speed", 50);
+                applyDrugBonus0("speed", 20);
                 break;
             case "极品药材":
                 applyDrugBonus0("health", 500);
                 applyDrugBonus0("mana", 500);
                 break;
             case "珍贵药材":
-                applyDrugBonus0("physicalDefense", 594);
-                applyDrugBonus0("magicDefense", 594);
+                applyDrugBonus0("physicalDefense", 100);
+                applyDrugBonus0("magicDefense", 100);
                 break;
             case "完美药材":
-                applyDrugBonus0("physicalAttack", 772);
-                applyDrugBonus0("magicAttack", 772);
+                applyDrugBonus0("physicalAttack", 100);
+                applyDrugBonus0("magicAttack", 100);
                 break;
             case "冰莲絮":
                 applyDrugBonus0("health", 2000);
@@ -13448,6 +13488,7 @@ let jinnangItems = [
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
     { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66ca04ddd9c307b7e9b2664e.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
+    { name: 'battleWithTree', displayName: '树桩挑战卡', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];
 
@@ -13787,6 +13828,11 @@ const itemEffects = {
             showInfoBox(`成功应用资质仙丹，宠物升级时会享受额外的资质加成！当前仙丹总数为${qualityPillCount}，宠物等级每提升一级会减少一颗`);
         }
         
+    },
+    battleWithTree: () => {
+        toggleFightingDrawer();
+        summonPracticeEnemy();
+        updatePetInfo();
     }
 };
 
@@ -14607,6 +14653,8 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
         }
     }
 
+    const skillAttributes = calculateSkillAttributes();
+    
     // 计算基础二级属性
     const baseSecondaryAttributes = {
         health: Math.floor((currentAttributes.endurance * 24 + currentAttributes.intelligence * 1 + currentAttributes.strength * 2 + currentAttributes.agility * 3 + currentAttributes.faith * 3) * multiplier),
@@ -14627,13 +14675,13 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const speedBonus = 1 + collectedPetCount * 0.005;
     
-    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health;
-    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana;
-    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack;
-    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus) + drugBonus.magicAttack;
-    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus) + drugBonus.physicalDefense;
-    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense;
-    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed;
+    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health + skillAttributes.health + drugBonus0.health;
+    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana + skillAttributes.mana + drugBonus0.mana;
+    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack;
+    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus) + drugBonus.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack;
+    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus) + drugBonus.physicalDefense + skillAttributes.physicalDefense + drugBonus0.physicalDefense;
+    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense;
+    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed + skillAttributes.speed + drugBonus0.speed;
 
     // 累加武装增益值
     Object.keys(armsAttributes).forEach(key => {

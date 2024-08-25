@@ -12760,7 +12760,7 @@ function updateQualityDisplayWithPillBonus() {
 
         // 恢复图标变暗状态并清除数字显示
         pillElements.forEach(pill => {
-            pill.style.opacity = "0.5"; // 应用变暗效果
+            pill.style.opacity = "0.8"; // 应用变暗效果
         });
         pillNumElements.forEach((pillNum) => {
             pillNum.textContent = "0";
@@ -12973,7 +12973,7 @@ function updateTreasureDescription(type) {
                 description = "上古武神的战利品，单次开启花费6两800文金子，您可能获得庆典蛋糕、精灵升级的相关道具、心鉴之石、施毒之术等提升战斗能力的法宝！";
                 break;
             case '五行仙葫':
-                description = "至尊五行仙葫，每次开启30两金，您可能获得珍贵的五行符和分解符材料！";
+                description = "至尊五行仙葫，每次开启16两800文金，您可能获得珍贵的五行符和分解符材料！";
                 break;
             case '至尊仙葫':
                 description = "价值连城的宝箱，单次开启花费18两800文金子，您可能获得召唤灵符，修为灵丹、举世无双悟性丹，飞升之石，仙人醍醐等超稀有道具！";
@@ -13032,6 +13032,7 @@ function collectTreasure() {
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
         '华贵的药材箱': 'fancyDrugBox',
+        '宠物资质仙丹': 'qualityEnhancePill',
         '高级神兽丹': 'advancedSkillPill',
         '一等分解符': 'firstFragments',
         '二等分解符': 'secondFragments',
@@ -13208,7 +13209,8 @@ function getRandomReward(type) {
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
             { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
             { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.4 },
-            { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 3.5 },
+            { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 3 },
+            { name: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', chance: 0.5 },
             { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.8 },
             { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 },
             { name: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', chance: 0.1 },
@@ -13237,36 +13239,36 @@ function getRandomReward(type) {
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 2 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 5 },
             { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 15 },
-            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 50 },
-            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 25 },
-            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 6 },
-            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
-            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
-            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
-            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
-            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
-            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
-            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
-            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
-            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
-            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
-            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
-            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
-            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
-            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
-            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
-            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
-            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
-            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
-            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
-            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 },
-            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 0.08 },
-            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 0.08 },
-            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 0.08 },
-            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 0.08 },
-            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 0.08 }
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 30 },
+            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 10 },
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 5 },
+            { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
+            { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
+            { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
+            { name: '金符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 1 },
+            { name: '金符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 1 },
+            { name: '木符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
+            { name: '木符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
+            { name: '木符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
+            { name: '木符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 1 },
+            { name: '木符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 1 },
+            { name: '水符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
+            { name: '水符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
+            { name: '水符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
+            { name: '水符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 1 },
+            { name: '水符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 1 },
+            { name: '火符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
+            { name: '火符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
+            { name: '火符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
+            { name: '火符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 1 },
+            { name: '火符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 1 },
+            { name: '土符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
+            { name: '土符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
+            { name: '土符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
+            { name: '土符（蓝）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929decc.png', chance: 1 },
+            { name: '土符（绿）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df18.png', chance: 1 }
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
@@ -15871,8 +15873,8 @@ function sellPet() {
         // 检查是否有五行符被当前宠物装备，遍历全局变量
         const petAmulet = wuxingStates.find(a => a.equipped && a.currentPetName === currentPet.name);
         
-        if (petAmulet) {
-            showInfoBox('宠物身上还有没取下来的五行符！', null, null, 'red');
+        if (petAmulet || qualityPillCount > 0) {
+            showInfoBox('宠物身上还有没取下来的五行符或资质仙丹！', null, null, 'red');
             return;
         } else {
             showMerchantModal();
@@ -15905,6 +15907,8 @@ function resetPet() {
 
     // 初始化等级和其他基础属性
     additionalPlayerCultivation = 0;
+    qualityPillCount = 0;
+    consumedPillCount = 0;
     armsOpened = false; // 武装上锁
     ascensionAttributes = {
         health: 0,
@@ -16025,6 +16029,7 @@ function resetPet() {
     
     // 更新显示的各项数值
     updateAscensionButton();
+    updateQualityDisplayWithPillBonus();
     updateAscensionDisplay();
     updateAscensionStatus();
     updateAttributePanel();
@@ -16635,7 +16640,7 @@ function getBlessGift() {
     miraculousPill += 10;
     qualityPill += 200;
     highGradePill += 500;
-    goldAmount += 1500000;
+    goldAmount += 1500000; 
     updateGoldDisplay(goldAmount);
 
     const itemsToIncrease = [
@@ -16649,6 +16654,7 @@ function getBlessGift() {
         'jumpingSoul',
         'hailMonsterPill',
         'hailMonsterAmulet',
+        'qualityEnhancePill'
     ];
     for (const item of itemsToIncrease) {
         addItemToJinnang(item, 50);
@@ -16718,7 +16724,8 @@ function upgradeWisdomTo() {
         'mutationScroll', //灵异秘卷
         'treasureMap', //藏宝图
         'casinoCoverLetter', //赌场介绍信
-        'jumpingSoul'
+        'jumpingSoul',
+        'qualityEnhancePill'
     ];
 
     for (const item of itemsToIncrease) {
@@ -18490,6 +18497,7 @@ function loadGameState() {
 
 function updateDisplayContent() {
     updatePetInfo();
+    updateQualityDisplayWithPillBonus();
     updatePetDisplay();
     updateQualityCard();
     updateAttributePanel();

@@ -15317,6 +15317,8 @@ function refreshShop(auto = false) {
     let commonBundleCount = 0;
     let rareBundleCount = 0;
 
+    let items = [];
+
     for (let i = 0; i < numItems; i++) {
         let isRare = Math.random() < probabilities[1];
         if (!auto && isRare && rareItemCount >= 3) isRare = false;
@@ -15336,8 +15338,14 @@ function refreshShop(auto = false) {
             isRare ? rareBundleCount++ : commonBundleCount++;
         }
 
-        addItemToShop(item, shopItems);
+        items.push(item);
     }
+
+    // 如果不是第20次刷新，按价格从高到低排序
+    items.sort((a, b) => b.price - a.price);
+
+    // 将排序后的商品添加到商店中
+    items.forEach(item => addItemToShop(item, shopItems));
 
     if (auto) startShopTimer();
 }

@@ -2380,7 +2380,7 @@
                         <div id="endurance-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-1">0</div>
-                    <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-1">
+                    <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-1">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2388,7 +2388,7 @@
                         <div id="intelligence-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-2">0</div>
-                    <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-2">
+                    <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-2">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2396,7 +2396,7 @@
                         <div id="strength-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-3">0</div>
-                    <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-3">
+                    <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-3">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2404,7 +2404,7 @@
                         <div id="agility-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-4">0</div>
-                    <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-4">
+                    <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-4">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2412,7 +2412,7 @@
                         <div id="faith-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-5">0</div>
-                    <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-5">
+                    <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-5">
                 </div>
                 <div class="button-grid">
                     <button onclick="rebornPet()">普通还童</button>
@@ -12728,6 +12728,9 @@ function updateQualityDisplayWithPillBonus() {
 
     const attributes = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
 
+    const activePillSrc = "https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png";
+    const inactivePillSrc = "https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png";
+
     if (qualityPillCount > 0) {
         // 显示 pillBonus 提示
         attributes.forEach(attribute => {
@@ -12737,10 +12740,28 @@ function updateQualityDisplayWithPillBonus() {
             pillBonusElement.style.fontWeight = "bold";
         });
 
-        // 更新 qualityPill 图标状态和数字显示
-        pillElements.forEach((pill) => {
-            pill.style.opacity = "1"; // 清除变暗效果
+        // 更新 qualityPill 图标状态和数字显示，并绑定点击事件
+        pillElements.forEach((pill, index) => {
+            pill.style.opacity = "1";
+            pill.style.cursor = "pointer";
+            pill.src = activePillSrc;
+
+            // 确保不会重复绑定点击事件
+            pill.onclick = () => {
+                showInfoBox(
+                    "是否取下已经装备的仙丹？",
+                    () => {
+                        qualityPillCount = Math.max(qualityPillCount - 1, 0);
+                        addItemToJinnang('qualityEnhancePill', 1);
+                        updateQualityDisplayWithPillBonus();
+                    },
+                    null,
+                    'red'
+                );
+            };
         });
+
+        // 更新显示数量
         pillNumElements.forEach((pillNum) => {
             pillNum.style.position = "absolute";
             pillNum.style.top = "10px";
@@ -12752,16 +12773,20 @@ function updateQualityDisplayWithPillBonus() {
             pillNum.textContent = qualityPillCount;
         });
     } else {
-        // 当 qualityPillCount 为 0 时，清除 pillBonus 提示
+        // 清除 pillBonus 提示
         attributes.forEach(attribute => {
             const pillBonusElement = document.getElementById(`${attribute}-pill-bonus`);
-            pillBonusElement.textContent = ""; // 清除内容
+            pillBonusElement.textContent = "";
         });
 
-        // 恢复图标变暗状态并清除数字显示
+        // 更新 qualityPill 图标状态，移除点击事件和数字显示
         pillElements.forEach(pill => {
-            pill.style.opacity = "0.8"; // 应用变暗效果
+            pill.style.opacity = "1";
+            pill.style.cursor = "default";
+            pill.src = inactivePillSrc;
+            pill.onclick = null;
         });
+
         pillNumElements.forEach((pillNum) => {
             pillNum.textContent = "0";
         });
@@ -12769,6 +12794,8 @@ function updateQualityDisplayWithPillBonus() {
 
     updateQualityCard(); // 更新资质卡片显示
 }
+
+
 
         
 function useSupremeWisdomPill() {
@@ -13029,6 +13056,7 @@ function collectTreasure() {
         '杨枝甘露': 'spiritWine',
         '仙人醍醐': 'ultraSkillBoomer',
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
+        '宠物资质仙丹*5': () => addItemToJinnang('qualityEnhancePill', 5),
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
         '华贵的药材箱': 'fancyDrugBox',
@@ -13243,7 +13271,7 @@ function getRandomReward(type) {
             { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 15 },
             { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 30 },
             { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 10 },
-            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 5 },
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 15 },
             { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
             { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
             { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
@@ -13278,7 +13306,7 @@ function getRandomReward(type) {
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 8 },
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 20 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 9 },           
-            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 9 },
+            { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 8.5 },
             { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 6 },
             { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 2 },
             { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 0.2 },
@@ -13286,6 +13314,7 @@ function getRandomReward(type) {
             { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 0.5 },
             { name: '高级经验书*6', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 6 },
             { name: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 0.1 },
+            { name: '宠物资质仙丹*5', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', chance: 0.5 },
             { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 0.1 }
         ]
     };
@@ -13702,6 +13731,11 @@ const itemEffects = {
 };
 
 function useSpiritWine() {
+     if (!awakened) {
+         showInfoBox("你的宠物还没有通过觉醒获取战斗精灵的庇护，杨枝甘露被宠物偷偷喝掉了");
+         return;
+     }
+    
      if (spiritLevel >= 120) {
         showInfoBox('你的精灵等级已达到最大级，无法继续使用此道具。', null, null, 'red');
         return;
@@ -16910,11 +16944,11 @@ function calculateQualityByPill() {
     }
     return 0;
 }
-
+// 根据固有资质计算得来的属性
 function calculateAttribute(currentValue, growthRate, level) {
     return Math.floor((currentValue / 2000) * growthRate * level);
 }
-
+// 根据资质仙丹、固有资质、培养属性、觉醒属性、道具属性综合计算的最终属性
 function calculateCurrentAttributes() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
@@ -16932,7 +16966,7 @@ function calculateCurrentAttributes() {
 }
 
 
-//所谓的leftAttributes就是指支持培养的属性值
+//所谓的attributesForTraning就是指支持培养的属性值
 function attributesForTraning() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);

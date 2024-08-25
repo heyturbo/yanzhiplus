@@ -2640,7 +2640,7 @@
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
                     <div style="display: flex; justify-content: center;">
-                        <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;">
+                        <img id="your-pet-image" onclick="openWuxingDisplay()" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
                         <div class="enemy-damage-display" id="enemy-damage-display"><span id="enemy-damage-value"></span></div>
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
@@ -2669,7 +2669,7 @@
                 <div class="battle-system-enemy-info">
                     <h2><span id="enemy-name">毁灭心魔</span> lv<span id="enemy-level">1</span></h2>
                     <div style="display: flex;justify-content: center;">
-                        <img id="enemy-image" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="毁灭心魔" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;">
+                        <img id="enemy-image" onclick="enemyInfo()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="毁灭心魔" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
                         <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
                     </div>
                     <div style="margin-top: 5px">生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></div>
@@ -5106,6 +5106,7 @@ function handleCollectButtonClick(petKey, pet, petSelect, statusDiv, collectButt
             petSelect.value = newOption;
             changePet(); // 更新宠物信息
 
+            deletePetData(pet.name);
             collectedPets.push(pet.name);
             collectedPetCount++;
             statusDiv.innerText = '已收录';
@@ -5680,9 +5681,13 @@ function showPetShop() {
 
     const ownedPets = Array.from(document.getElementById('pet-select').options).map(option => option.value);
 
+    const excludedPets = ["金珉奎", "Guolin·Li"]; // 定义不可购买的宠物名称列表
+
     Object.keys(pets).forEach(key => {
-        if (!ownedPets.includes(key)) { // 检查玩家是否已经拥有该宠物
-            const pet = pets[key];
+        const pet = pets[key];
+
+        // 排除已经拥有的宠物和指定名称的宠物
+        if (!ownedPets.includes(key) && !excludedPets.includes(pet.name)) {
             let price;
             switch (pet.rank) {
                 case 'R':
@@ -5695,6 +5700,7 @@ function showPetShop() {
                     price = 5000;
                     break;
             }
+
             const petDiv = document.createElement('div');
             petDiv.className = 'shop-item';
             petDiv.innerHTML = `
@@ -5731,6 +5737,7 @@ function showPetShop() {
         }
     });
 }
+
 
 
 // 添加关闭按钮功能
@@ -11765,14 +11772,32 @@ function displayAmuletDetails(amulet) {
 }
 
 function sortAmuletsByRank() {
-    // 按照rank从高到低进行排序
-    wuxingStates.sort((a, b) => a.rank - b.rank);
+    // 按照rank -> name -> color的顺序进行排序
+    wuxingStates.sort((a, b) => {
+        // 先按rank排序（从高到低）
+        if (a.rank !== b.rank) {
+            return a.rank - b.rank;
+        }
+        
+        // 再按name排序（按字母顺序）
+        const nameA = a.name.split('(')[0];
+        const nameB = b.name.split('(')[0];
+        if (nameA < nameB) return -1;
+        if (nameA > nameB) return 1;
+        
+        // 最后按color排序（按字母顺序）
+        if (a.color < b.color) return -1;
+        if (a.color > b.color) return 1;
+
+        return 0; // 所有比较都相等
+    });
 
     // 更新UI显示，确保排序结果及时显示
     updateWuxingDisplay();
 
-    showInfoBox('背包已按五行符等级整理完毕。', null, null, 'green');
+    showInfoBox('背包已按五行符等级、类型和颜色整理完毕。', null, null, 'green');
 }
+
 
 // 应用五行符增益
 function resetWuxingCritBonuses() {
@@ -12240,6 +12265,7 @@ function toggleLotteryDrawer() {
         stopLotteryCountdown();
     }
 }
+
 document.getElementById('lotteryRuleButton').addEventListener('click', () => {
     const ruleContent = document.getElementById('ruleContent');
     ruleContent.innerHTML = `
@@ -12305,6 +12331,7 @@ function stopLotteryCountdown() {
 function performLotteryDraw() {
     const { numbers: winningNumbers, blueBall: winningBlueBall } = generateLotteryWinningNumbers();
     document.getElementById('lotteryDrawResults').innerHTML = `开奖区: ${winningNumbers.join(', ')} <span style="color: blue;">${winningBlueBall}</span>`;
+    
     if (hasPlacedBet) { // 只有在已投注的情况下才进行奖金判断
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
@@ -12312,23 +12339,39 @@ function performLotteryDraw() {
             showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！`);
         }
     }
+    
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
     clearSelections();
+    canBet = true; // 允许再次投注
     hasPlacedBet = false; // 重置投注标志
 }
 
 function generateLotteryWinningNumbers() {
-    const numbers = [];
+    let numbers = [];
+    
+    // 检查玩家是否拥有 LuckyAmulet 道具
+    const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
+    const hasLuckyAmulet = luckyAmulet && luckyAmulet.quantity > 0;
+
+    if (hasLuckyAmulet && lotterySelectedNumbers.length > 0) {
+        // 从玩家选择的号码中随机选择一个加入中奖号码
+        const randomIndex = Math.floor(Math.random() * lotterySelectedNumbers.length);
+        const selectedNumber = lotterySelectedNumbers[randomIndex];
+        numbers.push(selectedNumber);
+    }
+
+    // 生成其余的中奖号码
     while (numbers.length < 5) {
         const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
         if (!numbers.includes(num)) {
             numbers.push(num);
         }
     }
+
     const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+
     return { numbers, blueBall };
 }
-
 
 function calculateLotteryPrize(winningNumbers, winningBlueBall) {
     const prizeTable = {
@@ -12343,11 +12386,10 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         '1:any': 200
     };
 
-
     const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers.slice(0, 5));
     const key = `${matchDetails.count}:${matchDetails.type}`;
     let prize = prizeTable[key] ? prizeTable[key] * lotteryBetCount : 0;
-    
+
     const playerBlueBall = lotterySelectedNumbers[5];
     if (playerBlueBall === winningBlueBall) {
         if (prize > 0) {
@@ -12362,11 +12404,10 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
             resultAmountElement.classList.remove('highlight');
         }, 1000);
     }
-    
-    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `结果区: <span style="color: gold; font-weight: bold;">${convertPrice(prize)}</span>` : `结果区: ${convertPrice(prize)}`;
+
+    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${convertPrice(prize)}</span>` : '奖金区: 0';
     return prize;
 }
-
 
 function getMatchDetails(winningNumbers, selectedNumbers) {
     const matchedNumbers = selectedNumbers.filter(num => winningNumbers.includes(num));
@@ -12501,10 +12542,11 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
     if (pendingPrize === 0) {
         showInfoBox('当前没有奖金可以领取！');
     } else {
-        goldAmount += pendingPrize;
+        goldAmount += Math.round(pendingPrize * 0.8);
         updateGoldDisplay(goldAmount);
         pendingPrize = 0;
         document.getElementById('lotteryResultAmount').innerHTML = '奖金区: 0';
+        showInfoBox(`你领取了${convertPrice(Math.round(pendingPrize * 0.8))}奖金！其中手续费为${convertPrice(Math.round(pendingPrize * 0.2))}`)
         updateLotteryDisplay();
     }
 });
@@ -13392,6 +13434,7 @@ let jinnangItems = [
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升200点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
+    { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性30点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
@@ -16801,6 +16844,7 @@ function upgradeWisdomTo() {
     
     if (target === "88888") {
         goldAmount += 99999999;
+        addItemToJinnang('luckyAmulet',1);
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;

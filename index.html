@@ -11741,10 +11741,14 @@ function displayAmuletDetails(amulet) {
     const wipeOffButton = document.createElement('button');
     wipeOffButton.innerText = '清空';
     wipeOffButton.onclick = () => wipeOffAmulet();
-    
+
+    // 新增整理按钮
+    const sortButton = document.createElement('button');
+    sortButton.innerText = '整理';
+    sortButton.onclick = () => sortAmuletsByRank();
+
     const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
     if (petAmulet && petAmulet.equipped) {
-
         unequipButton.disabled = false;
     } else {
         unequipButton.disabled = true;
@@ -11755,8 +11759,19 @@ function displayAmuletDetails(amulet) {
     wuxingButtonContainer.appendChild(equipButton);
     wuxingButtonContainer.appendChild(unequipButton);
     wuxingButtonContainer.appendChild(wipeOffButton);
+    wuxingButtonContainer.appendChild(sortButton); // 添加整理按钮
 
     detailsContainer.appendChild(wuxingButtonContainer);
+}
+
+function sortAmuletsByRank() {
+    // 按照rank从高到低进行排序
+    wuxingStates.sort((a, b) => a.rank - b.rank);
+
+    // 更新UI显示，确保排序结果及时显示
+    updateWuxingDisplay();
+
+    showInfoBox('背包已按五行符等级整理完毕。', null, null, 'green');
 }
 
 // 应用五行符增益

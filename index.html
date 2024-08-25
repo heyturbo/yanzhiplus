@@ -2380,7 +2380,7 @@
                         <div id="endurance-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-1">0</div>
-                    <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-1">
+                    <img id="quality-pill-1" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c;" alt="Quality-Pill-1">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2388,7 +2388,7 @@
                         <div id="intelligence-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-2">0</div>
-                    <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-2">
+                    <img id="quality-pill-2" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c;" alt="Quality-Pill-2">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2396,7 +2396,7 @@
                         <div id="strength-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-3">0</div>
-                    <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-3">
+                    <img id="quality-pill-3" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c;" alt="Quality-Pill-3">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2404,7 +2404,7 @@
                         <div id="agility-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-4">0</div>
-                    <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-4">
+                    <img id="quality-pill-4" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c;" alt="Quality-Pill-4">
                 </div>
                 <div class="quality-bar-container">
                     <div class="progress-bar">
@@ -2412,7 +2412,7 @@
                         <div id="faith-bar" style="width: 50%;"></div>
                     </div>
                     <div id="quality-pill-num-5">0</div>
-                    <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c; opacity: 0.3;" alt="Quality-Pill-5">
+                    <img id="quality-pill-5" src="https://pic.imgdb.cn/item/66caa91ad9c307b7e97841c0.png" style="width:35px;height:35px;border:1px solid #92341c;" alt="Quality-Pill-5">
                 </div>
                 <div class="button-grid">
                     <button onclick="rebornPet()">普通还童</button>
@@ -5453,6 +5453,7 @@ function handlePetChange(selectedPetKey, petSelectId) {
         // 检查 localStorage 中是否存在该宠物的数据
         const storedPetData = localStorage.getItem(`petData_${currentPet.name}`);
         if (storedPetData) {
+            resetPet();
             restorePetData(currentPet.name); // 如果存在数据，恢复宠物数据
         } else {
             resetPet(); // 否则重置宠物数据
@@ -7327,7 +7328,7 @@ function updateDamageValue(damage, enemy = false) {
         // 设置显示的伤害值
         damageElement.innerText = `-${damage}`;
     
-        // 在 100 毫秒后清空显示的伤害值
+        // 在 300 毫秒后清空显示的伤害值
         setTimeout(() => {
             damageElement.innerText = '';
         }, 300);
@@ -12788,7 +12789,7 @@ function updateQualityDisplayWithPillBonus() {
         });
 
         pillNumElements.forEach((pillNum) => {
-            pillNum.textContent = "0";
+            pillNum.textContent = "";
         });
     }
 
@@ -12875,7 +12876,7 @@ function absorbExperience() {
         showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
             // 玩家选择确认，进入自动使用循环
             while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
-                if (petLevel >= petMaxLevel || petLevel === 200) {
+                if (petLevel >= petMaxLevel || petLevel === 180) {
                     showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
                     break;
                 }
@@ -12960,7 +12961,7 @@ function ascend() {
     updateJinnangItems();
 
     // Update pet's max level and ascension status
-    petMaxLevel = 201;
+    petMaxLevel = 181;
     petAscended = true;
     updateAscensionStatus();
 
@@ -16674,7 +16675,7 @@ function getBlessGift() {
     miraculousPill += 10;
     qualityPill += 200;
     highGradePill += 500;
-    goldAmount += 1500000; 
+    goldAmount += 9500000; 
     updateGoldDisplay(goldAmount);
 
     const itemsToIncrease = [
@@ -16703,7 +16704,7 @@ function getBlessGift() {
     addItemToJinnang('cultivationPill200', 5);
     updateJinnangItems();
     updateTopBarItems();
-    showInfoBox("您获得了1500两金子和新手大礼包！其他物品请检查你的背包！");
+    showInfoBox("您获得了9.5锭金子和新手大礼包！其他物品请检查你的背包！");
 }
 
 function upgradeWisdomTo() {
@@ -16774,7 +16775,7 @@ function upgradeWisdomTo() {
     }
     
     if (target === "88888") {
-        goldAmount += 9999999;
+        goldAmount += 99999999;
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;
@@ -16987,7 +16988,6 @@ function updateAttributePanel() {
     const pet = currentPet;
     const qualities = pet.qualities;
     const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
-    const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
     const currentAttributes = attributesForTraning();
     // 此数组用于更新显示属性左边的总值
@@ -17626,7 +17626,7 @@ function increasePetLevelCheat(levels) {
 }
 
 function ascendCheat() {
-    petMaxLevel = 201;
+    petMaxLevel = 181;
     petAscended = true;
 
     showInfoBox("恭喜大侠的爱宠飞升成功！等级上限开放至200级，同时开放飞升之术功能！");

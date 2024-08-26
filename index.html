@@ -2486,7 +2486,7 @@
                             <div class="progress-bar">
                                 <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                             </div>
-                            <div style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;">
+                            <div id="secondary-attributes-panel" style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;cursor:pointer;">
                                 <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color:white;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
                                 <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color:white;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
                                 <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻击: <span style="color:white;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
@@ -2646,7 +2646,7 @@
                     <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
                     <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
                     <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
-                        <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130)); border-radius: 5px;" id="exp-bar"></div>
+                        <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130));" id="exp-bar"></div>
                         <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
                     </div>
                     <div id="player-status" class="status-display"></div>
@@ -4617,6 +4617,7 @@ function infoWuxing() {
     showInfoBox("\n1.悟性对宠物的成长至关重要 \n2.悟性越高，洗练所得高级技能的概率就越大 \n3.悟性能够给二级属性百分比的加成");
 }  
  
+// 敌人图像信息
 const enemyImages = [
     { status: 'default', name: '毁灭心魔', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
     { status: 'rampaged', name: '狂暴的心魔', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
@@ -4624,8 +4625,10 @@ const enemyImages = [
     { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
     { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
     { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
+    { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' }
 ];
 
+// 更改敌人图像的函数
 function changeEnemyImage(status) {
     const enemyImage = enemyImages.find(image => image.status === status);
 
@@ -4636,6 +4639,7 @@ function changeEnemyImage(status) {
         console.error(`Status '${status}' not found in enemyImages.`);
     }
 }
+
 
 function showBattleOverlay(imageUrl, duration = 500, opacity = 1, zIndex = -1) {
     const overlay = document.getElementById('battleOverlay');
@@ -6031,14 +6035,14 @@ function stopBattle() {
 }
 
 function showNextBattlePrompt(playerWon) {
-    battleState.playerWon = playerWon; // 设置 battleState 中的 playerWon 属性
+    battleState.playerWon = playerWon;
 
     if (playerWon) {
         const minRewardMultiplier = 0.35;
         const maxRewardMultiplier = 1.75;
         const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
         let reward = Math.floor(288 * battleRounds * rewardMultiplier);
-        reward = Math.max(reward, 288); // 确保最低奖励为 288
+        reward = Math.max(reward, 288);
 
         if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
             let extraReward = 0;
@@ -6046,21 +6050,27 @@ function showNextBattlePrompt(playerWon) {
                 extraReward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             }
             if (secondAscensionSkill.name === '财源滚滚') {
-                extraReward +=secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+                extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             reward += extraReward;
             logBattleEvent(`财源滚滚触发，额外增加了 ${convertPrice(extraReward)} 金子。`, 'pink');
         }
 
         goldAmount += reward;
-        logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`,"pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
-
-        battleRounds++;
         updateGoldDisplay(goldAmount);
-        updateEnemyAttributes(); // 仅在玩家获胜时更新毁灭心魔属性
-        gainExp(); // 获取经验
         updateTitle();
+        logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
+        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
+        if (!summonEnemy) {
+            battleRounds++;
+            updateEnemyAttributes();
+            gainExp();
+        } else {
+            toggleFightingDrawer();
+            handleBattleWithSummonEnemy(true);
+            summonEnemy = false;
+            return;
+        }
     } else {
         let penalty = 388 * battleRounds;
         if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
@@ -6070,22 +6080,29 @@ function showNextBattlePrompt(playerWon) {
                 compensation += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
             }
             if (secondAscensionSkill.name === '金牌调解') {
-                compensation += ascensionSkill.baseValue + ascensionSkill.increment(secondAscensionSkill.level);
+                compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
             }
             goldAmount += compensation;
             logBattleEvent(`金牌调解触发，未扣除金子并获得 ${convertPrice(compensation)} 的安慰金。`, 'pink');
         } else {
-            goldAmount = Math.max(0, goldAmount - penalty); // 确保金子数量不为负
+            goldAmount = Math.max(0, goldAmount - penalty);
         }
         showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
         showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
         updateGoldDisplay(goldAmount);
     }
-    extraShield = 0;
-    resetBattleState(playerWon); // 将玩家是否获胜传递给 resetBattleState
-    resetBuffState(playerWon);
-    clearEnemyEffect();
-    clearPlayerEffect();
+    if (!summonEnemy) {
+        extraShield = 0;
+        resetBattleState(playerWon);
+        resetBuffState(playerWon);
+        clearEnemyEffect();
+        clearPlayerEffect();
+    } else {
+        toggleFightingDrawer();
+        handleBattleWithSummonEnemy(false);
+        summonEnemy = false;
+        return;
+    }
 }
 
 function resetBuffState(playerWon) {
@@ -6451,39 +6468,109 @@ function updatePetInfo() {
     attributesFetched = true;
 }
 
-function summonPracticeEnemy() {
-    showInfoBox(
-        '你可以召唤战力树桩来测试战斗力',
-        () => {
-            enemyPet = {
-                health: 5000000000,
-                mana: 5000000000,
-                physicalAttack: 50000,
-                physicalDefense: 100000,
-                magicAttack: 50000,
-                magicDefense: 100000,
-                speed: 10000,
-                cultivation: 240000
-            };
-        
-            enemyMaxHealth = enemyPet.health;
-            enemyMaxMana = enemyPet.mana;
-            enemyPetCultivation = enemyPet.cultivation;
-        
-            enemyCritRate = 0.8;
-            enemyCritDamage = 2.5;
-            changeEnemyImage("practiceEnemy");
-            setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
-            document.getElementById('enemy-level').innerText = 'Lv100';
-            updateUI();
-        
-            battleState.enemy = { ...enemyPet };
-            storeEnemyInitialState();
-        },
-        () => {
-            return;
+// 全局敌人对象数组
+let summonEnemy = false;
+
+const enemies = {
+    practiceEnemy: {
+        name: '练习树桩',
+        level: 100,
+        health: 5000000000,
+        mana: 5000000000,
+        physicalAttack: 500,
+        physicalDefense: 10000,
+        magicAttack: 500,
+        magicDefense: 10000,
+        speed: 10000,
+        cultivation: 240000,
+        enemyCritRate: 0.8,
+        enemyCritDamage: 2.5,
+        backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
+        reward: () => gainExp(3000), // 奖励：3000经验值
+        rewardMessage: '3000经验值'
+    },
+    ancientEvil: {
+        name: '太古魔魂封印',
+        level: 100,
+        health: 67160000,
+        mana: 2400000,
+        physicalAttack: 168000,
+        physicalDefense: 99999999,
+        magicAttack: 5100,
+        magicDefense: 99999999,
+        speed: 3000,
+        cultivation: 151800,
+        enemyCritRate: 0.01,
+        enemyCritDamage: 1000,
+        backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
+        reward: () => addItemToJinnang('cultivationPill500', 10), // 奖励：10个特定道具
+        rewardMessage: '10个修为灵丹（橙）'
+    }
+};
+
+// 处理召唤敌人战斗结果的函数
+function handleBattleWithSummonEnemy(playerWon) {
+    if (!battleState.enemy) {
+        showInfoBox('没有敌人可处理', null, null, 'red');
+        return;
+    }
+    
+    if (playerWon) {
+        // 调用敌人的奖励函数
+        if (battleState.enemy.reward) {
+            battleState.enemy.reward();
+            showInfoBox(`你击败了${battleState.enemy.name}，获得了${battleState.enemy.rewardMessage}！`, null, null, 'green');
+        } else {
+            showInfoBox(`你击败了${battleState.enemy.name}，但没有任何奖励。`, null, null, 'yellow');
         }
-    );
+    } else {
+        // 失败处理
+        showInfoBox(`你在与${battleState.enemy.name}的战斗中失败了，没有获得任何奖励。`, null, null, 'red');
+    }
+
+    // 重置战斗状态
+    summonEnemy = false;
+    resetBattleState(playerWon);
+    resetBuffState(playerWon);
+    clearEnemyEffect();
+    clearPlayerEffect();
+    updateUI();
+}
+
+// 重构的召唤敌人函数
+function summonEnemyByType(enemyType) {
+    if (!summonEnemy && attributesFetched) {
+        const enemy = enemies[enemyType];
+        if (enemy && !summonEnemy) {
+            showInfoBox(
+                `你将会召唤${enemy.name}，战胜后你会获得奖励`,
+                () => {
+                    summonEnemy = true;
+                    battleState.enemy = { ...enemy };
+                    
+                    enemyMaxHealth = enemy.health;
+                    enemyMaxMana = enemy.mana;
+                    enemyPetCultivation = enemy.cultivation;
+                    enemyCritRate = enemy.enemyCritRate;
+                    enemyCritDamage = enemy.enemyCritDamage;
+                    
+                    changeEnemyImage(enemyType); // 调用更新敌人图像的函数
+                    setBackgroundImage(enemy.backgroundImage); // 更新背景图像
+                    document.getElementById('enemy-level').innerText = enemy.level;
+                    updateUI();
+                    storeEnemyInitialState();
+                },
+                () => {
+                    summonEnemy = false;
+                    return;
+                }
+            );
+        } else {
+            showInfoBox('未知敌人类型', null, null, 'red');
+        }
+    } else {
+        showInfoBox('正在战斗中或未知错误', null, null, 'red');
+    }
 }
         
 function initializeEnemyPet() {
@@ -6506,9 +6593,9 @@ function initializeEnemyPet() {
         battleState.enemy = { ...enemyPet };
     }
     storeEnemyInitialState();
-
 }
 
+//这是固定挑战怪物
 function updateEnemyAttributes() {
     const maxValues = {
         health: 500000000,
@@ -6597,6 +6684,8 @@ function updateEnemyAttributes() {
 
     battleState.enemy = { ...enemyPet };
     storeEnemyInitialState();
+    enemyLevel = battleRounds;
+    document.getElementById('enemy-level').innerText = enemyLevel;
     handleRampaged();
 }
 
@@ -6742,15 +6831,39 @@ function updateUI() {
     // 更新状态显示
     updatePlayerStatusDisplay();
     updateEnemyStatusDisplay();
-    document.getElementById('battleRounds').innerText = battleRounds;
-    enemyLevel = battleRounds;
-    document.getElementById('enemy-level').innerText = enemyLevel;
     updatePetLevel();
     getShieldStatus();
     updateHealthAndManaDisplay();
     calculateAndDisplayDodgeRate();
+    document.getElementById('battleRounds').innerText = battleRounds;
 }
 
+document.getElementById('secondary-attributes-panel').addEventListener('click', () => {
+    if (!attributesFetched) {
+        showInfoBox("请先从属性面板获取属性。");
+        return;
+    }
+    const skillAttributes = calculateSkillAttributes();
+    const nameMap = new Map([
+        ['health', '生命值'],
+        ['magicAttack', '法术攻击'],
+        ['magicDefense', '法术防御'],
+        ['mana', '法力值'],
+        ['physicalAttack', '物理攻击'],
+        ['physicalDefense', '物理防御'],
+        ['speed', '速度']
+    ]);
+
+    let skillAttributesMessage = '';
+
+    for (const [key, value] of Object.entries(skillAttributes)) {
+        const displayName = nameMap.get(key) || key; // 如果没有匹配到替换的名称，则使用原始英文名
+        skillAttributesMessage += `${displayName}: ${value}\n`;
+    }
+
+    showInfoBox(`\n1. 二级属性主要由各一级属性（耐力、智力等）决定 \n2. 被动技能的数量和等级也会增加二级属性 \n3.药材、五行符可以提供额外属性 \n4.精灵和飞升技能提供的属性为战斗属性，脱离战斗状态时将会复位 \n5. 当前技能加成为${skillAttributesMessage}`)
+});//点击二级属性面板弹出相关信息
+        
 function updateHealthAndManaDisplay() {
     updateDisplay('your-pet-health', 'your-pet-max-health', 'health', 20, '#cc0000');
     updateDisplay('your-pet-mana', 'your-pet-max-mana', 'mana', 10, '#0066ff');
@@ -13152,7 +13265,7 @@ function collectTreasure() {
         '修为灵丹（蓝）': 'cultivationPill200',
         '修为灵丹（橙）': 'cultivationPill500',
         '庆典蛋糕': 'celebrationCake',
-        '杨枝甘露': 'spiritWine',
+        '琼浆玉露': 'spiritWine',
         '仙人醍醐': 'ultraSkillBoomer',
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
         '宠物资质仙丹*5': () => addItemToJinnang('qualityEnhancePill', 5),
@@ -13361,7 +13474,7 @@ function getRandomReward(type) {
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
-            { name: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66ca04ddd9c307b7e9b2664e.png', chance: 1 },
+            { name: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', chance: 1 },
             { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 47 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
@@ -13474,7 +13587,7 @@ let jinnangItems = [
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升200点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
-    { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
+    { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66cc940dd9c307b7e9cb758d.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性30点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
@@ -13485,10 +13598,11 @@ let jinnangItems = [
     { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
-    { name: 'spiritWine', displayName: '杨枝甘露', url: 'https://pic.imgdb.cn/item/66ca04ddd9c307b7e9b2664e.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
+    { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
+    { name: 'spiritWine', displayName: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
-    { name: 'battleWithTree', displayName: '树桩挑战卡', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
+    { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
+    { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 100, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];
 
@@ -13831,14 +13945,79 @@ const itemEffects = {
     },
     battleWithTree: () => {
         toggleFightingDrawer();
-        summonPracticeEnemy();
+        summonEnemyByType('practiceEnemy');
+        updatePetInfo();
+    },
+    battleWithAncientEvil: () => {
+        toggleFightingDrawer();
+        summonEnemyByType('ancientEvil');
         updatePetInfo();
     }
 };
 
+let useAssignedItemCount = 0;
+let lastUsedItemName = null;
+
+function useAssignedItem() {
+    if (!selectedItem || !selectedItem.dataset.itemName) {
+        showInfoBox("请先选择一个道具。");
+        return;
+    }
+
+    const itemName = selectedItem.dataset.itemName;
+
+    // 检查是否更换了道具
+    if (itemName !== lastUsedItemName) {
+        useAssignedItemCount = 0; // 重置计数器
+        lastUsedItemName = itemName; // 更新最近使用的道具名称
+    }
+
+    // 增加计数器
+    useAssignedItemCount++;
+
+    // 如果连续使用同一个道具超过5次，提示是否全部使用
+    if (useAssignedItemCount >= 5) {
+        showInfoBox(
+            `您已经连续使用${useAssignedItemCount}次此道具。是否要全部使用？`,
+            () => {
+                useAllItems(itemName);  // 确认使用全部道具
+                useAssignedItemCount = 0;  // 重置计数器
+                lastUsedItemName = null;  // 重置最近使用的道具名称
+            },
+            () => {
+                useAssignedItemCount = 0;  // 取消后重置计数器
+                lastUsedItemName = null;
+            },
+            'red'
+        );
+        return;  // 暂停后续处理，等待玩家确认
+    }
+
+    // 检查道具是否在映射表中
+    if (itemEffects[itemName]) {
+        if (useItem(itemName)) {
+            itemEffects[itemName](); // 执行对应道具的效果
+            updateJinnangItems(); // 更新锦囊内容显示
+        } else {
+            showInfoBox("道具已耗尽。");
+        }
+    } else {
+        showInfoBox("该道具无法直接在背包内使用。");
+    }
+}
+
+function useAllItems(itemName) {
+    // 这里实现批量使用道具的逻辑
+    while (useItem(itemName)) {
+        itemEffects[itemName](); // 执行对应道具的效果
+    }
+    updateJinnangItems(); // 更新锦囊内容显示
+}
+
+        
 function useSpiritWine() {
      if (!awakened) {
-         showInfoBox("你的宠物还没有通过觉醒获取战斗精灵的庇护，杨枝甘露被宠物偷偷喝掉了");
+         showInfoBox("你的宠物还没有通过觉醒获取战斗精灵的庇护，琼浆玉露被宠物偷偷喝掉了");
          return;
      }
     
@@ -13912,66 +14091,6 @@ function increaseCultivation(amount) {
         showInfoBox(`${currentPet.name}的修为增加了${amount}点，当前修炼修为值为${additionalPlayerCultivation}`);
     }
 }
-
-let useAssignedItemCount = 0;
-let lastUsedItemName = null;
-
-function useAssignedItem() {
-    if (!selectedItem || !selectedItem.dataset.itemName) {
-        showInfoBox("请先选择一个道具。");
-        return;
-    }
-
-    const itemName = selectedItem.dataset.itemName;
-
-    // 检查是否更换了道具
-    if (itemName !== lastUsedItemName) {
-        useAssignedItemCount = 0; // 重置计数器
-        lastUsedItemName = itemName; // 更新最近使用的道具名称
-    }
-
-    // 增加计数器
-    useAssignedItemCount++;
-
-    // 如果连续使用同一个道具超过5次，提示是否全部使用
-    if (useAssignedItemCount >= 5) {
-        showInfoBox(
-            `您已经连续使用${useAssignedItemCount}次此道具。是否要全部使用？`,
-            () => {
-                useAllItems(itemName);  // 确认使用全部道具
-                useAssignedItemCount = 0;  // 重置计数器
-                lastUsedItemName = null;  // 重置最近使用的道具名称
-            },
-            () => {
-                useAssignedItemCount = 0;  // 取消后重置计数器
-                lastUsedItemName = null;
-            },
-            'red'
-        );
-        return;  // 暂停后续处理，等待玩家确认
-    }
-
-    // 检查道具是否在映射表中
-    if (itemEffects[itemName]) {
-        if (useItem(itemName)) {
-            itemEffects[itemName](); // 执行对应道具的效果
-            updateJinnangItems(); // 更新锦囊内容显示
-        } else {
-            showInfoBox("道具已耗尽。");
-        }
-    } else {
-        showInfoBox("该道具无法直接在背包内使用。");
-    }
-}
-
-function useAllItems(itemName) {
-    // 这里实现批量使用道具的逻辑
-    while (useItem(itemName)) {
-        itemEffects[itemName](); // 执行对应道具的效果
-    }
-    updateJinnangItems(); // 更新锦囊内容显示
-}
-
 
 function deleteItems() {
     if (!selectedItem) {

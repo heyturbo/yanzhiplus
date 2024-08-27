@@ -2577,7 +2577,7 @@
         </div>
     </div>
     <div class="jinnang-drawer" id="jinnang-drawer">
-        <div class="drawer-toggle" onclick="toggleJinnangDrawer()"><span id="jinnang-capacity">2000</span></div>
+        <div class="drawer-toggle" onclick="toggleJinnangDrawer()"><span id="jinnang-capacity" onclick="enlargeCapacity()">2000</span></div>
         <div class="jinnang-info" id="jinnang-info">
             <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll; margin-bottom:10px">
                 <div class="jinnang-reward" id="jinnang-reward"></div>
@@ -2587,9 +2587,9 @@
         <div class="treasure-action">
             <button onclick="sellItem()">出售道具</button>
             <button onclick="useAssignedItem()">使用道具</button>
+            <button onclick="useAllItems()">全部使用</button>
             <button onclick="deleteItems()">丢弃道具</button>
             <button onclick="openWuxingDisplay()">五行面板</button>
-            <button onclick="enlargeCapacity()">拓展背包</button>
         </div>
     </div>
     <div class="lottery-drawer" id="lotteryDrawer">
@@ -7214,10 +7214,10 @@ function calculateAndDisplayDodgeRate() {
     // 计算修为差异导致的魔法闪避率
     cultivationDifference = playerCultivation - enemyPetCultivation;
     if (cultivationDifference > 0) {
-        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过100%
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9) * 100).toFixed(2) + '%'; // 确保概率不超过90%
         enemyMagicDodgeElement.innerText = '0%';
     } else {
-        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过100%
+        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9) * 100).toFixed(2) + '%'; // 确保概率不超过90%
         playerMagicDodgeElement.innerText = '0%';
     }
 }
@@ -7288,7 +7288,7 @@ function handleMagicDodge(target) {
         // 玩家魔法闪避逻辑
         cultivationDifference = playerCultivation - enemyPetCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9); // 确保概率不超过1%
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家魔法闪避概率为：${dodgeChance}`);
@@ -7296,7 +7296,7 @@ function handleMagicDodge(target) {
         // 敌人魔法闪避逻辑
         cultivationDifference = enemyPetCultivation - playerCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9); // 确保概率不超过1%
         }
         dodgeElement = document.getElementById('enemy-image');
         console.log(`敌人魔法闪避概率为：${dodgeChance}`);
@@ -8014,6 +8014,10 @@ function performPoison() {
         }
     }
 
+    if (handleMagicDodge('enemy')) {
+        return;
+    }
+    
     const skillsArea = document.getElementById('skills-area');
     const skillDivs = Array.from(skillsArea.children);
     const selectedSkills = skillDivs
@@ -13562,7 +13566,7 @@ function collectTreasure() {
         '琼浆玉露': 'spiritWine',
         '仙人醍醐': 'ultraSkillBoomer',
         '高级经验书*6': () => addItemToJinnang('advancedExperienceBook', 6),
-        '宠物资质仙丹*5': () => addItemToJinnang('qualityEnhancePill', 5),
+        '资质仙丹礼包': 'qualityEnhancePillPKG',
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
         '华贵的药材箱': 'fancyDrugBox',
@@ -13822,7 +13826,7 @@ function getRandomReward(type) {
             { name: '金玉满堂福袋', url: 'https://pic.imgdb.cn/item/66c369f1d9c307b7e96503f4.png', chance: 0.5 },
             { name: '高级经验书*6', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 6 },
             { name: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', chance: 0.1 },
-            { name: '宠物资质仙丹*5', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', chance: 0.5 },
+            { name: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png', chance: 0.5 },
             { name: '小金袋（88两）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650410.png', chance: 0.1 }
         ]
     };
@@ -13906,7 +13910,8 @@ let jinnangItems = [
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
     { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 5, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
-    { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
+    { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
+    { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -14246,6 +14251,9 @@ const itemEffects = {
         }
         
     },
+    qualityEnhancePillPKG: () => {
+        addItemToJinnang('qualityEnhancePill',5);
+    },
     battleWithTree: () => summonEnemyByType('practiceEnemy'),
     battleWithAncientEvil: () => summonEnemyByType('ancientEvil'),
     battleWithExpEnemy: () => summonEnemyByType('expEnemy'),
@@ -14274,7 +14282,6 @@ const itemEffects = {
     }
 };
 
-let useAssignedItemCount = 0;
 let lastUsedItemName = null;
 
 function useAssignedItem() {
@@ -14284,33 +14291,7 @@ function useAssignedItem() {
     }
 
     const itemName = selectedItem.dataset.itemName;
-
-    // 检查是否更换了道具
-    if (itemName !== lastUsedItemName) {
-        useAssignedItemCount = 0; // 重置计数器
-        lastUsedItemName = itemName; // 更新最近使用的道具名称
-    }
-
-    // 增加计数器
-    useAssignedItemCount++;
-
-    // 如果连续使用同一个道具超过5次，提示是否全部使用
-    if (useAssignedItemCount >= 5) {
-        showInfoBox(
-            `您已经连续使用${useAssignedItemCount}次此道具。是否要全部使用？`,
-            () => {
-                useAllItems(itemName);  // 确认使用全部道具
-                useAssignedItemCount = 0;  // 重置计数器
-                lastUsedItemName = null;  // 重置最近使用的道具名称
-            },
-            () => {
-                useAssignedItemCount = 0;  // 取消后重置计数器
-                lastUsedItemName = null;
-            },
-            'red'
-        );
-        return;  // 暂停后续处理，等待玩家确认
-    }
+    lastUsedItemName = itemName; // 更新最近使用的道具名称
 
     // 检查道具是否在映射表中
     if (itemEffects[itemName]) {
@@ -14325,13 +14306,27 @@ function useAssignedItem() {
     }
 }
 
-function useAllItems(itemName) {
-    // 这里实现批量使用道具的逻辑
-    while (useItem(itemName)) {
-        itemEffects[itemName](); // 执行对应道具的效果
+function useAllItems() {
+    if (!lastUsedItemName) {
+        showInfoBox("请先选择一个道具并使用一次。");
+        return;
     }
-    updateJinnangItems(); // 更新锦囊内容显示
+
+    showInfoBox(
+        '某些道具（如魔魂封印卡）在批量使用后仍只会生效一次，请知悉后再继续',
+        () => { // 这是 onConfirm 回调
+            // 批量使用道具的逻辑
+            while (useItem(lastUsedItemName)) {
+                itemEffects[lastUsedItemName](); // 执行对应道具的效果
+            }
+            updateJinnangItems(); // 更新锦囊内容显示
+        },
+        () => { // 这是 onCancel 回调
+            return;
+        }
+    );
 }
+
 
 function generateSealCard() {
     // 定义封印卡片的英文名称和对应的汉字名称映射
@@ -17332,6 +17327,7 @@ function getBlessGift() {
     addItemToJinnang('advancedSkillPill', 1);
     addItemToJinnang('redEnvelope', 2);
     addItemToJinnang('goldAmuletPackage', 1);
+    addItemToJinnang('qualityEnhancePillPKG', 1);
     addItemToJinnang('cultivationPill200', 5);
     updateJinnangItems();
     updateTopBarItems();

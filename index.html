@@ -6031,6 +6031,9 @@ function startBattle() {
 function stopBattle() {
     onBattleState = false;
     clearInterval(battleInterval); // 战斗结束，停止定时器
+    if (summonEnemy) {
+        handleBattleWithSummonEnemy(false);
+    }
     logBattleEvent("战斗停止。");
 }
 
@@ -6389,12 +6392,12 @@ function calculateSkillAttributes() {
             if (skill) {
                 const skillLevel = skill.level || 1;
                 const levelMultiplier = 1 + 0.1 * (skillLevel - 1);
-                skillAttributes.health += Math.round(2168 * levelMultiplier);
-                skillAttributes.mana += Math.round(531 * levelMultiplier);
+                skillAttributes.health += Math.round(1168 * levelMultiplier);
+                skillAttributes.mana += Math.round(331 * levelMultiplier);
                 skillAttributes.physicalAttack += Math.round(128 * levelMultiplier);
                 skillAttributes.physicalDefense += Math.round(84 * levelMultiplier);
-                skillAttributes.magicAttack += Math.round(278 * levelMultiplier);
-                skillAttributes.magicDefense += Math.round(339 * levelMultiplier);
+                skillAttributes.magicAttack += Math.round(128 * levelMultiplier);
+                skillAttributes.magicDefense += Math.round(84 * levelMultiplier);
                 skillAttributes.speed += Math.round(11 * levelMultiplier);
             }
         });
@@ -6471,15 +6474,17 @@ function updatePetInfo() {
 // 全局敌人对象数组
 let summonEnemy = false;
 
+// 全局敌人信息对象
+// 全局敌人信息对象
 const enemies = {
     practiceEnemy: {
         name: '练习树桩',
         level: 100,
         health: 5000000000,
         mana: 5000000000,
-        physicalAttack: 500,
+        physicalAttack: 100,
         physicalDefense: 10000,
-        magicAttack: 500,
+        magicAttack: 100,
         magicDefense: 10000,
         speed: 10000,
         cultivation: 240000,
@@ -6503,29 +6508,35 @@ const enemies = {
         enemyCritRate: 0.01,
         enemyCritDamage: 1000,
         backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
-        reward: () => addItemToJinnang('cultivationPill500', 10), // 奖励：10个特定道具
-        rewardMessage: '10个修为灵丹（橙）'
+        reward: () => {
+            addItemToJinnang('cultivationPill500', 10);
+            addItemToJinnang('universalCrystal', 10);
+            addItemToJinnang('universalKernel', 10);
+       }, // 奖励：30个特定道具
+        rewardMessage: '10个修为灵丹（橙），10个宇宙之晶和10个宇宙精华（升级技能专用）'
     }
 };
 
 // 处理召唤敌人战斗结果的函数
 function handleBattleWithSummonEnemy(playerWon) {
-    if (!battleState.enemy) {
+    if (!battleState.enemyKey || !enemies[battleState.enemyKey]) {
         showInfoBox('没有敌人可处理', null, null, 'red');
         return;
     }
     
+    const enemy = enemies[battleState.enemyKey]; // 获取原始敌人对象
+    
     if (playerWon) {
         // 调用敌人的奖励函数
-        if (battleState.enemy.reward) {
-            battleState.enemy.reward();
-            showInfoBox(`你击败了${battleState.enemy.name}，获得了${battleState.enemy.rewardMessage}！`, null, null, 'green');
+        if (enemy.reward) {
+            enemy.reward(); // 执行奖励
+            showInfoBox(`你击败了${enemy.name}，获得了${enemy.rewardMessage}！`, null, null, 'green');
         } else {
-            showInfoBox(`你击败了${battleState.enemy.name}，但没有任何奖励。`, null, null, 'yellow');
+            showInfoBox(`你击败了${enemy.name}，但没有任何奖励。`, null, null, 'yellow');
         }
     } else {
         // 失败处理
-        showInfoBox(`你在与${battleState.enemy.name}的战斗中失败了，没有获得任何奖励。`, null, null, 'red');
+        showInfoBox(`你在与${enemy.name}的战斗中失败了，没有获得任何奖励。`, null, null, 'red');
     }
 
     // 重置战斗状态
@@ -6541,12 +6552,13 @@ function handleBattleWithSummonEnemy(playerWon) {
 function summonEnemyByType(enemyType) {
     if (!summonEnemy && attributesFetched) {
         const enemy = enemies[enemyType];
-        if (enemy && !summonEnemy) {
+        if (enemy) {
             showInfoBox(
                 `你将会召唤${enemy.name}，战胜后你会获得奖励`,
                 () => {
                     summonEnemy = true;
-                    battleState.enemy = { ...enemy };
+                    battleState.enemy = { ...enemy }; // 复制敌人属性到战斗状态
+                    battleState.enemyKey = enemyType; // 保存敌人类型，用于映射
                     
                     enemyMaxHealth = enemy.health;
                     enemyMaxMana = enemy.mana;
@@ -6861,7 +6873,7 @@ document.getElementById('secondary-attributes-panel').addEventListener('click', 
         skillAttributesMessage += `${displayName}: ${value}\n`;
     }
 
-    showInfoBox(`\n1. 二级属性主要由各一级属性（耐力、智力等）决定 \n2. 被动技能的数量和等级也会增加二级属性 \n3.药材、五行符可以提供额外属性 \n4.精灵和飞升技能提供的属性为战斗属性，脱离战斗状态时将会复位 \n5. 当前技能加成为${skillAttributesMessage}`)
+    showInfoBox(`\n1. 二级属性主要由各一级属性（耐力、智力等）决定 \n2. 被动技能的数量和等级也会增加二级属性 \n3.药材、五行符可以提供额外属性 \n4.精灵和飞升技能提供的属性为战斗属性，脱离战斗状态时将会复位 \n5. 当前技能加成为： \n ${skillAttributesMessage} \n6. 生命值是玩家受到伤害时会扣除的值，战斗过程中玩家的血量会每秒按照上线比例进行减少 \n7. 法力值是玩家使用技能时的必要消耗数值 \n8. 物理攻击决定物理类技能的伤害基础 \n9. 物理防御决定玩家对敌人物理技能的减伤效果 \n10. 法术攻击决定玩家的法术伤害类技能的强度，同时决定了玩家的治疗能力和施毒能力 \n11. 法术防御决定了玩家抵抗敌人法术伤害的减伤效果 \n12.速度决定战斗开始时的出手先后顺序，同时也决定了物理闪避率（根据双方速度之差判断闪避概率）`)
 });//点击二级属性面板弹出相关信息
         
 function updateHealthAndManaDisplay() {
@@ -7272,13 +7284,40 @@ function handleLevelUp() {
         return;
     }
 
+    // 提取成功率检查的逻辑
+    const checkSuccess = (rate) => Math.random() < rate;
+
+    if (skill.level >= 28 && skill.level <= 30) {
+        if (useItem('universalKernel', 5)) {
+            if (checkSuccess(0.4)) {
+                skill.level += 1;
+                showInfoBox(`${skill.name} 成功升级至 ${skill.level} 级`);
+            } else {
+                showInfoBox(`${skill.name} 升级失败！`, null, null, 'red');
+            }
+            return;
+        }
+    }
+
+    if (skill.level >= 24 && skill.level <= 27) {
+        if (useItem('universalCrystal', 5)) {
+            if (checkSuccess(0.4)) {
+                skill.level += 1;
+                showInfoBox(`${skill.name} 成功升级至 ${skill.level} 级`);
+            } else {
+                showInfoBox(`${skill.name} 升级失败！`, null, null, 'red');
+            }
+            return;
+        }
+    }
+    
     if (skill.level < 10) {
         showInfoBox('该技能现在不需要升级,10级后再来吧！');
         return;
     }
 
     if (skill.level >= 20) {
-        showInfoBox('该技能已达到最高等级！');
+        showInfoBox('该技能已达到目前阶段最高等级！请尝试使用药品系统中的“魔术棱柱”进行升级！');
         return;
     }
 
@@ -7286,17 +7325,18 @@ function handleLevelUp() {
     const expCost = 1000 + 200 * (nextLevel - 11);
 
     if (currentExp < expCost) {
-        showInfoBox(`此次升级需要${expCost}点经验值，你的经验值不足，无法升级！`);
+        showInfoBox(`此次升级需要 ${expCost} 点经验值，你的经验值不足，无法升级！`);
         return;
     }
 
     currentExp -= expCost;
     skill.level = nextLevel;
 
-    showInfoBox(`你消耗了${expCost}点经验值，将${skill.name} 成功升至 ${nextLevel} 级，威力增加了！`);
+    showInfoBox(`你消耗了 ${expCost} 点经验值，将 ${skill.name} 成功升至 ${nextLevel} 级，威力增加了！`);
     updateExpBar();
     updateUI();
 }
+
 
 function handleBulkLevelUp() {
     const skillMessages = [];
@@ -8156,7 +8196,13 @@ function handleDazed() {
     return false;
 }
 
+let alreadyUseMushroom = false;
 function handleMushroom() {
+    if (alreadyUseMushroom) {
+        showInfoBox('此道具无法重复使用，本次使用没有带来任何效果',null,null,'red');
+        return;
+    }
+    alreadyUseMushroom = true;
     const originalEnemyState = JSON.parse(JSON.stringify(enemyPet));
     const reducedEnemyState = {
         health: Math.round(enemyPet.health * 0.5),
@@ -8188,6 +8234,7 @@ function handleMushroom() {
     // 监听战斗回合结束事件，恢复敌人的原始状态
     const originalShowNextBattlePrompt = showNextBattlePrompt;
     showNextBattlePrompt = function(playerWon) {
+        alreadyUseMushroom = false;
         restoreOriginalEnemyState();
         originalShowNextBattlePrompt(playerWon);
         showNextBattlePrompt = originalShowNextBattlePrompt;
@@ -9535,7 +9582,7 @@ function useSelectedDrug() {
                     }).filter(skill => skill.level < 24 && skill !== null);
                     
                     if (upgradableSkills.length === 0) {
-                        showInfoBox("所有技能已达到24级，无法使用魔术棱柱。");
+                        showInfoBox("所有技能已达到24级，无法使用魔术棱柱。请尝试使用更高级的道具进行技能升级！");
                         break;
                     }
             
@@ -13601,8 +13648,11 @@ let jinnangItems = [
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
     { name: 'spiritWine', displayName: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
+    { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 1, description: '暂时不知道有什么用，可能未来会添加玩家模块（遥远的未来）' },
     { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 100, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
+    { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
+    { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];
 
@@ -13952,6 +14002,14 @@ const itemEffects = {
         toggleFightingDrawer();
         summonEnemyByType('ancientEvil');
         updatePetInfo();
+    },
+    universalCrystal: () => {
+        levelUpSkill();
+        addItemToJinnang('universalCrystal',1);
+    },
+    universalKernel: () => {
+        levelUpSkill();
+        addItemToJinnang('universalKernel',1);
     }
 };
 

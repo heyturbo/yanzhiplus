@@ -3983,12 +3983,31 @@ function togglePetOverview() {
 function workPage() {
     togglePetOverview();
 }
+// 保险函数 重置收益倍率
+function resetEarningMultiplier() {
+    // 遍历所有宠物状态
+    petStates.forEach(petState => {
+        // 将 earningMultiplier 重置为 1
+        petState.earningMultiplier = 1;
+    });
 
+    // 选项：你可以在这里添加代码来更新 UI，以反映更改
+    petStates.forEach(petState => {
+        const earningsElement = document.getElementById(`earnings-${petState.petName}`);
+        if (earningsElement) {
+            const finalEarnings = convertPrice(Math.floor(petState.goldAmount * petState.stamina * 0.01 * petState.earningMultiplier));
+            earningsElement.innerText = `${finalEarnings}金子`;
+        }
+    });
+
+    showInfoBox("所有宠物的 earningMultiplier 已重置为 1。");
+}
+
+        
 function infoPingfenpaihang() {
     const allPetData = [];
     const newPetStates = [];
 
-    // 仅遍历 savedPetData 中的 petStates
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
         if (key.startsWith('petData_')) {
@@ -4003,10 +4022,8 @@ function infoPingfenpaihang() {
         }
     }
 
-    // 按照 skillScore 从高到低排序
     allPetData.sort((a, b) => b.skillScore - a.skillScore);
 
-    // 显示养成界面
     const petOverview = document.getElementById('petOverview');
     petOverview.innerHTML = `
         <div style="margin-top: 10px; display: flex; flex-direction: row; justify-content: space-around; align-items: center; color: white; font-weight: bold; text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;">
@@ -4014,7 +4031,6 @@ function infoPingfenpaihang() {
             <button class="close-button" onclick="togglePetOverview()">X</button>
         </div>`;
 
-    // 清除所有旧的定时器，避免对不存在的宠物进行操作
     petStates.forEach((petState) => {
         if (petState.progressInterval) {
             clearInterval(petState.progressInterval);
@@ -4028,20 +4044,20 @@ function infoPingfenpaihang() {
         const petObject = Object.values(pets).find(p => p.name === pet.petName);
         const petImage = petObject ? petObject.image : '';
         const initialStamina = 100;
-        const initialEarnings = convertPrice(Math.floor(pet.skillScore * 0.0031415926) * initialStamina * 0.01);
+        const initialEarnings = Math.floor(pet.skillScore * 0.0031415926) * initialStamina * 0.01;
 
         petContainer.innerHTML = `
             <div class="pet-header">
                 <div id="header-container" style="display: flex; flex-direction: column; min-width: 70%;">
                     <h2>${pet.petName}（评分: ${pet.skillScore}）</h2>
-                    <div style="margin: 10px 0px 10px 0px; display: flex; justify-content: center;">💰能力值：<span id="earnings-${pet.petName}">${initialEarnings}金子</span></div>
+                    <div style="margin: 10px 0px 10px 0px; display: flex; justify-content: center;">💰能力值：<span id="earnings-${pet.petName}">${convertPrice(initialEarnings)}金子</span></div>
                     <div class="pet-status">
                         <div>😄心情: <span id="mood-${pet.petName}">100%</span></div>
                         <div>👊🏻体力: <span id="stamina-${pet.petName}">100%</span></div>
                     </div>
                 </div>
                 <div id="header-image" style="display: flex; align-items: center;">
-                    <img src="${petImage}" style="width: 80px; height: 80px; border-radius: 5px; border: 1px solid white;">
+                    <img id="petImage-${pet.petName}" src="${petImage}" style="width: 80px; height: 80px; border-radius: 5px; border: 1px solid white; cursor: pointer;">
                 </div>
             </div>
             <div class="pet-progress">
@@ -4062,16 +4078,36 @@ function infoPingfenpaihang() {
         const existingState = petStates.find(state => state.petName === pet.petName);
         const updatedGoldAmount = Math.floor(pet.skillScore * 0.0031415926);
 
+        const updateEarningsDisplay = (petState) => {
+            const earningsElement = document.getElementById(`earnings-${petState.petName}`);
+            const finalEarnings = convertPrice(Math.floor(petState.goldAmount * petState.stamina * 0.01 * petState.earningMultiplier));
+            earningsElement.innerText = `${finalEarnings}金子`;
+        };
+
         if (!existingState) {
-            newPetStates.push({
+            const initialState = {
                 petName: pet.petName,
                 mood: 100,
                 stamina: 100,
                 progressBar: progressBar,
                 goldAmount: updatedGoldAmount,
+                earningMultiplier: 1,
                 delegationActive: false,
                 progressInterval: null
+            };
+
+            newPetStates.push(initialState);
+
+            document.getElementById(`petImage-${pet.petName}`).addEventListener('click', () => {
+                if (useItem('spiritWine', 1) && initialState.earningMultiplier < 2) {
+                    initialState.earningMultiplier = Math.min(2, initialState.earningMultiplier + 0.1);
+                    showInfoBox(`已提升 ${pet.petName} 的能力值到 ${initialState.earningMultiplier}倍`);
+                    updateEarningsDisplay(initialState); // 更新显示
+                } else {
+                    showInfoBox('无法再提升能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
+                }
             });
+
         } else {
             if (existingState.progressInterval) {
                 clearInterval(existingState.progressInterval);
@@ -4088,12 +4124,22 @@ function infoPingfenpaihang() {
             progressBar.style.width = '0%';
             document.getElementById(`mood-${pet.petName}`).innerText = `${existingState.mood}%`;
             document.getElementById(`stamina-${pet.petName}`).innerText = `${existingState.stamina}%`;
-            document.getElementById(`earnings-${pet.petName}`).innerText = convertPrice(Math.floor(existingState.goldAmount * existingState.stamina * 0.01)) + '金子';
+            updateEarningsDisplay(existingState); // 初始显示时更新
 
             if (existingState.delegationActive) {
                 document.getElementById(`delegate-button-${pet.petName}`).innerText = "停止";
                 handleDelegation(pet.petName);
             }
+
+            document.getElementById(`petImage-${pet.petName}`).addEventListener('click', () => {
+                if (useItem('spiritWine', 1) && existingState.earningMultiplier < 2) {
+                    existingState.earningMultiplier = Math.min(2, existingState.earningMultiplier + 0.1);
+                    showInfoBox(`已提升 ${pet.petName} 的 earningMultiplier 到 ${existingState.earningMultiplier}`);
+                    updateEarningsDisplay(existingState); // 更新显示
+                } else {
+                    showInfoBox('无法再提升 earningMultiplier，已达到上限或没有足够的 spiritWine。', null, null, 'red');
+                }
+            });
         }
     });
 
@@ -4106,7 +4152,6 @@ function infoPingfenpaihang() {
 
 function startPetWork() {
     petStates.forEach((petState, index) => {
-        // 清除已有的进度条定时器，防止重复
         if (petState.progressInterval) {
             clearInterval(petState.progressInterval);
         }
@@ -4116,13 +4161,11 @@ function startPetWork() {
         const staminaElement = document.getElementById(`stamina-${petState.petName}`);
         const earningsElement = document.getElementById(`earnings-${petState.petName}`);
 
-        // 校验宠物的UI元素是否存在，如果不存在，跳过该宠物的处理
         if (!progressBar || !moodElement || !staminaElement || !earningsElement) {
             console.warn(`宠物 ${petState.petName} 的UI元素不存在，跳过处理`);
             return;
         }
 
-        // 为当前宠物状态设置新的定时器
         petState.progressInterval = setInterval(() => {
             if (petState.mood > 0 && petState.stamina > 0) {
                 const timeFactor = 1 + (100 - petState.mood) / 10;
@@ -4139,15 +4182,14 @@ function startPetWork() {
                     moodElement.innerText = `${petState.mood}%`;
                     staminaElement.innerText = `${petState.stamina}%`;
 
-                    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+                    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
                     earningsElement.innerText = `${updatedEarnings}金子`;
 
-                    const goldEarned = Math.floor(petState.goldAmount * gainFactor);
+                    const goldEarned = Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier);
                     goldAmount += goldEarned;
                     updateGoldDisplay(goldAmount);
                     document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
 
-                    // 如果心情或体力为0，停止进度条
                     if (petState.mood === 0 || petState.stamina === 0) {
                         clearInterval(petState.progressInterval);
                         petState.progressInterval = null;
@@ -4625,7 +4667,8 @@ const enemyImages = [
     { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
     { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
     { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
-    { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' }
+    { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
+    { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' }
 ];
 
 // 更改敌人图像的函数
@@ -6284,12 +6327,12 @@ function resetBattleState(playerWon) {
         }
     }
     
-    if (battleRounds === 101) {
+    if (playerWon && battleRounds === 101) {
         addItemToJinnang('magicPetAmulet', 1);
         showInfoBox('恭喜你战胜了第100轮毁灭心魔，获得了1个灵兽符文！');
     }
     
-    if (battleRounds === 151) {
+    if (playerWon && battleRounds === 151) {
         changeEnemyImage("realShape");
         showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }
@@ -6362,12 +6405,15 @@ function toggleFightingDrawer() {
 
     if (isOpen) {
         drawer.style.display = "flex";
-
         startBattle();
+        if (!summonEnemy) {
+            handleRampaged();
+        }
     } else {
         drawer.style.display = "none";
         stopBattle();
     }
+
     document.getElementById('battleRounds').innerText = battleRounds;
     syncBattlePetSelect();
 }
@@ -6475,7 +6521,6 @@ function updatePetInfo() {
 let summonEnemy = false;
 
 // 全局敌人信息对象
-// 全局敌人信息对象
 const enemies = {
     practiceEnemy: {
         name: '练习树桩',
@@ -6500,9 +6545,9 @@ const enemies = {
         health: 67160000,
         mana: 2400000,
         physicalAttack: 168000,
-        physicalDefense: 99999999,
+        physicalDefense: 999999,
         magicAttack: 5100,
-        magicDefense: 99999999,
+        magicDefense: 999999,
         speed: 3000,
         cultivation: 151800,
         enemyCritRate: 0.01,
@@ -6514,6 +6559,23 @@ const enemies = {
             addItemToJinnang('universalKernel', 10);
        }, // 奖励：30个特定道具
         rewardMessage: '10个修为灵丹（橙），10个宇宙之晶和10个宇宙精华（升级技能专用）'
+    },
+    expEnemy: {
+        name: '永夜大帝',
+        level: 200,
+        health: 127160000,
+        mana: 2400000,
+        physicalAttack: 6680000,
+        physicalDefense: 240000,
+        magicAttack: 318000,
+        magicDefense: 136200,
+        speed: 287000,
+        cultivation: 301800,
+        enemyCritRate: 0.15,
+        enemyCritDamage: 1.8,
+        backgroundImage: 'https://pic.imgdb.cn/item/66cd61f8d9c307b7e9af46c0.png',
+        reward: () => gainExp(1600000), // 奖励：30个特定道具
+        rewardMessage: '额外经验1600000点'
     }
 };
 
@@ -8198,8 +8260,8 @@ function handleDazed() {
 
 let alreadyUseMushroom = false;
 function handleMushroom() {
-    if (alreadyUseMushroom) {
-        showInfoBox('此道具无法重复使用，本次使用没有带来任何效果',null,null,'red');
+    if (alreadyUseMushroom || summonEnemy) {
+        showInfoBox('现在无法使用，生效失败！',null,null,'red');
         return;
     }
     alreadyUseMushroom = true;
@@ -13650,9 +13712,11 @@ let jinnangItems = [
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
     { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 1, description: '暂时不知道有什么用，可能未来会添加玩家模块（遥远的未来）' },
     { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
-    { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 100, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
+    { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
+    { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
+    { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 5, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' }
 ];
 
@@ -14003,6 +14067,11 @@ const itemEffects = {
         summonEnemyByType('ancientEvil');
         updatePetInfo();
     },
+    battleWithExpEnemy: () => {
+        toggleFightingDrawer();
+        summonEnemyByType('expEnemy');
+        updatePetInfo();
+    },
     universalCrystal: () => {
         levelUpSkill();
         addItemToJinnang('universalCrystal',1);
@@ -14010,7 +14079,8 @@ const itemEffects = {
     universalKernel: () => {
         levelUpSkill();
         addItemToJinnang('universalKernel',1);
-    }
+    },
+    resetEarningMultiplierPowder: () => resetEarningMultiplier()
 };
 
 let useAssignedItemCount = 0;
@@ -15675,6 +15745,9 @@ function getRandomCommonItem() {
         createItem('分解符礼包', 18888, 38880, 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png'),
         createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png'),
         createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png'),
+        createItem('树桩魔魂封印', 1388, 1788, 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png'),
+        createItem('战神魔魂封印', 15000, 30000, 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png'),
+        createItem('永夜大帝封印', 25000, 35000, 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png'),
         createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
     ];
 
@@ -15788,6 +15861,9 @@ function buyItem() {
         '分解符礼包': () => addItemToJinnang('fragmentsPackage', itemQuantity),
         '宠物资质仙丹': () => addItemToJinnang('qualityEnhancePill', itemQuantity),
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
+        '树桩魔魂封印': () => addItemToJinnang('battleWithTree', itemQuantity),
+        '战神魔魂封印': () => addItemToJinnang('battleWithAncientEvil', itemQuantity),
+        '永夜大帝封印': () => addItemToJinnang('battleWithExpEnemy', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 

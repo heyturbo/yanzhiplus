@@ -3976,7 +3976,7 @@ function togglePetOverview() {
         console.log("打开养成界面，保存当前宠物数据");
     } else {
         console.log("关闭养成界面，保存当前宠物数据");
-        storeCurrentPetData();
+        saveGameState();
     }
 }
 
@@ -3999,8 +3999,17 @@ function resetEarningMultiplier() {
             earningsElement.innerText = `${finalEarnings}金子`;
         }
     });
+    resetEarningSpeed();
 
     showInfoBox("所有宠物的能力值倍数已重置为 1。");
+}
+
+function resetEarningSpeed() {
+    // 遍历所有宠物状态
+    petStates.forEach(petState => {
+        // 将 earningMultiplier 重置为 1
+        petState.earningSpeed = 1;
+    });
 }
 
         
@@ -4092,6 +4101,7 @@ function infoPingfenpaihang() {
                 progressBar: progressBar,
                 goldAmount: updatedGoldAmount,
                 earningMultiplier: 1,
+                earningSpeed: 1,
                 delegationActive: false,
                 progressInterval: null
             };
@@ -4172,7 +4182,7 @@ function startPetWork() {
                 const gainFactor = 1 - (100 - petState.stamina) / 100;
 
                 const currentWidth = parseFloat(progressBar.style.width) || 0;
-                progressBar.style.width = `${Math.min(100, currentWidth + 1 / timeFactor)}%`;
+                progressBar.style.width = `${Math.min(100, currentWidth + (1 / timeFactor) * petState.earningSpeed)}%`;
 
                 if (parseFloat(progressBar.style.width) >= 100) {
                     progressBar.style.width = '0%';
@@ -4203,7 +4213,13 @@ function startPetWork() {
 function play(petName) {
     const petState = petStates.find(state => state.petName === petName);
     if (!petState) return;
-
+    
+    if (useItem('angelWings',1) && petState.earningSpeed <= 2) {
+        petState.earningSpeed += 0.1;
+        showInfoBox(`插上你给的翅膀，${petName}搬砖的速度如虎添翼`);
+        return;
+    }
+    
     let mood = petState.mood;
     const moodChange = Math.floor(Math.random() * 41) - 10;
 
@@ -4668,7 +4684,8 @@ const enemyImages = [
     { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
     { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
     { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
-    { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' }
+    { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' },
+    { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' }
 ];
 
 // 更改敌人图像的函数
@@ -5326,7 +5343,7 @@ function storeCurrentPetData() {
         petAscended: petAscended,
         petLevel: petLevel,
         petMaxLevel: petMaxLevel,
-        petStates: JSON.stringify(petStates),
+        
         petWisdom: petWisdom,
         playerCritDamage: playerCritDamage,
         playerCritRate: playerCritRate,
@@ -5363,7 +5380,7 @@ function restorePetData(petName) {
         petAscended = savedPetData.petAscended;
         petMaxLevel = savedPetData.petMaxLevel;
         petWisdom = savedPetData.petWisdom;
-        petStates = JSON.parse(savedPetData.petStates);
+        
         awakened = savedPetData.awakened;
         awakenAttributes = savedPetData.awakenAttributes;
         hallucinated = savedPetData.hallucinated;
@@ -6017,13 +6034,6 @@ function startBattle() {
 
     onBattleState = true;
 
-    playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
-    updateUI();
-
-    if (!playerTurn) {
-        setTimeout(enemyAttack, 500); // 延迟0.5秒后毁灭心魔先攻
-    }
-
     if (!firstStartBattle) {
         logBattleEvent("模拟回合制，为了防止作弊，每秒玩家会固定掉血1%，请及时操作！");
         firstStartBattle = true;
@@ -6068,6 +6078,17 @@ function startBattle() {
             console.log('尚未开始战斗');
         }
     }, 1000);
+
+    if (summonEnemy) {
+        return;
+    }
+
+    playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
+    updateUI();
+
+    if (!playerTurn) {
+        setTimeout(enemyAttack, 500); // 延迟0.5秒后毁灭心魔先攻
+    }
 }
 
 
@@ -6095,11 +6116,12 @@ function showNextBattlePrompt(playerWon) {
             summonEnemy = false;
             return;
         }
-    } else{
+    } else {
         if (!summonEnemy) {
             handlePetDefeat();
         } else {
             toggleFightingDrawer();
+            stopBattle();
             handleBattleWithSummonEnemy(false);
             summonEnemy = false;
             return;
@@ -6125,6 +6147,8 @@ function handleVictory() {
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
 
+    defeatedPets = [];
+    usedPets = []; 
     battleRounds++;
     updateEnemyAttributes();
     gainExp();
@@ -6146,13 +6170,6 @@ function handlePetDefeat() {
         // 所有宠物都已阵亡
         applyDefeatPenalty();
         logBattleEvent('所有宠物都已阵亡，本次战斗已失败！');
-        defeatedPets = [];
-        usedPets = [];
-        resetBattleState(false);
-        resetBuffState(false);
-        clearEnemyEffect();
-        clearPlayerEffect();
-        extraShield = 0;
         return;
     }
 
@@ -6161,13 +6178,6 @@ function handlePetDefeat() {
     } else {
         applyDefeatPenalty();
         logBattleEvent('没有其他宠物可以更换，本次战斗已失败！');
-        defeatedPets = [];
-        usedPets = [];
-        resetBattleState(false);
-        resetBuffState(false);
-        clearEnemyEffect();
-        clearPlayerEffect();
-        extraShield = 0;
     }
 }
 
@@ -6224,7 +6234,13 @@ function applyDefeatPenalty() {
     showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
     showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
     updateGoldDisplay(goldAmount);
-    
+    defeatedPets = [];
+    usedPets = [];
+    resetBattleState(false);
+    resetBuffState(false);
+    clearEnemyEffect();
+    clearPlayerEffect();
+    extraShield = 0;
 }
 
 function calculateExtraReward() {
@@ -6498,7 +6514,7 @@ function toggleFightingDrawer() {
         return;
     }
     
-    if (battleState.player.taunt) {
+    if (battleState.player.taunt && !summonEnemy) {
         performAttack('physical');
         return;
     }
@@ -6511,6 +6527,8 @@ function toggleFightingDrawer() {
         startBattle();
         if (!summonEnemy) {
             handleRampaged();
+        } else {
+            updatePetInfo();
         }
     } else {
         drawer.style.display = "none";
@@ -6624,6 +6642,34 @@ function updatePetInfo() {
 let summonEnemy = false;
 
 // 全局敌人信息对象
+// 定义不同敌人的独特战斗能力
+const specificAttackByEnemy = {
+    'expEnemy': () => {
+        const healthLost = Math.round(battleAttributes.health * 0.1);
+        battleAttributes.health -= healthLost;
+        logBattleEvent(`永夜大帝の法术穿透，损失${healthLost}生命值`, 'lightblue');
+        updateUI();
+    },
+    'noWorkBoss': () => {
+        const manaLost = Math.round(battleAttributes.mana * 0.15);
+        battleAttributes.mana -= Math.round(battleAttributes.mana * 0.15);
+        battleState.enemy.magicDefense = Math.round(battleAttributes.magicAttack * playerCritDamage);
+        battleState.enemy.physicalDefense = Math.round(battleAttributes.physicalDefense * playerCritDamage);
+        logBattleEvent(`無班之魂の法术穿透，损失${manaLost}法力值`, 'purple');
+    },
+    // 可以为其他敌人继续添加独特的战斗能力...
+};
+
+// 应用敌人的特殊攻击函数
+function applySpecificAttackByEnemy(summonedEnemyName) {
+    if (specificAttackByEnemy[summonedEnemyName]) {
+        specificAttackByEnemy[summonedEnemyName](); // 调用对应的特殊攻击函数
+    } else {
+        console.log(`敌人 ${summonedEnemyName} 没有特殊攻击能力`);
+    }
+}
+
+// 全局敌人信息对象
 const enemies = {
     practiceEnemy: {
         name: '练习树桩',
@@ -6660,7 +6706,7 @@ const enemies = {
             addItemToJinnang('cultivationPill500', 10);
             addItemToJinnang('universalCrystal', 10);
             addItemToJinnang('universalKernel', 10);
-       }, // 奖励：30个特定道具
+        }, // 奖励：30个特定道具
         rewardMessage: '10个修为灵丹（橙），10个宇宙之晶和10个宇宙精华（升级技能专用）'
     },
     expEnemy: {
@@ -6677,8 +6723,27 @@ const enemies = {
         enemyCritRate: 0.15,
         enemyCritDamage: 1.8,
         backgroundImage: 'https://pic.imgdb.cn/item/66cd61f8d9c307b7e9af46c0.png',
-        reward: () => gainExp(1600000), // 奖励：30个特定道具
-        rewardMessage: '额外经验1600000点'
+        reward: () => gainExp(1600000), 
+        rewardMessage: '额外经验1600000点',
+        specialty: 'expEnemy' // 特殊能力标识符
+    },
+    noWorkBoss: {
+        name: '無班之魂',
+        level: 200,
+        health: 600,
+        mana: 2800000,
+        physicalAttack: 2450,
+        physicalDefense: 1200,
+        magicAttack: 2450,
+        magicDefense: 1200,
+        speed: 999999,
+        cultivation: 9999999,
+        enemyCritRate: 1,
+        enemyCritDamage: 2.5,
+        backgroundImage: 'https://pic.imgdb.cn/item/66cd61f8d9c307b7e9af46c0.png',
+        reward: () => addItemToJinnang('angelWings',1), 
+        rewardMessage: '天使之翼',
+        specialty: 'noWorkBoss' // 特殊能力标识符
     }
 };
 
@@ -6722,6 +6787,7 @@ function summonEnemyByType(enemyType) {
                 `你将会召唤${enemy.name}，战胜后你会获得奖励`,
                 () => {
                     summonEnemy = true;
+                    toggleFightingDrawer();
                     battleState.enemy = { ...enemy }; // 复制敌人属性到战斗状态
                     battleState.enemyKey = enemyType; // 保存敌人类型，用于映射
                     
@@ -6739,6 +6805,9 @@ function summonEnemyByType(enemyType) {
                 },
                 () => {
                     summonEnemy = false;
+                    goldAmount -= 20000;
+                    updateGoldDisplay(goldAmount);
+                    showInfoBox('你放任魔魂逃跑了，扣除20两金',null,null,'red');
                     return;
                 }
             );
@@ -7135,20 +7204,20 @@ function calculateAndDisplayDodgeRate() {
     // 计算速度差异导致的物理闪避率
     speedDifference = battleAttributes.speed - battleState.enemy.speed;
     if (speedDifference > 0) {
-        playerPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 5000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        playerPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         enemyPhysicalDodgeElement.innerText = '0%';
     } else {
-        enemyPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 5000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        enemyPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         playerPhysicalDodgeElement.innerText = '0%';
     }
 
     // 计算修为差异导致的魔法闪避率
     cultivationDifference = playerCultivation - enemyPetCultivation;
     if (cultivationDifference > 0) {
-        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过100%
         enemyMagicDodgeElement.innerText = '0%';
     } else {
-        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过1%
+        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 1) * 100).toFixed(2) + '%'; // 确保概率不超过100%
         playerMagicDodgeElement.innerText = '0%';
     }
 }
@@ -7162,7 +7231,7 @@ function handleDodge(target) {
         // 玩家闪避逻辑
         speedDifference = battleAttributes.speed - battleState.enemy.speed;
         if (speedDifference > 0) {
-            dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家闪避概率为：${dodgeChance}`);
@@ -7170,7 +7239,7 @@ function handleDodge(target) {
         // 敌人闪避逻辑
         speedDifference = battleState.enemy.speed - battleAttributes.speed;
         if (speedDifference > 0) {
-            dodgeChance = Math.min((Math.abs(speedDifference) / 10000) * 0.01, 1); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('enemy-image');
         console.log(`敌人闪避概率为：${dodgeChance}`);
@@ -7804,7 +7873,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
 
-    const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 2) * manaCostMultiplier;
+    const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 20 * skillMultiplier) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     // 记录日志
@@ -8948,8 +9017,8 @@ function handleManaRecover() {
 } //被动回复法力值
 
 
-        
 
+        
 // 【怪物战斗】怪物伤害函数（物理/物理效果、法术/法术效果）
 function enemyAttack() {
     if (!battleState || !battleAttributes || !battleState.enemy) {
@@ -8991,7 +9060,11 @@ function enemyAttack() {
         damage = performEnemyMagicalAttack(isCritical);
     } else {
         logBattleEvent("毁灭心魔被沉默，无法进行法术攻击。", 'white');
-        return;
+    }
+
+    if (summonEnemy) {
+        const summonedEnemyName = battleState.enemy.specialty;
+        applySpecificAttackByEnemy(summonedEnemyName);
     }
 
     // 检查 damage 是否有效
@@ -12650,20 +12723,20 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
             <li>详细中奖规则：</li>
             <ul>
-                <li>5个红球全中且排列顺序一致：5000000文金子</li>
-                <li>5个红球全中：150000文金子</li>
-                <li>4个红球且排列顺序一致：1000000文金子</li>
-                <li>4个红球全中：50000文金子</li>
-                <li>3个红球全中且排列顺序一致：100000文金子</li>
-                <li>3个红球全中：5000文金子</li>
-                <li>2个红球全中且排列顺序一致：10000文金子</li>
+                <li>5个红球全中且排列顺序一致：5锭金子</li>
+                <li>5个红球全中：1锭500两金子</li>
+                <li>4个红球且排列顺序一致：1锭金子</li>
+                <li>4个红球全中：500两金子</li>
+                <li>3个红球全中且排列顺序一致：100两金子</li>
+                <li>3个红球全中：5两金子</li>
+                <li>2个红球全中且排列顺序一致：10两金子</li>
                 <li>2个红球全中：500文金子</li>
                 <li>只中1个红球：200文金子</li>
             </ul>
             <li>蓝球规则：</li>
             <ul>
                 <li>如果蓝球一致且红球中奖，当前奖金翻10倍。</li>
-                <li>如果蓝球一致但红球未中奖，奖金为固定1000文金子。</li>
+                <li>如果蓝球一致但红球未中奖，奖金为固定1两金子。</li>
             </ul>
             <li>本系统只用于游戏货币道具的随机获取，赌博是违法犯罪的行为，请勿铤而走险！</li>
         </ul>
@@ -12724,10 +12797,13 @@ function generateLotteryWinningNumbers() {
     const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
     const hasLuckyAmulet = luckyAmulet && luckyAmulet.quantity > 0;
 
-    if (hasLuckyAmulet && lotterySelectedNumbers.length > 0) {
-        // 从玩家选择的号码中随机选择一个加入中奖号码
-        const randomIndex = Math.floor(Math.random() * lotterySelectedNumbers.length);
-        const selectedNumber = lotterySelectedNumbers[randomIndex];
+    // 只使用玩家选择的前5个数字
+    const availableSelectedNumbers = lotterySelectedNumbers.slice(0, 5);
+
+    if (hasLuckyAmulet && availableSelectedNumbers.length > 0) {
+        // 从玩家选择的前5个号码中随机选择一个加入中奖号码
+        const randomIndex = Math.floor(Math.random() * availableSelectedNumbers.length);
+        const selectedNumber = availableSelectedNumbers[randomIndex];
         numbers.push(selectedNumber);
     }
 
@@ -13492,6 +13568,7 @@ function collectTreasure() {
         '华贵的药材箱': 'fancyDrugBox',
         '宠物资质仙丹': 'qualityEnhancePill',
         '高级神兽丹': 'advancedSkillPill',
+        '魔魂封印卡': 'bossSealCard',
         '一等分解符': 'firstFragments',
         '二等分解符': 'secondFragments',
         '三等分解符': 'thirdFragments',
@@ -13687,21 +13764,22 @@ function getRandomReward(type) {
             { name: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', chance: 15 },
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 0.5 },
             { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5.5 },
+            { name: '魔魂封印卡', url: 'https://pic.imgdb.cn/item/66cdc955d9c307b7e92c1f56.png', chance: 5 },
             { name: '毒粉礼包（10）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
             { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
             { name: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', chance: 1 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 47 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 42 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', chance: 5 },
-            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', chance: 15 },
-            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 30 },
-            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 10 },
-            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', chance: 15 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af497.png', chance: 5 },
+            { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af488.png', chance: 15 },
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af447.png', chance: 30 },
+            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af438.png', chance: 10 },
+            { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af3de.png', chance: 15 },
             { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
             { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
             { name: '金符（橙）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929de8a.png', chance: 1 },
@@ -13811,18 +13889,20 @@ let jinnangItems = [
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
     { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
     { name: 'fragmentsPackage', displayName: '分解符礼包', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png', price: 200, quantity: 0, description: '直接使用，打开可获得100个五行符分解碎片' },
-    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df78.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df5c.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
-    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df3b.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'firstFragments', displayName: '一等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af497.png', price: 1000, quantity: 0, description: '直接使用，获得625枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'secondFragments', displayName: '二等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af488.png', price: 600, quantity: 0, description: '直接使用，获得125枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'thirdFragments', displayName: '三等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af447.png', price: 300, quantity: 0, description: '直接使用，获得25枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'fourthFragments', displayName: '四等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af438.png', price: 200, quantity: 0, description: '直接使用，获得5枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
+    { name: 'fifthFragments', displayName: '五等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af3de.png', price: 100, quantity: 0, description: '直接使用，获得1枚五行符分解碎片。分解碎片可用于强化五行符获得更强力的属性加成' },
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
     { name: 'spiritWine', displayName: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
-    { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 1, description: '暂时不知道有什么用，可能未来会添加玩家模块（遥远的未来）' },
-    { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 100, description: '使用可召唤出树桩测试战力' },
+    { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 1, description: '在打工界面使用。可以给正在打工的宠物玩耍，永久提升TA的打工速度，同一宠物最多使用10次哦' },
+    { name: 'bossSealCard', displayName: '魔魂封印卡', url: 'https://pic.imgdb.cn/item/66cdc955d9c307b7e92c1f56.png', price: 0, quantity: 0, description: '使用后可召唤出各类强大的封印魔魂，挑战成功可能获得各类奖励' },
+    { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
+    { name: 'noWorkBoss', displayName: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
     { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 5, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
@@ -14166,21 +14246,10 @@ const itemEffects = {
         }
         
     },
-    battleWithTree: () => {
-        toggleFightingDrawer();
-        summonEnemyByType('practiceEnemy');
-        updatePetInfo();
-    },
-    battleWithAncientEvil: () => {
-        toggleFightingDrawer();
-        summonEnemyByType('ancientEvil');
-        updatePetInfo();
-    },
-    battleWithExpEnemy: () => {
-        toggleFightingDrawer();
-        summonEnemyByType('expEnemy');
-        updatePetInfo();
-    },
+    battleWithTree: () => summonEnemyByType('practiceEnemy'),
+    battleWithAncientEvil: () => summonEnemyByType('ancientEvil'),
+    battleWithExpEnemy: () => summonEnemyByType('expEnemy'),
+    noWorkBoss: () => summonEnemyByType('noWorkBoss'),
     universalCrystal: () => {
         levelUpSkill();
         addItemToJinnang('universalCrystal',1);
@@ -14189,7 +14258,20 @@ const itemEffects = {
         levelUpSkill();
         addItemToJinnang('universalKernel',1);
     },
-    resetEarningMultiplierPowder: () => resetEarningMultiplier()
+    resetEarningMultiplierPowder: () => resetEarningMultiplier(),
+    bossSealCard: () => generateSealCard(),
+    seperateStone: () => {
+        hallucinatePet();
+        addItemToJinnang('seperateStone',1);
+    },
+    coagulateStone: () => {
+        if (!hallucinated) {
+            showInfoBox('你的宠物还没有开启幻化状态，请先使用离魂石开启！',null,null,'red');
+        } else {
+            hallucinatePet();
+        }
+        addItemToJinnang('coagulateStone',1);
+    }
 };
 
 let useAssignedItemCount = 0;
@@ -14251,6 +14333,31 @@ function useAllItems(itemName) {
     updateJinnangItems(); // 更新锦囊内容显示
 }
 
+function generateSealCard() {
+    // 定义封印卡片的英文名称和对应的汉字名称映射
+    const sealCardsMap = new Map([
+        ['battleWithTree', '树桩魔魂封印'],
+        ['battleWithExpEnemy', '战神魔魂封印'],
+        ['battleWithAncientEvil', '太古魔魂封印'],
+        ['noWorkBoss', '無班之魂']
+    ]);
+
+    // 封印卡片的英文名称数组
+    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss'];
+
+    // 随机选择一个封印卡片的英文名称
+    const randomIndex = Math.floor(Math.random() * sealCards.length);
+    const selectedCard = sealCards[randomIndex];
+
+    // 获取对应的汉字名称
+    const chineseName = sealCardsMap.get(selectedCard);
+
+    // 将选中的封印卡片名称传入 addItemToJinnang 函数，并增加数量 1
+    addItemToJinnang(selectedCard, 1);
+
+    // 显示提示框，告知玩家解锁了哪张封印卡片，并显示汉字名称
+    showInfoBox(`你解锁了一张${chineseName}`);
+}
         
 function useSpiritWine() {
      if (!awakened) {
@@ -15782,12 +15889,25 @@ function refreshShop(auto = false) {
 
     let items = [];
 
+    const rareCounts = {
+        item: 0,
+        bundle: 0,
+        sSkill: 0,
+        ssSkill: 0,
+        maxItems: numItems * probabilities[1] // 估算稀有物品的最大数量
+    };
+
     for (let i = 0; i < numItems; i++) {
         let isRare = Math.random() < probabilities[1];
-        if (!auto && isRare && rareItemCount >= 3) isRare = false;
+        if (!auto && isRare && rareItemCount >= 8) isRare = false;
         if (isRare) rareItemCount++;
 
-        let item = isRare ? getRandomRareItem() : getRandomCommonItem();
+        let item;
+        if (isRare) {
+            item = getRandomRareItem(rareCounts);
+        } else {
+            item = getRandomCommonItem();
+        }
 
         if (item.name.includes('包裹')) {
             const bundleCount = isRare ? rareBundleCount : commonBundleCount;
@@ -15854,9 +15974,6 @@ function getRandomCommonItem() {
         createItem('分解符礼包', 18888, 38880, 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png'),
         createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png'),
         createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png'),
-        createItem('树桩魔魂封印', 1388, 1788, 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png'),
-        createItem('战神魔魂封印', 15000, 30000, 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png'),
-        createItem('永夜大帝封印', 25000, 35000, 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png'),
         createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
     ];
 
@@ -15869,7 +15986,7 @@ function getRandomCommonItem() {
     return selectRandomItems(commonItems, 1)[0];
 }
 
-function getRandomRareItem() {
+function getRandomRareItem(rareCounts) {
     const rareItems = [
         createItem('灵异金丹', 6288, 12988, 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png'),
         createItem('仙人醍醐', 86788, 169238, 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png'),
@@ -15881,9 +15998,31 @@ function getRandomRareItem() {
     const ssSkills = collectSkillsByRarity('SS');
     const sSkills = collectSkillsByRarity('S');
 
-    return Math.random() < 0.2 && rareItems.length > 1
-        ? createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 50), true)
-        : selectRandomItems([...rareItems, ...ssSkills, ...sSkills], 1)[0];
+    const itemTypes = ['item', 'bundle', 'sSkill', 'ssSkill'];
+    let itemType;
+
+    do {
+        itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+    } while (rareCounts[itemType] >= rareCounts.maxItems / 4); // 确保每类物品不超过四分之一
+
+    let item;
+    switch (itemType) {
+        case 'item':
+            item = selectRandomItems(rareItems, 1)[0];
+            break;
+        case 'bundle':
+            item = createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 50), true);
+            break;
+        case 'sSkill':
+            item = selectRandomItems(sSkills, 1)[0];
+            break;
+        case 'ssSkill':
+            item = selectRandomItems(ssSkills, 1)[0];
+            break;
+    }
+
+    rareCounts[itemType]++;
+    return item;
 }
 
 function createItem(name, minPrice, maxPrice, url) {
@@ -15936,13 +16075,25 @@ function buyItem() {
         return showInfoBox("请选择一个商品进行购买！");
     }
     
-    let price = parseInt(selectedItem.dataset.price, 10);
+    const originalPrice = parseInt(selectedItem.dataset.price, 10);
+    let price = originalPrice;
     const itemName = selectedItem.dataset.name;
     const eightyDiscountCard = jinnangItems.find(i => i.name === 'eightyDiscountCard');
     
+    // 获取当前称号的等级
+    const titleElement = document.getElementById('personal-honor');
+    const currentTitleIndex = titles.indexOf(titleElement.innerText);
+    
+    // 计算称号折扣
+    const titleDiscount = 1 - (currentTitleIndex * 0.005);
+    
+    // 应用eightyDiscountCard的折扣
     if (eightyDiscountCard && eightyDiscountCard.quantity > 0) {
         price = Math.round(price * 0.8);
     }
+
+    // 应用称号折扣
+    price = Math.round(price * titleDiscount);
 
     if (goldAmount < price) {
         return showInfoBox("金子不够，购买失败！");
@@ -15998,14 +16149,14 @@ function buyItem() {
         return showInfoBox("未知包裹类型，购买失败！");
     }
 
-
-    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}`);
+    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}，其中折扣为${convertPrice(originalPrice - price)}`);
     updateTopBarItems();
     updateJinnangItems();
     goldAmount -= price;
     updateGoldDisplay(goldAmount);
     selectedItem.remove();
 }
+
 
 function addSkillToPet(skillName) {
     const skill = currentPet.skills.find(skill => skill.name === skillName);
@@ -18630,6 +18781,7 @@ const titles = [
     "傲视群雄", "龙腾四海", "王者归来", "魔兽之王", "Legend",
     "神"
 ];
+
 let petScore;
 function updateTitle() {
     let currentTitleIndex = 0;

@@ -4000,7 +4000,7 @@ function resetEarningMultiplier() {
         }
     });
 
-    showInfoBox("所有宠物的 earningMultiplier 已重置为 1。");
+    showInfoBox("所有宠物的能力值倍数已重置为 1。");
 }
 
         
@@ -4134,10 +4134,10 @@ function infoPingfenpaihang() {
             document.getElementById(`petImage-${pet.petName}`).addEventListener('click', () => {
                 if (useItem('spiritWine', 1) && existingState.earningMultiplier < 2) {
                     existingState.earningMultiplier = Math.min(2, existingState.earningMultiplier + 0.1);
-                    showInfoBox(`已提升 ${pet.petName} 的 earningMultiplier 到 ${existingState.earningMultiplier}`);
+                    showInfoBox(`已提升 ${pet.petName} 的能力值到 ${existingState.earningMultiplier}倍`);
                     updateEarningsDisplay(existingState); // 更新显示
                 } else {
-                    showInfoBox('无法再提升 earningMultiplier，已达到上限或没有足够的 spiritWine。', null, null, 'red');
+                    showInfoBox('无法再提升额外能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
                 }
             });
         }
@@ -4214,7 +4214,7 @@ function play(petName) {
     const earningsElement = document.getElementById(`earnings-${petState.petName}`);
     const timeFactor = 1 + (100 - petState.mood) / 10;
     const gainFactor = 1 - (100 - petState.stamina) / 100;
-    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
     earningsElement.innerText = `${updatedEarnings}金子`;
 
     const moodEvents = {
@@ -4321,7 +4321,7 @@ function rest(petName) {
         const earningsElement = document.getElementById(`earnings-${petState.petName}`);
         const timeFactor = 1 + (100 - petState.mood) / 10;
         const gainFactor = 1 - (100 - petState.stamina) / 100;
-        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
         earningsElement.innerText = `${updatedEarnings}金子`;
 
         if (petState.mood > 0 && petState.stamina > 0) {
@@ -4351,7 +4351,7 @@ function feed(petName) {
         const earningsElement = document.getElementById(`earnings-${petState.petName}`);
         const timeFactor = 1 + (100 - petState.mood) / 10;
         const gainFactor = 1 - (100 - petState.stamina) / 100;
-        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
         earningsElement.innerText = `${updatedEarnings}金子`;
 
         if (!petState.progressInterval && petState.mood > 0 && petState.stamina > 0) {
@@ -4533,7 +4533,7 @@ function chat(petName) {
     const earningsElement = document.getElementById(`earnings-${petState.petName}`);
     const timeFactor = 1 + (100 - petState.mood) / 10;
     const gainFactor = 1 - (100 - petState.stamina) / 100;
-    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor));
+    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
     earningsElement.innerText = `${updatedEarnings}金子`;
 }
 
@@ -6080,76 +6080,179 @@ function stopBattle() {
     logBattleEvent("战斗停止。");
 }
 
+let defeatedPets = []; // 记录已阵亡的宠物 { key: 'xiaojin', name: '小金牛' }
+let usedPets = []; // 记录所有已出战的宠物 { key: 'xiaojin', name: '小金牛' }
+
 function showNextBattlePrompt(playerWon) {
     battleState.playerWon = playerWon;
 
     if (playerWon) {
-        const minRewardMultiplier = 0.35;
-        const maxRewardMultiplier = 1.75;
-        const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
-        let reward = Math.floor(288 * battleRounds * rewardMultiplier);
-        reward = Math.max(reward, 288);
-
-        if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
-            let extraReward = 0;
-            if (ascensionSkill.name === '财源滚滚') {
-                extraReward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            }
-            if (secondAscensionSkill.name === '财源滚滚') {
-                extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
-            }
-            reward += extraReward;
-            logBattleEvent(`财源滚滚触发，额外增加了 ${convertPrice(extraReward)} 金子。`, 'pink');
-        }
-
-        goldAmount += reward;
-        updateGoldDisplay(goldAmount);
-        updateTitle();
-        logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
         if (!summonEnemy) {
-            battleRounds++;
-            updateEnemyAttributes();
-            gainExp();
+            handleVictory();
         } else {
             toggleFightingDrawer();
-            handleBattleWithSummonEnemy(true);
+            handleBattleWithSummonEnemy(playerWon);
             summonEnemy = false;
             return;
         }
-    } else {
-        let penalty = 388 * battleRounds;
-        if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
-            penalty = 0;
-            let compensation = 0;
-            if (ascensionSkill.name === '金牌调解') {
-                compensation += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
-            }
-            if (secondAscensionSkill.name === '金牌调解') {
-                compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
-            }
-            goldAmount += compensation;
-            logBattleEvent(`金牌调解触发，未扣除金子并获得 ${convertPrice(compensation)} 的安慰金。`, 'pink');
+    } else{
+        if (!summonEnemy) {
+            handlePetDefeat();
         } else {
-            goldAmount = Math.max(0, goldAmount - penalty);
+            toggleFightingDrawer();
+            handleBattleWithSummonEnemy(false);
+            summonEnemy = false;
+            return;
         }
-        showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
-        showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
-        updateGoldDisplay(goldAmount);
-    }
-    if (!summonEnemy) {
-        extraShield = 0;
-        resetBattleState(playerWon);
-        resetBuffState(playerWon);
-        clearEnemyEffect();
-        clearPlayerEffect();
-    } else {
-        toggleFightingDrawer();
-        handleBattleWithSummonEnemy(false);
-        summonEnemy = false;
-        return;
     }
 }
+
+function handleVictory() {
+    // 胜利逻辑
+    const minRewardMultiplier = 0.35;
+    const maxRewardMultiplier = 1.75;
+    const rewardMultiplier = Math.random() * (maxRewardMultiplier - minRewardMultiplier) + minRewardMultiplier;
+    let reward = Math.floor(288 * battleRounds * rewardMultiplier);
+    reward = Math.max(reward, 288);
+
+    if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
+        reward += calculateExtraReward();
+    }
+
+    goldAmount += reward;
+    updateGoldDisplay(goldAmount);
+    updateTitle();
+    logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
+    showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
+
+    battleRounds++;
+    updateEnemyAttributes();
+    gainExp();
+    resetBattleState(playerWon);
+    resetBuffState(playerWon);
+    clearEnemyEffect();
+    clearPlayerEffect();
+    extraShield = 0;
+}
+
+function handlePetDefeat() {
+    const petSelect = document.getElementById("pet-select");
+    const selectedPetKey = petSelect.value;
+
+    const currentPetKey = Object.keys(pets).find(key => pets[key].name === currentPet.name);
+    defeatedPets.push({ key: currentPetKey, name: currentPet.name }); // 记录阵亡的宠物
+
+    if (defeatedPets.length === petSelect.options.length) {
+        // 所有宠物都已阵亡
+        applyDefeatPenalty();
+        logBattleEvent('所有宠物都已阵亡，本次战斗已失败！');
+        defeatedPets = [];
+        usedPets = [];
+        resetBattleState(false);
+        resetBuffState(false);
+        clearEnemyEffect();
+        clearPlayerEffect();
+        extraShield = 0;
+        return;
+    }
+
+    if (petSelect.options.length > 1) {
+        promptPetSwitch(petSelect, selectedPetKey);
+    } else {
+        applyDefeatPenalty();
+        logBattleEvent('没有其他宠物可以更换，本次战斗已失败！');
+        defeatedPets = [];
+        usedPets = [];
+        resetBattleState(false);
+        resetBuffState(false);
+        clearEnemyEffect();
+        clearPlayerEffect();
+        extraShield = 0;
+    }
+}
+
+function promptPetSwitch(petSelect, selectedPetKey) {
+    showInfoBox(
+        `${currentPet.name}已阵亡, 是否更换至其他宠物继续战斗？`,
+        () => {
+            let newOption;
+            let availableOptions = Array.from(petSelect.options)
+                .map(option => {
+                    const petKey = Object.keys(pets).find(key => pets[key].name === option.value);
+                    return { key: petKey, name: option.value };
+                })
+                .filter(option => !usedPets.some(pet => pet.key === option.key)); // 过滤已出战的宠物
+
+            if (availableOptions.length === 0) {
+                // 如果没有可用的宠物，执行失败逻辑
+                applyDefeatPenalty();
+                logBattleEvent('没有可用的宠物进行更换，本次战斗已失败！');
+                defeatedPets = [];
+                usedPets = [];
+                return;
+            }
+
+            do {
+                const randomIndex = Math.floor(Math.random() * availableOptions.length);
+                newOption = availableOptions[randomIndex];
+            } while (newOption.key === selectedPetKey);
+
+            petSelect.value = newOption.name;
+            usedPets.push(newOption); // 记录新选择的宠物
+            changePet();
+        },
+        () => {
+            applyDefeatPenalty();
+            logBattleEvent('本次战斗已失败！');
+            defeatedPets = [];
+            usedPets = [];
+        }
+    );
+}
+
+function applyDefeatPenalty() {
+    // 失败惩罚逻辑
+    let penalty = 388 * battleRounds;
+
+    if (ascensionSkill.name === '金牌调解' || secondAscensionSkill.name === '金牌调解') {
+        penalty = 0;
+        goldAmount += calculateCompensation();
+    } else {
+        goldAmount = Math.max(0, goldAmount - penalty);
+    }
+
+    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
+    showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
+    updateGoldDisplay(goldAmount);
+    
+}
+
+function calculateExtraReward() {
+    // 额外奖励计算逻辑
+    let extraReward = 0;
+    if (ascensionSkill.name === '财源滚滚') {
+        extraReward += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+    }
+    if (secondAscensionSkill.name === '财源滚滚') {
+        extraReward += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+    }
+    logBattleEvent(`财源滚滚触发，额外增加了 ${convertPrice(extraReward)} 金子。`, 'pink');
+    return extraReward;
+}
+
+function calculateCompensation() {
+    // 赔偿金计算逻辑
+    let compensation = 0;
+    if (ascensionSkill.name === '金牌调解') {
+        compensation += ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level);
+    }
+    if (secondAscensionSkill.name === '金牌调解') {
+        compensation += secondAscensionSkill.baseValue + secondAscensionSkill.increment(secondAscensionSkill.level);
+    }
+    logBattleEvent(`金牌调解触发，未扣除金子并获得 ${convertPrice(compensation)} 的安慰金。`, 'pink');
+    return compensation;
+}
+
 
 function resetBuffState(playerWon) {
     if (battleState.player.usingBuff) {
@@ -7349,7 +7452,7 @@ function handleLevelUp() {
     // 提取成功率检查的逻辑
     const checkSuccess = (rate) => Math.random() < rate;
 
-    if (skill.level >= 28 && skill.level <= 30) {
+    if (skill.level >= 28 && skill.level <= 29) {
         if (useItem('universalKernel', 5)) {
             if (checkSuccess(0.4)) {
                 skill.level += 1;
@@ -7357,6 +7460,9 @@ function handleLevelUp() {
             } else {
                 showInfoBox(`${skill.name} 升级失败！`, null, null, 'red');
             }
+            return;
+        } else {
+            showInfoBox('你没有宇宙精华了！',null,null,'red');
             return;
         }
     }
@@ -7369,6 +7475,9 @@ function handleLevelUp() {
             } else {
                 showInfoBox(`${skill.name} 升级失败！`, null, null, 'red');
             }
+            return;
+        } else {
+            showInfoBox('你没有宇宙之晶了！',null,null,'red');
             return;
         }
     }
@@ -7613,7 +7722,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
+    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 2);
     const effectiveDefense = Math.floor(battleState.enemy.physicalDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.physicalAttack * skillMultiplier) - effectiveDefense));
 
@@ -7681,7 +7790,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
+    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 2);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
 
@@ -7755,7 +7864,7 @@ function performIndependentMagicAttack() {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.5, Math.floor(enemyPetCultivation / 520000));
+    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 2);
     const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
     let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
@@ -8922,7 +9031,7 @@ function performEnemyPhysicalAttack(isCritical) {
     }
    
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.5, Math.floor(playerCultivation / 520000));
+    const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 2);
     const effectiveDefense = Math.floor(battleAttributes.physicalDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -8975,7 +9084,7 @@ function performEnemyMagicalAttack(isCritical) {
     }
     
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.5, Math.floor(playerCultivation / 520000));
+    const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 2);
     const effectiveDefense = Math.floor(battleAttributes.magicDefense * defenseFactor * cultivationFactor);
     let damage = Math.max(0, Math.floor((battleState.enemy.magicAttack || 0) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -12367,7 +12476,7 @@ function enhanceAmulet(tag) {
 
 // 处理额外值强化
 function handleAdditionalValuesEnhancement(amulet) {
-    const enhancementMultiplier = 1.1 + Math.random() * (0.3 - 0.1);
+    const enhancementMultiplier = 1.1 + Math.random() * 0.2;
 
     // 获取已存在的属性集合，防止生成相同的属性条目
     const existingAttributes = new Set(
@@ -16394,7 +16503,9 @@ function resetPet() {
     reenableAscension = false; // 第二个飞升之术关闭
     remainingPoints = 0;
     removeArmsAttributes();
-    restoreEnemyState();
+    if (!onBattleState) {
+        restoreEnemyState();
+    }
     secondAscensionSkill = {
         name: '未开启',
         level: 1,
@@ -18910,7 +19021,7 @@ function updateDisplayContent() {
     updateAscensionDisplay();
     updateAwakenStatus();
     updateAscensionButton();
-    restoreEnemyState();
+    // restoreEnemyState();暂时不重置数据
     checkSecondAscensionEnabled();
     updateGoldDisplay(goldAmount); // 调用更新金子显示的函数
     updateExpBar();

@@ -4113,13 +4113,18 @@ function infoPingfenpaihang() {
             newPetStates.push(initialState);
 
             document.getElementById(`petImage-${pet.petName}`).addEventListener('click', () => {
-                if (useItem('spiritWine', 1) && initialState.earningMultiplier < 2) {
-                    initialState.earningMultiplier = Math.min(2, initialState.earningMultiplier + 0.1);
-                    showInfoBox(`已提升 ${pet.petName} 的能力值到 ${initialState.earningMultiplier}倍`);
-                    updateEarningsDisplay(initialState); // 更新显示
-                } else {
-                    showInfoBox('无法再提升能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
-                }
+                showInfoBox(
+                    `当前能力值倍数为${initialState.earningMultiplier}，点击确认可尝试提升`,
+                    () => {
+                        if (useItem('spiritWine', 1) && initialState.earningMultiplier < 2) {
+                            initialState.earningMultiplier = Math.min(2, initialState.earningMultiplier + 0.1);
+                            showInfoBox(`已提升 ${pet.petName} 的能力值到 ${initialState.earningMultiplier}倍`);
+                            updateEarningsDisplay(initialState);
+                        } else {
+                            showInfoBox('无法再提升能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
+                        }
+                    }
+                );
             });
 
         } else {
@@ -4138,7 +4143,7 @@ function infoPingfenpaihang() {
             progressBar.style.width = '0%';
             document.getElementById(`mood-${pet.petName}`).innerText = `${existingState.mood}%`;
             document.getElementById(`stamina-${pet.petName}`).innerText = `${existingState.stamina}%`;
-            updateEarningsDisplay(existingState); // 初始显示时更新
+            updateEarningsDisplay(existingState);
 
             if (existingState.delegationActive) {
                 document.getElementById(`delegate-button-${pet.petName}`).innerText = "停止";
@@ -4146,13 +4151,18 @@ function infoPingfenpaihang() {
             }
 
             document.getElementById(`petImage-${pet.petName}`).addEventListener('click', () => {
-                if (useItem('spiritWine', 1) && existingState.earningMultiplier < 2) {
-                    existingState.earningMultiplier = Math.min(2, existingState.earningMultiplier + 0.1);
-                    showInfoBox(`已提升 ${pet.petName} 的能力值到 ${existingState.earningMultiplier}倍`);
-                    updateEarningsDisplay(existingState); // 更新显示
-                } else {
-                    showInfoBox('无法再提升额外能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
-                }
+                showInfoBox(
+                    `当前能力值倍数为${existingState.earningMultiplier}，点击确认可尝试提升`,
+                    () => {
+                        if (useItem('spiritWine', 1) && existingState.earningMultiplier < 2) {
+                            existingState.earningMultiplier = Math.min(2, existingState.earningMultiplier + 0.1);
+                            showInfoBox(`已提升 ${pet.petName} 的能力值到 ${existingState.earningMultiplier}倍`);
+                            updateEarningsDisplay(existingState);
+                        } else {
+                            showInfoBox('无法再提升能力值，已达到上限或没有足够的琼浆玉露。', null, null, 'red');
+                        }
+                    }
+                );
             });
         }
     });
@@ -4160,9 +4170,9 @@ function infoPingfenpaihang() {
     petStates = newPetStates;
     saveGameState();
     storeCurrentPetData();
-    
     startPetWork();
 }
+
 
 function startPetWork() {
     petStates.forEach((petState, index) => {

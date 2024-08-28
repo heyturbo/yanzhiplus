@@ -1357,6 +1357,10 @@
             transition: transform 0.3s;
             max-height: 90%;
             overflow-y: auto;
+            background-image: url(https://pic.imgdb.cn/item/66ceec7fd9c307b7e9851687.gif);
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
         
         .lottery-drawer.open {
@@ -1406,7 +1410,7 @@
             padding: 10px;
             margin: 15px 0;
             text-align: center;
-            background-color: #f9f9f9;
+            background-color: hwb(0deg 98% 2% / 50%);
         }
         
         .lottery-number-box {
@@ -2625,7 +2629,6 @@
             <div class="lottery-box" id="lotteryResultAmount">奖金区: 0</div>
         </div>
         <div class="lottery-section lottery-footer">
-            <div class="lottery-box" id="lotteryCountdown">倒计时: 10s</div>
             <button id="lotteryClaimPrize">领取奖金</button>
         </div>
     </div>
@@ -12785,27 +12788,6 @@ function addWuxingFragments(amount) {
 }        
 
 // lottery.js
-let lotteryPrizePool = "无上限奖池";
-let lotteryBetCount = 0;
-let lotteryBetAmount = 0;
-let lotterySelectedNumbers = [];
-let lastSelectedNumbers = [];
-let lotteryCountdown = 10;
-let lotteryDrawInterval;
-let canBet = true;
-let pendingPrize = 0;
-let hasPlacedBet = false;
-
-function toggleLotteryDrawer() {
-    const drawer = document.getElementById('lotteryDrawer');
-    drawer.classList.toggle('open');
-    if (drawer.classList.contains('open')) {
-        startLotteryCountdown();
-    } else {
-        stopLotteryCountdown();
-    }
-}
-
 document.getElementById('lotteryRuleButton').addEventListener('click', () => {
     const ruleContent = document.getElementById('ruleContent');
     ruleContent.innerHTML = `
@@ -12840,6 +12822,20 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
     document.getElementById('lotteryRuleModal').style.display = 'block';
 });
 
+let lotteryPrizePool = "无上限奖池";
+let lotteryBetCount = 0;
+let lotteryBetAmount = 0;
+let lotterySelectedNumbers = [];
+let lastSelectedNumbers = [];
+let canBet = true;
+let pendingPrize = 0;
+let hasPlacedBet = false;
+
+function toggleLotteryDrawer() {
+    const drawer = document.getElementById('lotteryDrawer');
+    drawer.classList.toggle('open');
+}
+
 document.querySelector('.modal .close').addEventListener('click', () => {
     document.getElementById('lotteryRuleModal').style.display = 'none';
 });
@@ -12850,29 +12846,11 @@ window.addEventListener('click', (event) => {
     }
 });
 
-function startLotteryCountdown() {
-    lotteryDrawInterval = setInterval(() => {
-        lotteryCountdown--;
-        document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
-        if (lotteryCountdown === 0) {
-            performLotteryDraw();
-            lotteryCountdown = 10;
-            canBet = true;
-        }
-    }, 1000);
-}
-
-function stopLotteryCountdown() {
-    clearInterval(lotteryDrawInterval);
-    lotteryCountdown = 10;
-    document.getElementById('lotteryCountdown').textContent = `倒计时: ${lotteryCountdown}s`;
-}
-
 function performLotteryDraw() {
     const { numbers: winningNumbers, blueBall: winningBlueBall } = generateLotteryWinningNumbers();
     document.getElementById('lotteryDrawResults').innerHTML = `开奖区: ${winningNumbers.join(', ')} <span style="color: blue;">${winningBlueBall}</span>`;
     
-    if (hasPlacedBet) { // 只有在已投注的情况下才进行奖金判断
+    if (hasPlacedBet) {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
             pendingPrize += prize;
@@ -12882,8 +12860,8 @@ function performLotteryDraw() {
     
     highlightMatchingNumbers(winningNumbers, winningBlueBall);
     clearSelections();
-    canBet = true; // 允许再次投注
-    hasPlacedBet = false; // 重置投注标志
+    canBet = true;
+    hasPlacedBet = false;
 }
 
 function generateLotteryWinningNumbers() {
@@ -12948,7 +12926,7 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         }, 1000);
     }
 
-    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: gold; font-weight: bold;">${convertPrice(prize)}</span>` : '奖金区: 0';
+    document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: gold; font-weight: bold; text-shadow: 0 0 5px #6f391c;">${convertPrice(prize)}</span>` : '奖金区: 0';
     return prize;
 }
 
@@ -13046,32 +13024,31 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             return;
         }
 
-        // 检查是否拥有casinoCoverLetter道具
         const casinoCoverLetterItem = jinnangItems.find(i => i.name === 'casinoCoverLetter');
         const hasCasinoCoverLetter = casinoCoverLetterItem && casinoCoverLetterItem.quantity > 0;
 
         if (hasCasinoCoverLetter && lotteryBetCount <= 500) {
-            // 使用casinoCoverLetter进行投注
             useItem('casinoCoverLetter', 1);
             lastSelectedNumbers = [...lotterySelectedNumbers];
-            canBet = false; // 禁止在下一次开奖之前再次投注
-
+            canBet = false;
             document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
-            
             updateLotteryDisplay();
-            hasPlacedBet = true; // 更新投注标志
+            hasPlacedBet = true;
+            setTimeout(() => {
+                performLotteryDraw(); // 立即执行开奖
+            }, 1000);
         } else {
-            // 正常逻辑扣除金子进行投注
             if (goldAmount >= lotteryBetAmount) {
                 goldAmount -= lotteryBetAmount;
                 updateGoldDisplay(goldAmount);
                 lastSelectedNumbers = [...lotterySelectedNumbers];
-                canBet = false; // 禁止在下一次开奖之前再次投注
-
+                canBet = false;
                 document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
-                
                 updateLotteryDisplay();
-                hasPlacedBet = true; // 更新投注标志
+                hasPlacedBet = true;
+                setTimeout(() => {
+                    performLotteryDraw(); // 立即执行开奖
+                }, 1000);
             } else {
                 showInfoBox('余额不足');
             }
@@ -13144,10 +13121,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
         lotterySelectedNumbers.push(blueBall);
         document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
-        hasPlacedBet = false; // 重置投注标志
+        hasPlacedBet = false;
     });
 
-    // 确保 .lottery-footer 元素存在
     const lotteryFooter = document.querySelector('.lottery-footer');
     if (lotteryFooter) {
         lotteryFooter.appendChild(autoSelectButton);

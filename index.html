@@ -4356,27 +4356,57 @@ function feed(petName) {
     const staminaCost = baseCost * (100 - currentStamina);
     const feedCost = Math.ceil(staminaCost / 10) * 10;
 
-    if (goldAmount >= feedCost) {
+    // 过滤出背包中所有有效的食物（数量大于0）
+    const availableFoodItems = jinnangItems.filter(item => {
+        return (item.name === 'redApple' || item.name === 'chocolate') && item.quantity > 0;
+    });
+
+    if (availableFoodItems.length > 0) {
+        // 随机选择一个食物
+        const randomIndex = Math.floor(Math.random() * availableFoodItems.length);
+        const feedItem = availableFoodItems[randomIndex];
+
+        // 使用选定的食物
+        useItem(feedItem.name, 1);
+
+        let staminaIncrease = 0;
+        let infoMessage = '';
+
+        // 根据不同的食物调整体力增加值和提示信息
+        if (feedItem.name === 'redApple') {
+            staminaIncrease = 15;
+            infoMessage = `你递给${petName}一个美味的苹果，${petName}似乎从没见过这种水果，小心翼翼咬了一口，被香脆的口感惊喜到了。`;
+        } else if (feedItem.name === 'chocolate') {
+            staminaIncrease = 20;
+            infoMessage = `你递给${petName}一块巧克力，${petName}感受到甜蜜的味道，体力有所恢复。`;
+        }
+
+        petState.stamina = Math.min(100, petState.stamina + staminaIncrease);
+        document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
+        showInfoBox(infoMessage);
+
+    } else if (goldAmount >= feedCost) {
         goldAmount -= feedCost;
         updateGoldDisplay(goldAmount);
-        document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
         petState.stamina = Math.min(100, petState.stamina + 50);
         document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
         showInfoBox(`${petName}缠着你要吃大餐，你为此花费了${convertPrice(feedCost)}金子`);
-
-        const earningsElement = document.getElementById(`earnings-${petState.petName}`);
-        const timeFactor = 1 + (100 - petState.mood) / 10;
-        const gainFactor = 1 - (100 - petState.stamina) / 100;
-        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
-        earningsElement.innerText = `${updatedEarnings}金子`;
-
-        if (!petState.progressInterval && petState.mood > 0 && petState.stamina > 0) {
-            startPetWork();
-        }
+        document.getElementById("current-gold").innerText = `${convertPrice(goldAmount)}`;
     } else {
         showInfoBox("金钱不足，无法喂食！");
+        return;
+    }
+
+    const gainFactor = 1 - (100 - petState.stamina) / 100;
+    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
+    document.getElementById(`earnings-${petState.petName}`).innerText = `${updatedEarnings}金子`;
+
+    if (!petState.progressInterval && petState.mood > 0 && petState.stamina > 0) {
+        startPetWork();
     }
 }
+
+
 
 function chat(petName) {
     const petState = petStates.find(state => state.petName === petName);
@@ -6649,7 +6679,8 @@ const specificAttackByEnemy = {
     'expEnemy': () => {
         const healthLost = Math.round(battleAttributes.health * 0.1);
         battleAttributes.health -= healthLost;
-        logBattleEvent(`永夜大帝の法术穿透，损失${healthLost}生命值`, 'lightblue');
+        battlestate.enemy.health += healthLost;
+        logBattleEvent(`永夜大帝の吸血魔刃，吸取了你了你${healthLost}生命值`, 'lightred');
         updateUI();
     },
     'noWorkBoss': () => {
@@ -6657,7 +6688,7 @@ const specificAttackByEnemy = {
         battleAttributes.mana -= Math.round(battleAttributes.mana * 0.15);
         battleState.enemy.magicDefense = Math.round(battleAttributes.magicAttack * playerCritDamage);
         battleState.enemy.physicalDefense = Math.round(battleAttributes.physicalDefense * playerCritDamage);
-        logBattleEvent(`無班之魂の法术穿透，损失${manaLost}法力值`, 'purple');
+        logBattleEvent(`無班之魂の法术穿透，损失${manaLost}法力值`, 'lightblue');
         handleNoWorkBossSkill();
     },
     'ancientEvil': () => handleAncientEvilSkill(),
@@ -6719,7 +6750,7 @@ const enemies = {
         level: 200,
         health: 127160000,
         mana: 2400000,
-        physicalAttack: 6680000,
+        physicalAttack: 280000,
         physicalDefense: 240000,
         magicAttack: 318000,
         magicDefense: 136200,
@@ -6824,23 +6855,57 @@ function summonEnemyByType(enemyType) {
     }
 }
 
+function handleNoWorkBossSkill() {
+    // 生成一个随机数，如果小于0.6，则退出函数
+    if (Math.random() < 0.6) {
+        return;
+    }
+
+    // 获取敌人的等级元素并将其值转换为整数
+    const enemyLevelElement = document.getElementById('enemy-level');
+    const enemyLevel = parseInt(enemyLevelElement.innerText, 10);
+
+    // 增加敌人的等级
+    const newEnemyLevel = enemyLevel + 200;
+    enemyLevelElement.innerText = newEnemyLevel;
+
+    // 记录事件日志
+    logBattleEvent('無班之魂变得恼怒，等级提升了', 'red');
+}
+
+        
 function handleAncientEvilSkill() {
+    // 确保 battleState.player.damageLost 被正确初始化
+    if (typeof battleState.player.damageLost === 'undefined') {
+        battleState.player.damageLost = false;
+    }
+
+    // 检查是否已经触发了该技能
+    if (battleState.player.damageLost) {
+        return;
+    }
+
+    // 保存原始暴击伤害值
     const originalPlayerCritDamage = playerCritDamage;
     const originalEnemyCritDamage = enemyCritDamage;
 
     // 调整暴击伤害值
     playerCritDamage = Math.round(originalPlayerCritDamage * 0.5);
     enemyCritDamage += Math.round(originalPlayerCritDamage * 0.5);
+    battleState.player.damageLost = true;
 
     // 10秒后恢复原始暴击伤害值
     setTimeout(() => {
+        battleState.player.damageLost = false;
         playerCritDamage = originalPlayerCritDamage;
         enemyCritDamage = originalEnemyCritDamage;
         updateUI();
     }, 10000);
 
+    // 记录事件
     logBattleEvent('太古魔魂会吸收你的暴击伤害作为己用', 'lightblue');
 }
+
 
         
 function initializeEnemyPet() {
@@ -8821,7 +8886,7 @@ function performDefense() {
 
     applyDefenseBonus(selectedSkillName);
     playerTurn = false;
-    setTimeout(enemyAttack, 500);
+    setTimeout(enemyAttack, 350);
     getShieldStatus();
 
     applyAscensionEffects();
@@ -9089,24 +9154,16 @@ function enemyAttack() {
         const summonedEnemyName = battleState.enemy.specialty;
         applySpecificAttackByEnemy(summonedEnemyName);
     }
+    
+    handleManaRecover();
+    handleBurnt();
 
     // 检查 damage 是否有效
     if (isNaN(damage) || damage <= 0) {
         console.error("Invalid damage value before reduction:", damage);
         return;
     }
-
-    // 首先处理伤害减免
-    damage = handleDamageReduction(damage);
-
-    // 然后计算最终伤害，包括暴击和其他修正
-    damage = calculateDamage(damage, isCritical, enemyCritDamage);
-
-    // 处理燃烧效果
-    handleBurnt();
-    handleResurrection(damage);
-    handleManaRecover();
-
+    
     // 检查玩家和敌人的血量，更新战斗状态
     if (battleAttributes.health <= 0) {
         showNextBattlePrompt(false);
@@ -9116,6 +9173,13 @@ function enemyAttack() {
         updateUI();
         playerTurn = true;
     }
+
+    // 首先处理伤害减免
+    damage = handleDamageReduction(damage);
+
+    // 然后计算最终伤害，包括暴击和其他修正
+    damage = calculateDamage(damage, isCritical, enemyCritDamage);
+    handleResurrection(damage);
 }
 
 
@@ -13554,7 +13618,8 @@ function collectTreasure() {
     const rewardActions = {
         '普通经验书': 'normalExperienceBook',
         '高级经验书': 'advancedExperienceBook',
-        '苹果': () => generateItemToJinnang('redApple', '苹果', 'https://pic.imgdb.cn/item/66cebbd8d9c307b7e93efec4.png', price = 100, quantity = 1, description = '美味的苹果'),
+        '水晶红富士': () => generateItemToJinnang('redApple', '水晶红富士', 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', price = 100, quantity = 1, description = '美味的苹果'),
+        '浓情费罗列': () => generateItemToJinnang('chocolate', '浓情费罗列', 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', price = 100, quantity = 1, description = '一口下去，丝滑的巧克力和爆浆甜心在你的口腔中交织，回味无穷'),
         '飞升之石': 'ascensionStone',
         '举世无双悟性丹': 'supremeWisdomPill',
         '无限宝石': 'infiniteGem',
@@ -13760,14 +13825,15 @@ function getTreasureCost(type) {
 function getRandomReward(type) {
     const rewards = {
         '经验宝箱': [
-            { name: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', chance: 80 },
+            { name: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', chance: 90 },
             { name: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', chance: 9.95 },
-            { name: '苹果', url: 'https://pic.imgdb.cn/item/66cebbd8d9c307b7e93efec4.png', chance: 10 },
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 0.05 }
         ],
         '奇馈宝箱': [
-            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 20 },
-            { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 23 },
+            { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 10 },
+            { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 20 },
+            { name: '水晶红富士', url: 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', chance: 8 },
+            { name: '浓情费罗列', url: 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', chance: 5 },
             { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', chance: 10 },
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 10 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
@@ -13927,7 +13993,7 @@ let jinnangItems = [
     { name: 'goldAmuletPackage', displayName: '金符组合锦囊', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 1, quantity: 0, description: '直接使用，打开后获得一整套金符。金符可以使你在反弹来自敌人的伤害，装备数量越多，反弹比例越高' },
     { name: 'spiritWine', displayName: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', price: 100, quantity: 0, description: '直接使用，精灵最爱喝的口味。可以直接提升2级精灵等级哦（友情提示，建议精灵到达100级后使用，此道具可突破精灵成长上限至120级）' },
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
-    { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 1, description: '在打工界面使用。可以给正在打工的宠物玩耍，永久提升TA的打工速度，同一宠物最多使用10次哦' },
+    { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 0, description: '在打工界面使用。可以给正在打工的宠物玩耍，永久提升TA的打工速度，同一宠物最多使用10次哦' },
     { name: 'bossSealCard', displayName: '魔魂封印卡', url: 'https://pic.imgdb.cn/item/66cdc955d9c307b7e92c1f56.png', price: 0, quantity: 0, description: '使用后可召唤出各类强大的封印魔魂，挑战成功可能获得各类奖励' },
     { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
@@ -13935,10 +14001,10 @@ let jinnangItems = [
     { name: 'noWorkBoss', displayName: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
-    { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 5, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
+    { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 1, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
-    { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 5, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' }
+    { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -14339,6 +14405,10 @@ const itemEffects = {
         goldAmount += 100000000;
         updateGoldDisplay(goldAmount);
         saveGameState();
+    },
+    chocolate: () => {
+        additionalPlayerCultivation += 2;
+        showInfoBox('你吃了一个费罗列',null,null,'brown'); 
     }
 };
 

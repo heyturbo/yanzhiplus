@@ -1630,6 +1630,7 @@
             font-size: 24px;
             font-weight: bold;
             font-style: italic;
+            text-shadow: 0 0 2px black;
         }
 
         .enemy-damage-display {
@@ -2518,7 +2519,7 @@
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
-        <div class="drawer-toggle" onclick="toggleShop()">商店</div>
+        <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span></div>
         <div class="shop-info" id="shop-info">
             <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;">
                 <div class="shop-items" id="shop-items">
@@ -6398,6 +6399,9 @@ function resetBuffState(playerWon) {
 }
 
 function gainExp(expToAdd = 0) {
+    const enemyLevelElement = document.getElementById('enemy-level');
+    const enemyLevel = parseInt(enemyLevelElement.innerText, 10);
+    
     let expMultiplier = battleState.player.expMultiplier || 1;
 
     // 检查并应用举一反三技能的经验值加成
@@ -6418,7 +6422,7 @@ function gainExp(expToAdd = 0) {
         ? expToAdd 
         : (petLevel >= 180 
             ? Math.floor(Math.random() * (2288 - 1288 + 1) * expMultiplier) + 1288
-            : Math.floor(100 + (Math.pow(battleRounds, 1.1) * 0.85 * battleRounds) * expMultiplier));
+            : Math.floor(100 + (Math.pow(enemyLevel, 1.1) * 0.85 * enemyLevel) * expMultiplier));
 
     let totalGainedExp = currentExp + gainedExp;
 
@@ -6434,11 +6438,11 @@ function gainExp(expToAdd = 0) {
 
         // 确定 maxExp 的增量
         let increment;
-        if (petLevel < 100 && battleRounds < 100) {
+        if (petLevel < 100 && enemyLevel < 100) {
             increment = Math.floor(Math.random() * (1000 - 600 + 1)) + 600;
-        } else if (petLevel >= 101 && petLevel <= 180 && battleRounds >= 101 && battleRounds <= 140) {
+        } else if (petLevel >= 101 && petLevel <= 180 && enemyLevel >= 101 && enemyLevel <= 140) {
             increment = Math.floor(Math.random() * (1800 - 1200 + 1)) + 1200;
-        } else if (petLevel >= 181 && petLevel <= 200 && battleRounds >= 141 && battleRounds <= 150) {
+        } else if (petLevel >= 181 && petLevel <= 200 && enemyLevel >= 141 && enemyLevel <= 150) {
             increment = Math.floor(Math.random() * (3600 - 2000 + 1)) + 2000;
         } else {
             increment = Math.floor(Math.random() * (3600 - 600 + 1)) + 600; // 默认增长规则
@@ -6695,7 +6699,7 @@ const specificAttackByEnemy = {
         const healthLost = Math.round(battleAttributes.health * 0.1);
         battleAttributes.health -= healthLost;
         battlestate.enemy.health += healthLost;
-        logBattleEvent(`永夜大帝の吸血魔刃，吸取了你了你${healthLost}生命值`, 'lightred');
+        logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'lightred');
         updateUI();
     },
     'noWorkBoss': () => {
@@ -7267,8 +7271,6 @@ function calculateDamage(baseDamage, isCritical, critDamage) {
     return baseDamage;
 }
 
-
-
 function checkCriticalHit(critRate) {
     return Math.random() < critRate;
 }
@@ -7746,7 +7748,7 @@ function selectSkillAndCalculateMultiplier(type) {
         isSkillUsed = true;
         logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
         if (type === 'physical') {
-            const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds);
+            const manaCost = Math.floor((Math.random() * (200 - 50 + 1) * skillLevel));
             battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667269e9d9c307b7e915e15a.gif');
         } else if (type === 'magical') {
@@ -7754,10 +7756,10 @@ function selectSkillAndCalculateMultiplier(type) {
         }
     } else {
         if (type === 'physical') {
-            logBattleEvent("你用拳头平A了对方。");
+            logBattleEvent("⚔️【玩家攻击】你用拳头平A了对方。");
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667123f9d9c307b7e9e34049.gif');
         } else if (type === 'magical') {
-            logBattleEvent("你操控小树枝击向了对方。");
+            logBattleEvent("⚔️【玩家攻击】你操控小树枝击向了对方。");
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/6671343bd9c307b7e9031c3d.gif');
         }
     }
@@ -7797,7 +7799,7 @@ function performAttack(type) {
     } else if (attackType === 'magical') {
         const result = performMagicalAttack(skillMultiplier, isSkillUsed);
         if (result.retryPhysical) {
-            logBattleEvent("法力值不足，自动转为物理攻击。", 'red');
+            logBattleEvent("⚔️【玩家攻击】法力值不足，自动转为物理攻击。", 'red');
             performAttack('physical');
             return;
         }
@@ -7851,23 +7853,46 @@ function updateDamageValue(damage, enemy = false) {
     const playerDamageValueElement = document.getElementById('player-damage-value');
     const enemyDamageValueElement = document.getElementById('enemy-damage-value');
     
+    // 安全检查：确保 DOM 元素存在
+    if (!playerDamageValueElement || !enemyDamageValueElement) {
+        console.error("Failed to get damage value element.");
+        return;
+    }
+
     // 根据 enemy 参数决定显示在哪个元素上
     const damageElement = enemy ? enemyDamageValueElement : playerDamageValueElement;
 
-    // 安全检查：确保 damage 不是 NaN
-    if (!isNaN(damage) && damage >= 0) {
-        // 设置显示的伤害值
-        damageElement.innerText = `-${damage}`;
-    
-        // 在 300 毫秒后清空显示的伤害值
-        setTimeout(() => {
-            damageElement.innerText = '';
-        }, 300);
-    } else {
-        console.error("Invalid damage value: NaN");
+    // 确保 damage 不是 NaN 并且有效
+    if (isNaN(damage) || damage < 0) {
+        console.error("Invalid damage value: NaN or negative value.");
         return;
     }
+
+    // 暴击判断
+    let isCritical = enemy ? checkCriticalHit(enemyCritRate) : checkCriticalHit(playerCritRate);
+
+    // 显示之前先清空旧的内容
+    damageElement.innerText = '';
+
+    // 设置暴击显示样式
+    if (isCritical) {
+        damageElement.innerText = `-${damage}`;
+        damageElement.style.color = 'red';
+        damageElement.style.fontSize = '26px';
+        damageElement.style.textShadow = 'text-shadow: 0 0 2px black;';
+    } else {
+        // 正常显示
+        damageElement.innerText = `-${damage}`;
+    }
+
+    // 在 300 毫秒后清空显示的伤害值
+    setTimeout(() => {
+        if (damageElement.innerText !== null) {
+            damageElement.innerText = '';
+        }
+    }, 200);
 }
+
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -8467,7 +8492,6 @@ function handleStunned() {
     if (battleState.enemy.stunned) {
         logBattleEvent("邪佞眩晕，无法行动。", 'wheat');
         playerTurn = true;
-        handleManaRecover();
         return true;
     }
     return false;
@@ -8480,14 +8504,6 @@ function handleCriticalAndDrunken(damage) {
         const extraDamage = Math.floor(battleAttributes.physicalAttack * battleState.player.extraCritDamageMultiplier);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
         logBattleEvent(`灵魂穿刺触发，额外造成了 ${extraDamage} 点伤害。`, 'red');
-    }
-
-    if (isCritical) {
-        const logDiv = document.getElementById('log');
-        logDiv.classList.add('critical-hit');
-        setTimeout(() => {
-            logDiv.classList.remove('critical-hit');
-        }, 300);
     }
 
     // 调用处理醉酒状态的函数
@@ -8559,7 +8575,6 @@ function handleDazed() {
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
             logBattleEvent(`混乱状态下，邪佞攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
             playerTurn = true;
-            handleManaRecover();
             return true;
         }
     }
@@ -8731,7 +8746,7 @@ function performHeal() {
     battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
     
-    logBattleEvent(`你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
+    logBattleEvent(`🔮【玩家治疗】你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c8f.gif');
 
     handleDivineProtection(selectedSkills, skillLevel);
@@ -8850,7 +8865,7 @@ function handleReflectAndHeal(damage) {
             console.error("Heal amount is NaN, setting to 0.");
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-        logBattleEvent(`仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
+        logBattleEvent(`🔮【玩家治疗】仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c7d.gif');
     }
 }//处理仙气（包含反弹逻辑）
@@ -8917,9 +8932,9 @@ function performDefense() {
     battleState.player.defenseReduction = defenseReduction;
     
     if (defenseReduction < 1){
-        logBattleEvent(`你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
+        logBattleEvent(`🛡【玩家防御】你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害。`, 'orange');
     } else {
-        logBattleEvent(`你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害，溢出值已形成护盾。`, 'orange');
+        logBattleEvent(`🛡【玩家防御】你施放了防御技能 ${selectedSkillName}，本回合抵抗了 ${Math.floor(defenseReduction * 100)}% 伤害，溢出值已形成护盾。`, 'orange');
     }
     
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718ca1.gif');
@@ -9153,6 +9168,7 @@ function enemyAttack() {
         console.error("战斗状态未初始化");
         return;
     }
+    handleManaRecover();
 
     if (handleDazed()) return;
     if (handleStunned()) return;
@@ -9195,7 +9211,6 @@ function enemyAttack() {
         applySpecificAttackByEnemy(summonedEnemyName);
     }
     
-    handleManaRecover();
     handleBurnt();
 
     // 检查 damage 是否有效
@@ -9467,10 +9482,10 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
             const healthRecovered = Math.floor(enemyMaxHealth * 0.2);
             battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
             drugInventory['延寿露'].quantity -= 1;
-            logBattleEvent(`邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
+            logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
         } else {
-            logBattleEvent("邪佞想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
+            logBattleEvent("🥷【敌人偷窃】邪佞想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
             handleSlow(); // 直接应用迟缓效果
         }
         return true;
@@ -9479,10 +9494,10 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
             const manaRecovered = Math.floor(enemyMaxMana * 0.2);
             battleState.enemy.mana = Math.min(enemyMaxMana, battleState.enemy.mana + manaRecovered);
             drugInventory['天山雪莲'].quantity -= 1;
-            logBattleEvent(`邪佞窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
+            logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
         } else {
-            logBattleEvent("邪佞想窃取你的资源，但你识破了，没受到任何损失", '#66CDAA');
+            logBattleEvent("🥷【敌人偷窃】邪佞想窃取你的资源，但你识破了，没受到任何损失", '#66CDAA');
             handleSlow(); // 直接应用迟缓效果
         }
         return true;
@@ -9511,7 +9526,7 @@ function handleSlaughter() {
 
         if (cultivationDifference > 0 && battleState.enemy.health <= cultivationDifference * 150) {
             battleState.enemy.health = 0;
-            logBattleEvent(`道高一尺，魔高一丈，敌人低于你的修为，施法时损失${battleState.enemy.health}点生命值，被当即斩杀！`, '#FFDD55');
+            logBattleEvent(`⚔️【敌人攻击】道高一尺，魔高一丈，敌人低于你的修为，施法时损失${battleState.enemy.health}点生命值，被当即斩杀！`, '#FFDD55');
             updateUI();
             updatePlayerStatusDisplay();
             
@@ -9521,7 +9536,7 @@ function handleSlaughter() {
             }
         } else if (cultivationDifference < 0 && battleAttributes.health <= Math.abs(cultivationDifference)) {
             battleAttributes.health = 0;
-            logBattleEvent(`道高一尺，魔高一丈，你低于敌人的修为，施法时损失${battleAttributes.health}点生命值，被当即斩杀！`, '#FFDD55');
+            logBattleEvent(`⚔️【敌人攻击】道高一尺，魔高一丈，你低于敌人的修为，施法时损失${battleAttributes.health}点生命值，被当即斩杀！`, '#FFDD55');
             updateUI();
             updatePlayerStatusDisplay();
 
@@ -9588,7 +9603,7 @@ function handleTorn() {
         }
         const tornDamage = Math.floor(battleState.enemy.physicalAttack * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - tornDamage);
-        logBattleEvent(`身中邪佞充满毒性的撕裂伤害，正在持续失血，受到 ${tornDamage} 点伤害。`, 'red');
+        logBattleEvent(`⚔️【敌人攻击】身中邪佞充满毒性的撕裂伤害，正在持续失血，受到 ${tornDamage} 点伤害。`, 'red');
         updateUI();
         updatePlayerStatusDisplay();
         
@@ -9720,7 +9735,7 @@ function handleDrunken(damage) {
     if (battleState.player.drunken && damage > 0) {
         const drunkenDamage = Math.floor(damage * 0.05);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
-        logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
+        logBattleEvent(`⚔️【敌人反弹】醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
     }
 } //处理醉酒
 
@@ -9729,6 +9744,7 @@ function handleDrunken(damage) {
 
 // 【怪物辅助】怪物回血、增益等函数      
 function enemyHeal() {
+    handleManaRecover();
     if (enemyHealCount >= 10) {
         return;
     }
@@ -9757,19 +9773,18 @@ function enemyHeal() {
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     enemyHealCount += 1; // 增加治疗次数
 
-    logBattleEvent(`邪佞施放魔王之力，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
+    logBattleEvent(`🔮【敌人治疗】邪佞施放魔王之力，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66754252d9c307b7e9e67706.gif');
 
     // 检查中毒效果
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
-        logBattleEvent(`邪佞中毒，失去了 ${poisonDamage} 点生命值。`, '#C10066');
+        logBattleEvent(`☣【敌人中毒】邪佞中毒，失去了 ${poisonDamage} 点生命值。`, '#C10066');
     }
 
     playerTurn = true; // 轮到玩家回合
     handleBurnt();
-    handleManaRecover();
     showEffect('enemyEffect');
     updateUI();
 }
@@ -15950,7 +15965,7 @@ function updateGoldDisplay(goldAmount) {
 
     // 确保 goldAmount 不超过 999,999,999
     if (goldAmount > 999999999) {
-        goldAmount = 999999999;
+        goldAmount == 999999999;
         showInfoBox('你的金子数已越界！',null,null,'red');
     }
 
@@ -15970,6 +15985,21 @@ function toggleShop() {
     const info = document.getElementById('shop-info');
     drawer.classList.toggle('open');
     info.classList.toggle('open');
+
+    const discountElement = document.getElementById('discount-detail');
+    const eightyDiscountCard = jinnangItems.find(i => i.name === 'eightyDiscountCard');
+    const titleElement = document.getElementById('personal-honor');
+    const currentTitleIndex = titles.indexOf(titleElement.innerText);
+    const titleDiscount = 1 - (currentTitleIndex * 0.005);
+    let discount = 1;
+
+    // 应用eightyDiscountCard的折扣
+    if (eightyDiscountCard && eightyDiscountCard.quantity > 0) {
+        discount = 0.8;
+    }
+    
+    discount *= titleDiscount;
+    discountElement.innerText = `（称号乐享${(discount * 100).toFixed(0)}折）`;
 }
 
 function initShop() {
@@ -16141,7 +16171,7 @@ function getRandomRareItem(rareCounts) {
 
     do {
         itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
-    } while (rareCounts[itemType] >= rareCounts.maxItems / 4); // 确保每类物品不超过四分之一
+    } while (rareCounts[itemType] >= rareCounts.maxItems); // 确保每类物品不超过四分之一
 
     let item;
     switch (itemType) {
@@ -16234,7 +16264,7 @@ function buyItem() {
     price = Math.round(price * titleDiscount);
 
     if (goldAmount < price) {
-        return showInfoBox("金子不够，购买失败！");
+        return showInfoBox("金子不足，购买失败！");
     }
 
     const isPackage = itemName.includes('包裹');
@@ -16259,9 +16289,6 @@ function buyItem() {
         '分解符礼包': () => addItemToJinnang('fragmentsPackage', itemQuantity),
         '宠物资质仙丹': () => addItemToJinnang('qualityEnhancePill', itemQuantity),
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
-        '树桩魔魂封印': () => addItemToJinnang('battleWithTree', itemQuantity),
-        '战神魔魂封印': () => addItemToJinnang('battleWithAncientEvil', itemQuantity),
-        '永夜大帝封印': () => addItemToJinnang('battleWithExpEnemy', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -16287,7 +16314,7 @@ function buyItem() {
         return showInfoBox("未知包裹类型，购买失败！");
     }
 
-    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}，其中折扣为${convertPrice(originalPrice - price)}`);
+    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}，本次消费为你节省了${convertPrice(originalPrice - price)}金`);
     updateTopBarItems();
     updateJinnangItems();
     goldAmount -= price;

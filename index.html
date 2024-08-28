@@ -7250,23 +7250,8 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
 
 //总伤害计算函数
 function calculateDamage(baseDamage, isCritical, critDamage) {
-    const activeEffects = applyWuxingEffects();
-    let fireEffect = 0;
-
-    // 首先计算暴击伤害
     if (isCritical) {
         baseDamage = Math.floor(baseDamage * critDamage);
-    }
-
-    // 仅当 playerTurn 为 true 时，应用火符效果
-    if (playerTurn && activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
-        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
-        fireEffect = Math.floor(baseDamage * damageBoostPercentage);
-        baseDamage = Math.floor(baseDamage * (1 + damageBoostPercentage));
-
-        if (!isNaN(fireEffect) && fireEffect > 0) {
-            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
-        } 
     }
 
     return baseDamage;
@@ -7905,6 +7890,18 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     // 在所有效果应用后计算最终伤害
     let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+    // 如果存在火符的效果则还需要计算一层
+    const activeEffects = applyWuxingEffects();
+    let fireEffect = 0;
+    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        fireEffect = Math.floor(finalDamage * damageBoostPercentage);
+        finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
+
+        if (!isNaN(fireEffect) && fireEffect > 0) {
+            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
+        } 
+    }
 
     if (battleState.enemy.revived) {
         finalDamage = Math.floor(0.1 * finalDamage);
@@ -7965,6 +7962,19 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     // 在所有效果应用后计算最终伤害
     let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+
+    // 如果存在火符的效果则还需要计算一层
+    const activeEffects = applyWuxingEffects();
+    let fireEffect = 0;
+    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        fireEffect = Math.floor(finalDamage * damageBoostPercentage);
+        finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
+
+        if (!isNaN(fireEffect) && fireEffect > 0) {
+            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
+        } 
+    }
 
     if (battleState.enemy.revived) {
         finalDamage = Math.floor(0.1 * finalDamage);
@@ -8035,6 +8045,19 @@ function performIndependentMagicAttack() {
 
     // 在所有效果应用后计算最终伤害
     let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+
+    // 如果存在火符的效果则还需要计算一层
+    const activeEffects = applyWuxingEffects();
+    let fireEffect = 0;
+    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        fireEffect = Math.floor(finalDamage * damageBoostPercentage);
+        finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
+
+        if (!isNaN(fireEffect) && fireEffect > 0) {
+            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
+        } 
+    }
 
     if (battleState.enemy.revived) {
         finalDamage = Math.floor(0.1 * finalDamage);

@@ -634,6 +634,7 @@
             border-radius: 10px;
             text-align: center;
             color: white;
+            display: none;
         }
         .battle-pet-selector select {
             font-size: 16px;
@@ -1598,7 +1599,7 @@
             display: flex;
             gap: 10px;
             width: 100%;
-            min-height: 50%;
+            min-height: 0%;
             flex-direction: row;
         }
         
@@ -1641,7 +1642,7 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            max-height: 30%;
+            max-height: 45%;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.7);
@@ -1653,7 +1654,7 @@
             display: block;
             unicode-bidi: isolate;
             overflow-y: auto;
-            max-height: 70%;
+            max-height: 75%;
             line-height: 20px;
         }
 
@@ -2643,9 +2644,9 @@
                         <img id="your-pet-image" onclick="openWuxingDisplay()" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
                         <div class="enemy-damage-display" id="enemy-damage-display"><span id="enemy-damage-value"></span></div>
                     </div>
-                    <div style="margin-top: 5px">生命值: <span id="your-pet-health"></span><span id="your-pet-max-health"></span></div>
-                    <div style="margin-bottom: 10px">法力值: <span id="your-pet-mana"></span><span id="your-pet-max-mana"></span></div>
-                    <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
+                    <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
+                    <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
+                    <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
                         <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130));" id="exp-bar"></div>
                         <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
                     </div>
@@ -2672,8 +2673,8 @@
                         <img id="enemy-image" onclick="enemyInfo()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
                         <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
                     </div>
-                    <div style="margin-top: 5px">生命值: <span id="enemy-pet-health"></span><span id="enemy-max-health"></span></div>
-                    <div style="margin-bottom: 5px">法力值: <span id="enemy-pet-mana"></span><span id="enemy-max-mana"></span></div>
+                    <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
+                    <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
                     <div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
@@ -6176,6 +6177,7 @@ function handleVictory() {
     goldAmount += reward;
     updateGoldDisplay(goldAmount);
     updateTitle();
+    playerWon = true;
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
 

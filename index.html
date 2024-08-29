@@ -791,7 +791,6 @@
             margin: 0px;
             font-size: 12px;
             grid-template-columns: repeat(2, 1fr);
-            align-items: stretch;
             gap: 2px;
         }
         .shop-item {
@@ -4228,102 +4227,109 @@ function startPetWork() {
 function play(petName) {
     const petState = petStates.find(state => state.petName === petName);
     if (!petState) return;
-    
-    if (useItem('angelWings',1) && petState.earningSpeed <= 2) {
+
+    if (useItem('angelWings', 1) && petState.earningSpeed <= 2) {
         petState.earningSpeed += 0.1;
         showInfoBox(`插上你给的翅膀，${petName}搬砖的速度如虎添翼`);
         return;
     }
-    
+
     let mood = petState.mood;
-    const moodChange = Math.floor(Math.random() * 41) - 10;
+    const availableMoodItems = jinnangItems.filter(item => (item.name === 'fancyFlower' || item.name === 'damoTumbler') && item.quantity > 0);
 
-    mood = Math.min(100, Math.max(0, mood + moodChange));
-    petState.mood = mood;
-    document.getElementById(`mood-${petName}`).innerText = `${mood}%`;
+    if (availableMoodItems.length > 0) {
+        // 如果有可用的物品，则使用物品提升心情
+        const feedItem = availableMoodItems[Math.floor(Math.random() * availableMoodItems.length)];
+        useItem(feedItem.name, 1);
 
-    const earningsElement = document.getElementById(`earnings-${petState.petName}`);
-    const timeFactor = 1 + (100 - petState.mood) / 10;
-    const gainFactor = 1 - (100 - petState.stamina) / 100;
-    const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * gainFactor * petState.earningMultiplier));
-    earningsElement.innerText = `${updatedEarnings}金子`;
+        const moodChanges = {
+            'fancyFlower': { change: 15, message: `${petName}被眼前的景象惊喜到了，ta接过去，大口大口呼吸着花束的味道。` },
+            'damoTumbler': { change: 15, message: `${petName}假装生气地跟你说自己不是小孩子，但还是在你看不到的角落偷偷拨弄你送他的不倒翁。` }
+        };
 
-    const moodEvents = {
-        '-10': `你准备了${petName}最喜欢的美食,但它只是尝了一口就走开了,看起来没有胃口。`,
-        '-9': `你试图和${petName}玩耍，但它似乎不感兴趣，只想静静待着。`,
-        '-8': `${petName}今天有点烦躁，也许需要一些安静的时间。`,
-        '-7': `${petName}看起来有些无精打采，可能需要更多的关注。`,
-        '-6': `${petName}对你提供的玩具没什么兴趣，似乎有些心不在焉。`,
-        '-5': `你邀请${petName}一起看了一部新上映的电影,但它似乎对情节不太感兴趣,中途还打了几个哈欠。`,
-        '-4': `${petName}稍微有点不开心，但还是愿意和你待在一起。`,
-        '-3': `${petName}似乎有点疲惫，可能需要休息。`,
-        '-2': `${petName}对新的活动有些犹豫，不过还是参与了。`,
-        '-1': `${petName}有点沉默，不过一会儿应该会好些。`,
-        '0': `${petName}的心情没有变化，但至少没有变坏。`,
-        '1': `你和${petName}一起欣赏了一场音乐会,它听到熟悉的旋律时,脸上露出了微笑。`,
-        '2': `${petName}对你的新发型表示赞赏，心情稍微好了一些。`,
-        '3': `${petName}非常享受今天的阳光，心情变得更好。`,
-        '4': `${petName}和你一起在公园散步，似乎很开心。`,
-        '5': `${petName}对你为它准备的小惊喜感到很高兴。`,
-        '6': `你带${petName}去了它最喜欢的公园,陪它玩了一会儿飞盘,它看起来很开心。`,
-        '7': `${petName}尝试了一些新的食物，并且非常喜欢。`,
-        '8': `${petName}在你给它的新床上睡得很好，心情很好。`,
-        '9': `${petName}享受了一次特别的护理，显得非常满意。`,
-        '10': `${petName}在你的陪伴下感到很放松，心情明显好转。`,
-        '11': `你和${petName}一起做了一顿美味的晚餐,它吃得非常满足,心情明显好转。`,
-        '12': `${petName}和你一起看了一部搞笑电影，笑得合不拢嘴。`,
-        '13': `${petName}在和朋友玩耍后，显得非常高兴。`,
-        '14': `${petName}收到了它最喜欢的玩具，心情大好。`,
-        '15': `${petName}对新的学习项目表现出极大的兴趣，心情愉悦。`,
-        '16': `你和${petName}一起回顾了你们的旅行照片,它对那些美好的回忆感到非常怀念和高兴。`,
-        '17': `${petName}在与你的游戏中赢了一局，显得非常自信。`,
-        '18': `${petName}今天的训练非常顺利，心情非常好。`,
-        '19': `${petName}在阳台上悠闲地晒太阳，心情很放松。`,
-        '20': `${petName}得到了很多赞美，心情非常好。`,
-        '21': `你和${petName}一起参加了一个有趣的绘画活动,它非常投入,画出了一幅令人印象深刻的作品。`,
-        '22': `${petName}在和你一起的时光中感到无比快乐。`,
-        '23': `${petName}在公园里结识了新朋友，心情极佳。`,
-        '24': `${petName}得到了它最爱的零食，开心极了。`,
-        '25': `${petName}在运动会上表现出色，心情飞扬。`,
-        '26': `你和${petName}一起参加了一场激动人心的球赛,当你们支持的队伍获胜时,它兴奋得跳了起来,心情极佳!`,
-        '27': `${petName}被你抱了很久，心情特别好。`,
-        '28': `${petName}看到你为它准备的新家，非常激动。`,
-        '29': `${petName}和你一起度过了最美好的一天，心情无比愉悦。`,
-        '30': `${petName}享受了一次完美的旅行，心情极好！`
-    };
+        mood = Math.min(100, mood + moodChanges[feedItem.name].change);
+        petState.mood = mood;
+        document.getElementById(`mood-${petName}`).innerText = `${mood}%`;
+        
+        showInfoBox(moodChanges[feedItem.name].message);
+    } else {
+        // 如果没有可用的物品，执行随机提升心情的逻辑
+        const moodChange = Math.floor(Math.random() * 41) - 10;
+        mood = Math.min(100, Math.max(0, mood + moodChange));
+        petState.mood = mood;
+        document.getElementById(`mood-${petName}`).innerText = `${mood}%`;
 
-    let infoMessage = moodEvents[moodChange.toString()];
+        const earningsElement = document.getElementById(`earnings-${petState.petName}`);
+        const updatedEarnings = convertPrice(Math.floor(petState.goldAmount * (1 - (100 - petState.stamina) / 100) * petState.earningMultiplier));
+        earningsElement.innerText = `${updatedEarnings}金子`;
 
-    // 物品奖励逻辑
-    if (moodChange > 0) {
-        const rewardProbability = Math.random() * 100;
-        if (rewardProbability < moodChange) {
-            // 从 jinnangItems 中随机选择一个物品
-            const randomIndex = Math.floor(Math.random() * jinnangItems.length);
-            const selectedItem = jinnangItems[randomIndex];
+        const moodEvents = {
+            '-10': `你准备了${petName}最喜欢的美食,但它只是尝了一口就走开了,看起来没有胃口。`,
+            '-9': `你试图和${petName}玩耍，但它似乎不感兴趣，只想静静待着。`,
+            '-8': `${petName}今天有点烦躁，也许需要一些安静的时间。`,
+            '-7': `${petName}看起来有些无精打采，可能需要更多的关注。`,
+            '-6': `${petName}对你提供的玩具没什么兴趣，似乎有些心不在焉。`,
+            '-5': `你邀请${petName}一起看了一部新上映的电影,但它似乎对情节不太感兴趣,中途还打了几个哈欠。`,
+            '-4': `${petName}稍微有点不开心，但还是愿意和你待在一起。`,
+            '-3': `${petName}似乎有点疲惫，可能需要休息。`,
+            '-2': `${petName}对新的活动有些犹豫，不过还是参与了。`,
+            '-1': `${petName}有点沉默，不过一会儿应该会好些。`,
+            '0': `${petName}的心情没有变化，但至少没有变坏。`,
+            '1': `你和${petName}一起欣赏了一场音乐会,它听到熟悉的旋律时,脸上露出了微笑。`,
+            '2': `${petName}对你的新发型表示赞赏，心情稍微好了一些。`,
+            '3': `${petName}非常享受今天的阳光，心情变得更好。`,
+            '4': `${petName}和你一起在公园散步，似乎很开心。`,
+            '5': `${petName}对你为它准备的小惊喜感到很高兴。`,
+            '6': `你带${petName}去了它最喜欢的公园,陪它玩了一会儿飞盘,它看起来很开心。`,
+            '7': `${petName}尝试了一些新的食物，并且非常喜欢。`,
+            '8': `${petName}在你给它的新床上睡得很好，心情很好。`,
+            '9': `${petName}享受了一次特别的护理，显得非常满意。`,
+            '10': `${petName}在你的陪伴下感到很放松，心情明显好转。`,
+            '11': `你和${petName}一起做了一顿美味的晚餐,它吃得非常满足,心情明显好转。`,
+            '12': `${petName}和你一起看了一部搞笑电影，笑得合不拢嘴。`,
+            '13': `${petName}在和朋友玩耍后，显得非常高兴。`,
+            '14': `${petName}收到了它最喜欢的玩具，心情大好。`,
+            '15': `${petName}对新的学习项目表现出极大的兴趣，心情愉悦。`,
+            '16': `你和${petName}一起回顾了你们的旅行照片,它对那些美好的回忆感到非常怀念和高兴。`,
+            '17': `${petName}在与你的游戏中赢了一局，显得非常自信。`,
+            '18': `${petName}今天的训练非常顺利，心情非常好。`,
+            '19': `${petName}在阳台上悠闲地晒太阳，心情很放松。`,
+            '20': `${petName}得到了很多赞美，心情非常好。`,
+            '21': `你和${petName}一起参加了一个有趣的绘画活动,它非常投入,画出了一幅令人印象深刻的作品。`,
+            '22': `${petName}在和你一起的时光中感到无比快乐。`,
+            '23': `${petName}在公园里结识了新朋友，心情极佳。`,
+            '24': `${petName}得到了它最爱的零食，开心极了。`,
+            '25': `${petName}在运动会上表现出色，心情飞扬。`,
+            '26': `你和${petName}一起参加了一场激动人心的球赛,当你们支持的队伍获胜时,它兴奋得跳了起来,心情极佳!`,
+            '27': `${petName}被你抱了很久，心情特别好。`,
+            '28': `${petName}看到你为它准备的新家，非常激动。`,
+            '29': `${petName}和你一起度过了最美好的一天，心情无比愉悦。`,
+            '30': `${petName}享受了一次完美的旅行，心情极好！`
+        };
+
+        let infoMessage = moodEvents[moodChange.toString()] || `你和${petName}一起度过了一个平凡但快乐的时光。`;
+
+        if (moodChange > 0 && Math.random() * 100 < moodChange) {
+            const selectedItem = jinnangItems[Math.floor(Math.random() * jinnangItems.length)];
             selectedItem.quantity += 1;
-            
-            // 更新消息内容
             infoMessage += ` 在这次亲密的玩耍中，你们还惊喜地收获了一个${selectedItem.displayName}！`;
         }
+
+        showInfoBox(infoMessage);
+        if (mood <= 20) {
+            showInfoBox(`${petName}最近似乎有些闷闷不乐,也许你们可以尝试一些新的活动,如烹饪课或者瑜伽课,给生活增添一些乐趣。`);
+        } else if (mood >= 100) {
+            showInfoBox(`${petName}最近心情非常好,它非常享受和你在一起的每一刻,无论是一起探索新的餐厅,还是在家中观看你们都喜欢的经典电影。`);
+        }
+    
+        petState.stamina = Math.max(0, petState.stamina - Math.abs(moodChange));
+        document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
     }
-
-    showInfoBox(infoMessage);
-
-    if (mood <= 20) {
-        showInfoBox(`${petName}最近似乎有些闷闷不乐,也许你们可以尝试一些新的活动,如烹饪课或者瑜伽课,给生活增添一些乐趣。`);
-    } else if (mood >= 100) {
-        showInfoBox(`${petName}最近心情非常好,它非常享受和你在一起的每一刻,无论是一起探索新的餐厅,还是在家中观看你们都喜欢的经典电影。`);
-    }
-
-    petState.stamina = Math.max(0, petState.stamina - Math.abs(moodChange));
-    document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
-
+    
     if (!petState.progressInterval && mood > 0 && petState.stamina > 0) {
         startPetWork();
     }
 }
-
         
 function rest(petName) {
     const petState = petStates.find(state => state.petName === petName);
@@ -7823,6 +7829,7 @@ function performAttack(type) {
     }
 
     playerTurn = false;
+    handleManaRecover()
     setTimeout(enemyAttack, 500);
     updateUI();
     applyAscensionEffects();
@@ -9168,7 +9175,6 @@ function enemyAttack() {
         console.error("战斗状态未初始化");
         return;
     }
-    handleManaRecover();
 
     if (handleDazed()) return;
     if (handleStunned()) return;
@@ -9744,7 +9750,6 @@ function handleDrunken(damage) {
 
 // 【怪物辅助】怪物回血、增益等函数      
 function enemyHeal() {
-    handleManaRecover();
     if (enemyHealCount >= 10) {
         return;
     }
@@ -13617,7 +13622,7 @@ function updateTreasureDescription(type) {
     } else {
         switch (type) {
             case '奇馈宝箱':
-                description = "充满奇异道具的宝箱，单次开启花费1两金子，您可能获得各种用于培养宠物资质、重塑技能的道具，甚至还能获得开启属性专精的关键道具！";
+                description = "充满奇异道具的宝箱，单次开启花费1两金子，您可能获得各种用于培养宠物的道具，还可能获得宠物转职、宠物日常生活的关键道具！";
                 break;
             case '灵魂宝箱':
                 description = "神秘莫测的宝箱，单次开启花费2两金子，您可能获得宠物进化所需的各种灵魂！";
@@ -13648,6 +13653,8 @@ function collectTreasure() {
         '高级经验书': 'advancedExperienceBook',
         '水晶红富士': () => generateItemToJinnang('redApple', '水晶红富士', 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', price = 100, quantity = 1, description = '美味的苹果'),
         '浓情费罗列': () => generateItemToJinnang('chocolate', '浓情费罗列', 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', price = 100, quantity = 1, description = '一口下去，丝滑的巧克力和爆浆甜心在你的口腔中交织，回味无穷'),
+        '迷人的花束': () => generateItemToJinnang('fancyFlower', '迷人的花束', 'https://pic.imgdb.cn/item/66cfe544d9c307b7e978e72b.png', price = 100, quantity = 1, description = '迷人的花束，赠给爱人以芬芳'),
+        '达摩不倒翁': () => generateItemToJinnang('damoTumbler', '达摩不倒翁', 'https://pic.imgdb.cn/item/66cfee41d9c307b7e983f6f7.png', price = 100, quantity = 1, description = '达摩不倒翁，按压越用力，弹起来越容易撞到头'),
         '飞升之石': 'ascensionStone',
         '举世无双悟性丹': 'supremeWisdomPill',
         '无限宝石': 'infiniteGem',
@@ -13860,8 +13867,10 @@ function getRandomReward(type) {
         '奇馈宝箱': [
             { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 10 },
             { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 20 },
-            { name: '水晶红富士', url: 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', chance: 8 },
-            { name: '浓情费罗列', url: 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', chance: 5 },
+            { name: '水晶红富士', url: 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', chance: 4 },
+            { name: '浓情费罗列', url: 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', chance: 3 },
+            { name: '迷人的花束', url: 'https://pic.imgdb.cn/item/66cfe544d9c307b7e978e72b.png', chance: 3 },
+            { name: '达摩不倒翁', url: 'https://pic.imgdb.cn/item/66cfee41d9c307b7e983f6f7.png', chance: 3 },
             { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', chance: 10 },
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 10 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
@@ -13970,7 +13979,6 @@ let jinnangItems = [
     { name: 'hailMonsterPill', displayName: '聚灵丹', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png', price: 50, quantity: 5, description: '可在战斗界面开启自动战斗功能，每次开启消耗一个' },
     { name: 'hailMonsterAmulet', displayName: '唤妖符', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png', price: 50, quantity: 5, description: '可战斗界面跳过10轮，轮次越高，敌人越强大，谨慎使用' },
     { name: 'blessGift', displayName: '新手福袋', url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png', price: 1, quantity: 0, description: '新手时期的嘉奖，要合理分配哦' },
-    { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
     { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后获得30000经验值' },
@@ -14130,7 +14138,7 @@ function showItemDescription(price, description, itemDiv, item) {
 
 function updateJinnangCapacityDisplay() {
     let currentTotalQuantity = jinnangItems.reduce((sum, i) => sum + i.quantity, 0);
-    document.getElementById('jinnang-capacity').innerText = `背包容量：${currentTotalQuantity}/${jinnangCapacity}`;
+    document.getElementById('jinnang-capacity').innerText = `容量：${currentTotalQuantity}/${jinnangCapacity}`;
 }
         
 function closeDescriptionBox() {
@@ -14437,6 +14445,18 @@ const itemEffects = {
     chocolate: () => {
         additionalPlayerCultivation += 2;
         showInfoBox('你吃了一个费罗列',null,null,'brown'); 
+    },
+    fancyFlower: () => {
+        additionalPlayerCultivation += 5;
+        showInfoBox(`你向${currentPet.name}送出了一捧花束，${currentPet.name}看到你突然的举动，一时局促地害羞起来`,null,null,'lightred'); 
+    },
+    damoTumbler: () => {
+        addItemToJinnang('damoTumbler',1);
+        showInfoBox('快给你最中意的崽玩吧',null,null,'black');
+    },
+    tejiWisdomPill: () => {
+        upgradeWisdom();
+        showInfoBox(`你使用了一颗特级悟性丹，将悟性提升至${currentWisdom}`);
     }
 };
 

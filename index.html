@@ -6915,13 +6915,10 @@ function summonEnemyByType(enemyType) {
 
 function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
-
-    expBoss = setInterval(() => {
     battleAttributes.health -= healthLost;
     battlestate.enemy.health += healthLost;
     logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'lightred');
     updateUI();
-    },1000);
 }
         
 let canPoison = true; // 添加一个标志变量来控制 performPoison 的执行

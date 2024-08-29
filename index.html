@@ -6100,10 +6100,10 @@ function startBattle() {
         if (onBattleState) {
             if (battleAttributes.health <= 0) {
                 showNextBattlePrompt(false); // 玩家失败，传递失败状态
-                return; // 结束当前循环，防止后续逻辑执行
+                return;
             } else if (battleState.enemy.health <= 0) {
                 showNextBattlePrompt(true);
-                return; // 结束当前循环，防止后续逻辑执行
+                return;
             }
     
             let delayPenalty;
@@ -6116,15 +6116,27 @@ function startBattle() {
             if (extraShield > 0) {
                 if (delayPenalty <= extraShield) {
                     extraShield -= delayPenalty;
-                    delayPenalty = 0; // 由于护盾完全抵消，不再扣血
+                    delayPenalty = 0;
                 } else {
                     delayPenalty -= extraShield;
-                    extraShield = 0; // 护盾被消耗完，剩余伤害扣除生命值
+                    extraShield = 0;
                 }
             }
     
-            battleAttributes.health = Math.max(0, battleAttributes.health - delayPenalty); // 确保生命值不会变成负数
-    
+            battleAttributes.health = Math.max(0, battleAttributes.health - delayPenalty);
+
+            if (summonEnemy) {
+                const summonedEnemyName = battleState.enemy.specialty;
+
+                // 从 specificAttackByEnemy 中获取类型和行为
+                const enemyAttack = specificAttackByEnemy[summonedEnemyName];
+
+                if (enemyAttack && enemyAttack.type === 'interval') {
+                    // 延时性效果：在每次 battleInterval 触发时调用
+                    enemyAttack.action();
+                }  
+            }
+            
             updateUI();
             divineWeaponManager.applyNirvanaGemEffects();  
             handleSpiritHeal(); // 精灵治愈
@@ -6135,11 +6147,11 @@ function startBattle() {
         }
     }, 1000);
 
-    playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
+    playerTurn = battleAttributes.speed >= battleState.enemy.speed;
     updateUI();
 
     if (!playerTurn) {
-        setTimeout(enemyAttack, 500); // 延迟0.5秒后邪佞先攻
+        setTimeout(enemyAttack, 500);
     }
 }
 
@@ -6175,7 +6187,6 @@ function showNextBattlePrompt(playerWon) {
             return;
         } else {
             toggleFightingDrawer();
-            stopBattle();
             handleBattleWithSummonEnemy(false);
             summonEnemy = false;
             return;
@@ -6209,8 +6220,6 @@ function handleVictory() {
     gainExp();
     resetBattleState(playerWon);
     resetBuffState(playerWon);
-    clearEnemyEffect();
-    clearPlayerEffect();
     extraShield = 0;
 }
 
@@ -6252,8 +6261,6 @@ function promptPetSwitch(petSelect, selectedPetKey) {
                 // 如果没有可用的宠物，执行失败逻辑
                 applyDefeatPenalty();
                 logBattleEvent('没有可用的宠物进行更换，本次战斗已失败！');
-                defeatedPets = [];
-                usedPets = [];
                 return;
             }
 
@@ -6269,8 +6276,6 @@ function promptPetSwitch(petSelect, selectedPetKey) {
         () => {
             applyDefeatPenalty();
             logBattleEvent('本次战斗已失败！');
-            defeatedPets = [];
-            usedPets = [];
         }
     );
 }
@@ -6293,8 +6298,6 @@ function applyDefeatPenalty() {
     usedPets = [];
     resetBattleState(false);
     resetBuffState(false);
-    clearEnemyEffect();
-    clearPlayerEffect();
     extraShield = 0;
 }
 
@@ -6700,32 +6703,6 @@ function updatePetInfo() {
 let summonEnemy = false;
 
 // 全局敌人信息对象
-// 定义不同敌人的独特战斗能力
-const specificAttackByEnemy = {
-    'expEnemy': () => handleExpEnemySkill(),
-    'noWorkBoss': () => {
-        const manaLost = Math.round(battleAttributes.mana * 0.15);
-        battleAttributes.mana -= Math.round(battleAttributes.mana * 0.15);
-        battleState.enemy.magicDefense = Math.round(battleAttributes.magicAttack * playerCritDamage);
-        battleState.enemy.physicalDefense = Math.round(battleAttributes.physicalDefense * playerCritDamage);
-        logBattleEvent(`無班之魂の法术穿透，损失${manaLost}法力值`, 'lightblue');
-        handleNoWorkBossSkill();
-    },
-    'ancientEvil': () => handleAncientEvilSkill(),
-    'qiongQi': () => handleQiongQiSkill(),
-    // 可以为其他敌人继续添加独特的战斗能力...
-};
-
-// 应用敌人的特殊攻击函数
-function applySpecificAttackByEnemy(summonedEnemyName) {
-    if (specificAttackByEnemy[summonedEnemyName]) {
-        specificAttackByEnemy[summonedEnemyName](); // 调用对应的特殊攻击函数
-    } else {
-        console.log(`敌人 ${summonedEnemyName} 没有特殊攻击能力`);
-    }
-}
-
-// 全局敌人信息对象
 const enemies = {
     practiceEnemy: {
         name: '练习树桩',
@@ -6816,11 +6793,56 @@ const enemies = {
         enemyCritRate: 0,
         enemyCritDamage: 0,
         backgroundImage: 'https://pic.imgdb.cn/item/66d071cbd9c307b7e9344927.png',
-        reward: () => addItemToJinnang('earthlyEnergy',100), 
-        rewardMessage: '100个珍贵的天地灵气',
+        reward: () => generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具'),
+        rewardMessage: '1个珍贵的洪荒至尊仙葫',
         specialty: 'qiongQi' // 特殊能力标识符
     },
 };
+// 定义不同敌人的独特战斗能力
+const specificAttackByEnemy = {
+    'expEnemy': {
+        type: 'interval', // 延时性效果
+        action: () => handleExpEnemySkill() //永夜大帝吸血
+    },
+    'noWorkBoss': {
+        type: 'interval', // 延时性效果
+        action: () => {
+            const manaLost = Math.round(battleAttributes.mana * 0.15);
+            battleAttributes.mana -= manaLost;
+            battleState.enemy.magicDefense = Math.round(battleAttributes.magicAttack * playerCritDamage);
+            battleState.enemy.physicalDefense = Math.round(battleAttributes.physicalDefense * playerCritDamage);
+            logBattleEvent(`無班之魂の法术穿透，损失${manaLost}法力值`, 'lightblue');
+            handleNoWorkBossSkill(); //概率升级
+        }
+    },
+    'ancientEvil': {
+        type: 'interval', // 延时性效果
+        action: () => handleAncientEvilSkill() //吸收暴击
+    },
+    'qiongQi': {
+        type: 'instant', // 即时性效果
+        action: () => {
+            handleQiongQiSkill(); //吸血回防
+            handleTaunt();
+        }
+    },
+    // 可以为其他敌人继续添加独特的战斗能力...
+};
+
+function applySpecificAttackByEnemy(summonedEnemyName) {
+    const attack = specificAttackByEnemy[summonedEnemyName];
+    if (attack) {
+        if (attack.type === 'interval') {
+            // 延时性效果：在每次 battleInterval 触发时调用
+            attack.action();
+        } else if (attack.type === 'instant') {
+            // 即时性效果：立即执行一次
+            attack.action();
+        }
+    } else {
+        console.log(`敌人 ${summonedEnemyName} 没有特殊攻击能力`);
+    }
+}
 
 // 处理召唤敌人战斗结果的函数
 function handleBattleWithSummonEnemy(playerWon) {
@@ -6851,24 +6873,7 @@ function handleBattleWithSummonEnemy(playerWon) {
     clearEnemyEffect();
     clearPlayerEffect();
     clearAutoBattle();
-    clearSpecialty();
     updateUI();
-}
-
-function clearSpecialty() {
-    const intervals = ['qiongQi', 'expBoss'];
-    
-    intervals.forEach(interval => {
-        // 直接使用变量名来引用全局或局部的定时器变量
-        if (window[interval]) {  // 假设定时器变量是在全局范围内定义的
-            clearInterval(window[interval]);
-            window[interval] = null;  // 清除后将其置为 null，避免重复清除
-        }
-    });
-
-    if (!canPoison) {
-        canPoison = true;
-    }
 }
 
         
@@ -6882,20 +6887,28 @@ function summonEnemyByType(enemyType) {
                 () => {
                     summonEnemy = true;
                     toggleFightingDrawer();
-                    battleState.enemy = { ...enemy }; // 复制敌人属性到战斗状态
-                    battleState.enemyKey = enemyType; // 保存敌人类型，用于映射
+                    battleState.enemy = { ...enemy };
+                    battleState.enemyKey = enemyType;
                     
                     enemyMaxHealth = enemy.health;
                     enemyMaxMana = enemy.mana;
                     enemyPetCultivation = enemy.cultivation;
                     enemyCritRate = enemy.enemyCritRate;
                     enemyCritDamage = enemy.enemyCritDamage;
-                    
-                    changeEnemyImage(enemyType); // 调用更新敌人图像的函数
-                    setBackgroundImage(enemy.backgroundImage); // 更新背景图像
+
+                    changeEnemyImage(enemyType);
+                    setBackgroundImage(enemy.backgroundImage);
                     document.getElementById('enemy-level').innerText = enemy.level;
                     updateUI();
                     storeEnemyInitialState();
+
+                    // 如果敌人类型为 'instant'，立即执行一次特殊攻击
+                    const enemyAttack = specificAttackByEnemy[enemy.specialty];
+
+                    if (enemyAttack && enemyAttack.type === 'instant') {
+                        // 即时性效果：立即执行一次特殊攻击
+                        enemyAttack.action();
+                    }
                 },
                 () => {
                     summonEnemy = false;
@@ -6915,44 +6928,91 @@ function summonEnemyByType(enemyType) {
 
 function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
+    
     battleAttributes.health -= healthLost;
-    battlestate.enemy.health += healthLost;
-    logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'lightred');
+    battleState.enemy.health += healthLost;
+    logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'red');
     updateUI();
 }
         
-let canPoison = true; // 添加一个标志变量来控制 performPoison 的执行
 
 function handleQiongQiSkill() {
-    if (!canPoison) {
-        return;
-    }
-    
     // 计算损失的生命值和临时护盾
     const healthLost = Math.round(battleAttributes.health * (0.01 + Math.random() * 0.02));
     let temporaryShield = Math.round(healthLost * playerCritDamage * 5);
+    
+    if (summonEnemy) {
+        battleState.enemy.physicalDefense = 999999999999;
+        battleState.enemy.magicDefense = 999999999999;
+    } 
 
     // 创建并存储定时器
-    qiongQi = setInterval(() => {
-        battleAttributes.health -= healthLost;
-        enemyMaxHealth += healthLost;
-        battleState.enemy.physicalDefense += temporaryShield;
-        battleState.enemy.magicDefense += temporaryShield;
-    
-        enemyPetCultivation = playerCultivation + 1;
-        battleState.enemy.speed = battleAttributes.speed + 1;
-    
-        // 更新UI和记录战斗事件
-        updateUI();
-    }, 500);
-    
+    setTimeout(() => {
+        if (summonEnemy) {
+            battleState.enemy.physicalDefense = 3000;
+            battleState.enemy.magicDefense = 3000;
+        }
+        
+        qiongQi = setInterval(() => {
+                battleAttributes.health -= healthLost;
+                enemyMaxHealth += healthLost;
+                battleState.enemy.health += healthLost;
+                battleState.enemy.physicalDefense += temporaryShield;
+                battleState.enemy.magicDefense += temporaryShield;
+            
+                enemyPetCultivation = playerCultivation + 1;
+                battleState.enemy.speed = battleAttributes.speed + 1;
+            
+                // 更新UI和记录战斗事件
+                updateUI();
+            if (battleAttributes.health <= 0 || battleState.enemy.health <= 0) {
+                clearInterval(qiongQi);
+            }
+            
+        },800);
+    },3000);
     logBattleEvent('穷奇擅长吸收敌人的生命之力转换为自己的护甲', 'gold');
-    canPoison = false;
+}
+
+//此函数为洪荒至尊仙葫开启逻辑
+function openHongHuangTreasure() {
+    const treasure = [
+        { displayName: '资质仙丹礼包', name: 'qualityEnhancePillPKG', quantity: 2, chance: 10 },
+        { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 10 },
+        { displayName: '仙人醍醐', name: 'ultraSkillBoomer', quantity: 1, chance: 10 },
+        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 10 },
+        { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 10 },
+        { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
+        { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
+        { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
+        { displayName: '召唤灵符*5', name: 'summonCharmPaper', quantity: 5, chance: 5 },
+        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 10 },
+        { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 10 },
+        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 1 },
+        { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
+        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 }
+    ];
+
+    // 计算总的概率权重
+    const totalChance = treasure.reduce((sum, item) => sum + item.chance, 0);
+
+    // 生成一个随机数，范围在0到totalChance之间
+    let randomChance = Math.random() * totalChance;
+
+    // 遍历奖品列表，根据概率选择一个奖品
+    for (let item of treasure) {
+        if (randomChance < item.chance) {
+            addItemToJinnang(item.name, item.quantity); // 添加奖品到锦囊
+            showInfoBox(`你获得了: ${item.displayName}`,'red');
+            break;
+        }
+        randomChance -= item.chance; // 递减randomChance，直到找到匹配的奖品
+    }
 }
         
 function handleNoWorkBossSkill() {
-    // 生成一个随机数，如果小于0.6，则退出函数
-    if (Math.random() < 0.6) {
+    // 生成一个随机数，如果小于0.8，则退出函数
+    if (Math.random() < 0.8) {
         return;
     }
 
@@ -6985,8 +7045,8 @@ function handleAncientEvilSkill() {
     const originalEnemyCritDamage = enemyCritDamage;
 
     // 调整暴击伤害值
-    playerCritDamage = Math.round(originalPlayerCritDamage * 0.5);
-    enemyCritDamage += Math.round(originalPlayerCritDamage * 0.5);
+    playerCritDamage = originalPlayerCritDamage * 0.5;
+    enemyCritDamage += originalPlayerCritDamage * 0.5;
     battleState.player.damageLost = true;
 
     // 10秒后恢复原始暴击伤害值
@@ -8225,11 +8285,6 @@ function performPoison() {
         performAttack('physical');
         return;
     }
-
-    if (!canPoison) {
-        logBattleEvent('无法执行中毒', 'red');
-        return;
-    }
     
     if (!poisonSkillActivated) {
         if (useItem('poisonSkillBook')) {
@@ -9281,11 +9336,6 @@ function enemyAttack() {
         damage = performEnemyMagicalAttack(isCritical);
     } else {
         logBattleEvent("邪佞被沉默，无法进行法术攻击。", 'white');
-    }
-
-    if (summonEnemy) {
-        const summonedEnemyName = battleState.enemy.specialty;
-        applySpecificAttackByEnemy(summonedEnemyName);
     }
     
     handleBurnt();
@@ -14593,7 +14643,8 @@ const itemEffects = {
             bottleItem.quantity = 1;
         }
         updateJinnangItems();
-    }
+    },
+    hongHuang: () => openHongHuangTreasure(),
 };
 
 let lastUsedItemName = null;
@@ -17257,32 +17308,39 @@ function updateSkillsArea(selectedSkills) {
 }
 
 function deleteSkill(skill, skillDiv, skillsArea) {
-    const skillDescrip = skill.description;
-    
-    // 定义确认删除技能的回调函数
-    function onConfirm() {
-        skillsArea.removeChild(skillDiv);
+    // 在 currentPet.skills 中找到与 skillDiv 对应的技能对象
+    const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
 
-        // 获取当前技能列表并更新评分
-        const remainingSkills = Array.from(skillsArea.children).map(div => {
-            const [name, rarity] = div.innerText.split(' (');
-            return { name, rarity: rarity.replace(')', '') };
-        });
-        updateSkillScore(remainingSkills);
+    if (matchingSkill) {
+        const skillDescription = matchingSkill.description;
+
+        // 定义确认删除技能的回调函数
+        function onConfirm() {
+            skillsArea.removeChild(skillDiv);
+
+            // 获取当前技能列表并更新评分
+            const remainingSkills = Array.from(skillsArea.children).map(div => {
+                const [name, rarity] = div.innerText.split(' (');
+                return { name, rarity: rarity.replace(')', '') };
+            });
+            updateSkillScore(remainingSkills);
+        }
+
+        // 定义取消删除技能的回调函数
+        function onCancel() {
+            console.log('取消删除技能');
+        }
+
+        // 显示信息框，展示对应技能的描述并传入回调函数
+        showInfoBox(
+            `${skill.name} ${matchingSkill.level}级：${skillDescription}\n\n你是否要删除此技能?`,
+            onConfirm,
+            onCancel,
+            'black' // 可选的颜色参数
+        );
+    } else {
+        console.error('未找到匹配的技能');
     }
-
-    // 定义取消删除技能的回调函数
-    function onCancel() {
-        console.log('取消删除技能');
-    }
-
-    // 显示信息框，传入回调函数
-    showInfoBox(
-        `技能描述：${skillDescrip}。点击确认可删除此技能`,
-        onConfirm,
-        onCancel,
-        'red' // 可选的颜色参数
-    );
 }
 
 let cultivationTime;

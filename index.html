@@ -3969,7 +3969,7 @@ function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
 }
 function infoWuxingFu() {
-    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高/品质越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化根据品质消耗1/5/25/125/625碎片和经验值，品质越高，强化所得属性越好\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多/装备的五行符品质越好，其五行符强度越高，战斗效果越强大");
+    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高/品质越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化根据品质消耗1/5/25/125/625碎片和经验值，品质越高，强化所得属性越好\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多/装备的五行符品质越好，等级越高，其五行符强度越高，战斗效果越强大");
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -7846,7 +7846,7 @@ function checkWaterAmuletChance() {
     const activeEffects = applyWuxingEffects();
 
     if (activeEffects.waterAmulet && activeEffects.waterAmulet > 0) {
-        const extraAttackProbability = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.waterAmulet];
+        const extraAttackProbability = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.waterAmulet];
         if (Math.random() < extraAttackProbability) {
             return true; 
         }
@@ -7940,7 +7940,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const activeEffects = applyWuxingEffects();
     let fireEffect = 0;
     if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
-        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.fireAmulet];
         fireEffect = Math.floor(finalDamage * damageBoostPercentage);
         finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
 
@@ -8013,7 +8013,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     const activeEffects = applyWuxingEffects();
     let fireEffect = 0;
     if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
-        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.fireAmulet];
         fireEffect = Math.floor(finalDamage * damageBoostPercentage);
         finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
 
@@ -8096,7 +8096,7 @@ function performIndependentMagicAttack() {
     const activeEffects = applyWuxingEffects();
     let fireEffect = 0;
     if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
-        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.fireAmulet];
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.fireAmulet];
         fireEffect = Math.floor(finalDamage * damageBoostPercentage);
         finalDamage = Math.floor(finalDamage * (1 + damageBoostPercentage));
 
@@ -8849,7 +8849,7 @@ function handleReflectAndHeal(damage) {
     // 处理金符效果的反弹逻辑
     const activeEffects = applyWuxingEffects();
     if (activeEffects.goldAmulet && activeEffects.goldAmulet > 0) {
-        const goldReflectPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.goldAmulet];
+        const goldReflectPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.goldAmulet];
         if (!isNaN(goldReflectPercentage) && goldReflectPercentage > 0) {
             let reflectDamage = Math.floor(damage * goldReflectPercentage);
             if (isNaN(reflectDamage)) {
@@ -9018,7 +9018,7 @@ function handleDamageReduction(damage) {
 
     // 处理土符效果的伤害减免
     if (activeEffects.earthAmulet && activeEffects.earthAmulet > 0) {
-        const earthReductionPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.earthAmulet];
+        const earthReductionPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.earthAmulet];
         const earthReduction = Math.floor(finalDamage * earthReductionPercentage);
         finalDamage -= earthReduction;
         totalDamageReduction += earthReduction;
@@ -9707,7 +9707,7 @@ function handleHealingBan(skillMultiplier) {
 
     // 应用木符效果增加治疗量
     if (activeEffects.woodAmulet && activeEffects.woodAmulet > 0) {
-        const healBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20][activeEffects.woodAmulet];
+        const healBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.woodAmulet];
         const woodEffect = Math.floor(baseHealing * healBoostPercentage);
         baseHealing = Math.floor(baseHealing * (1 + healBoostPercentage));
         logBattleEvent(`🟢奥义·木之春意！治疗量增加了 ${woodEffect}。`, 'aqua');
@@ -12795,7 +12795,23 @@ function applyWuxingEffects() {
         if (state.equipped && state.currentPetName === currentPet.name) {
             const amuletType = state.tag.split('(')[0];
             if (effects.hasOwnProperty(amuletType)) {
-                effects[amuletType] += [5, 4, 3, 2, 1][state.rank - 1];  // 根据 rank 调整效果指数
+                // 根据 rank 获取基础效果值
+                let baseEffectValue = [5, 4, 3, 2, 1][state.rank - 1];
+
+                // 根据等级计算额外的强度价值
+                let levelBonus = 0;
+                if (state.level > 20 && state.level <= 40) {
+                    levelBonus = 1;
+                } else if (state.level > 40 && state.level <= 60) {
+                    levelBonus = 2;
+                } else if (state.level > 60 && state.level <= 80) {
+                    levelBonus = 3;
+                } else if (state.level > 80 && state.level <= 100) {
+                    levelBonus = 4;
+                }
+
+                // 总效果指数 = 基础效果值 + 等级增益
+                effects[amuletType] += baseEffectValue + levelBonus;
             }
         }
     });
@@ -12804,21 +12820,30 @@ function applyWuxingEffects() {
     const activeEffects = {};
     Object.keys(effects).forEach(type => {
         const effectValue = effects[type];
-        if (effectValue >= 25) {
-            activeEffects[type] = 5;  // 1级效果
+        if (effectValue >= 45) {
+            activeEffects[type] = 9;  // 9档效果
+        } else if (effectValue >= 40) {
+            activeEffects[type] = 8;  // 8档效果
+        } else if (effectValue >= 35) {
+            activeEffects[type] = 7;  // 7档效果
+        } else if (effectValue >= 30) {
+            activeEffects[type] = 6;  // 6档效果
+        } else if (effectValue >= 25) {
+            activeEffects[type] = 5;  // 5档效果
         } else if (effectValue >= 20) {
-            activeEffects[type] = 4;  // 2级效果
+            activeEffects[type] = 4;  // 4档效果
         } else if (effectValue >= 15) {
-            activeEffects[type] = 3;  // 3级效果
+            activeEffects[type] = 3;  // 3档效果
         } else if (effectValue >= 10) {
-            activeEffects[type] = 2;  // 4级效果
+            activeEffects[type] = 2;  // 2档效果
         } else if (effectValue >= 5) {
-            activeEffects[type] = 1;  // 5级效果
+            activeEffects[type] = 1;  // 1档效果
         }
     });
 
     return activeEffects;  // 返回包含所有生效效果的对象
 }
+
 
 
 function getAmuletImageURL(name) {
@@ -14418,12 +14443,12 @@ const itemEffects = {
     fourthFragments: () => addWuxingFragments(5),
     fifthFragments: () => addWuxingFragments(1),
     goldAmuletPackage: () => {
-        addAmuletToManager('goldAmulet', 'red', 1);
-        addAmuletToManager('goldAmulet', 'purple', 1);
-        addAmuletToManager('goldAmulet', 'orange', 1);
-        addAmuletToManager('goldAmulet', 'blue', 1);
-        addAmuletToManager('goldAmulet', 'green', 1);
-        showInfoBox('你获得金符（红）金符（紫）金符（橙）金符（蓝）金符（绿），请在五行面板中查看！')
+        const colors = ['red', 'purple', 'orange', 'blue', 'green'];
+        
+        // 遍历颜色数组，将金符添加到管理器中
+        colors.forEach(color => addAmuletToManager('goldAmulet', color, 1));
+        
+        showInfoBox('你获得金符（红）金符（紫）金符（橙）金符（蓝）金符（绿），请在五行面板中查看！');
     },
     spiritWine: () => useSpiritWine(),
     qualityEnhancePill: () => {
@@ -14519,7 +14544,7 @@ function useAssignedItem() {
             showInfoBox("道具已耗尽。");
         }
     } else {
-        showInfoBox("该道具无法直接在背包内使用。");
+        showInfoBox("该道具无法在背包内使用。");
     }
 }
 
@@ -14530,13 +14555,14 @@ function useAllItems() {
     }
 
     showInfoBox(
-        '某些道具（如魔魂封印卡）在批量使用后仍只会生效一次，请知悉后再继续',
+        '道具数量过多，批量使用可能会导致过载崩溃，请提前存档',
         () => { // 这是 onConfirm 回调
             // 批量使用道具的逻辑
             while (useItem(lastUsedItemName)) {
                 itemEffects[lastUsedItemName](); // 执行对应道具的效果
             }
             updateJinnangItems(); // 更新锦囊内容显示
+            lastUsedItemName = null;
         },
         () => { // 这是 onCancel 回调
             return;

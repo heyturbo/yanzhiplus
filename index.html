@@ -4740,7 +4740,8 @@ const enemyImages = [
     { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
     { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
     { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' },
-    { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' }
+    { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' },
+    { status: 'qiongQi', name: '穷奇', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif' }
 ];
 
 // 更改敌人图像的函数
@@ -6134,10 +6135,6 @@ function startBattle() {
         }
     }, 1000);
 
-    if (summonEnemy) {
-        return;
-    }
-
     playerTurn = battleAttributes.speed >= battleState.enemy.speed; // 根据速度值决定优先攻击顺序
     updateUI();
 
@@ -6705,13 +6702,7 @@ let summonEnemy = false;
 // 全局敌人信息对象
 // 定义不同敌人的独特战斗能力
 const specificAttackByEnemy = {
-    'expEnemy': () => {
-        const healthLost = Math.round(battleAttributes.health * 0.1);
-        battleAttributes.health -= healthLost;
-        battlestate.enemy.health += healthLost;
-        logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'lightred');
-        updateUI();
-    },
+    'expEnemy': () => handleExpEnemySkill(),
     'noWorkBoss': () => {
         const manaLost = Math.round(battleAttributes.mana * 0.15);
         battleAttributes.mana -= Math.round(battleAttributes.mana * 0.15);
@@ -6721,6 +6712,7 @@ const specificAttackByEnemy = {
         handleNoWorkBossSkill();
     },
     'ancientEvil': () => handleAncientEvilSkill(),
+    'qiongQi': () => handleQiongQiSkill(),
     // 可以为其他敌人继续添加独特的战斗能力...
 };
 
@@ -6809,7 +6801,25 @@ const enemies = {
         reward: () => addItemToJinnang('angelWings',1), 
         rewardMessage: '天使之翼',
         specialty: 'noWorkBoss' // 特殊能力标识符
-    }
+    },
+    qiongQi: {
+        name: '穷奇',
+        level: 160,
+        health: 38000,
+        mana: 12000,
+        physicalAttack: 3450,
+        physicalDefense: 63600,
+        magicAttack: 1128,
+        magicDefense: 31250,
+        speed: 320000,
+        cultivation: 150000,
+        enemyCritRate: 0,
+        enemyCritDamage: 0,
+        backgroundImage: 'https://pic.imgdb.cn/item/66d071cbd9c307b7e9344927.png',
+        reward: () => addItemToJinnang('earthlyEnergy',100), 
+        rewardMessage: '100个珍贵的天地灵气',
+        specialty: 'qiongQi' // 特殊能力标识符
+    },
 };
 
 // 处理召唤敌人战斗结果的函数
@@ -6840,9 +6850,28 @@ function handleBattleWithSummonEnemy(playerWon) {
     resetBuffState(playerWon);
     clearEnemyEffect();
     clearPlayerEffect();
+    clearAutoBattle();
+    clearSpecialty();
     updateUI();
 }
 
+function clearSpecialty() {
+    const intervals = ['qiongQi', 'expBoss'];
+    
+    intervals.forEach(interval => {
+        // 直接使用变量名来引用全局或局部的定时器变量
+        if (window[interval]) {  // 假设定时器变量是在全局范围内定义的
+            clearInterval(window[interval]);
+            window[interval] = null;  // 清除后将其置为 null，避免重复清除
+        }
+    });
+
+    if (!canPoison) {
+        canPoison = true;
+    }
+}
+
+        
 // 重构的召唤敌人函数
 function summonEnemyByType(enemyType) {
     if (!summonEnemy && attributesFetched) {
@@ -6884,6 +6913,46 @@ function summonEnemyByType(enemyType) {
     }
 }
 
+function handleExpEnemySkill() {
+    const healthLost = Math.round(battleAttributes.health * 0.1);
+
+    expBoss = setInterval(() => {
+    battleAttributes.health -= healthLost;
+    battlestate.enemy.health += healthLost;
+    logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'lightred');
+    updateUI();
+    },1000);
+}
+        
+let canPoison = true; // 添加一个标志变量来控制 performPoison 的执行
+
+function handleQiongQiSkill() {
+    if (!canPoison) {
+        return;
+    }
+    
+    // 计算损失的生命值和临时护盾
+    const healthLost = Math.round(battleAttributes.health * (0.01 + Math.random() * 0.02));
+    let temporaryShield = Math.round(healthLost * playerCritDamage * 5);
+
+    // 创建并存储定时器
+    qiongQi = setInterval(() => {
+        battleAttributes.health -= healthLost;
+        enemyMaxHealth += healthLost;
+        battleState.enemy.physicalDefense += temporaryShield;
+        battleState.enemy.magicDefense += temporaryShield;
+    
+        enemyPetCultivation = playerCultivation + 1;
+        battleState.enemy.speed = battleAttributes.speed + 1;
+    
+        // 更新UI和记录战斗事件
+        updateUI();
+    }, 500);
+    
+    logBattleEvent('穷奇擅长吸收敌人的生命之力转换为自己的护甲', 'gold');
+    canPoison = false;
+}
+        
 function handleNoWorkBossSkill() {
     // 生成一个随机数，如果小于0.6，则退出函数
     if (Math.random() < 0.6) {
@@ -7858,7 +7927,7 @@ function handleWaterAmuletEffect(attackType, damage) {
     logBattleEvent("🔵奥义·水之再动！！", 'aqua');
     performAttack(attackType); // 再次执行相同类型的攻击
 }
-
+        
 function updateDamageValue(damage, enemy = false) {
     // 获取玩家和敌人的 DOM 元素
     const playerDamageValueElement = document.getElementById('player-damage-value');
@@ -8157,6 +8226,11 @@ function performPoison() {
     
     if (battleState.player.taunt) {
         performAttack('physical');
+        return;
+    }
+
+    if (!canPoison) {
+        logBattleEvent('无法执行中毒', 'red');
         return;
     }
     
@@ -12013,7 +12087,6 @@ function clearEnemyEffect() {
             }
         }
     });
-
     updatePlayerStatusDisplay();
 } //清理玩家目前的减益效果
 
@@ -14089,6 +14162,7 @@ let jinnangItems = [
     { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
+    { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
     { name: 'noWorkBoss', displayName: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
@@ -14466,6 +14540,7 @@ const itemEffects = {
     battleWithAncientEvil: () => summonEnemyByType('ancientEvil'),
     battleWithExpEnemy: () => summonEnemyByType('expEnemy'),
     noWorkBoss: () => summonEnemyByType('noWorkBoss'),
+    qiongQi: () => summonEnemyByType('qiongQi'),
     universalCrystal: () => {
         levelUpSkill();
         addItemToJinnang('universalCrystal',1);
@@ -14577,11 +14652,12 @@ function generateSealCard() {
         ['battleWithTree', '树桩魔魂封印'],
         ['battleWithExpEnemy', '战神魔魂封印'],
         ['battleWithAncientEvil', '太古魔魂封印'],
-        ['noWorkBoss', '無班之魂']
+        ['noWorkBoss', '無班之魂'],
+        ['qiongQi', '穷奇']
     ]);
 
     // 封印卡片的英文名称数组
-    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss'];
+    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi'];
 
     // 随机选择一个封印卡片的英文名称
     const randomIndex = Math.floor(Math.random() * sealCards.length);

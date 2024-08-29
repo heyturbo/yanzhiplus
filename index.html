@@ -4228,7 +4228,7 @@ function play(petName) {
     const petState = petStates.find(state => state.petName === petName);
     if (!petState) return;
 
-    if (useItem('angelWings', 1) && petState.earningSpeed <= 2) {
+    if (useItem('angelWings', 1) && petState.earningSpeed < 2) {
         petState.earningSpeed += 0.1;
         showInfoBox(`插上你给的翅膀，${petName}搬砖的速度如虎添翼`);
         return;

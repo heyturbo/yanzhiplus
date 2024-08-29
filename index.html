@@ -998,16 +998,20 @@
              /* 使两个子容器分布在容器的两边 */
             gap: 2px; /* 调整两列之间的间距 */
             padding: 2px;
+            width: 100%;
+            flex-direction: row;
             justify-content: space-between;
         }
         
         .quality-details {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            padding: 0px 0px 10px 0px;
-            gap: 5px 5px; /* 调整每个条目之间的间距 */
+            padding: 5px;
+             /* 调整每个条目之间的间距 */
             font-size: 14px;
-            align-items: flex-start;
+            width: 95%;
+            align-items: center;
+            justify-items: start;
         }
         .image-frame img {
             max-width: 100%;
@@ -1147,7 +1151,7 @@
         }
         
         .transform-pet-modal {
-            width: 90%;
+            width: 95%;
             position: relative;
             border-radius: 2px;
             background-color: #DFBF6E;
@@ -1241,7 +1245,6 @@
             justify-content: space-between;
             flex-direction: row;
             width: 100%;
-            margin: 10px;
         }
         
         .transform-pet-button {
@@ -1254,6 +1257,7 @@
             padding: 4px 6px;
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
+            flex: 0.2;
         }
 
         
@@ -1848,7 +1852,7 @@
             width: 80%;
             border: 2px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            z-index: 9999;
             border-radius: 10px;
         }
         
@@ -2371,12 +2375,12 @@
             <div class="drawer-container">
                 <div class="quality-container">
                     <div class="quality-details">
-                        <div>名称: <span id="quality-name">小金牛</span></div>
-                        <div>品质: <span id="quality-tier">普通</span></div>
-                        <div>成长率: <span id="quality-growth-rate">100%</span></div>
-                        <div>变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
-                        <div>进化等级: <span id="evolution-level">0</span></div>
-                        <div>当前悟性: <span id="current-wisdom">0</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">名称: <span id="quality-name">小金牛</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">品质: <span id="quality-tier">普通</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">成长率: <span id="quality-growth-rate">100%</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">进化等级: <span id="evolution-level">0</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">当前悟性: <span id="current-wisdom">0</span></div>
                     </div>
                 </div>
                 <div class="quality-bar-container">
@@ -8128,13 +8132,6 @@ function performIndependentMagicAttack() {
         logBattleEvent(`醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
     }
 
-    if (isCritical) {
-        const logDiv = document.getElementById('log');
-        logDiv.classList.add('critical-hit');
-        setTimeout(() => {
-            logDiv.classList.remove('critical-hit');
-        }, 300);
-    }
 } //独立法伤
 
 function performPoison() {
@@ -8226,6 +8223,7 @@ function performPoison() {
     }
     
     playerTurn = false;
+    handleManaRecover();
     setTimeout(enemyAttack, 500);
     applyAscensionEffects();
     updateUI();
@@ -8759,6 +8757,7 @@ function performHeal() {
     handleDivineProtection(selectedSkills, skillLevel);
 
     playerTurn = false; // 轮到邪佞回合
+    handleManaRecover();
     enemyAttack();
     applyAscensionEffects();
     getShieldStatus();
@@ -8948,6 +8947,7 @@ function performDefense() {
 
     applyDefenseBonus(selectedSkillName);
     playerTurn = false;
+    handleManaRecover();
     setTimeout(enemyAttack, 350);
     getShieldStatus();
 
@@ -10419,7 +10419,7 @@ function mergeDrug() {
 
         
 
-// 【玩家战斗组件】精灵系统函数        
+// 【玩家战斗组件】精灵系统函数      
 document.getElementById('battle-spirit-button').addEventListener('click', () => {
     if (battleState.player.taunt) {
         performAttack('physical');
@@ -10466,6 +10466,29 @@ function getBaseSpiritAttributes() {
     }
 } // 获取精灵提供的基础属性增益
 
+function displayInBottle() {
+    const spiritInfo = getBaseSpiritAttributes();
+    const nameMap = new Map([
+        ['health', '生命值'],
+        ['magicAttack', '法术攻击'],
+        ['magicDefense', '法术防御'],
+        ['mana', '法力值'],
+        ['physicalAttack', '物理攻击'],
+        ['physicalDefense', '物理防御'],
+        ['speed', '速度']
+    ]);
+
+    let spiritInfoMessage = '';
+
+    for (const [key, value] of Object.entries(spiritInfo)) {
+        const displayName = nameMap.get(key) || key; // 如果没有匹配到替换的名称，则使用原始英文名
+        spiritInfoMessage += `${displayName}: ${value}\n`;
+    }
+
+    showInfoBox(`\n1.当前你携带的精灵等级为${spiritLevel}，成长系数为${spiritMultiplier}。\n2.精灵的各项数值为：\n ${spiritInfoMessage}`);
+}
+
+        
 function updateSpiritDisplay() {
     const spiritAttributes = getCurrentSpiritAttributes();
     document.getElementById('spirit-level').innerText = spiritLevel;
@@ -12092,6 +12115,7 @@ function openWuxingDisplay() {
 
 function closeWuxingDisplay() {
     document.getElementById('wuxing-display').style.display = 'none';
+    updateWuxingBonusState();
 }
 
 // 初始化五行符管理器
@@ -12307,7 +12331,7 @@ function displayAmuletDetails(amulet) {
     const detailsContainer = document.getElementById('amulet-details');
     detailsContainer.innerHTML = `
         <div id="text-container" style="height: 120px;margin-bottom: 30px;line-height: 28px;">
-            <h3 style="margin:0;color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})</h3>
+            <h3 style="margin:0;color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})<span id="equipped-pet-name"></span></h3>
             <p style="margin:0;">等级: ${amulet.level}</p>
             <p style="margin:0;">主条目: ${Object.entries(amulet.drugBonus)
                 .filter(([key, value]) => value > 0)
@@ -12318,6 +12342,7 @@ function displayAmuletDetails(amulet) {
                 : `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
         </div>
     `;
+    
     
     const wuxingButtonContainer = document.createElement('div');
     wuxingButtonContainer.className = 'wuxing-action';
@@ -12352,8 +12377,10 @@ function displayAmuletDetails(amulet) {
 
     const petAmulet = wuxingStates.find(a => a.tag === amulet.tag);
     if (petAmulet && petAmulet.equipped) {
+        document.getElementById('equipped-pet-name').innerText = `  由${petAmulet.currentPetName}装备`;
         unequipButton.disabled = false;
     } else {
+        document.getElementById('equipped-pet-name').innerText = '';
         unequipButton.disabled = true;
     }
 
@@ -12594,6 +12621,7 @@ function equipAmulet(tag) {
 
     amulet.equipped = true;
     amulet.currentPetName = currentPet.name;
+    document.getElementById('equipped-pet-name').innerText = ` 由${amulet.currentPetName}装备`;
 
     applyAmuletBonus(amulet, true);
     updateWuxingDisplay();
@@ -12612,11 +12640,11 @@ function unequipAmulet(tag) {
         return;
     }
 
-    if (amulet.currentPetName !== currentPet.name) {
-        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要至装备宠物处卸下。`, null, null, 'red');
-        return;
-    }
-
+    //if (amulet.currentPetName !== currentPet.name) {
+        //showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要至装备宠物处卸下。`, null, null, 'red');
+        //return;
+    //}
+    document.getElementById('equipped-pet-name').innerText = '';
     applyAmuletBonus(amulet, false);
     amulet.equipped = false;
     amulet.currentPetName = null;
@@ -12650,8 +12678,8 @@ function enhanceAmulet(tag) {
         return;
     }
 
-    if (amulet.equipped) {
-        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要卸下后强化。`, null, null, 'red');
+    if (amulet.equipped && amulet.currentPetName !== currentPet.name) {
+        showInfoBox(`该五行符已经被 ${amulet.currentPetName} 装备，需要至该宠物界面强化。`, null, null, 'red');
         return;
     }
 
@@ -13820,8 +13848,10 @@ function openTreasure(times = 1) {
     for (const reward of totalRewards) {
         rewardHTML += `<div><img src="${reward.url}" alt="${reward.name}"><div>${reward.name}</div></div>`;
     }
-    document.getElementById('treasure-reward').innerHTML = rewardHTML;
-    showEffect('generalEffect', 'https://pic.imgdb.cn/item/66a34156d9c307b7e94568b1.gif');
+    setTimeout( () => {
+        document.getElementById('treasure-reward').innerHTML = rewardHTML;
+        showEffect('generalEffect', 'https://pic.imgdb.cn/item/66a34156d9c307b7e94568b1.gif');
+    },100);
 }
 
 function openTenthTreasure() {
@@ -14040,7 +14070,8 @@ let jinnangItems = [
     { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 1, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
-    { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' }
+    { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' },
+    { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
 // 切换锦囊抽屉的显示状态
@@ -14457,6 +14488,14 @@ const itemEffects = {
     tejiWisdomPill: () => {
         upgradeWisdom();
         showInfoBox(`你使用了一颗特级悟性丹，将悟性提升至${currentWisdom}`);
+    },
+    spiritBottle: () => {
+        displayInBottle();
+        const bottleItem = jinnangItems.find(item => item.name === 'spiritBottle');
+        if (bottleItem && bottleItem.quantity !== 1) {
+            bottleItem.quantity = 1;
+        }
+        updateJinnangItems();
     }
 };
 
@@ -14586,15 +14625,17 @@ function getRandomDrug(minNum, maxNum) {
 }
             
 function useLiguolin() {
-    if (currentPet.name === "Guolin·Li") {
-        showInfoBox("你是否愿意接纳他的爱？", 
-            () => {
-                showInfoBox("To my best love in my life");
-                fulfillPetSkill();
-            }
-        ); // 关闭 showInfoBox 的括号
+    const petSelect = document.getElementById('pet-select');
+    const petKey = Object.keys(pets).find(key => pets[key].name === 'Guolin·Li');
+    
+    if (Array.from(petSelect.options).some(option => option.value === petKey)) {
+        showInfoBox(`您已召唤Mr.right！`);
     } else {
-        showInfoBox('这不是你的Mr.right',null,null,'red');
+        showInfoBox(`您成功俘获了Guolin·Li！`);
+        const option = document.createElement('option');
+        option.value = petKey;
+        option.text = 'Guolin·Li';
+        petSelect.appendChild(option);
     }
 }
             
@@ -16982,7 +17023,6 @@ function upgradeWisdom() {
 
 function trainSkills() {
     const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
-    const liguolin = jinnangItems.find(item => item.name === 'liguolin');
     
     if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
         showInfoBox("你拥有极为珍贵的仙人醍醐，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
@@ -17528,7 +17568,7 @@ function upgradeWisdomTo() {
     const target = prompt(`你期待将宠物悟性提升至__ (请输入1-${awakened ? 25 : 20}之间的整数。当宠物觉醒后,你可以使用该功能尝试将宠物悟性一键提升至最高25。):`);
     if (target === null) return;
 
-    if (target === "liguolin" && currentPet.name === 'Guolin·Li') {
+    if (target === "liguolin" && currentPet.name !== 'Guolin·Li') {
         addItemToJinnang('liguolin',1);
         showInfoBox("你终将会得到梦寐以求的东西（请检查你的背包）");
         return;

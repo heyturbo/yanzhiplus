@@ -8863,6 +8863,8 @@ function handleReflectAndHeal(damage) {
         }
     }
 
+    updateDamageValue(reflectDamage);
+    
     // 处理仙气护体的治疗逻辑
     if (battleState.player.divineProtection) {
         let healAmount = Math.floor(3 * battleAttributes.magicAttack * (Math.random() * (0.12 - 0.08) + 0.2));
@@ -9743,6 +9745,7 @@ function handleDrunken(damage) {
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
         logBattleEvent(`⚔️【敌人反弹】醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
     }
+    updateDamageValue(drunkenDamage, true);
 } //处理醉酒
 
 

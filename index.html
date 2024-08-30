@@ -6878,48 +6878,54 @@ function handleBattleWithSummonEnemy(playerWon) {
 
         
 // 重构的召唤敌人函数
-function summonEnemyByType(enemyType) {
+function summonEnemyByType(enemyType, manuallySummon = true) {
     if (!summonEnemy && attributesFetched) {
         const enemy = enemies[enemyType];
+        
         if (enemy) {
-            showInfoBox(
-                `你将会召唤${enemy.name}，战胜后你会获得奖励`,
-                () => {
-                    summonEnemy = true;
-                    toggleFightingDrawer();
-                    battleState.enemy = { ...enemy };
-                    battleState.enemyKey = enemyType;
-                    
-                    enemyMaxHealth = enemy.health;
-                    enemyMaxMana = enemy.mana;
-                    enemyPetCultivation = enemy.cultivation;
-                    enemyCritRate = enemy.enemyCritRate;
-                    enemyCritDamage = enemy.enemyCritDamage;
+            const summonEnemyLogic = () => {
+                summonEnemy = true;
+                toggleFightingDrawer();
+                battleState.enemy = { ...enemy };
+                battleState.enemyKey = enemyType;
+                
+                enemyMaxHealth = enemy.health;
+                enemyMaxMana = enemy.mana;
+                enemyPetCultivation = enemy.cultivation;
+                enemyCritRate = enemy.enemyCritRate;
+                enemyCritDamage = enemy.enemyCritDamage;
 
-                    changeEnemyImage(enemyType);
-                    setBackgroundImage(enemy.backgroundImage);
-                    document.getElementById('enemy-level').innerText = enemy.level;
-                    updateUI();
-                    storeEnemyInitialState();
+                changeEnemyImage(enemyType);
+                setBackgroundImage(enemy.backgroundImage);
+                document.getElementById('enemy-level').innerText = enemy.level;
+                updateUI();
+                storeEnemyInitialState();
 
-                    // 如果敌人类型为 'instant'，立即执行一次特殊攻击
-                    const enemyAttack = specificAttackByEnemy[enemy.specialty];
+                // 如果敌人类型为 'instant'，立即执行一次特殊攻击
+                const enemyAttack = specificAttackByEnemy[enemy.specialty];
 
-                    if (enemyAttack && enemyAttack.type === 'instant') {
-                        // 即时性效果：立即执行一次特殊攻击
-                        enemyAttack.action();
-                    }
-                },
-                () => {
-                    summonEnemy = false;
-                    goldAmount -= 20000;
-                    updateGoldDisplay(goldAmount);
-                    showInfoBox('你放任魔魂逃跑了，扣除20两金',null,null,'red');
-                    return;
+                if (enemyAttack && enemyAttack.type === 'instant') {
+                    enemyAttack.action();
                 }
-            );
+            };
+
+            if (manuallySummon) {
+                showInfoBox(
+                    `你将会召唤${enemy.name}，战胜后你会获得奖励`,
+                    summonEnemyLogic,
+                    () => {
+                        summonEnemy = false;
+                        goldAmount -= 20000;
+                        updateGoldDisplay(goldAmount);
+                        showInfoBox('你仓皇逃跑中，损失了20两金', null, null, 'red');
+                        return;
+                    }
+                );
+            } else {
+                summonEnemyLogic();
+            }
         } else {
-            showInfoBox('未知敌人类型', null, null, 'red');
+            showInfoBox('未知的敌人类型', null, null, 'red');
         }
     } else {
         showInfoBox('正在战斗中或未知错误', null, null, 'red');
@@ -6936,42 +6942,60 @@ function handleExpEnemySkill() {
 }
         
 
+let qiongQi = null;  // 确保 qiongQi 变量在全局范围内定义
+
 function handleQiongQiSkill() {
+    // 检查当前敌人的 specialty 是否为 'qiongQi'
+    const isQiongQiName = battleState.enemy.specialty === 'qiongQi';
+    
     // 计算损失的生命值和临时护盾
     const healthLost = Math.round(battleAttributes.health * (0.01 + Math.random() * 0.02));
-    let temporaryShield = Math.round(healthLost * playerCritDamage * 5);
+    let temporaryShield = Math.round(healthLost * playerCritDamage);
     
-    if (summonEnemy) {
+    // 清除现有定时器，防止重复运行
+    if (qiongQi !== null) {
+        clearInterval(qiongQi);
+        qiongQi = null;
+    }
+
+    if (summonEnemy && isQiongQiName) {
+        // 设置高防御值
         battleState.enemy.physicalDefense = 999999999999;
         battleState.enemy.magicDefense = 999999999999;
-    } 
 
-    // 创建并存储定时器
-    setTimeout(() => {
-        if (summonEnemy) {
-            battleState.enemy.physicalDefense = 3000;
-            battleState.enemy.magicDefense = 3000;
-        }
-        
-        qiongQi = setInterval(() => {
+        // 创建定时器并延迟2秒启动
+        setTimeout(() => {
+            battleState.enemy.physicalDefense = battleAttributes.physicalAttack;
+            battleState.enemy.magicDefense = battleAttributes.magicAttack;
+
+            qiongQi = setInterval(() => {
                 battleAttributes.health -= healthLost;
                 enemyMaxHealth += healthLost;
                 battleState.enemy.health += healthLost;
                 battleState.enemy.physicalDefense += temporaryShield;
                 battleState.enemy.magicDefense += temporaryShield;
-            
+
                 enemyPetCultivation = playerCultivation + 1;
                 battleState.enemy.speed = battleAttributes.speed + 1;
-            
+
                 // 更新UI和记录战斗事件
                 updateUI();
-            if (battleAttributes.health <= 0 || battleState.enemy.health <= 0 || !summonEnemy) {
-                clearInterval(qiongQi);
-            }
-            
-        },800);
-    },3000);
-    logBattleEvent('穷奇擅长吸收敌人的生命之力转换为自己的护甲', 'gold');
+
+                // 结束条件：玩家死亡、敌人死亡或 summonEnemy 变为 false
+                if (battleAttributes.health <= 0 || battleState.enemy.health <= 0 || !summonEnemy) {
+                    clearInterval(qiongQi);
+                    qiongQi = null; // 防止后续错误
+                }
+            }, 800);
+        }, 2000);
+        logBattleEvent('穷奇擅长吸收敌人的生命之力转换为自己的护甲', 'gold');
+    } else {
+        // 如果条件不满足，确保定时器不会运行
+        if (qiongQi !== null) {
+            clearInterval(qiongQi);
+            qiongQi = null;
+        }
+    }
 }
 
 //此函数为洪荒至尊仙葫开启逻辑
@@ -7002,8 +7026,10 @@ function openHongHuangTreasure() {
     // 遍历奖品列表，根据概率选择一个奖品
     for (let item of treasure) {
         if (randomChance < item.chance) {
-            addItemToJinnang(item.name, item.quantity); // 添加奖品到锦囊
-            showInfoBox(`你获得了: ${item.displayName}`,'red');
+            setTimeout(() => {
+                addItemToJinnang(item.name, item.quantity); // 添加奖品到锦囊
+                showInfoBox(`你获得了: ${item.displayName}`,'red');
+            },300);
             break;
         }
         randomChance -= item.chance; // 递减randomChance，直到找到匹配的奖品

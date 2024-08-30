@@ -442,16 +442,14 @@
             height: 45px;
         }
         .core-area {
-            background-color: #fff;
+            background-color: hwb(0deg 100% 0% / 95%);
             display: flex;
             border-radius: 10px;
             justify-content: center;
-            background-image: url(https://pic.imgdb.cn/item/66a4f420d9c307b7e9c23f5c.gif);
-            background-size: contain;
-            opacity: 0.95;
             width: 90%;
             padding: 5px;
             margin: 5px 0px 5px 0px;
+            flex-direction: column;
         }
         .core-area-for-skills {
             width: 90%;
@@ -544,6 +542,97 @@
             gap: 5px 5px;
             width: 100%;
         }
+        .advancement-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            background-image: url(https://gd-hbimg.huaban.com/fd730cf6da92e721e4b42157c4d33fb543d9a986fc917-bTarH2_fw1200);
+            background-size: cover;
+            border-radius: 10px 10px 2px 2px;
+            align-items: center;
+            font-size: 12px;
+            color: aliceblue;
+        }
+        .advancement-series {
+            padding: 5px;
+            margin: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            background: transparent;
+            color: #f1f9ff;
+            border: 1px solid #155173;
+            box-shadow: 0px 0px 2px 0px rgb(191 198 204);
+        }
+        .aquire-skill-advancement-panel {
+          width: 90%;
+          box-shadow: 0 0px 6px 2px rgb(0 0 0 / 40%);
+          padding: 2px;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          overflow: scroll;
+          display: block;
+          background: #6f391c;
+          border-radius: 2px;
+          color: #92341c;
+        }
+        .skill-detail-panel {
+          font-size: 14px;
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+        .skill-detail {
+        width: 100%;
+        display: flex;
+        gap: 20px;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-around;
+        }
+        .panel-top, .panel-middle, .panel-bottom {
+          margin-bottom: 10px;
+          max-height: 200px;
+          overflow-y: scroll;
+          display: flex;
+          font-size: 14px;
+          gap: 10px;
+          flex-direction: row;
+          justify-content: space-evenly;
+          border: 1px solid #6f391c;
+          padding: 10px;
+          border-radius: 2px;
+          width: 95%;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .panel-middle button,
+        .panel-bottom button,
+        .skill-detail-panel button {
+          border: 1px solid #6F391C;
+          background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+          box-shadow: inset 0px 0px 2px 1px #87431F;
+          font-size: 12px;
+          border-radius: 5px;
+          color: #F9DE9B;
+          padding: 4px 6px;
+          cursor: pointer;
+          transition: transform 0.1s, box-shadow 0.1s;
+          width: 60px;
+        }
+        
+        .applied-skill {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+          width: 100%;
+          flex-direction: row;
+        }
         .core-area .skills div {
             padding: 5px;
             margin: 5px 0px;
@@ -554,6 +643,7 @@
             box-shadow: 0px 0px 1px 1px rgb(0 0 0 / 30%);
             box-sizing: border-box;
             cursor: pointer;
+            background-color: white;
         }
         .core-area .skills .s-skill {
             border: 2px solid gold;
@@ -2324,6 +2414,28 @@
         </div>
     </div>
     <div class="core-area">
+        <div class="advancement-container">
+            <button id="advancement-learn" onclick="openAquireSkillAdvancementPanel()" class="advancement-series">领悟</button>
+            <div>Skills for Your Lovely Pet</div>
+            <button id="advancement-apply" onclick="infoAdvancement()" class="advancement-series">说明</button>
+        </div>
+        <div id="skill-advancement-panel" class="aquire-skill-advancement-panel" style="display: none;">
+        <div class="drawer-toggle" onclick="openAquireSkillAdvancementPanel()">技能加成</div>
+          <div style="padding: 10px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
+          <div class="panel-top">
+            <div>亲密度: <span id="intimacy"></span></div>
+            <div>集中值: <span id="attention"></span></div>
+            <div>学习度: <span id="learning-value"></span></div>
+          </div>
+          <div class="panel-middle">
+            <div>技能点:<span id="skill-points"></span></div>
+            <button id="aquire-skill-btn">领会</button>
+            <button id="reset-skill-btn">重置</button>
+          </div>
+          <div class="panel-bottom" id="applied-skills-list" style="height:200px;"></div>
+          <div class="skill-detail-panel" id="advancement-detail-panel"></div>
+        </div>
+        </div>
         <div class="skills" id="skills-area"></div>
     </div>
     <div class="top-bar">
@@ -3968,8 +4080,32 @@ function infoFeisheng() {
 function infoPingfen() {
     showInfoBox("\n1.评分用于展示宠物的综合实力，且作为出售宠物时唯一的估价依据\n2.培养越用心，评分则越高（技能情况、养成档次、属性值等）\n3.宠物可以在评分界面里外派打工获得额外金钱奖励 \n4.在评分排行界面，可以和你的宠物玩耍改变它的心情，心情决定打工的速度 \n5.除了心情以外，体力会影响宠物每次打工的收益，可以通过休息或喂食提升体力");
 }
+
+function infoAdvancement() {
+  showInfoBox("\n1. 通过领悟,让你的宠物学会强大的技能加成,显著提升战斗力!\n2. 每次领悟需要消耗亲密度和集中值,领悟结果有一定的随机性。\n3. 你最多可以为每个宠物领悟10个技能加成,每个加成有高中低三个等级。\n4. 提升加成等级会消耗技能点,宠物每升12级会得到1点技能点。\n5. 消耗学习度可以提升已领悟技能的等级,每级提供不同的加成效果。\n6. 将已领悟的技能加成应用到宠物的实际技能上,可以大幅提升技能威力!\n7. 如果你对现有的加成不满意,可以选择删除或者消耗道具重置所有技能。\n8. 合理分配资源,选择适合宠物的加成策略,让你的宠物变得更加强大吧!");
+}
+        
 function infoWuxingFu() {
-    showInfoBox("\n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高/品质越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化根据品质消耗1/5/25/125/625碎片和经验值，品质越高，强化所得属性越好\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多/装备的五行符品质越好，等级越高，其五行符强度越高，战斗效果越强大");
+    updateWuxingDisplay();
+    updateWuxingBonusState();
+    const wuxingInfo = drugBonus;
+    const nameMap = new Map([
+        ['health', '生命值'],
+        ['magicAttack', '法术攻击'],
+        ['magicDefense', '法术防御'],
+        ['mana', '法力值'],
+        ['physicalAttack', '物理攻击'],
+        ['physicalDefense', '物理防御'],
+        ['speed', '速度']
+    ]);
+
+    let wuxingInfoMessage = '';
+
+    for (const [key, value] of Object.entries(wuxingInfo)) {
+        const displayName = nameMap.get(key) || key; // 如果没有匹配到替换的名称，则使用原始英文名
+        wuxingInfoMessage += `${displayName}: ${value}\n`;
+    }
+    showInfoBox(`\n 当前五行符为${currentPet.name}提供的增益为：\n ${wuxingInfoMessage} \n1.五行符类型: 金木水火土五类,每类五色(红绿橙蓝紫)\n2. 分解机制: 不需要的五行符可以分解，等级越高/品质越高的五行符分解所得碎片越多\n3. 强化系统: 每级强化根据品质消耗1/5/25/125/625碎片和经验值，品质越高，强化所得属性越好\n4. 主词条提升: 按颜色不同，五行符的主词条会有不同。需要尤其注意，红色的五行符只有强化一次后才能确定未来的增长条目\n5. 副词条机制: 随机1-5条，逢5级倍数强化可能增加条数或提升已有条数\n6. 装备限制: 每色最多装备1个,最多同时装备5个五行符\n7.每种五行符会有独特的战斗效果：金符反弹伤害/火符增加输出/土符减少伤害/水符概率再动/木符提升治疗 \n8. 单一种类五行符装备越多/装备的五行符品质越好，等级越高，其五行符强度越高，战斗效果越强大`);
 }
 
 let petStates = []; // 全局数组存储每个宠物的状态
@@ -4350,12 +4486,12 @@ function rest(petName) {
     }
 
     petState.progressBar.style.width = '0%';
-    petState.stamina = Math.min(100, petState.stamina + 10);
+    petState.stamina = Math.min(100, petState.stamina + 5);
     document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
     showInfoBox(`${petName}不舍地拉住你的衣角：我就睡一小会儿，不可以离开哦…`);
 
     setTimeout(() => {
-        petState.stamina = Math.min(100, petState.stamina + 10);
+        petState.stamina = Math.min(100, petState.stamina + 5);
         document.getElementById(`stamina-${petName}`).innerText = `${petState.stamina}%`;
         showInfoBox(`${petName}睁开眼睛，看到你在身边，顿时充满了干劲`);
 
@@ -4379,7 +4515,7 @@ function feed(petName) {
     const currentStamina = petState.stamina;
     const baseCost = 1000 + workSalary / 10;
     const staminaCost = baseCost * (100 - currentStamina);
-    const feedCost = Math.ceil(staminaCost / 10) * 10;
+    const feedCost = Math.round(Math.ceil(staminaCost / 10) * 10 * (petState.earningMultiplier + petState.earningSpeed));
 
     // 过滤出背包中所有有效的食物（数量大于0）
     const availableFoodItems = jinnangItems.filter(item => {
@@ -4399,10 +4535,10 @@ function feed(petName) {
 
         // 根据不同的食物调整体力增加值和提示信息
         if (feedItem.name === 'redApple') {
-            staminaIncrease = 15;
+            staminaIncrease = 5;
             infoMessage = `你递给${petName}一个美味的苹果，${petName}似乎从没见过这种水果，小心翼翼咬了一口，被香脆的口感惊喜到了。`;
         } else if (feedItem.name === 'chocolate') {
-            staminaIncrease = 20;
+            staminaIncrease = 10;
             infoMessage = `你递给${petName}一块巧克力，${petName}感受到甜蜜的味道，体力有所恢复。`;
         }
 
@@ -4683,7 +4819,7 @@ function handleDelegation(petName) {
 
         if (petState.stamina < 80 && cultivationPoints > 0) {
             const staminaNeeded = 100 - petState.stamina;
-            const feedCost = Math.ceil((1000 + petState.goldAmount / 10) * staminaNeeded / 10) * 10;
+            const feedCost = Math.round(Math.ceil((1000 + petState.goldAmount / 10) * staminaNeeded / 10) * 10 * (petState.earningMultiplier + petState.earningSpeed));
             if (cultivationPoints >= staminaNeeded) {
                 if (goldAmount >= feedCost) {
                     petState.stamina = Math.min(100, petState.stamina + staminaNeeded);
@@ -6212,6 +6348,7 @@ function handleVictory() {
     playerWon = true;
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
+    increaseCurrentPetIntimacy(30);
 
     defeatedPets = [];
     usedPets = []; 
@@ -6293,6 +6430,7 @@ function applyDefeatPenalty() {
 
     showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
     showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
+    increaseCurrentPetIntimacy(-5);
     updateGoldDisplay(goldAmount);
     defeatedPets = [];
     usedPets = [];
@@ -6719,7 +6857,8 @@ const enemies = {
         enemyCritDamage: 2.5,
         backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
         reward: () => gainExp(3000), // 奖励：3000经验值
-        rewardMessage: '3000经验值'
+        rewardMessage: '3000经验值',
+        specialty: 'practiceEnemy'
     },
     ancientEvil: {
         name: '太古魔魂封印',
@@ -6736,11 +6875,18 @@ const enemies = {
         enemyCritDamage: 1000,
         backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
         reward: () => {
-            addItemToJinnang('cultivationPill500', 10);
-            addItemToJinnang('universalCrystal', 10);
-            addItemToJinnang('universalKernel', 10);
-        }, // 奖励：30个特定道具
-        rewardMessage: '10个修为灵丹（橙），10个宇宙之晶和10个宇宙精华（升级技能专用）',
+            const items = ['cultivationPill500', 'universalCrystal', 'universalKernel'];
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            const randomQuantity = Math.floor(Math.random() * 6) + 5; // Math.random() * 6 生成 0-5，+5 后得到 5-10
+            const itemMap = {
+                'cultivationPill500': '修为灵丹（橙）',
+                'universalCrystal': '天空之晶',
+                'universalKernel': '天空精华'
+            };
+            addItemToJinnang(randomItem, randomQuantity);
+            showInfoBox(`你获得了${randomQuantity}个${itemMap[randomItem]}，请检查你的背包！`);
+        }, // 奖励：随机道具
+        rewardMessage: '无',
         specialty: 'ancientEvil'
     },
     expEnemy: {
@@ -6793,8 +6939,11 @@ const enemies = {
         enemyCritRate: 0,
         enemyCritDamage: 0,
         backgroundImage: 'https://pic.imgdb.cn/item/66d071cbd9c307b7e9344927.png',
-        reward: () => generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具'),
-        rewardMessage: '1个珍贵的洪荒至尊仙葫',
+        reward: () => {
+            generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
+            increaseCurrentPetIntimacy(600);
+        },
+        rewardMessage: '1个珍贵的洪荒至尊仙葫。在这次艰难的对抗中，你的宠物与你并肩作战，好感大增，亲密度增加了600！',
         specialty: 'qiongQi' // 特殊能力标识符
     },
 };
@@ -6826,6 +6975,21 @@ const specificAttackByEnemy = {
             handleTaunt();
         }
     },
+    'practiceEnemy': {
+        type: 'instant',
+        action: () => {
+            let practiceEnemy;
+            practiceEnemy = setTimeout(() => {
+                if (summonEnemy && battleState.enemy.specialty === 'practiceEnemy' && onBattleState) {
+                    battleState.enemy.physicalAttack += 3000000;
+                    updateUI();
+                    showInfoBox('还没死，还得练，再给你上上强度');
+                } else {
+                    clearTimeout(practiceEnemy);
+                }
+            },30000);
+        }
+    }
     // 可以为其他敌人继续添加独特的战斗能力...
 };
 
@@ -6857,7 +7021,9 @@ function handleBattleWithSummonEnemy(playerWon) {
         // 调用敌人的奖励函数
         if (enemy.reward) {
             enemy.reward(); // 执行奖励
-            showInfoBox(`你击败了${enemy.name}，获得了${enemy.rewardMessage}！`, null, null, 'green');
+            if (enemy.rewardMessage !== '无') {
+                showInfoBox(`你击败了${enemy.name}，获得了${enemy.rewardMessage}！`, null, null, 'green');
+            }
         } else {
             showInfoBox(`你击败了${enemy.name}，但没有任何奖励。`, null, null, 'yellow');
         }
@@ -7001,18 +7167,20 @@ function handleQiongQiSkill() {
 //此函数为洪荒至尊仙葫开启逻辑
 function openHongHuangTreasure() {
     const treasure = [
-        { displayName: '资质仙丹礼包', name: 'qualityEnhancePillPKG', quantity: 2, chance: 10 },
-        { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 10 },
-        { displayName: '仙人醍醐', name: 'ultraSkillBoomer', quantity: 1, chance: 10 },
-        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 10 },
+        { displayName: '资质仙丹礼包', name: 'qualityEnhancePillPKG', quantity: 2, chance: 5 },
+        { displayName: '集中值（4点）*10', name: 'attentionValue', quantity: 10, chance: 5 },
+        { displayName: '灵兽悟道书', name: 'learningValueBook', quantity: 1, chance: 5 },
+        { displayName: '灵兽清心丹', name: 'resetAdvancementPill', quantity: 1, chance: 5 },
+        { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 5 },
+        { displayName: '仙人醍醐*2', name: 'ultraSkillBoomer', quantity: 2, chance: 10 },
+        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 15.5 },
         { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 10 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
-        { displayName: '召唤灵符*5', name: 'summonCharmPaper', quantity: 5, chance: 5 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 10 },
-        { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 10 },
-        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 1 },
+        { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
+        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 0.5 },
         { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
         { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 }
     ];
@@ -7881,6 +8049,437 @@ function calculateSkillLevelAndMultiplier(skill) {
     return { skillLevel, skillMultiplier };
 }
 
+// 全局变量
+const advancementStates = []; // 保持唯一的全局变量
+
+function initializeAdvancementStates() {
+  const applicableSkills = Object.values(pets).flatMap(pet =>
+    pet.skills.filter(skill => skill.type === "PA" || skill.type === "MA")
+      .flatMap(skill => [
+        { ...skill, rank: '高', multiplier: 0, petName: pet.name, skillName: `${skill.name}[高]` },
+        { ...skill, rank: '中', multiplier: 0, petName: pet.name, skillName: `${skill.name}[中]` },
+        { ...skill, rank: '低', multiplier: 0, petName: pet.name, skillName: `${skill.name}[低]` }
+      ])
+  );
+
+  if (applicableSkills.length === 0) {
+    showInfoBox('没有可用的技能');
+    return null;
+  }
+
+  let currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  if (!currentPetState) {
+    currentPetState = {
+      petName: currentPet.name,
+      intimacy: 0,
+      attention: 0,
+      appliedSkills: [],
+      learningValue: 0,
+      skillPoints: calculateSkillPointsForPet()
+    };
+    advancementStates.push(currentPetState);
+  }
+
+  return { currentPetState, applicableSkills };
+}
+
+
+function calculateSkillPointsForPet() {
+  return Math.floor(petLevel / 12);
+}
+
+function aquireSkillAdvancement(currentPetState, applicableSkills) {
+  const appliedSkillsCount = currentPetState.appliedSkills.length;
+  let probability;
+  
+  if (appliedSkillsCount >= 9) {
+    probability = Math.random();
+    if (probability < 0.05) {
+      // 5%概率得到一个加成
+      return acquireSkill(currentPetState, applicableSkills);
+    } else if (probability < 0.50) {
+      // 45%概率得到（100~300）学习度
+      addLearningValue(currentPetState);
+      return null;
+    } else {
+      // 50%概率一无所获
+      showInfoBox('你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后一无所获。');
+      return null;
+    }
+  } else if (appliedSkillsCount >= 7) {
+    probability = Math.random();
+    if (probability < 0.15) {
+      // 15%概率得到一个加成
+      return acquireSkill(currentPetState, applicableSkills);
+    } else if (probability < 0.60) {
+      // 45%概率得到（100~300）学习度
+      addLearningValue(currentPetState);
+      return null;
+    } else {
+      // 40%概率一无所获
+      showInfoBox('你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后一无所获。');
+      return null;
+    }
+  } else if (appliedSkillsCount >= 5) {
+    probability = Math.random();
+    if (probability < 0.35) {
+      // 35%概率得到一个加成
+      return acquireSkill(currentPetState, applicableSkills);
+    } else if (probability < 0.70) {
+      // 25%概率得到（100~300）学习度
+      addLearningValue(currentPetState);
+      return null;
+    } else {
+      // 30%概率一无所获
+      showInfoBox('你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后一无所获。');
+      return null;
+    }
+  } else {
+    probability = Math.random();
+    if (probability < 0.70) {
+      // 70%概率得到一个加成
+      return acquireSkill(currentPetState, applicableSkills);
+    } else if (probability < 0.80) {
+      // 10%概率得到（100~300）学习度
+      addLearningValue(currentPetState);
+      return null;
+    } else {
+      // 20%概率一无所获
+      showInfoBox('你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后一无所获。');
+      return null;
+    }
+  }
+}
+
+function acquireSkill(currentPetState, applicableSkills) {
+  // 过滤掉已领会的技能
+  const availableSkills = applicableSkills.filter(skill => 
+    !currentPetState.appliedSkills.some(applied => applied.skillName === skill.skillName)
+  );
+
+  if (availableSkills.length === 0) {
+    showInfoBox('已领会所有可用技能的该等级');
+    return null;
+  }
+
+  const acquiredSkill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+  currentPetState.appliedSkills.push({
+    ...acquiredSkill,
+    level: 1,
+    applied: false
+  });
+  
+  currentPetState.skillPoints = calculateSkillPoints(currentPetState); // 更新技能点数
+  return acquiredSkill;
+}
+
+
+function addLearningValue(currentPetState) {
+  const learningValueGained = Math.floor(Math.random() * 201) + 100; // 100到300之间的随机值
+  currentPetState.learningValue += learningValueGained;
+  showInfoBox(`你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后勉强获得了${learningValueGained}学习度！`);
+}
+
+function increaseCurrentPetLearningValue(amount) {
+  const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  if (currentPetState) {
+    currentPetState.learningValue += amount;
+    console.log(`你的宠物学习度增加了 ${amount} 点。`);
+  } else {
+    console.error('当前宠物状态不存在');
+  }
+  updateAdvancement();
+}
+
+function increaseCurrentPetIntimacy(amount) {
+  const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  if (currentPetState) {
+    currentPetState.intimacy += amount;
+    console.log(`你的宠物亲密度增加了 ${amount} 点。`);
+  } else {
+    console.error('当前宠物状态不存在');
+  }
+  updateAdvancement();
+}
+        
+function increaseCurrentPetAttention(amount) {
+  const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  if (currentPetState) {
+    currentPetState.attention += amount;
+    console.log(`你的宠物集中值增加了 ${amount} 点。`);
+  } else {
+    console.error('当前宠物状态不存在');
+  }
+  updateAdvancement();
+}
+
+
+function test() {
+    increaseCurrentPetLearningValue(200000);
+    increaseCurrentPetIntimacy(6000);
+    increaseCurrentPetAttention(1000);
+}
+        
+function openAquireSkillAdvancementPanel() {
+  const panel = document.getElementById('skill-advancement-panel');
+  const currentDisplay = window.getComputedStyle(panel).display;
+
+  if (currentDisplay === 'none') {
+    panel.style.display = 'block';
+    updateAdvancement();
+  } else if (currentDisplay === 'block') {
+    panel.style.display = 'none';
+  }
+  document.getElementById('advancement-detail-panel').innerHTML = '';
+}
+
+function calculateSkillPoints(currentPetState) {
+  const totalSkillPoints = Math.floor(petLevel / 12);
+
+  const usedSkillPoints = currentPetState.appliedSkills.reduce((total, skill) => {
+    return total + (skill.level > 1 ? skill.level - 1 : 0);
+  }, 0);
+
+  return totalSkillPoints - usedSkillPoints;
+}
+
+
+function updateAdvancement() {
+  let { currentPetState, applicableSkills } = initializeAdvancementStates();
+  if (!currentPetState) return;
+
+  document.getElementById('intimacy').textContent = currentPetState.intimacy;
+  document.getElementById('attention').textContent = currentPetState.attention;
+  document.getElementById('learning-value').textContent = currentPetState.learningValue;
+
+  const skillPoints = calculateSkillPoints(currentPetState);
+  document.getElementById('skill-points').textContent = `${skillPoints}`;
+
+  const rankMap = {
+    '高': '高',
+    '中': '中',
+    '低': '低'
+  };
+
+  const appliedSkillsList = document.getElementById('applied-skills-list');
+  appliedSkillsList.innerHTML = currentPetState.appliedSkills.map(skill => `
+    <div class="applied-skill" style="position: relative;height:48px;">
+      <img id="advancement-image" src="https://pic.imgdb.cn/item/66d19552d9c307b7e9a25ac0.png" alt="advancement" style="width:45px;height:45px;border:1px solid black">
+      <span style="
+        position: absolute;
+        top: 10px;
+        left: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 16px;
+        text-shadow: 0px 0px 2px black;
+        pointer-events: none;">
+        ${rankMap[skill.rank]}
+      </span>
+      <p style="width: 40%;">${skill.name} (${skill.petName})</p>
+      <button class="skill-detail-btn" data-skill-name="${skill.name}">详情</button>
+    </div>
+  `).join('');
+
+  const skillDetailBtns = document.querySelectorAll('.skill-detail-btn');
+  skillDetailBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const skillName = btn.dataset.skillName;
+      const skill = currentPetState.appliedSkills.find(s => s.name === skillName);
+      showSkillDetail(skill);
+    });
+  });
+}
+
+const aquireSkillBtn = document.getElementById('aquire-skill-btn');
+aquireSkillBtn.addEventListener('click', () => {
+  let currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  
+  if (!currentPetState) {
+    showInfoBox('当前宠物状态不存在');
+    return;
+  }
+  
+  const { applicableSkills } = initializeAdvancementStates();
+  
+  if (currentPetState.intimacy >= 30 && currentPetState.attention >= 2) {
+    currentPetState.intimacy -= 30;
+    currentPetState.attention -= 2;
+    
+    const acquiredSkill = aquireSkillAdvancement(currentPetState, applicableSkills);
+    if (acquiredSkill) {
+      showInfoBox(`你的宠物经过一段时间的沉思，学会了${acquiredSkill.name} 加成术`);
+    }
+  } else {
+    showInfoBox('每次领悟需要耗费2集中值和30亲密度!',null,null,'red');
+  }
+    updateAdvancement();
+});
+        
+const resetSkillBtn = document.getElementById('reset-skill-btn');
+resetSkillBtn.addEventListener('click', () => {
+  const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+  if (!currentPetState) {
+    showInfoBox('当前宠物状态不存在');
+    return;
+  }
+
+  if (useItem('resetAdvancementPill',1)) { // 假设金子数量是一个全局变量
+    showInfoBox('你是否要重置所有技能的等级？', () => {
+      // 先处理所有已应用的技能，移除其 multiplier 的影响
+      currentPetState.appliedSkills.forEach(skill => {
+        if (skill.applied) {
+          handleApplyAdvancement(skill, false);
+        }
+      });
+
+      // 重置所有技能等级为1，返还所有 skillPoints
+      currentPetState.appliedSkills.forEach(skill => {
+        skill.level = 1;
+        skill.multiplier = 0;
+        skill.applied = false; // 复位应用状态
+      });
+
+      updateAdvancement();
+      document.getElementById('advancement-detail-panel').innerHTML = '';
+      showInfoBox('所有技能已重置，并返还所有技能点。');
+    }, () => {
+      addItemToJinnang('resetAdvancementPill',1);
+      showInfoBox('操作已取消。');
+    });
+  } else {
+    showInfoBox('道具数量不足，无法重置技能！', null, null, 'red');
+  }
+});
+
+const rankMultiplierMap = {
+  '高': [0, 0.1, 0.2, 0.3, 0.4, 0.5],
+  '中': [0, 0.05, 0.1, 0.15, 0.2, 0.25],
+  '低': [0, 0.02, 0.04, 0.06, 0.08, 0.1]
+};
+
+function showSkillDetail(skill) {
+    const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+    if (!currentPetState) {
+    console.error('当前宠物状态不存在');
+    return;
+    }
+    
+    const skillPoints = calculateSkillPoints(currentPetState);
+    const nextMultiplier = rankMultiplierMap[skill.rank][skill.level];
+    
+    const detailHtml = `
+    <div class="skill-detail">
+    <div style="display: flex;flex-direction: row;justify-content: space-evenly;width: 100%;">
+      <div>名称: ${skill.skillName}</div>
+      <div>等级: ${skill.level}</div>
+      <div>加成: ${(skill.multiplier * 100).toFixed(0)}%</div>
+    </div>
+      <button id="delete-skill-btn">删除</button>
+      <button id="upgrade-skill-btn">升级</button>
+      <button id="apply-skill-btn">${skill.applied ? '禁用' : '应用'}</button>
+    </div>
+    `;
+
+    const detailPanel = document.querySelector('.skill-detail-panel');
+    detailPanel.innerHTML = detailHtml;
+
+    const deleteSkillBtn = document.getElementById('delete-skill-btn');
+    deleteSkillBtn.addEventListener('click', () => {
+      const index = currentPetState.appliedSkills.findIndex(s => s.skillName === skill.skillName);
+    
+      showInfoBox("删除技能加成后将无法撤销，是否确认删除？",
+      () => {
+          if (skill.applied) {
+            handleApplyAdvancement(skill, false); // 先移除加成
+          }
+          currentPetState.appliedSkills.splice(index, 1);
+          updateAdvancement();
+          document.getElementById('advancement-detail-panel').innerHTML = '';
+      },
+      () => {
+          showInfoBox("取消删除技能");
+      });
+    });
+    
+    const upgradeSkillBtn = document.getElementById('upgrade-skill-btn');
+    upgradeSkillBtn.addEventListener('click', () => {
+      if (skillPoints <= 0) {
+        showInfoBox('你的技能点数不足，无法升级！', null, null, 'red');
+        return;
+      }
+    
+      const learningValueNeeded = [600, 2000, 6000, 12000, 20000][skill.level - 1];
+      const nextMultiplier = rankMultiplierMap[skill.rank][skill.level]; // 计算下一级 multiplier
+    
+      if (currentPetState.learningValue >= learningValueNeeded && skill.level < 6) {
+        showInfoBox(`此次升级需要${learningValueNeeded}点学习度，是否继续？`,
+          () => {
+            if (skill.applied) {
+              handleApplyAdvancement(skill, false); // 升级前移除当前 multiplier
+            }
+    
+            currentPetState.learningValue -= learningValueNeeded;
+            skill.level++;
+            skill.multiplier = nextMultiplier;
+    
+            if (skill.applied) {
+              handleApplyAdvancement(skill, true); // 升级后重新应用 multiplier
+            }
+    
+            updateAdvancement();
+            showSkillDetail(skill);
+          },
+          () => {
+              return;
+          });
+      } else {
+        showInfoBox('学习度不足或已达到最大等级!', null, null, 'red');
+      }
+    });
+    
+    const applySkillBtn = document.getElementById('apply-skill-btn');
+    applySkillBtn.addEventListener('click', () => {
+      if (skill.applied) {
+        handleApplyAdvancement(skill, false); // 如果已应用，先取消应用
+      } else {
+        handleApplyAdvancement(skill, true); // 如果未应用，应用加成
+      }
+      skill.applied = !skill.applied; // 切换应用状态
+      showSkillDetail(skill);
+    });
+}
+
+function handleApplyAdvancement(skill, applied) {
+  const skillsArea = document.getElementById("skills-area");
+  if (!skillsArea) {
+    console.error("skills-area element not found.");
+    return;
+  }
+
+  // 获取当前宠物的技能列表
+  const skills = Array.from(skillsArea.children).map(skillDiv => {
+    const skillName = skillDiv.innerText.split(' ')[0];
+    const skillType = skill.type;
+    return currentPet.skills.find(s => s.name === skillName && s.type === skillType);
+  }).filter(s => s !== undefined);
+
+  // 查找要应用加成的技能是否在当前宠物的技能列表中
+  const targetSkill = skills.find(s => s.name === skill.name);
+  
+  if (targetSkill) {
+    // 如果技能在宠物的技能列表中，应用或取消加成
+    targetSkill.multiplier += applied ? skill.multiplier : -skill.multiplier;
+    console.log(`现在你的技能威力是${targetSkill.multiplier}`);
+  } else {
+    // 如果技能不在宠物的技能列表中，显示警告信息
+    showInfoBox(`${currentPet.name}并不会释放${skill.name}，应用或禁用后不会产生任何效果！`, null, null, 'red');
+  }
+}
+
+        
 function selectSkillAndCalculateMultiplier(type) {
     let selectedSkills = [];
     let skillMultiplier = 1;
@@ -8356,6 +8955,12 @@ function performPoison() {
         return;
     }
 
+    let poisonChance = 0.3;
+    if (useItem('poisonPowder')) {
+        poisonChance = 0.7;
+        skillMultiplier += 1;
+    }
+    
     const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9));
     battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
     logBattleEvent(`你对邪佞造成了 ${poisonDamage} 点中毒伤害，消耗了 ${manaCost} 点法力值。`, '#C10066');
@@ -8364,10 +8969,7 @@ function performPoison() {
     }
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
     updateDamageValue(poisonDamage); // 显示玩家伤害
-    let poisonChance = 0.3;
-    if (useItem('poisonPowder')) {
-        poisonChance = 0.7;
-    }
+
 
     if (Math.random() < poisonChance && !battleState.enemy.poisoned) {
         battleState.enemy.poisoned = true;
@@ -13871,7 +14473,7 @@ function collectTreasure() {
         '精灵觉醒石': 'spiritAwakenStone',
         '施毒之术': 'poisonSkillBook',
         '毒粉': 'poisonPowder',
-        '毒粉礼包（10）': () => addItemToJinnang('poisonPowder', 10),
+        '毒粉礼包（3）': () => addItemToJinnang('poisonPowder', 3),
         '遗失的洛书·密钥': 'lostBook',
         '残页的河图·灵匙': 'fragmentedMap',
         '定空的灵石·图章': 'nirvanaGem',
@@ -14076,13 +14678,12 @@ function getRandomReward(type) {
             { name: '还童金丹', url: 'https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png', chance: 10 },
             { name: '资质重生丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png', chance: 10 },
             { name: '万化灵丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png', chance: 20 },
-            { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1 },
-            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.4 },
+            { name: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', chance: 1.2 },
+            { name: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', chance: 1.2 },
             { name: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 3 },
             { name: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', chance: 0.5 },
-            { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.8 },
+            { name: '特级悟性丹礼包（10）', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', chance: 0.9 },
             { name: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', chance: 0.1 },
-            { name: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', chance: 0.1 },
             { name: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', chance: 0.1 }
         ],
         '灵魂宝箱': [
@@ -14099,13 +14700,11 @@ function getRandomReward(type) {
             { name: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', chance: 0.5 },
             { name: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 5.5 },
             { name: '魔魂封印卡', url: 'https://pic.imgdb.cn/item/66cdc955d9c307b7e92c1f56.png', chance: 5 },
-            { name: '毒粉礼包（10）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
+            { name: '毒粉礼包（3）', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', chance: 1 },
             { name: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', chance: 1 },
             { name: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', chance: 1 },
             { name: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', chance: 1 },
-            { name: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', chance: 1 },
-            { name: '琼浆玉露', url: 'https://pic.imgdb.cn/item/66cc9401d9c307b7e9cb6a4b.png', chance: 1 },
-            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 42 },
+            { name: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 44 },
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
@@ -14192,7 +14791,7 @@ let jinnangItems = [
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: 50, quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: 80, quantity: 0, description: '刷新精灵的增幅百分比' },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', price: 150, quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },
-    { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', price: 1500, quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药' },
+    { name: 'poisonSkillBook', displayName: '施毒之术', url: 'https://pic.imgdb.cn/item/666c23ccd9c307b7e9eb864b.png', price: 1500, quantity: 0, description: '失传已久的施毒秘法，掌握后可释放烈性毒药，多余的施毒之术可兑换毒粉' },
     { name: 'poisonPowder', displayName: '毒粉', url: 'https://pic.imgdb.cn/item/666c2428d9c307b7e9ec3327.png', price: 50, quantity: 0, description: '配合毒粉，可使施毒成功率大大提升' },
     { name: 'earthlyEnergy', displayName: '天地灵气', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', price: 30, quantity: 0, description: '荟萃日月之精华，提升飞升之术等级的必需之物' },
     { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/669754f1d9c307b7e9bfec8f.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
@@ -14243,6 +14842,9 @@ let jinnangItems = [
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
     { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' },
+    { name: 'attentionValue', displayName: '集中值（4点）', url: 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png', price: 200, quantity: 0, description: '直接使用，给当前宠物增加4点集中值' },
+    { name: 'learningValueBook', displayName: '灵兽悟道书', url: 'https://pic.imgdb.cn/item/66d1c3a4d9c307b7e9ddf33e.png', price: 3000, quantity: 0, description: '直接使用，给当前宠物提供20000点学习度，学习度可用于提升技能加成' },
+    { name: 'resetAdvancementPill', displayName: '灵兽清心丹', url: 'https://pic.imgdb.cn/item/66d1c416d9c307b7e9de526a.png', price: 500, quantity: 0, description: '在领悟面板进行重置使用，加成重置后，会返还所有的技能点' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -14561,6 +15163,17 @@ const itemEffects = {
     cultivationPill200: () => increaseCultivation(200),
     cultivationPill500: () => increaseCultivation(500),
     blessGift: () => getBlessGift(),
+    poisonSkillBook: () => {
+        showInfoBox('你可以使用1本施毒之术兑换5个毒粉',
+            () => {
+               addItemToJinnang('poisonPowder',5);
+               showInfoBox('成功兑换5个毒粉！');
+            },
+            () => {
+                addItemToJinnang('poisonSkillBook',1);
+                showInfoBox('取消兑换！');
+            });
+    },
     tinyBag: () => {
         goldAmount += 88000;
         updateGoldDisplay(goldAmount);
@@ -14671,6 +15284,8 @@ const itemEffects = {
         updateJinnangItems();
     },
     hongHuang: () => openHongHuangTreasure(),
+    attentionValue: () => increaseCurrentPetAttention(4),
+    learningValueBook: () => increaseCurrentPetLearningValue(20000),
 };
 
 let lastUsedItemName = null;
@@ -14706,12 +15321,7 @@ function useAllItems() {
     showInfoBox(
         '道具数量过多，批量使用可能会导致过载崩溃，请提前存档',
         () => { // 这是 onConfirm 回调
-            // 批量使用道具的逻辑
-            while (useItem(lastUsedItemName)) {
-                itemEffects[lastUsedItemName](); // 执行对应道具的效果
-            }
-            updateJinnangItems(); // 更新锦囊内容显示
-            lastUsedItemName = null;
+            useItemsInBatches(lastUsedItemName);
         },
         () => { // 这是 onCancel 回调
             return;
@@ -14719,6 +15329,29 @@ function useAllItems() {
     );
 }
 
+function useItemsInBatches(itemName) {
+    function processNextBatch() {
+        // 每次批量处理一部分道具，避免阻塞主线程
+        let batchSize = 100; // 可以根据实际情况调整批处理的量
+        let itemsProcessed = 0;
+
+        while (itemsProcessed < batchSize && useItem(itemName)) {
+            itemEffects[itemName](); // 执行对应道具的效果
+            itemsProcessed++;
+        }
+
+        updateJinnangItems(); // 更新锦囊内容显示
+
+        if (useItem(itemName)) {
+            // 如果还有剩余道具，继续异步处理
+            setTimeout(processNextBatch, 0);
+        } else {
+            lastUsedItemName = null; // 重置最近使用的道具名称
+        }
+    }
+
+    processNextBatch();
+}
 
 function generateSealCard() {
     // 定义封印卡片的英文名称和对应的汉字名称映射
@@ -15903,9 +16536,9 @@ function calculateAvailableTrainingCount(petLevel) {
     let count = 0;
     if (petLevel >= 0) count++; // 宠物等级大于等于0时增加一次
     if (petLevel >= 60) count++; // 宠物等级大于等于60时增加一次
-    if (petLevel >= 149) count++; // 宠物等级大于等于120时增加一次
-    if (petLevel >= 160) count++; // 宠物等级大于等于180时增加一次
-    if (petLevel >= 180) count++; // 宠物等级大于等于200时增加一次
+    if (petLevel >= 149) count++; // 宠物等级大于等于149时增加一次
+    if (petLevel >= 160) count++; // 宠物等级大于等于160时增加一次
+    if (petLevel >= 180) count++; // 宠物等级大于等于180时增加一次
     return count;
 }
 
@@ -15955,11 +16588,11 @@ function trainAttributesAfterFifth() {
 
     const leftAttributes = attributesForTraning();
 
-    const maxEndurance = Math.round(leftAttributes.endurance * 0.4);
-    const maxIntelligence = Math.round(leftAttributes.intelligence * 0.4);
-    const maxStrength = Math.round(leftAttributes.strength * 0.4);
-    const maxAgility = Math.round(leftAttributes.agility * 0.4);
-    const maxFaith = Math.round(leftAttributes.faith * 0.4);
+    const maxEndurance = Math.round((leftAttributes.endurance - additionalAttributes.endurance) * 0.4);
+    const maxIntelligence = Math.round((leftAttributes.intelligence - additionalAttributes.intelligence) * 0.4);
+    const maxStrength = Math.round((leftAttributes.strength - additionalAttributes.strength) * 0.4);
+    const maxAgility = Math.round((leftAttributes.agility - additionalAttributes.agility) * 0.4);
+    const maxFaith = Math.round((leftAttributes.faith - additionalAttributes.faith) * 0.4);
     console.log(`金子培养上限值：${maxEndurance}, ${maxIntelligence}, ${maxStrength}, ${maxAgility}, ${maxFaith},`);
 
     const randomGrowthCount = () => {
@@ -16028,11 +16661,11 @@ function bonusAttributesDisplay() {
     const attributeNames = ['endurance', 'intelligence', 'strength', 'agility', 'faith'];
     const leftAttributes = attributesForTraning();
     const maxAttributes = {
-        endurance: Math.round(leftAttributes.endurance * 0.4),
-        intelligence: Math.round(leftAttributes.intelligence * 0.4),
-        strength: Math.round(leftAttributes.strength * 0.4),
-        agility: Math.round(leftAttributes.agility * 0.4),
-        faith: Math.round(leftAttributes.faith * 0.4)
+        endurance: Math.round((leftAttributes.endurance - additionalAttributes.endurance) * 0.4),
+        intelligence: Math.round((leftAttributes.intelligence - additionalAttributes.intelligence) * 0.4),
+        strength: Math.round((leftAttributes.strength - additionalAttributes.strength) * 0.4),
+        agility: Math.round((leftAttributes.agility - additionalAttributes.agility) * 0.4),
+        faith: Math.round((leftAttributes.faith - additionalAttributes.faith) * 0.4)
     };
 
     attributeNames.forEach(attribute => {
@@ -19135,13 +19768,13 @@ window.onload = function() {
     // 初始化敌方宠物
     initializeEnemyPet();
     }
-    
-    // 更新 UI
+
     updateQualityCard();
     updateGoldDisplay(goldAmount);
     updateAttributePanel();
     updateExpBar();
-    updatePetInfo(); // 更新宠物和邪佞宠物的属性
+    initializeAdvancementStates();//初始化领悟系统
+    updatePetInfo(); 
     
     // 默认隐藏战斗抽屉
     const fightingDrawer = document.getElementById("fightingDrawer");

@@ -548,7 +548,7 @@
         .advancement-container {
             display: flex;
             flex-direction: row;
-            justify-content: space-evenly;
+            justify-content: space-around;
             background-image: url(https://gd-hbimg.huaban.com/fd730cf6da92e721e4b42157c4d33fb543d9a986fc917-bTarH2_fw1200);
             background-size: cover;
             border-radius: 10px 10px 10px 10px;
@@ -586,6 +586,7 @@
           display: flex;
           flex-direction: column;
           gap: 10px;
+          height: 80px;
         }
         .skill-detail {
         width: 100%;
@@ -603,7 +604,7 @@
           display: flex;
           font-size: 14px;
           gap: 10px;
-          flex-direction: row;
+          flex-direction: column;
           justify-content: space-evenly;
           border: 1px solid #6f391c;
           padding: 10px;
@@ -2421,21 +2422,21 @@
     </div>
     <div class="core-area">
         <div class="advancement-container">
-            <button id="advancement-learn" onclick="openAquireSkillAdvancementPanel()" class="advancement-series">领悟</button>
+            <button id="advancement-learn" onclick="openAquireSkillAdvancementPanel()" class="advancement-series">海底领悟</button>
             <div>Skills for Your Lovely Pet</div>
-            <button id="advancement-apply" onclick="infoAdvancement()" class="advancement-series">说明</button>
+            <button id="advancement-apply" onclick="infoAdvancement()" class="advancement-series">加成说明</button>
         </div>
         <div id="skill-advancement-panel" class="aquire-skill-advancement-panel" style="display: none;">
         <div class="drawer-toggle" onclick="openAquireSkillAdvancementPanel()">技能加成</div>
           <div style="padding: 10px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
-          <div class="panel-top">
+          <div class="panel-top" style="display: flex;flex-direction: row;justify-content: space-between;">
             <div>亲密度: <span id="intimacy"></span></div>
             <div>集中值: <span id="attention"></span></div>
             <div>学习度: <span id="learning-value"></span></div>
           </div>
           <div class="panel-middle">
             <div>技能点:<span id="skill-points"></span></div>
-            <button id="aquire-skill-btn">领会</button>
+            <button id="aquire-skill-btn">领悟</button>
             <button id="reset-skill-btn">重置</button>
           </div>
           <div class="panel-bottom" id="applied-skills-list" style="height:200px;"></div>

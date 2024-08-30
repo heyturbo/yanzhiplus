@@ -450,6 +450,9 @@
             padding: 5px;
             margin: 5px 0px 5px 0px;
             flex-direction: column;
+            background-image: url(https://pic.imgdb.cn/item/66d161f3d9c307b7e950a148.png);
+            background-size: cover;
+            background-position: center;
         }
         .core-area-for-skills {
             width: 90%;
@@ -548,7 +551,7 @@
             justify-content: space-evenly;
             background-image: url(https://gd-hbimg.huaban.com/fd730cf6da92e721e4b42157c4d33fb543d9a986fc917-bTarH2_fw1200);
             background-size: cover;
-            border-radius: 10px 10px 2px 2px;
+            border-radius: 10px 10px 10px 10px;
             align-items: center;
             font-size: 12px;
             color: aliceblue;
@@ -639,19 +642,22 @@
             text-align: center;
             border-radius: 5px;
             font-size: 12px;
-            font-weight: bold;
-            box-shadow: 0px 0px 1px 1px rgb(0 0 0 / 30%);
+            box-shadow: 0px 0px 1px 1px rgb(200 255 255);
             box-sizing: border-box;
             cursor: pointer;
-            background-color: white;
+            background-color: hsl(202deg 64% 33% / 70%);
+            color: #b6ffff;
         }
         .core-area .skills .s-skill {
-            border: 2px solid gold;
-            background-color: #fefefc;
+            border: 2px solid #b9bdfd;
+            background-color: hsl(236deg 77% 80% / 50%);
+            box-shadow: 0px 0px 5px 1px #c9ccf8;
         }
         .core-area .skills .ss-skill {
-            border: 2px solid gold;
-            background-color: #ffc900;
+            border: 2px solid #c8ffff;
+            box-shadow: 0px 0px 4px 1px white;
+            background-color: hsl(237deg 76% 75% / 80%);
+            font-weight: bold;
         }
         .bottom-bar .info {
             display: flex;
@@ -6349,6 +6355,7 @@ function handleVictory() {
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
     increaseCurrentPetIntimacy(30);
+    increaseCurrentPetLearningValue(200);
 
     defeatedPets = [];
     usedPets = []; 
@@ -8050,7 +8057,7 @@ function calculateSkillLevelAndMultiplier(skill) {
 }
 
 // 全局变量
-const advancementStates = []; // 保持唯一的全局变量
+let advancementStates = []; // 保持唯一的全局变量
 
 function initializeAdvancementStates() {
   const applicableSkills = Object.values(pets).flatMap(pet =>
@@ -8194,7 +8201,8 @@ function increaseCurrentPetLearningValue(amount) {
 function increaseCurrentPetIntimacy(amount) {
   const currentPetState = advancementStates.find(state => state.petName === currentPet.name);
   if (currentPetState) {
-    currentPetState.intimacy += amount;
+    // 更新亲密度，但确保最低为0
+    currentPetState.intimacy = Math.max(0, currentPetState.intimacy + amount);
     console.log(`你的宠物亲密度增加了 ${amount} 点。`);
   } else {
     console.error('当前宠物状态不存在');
@@ -17031,6 +17039,7 @@ function getRandomRareItem(rareCounts) {
         createItem('修为灵丹（蓝）', 86788, 109238, 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png'),
         createItem('宠物资质仙丹', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png'),
         createItem('融会贯通', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png'),
+        createItem('集中值（4点）', 86788, 129238, 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png'),
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -17159,6 +17168,7 @@ function buyItem() {
         '分解符礼包': () => addItemToJinnang('fragmentsPackage', itemQuantity),
         '宠物资质仙丹': () => addItemToJinnang('qualityEnhancePill', itemQuantity),
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
+        '集中值（4点）': () => addItemToJinnang('attentionValue', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -18433,7 +18443,9 @@ function upgradeWisdomTo() {
         'treasureMap', //藏宝图
         'casinoCoverLetter', //赌场介绍信
         'jumpingSoul',
-        'qualityEnhancePill'
+        'qualityEnhancePill',
+        'attentionValue',
+        'learningValueBook'
     ];
 
     for (const item of itemsToIncrease) {
@@ -18442,15 +18454,19 @@ function upgradeWisdomTo() {
     addItemToJinnang('earthlyEnergy', 9999);
     addItemToJinnang('tejiWisdomPill', 9999);
     addItemToJinnang('ultraSkillBoomer', 9999);
+    increaseCurrentPetIntimacy(21000);
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;
     }
     
     if (target === "88888") {
-        goldAmount += 9999999;
+        goldAmount += 999999;
         addItemToJinnang('luckyAmulet',1);
-        addItemToJinnang('eightyDiscountCard',1);
+        addItemToJinnang('earthlyEnergy', 9999);
+        addItemToJinnang('attentionValue', 999);
+        addItemToJinnang('learningValueBook',999);
+        increaseCurrentPetIntimacy(21000);
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;
@@ -19897,6 +19913,7 @@ function saveGameState() {
         skillScore: skillScore,
         petsInSelect: petsInSelect,
         petStates: JSON.stringify(petStates),
+        advancementStates: JSON.stringify(advancementStates),
         currentSpecialization: currentSpecialization,
         consumedPillCount: consumedPillCount,
         petLevel: petLevel,
@@ -20158,9 +20175,11 @@ function loadGameState() {
         if (savedState.wuxingStates) {
             wuxingStates = JSON.parse(savedState.wuxingStates);
         }
-
         if (savedState.wuxingFragments) {
             wuxingFragments = savedState.wuxingFragments;
+        }
+        if (savedState.advancementStates) {
+            advancementStates = JSON.parse(savedState.advancementStates);
         }
         skillScore = savedState.skillScore;
         blessGiftClaimed = savedState.blessGiftClaimed;

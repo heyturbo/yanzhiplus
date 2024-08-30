@@ -8287,19 +8287,20 @@ function updateAdvancement() {
         ${rankMap[skill.rank]}
       </span>
       <p style="width: 40%;">${skill.name} (${skill.petName})</p>
-      <button class="skill-detail-btn" data-skill-name="${skill.name}">详情</button>
+      <button class="skill-detail-btn" data-skill-id="${skill.name}-${skill.rank}">详情</button>
     </div>
   `).join('');
 
   const skillDetailBtns = document.querySelectorAll('.skill-detail-btn');
   skillDetailBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      const skillName = btn.dataset.skillName;
-      const skill = currentPetState.appliedSkills.find(s => s.name === skillName);
+      const skillId = btn.dataset.skillId;
+      const skill = currentPetState.appliedSkills.find(s => `${s.name}-${s.rank}` === skillId);
       showSkillDetail(skill);
     });
   });
 }
+
 
 const aquireSkillBtn = document.getElementById('aquire-skill-btn');
 aquireSkillBtn.addEventListener('click', () => {

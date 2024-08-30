@@ -605,13 +605,12 @@
           font-size: 14px;
           gap: 10px;
           flex-direction: column;
-          justify-content: space-evenly;
+          justify-content: flex-start;
           border: 1px solid #6f391c;
           padding: 10px;
           border-radius: 2px;
           width: 95%;
           align-items: center;
-          flex-wrap: wrap;
         }
 
         .panel-middle button,
@@ -4089,7 +4088,7 @@ function infoPingfen() {
 }
 
 function infoAdvancement() {
-  showInfoBox("\n1. 通过领悟,让你的宠物学会强大的技能加成,显著提升战斗力!\n2. 每次领悟需要消耗亲密度和集中值,领悟结果有一定的随机性。\n3. 你最多可以为每个宠物领悟10个技能加成,每个加成有高中低三个等级。\n4. 提升加成等级会消耗技能点,宠物每升12级会得到1点技能点。\n5. 消耗学习度可以提升已领悟技能的等级,每级提供不同的加成效果。\n6. 将已领悟的技能加成应用到宠物的实际技能上,可以大幅提升技能威力!\n7. 如果你对现有的加成不满意,可以选择删除或者消耗道具重置所有技能。\n8. 合理分配资源,选择适合宠物的加成策略,让你的宠物变得更加强大吧!");
+  showInfoBox("\n1. 通过领悟,让你的宠物的SS技能获得更强大的能力!\n2. 每次领悟需要消耗亲密度和集中值,领悟结果有一定的随机性。\n3. 你最多可以为每个宠物领悟10个技能加成,每个加成有高中低三个等级。\n4. 提升加成等级会消耗技能点,宠物每升12级会得到1点技能点。\n5. 消耗学习度可以提升已领悟技能的等级,每级提供不同的加成效果。\n6. 将已领悟的技能加成应用到宠物的实际技能上,可以大幅提升技能威力!\n7. 如果你对现有的加成不满意,可以选择删除或者消耗道具重置所有技能。\n8. 合理分配资源,选择适合宠物的加成策略,让你的宠物变得更加强大吧!");
 }
         
 function infoWuxingFu() {
@@ -8061,14 +8060,17 @@ function calculateSkillLevelAndMultiplier(skill) {
 let advancementStates = []; // 保持唯一的全局变量
 
 function initializeAdvancementStates() {
-  const applicableSkills = Object.values(pets).flatMap(pet =>
-    pet.skills.filter(skill => skill.type === "PA" || skill.type === "MA")
-      .flatMap(skill => [
-        { ...skill, rank: '高', multiplier: 0, petName: pet.name, skillName: `${skill.name}[高]` },
-        { ...skill, rank: '中', multiplier: 0, petName: pet.name, skillName: `${skill.name}[中]` },
-        { ...skill, rank: '低', multiplier: 0, petName: pet.name, skillName: `${skill.name}[低]` }
-      ])
-  );
+const applicableSkills = Object.values(pets).flatMap(pet =>
+  pet.skills
+    .filter(skill => 
+      (skill.type === "PA" || skill.type === "MA" || skill.type === "PP") && skill.rarity === "SS"
+    )
+    .flatMap(skill => [
+      { ...skill, rank: '高', multiplier: 0, petName: pet.name, skillName: `${skill.name}[高]` },
+      { ...skill, rank: '中', multiplier: 0, petName: pet.name, skillName: `${skill.name}[中]` },
+      { ...skill, rank: '低', multiplier: 0, petName: pet.name, skillName: `${skill.name}[低]` }
+    ])
+);
 
   if (applicableSkills.length === 0) {
     showInfoBox('没有可用的技能');
@@ -8093,7 +8095,7 @@ function initializeAdvancementStates() {
 
 
 function calculateSkillPointsForPet() {
-  return Math.floor(petLevel / 12);
+  return Math.floor(petLevel / 9);
 }
 
 function aquireSkillAdvancement(currentPetState, applicableSkills) {

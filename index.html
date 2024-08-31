@@ -6063,7 +6063,7 @@ let drugInventory = {
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加2000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加2000点法力值" },
-    "宇宙之尘": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
+    "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得50000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
@@ -7986,7 +7986,7 @@ function handleLevelUp() {
     }
 
     if (skill.level >= 20) {
-        showInfoBox('该技能已达到目前阶段最高等级！请尝试使用药品系统中的“宇宙之尘”进行升级！');
+        showInfoBox('该技能已达到目前阶段最高等级！请尝试使用药品系统中的“魔术棱柱”进行升级！');
         return;
     }
 
@@ -10740,7 +10740,7 @@ function useSelectedDrug() {
                     }
                 }, healthInterval);
                 break;
-            case "宇宙之尘":
+            case "魔术棱柱":
                 if (currentExp >= 30000) {
                     const skillsArea = document.getElementById("skills-area");
                     const upgradableSkills = Array.from(skillsArea.children).map(skillDiv => {
@@ -10750,7 +10750,7 @@ function useSelectedDrug() {
                     }).filter(skill => skill.level < 24 && skill !== null);
                     
                     if (upgradableSkills.length === 0) {
-                        showInfoBox("所有技能已达到24级，无法使用宇宙之尘。请尝试使用更高级的道具进行技能升级！");
+                        showInfoBox("所有技能已达到24级，无法使用魔术棱柱。请尝试使用更高级的道具进行技能升级！");
                         break;
                     }
             
@@ -10772,7 +10772,7 @@ function useSelectedDrug() {
                     updateExpBar(); // 更新经验条显示
                     updateUI(); // 更新界面显示
                 } else {
-                    showInfoBox("经验不足，无法使用宇宙之尘。");
+                    showInfoBox("经验不足，无法使用魔术棱柱。");
                 }
                 break;
             case "幸运金币":

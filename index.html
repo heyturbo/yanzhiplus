@@ -9,10 +9,10 @@
             font-family: Arial, sans-serif;
             display: flex;
             flex-direction: column;
-            align-items: center;
             margin: 0;
             padding: 0;
             color: #6f391c;
+            align-items: center;
         }
         #petOverview {
             display: none; /* 默认隐藏 */
@@ -389,7 +389,6 @@
             margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 41%);
-            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -449,16 +448,16 @@
             padding: 5px;
             margin: 5px 0px 5px 0px;
             flex-direction: column;
-            background-image: url(https://pic.imgdb.cn/item/66d2bfe2d9c307b7e9fa97dc.png);
+            background-image: url(https://pic.imgdb.cn/item/66d324a9d9c307b7e97a8e72.png);
             background-size: cover;
             background-position: center;
+            border: 1px groove aliceblue;
         }
         .core-area-for-skills {
             width: 90%;
             margin: 10px 0px 5px 0px;
             padding: 5px;
             background-color: hsl(0deg 0% 100% / 40%);
-            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -647,16 +646,21 @@
             cursor: pointer;
             background-color: hsl(202deg 64% 33% / 70%);
             color: #b6ffff;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
         .core-area .skills .s-skill {
-            border: 2px solid #b9bdfd;
-            background-color: hsl(236deg 77% 80% / 50%);
-            box-shadow: 0px 0px 5px 1px #c9ccf8;
+            border: 1px solid #76c0dd;
+            background-color: hsl(202deg 50% 40% / 70%);
+            box-shadow: 0px 0px 5px 2px hsl(202 53% 84% / 1);
         }
         .core-area .skills .ss-skill {
-            border: 2px solid #c8ffff;
-            box-shadow: 0px 0px 4px 1px white;
-            background-color: hsl(237deg 76% 75% / 80%);
+            border: 2px solid #e8f2ed;
+            box-shadow: 0px 0px 4px 1px #e2e8e3;
+            background-color: hsl(190deg 60% 55% / 50%);
             font-weight: bold;
         }
         .bottom-bar .info {
@@ -673,14 +677,15 @@
         height: 20px;
         }
         .description-box {
-            margin: 5px 0px;
-            padding: 5px;
-            width: 90%;
-            background-color: rgb(255 255 255 / 40%);
+            margin: 5px;
+            padding: 10px;
+            width: 89%;
+            background-color: hsl(0deg 0% 100% / 39%);
             border-radius: 10px;
-            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
-            text-align: justify;
-            border: 1px groove white;
+            text-align: left;
+            border: 1px groove aliceblue;
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.8);
         }
         .treasure-description-box {
             gap: 4px;
@@ -2611,13 +2616,13 @@
                                 <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
                             </div>
                             <div id="secondary-attributes-panel" style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;cursor:pointer;">
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color:white;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color:white;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻击: <span style="color:white;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防御: <span style="color:white;" id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻击: <span style="color:white;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防御: <span style="color:white;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度: <span style="color:white;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color: white;width: 60px;text-align: center;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color: white;width: 60px;text-align: center;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度值: <span style="color: white;width: 60px;text-align: center;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
                             </div>
                     </div>
                 </div>
@@ -18054,12 +18059,29 @@ function updateSkillsArea(selectedSkills) {
 function deleteSkill(skill, skillDiv, skillsArea) {
     // 在 currentPet.skills 中找到与 skillDiv 对应的技能对象
     const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
+    const skillType = matchingSkill.type;
 
     if (matchingSkill) {
+        let skillLevel = matchingSkill.level ? matchingSkill.level : 1;
+        let skillMultiplier = matchingSkill.multiplier;
+
+        const skillTypeMap = {
+            "PA": "物理攻击技能，与物理攻击力相关",
+            "MA": "法术攻击技能，与法术攻击力相关",
+            "PP": "施毒技能，与法术攻击力和修为有关",
+            "PH": "治疗技能，与法术攻击力和修为有关",
+            "PD": "防御技能",
+            "SH": "智慧守护技能",
+            "HL": "法力回复技能",
+            "N": "被动属性加成技能，将会按照固定值为玩家提供二级属性",
+        };
+        
         const skillDescription = matchingSkill.description;
+        const skillTypeDescription = skillTypeMap[skillType] || "未知类型技能";
 
         // 定义确认删除技能的回调函数
         function onConfirm() {
+            // 删除技能的DOM元素
             skillsArea.removeChild(skillDiv);
 
             // 获取当前技能列表并更新评分
@@ -18077,13 +18099,21 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
         // 显示信息框，展示对应技能的描述并传入回调函数
         showInfoBox(
-            `${skill.name} ${matchingSkill.level}级：${skillDescription}\n\n你是否要删除此技能?`,
-            onConfirm,
+            `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
+            () => {
+                showInfoBox(`你确定要删除${skill.name}吗？该操作无法恢复！`,
+                    onConfirm,
+                    onCancel,
+                    'red'
+                );
+            },
             onCancel,
             'black' // 可选的颜色参数
         );
     } else {
         console.error('未找到匹配的技能');
+        // 可以考虑在UI中给出用户友好的提示
+        showInfoBox('未找到匹配的技能，删除操作无法进行。', null, null, 'red');
     }
 }
 

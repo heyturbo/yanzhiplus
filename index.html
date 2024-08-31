@@ -389,13 +389,14 @@
             margin: 5px 5px;
             padding: 5px;
             background-color: rgb(255 255 255 / 41%);
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
             display: flex;
             justify-content: space-around;
             align-items: center;
             border-radius: 10px;
             flex-direction: row;
             flex-wrap: nowrap;
+            border: 1px groove white;
         }
         
         .top-bar div {
@@ -419,12 +420,13 @@
             padding: 5px;
             background-color: rgb(255 255 255 / 40%);
             border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1);
+            /* box-shadow: 0 0px 5px rgba(0, 0, 0, 0.1); */
             display: flex;
             border-radius: 10px;
             flex-direction: row;
             flex-wrap: nowrap;
             justify-content: space-between;
+            border: 1px groove white;
         }
         
         .bottom-bar div {
@@ -456,11 +458,12 @@
             margin: 10px 0px 5px 0px;
             padding: 5px;
             background-color: hsl(0deg 0% 100% / 40%);
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
             display: flex;
             flex-direction: column;
             align-items: center;
             border-radius: 10px;
+            border: 1px groove white;
         }
         .button-row {
             display: grid;
@@ -667,6 +670,7 @@
             align-items: center;
         }
         .bottom-bar .info div {
+        height: 20px;
         }
         .description-box {
             margin: 5px 0px;
@@ -674,8 +678,9 @@
             width: 90%;
             background-color: rgb(255 255 255 / 40%);
             border-radius: 10px;
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            /* box-shadow: 0 1px 2px rgb(0 0 0 / 40%); */
             text-align: justify;
+            border: 1px groove white;
         }
         .treasure-description-box {
             gap: 4px;
@@ -704,21 +709,20 @@
             font-size: 14px;
         }
         .pet-selector {
-            width: 90%;
-            margin: 5px 5px;
-            padding: 5px;
-            background-color: rgb(255 255 255 / 50%);
-            box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
+            width: 80px;
+            padding: 4px;
             border-radius: 10px;
             text-align: center;
         }
         .pet-selector select {
-            padding: 0px;
-            font-size: 16px;
+            padding: 2px;
+            font-size: 14px;
             border-radius: 5px;
-            background-color: #ffffff75;
+            background-color: hsl(0deg 0% 100% / 40%);
             border: 1px solid #ccc;
             width: 100%;
+            color: #6f391c;
+            text-align: center;
         }
         .battle-pet-selector {
             padding: 5px;
@@ -2479,12 +2483,7 @@
             <div><span id="miraculous-pill">1</span></div>
         </div>
     </div>
-    <div class="pet-selector">
-        <select id="pet-select" onchange="changePet()">
-            <option value="xiaojin">小金牛</option>
-            <!-- 其他宠物 -->
-        </select>
-    </div>
+
     <div class="quality-drawer" id="quality-drawer">
         <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
         <div class="quality-info" id="quality-info">
@@ -2965,11 +2964,18 @@
             <img style="width: 180px;height: 180px;" id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
         </div>
         <div class="info" style="display: flex;flex-direction: column;">
-            <div id="gold-container" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;">
+            <div id="gold-container" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;border: 1px solid #6f391c;">
                 <div style="background: #B19768;padding: 2px;margin-right: 4px;color: white;box-shadow: inset 0px 0px 2px 1px #E3D8B9;text-shadow: -1px -1px 0 #693331, 1px -1px 0 #693331, -1px 1px 0 #693331, 1px 1px 0 #693331;">金子: </div>
                 <span id="gold-amount">50000</span>
             </div> 
-            <div>宠物名称： <span id="pet-name">小金牛</span></div>
+            <div>宠物： 
+                <div class="pet-selector">
+                    <select id="pet-select" onchange="changePet()">
+                        <option value="xiaojin">小金牛</option>
+                        <!-- 其他宠物 -->
+                    </select>
+                </div>
+            </div>
             <div>玩家称号： <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长： <span id="game-timer">00:00</span></div>
             <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">
@@ -5740,7 +5746,7 @@ function changeBattlePet(skipConfirmation = false) {
 }
         
 function updatePetDisplay() {
-    document.getElementById("pet-name").innerText = currentPet.name; // 更新宠物名称显示
+    
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
     document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
     document.getElementById("your-pet-image").src = currentPet.image;

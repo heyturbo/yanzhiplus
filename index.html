@@ -10,10 +10,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-image: url('https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png');
-            background-repeat: repeat; /* 图片平铺 */
-            background-size: auto; /* 保持原图大小 */
-            background-attachment: fixed; /* 背景固定 */
             margin: 0;
             padding: 0;
         }
@@ -338,10 +334,10 @@
         overflow: hidden;
                 }
                 body {
-        margin: 0px;
-        max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
+                    margin: 0px;
+                    max-height: 100%; /* or `height: calc(100% - 16px);` if body has default margin */
+                    overflow: auto;
+                    -webkit-overflow-scrolling: touch;
                 }
             }
         }
@@ -450,7 +446,7 @@
             padding: 5px;
             margin: 5px 0px 5px 0px;
             flex-direction: column;
-            background-image: url(https://pic.imgdb.cn/item/66d161f3d9c307b7e950a148.png);
+            background-image: url(https://pic.imgdb.cn/item/66d2bfe2d9c307b7e9fa97dc.png);
             background-size: cover;
             background-position: center;
         }
@@ -467,12 +463,11 @@
         }
         .button-row {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 0px 10px;
             margin: 0px 0px;
-            flex-direction: row;
-            flex-wrap: wrap;
             justify-items: center;
+            overflow-x: scroll;
         }
         
         .button-row button {
@@ -547,8 +542,9 @@
         }
         .advancement-container {
             display: flex;
+            gap: 20px;
             flex-direction: row;
-            justify-content: space-around;
+            justify-content: space-evenly;
             background-image: url(https://gd-hbimg.huaban.com/fd730cf6da92e721e4b42157c4d33fb543d9a986fc917-bTarH2_fw1200);
             background-size: cover;
             border-radius: 10px 10px 10px 10px;
@@ -565,16 +561,16 @@
             color: #f1f9ff;
             border: 1px solid #155173;
             box-shadow: 0px 0px 2px 0px rgb(191 198 204);
+            cursor: pointer;
         }
         .aquire-skill-advancement-panel {
           width: 90%;
           box-shadow: 0 0px 6px 2px rgb(0 0 0 / 40%);
-          padding: 2px;
+          padding: 1px 2px 2px 2px;
           position: fixed;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          overflow: scroll;
           display: block;
           background: #6f391c;
           border-radius: 2px;
@@ -587,6 +583,7 @@
           flex-direction: column;
           gap: 10px;
           height: 80px;
+          justify-content: center;
         }
         .skill-detail {
         width: 100%;
@@ -710,7 +707,7 @@
             width: 90%;
             margin: 5px 5px;
             padding: 5px;
-            background-color: rgb(255 255 255 / 95%);
+            background-color: rgb(255 255 255 / 50%);
             box-shadow: 0 1px 2px rgb(0 0 0 / 40%);
             border-radius: 10px;
             text-align: center;
@@ -750,6 +747,7 @@
             height: 180px;
             border-radius: 10px;
             box-shadow: 0px 0px 2px 0px #003670;
+            cursor: pointer;
         }
         .info-card {
             display: none;
@@ -1120,7 +1118,7 @@
             align-items: stretch;
             justify-items: stretch;
             margin-bottom': 1';
-            margin: 0px 0px 10px 0px;
+            margin: 10px 0px 10px 0px;
         }
         .button-grid button {
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
@@ -2428,7 +2426,7 @@
         <div id="skill-advancement-panel" class="aquire-skill-advancement-panel" style="display: none;">
         <div class="drawer-toggle" onclick="openAquireSkillAdvancementPanel()">技能加成</div>
           <div style="padding: 10px;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;border: 1px solid black;">
-          <div class="panel-top" style="display: flex;flex-direction: row;justify-content: space-between;">
+          <div class="panel-top" style="overflow: hidden;display: flex;margin-bottom: 10px;flex-direction: row;justify-content: space-between;align-items: center;color: white;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;">
             <div>亲密度: <span id="intimacy"></span></div>
             <div>集中值: <span id="attention"></span></div>
             <div>学习度: <span id="learning-value"></span></div>
@@ -2439,7 +2437,7 @@
             <button id="reset-skill-btn">重置</button>
           </div>
           <div class="panel-bottom" id="applied-skills-list" style="height:200px;"></div>
-          <div class="skill-detail-panel" id="advancement-detail-panel"></div>
+          <div class="skill-detail-panel" id="advancement-detail-panel" style="overflow: hidden;margin-bottom: 0px;align-items: center;background: #e4bb5c;border: 1px solid #6f391c;border-radius: 2px;font-weight: bold;"></div>
         </div>
         </div>
         <div class="skills" id="skills-area"></div>
@@ -2496,7 +2494,7 @@
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">名称: <span id="quality-name">小金牛</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">品质: <span id="quality-tier">普通</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">成长率: <span id="quality-growth-rate">100%</span></div>
-                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">变异: <span id="quality-mutated">未变异</span><button onclick="useMutationScroll()">卷轴</button></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">变异: <span id="quality-mutated">未变异</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">进化等级: <span id="evolution-level">0</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">当前悟性: <span id="current-wisdom">0</span></div>
                     </div>
@@ -2704,7 +2702,7 @@
         </div>
     </div>
     <div class="jinnang-drawer" id="jinnang-drawer">
-        <div class="drawer-toggle" onclick="toggleJinnangDrawer()"><span id="jinnang-capacity" onclick="enlargeCapacity()">2000</span></div>
+        <div class="drawer-toggle" onclick="toggleJinnangDrawer()"><span id="jinnang-capacity">2000</span></div>
         <div class="jinnang-info" id="jinnang-info">
             <div id="jinnang-reward-container" style="min-height:100px; max-height:300px; overflow-y:scroll; margin-bottom:10px">
                 <div class="jinnang-reward" id="jinnang-reward"></div>
@@ -2963,7 +2961,7 @@
         </div>
     </div>
     <div class="bottom-bar">
-        <div class="pet-image">
+        <div class="pet-image" onclick="showBiography()">
             <img style="width: 180px;height: 180px;" id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
         </div>
         <div class="info" style="display: flex;flex-direction: column;">
@@ -5748,8 +5746,7 @@ function updatePetDisplay() {
     document.getElementById("your-pet-image").src = currentPet.image;
     // 检查宠物是否已经变异
     if (currentPet.qualities.mutated) {
-        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-        document.body.style.backgroundRepeat = "repeat";
+        updateMutatedImg();
     }
 }
         
@@ -6066,7 +6063,7 @@ let drugInventory = {
     "焚灵之丸": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b52a.png", tier: 1, description: "紫色品阶，消耗自身生命值上限20%生命值，20秒内提升50%物理攻击力、法术攻击、暴击率和暴击伤害。生命值不足上限20%时无法使用。" },
     "冰莲絮": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b4f5.png", tier: 2, description: "蓝色品阶，永久增加2000点生命值" },
     "晗灵果": { quantity: 2, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b522.png", tier: 2, description: "蓝色品阶，永久增加2000点法力值" },
-    "魔术棱柱": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
+    "宇宙之尘": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e90669fa.png", tier: 1, description: "紫色品阶，消耗30000当前经验升级一个随机技能，通过该道具最多可让技能升至24级" },
     "幸运金币": { quantity: 0, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a20.png", tier: 0, description: "橙色品阶，使用后将随机触发事件：让怪物血量变为1/获得50000经验/回退10轮" },
     "双倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a2f.png", tier: 2, description: "蓝色品阶，使用后60秒内战斗获胜所得经验增加两倍" },
     "四倍经验药": { quantity: 1, url: "https://pic.imgdb.cn/item/666e9aeed9c307b7e9066a29.png", tier: 1, description: "紫色品阶，使用后60秒内战斗获胜所得经验增加四倍" },
@@ -7109,7 +7106,7 @@ function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
     
     battleAttributes.health -= healthLost;
-    battleState.enemy.health += healthLost;
+    battleState.enemy.health += healthLost * 10;
     logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'red');
     updateUI();
 }
@@ -7143,8 +7140,8 @@ function handleQiongQiSkill() {
 
             qiongQi = setInterval(() => {
                 battleAttributes.health -= healthLost;
-                enemyMaxHealth += healthLost;
-                battleState.enemy.health += healthLost;
+                enemyMaxHealth += healthLost * 10;
+                battleState.enemy.health += healthLost * 10;
                 battleState.enemy.physicalDefense += temporaryShield;
                 battleState.enemy.magicDefense += temporaryShield;
 
@@ -7174,22 +7171,24 @@ function handleQiongQiSkill() {
 //此函数为洪荒至尊仙葫开启逻辑
 function openHongHuangTreasure() {
     const treasure = [
-        { displayName: '资质仙丹礼包', name: 'qualityEnhancePillPKG', quantity: 2, chance: 5 },
+        { displayName: '资质仙丹礼包*2', name: 'qualityEnhancePillPKG', quantity: 2, chance: 5 },
         { displayName: '集中值（4点）*10', name: 'attentionValue', quantity: 10, chance: 5 },
         { displayName: '灵兽悟道书', name: 'learningValueBook', quantity: 1, chance: 5 },
         { displayName: '灵兽清心丹', name: 'resetAdvancementPill', quantity: 1, chance: 5 },
         { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 5 },
-        { displayName: '仙人醍醐*2', name: 'ultraSkillBoomer', quantity: 2, chance: 10 },
-        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 15.5 },
-        { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 10 },
+        { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 1, chance: 5 },
+        { displayName: '仙人醍醐*2', name: 'ultraSkillBoomer', quantity: 2, chance: 5 },
+        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 10 },
+        { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 10 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
-        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 0.5 },
+        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 1 },
         { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
-        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 }
+        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 10 },
+        { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 5 },
     ];
 
     // 计算总的概率权重
@@ -7204,7 +7203,7 @@ function openHongHuangTreasure() {
             setTimeout(() => {
                 addItemToJinnang(item.name, item.quantity); // 添加奖品到锦囊
                 showInfoBox(`你获得了: ${item.displayName}`,'red');
-            },300);
+            },200);
             break;
         }
         randomChance -= item.chance; // 递减randomChance，直到找到匹配的奖品
@@ -7987,7 +7986,7 @@ function handleLevelUp() {
     }
 
     if (skill.level >= 20) {
-        showInfoBox('该技能已达到目前阶段最高等级！请尝试使用药品系统中的“魔术棱柱”进行升级！');
+        showInfoBox('该技能已达到目前阶段最高等级！请尝试使用药品系统中的“宇宙之尘”进行升级！');
         return;
     }
 
@@ -8652,11 +8651,22 @@ function updateDamageValue(damage, enemy = false) {
     if (isCritical) {
         damageElement.innerText = `-${damage}`;
         damageElement.style.color = 'red';
-        damageElement.style.fontSize = '26px';
-        damageElement.style.textShadow = 'text-shadow: 0 0 2px black;';
+        damageElement.style.fontSize = '24px';
+        damageElement.style.textShadow = 'text-shadow: 0 0 2px orange;';
+        damageElement.style.textWrap = 'no-warp;';
+        damageElement.style.position = 'absolute;';
+        damageElement.style.top = '18%;';
+        damageElement.style.left = '70%;';
     } else {
         // 正常显示
         damageElement.innerText = `-${damage}`;
+        damageElement.style.color = 'yellow';
+        damageElement.style.fontSize = '18px';
+        damageElement.style.textShadow = 'text-shadow: 0 0 2px black;';
+        damageElement.style.textWrap = 'no-warp;';
+        damageElement.style.position = 'absolute;';
+        damageElement.style.top = '18%;';
+        damageElement.style.left = '24%;';
     }
 
     // 在 300 毫秒后清空显示的伤害值
@@ -10730,7 +10740,7 @@ function useSelectedDrug() {
                     }
                 }, healthInterval);
                 break;
-            case "魔术棱柱":
+            case "宇宙之尘":
                 if (currentExp >= 30000) {
                     const skillsArea = document.getElementById("skills-area");
                     const upgradableSkills = Array.from(skillsArea.children).map(skillDiv => {
@@ -10740,7 +10750,7 @@ function useSelectedDrug() {
                     }).filter(skill => skill.level < 24 && skill !== null);
                     
                     if (upgradableSkills.length === 0) {
-                        showInfoBox("所有技能已达到24级，无法使用魔术棱柱。请尝试使用更高级的道具进行技能升级！");
+                        showInfoBox("所有技能已达到24级，无法使用宇宙之尘。请尝试使用更高级的道具进行技能升级！");
                         break;
                     }
             
@@ -10762,7 +10772,7 @@ function useSelectedDrug() {
                     updateExpBar(); // 更新经验条显示
                     updateUI(); // 更新界面显示
                 } else {
-                    showInfoBox("经验不足，无法使用魔术棱柱。");
+                    showInfoBox("经验不足，无法使用宇宙之尘。");
                 }
                 break;
             case "幸运金币":
@@ -13720,7 +13730,15 @@ function performLotteryDraw() {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
             pendingPrize += prize;
-            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！`);
+    
+            const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
+            let bonusAmount = 0;
+            if (luckyAmulet && luckyAmulet.quantity >= 2) {
+                const bonusMultiplier = (luckyAmulet.quantity - 1) * 0.1;
+                bonusAmount = Math.floor(prize * bonusMultiplier);
+            }
+    
+            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！${bonusAmount > 0 ? `由于你拥有${luckyAmulet.quantity}张财运亨通，本次中奖奖金包含加码${convertPrice(bonusAmount)}金！` : ''}`);
         }
     }
     
@@ -13733,21 +13751,17 @@ function performLotteryDraw() {
 function generateLotteryWinningNumbers() {
     let numbers = [];
     
-    // 检查玩家是否拥有 LuckyAmulet 道具
     const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
     const hasLuckyAmulet = luckyAmulet && luckyAmulet.quantity > 0;
 
-    // 只使用玩家选择的前5个数字
     const availableSelectedNumbers = lotterySelectedNumbers.slice(0, 5);
 
     if (hasLuckyAmulet && availableSelectedNumbers.length > 0) {
-        // 从玩家选择的前5个号码中随机选择一个加入中奖号码
         const randomIndex = Math.floor(Math.random() * availableSelectedNumbers.length);
         const selectedNumber = availableSelectedNumbers[randomIndex];
         numbers.push(selectedNumber);
     }
 
-    // 生成其余的中奖号码
     while (numbers.length < 5) {
         const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
         if (!numbers.includes(num)) {
@@ -13784,12 +13798,18 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         } else {
             prize += 1000;
         }
-        // 奖金区数字放大和闪烁效果
+
         const resultAmountElement = document.getElementById('lotteryResultAmount');
         resultAmountElement.classList.add('highlight');
         setTimeout(() => {
             resultAmountElement.classList.remove('highlight');
         }, 1000);
+    }
+
+    const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
+    if (luckyAmulet && luckyAmulet.quantity >= 2) {
+        const bonusMultiplier = 1 + (luckyAmulet.quantity * 0.1);
+        prize = Math.floor(prize * bonusMultiplier);
     }
 
     document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: gold; font-weight: bold; text-shadow: 0 0 5px #6f391c;">${convertPrice(prize)}</span>` : '奖金区: 0';
@@ -14465,7 +14485,7 @@ function collectTreasure() {
         '普通经验书': 'normalExperienceBook',
         '高级经验书': 'advancedExperienceBook',
         '水晶红富士': () => generateItemToJinnang('redApple', '水晶红富士', 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', price = 100, quantity = 1, description = '美味的苹果'),
-        '浓情费罗列': () => generateItemToJinnang('chocolate', '浓情费罗列', 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', price = 100, quantity = 1, description = '一口下去，丝滑的巧克力和爆浆甜心在你的口腔中交织，回味无穷'),
+        '浓情费罗列': () => generateItemToJinnang('chocolate', '浓情费罗列', 'https://pic.imgdb.cn/item/66d2d3ead9c307b7e9180338.png', price = 100, quantity = 1, description = '一口下去，丝滑的巧克力和爆浆甜心在你的口腔中交织，回味无穷'),
         '迷人的花束': () => generateItemToJinnang('fancyFlower', '迷人的花束', 'https://pic.imgdb.cn/item/66cfe544d9c307b7e978e72b.png', price = 100, quantity = 1, description = '迷人的花束，赠给爱人以芬芳'),
         '达摩不倒翁': () => generateItemToJinnang('damoTumbler', '达摩不倒翁', 'https://pic.imgdb.cn/item/66cfee41d9c307b7e983f6f7.png', price = 100, quantity = 1, description = '达摩不倒翁，按压越用力，弹起来越容易撞到头'),
         '飞升之石': 'ascensionStone',
@@ -14683,7 +14703,7 @@ function getRandomReward(type) {
             { name: '神兽还童丹', url: 'https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png', chance: 10 },
             { name: '高级悟性丹', url: 'https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png', chance: 20 },
             { name: '水晶红富士', url: 'https://pic.imgdb.cn/item/66ced7d4d9c307b7e9650a3b.png', chance: 4 },
-            { name: '浓情费罗列', url: 'https://pic.imgdb.cn/item/66cedacfd9c307b7e96a200d.png', chance: 3 },
+            { name: '浓情费罗列', url: 'https://pic.imgdb.cn/item/66d2d3ead9c307b7e9180338.png', chance: 3 },
             { name: '迷人的花束', url: 'https://pic.imgdb.cn/item/66cfe544d9c307b7e978e72b.png', chance: 3 },
             { name: '达摩不倒翁', url: 'https://pic.imgdb.cn/item/66cfee41d9c307b7e983f6f7.png', chance: 3 },
             { name: '冰魄还童丹', url: 'https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png', chance: 10 },
@@ -14791,6 +14811,7 @@ let jinnangItems = [
     { name: 'hailMonsterPill', displayName: '聚灵丹', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png', price: 50, quantity: 5, description: '可在战斗界面开启自动战斗功能，每次开启消耗一个' },
     { name: 'hailMonsterAmulet', displayName: '唤妖符', url: 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png', price: 50, quantity: 5, description: '可战斗界面跳过10轮，轮次越高，敌人越强大，谨慎使用' },
     { name: 'blessGift', displayName: '新手福袋', url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png', price: 1, quantity: 0, description: '新手时期的嘉奖，要合理分配哦' },
+    { name: 'backToOne', displayName: '穿越时空套餐', url: 'https://pic.imgdb.cn/item/6656a1b6d9c307b7e9baa881.png', price: 100, quantity: 0, description: '打开立即获得100组无限宝石和清心酿，回到第一轮战斗' },
     { name: 'normalExperienceBook', displayName: '普通经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e9b.png', price: 50, quantity: 0, description: '无名者的经验，使用后获得10000经验值' },
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
     { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后获得30000经验值' },
@@ -14846,14 +14867,14 @@ let jinnangItems = [
     { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
-    { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
-    { name: 'noWorkBoss', displayName: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
+    { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
+    { name: 'noWorkBoss', displayName: '無班之魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },
-    { name: 'resetEarningMultiplierPowder', displayName: '归元散', url: 'https://pic.imgdb.cn/item/66c43d02d9c307b7e954d4f7.gif', price: 0, quantity: 1, description: '谨慎使用。重置当前打工宠物的能力值倍率，仅供NaN值时调试使用' },
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
     { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' },
+    { name: 'enlargeCapacityCard', displayName: '背包扩容卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 1000, quantity: 1, description: '使用后开启1000背包容量' },
     { name: 'attentionValue', displayName: '集中值（4点）', url: 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png', price: 200, quantity: 0, description: '直接使用，给当前宠物增加4点集中值' },
     { name: 'learningValueBook', displayName: '灵兽悟道书', url: 'https://pic.imgdb.cn/item/66d1c3a4d9c307b7e9ddf33e.png', price: 3000, quantity: 0, description: '直接使用，给当前宠物提供20000点学习度，学习度可用于提升技能加成' },
     { name: 'resetAdvancementPill', displayName: '灵兽清心丹', url: 'https://pic.imgdb.cn/item/66d1c416d9c307b7e9de526a.png', price: 500, quantity: 0, description: '在领悟面板进行重置使用，加成重置后，会返还所有的技能点' },
@@ -14910,7 +14931,13 @@ function addItemToJinnang(itemName, quantity = 1) {
 
         // 若有剩余数量，提示背包已满
         if (quantity > 0) {
-            showInfoBox("当前背包已没有空余位置！");
+            showInfoBox("当前背包已没有空余位置！",
+               () => {
+                   enlargeCapacity();
+               },
+               () => {
+                   enlargeCapacity();
+               });
         }
     } else {
         // 如果没有该物品，则调用 generateItemToJinnang 生成并添加新物品
@@ -14923,7 +14950,13 @@ function addItemToJinnang(itemName, quantity = 1) {
 
         // 若有剩余数量，提示背包已满
         if (quantity > 0) {
-            showInfoBox("当前背包已没有空余位置！");
+            showInfoBox("当前背包已没有空余位置！",
+               () => {
+                   enlargeCapacity();
+               },
+               () => {
+                   enlargeCapacity();
+               });
         }
     }
 
@@ -15023,6 +15056,12 @@ function sellItem() {
     }
 }//拓展背包
 
+function enlargeJinnangCapacity(amount) {
+    jinnangCapacity += amount;
+    showInfoBox(`容量已增加${amount}，当前容量为${jinnangCapacity}`);
+    updateJinnangCapacityDisplay();
+}
+        
 function enlargeCapacity() {
     let cost;
     let increaseAmount;
@@ -15202,7 +15241,10 @@ const itemEffects = {
         setTimeout(handleSummonPet, 0);
     },
     liguolin: () => useLiguolin(),
-    mutationScroll: () => useMutationScroll(),
+    mutationScroll: () => {
+        useMutationScroll();
+        addItemToJinnang('mutationScroll',1);
+    },
     advancedSkillPill: () => fulfillPetSkill(),
     drugBox: () => getRandomDrug(10,20),
     fancyDrugBox: () => getRandomDrug(20,40),
@@ -15296,8 +15338,19 @@ const itemEffects = {
         updateJinnangItems();
     },
     hongHuang: () => openHongHuangTreasure(),
-    attentionValue: () => increaseCurrentPetAttention(4),
-    learningValueBook: () => increaseCurrentPetLearningValue(20000),
+    attentionValue: () => {
+        increaseCurrentPetAttention(4);
+        showInfoBox('当前宠物增加了4点集中值');
+    },
+    learningValueBook: () => {
+        increaseCurrentPetLearningValue(20000);
+        showInfoBox('当前宠物增加了20000学习度');
+    },
+    enlargeCapacityCard: () => enlargeJinnangCapacity(1000),
+    backToOne: () => {
+        addItemToJinnang('infiniteGem',100);
+        addItemToJinnang('ignoranceWater',100);
+    }
 };
 
 let lastUsedItemName = null;
@@ -16771,20 +16824,32 @@ function showBiography() {
     const biography = biographies[currentPetName];
     const skillScore = parseInt(document.getElementById("skill-score").innerText, 10);
 
-    let message;
+    let message = "";
+
     if (skillScore < 1000000) {
         message = "您的宠物评分过低，请提升到1000000后再试！（宠物传记共有3段，评分达到1000000、2000000和3000000时会分别解锁）";
-    } else if (skillScore < 2000000) {
-        message = biography[0];
-    } else if (skillScore < 3000000) {
-        message = biography[0] + "\n" + biography[1];
-    } else if (skillScore < 4000000) {
-        message = biography[0] + "\n" + biography[1] + "\n" + biography[2];
     } else {
-        message = biography[0] + "\n" + biography[1] + "\n" + biography[2] + "\n" + biography[3];
+        // 使用数组来存储每个可能的段落
+        const paragraphs = [];
+
+        if (biography[0] && skillScore >= 1000000) {
+            paragraphs.push(biography[0]);
+        }
+        if (biography[1] && skillScore >= 2000000) {
+            paragraphs.push(biography[1]);
+        }
+        if (biography[2] && skillScore >= 3000000) {
+            paragraphs.push(biography[2]);
+        }
+        if (biography[3] && skillScore >= 4000000) {
+            paragraphs.push(biography[3]);
+        }
+
+        // 将所有段落拼接成一个字符串，用换行符分隔
+        message = paragraphs.join("\n");
     }
 
-    showInfoBox(message,null,null,'black');
+    showInfoBox(message, null, null, 'black');
 }
 
 
@@ -18471,6 +18536,7 @@ function upgradeWisdomTo() {
         addItemToJinnang('attentionValue', 999);
         addItemToJinnang('learningValueBook',999);
         increaseCurrentPetIntimacy(21000);
+        generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1000, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
         return;
@@ -18991,6 +19057,23 @@ function useBingpoRebornPill() {
     }
 }
 
+function updateMutatedImg() {
+    if (currentPet.qualities.mutated) {
+        // 设置变异背景
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/66d2bf00d9c307b7e9f8b50a.gif')";
+        document.body.style.backgroundRepeat = "no-repeat";
+        document.body.style.backgroundSize = "cover";
+        document.body.style.backgroundAttachment = "fixed";
+    } else {
+        // 复位为正常背景
+        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png')";
+        document.body.style.backgroundRepeat = "repeat";  // 显式设置为 repeat
+        document.body.style.backgroundSize = 'auto';
+        document.body.style.backgroundAttachment = 'fixed';
+    }
+}
+
+        
 function resetPetQualitiesAndSkills() {
     // 重置宠物的品质和成长率
     let tier, growthRate;
@@ -19020,9 +19103,7 @@ function resetPetQualitiesAndSkills() {
         qualities.faith.current = Math.round(qualities.faith.current * 1.1);
         qualities.agility.current = Math.round(qualities.agility.current * 1.1);
         qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
-        // 设置背景为变异背景
-        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-        document.body.style.backgroundRepeat = "repeat";
+        updateMutatedImg();
     }
 
     bingpoRebornPill--;
@@ -19122,8 +19203,7 @@ function rebornPet(isCheatMode = false) {
         growthRate = tier === '卓越' ? getWeightedRandom([300, 320], [0.5, 0.5]) : getWeightedRandom([340, 360, 380, 400], [0.3, 0.5, 0.15, 0.05]);
         currentPet.qualities.mutated = true;
         // 设置背景为变异背景
-        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-        document.body.style.backgroundRepeat = "repeat";
+        updateMutatedImg();
     }
     
     currentPet.qualities.tier = tier;
@@ -19238,8 +19318,7 @@ function trainQuality() {
         ascendCheat();
         updateAwakenStatus();
         updateAscensionStatus();
-        document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-        document.body.style.backgroundRepeat = "repeat";
+        updateMutatedImg();
 
         return;
     }
@@ -19423,8 +19502,7 @@ function mutatePet() {
     qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
 
     // 设置背景为变异背景
-    document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-    document.body.style.backgroundRepeat = "repeat";
+    updateMutatedImg();
 
     updateQualityCard();
     updateSkillScore();
@@ -19440,12 +19518,12 @@ function useMutationScroll() {
     }
         
     if (awakened) {
-        showInfoBox("您的宠物已经觉醒，无法使用灵异秘卷！");
+        showInfoBox("您的宠物已经觉醒，使用灵异秘卷没有带来任何效果！");
         return;
     }
 
     if (currentPet.qualities.mutated) {
-        showInfoBox("您的宠物已经变异，无法使用灵异秘卷！");
+        showInfoBox("您的宠物已经变异，使用灵异秘卷没有带来任何效果！");
         return;
     }
         
@@ -19463,8 +19541,7 @@ function useMutationScroll() {
     qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
 
     // 设置背景为变异背景
-    document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-    document.body.style.backgroundRepeat = "repeat";
+    updateMutatedImg();
 
     // 更新UI
     updateQualityCard();
@@ -19792,6 +19869,7 @@ window.onload = function() {
     updateQualityCard();
     updateGoldDisplay(goldAmount);
     updateAttributePanel();
+    updateMutatedImg();
     updateExpBar();
     initializeAdvancementStates();//初始化领悟系统
     updatePetInfo(); 
@@ -20249,8 +20327,7 @@ function loadGameState() {
 
         // 检查宠物是否已经变异
         if (currentPet.qualities.mutated) {
-            document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/665c7652d9c307b7e991a20d.png')";
-            document.body.style.backgroundRepeat = "repeat";
+            updateMutatedImg();
         }
         //
         if (savedState.alreadyUnlocked) {
@@ -20267,6 +20344,7 @@ function updateDisplayContent() {
     updatePetInfo();
     updateQualityDisplayWithPillBonus();
     updatePetDisplay();
+    updateMutatedImg();
     updateQualityCard();
     updateAttributePanel();
     updateTopBarItems();

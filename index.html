@@ -13740,7 +13740,8 @@ function performLotteryDraw() {
     if (hasPlacedBet) {
         const prize = calculateLotteryPrize(winningNumbers, winningBlueBall);
         if (prize > 0) {
-            pendingPrize += prize;
+            const originalPrice = prize;
+            
     
             const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
             let bonusAmount = 0;
@@ -13748,8 +13749,9 @@ function performLotteryDraw() {
                 const bonusMultiplier = (luckyAmulet.quantity - 1) * 0.1;
                 bonusAmount = Math.floor(prize * bonusMultiplier);
             }
+            pendingPrize += (prize + bonusAmount);
     
-            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！${bonusAmount > 0 ? `由于你拥有${luckyAmulet.quantity}张财运亨通，本次中奖奖金包含加码${convertPrice(bonusAmount)}金！` : ''}`);
+            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！${bonusAmount > 0 ? `由于你拥有${luckyAmulet.quantity}张财运亨通，本次中奖奖金加码${convertPrice(bonusAmount)}金！` : ''}`);
         }
     }
     
@@ -18063,7 +18065,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
     if (matchingSkill) {
         let skillLevel = matchingSkill.level ? matchingSkill.level : 1;
-        let skillMultiplier = matchingSkill.multiplier;
+        let skillMultiplier = calculateSkillLevelAndMultiplier(matchingSkill).skillMultiplier;
 
         const skillTypeMap = {
             "PA": "物理攻击技能，与物理攻击力相关",

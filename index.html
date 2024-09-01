@@ -2429,7 +2429,7 @@
     <div class="core-area">
         <div class="advancement-container">
             <button id="advancement-learn" onclick="openAquireSkillAdvancementPanel()" class="advancement-series">Acquire</button>
-            <div>Skills for Your Lovely Pet</div>
+            <div id="fullscreenBtn" style="cursor: pointer;">Skills for Your Lovely Pet</div>
             <button id="advancement-apply" onclick="infoAdvancement()" class="advancement-series">Summary</button>
         </div>
         <div id="skill-advancement-panel" class="aquire-skill-advancement-panel" style="display: none;">
@@ -2644,7 +2644,7 @@
     <div class="shop-drawer" id="shop-drawer">
         <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span></div>
         <div class="shop-info" id="shop-info">
-            <div id="shop-info-container"style="max-height: 600px;overflow-y: scroll;">
+            <div id="shop-info-container"style="max-height: 550px;overflow-y: scroll;">
                 <div class="shop-items" id="shop-items">
                     <!-- 商店商品展示区 -->
                 </div>
@@ -20402,6 +20402,59 @@ function updateDisplayContent() {
     setInnerText("evolution-level", evolutionLevel);
     // ...
 }
+
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+    fullscreenBtn.addEventListener('click', function() {
+        if (!document.fullscreenElement &&    // W3C 标准
+            !document.mozFullScreenElement && // Firefox
+            !document.webkitFullscreenElement && // Chrome, Safari and Opera
+            !document.msFullscreenElement) { // IE/Edge
+
+            // 当前未处于全屏状态，尝试Skills for Your Lovely Pet
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) { /* Firefox */
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) { /* IE/Edge */
+                document.documentElement.msRequestFullscreen();
+            }
+
+            fullscreenBtn.textContent = "Click to Resume Screen"; // 更新按钮文本
+        } else {
+            // 当前处于全屏状态，尝试Click to Resume Screen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) { /* Firefox */
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) { /* IE/Edge */
+                document.msExitFullscreen();
+            }
+
+            fullscreenBtn.textContent = "Skills for Your Lovely Pet"; // 更新按钮文本
+        }
+    });
+
+    // 监听全屏状态变化事件，以确保按钮文本始终与全屏状态同步
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    document.addEventListener('mozfullscreenchange', onFullscreenChange);
+    document.addEventListener('MSFullscreenChange', onFullscreenChange);
+
+    function onFullscreenChange() {
+        if (document.fullscreenElement || 
+            document.mozFullScreenElement || 
+            document.webkitFullscreenElement || 
+            document.msFullscreenElement) {
+            fullscreenBtn.textContent = "Click to Resume Screen";
+        } else {
+            fullscreenBtn.textContent = "Skills for Your Lovely Pet";
+        }
+    }
     </script>
 </body>
 </html>

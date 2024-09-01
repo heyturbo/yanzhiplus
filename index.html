@@ -19894,7 +19894,7 @@ function showImageBox() {
 window.onload = function() {
     // 加载游戏状态
     if (localStorage.gameState || localStorage.petData) {
-        loadGameState();
+        loadGameState(true);
         initializeEnemyPet();
         handleRampaged();
         updateEnemyAttributes();
@@ -20200,7 +20200,16 @@ function getSkillFromName(name, level) {
     return null;
 }
 // 加载游戏
-function loadGameState() {
+function loadGameState(auto = false) {
+    if (!auto) {
+        showInfoBox('你确定要读取存档吗？这可能会覆盖现在的数据？',
+                    () => {
+                        showInfoBox('读取成功！');
+                    },
+                    () => {
+                        return;
+                    });
+    }
     const savedState = JSON.parse(localStorage.getItem('gameState'));
     if (!savedState) return;
     const petSelect = document.getElementById('pet-select');

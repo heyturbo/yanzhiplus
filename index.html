@@ -1700,17 +1700,17 @@
         .battle-system-content {
             display: flex;
             flex-direction: column;
-            padding: 10px;
+            padding: 5px;
             width: 100%;
             justify-content: space-between;
         }
         
         .battle-system-info-wrapper {
             display: flex;
-            gap: 10px;
             width: 100%;
-            min-height: 0%;
+            min-height: 360px;
             flex-direction: row;
+            flex-wrap: nowrap;
         }
         
         .battle-system-pet-info, .battle-system-enemy-info {
@@ -1724,7 +1724,6 @@
             border-radius: 8px;
             line-height: 12px;
             min-height50%: 5;
-            min-height: 50%;
             flex-direction: column;
         }
         /* 非暴击时，快速渐进渐出 */
@@ -1796,8 +1795,8 @@
         .player-damage-display {
             color: #f6ff00;
             position: absolute;
-            top: 18%;
-            left: 70%;
+            top: 10%;
+            left: 65%;
             font-size: 24px;
             font-weight: bold;
             font-style: italic;
@@ -1807,8 +1806,31 @@
         .enemy-damage-display {
             color: #f6ff00;
             position: absolute;
-            top: 18%;
-            left: 24%;
+            top: 10%;
+            left: 15%;
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+            z-index: 9999;
+        }
+
+        .player-extra-damage-display {
+            color: #f6ff00;
+            position: absolute;
+            top: 7%;
+            left: 65%;
+            font-size: 24px;
+            font-weight: bold;
+            font-style: italic;
+            text-shadow: 0 0 2px black;
+            z-index: 9999;
+        }
+
+        .enemy-extra-damage-display {
+            color: #f6ff00;
+            position: absolute;
+            top: 7%;
+            left: 15%;
             font-size: 24px;
             font-weight: bold;
             font-style: italic;
@@ -1818,7 +1840,7 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            max-height: 45%;
+            max-height: 280px;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.7);
@@ -1947,7 +1969,7 @@
         
 #visualEffectsContainer {
     position: relative;
-    width: 100%;
+    width: 50%;
     pointer-events: none; /* 确保特效不影响页面其他交互 */
     height: 0%;
 }
@@ -2832,16 +2854,19 @@
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
-                    <div style="display: flex; justify-content: center;">
-                        <img id="your-pet-image" onclick="openWuxingDisplay()" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 80px; height: 80px; border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
-                        <div class="enemy-damage-display" id="enemy-damage-display"><span id="enemy-damage-value"></span></div>
+                    <div style="display: flex;justify-content: center;position:relative;align-items: center;border: 1px solid #ffffff;border-radius: 5px;padding: 2px;height: 60px;">
+                        <img id="your-pet-image" onclick="openWuxingDisplay()" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
+                        <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
+                            <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
+                            <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
+                            <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130));" id="exp-bar"></div>
+                                <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
+                            </div>
+                        </div>
                     </div>
-                    <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
-                    <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
-                    <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
-                        <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130));" id="exp-bar"></div>
-                        <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
-                    </div>
+                    <div class="enemy-damage-display" id="enemy-damage-display"><span id="enemy-damage-value"></span></div>
+                    <div class="enemy-extra-damage-display" id="enemy-extra-damage-display"><span id="enemy-extra-damage-value"></span></div>
                     <div id="player-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
@@ -2861,12 +2886,15 @@
                 </div>
                 <div class="battle-system-enemy-info">
                     <h2><span id="enemy-name">邪佞</span> lv<span id="enemy-level">1</span></h2>
-                    <div style="display: flex;justify-content: center;">
-                        <img id="enemy-image" onclick="enemyInfo()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 80px;height: 80px;border: 1px groove white; border-radius: 10px; box-shadow: 0 0 2px 0 black;cursor: pointer;">
-                        <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
+                    <div style="display: flex;justify-content: center;position:relative;align-items: center;border: 1px solid #ffffff;border-radius: 5px;padding: 2px;height: 60px;">
+                        <img id="enemy-image" onclick="enemyInfo()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
+                        <div id="enemy-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
+                            <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
+                            <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
+                        </div>
                     </div>
-                    <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
-                    <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
+                    <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
+                    <div class="player-extra-damage-display" id="player-extra-damage-display"><span id="player-extra-damage-value"></span></div>
                     <div id="enemy-status" class="status-display"></div>
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
@@ -5824,14 +5852,10 @@ function changeBattlePet(skipConfirmation = false) {
 }
         
 function updatePetDisplay() {
-    
     document.getElementById("your-pet-name").innerText = currentPet.name; // 更新宠物名称显示
     document.getElementById("pet-image").src = currentPet.image; // 更新宠物图片显示
     document.getElementById("your-pet-image").src = currentPet.image;
-    // 检查宠物是否已经变异
-    if (currentPet.qualities.mutated) {
-        updateMutatedImg();
-    }
+    updateMutatedImg();
 }
         
 function showSummonPanel() {
@@ -7668,14 +7692,16 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
     }
 
     currentElement.innerHTML = `
+    <div style="z-index:1000;">
         <div style="width: 100%; background-color: #35472C; overflow: hidden; position: relative; border: 1px solid black;">
-            <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background: ${gradientColor}; text-align: center; color: white; font-weight: bold; transition: width 0.5s ease-in-out;">
+            <div id="${currentId}-bar" style="width: ${percentage}%; height: 100%; background: ${gradientColor}; text-align: center; color: white; font-size: 12px; font-weight: bold; transition: width 0.5s ease-in-out;">
                 <span style="text-stroke: 1px black;">${currentValue}/${maxValue}</span>
             </div>
             ${percentage < warningThreshold ? `
                 <div id="${currentId}-warning" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; border: 1px solid ${warningColor}; animation: warning-blink 1s infinite;"></div>
             ` : ''}
         </div>
+    </div>
     `;
 
     maxElement.style.display = 'none';
@@ -8705,9 +8731,10 @@ function handleWaterAmuletEffect(attackType, damage) {
     performAttack(attackType); // 再次执行相同类型的攻击
 }
         
-function updateDamageValue(damage, enemy = false) {
-    const playerDamageValueElement = document.getElementById('player-damage-value');
-    const enemyDamageValueElement = document.getElementById('enemy-damage-value');
+function updateDamageValue(damage, enemy = false, damageType = 'damage') {
+    // 根据 damageType 确定要操作的 DOM 元素
+    const playerDamageValueElement = document.getElementById(`player-${damageType}-value`);
+    const enemyDamageValueElement = document.getElementById(`enemy-${damageType}-value`);
 
     if (!playerDamageValueElement || !enemyDamageValueElement) {
         console.error("Failed to get damage value element.");
@@ -8726,6 +8753,7 @@ function updateDamageValue(damage, enemy = false) {
 
     // 清除之前的动画效果和样式
     damageElement.className = '';
+    damageElement.style.background = '';
     damageElement.style.opacity = '1';
     damageElement.style.transform = 'translateY(0)';
 
@@ -8737,12 +8765,20 @@ function updateDamageValue(damage, enemy = false) {
             damageElement.style.color = 'red';
             damageElement.style.fontSize = '24px';
             damageElement.style.textShadow = '0 0 2px orange';
+            damageElement.style.padding = '10px';
+            
+            damageElement.style.borderRadius = '10px';
+            damageElement.style.zIndex = '99999';
             damageElement.classList.add('critical-hit-animation');
         } else {
             // 非暴击：黄色，快速渐进渐出
             damageElement.style.color = 'yellow';
             damageElement.style.fontSize = '22px';
             damageElement.style.textShadow = '0 0 2px black';
+            damageElement.style.padding = '10px';
+            
+            damageElement.style.borderRadius = '10px';
+            damageElement.style.zIndex = '99999';
             damageElement.classList.add('normal-hit-animation');
         }
     } else {
@@ -8752,6 +8788,10 @@ function updateDamageValue(damage, enemy = false) {
         damageElement.style.color = 'limegreen';
         damageElement.style.fontSize = '22px';
         damageElement.style.textShadow = '0 0 8px lime';
+        damageElement.style.padding = '10px';
+        
+        damageElement.style.borderRadius = '10px';
+        damageElement.style.zIndex = '99999';
         damageElement.classList.add('heal-animation');
     }
 
@@ -8761,8 +8801,7 @@ function updateDamageValue(damage, enemy = false) {
         damageElement.className = '';  // 清除动画类名，防止影响下一次显示
     }, 300);
 }
-
-
+        
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
@@ -8820,7 +8859,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点物理伤害。`, 'white');
     }
 
-    updateDamageValue(finalDamage); // 显示玩家伤害
+    updateDamageValue(finalDamage,false,'damage'); // 显示玩家伤害
 
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
@@ -8893,7 +8932,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         logBattleEvent(`⚔️【玩家攻击】你进行了法术攻击，造成了 ${finalDamage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     }
-    updateDamageValue(finalDamage); // 显示玩家伤害
+    updateDamageValue(finalDamage, false, 'damage'); // 显示玩家伤害
     applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
     
     if (battleState.enemy.pierced) {
@@ -8975,7 +9014,7 @@ function performIndependentMagicAttack() {
     } else {
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点伤害。`, 'wheat');
     }
-    updateDamageValue(finalDamage); // 显示玩家伤害
+    updateDamageValue(finalDamage,false,'extra-damage'); // 显示玩家伤害
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66712ba3d9c307b7e9f2ab59.gif');
 
     applyMagicAttackEffects(finalDamage, skillMultiplier); // 传递 damage 和 skillMultiplier 参数以应用效果
@@ -9075,7 +9114,7 @@ function performPoison() {
         handlePierced(); // 处理穿透效果
     }
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66713185d9c307b7e9fe5fc6.gif');
-    updateDamageValue(poisonDamage); // 显示玩家伤害
+    updateDamageValue(poisonDamage, false, 'damage'); // 显示玩家伤害
 
 
     if (Math.random() < poisonChance && !battleState.enemy.poisoned) {
@@ -9112,6 +9151,7 @@ function handlePoison(skillMultiplier = 1) {
 
         //logBattleEvent(`邪佞中毒，受到 ${poisonDamage} 点毒性伤害，当前修为加持下，中毒效果还将持续 ${remainingSeconds} 秒。`, '#C10066');
         updateUI();
+        updateDamageValue(poisonDamage,false,'extra-damage');
         updateEnemyStatusDisplay();
 
     }, 100); // 每0.1秒触发一次
@@ -9330,7 +9370,7 @@ function handlePiercedEffect(cultivationBonus) {
             const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.84 - 0.42) + 0.24) * (1 + playerCultivation / 500000));
             battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
             logBattleEvent(`穿心蚀骨之毒爆！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
-            updateDamageValue(aftershockDamage);
+            updateDamageValue(aftershockDamage,false,'extra-damage');
             showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
             pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
             battleState.enemy.pierced = false; // 清除穿透状态
@@ -9346,6 +9386,7 @@ function handlePierced() {
     const extraDamage = Math.floor(battleAttributes.physicalAttack * 5);
     battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
     logBattleEvent(`敌人受到 ${extraDamage} 点穿透伤害。`, '#ADFF2F');
+    updateDamageValue(extraDamage,false,'extra-damage');
     pierceDamageContainer.totalPierceDamage += extraDamage; // 累积穿透伤害
     updateUI();
 
@@ -9370,6 +9411,7 @@ function handleCriticalAndDrunken(damage) {
     if ((ascensionSkill.name === '灵魂穿刺' || secondAscensionSkill.name === '灵魂穿刺') && isCritical && Math.random() < battleState.player.extraCritDamageChance) {
         const extraDamage = Math.floor(battleAttributes.physicalAttack * battleState.player.extraCritDamageMultiplier);
         battleState.enemy.health = Math.max(0, battleState.enemy.health - extraDamage);
+        updateDamageValue(extraDamage,false,'extra-damage');
         logBattleEvent(`灵魂穿刺触发，额外造成了 ${extraDamage} 点伤害。`, 'red');
     }
 
@@ -9426,7 +9468,7 @@ function handleBurnt() {
 
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
         logBattleEvent(`邪佞受到了 ${burntDamage} 点灼烧伤害。`, 'red');
-        updateDamageValue(burntDamage);
+        updateDamageValue(burntDamage,false,'extra-damage');
         updateUI();
 
         if (battleState.enemy.health <= 0) {
@@ -9442,7 +9484,7 @@ function handleDazed() {
             const selfDamage = battleState.enemy.physicalAttack;
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
             logBattleEvent(`混乱状态下，邪佞攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
-            updateDamageValue(selfDamage);
+            updateDamageValue(selfDamage, false, 'damage');
             playerTurn = true;
             return true;
         }
@@ -9617,7 +9659,8 @@ function performHeal() {
     
     logBattleEvent(`🔮【玩家治疗】你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c8f.gif');
-    updateDamageValue(-healAmount,true);
+
+    updateDamageValue(-healAmount, true, 'damage');
 
     handleDivineProtection(selectedSkills, skillLevel);
 
@@ -9736,6 +9779,7 @@ function handleReflectAndHeal(damage) {
             console.error("Heal amount is NaN, setting to 0.");
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
+        updateDamageValue(-healAmount,false,'extra-damage');
         logBattleEvent(`🔮【玩家治疗】仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c7d.gif');
     }
@@ -9920,7 +9964,7 @@ function handleDamageReduction(damage) {
     }
     wiseDefenseManaCost = 0;
     handleReflectAndHeal(formattedFinalDamage);
-    updateDamageValue(formattedFinalDamage, true); // 显示敌人伤害
+    updateDamageValue(formattedFinalDamage, true, 'damage'); // 显示敌人伤害
 
     console.log(`护盾抵挡了 ${shieldReduction} 点伤害，土符抵挡了${totalDamageReduction}，格挡技能抵挡 ${defenseReduction} 点伤害，智慧守护抵挡${isNaN(wiseDefense) ? 0 : wiseDefense}点伤害，目前护盾量为 ${formattedExtraShield}，你最终受到了  ${formattedFinalDamage}  点伤害。`);
     getShieldStatus();
@@ -10122,6 +10166,7 @@ function performEnemyPhysicalAttack(isCritical) {
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) - effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     
+    
     if (isCritical) {
         logBattleEvent(`⚔️【敌人攻击】邪佞施放物理技能·黑暗血刃并发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
     } else {
@@ -10141,11 +10186,13 @@ function performEnemyPhysicalAttack(isCritical) {
             enemyPhysicalAttackCount++;
             extraDamage = absM * enemyPhysicalAttackCount;
             logBattleEvent(`⚔️【敌人攻击】杀戮状态下由于修为差距，敌人本次物理攻击额外造成了 ${extraDamage} 点伤害！`, 'grey');
+            updateDamageValue(extraDamage, true,'extra-damage');
         } else if (cultivationDiff > 0) {
             // 玩家修为高于敌人修为
             const mPlus = cultivationDiff;
             battleState.enemy.health -= mPlus;
             logBattleEvent(`⚔️【敌人攻击】杀戮状态下由于修为差距，敌人在施放物理攻击时自身损失了 ${mPlus} 点生命值！`, 'grey');
+            updateDamageValue(extraDamage,false,'extra-damage');
         }
 
         damage += extraDamage;
@@ -10187,7 +10234,7 @@ function performEnemyMagicalAttack(isCritical) {
     } else {
         logBattleEvent(`⚔️【敌人攻击】邪佞施放法术技能·嗜血魔咒，造成了 ${damage} 点伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
     }
-
+    
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66717584d9c307b7e98a90e6.gif');
 
     // 应用邪佞法术效果
@@ -10349,7 +10396,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
             battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
             drugInventory['延寿露'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
-            updateDamageValue(-healthRecovered);
+            updateDamageValue(-healthRecovered, false, 'damage');
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
         } else {
             logBattleEvent("🥷【敌人偷窃】邪佞想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
@@ -10394,6 +10441,7 @@ function handleSlaughter() {
         if (cultivationDifference > 0 && battleState.enemy.health <= cultivationDifference * 150) {
             battleState.enemy.health = 0;
             logBattleEvent(`⚔️【敌人攻击】道高一尺，魔高一丈，敌人低于你的修为，施法时损失${battleState.enemy.health}点生命值，被当即斩杀！`, '#FFDD55');
+            updateDamageValue(battleState.enemy.health,false,'damage');
             updateUI();
             updatePlayerStatusDisplay();
             
@@ -10404,6 +10452,7 @@ function handleSlaughter() {
         } else if (cultivationDifference < 0 && battleAttributes.health <= Math.abs(cultivationDifference)) {
             battleAttributes.health = 0;
             logBattleEvent(`⚔️【敌人攻击】道高一尺，魔高一丈，你低于敌人的修为，施法时损失${battleAttributes.health}点生命值，被当即斩杀！`, '#FFDD55');
+            updateDamageValue(battleState.enemy.health,true,'damage');
             updateUI();
             updatePlayerStatusDisplay();
 
@@ -10412,7 +10461,6 @@ function handleSlaughter() {
                 return;
             }
         }
-
     }, 500);
 
     setTimeout(() => {
@@ -10471,6 +10519,7 @@ function handleTorn() {
         const tornDamage = Math.floor(battleState.enemy.physicalAttack * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - tornDamage);
         logBattleEvent(`⚔️【敌人攻击】身中邪佞充满毒性的撕裂伤害，正在持续失血，受到 ${tornDamage} 点伤害。`, 'red');
+        updateDamageValue(tornDamage,true,'extra-damage');
         updateUI();
         updatePlayerStatusDisplay();
         
@@ -10603,6 +10652,7 @@ function handleDrunken(damage) {
         const drunkenDamage = Math.floor(damage * 0.05);
         battleAttributes.health = Math.max(0, battleAttributes.health - drunkenDamage);
         logBattleEvent(`⚔️【敌人反弹】醉酒状态下，你招式过猛误伤自身，受到 ${drunkenDamage} 点溅射伤害。`, '#FF0088');
+        updateDamageValue(drunkenDamage,true,'extra-damage');
     }
 } //处理醉酒
 
@@ -10641,13 +10691,14 @@ function enemyHeal() {
 
     logBattleEvent(`🔮【敌人治疗】邪佞施放魔王之力，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66754252d9c307b7e9e67706.gif');
-    updateDamageValue(-healAmount);
+    updateDamageValue(-healAmount,false,'damage');
 
     // 检查中毒效果
     if (battleState.enemy.poisoned) {
         const poisonDamage = Math.floor(battleAttributes.magicAttack * battleRounds * (Math.random() * (0.06 - 0.03) + 0.03));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
         logBattleEvent(`☣【敌人中毒】邪佞中毒，失去了 ${poisonDamage} 点生命值。`, '#C10066');
+        updateDamageValue(poisonDamage,false,'extra-damage');
     }
 
     playerTurn = true; // 轮到玩家回合
@@ -10704,7 +10755,7 @@ function handleRampaged() {
             if (battleState.enemy.health < enemyMaxHealth) {
                 battleState.enemy.health = enemyMaxHealth;
                 logBattleEvent("邪佞复生成功，生命值恢复到100%！", "red");
-                updateDamageValue(-enemyMaxHealth);
+                updateDamageValue(-enemyMaxHealth,false,'damage');
                 battleState.enemy.revived = false;
                 updateUI();
                 console.log('Enemy revived to full health.');
@@ -10826,7 +10877,7 @@ function useSelectedDrug() {
                         clearInterval(healthRegenInterval);
                     } else {
                         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRegenAmount);
-                        updateDamageValue(-healthRegenAmount,true);
+                        updateDamageValue(-healthRegenAmount,true,'damage');
                         updateUI();
                         healthElapsedTime += healthInterval;
                     }
@@ -10938,7 +10989,7 @@ function useSelectedDrug() {
                 break;
             case "延寿露":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + Math.floor(maxHealth * 0.2));
-                updateDamageValue(-Math.floor(maxHealth * 0.2),true);
+                updateDamageValue(-Math.floor(maxHealth * 0.2),true,'damage');
                 break;
             case "天山雪莲":
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + Math.floor(maxMana * 0.2));
@@ -10946,7 +10997,7 @@ function useSelectedDrug() {
                 break;
             case "普通药材":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 1000);
-                updateDamageValue(-(battleAttributes.health + 1000),true);
+                updateDamageValue(-(battleAttributes.health + 1000),true,'damage');
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 1000);
                 break;
             case "上等药材":
@@ -11572,7 +11623,7 @@ function handleSpiritHeal() {
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
-        updateDamageValue(-healValue,true);
+        updateDamageValue(-healValue,true,'extra-damage');
         updateUI();
     }
 } //战斗精灵的随机回血

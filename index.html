@@ -653,9 +653,9 @@
             overflow: hidden;
         }
         .core-area .skills .s-skill {
-            border: 1px solid #76c0dd;
+            border: 1px solid #e8f3ee;
             background-color: hsl(202deg 50% 40% / 70%);
-            box-shadow: 0px 0px 5px 2px hsl(202 53% 84% / 1);
+            box-shadow: inset 0px 0px 10px 0px hsl(202 53% 84% / 1);
         }
         .core-area .skills .ss-skill {
             border: 2px solid #e8f2ed;
@@ -2644,7 +2644,7 @@
     <div class="shop-drawer" id="shop-drawer">
         <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span></div>
         <div class="shop-info" id="shop-info">
-            <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;">
+            <div id="shop-info-container"style="max-height: 600px;overflow-y: scroll;">
                 <div class="shop-items" id="shop-items">
                     <!-- 商店商品展示区 -->
                 </div>
@@ -15320,11 +15320,10 @@ const itemEffects = {
         additionalPlayerCultivation += 1;
         showInfoBox('你吃了一个苹果',null,null,'green');
     },
-    resetJinnang: () => {
-        clearOldItems();
-        goldAmount += 100000000;
-        updateGoldDisplay(goldAmount);
-        saveGameState();
+    resetJinnang: async () => {
+        await clearOldItems();  // 等待清除旧物品完成
+        await saveGameState();  // 等待保存游戏状态完成
+        setTimeout(() => window.location.reload(), 0);  // 立即刷新页面
     },
     chocolate: () => {
         additionalPlayerCultivation += 2;

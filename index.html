@@ -1708,7 +1708,7 @@
         .battle-system-info-wrapper {
             display: flex;
             width: 100%;
-            min-height: 360px;
+            /* min-height: 390px; */
             flex-direction: row;
             flex-wrap: nowrap;
         }
@@ -1717,12 +1717,12 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 10px;
-            font-size: 14px;
+            font-size: 12px;
             flex: 1;
             display: flex;
             background: rgba(0, 0, 0, 0.7);
             border-radius: 8px;
-            line-height: 12px;
+            line-height: 14px;
             min-height50%: 5;
             flex-direction: column;
         }
@@ -1840,7 +1840,7 @@
             border: 1px solid #ccc;
             padding: 5px;
             margin-bottom: 0px;
-            max-height: 280px;
+            max-height: 380px;
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.7);
@@ -2030,7 +2030,8 @@
             font-size: 14px;
             color: #ff0000;
             font-weight: bold;
-            margin: 1px 0px;
+            margin: 5px 5px;
+            height: 5px;
         }
         #battle-spirit-modal {
             position: fixed;
@@ -2871,17 +2872,21 @@
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 0px;overflow-y: scroll;display: flex;flex-direction: column;flex-wrap: nowrap;">
-                    <p>物理攻击: <span id="your-pet-physical-attack"></span></p>
-                    <p>物理防御: <span id="your-pet-physical-defense"></span></p>
-                    <p>法术攻击: <span id="your-pet-magic-attack"></span></p>
-                    <p>法术防御: <span id="your-pet-magic-defense"></span></p>
-                    <p>速度: <span id="your-pet-speed"></span></p>
-                    <p>修为: <span id="your-pet-cultivation"></span></p>
-                    <p>暴击: <span id="player-crit-rate"></span></p>
-                    <p>暴击伤害: <span id="player-crit-damage"></span></p>
-                    <p>物理闪避: <span id="player-physical-dodge-rate"></span></p>
-                    <p>法术闪避: <span id="player-magic-dodge-rate"></span></p>
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;">
+                    <div style="width: 85px;">
+                        <p>物攻: <span id="your-pet-physical-attack"></span></p>
+                        <p>物防: <span id="your-pet-physical-defense"></span></p>
+                        <p>法攻: <span id="your-pet-magic-attack"></span></p>
+                        <p>法防: <span id="your-pet-magic-defense"></span></p>
+                        <p>速度: <span id="your-pet-speed"></span></p>
+                    </div>
+                    <div style="width: 85px;">
+                        <p>修为: <span id="your-pet-cultivation"></span></p>
+                        <p>暴击: <span id="player-crit-rate"></span></p>
+                        <p>暴伤: <span id="player-crit-damage"></span></p>
+                        <p>物闪: <span id="player-physical-dodge-rate"></span></p>
+                        <p>法闪: <span id="player-magic-dodge-rate"></span></p>
+                    </div>
                     </div>
                 </div>
                 <div class="battle-system-enemy-info">
@@ -2899,17 +2904,21 @@
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 0px;overflow-y: scroll;display: flex;flex-direction: column;flex-wrap: nowrap;">
-                    <p>物理攻击: <span id="enemy-pet-physical-attack"></span></p>
-                    <p>物理防御: <span id="enemy-pet-physical-defense"></span></p>
-                    <p>法术攻击: <span id="enemy-pet-magic-attack"></span></p>
-                    <p>法术防御: <span id="enemy-pet-magic-defense"></span></p>
-                    <p>速度: <span id="enemy-pet-speed"></span></p>
-                    <p>修为: <span id="enemy-pet-cultivation"></span></p>
-                    <p>暴击: <span id="enemy-crit-rate"></span></p>
-                    <p>暴击伤害: <span id="enemy-crit-damage"></span></p>
-                    <p>物理闪避: <span id="enemy-physical-dodge-rate"></span></p>
-                    <p>法术闪避: <span id="enemy-magic-dodge-rate"></span></p>
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;">
+                    <div style="width: 85px;">
+                        <p>物攻: <span id="enemy-pet-physical-attack"></span></p>
+                        <p>物防: <span id="enemy-pet-physical-defense"></span></p>
+                        <p>法攻: <span id="enemy-pet-magic-attack"></span></p>
+                        <p>法防: <span id="enemy-pet-magic-defense"></span></p>
+                        <p>速度: <span id="enemy-pet-speed"></span></p>
+                    </div>
+                    <div style="width: 85px;">
+                        <p>修为: <span id="enemy-pet-cultivation"></span></p>
+                        <p>暴击: <span id="enemy-crit-rate"></span></p>
+                        <p>暴伤: <span id="enemy-crit-damage"></span></p>
+                        <p>物闪: <span id="enemy-physical-dodge-rate"></span></p>
+                        <p>法闪: <span id="enemy-magic-dodge-rate"></span></p>
+                    </div>
                     </div>
                 </div>
             </div>
@@ -7753,10 +7762,10 @@ function calculateAndDisplayDodgeRate() {
     // 计算修为差异导致的魔法闪避率
     cultivationDifference = playerCultivation - enemyPetCultivation;
     if (cultivationDifference > 0) {
-        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9) * 100).toFixed(2) + '%'; // 确保概率不超过90%
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         enemyMagicDodgeElement.innerText = '0%';
     } else {
-        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9) * 100).toFixed(2) + '%'; // 确保概率不超过90%
+        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         playerMagicDodgeElement.innerText = '0%';
     }
 }
@@ -7796,11 +7805,11 @@ function handleDodge(target) {
         // 触发闪避
         // 应用视觉效果
         if (target === 'player') {
-            dodgeElement.style.marginRight = '20px';
+            
             dodgeElement.style.opacity = '0.5';
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         } else {
-            dodgeElement.style.marginLeft = '20px';
+            
             dodgeElement.style.opacity = '0.5';
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         }
@@ -7827,7 +7836,7 @@ function handleMagicDodge(target) {
         // 玩家魔法闪避逻辑
         cultivationDifference = playerCultivation - enemyPetCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家魔法闪避概率为：${dodgeChance}`);
@@ -7835,7 +7844,7 @@ function handleMagicDodge(target) {
         // 敌人魔法闪避逻辑
         cultivationDifference = enemyPetCultivation - playerCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.9); // 确保概率不超过1%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('enemy-image');
         console.log(`敌人魔法闪避概率为：${dodgeChance}`);
@@ -7852,11 +7861,11 @@ function handleMagicDodge(target) {
     if (isDodge) {
         // 触发闪避，应用视觉效果
         if (target === 'player') {
-            dodgeElement.style.marginRight = '20px';
+            
             dodgeElement.style.opacity = '0.5';
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         } else {
-            dodgeElement.style.marginLeft = '20px';
+            
             dodgeElement.style.opacity = '0.5';
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         }

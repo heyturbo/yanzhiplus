@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project T</title>
+    <title>Project TS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -108,7 +108,7 @@
             border-radius: 5px;
             color: white;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             border: 1px solid hsl(0deg 0% 100% / 70%);
             box-shadow: 0 0 20px 0px rgba(0, 0, 0, 0.5);
         }
@@ -1727,7 +1727,72 @@
             min-height: 50%;
             flex-direction: column;
         }
+        /* 非暴击时，快速渐进渐出 */
+        .normal-hit-animation {
+            animation: fadeInOut 300ms ease-in-out forwards;
+        }
         
+        /* 暴击时，震荡效果 */
+        .critical-hit-animation {
+            animation: shake 300ms ease-in-out forwards;
+        }
+        
+        /* 生命恢复，向上渐出 */
+        .heal-animation {
+            animation: healMoveUp 300ms ease-in-out forwards;
+        }
+        
+        /* 定义动画：渐进渐出 */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.2);
+            }
+        }
+        
+        /* 定义动画：震荡效果 */
+        @keyframes shake {
+            0% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+            75% {
+                transform: translateX(-5px);
+            }
+            100% {
+                transform: translateX(0);
+            }
+        }
+        
+        /* 定义动画：向上渐出 */
+        @keyframes healMoveUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+
         .player-damage-display {
             color: #f6ff00;
             position: absolute;
@@ -5473,38 +5538,46 @@ function deletePetData(petName) {
 // 删档函数
 function deleteAllPetData() {
     showInfoBox('你确定删除其他宠物数据吗？操作不可恢复！', () => {
-        const keysToRemove = [];
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            if (key.startsWith('petData_')) {
-                keysToRemove.push(key);
-            }
-        }
-        keysToRemove.forEach(key => {
-            const petName = key.replace('petData_', '');
-            if (petName !== currentPet.name) {
-                localStorage.removeItem(key);
-                
-                const petSelect = document.getElementById('pet-select');
-                const optionToRemove = Array.from(petSelect.options).find(option => option.text === petName);
-                if (optionToRemove) {
-                    petSelect.removeChild(optionToRemove);
+        showInfoBox('你真的要重置当前的所有数据吗？', () => {
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('petData_')) {
+                    keysToRemove.push(key);
                 }
             }
-        });
-        
-        // 检查 localStorage 中是否存在 'gameState' 数据
-        if (localStorage.getItem('gameState') !== null) {
-            localStorage.removeItem('gameState');
-            console.log('gameState 已被删除');
-        } else {
-            console.log('gameState 不存在');
-        }
-        
-        showInfoBox('除当前宠物外，其他宠物数据均已删除！如果你需要删除所有数据，请不要进行任何操作，直接刷新本页面完成初始化。如果你需要保留当前宠物的数据，你可以点击存档。');
-        console.log(`Deleted ${keysToRemove.length - 1} pet data entries.`);
+            keysToRemove.forEach(key => {
+                const petName = key.replace('petData_', '');
+                if (petName !== currentPet.name) {
+                    localStorage.removeItem(key);
+                    
+                    const petSelect = document.getElementById('pet-select');
+                    const optionToRemove = Array.from(petSelect.options).find(option => option.text === petName);
+                    if (optionToRemove) {
+                        petSelect.removeChild(optionToRemove);
+                    }
+                }
+            });
+
+            // 检查 localStorage 中是否存在 'gameState' 数据
+            if (localStorage.getItem('gameState') !== null) {
+                localStorage.removeItem('gameState');
+                console.log('gameState 已被删除');
+            } else {
+                console.log('gameState 不存在');
+            }
+
+            showInfoBox('除当前宠物外，其他宠物数据均已删除！如果你需要删除所有数据，请不要进行任何操作，直接刷新本页面完成初始化。如果你需要保留当前宠物的数据，你可以点击存档。');
+            console.log(`Deleted ${keysToRemove.length - 1} pet data entries.`);
+        }, 
+        () => {
+            showInfoBox('操作已取消！', null, null, 'red');
+            return;
+        }, 
+        'red');
     });
 }
+
         
 // 存储当前宠物的数据
 function storeCurrentPetData() {
@@ -8633,59 +8706,60 @@ function handleWaterAmuletEffect(attackType, damage) {
 }
         
 function updateDamageValue(damage, enemy = false) {
-    // 获取玩家和敌人的 DOM 元素
     const playerDamageValueElement = document.getElementById('player-damage-value');
     const enemyDamageValueElement = document.getElementById('enemy-damage-value');
-    
-    // 安全检查：确保 DOM 元素存在
+
     if (!playerDamageValueElement || !enemyDamageValueElement) {
         console.error("Failed to get damage value element.");
         return;
     }
 
-    // 根据 enemy 参数决定显示在哪个元素上
     const damageElement = enemy ? enemyDamageValueElement : playerDamageValueElement;
 
-    // 确保 damage 不是 NaN 并且有效
-    if (isNaN(damage) || damage < 0) {
-        console.error("Invalid damage value: NaN or negative value.");
+    if (isNaN(damage)) {
+        console.error("Invalid damage value: NaN.");
         return;
     }
 
-    // 暴击判断
+    // 判断是否为暴击
     let isCritical = enemy ? checkCriticalHit(enemyCritRate) : checkCriticalHit(playerCritRate);
 
-    // 显示之前先清空旧的内容
-    damageElement.innerText = '';
+    // 清除之前的动画效果和样式
+    damageElement.className = '';
+    damageElement.style.opacity = '1';
+    damageElement.style.transform = 'translateY(0)';
 
-    // 设置暴击显示样式
-    if (isCritical) {
+    if (damage >= 0) {
+        // 正伤害
         damageElement.innerText = `-${damage}`;
-        damageElement.style.color = 'red';
-        damageElement.style.fontSize = '24px';
-        damageElement.style.textShadow = 'text-shadow: 0 0 2px orange;';
-        damageElement.style.textWrap = 'no-warp;';
-        damageElement.style.position = 'absolute;';
-        damageElement.style.top = '18%;';
-        damageElement.style.left = '70%;';
+        if (isCritical) {
+            // 暴击：红色、震荡效果
+            damageElement.style.color = 'red';
+            damageElement.style.fontSize = '24px';
+            damageElement.style.textShadow = '0 0 2px orange';
+            damageElement.classList.add('critical-hit-animation');
+        } else {
+            // 非暴击：黄色，快速渐进渐出
+            damageElement.style.color = 'yellow';
+            damageElement.style.fontSize = '22px';
+            damageElement.style.textShadow = '0 0 2px black';
+            damageElement.classList.add('normal-hit-animation');
+        }
     } else {
-        // 正常显示
-        damageElement.innerText = `-${damage}`;
-        damageElement.style.color = 'yellow';
-        damageElement.style.fontSize = '18px';
-        damageElement.style.textShadow = 'text-shadow: 0 0 2px black;';
-        damageElement.style.textWrap = 'no-warp;';
-        damageElement.style.position = 'absolute;';
-        damageElement.style.top = '18%;';
-        damageElement.style.left = '24%;';
+        // 生命恢复：绿色，向上渐出
+        const healAmount = Math.abs(damage);
+        damageElement.innerText = `+${healAmount}`;
+        damageElement.style.color = 'limegreen';
+        damageElement.style.fontSize = '22px';
+        damageElement.style.textShadow = '0 0 8px lime';
+        damageElement.classList.add('heal-animation');
     }
 
-    // 在 300 毫秒后清空显示的伤害值
+    // 在 300 毫秒后清空显示的值
     setTimeout(() => {
-        if (damageElement.innerText !== null) {
-            damageElement.innerText = '';
-        }
-    }, 200);
+        damageElement.innerText = '';
+        damageElement.className = '';  // 清除动画类名，防止影响下一次显示
+    }, 300);
 }
 
 
@@ -9256,6 +9330,7 @@ function handlePiercedEffect(cultivationBonus) {
             const aftershockDamage = Math.floor(pierceDamageContainer.totalPierceDamage * (Math.random() * (0.84 - 0.42) + 0.24) * (1 + playerCultivation / 500000));
             battleState.enemy.health = Math.max(0, battleState.enemy.health - aftershockDamage);
             logBattleEvent(`穿心蚀骨之毒爆！敌人承受了 ${aftershockDamage} 点穿透余波伤害。`, '#ADFF2F');
+            updateDamageValue(aftershockDamage);
             showBattleOverlay("https://pic.imgdb.cn/item/66a647c5d9c307b7e9f3c420.gif", 1500, 0.8);
             pierceDamageContainer.totalPierceDamage = 0; // 重置累积的穿透伤害
             battleState.enemy.pierced = false; // 清除穿透状态
@@ -9351,6 +9426,7 @@ function handleBurnt() {
 
         battleState.enemy.health = Math.max(0, battleState.enemy.health - burntDamage);
         logBattleEvent(`邪佞受到了 ${burntDamage} 点灼烧伤害。`, 'red');
+        updateDamageValue(burntDamage);
         updateUI();
 
         if (battleState.enemy.health <= 0) {
@@ -9366,6 +9442,7 @@ function handleDazed() {
             const selfDamage = battleState.enemy.physicalAttack;
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
             logBattleEvent(`混乱状态下，邪佞攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
+            updateDamageValue(selfDamage);
             playerTurn = true;
             return true;
         }
@@ -9540,6 +9617,7 @@ function performHeal() {
     
     logBattleEvent(`🔮【玩家治疗】你恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c8f.gif');
+    updateDamageValue(-healAmount,true);
 
     handleDivineProtection(selectedSkills, skillLevel);
 
@@ -10271,6 +10349,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
             battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
             drugInventory['延寿露'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
+            updateDamageValue(-healthRecovered);
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a250dfd9c307b7e97f96eb.png');
         } else {
             logBattleEvent("🥷【敌人偷窃】邪佞想窃取你的资源，但被你抓包打跑了，你没受到任何损失", '#66CDAA');
@@ -10562,6 +10641,7 @@ function enemyHeal() {
 
     logBattleEvent(`🔮【敌人治疗】邪佞施放魔王之力，恢复了 ${healAmount} 点生命值，消耗了 ${manaCost} 点法力值。`, 'aqua');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66754252d9c307b7e9e67706.gif');
+    updateDamageValue(-healAmount);
 
     // 检查中毒效果
     if (battleState.enemy.poisoned) {
@@ -10624,6 +10704,7 @@ function handleRampaged() {
             if (battleState.enemy.health < enemyMaxHealth) {
                 battleState.enemy.health = enemyMaxHealth;
                 logBattleEvent("邪佞复生成功，生命值恢复到100%！", "red");
+                updateDamageValue(-enemyMaxHealth);
                 battleState.enemy.revived = false;
                 updateUI();
                 console.log('Enemy revived to full health.');
@@ -10745,7 +10826,7 @@ function useSelectedDrug() {
                         clearInterval(healthRegenInterval);
                     } else {
                         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healthRegenAmount);
-                        logBattleEvent(`生命值 + ${healthRegenAmount}点。`, 'gold');
+                        updateDamageValue(-healthRegenAmount,true);
                         updateUI();
                         healthElapsedTime += healthInterval;
                     }
@@ -10857,7 +10938,7 @@ function useSelectedDrug() {
                 break;
             case "延寿露":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + Math.floor(maxHealth * 0.2));
-                logBattleEvent(`使用延寿露，恢复了 ${Math.floor(maxHealth * 0.2)} 点生命值。`, 'gold');
+                updateDamageValue(-Math.floor(maxHealth * 0.2),true);
                 break;
             case "天山雪莲":
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + Math.floor(maxMana * 0.2));
@@ -10865,6 +10946,7 @@ function useSelectedDrug() {
                 break;
             case "普通药材":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + 1000);
+                updateDamageValue(-(battleAttributes.health + 1000),true);
                 battleAttributes.mana = Math.min(maxMana, battleAttributes.mana + 1000);
                 break;
             case "上等药材":
@@ -11490,6 +11572,7 @@ function handleSpiritHeal() {
         battleState.player.health = Math.min(battleState.player.health + healValue, maxHealth);
 
         logBattleEvent(`🧚🏻‍♀️精灵为你祈福，恢复了⭐️${healValue}⭐️生命值`, "pink");
+        updateDamageValue(-healValue,true);
         updateUI();
     }
 } //战斗精灵的随机回血
@@ -11995,13 +12078,22 @@ function enemyInfo() {
 
     // 创建标题元素
     const title = document.createElement('h2');
-    title.innerText = '邪佞(精英)';
+    if (!summonEnemy) {
+        title.innerText = '邪佞(精英)';
+    } else {
+        title.innerText = `${battleState.enemy.name}`;
+    }
     title.style.margin = '0';
     title.style.marginBottom = '10px';
 
     // 创建描述元素
     const description = document.createElement('p');
-    description.innerText = '潜藏于三界裂缝，以迷惑人心智、吸收人的恐惧而不断变强的邪祟。';
+    if (!summonEnemy) {
+        description.innerText = '潜藏于三界裂缝，以迷惑人心智、吸收人的恐惧而不断变强的邪祟。';
+    } else {
+        description.innerText = '这是一个召唤得来的怪物。';
+    }
+    
     description.style.margin = '0';
 
     // 将标题和描述添加到容器中
@@ -12019,15 +12111,27 @@ function enemyInfo() {
 
     // 创建详情容器
     const detailsContainer = document.createElement('div');
-
-    // 创建详情段落
-    const details = [
-        '邪佞共有两种形态：正常和狂暴',
-        '正常形态下，它会交替使用物理和法术技能攻击邪佞。邪佞精通人心操纵之术,若玩家被施加"醉酒"、"摄魂"等效果，战局风险会极大提高。',
-        '每10轮邪佞会进入狂暴状态，此时邪佞生命低于20%时将在2秒内加持霸体且触发复生。',
-        '邪佞一共有150轮，通关后可以继续挑战无尽Boss“深渊之神”。这是一个强大的怪物，能力多变。'
-    ];
-
+    
+    // 预先声明 details 变量
+    let details;
+    
+    if (!summonEnemy) {
+        details = [
+            '邪佞共有两种形态：正常和狂暴',
+            '正常形态下，它会交替使用物理和法术技能攻击邪佞。邪佞精通人心操纵之术,若玩家被施加"醉酒"、"摄魂"等效果，战局风险会极大提高。',
+            '每10轮邪佞会进入狂暴状态，此时邪佞生命低于20%时将在2秒内加持霸体且触发复生。',
+            '邪佞一共有150轮，通关后可以继续挑战无尽Boss“深渊之神”。这是一个强大的怪物，能力多变。'
+        ];
+    } else {
+        details = [
+            '挑战召唤的敌人往往会获得更丰富的奖励',
+            '目前召唤敌人和邪佞共享一套战斗系统，但它们通常具备特殊的战斗效果。',
+            '挑战失败会受到惩罚。',
+            '中途退出会视为挑战失败哦。'
+        ];
+    }
+    
+    // 现在 details 数组在这里是可访问的
     details.forEach(detail => {
         const p = document.createElement('p');
         p.innerText = detail;
@@ -18071,9 +18175,9 @@ function deleteSkill(skill, skillDiv, skillsArea) {
             "MA": "法术攻击技能，与法术攻击力相关",
             "PP": "施毒技能，与法术攻击力和修为有关",
             "PH": "治疗技能，与法术攻击力和修为有关",
-            "PD": "防御技能",
-            "SH": "智慧守护技能",
-            "HL": "法力回复技能",
+            "PD": "防御技能，会根据技能系数增加防御的伤害抵消数值",
+            "SH": "智慧守护技能,在战斗中会根据等级消耗一定比例的法力值来抵消伤害",
+            "HL": "法力回复技能，在战斗中会根据等级每回合回复一定比例的法力值",
             "N": "被动属性加成技能，将会按照固定值为玩家提供二级属性",
         };
         
@@ -18334,14 +18438,14 @@ function calculatePlayerCultivation(totalScore) {
 
     if (currentSpecialization === '慧光辉耀') {
         const spec = specializations['慧光辉耀'];
-        const multiplier = Math.min(1 + (spec.level * 0.025), 4);
-        playerCultivation = Math.round((totalScore / 128 + additionalPlayerCultivation * 0.5) * multiplier * Math.pow(1.001, petLevel));
+        const multiplier = Math.min(1 + (spec.level * 0.017), 3);
+        playerCultivation = Math.min(2400000, Math.round((totalScore / 128 + additionalPlayerCultivation) * multiplier * Math.pow(1.001, petLevel)));
     } else if (currentSpecialization === '神魔之力' || currentSpecialization === '坚韧之心') {
         const spec = specializations[currentSpecialization];
         const multiplier = Math.min(1 + (spec.level * 0.017), 3);
-        playerCultivation = Math.round(totalScore / 128 * multiplier * Math.pow(1.0025, petLevel)) + additionalPlayerCultivation;
+        playerCultivation = Math.min(2000000, Math.round((totalScore / 128 * multiplier * Math.pow(1.0025, petLevel)) + additionalPlayerCultivation));
     } else {
-        playerCultivation = Math.round(totalScore / 128 * Math.pow(1.003, petLevel)) + additionalPlayerCultivation;
+        playerCultivation = Math.min(2000000, Math.round((totalScore / 128 * Math.pow(1.003, petLevel)) + additionalPlayerCultivation));
     }
 
     return playerCultivation;
@@ -18356,17 +18460,8 @@ function updateSkillScore(selectedSkills = []) {
     const faith = petQualities.faith.current;
     const agility = petQualities.agility.current;
     const intelligence = petQualities.intelligence.current;
-
     const qualityScore = Math.floor((endurance + strength + faith + agility + intelligence) * (growthRate / 100) / 100);
 
-    // 计算属性评分
-    const enduranceAttr = parseInt(document.getElementById("attribute-endurance").innerText);
-    const intelligenceAttr = parseInt(document.getElementById("attribute-intelligence").innerText);
-    const strengthAttr = parseInt(document.getElementById("attribute-strength").innerText);
-    const agilityAttr = parseInt(document.getElementById("attribute-agility").innerText);
-    const faithAttr = parseInt(document.getElementById("attribute-faith").innerText);
-
-    const attributeScore = enduranceAttr * 28 + intelligenceAttr * 15 + strengthAttr * 8 + agilityAttr * 41 + faithAttr * 48;
 
     // 计算二级属性评分
     const health = parseInt(document.getElementById("secondary-health").innerText);
@@ -18376,19 +18471,8 @@ function updateSkillScore(selectedSkills = []) {
     const magicAttack = parseInt(document.getElementById("secondary-magic-attack").innerText);
     const magicDefense = parseInt(document.getElementById("secondary-magic-defense").innerText);
     const speed = parseInt(document.getElementById("secondary-speed").innerText);
-
     const secondaryAttributeScore = (health + mana + physicalAttack + physicalDefense + magicAttack + magicDefense + speed) * 2;
 
-    // 计算药物附加值
-    const drugHealth = drugBonus.health + drugBonus0.health;
-    const drugMana = drugBonus.mana + drugBonus0.mana;
-    const drugPhysicalAttack = drugBonus.physicalAttack + drugBonus0.physicalAttack;
-    const drugPhysicalDefense = drugBonus.physicalDefense + drugBonus0.physicalDefense;
-    const drugMagicAttack = drugBonus.magicAttack + drugBonus0.magicAttack;
-    const drugMagicDefense = drugBonus.magicDefense + drugBonus0.magicDefense;
-    const drugSpeed = drugBonus.speed + drugBonus0.speed;
-
-    const drugAttributeScore = Math.round((drugHealth + drugMana + drugPhysicalAttack + drugPhysicalDefense + drugMagicAttack + drugMagicDefense + drugSpeed) * 0.56);
     
     // 计算技能评分
     let skillsScore = 0;
@@ -18421,7 +18505,7 @@ function updateSkillScore(selectedSkills = []) {
     if (ssSkillCount > 1) skillsScore += 50000;
 
     // 计算总评分
-    const totalScore = qualityScore + attributeScore + skillsScore + secondaryAttributeScore + drugAttributeScore;
+    const totalScore = qualityScore + skillsScore + secondaryAttributeScore;
     skillScore = totalScore;
 
     // 计算修为值
@@ -19140,7 +19224,6 @@ function resetPetQualitiesAndSkills() {
         qualities.faith.current = Math.round(qualities.faith.current * 1.1);
         qualities.agility.current = Math.round(qualities.agility.current * 1.1);
         qualities.intelligence.current = Math.round(qualities.intelligence.current * 1.1);
-        updateMutatedImg();
     }
 
     bingpoRebornPill--;
@@ -19175,6 +19258,7 @@ function resetPetQualitiesAndSkills() {
 
     updatePetLevel();
     updatePetWisdom();
+    updateMutatedImg();
     updateAttributePanel();
 }
         
@@ -19206,7 +19290,7 @@ function rebornPet(isCheatMode = false) {
     
             currentPet.qualities.mutated = false;
             // 恢复原背景
-            document.body.style.backgroundImage = "";
+            updateMutatedImg();
             updateQualityCard();
             updateSkillScore();
         });
@@ -19282,6 +19366,7 @@ function rebornPet(isCheatMode = false) {
     updatePetWisdom();
     updateAttributePanel();
     updateTitle();
+    updateMutatedImg();
 }
 
 
@@ -19586,13 +19671,10 @@ function useMutationScroll() {
     updateTitle();
     showInfoBox("在上古卷轴的教诲下，你的宠物实现了本质的蜕变");
 }
-
-// Example usage:
-// useMutationScroll(); // 调用此函数消耗一个“灵异秘卷”并执行特别的变异规则
         
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+} //随机数
 
 function getWeightedRandom(values, weights) {
     const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
@@ -19604,7 +19686,7 @@ function getWeightedRandom(values, weights) {
         rand -= weights[i];
     }
     return values[0];
-}
+} //加权随机数
 
 setInterval(updateDescriptionBox, 30000);
 updateDescriptionBox(); // 初始化描述框
@@ -19895,9 +19977,12 @@ window.onload = function() {
     // 加载游戏状态
     if (localStorage.gameState || localStorage.petData) {
         loadGameState(true);
-        initializeEnemyPet();
-        handleRampaged();
-        updateEnemyAttributes();
+        setTimeout(() => {
+            initializeEnemyPet();
+            handleRampaged();
+            updateEnemyAttributes();
+        },0);
+
     } else {     
     // 初始化敌方宠物
     initializeEnemyPet();
@@ -20204,186 +20289,191 @@ function loadGameState(auto = false) {
     if (!auto) {
         showInfoBox('你确定要读取存档吗？这可能会覆盖现在的数据？',
                     () => {
+                        loadGameData();
                         showInfoBox('读取成功！');
                     },
                     () => {
                         return;
                     });
+    } else {
+        loadGameData();
     }
-    const savedState = JSON.parse(localStorage.getItem('gameState'));
-    if (!savedState) return;
-    const petSelect = document.getElementById('pet-select');
-    const petsInSelect = Array.from(petSelect.options).map(option => option.value);
-    const secondSkillBox = document.getElementById('second-ascension-skill');
-    
-    // 检查并添加移除的宠物
-    if (savedState.petsInSelect) {
-        savedState.petsInSelect.forEach(petKey => {
-            if (!petsInSelect.includes(petKey) && pets[petKey]) {
-                const option = document.createElement('option');
-                option.value = petKey;
-                option.text = pets[petKey].name; // 假设每个宠物对象都有一个`name`属性
-                petSelect.add(option);
-            }
-        });
-    }
-
-    // 切换到最后一次存储的宠物
-    if (savedState.currentPetKey !== undefined && pets[savedState.currentPetKey]) {
-        currentPetKey = savedState.currentPetKey;
-        petSelect.value = currentPetKey;
-        changePet(true); // 跳过确认提示，直接切换宠物
-    }
-
-    if (savedState) {
-        currentPet = JSON.parse(savedState.currentPet);
-        currentSpecialization = savedState.currentSpecialization;
-        petLevel = savedState.petLevel;
-        evolutionLevel = savedState.evolutionLevel;
-        remainingPoints = savedState.remainingPoints;
-        trainingCount = savedState.trainingCount;
-        currentWisdom = savedState.currentWisdom;
-        petAscended = savedState.petAscended;
-        ascensionAttributes = savedState.ascensionAttributes;
-        petMaxLevel = savedState.petMaxLevel;
-        petWisdom = savedState.petWisdom;
-        awakened = savedState.awakened;
-        hallucinated = savedState.hallucinated;
-        hallucinationLevel = savedState.hallucinationLevel;
-        experienceTreasureOpenCount = savedState.experienceTreasureOpenCount;
-        armsOpened = savedState.armsOpened; // 恢复武装解锁情况
-        armsAttributes = JSON.parse(savedState.armsAttributes); // 恢复武装属性情况
-        tasks = JSON.parse(savedState.tasks); // 恢复任务系统情况
-        battleRounds = savedState.battleRounds;
-        currentExp = savedState.currentExp;
-        maxExp = savedState.maxExp;
-        goldAmount = savedState.goldAmount;
-        playerCritRate = savedState.playerCritRate;
-        playerCritDamage = savedState.playerCritDamage;
-        playerCultivation = savedState.playerCultivation;
-        additionalPlayerCultivation = savedState.additionalPlayerCultivation;
-        enemyPetCultivation = savedState.enemyPetCultivation;
-        enemyCritRate = savedState.enemyCritRate;
-        enemyCritDamage = savedState.enemyCritDamage;
-        ascensionEnabled = savedState.ascensionEnabled;
-        poisonSkillActivated = savedState.poisonSkillActivated;
-        spiritLevel = savedState.spiritLevel;
-        spiritMultiplier = savedState.spiritMultiplier;
-        reenableAscension = savedState.reenableAscension;
-        bonusAttributes = savedState.bonusAttributes;        
-        baseAttributes = savedState.baseAttributes;
-        // 检查并获取技能
-        if (savedState.ascensionSkill && savedState.ascensionSkill.name) {
-            ascensionSkill = getSkillFromName(savedState.ascensionSkill.name, savedState.ascensionSkill.level);
-        } else {
-            ascensionSkill = null;
-        }
+    function loadGameData() {
+        const savedState = JSON.parse(localStorage.getItem('gameState'));
+        if (!savedState) return;
+        const petSelect = document.getElementById('pet-select');
+        const petsInSelect = Array.from(petSelect.options).map(option => option.value);
+        const secondSkillBox = document.getElementById('second-ascension-skill');
         
-        if (savedState.secondAscensionSkill && savedState.secondAscensionSkill.name) {
-            secondAscensionSkill = getSkillFromName(savedState.secondAscensionSkill.name, savedState.secondAscensionSkill.level);
-        } else {
-            secondAscensionSkill = null;
-        }
-        if (JSON.stringify(savedState.petStates)) {
-            petStates = JSON.parse(savedState.petStates);
-        }
-        if (savedState.qualityPillCount) {
-            qualityPillCount = savedState.qualityPillCount;
-        } //这是资质仙丹的数值
-        if (savedState.consumedPillCount) {
-            consumedPillCount = savedState.consumedPillCount;
-        } //这是资质仙丹的数值
-        
-        if (savedState.drugBonus0) {
-            drugBonus = savedState.drugBonus0;
-        }
-        if (savedState.drugBonus) {
-            drugBonus = savedState.drugBonus;
-        }
-        if (savedState.wuxingStates) {
-            wuxingStates = JSON.parse(savedState.wuxingStates);
-        }
-        if (savedState.wuxingFragments) {
-            wuxingFragments = savedState.wuxingFragments;
-        }
-        if (savedState.advancementStates) {
-            advancementStates = JSON.parse(savedState.advancementStates);
-        }
-        skillScore = savedState.skillScore;
-        blessGiftClaimed = savedState.blessGiftClaimed;
-        enemyPet = savedState.enemyPet;
-        enemyMaxHealth = savedState.enemyMaxHealth;
-        enemyMaxMana = savedState.enemyMaxMana;
-        enemyInitialState = savedState.enemyInitialState; // 加载敌人的初始状态
-        divinedWeaponStatus = savedState.divinedWeaponStatus;
-        alreadyUseDrug= savedState.alreadyUseDrug; //使用药物提示
-        drugInventory = JSON.parse(savedState.drugInventory); // 恢复药品系统
-        collectCost= savedState.collectCost; //采集药物成本
-        experienceTreasureOpenCount= savedState.experienceTreasureOpenCount; //经验宝箱成本
-
-        if (awakened && savedState.awakenAttributes) {
-            awakenAttributes = savedState.awakenAttributes;
-        }
-        if (savedState.specializations) {
-            specializations = savedState.specializations;
-        }
-        if (savedState.additionalAttributes) {
-            additionalAttributes = savedState.additionalAttributes;
-        }
-        if (savedState.currentSpecialization !== undefined) {
-            currentSpecialization = savedState.currentSpecialization;
-        }
-        if (savedState.collectedPets) {
-            collectedPets = savedState.collectedPets;
-        }
-        if (savedState.collectedPetCount !== undefined) {
-            collectedPetCount = savedState.collectedPetCount;
-        }
-        //假如存在神器
-        if (savedState.divineWeapons) {
-            divineWeaponManager.setWeaponData(savedState.divineWeapons);
-        }
-        if (savedState.existingSkills) {
-            const skillsArea = document.getElementById("skills-area");
-            skillsArea.innerHTML = ''; // 清空当前技能
-            savedState.existingSkills.forEach(skill => {
-                const skillDiv = document.createElement('div');
-                skillDiv.innerText = `${skill.name} (${skill.rarity})`;
-                skillDiv.onclick = () => {
-                    deleteSkill(skill, skillDiv, skillsArea);
-                };
-                if (skill.rarity === 'S') {
-                    skillDiv.classList.add('s-skill');
-                } else if (skill.rarity === 'SS') {
-                    skillDiv.classList.add('ss-skill');
+        // 检查并添加移除的宠物
+        if (savedState.petsInSelect) {
+            savedState.petsInSelect.forEach(petKey => {
+                if (!petsInSelect.includes(petKey) && pets[petKey]) {
+                    const option = document.createElement('option');
+                    option.value = petKey;
+                    option.text = pets[petKey].name; // 假设每个宠物对象都有一个`name`属性
+                    petSelect.add(option);
                 }
-                skillsArea.appendChild(skillDiv);
             });
         }
-        if (savedState.secondAscensionSkill && savedState.reenableAscension) {
-            secondSkillBox.style.display = 'block';
-            updateSecondAscensionDisplay();
+    
+        // 切换到最后一次存储的宠物
+        if (savedState.currentPetKey !== undefined && pets[savedState.currentPetKey]) {
+            currentPetKey = savedState.currentPetKey;
+            petSelect.value = currentPetKey;
+            changePet(true); // 跳过确认提示，直接切换宠物
         }
-        if (savedState.gameItems) {
-            gameItems = savedState.gameItems;
-            restoreItems(); // 恢复道具数据
+    
+        if (savedState) {
+            currentPet = JSON.parse(savedState.currentPet);
+            currentSpecialization = savedState.currentSpecialization;
+            petLevel = savedState.petLevel;
+            evolutionLevel = savedState.evolutionLevel;
+            remainingPoints = savedState.remainingPoints;
+            trainingCount = savedState.trainingCount;
+            currentWisdom = savedState.currentWisdom;
+            petAscended = savedState.petAscended;
+            ascensionAttributes = savedState.ascensionAttributes;
+            petMaxLevel = savedState.petMaxLevel;
+            petWisdom = savedState.petWisdom;
+            awakened = savedState.awakened;
+            hallucinated = savedState.hallucinated;
+            hallucinationLevel = savedState.hallucinationLevel;
+            experienceTreasureOpenCount = savedState.experienceTreasureOpenCount;
+            armsOpened = savedState.armsOpened; // 恢复武装解锁情况
+            armsAttributes = JSON.parse(savedState.armsAttributes); // 恢复武装属性情况
+            tasks = JSON.parse(savedState.tasks); // 恢复任务系统情况
+            battleRounds = savedState.battleRounds;
+            currentExp = savedState.currentExp;
+            maxExp = savedState.maxExp;
+            goldAmount = savedState.goldAmount;
+            playerCritRate = savedState.playerCritRate;
+            playerCritDamage = savedState.playerCritDamage;
+            playerCultivation = savedState.playerCultivation;
+            additionalPlayerCultivation = savedState.additionalPlayerCultivation;
+            enemyPetCultivation = savedState.enemyPetCultivation;
+            enemyCritRate = savedState.enemyCritRate;
+            enemyCritDamage = savedState.enemyCritDamage;
+            ascensionEnabled = savedState.ascensionEnabled;
+            poisonSkillActivated = savedState.poisonSkillActivated;
+            spiritLevel = savedState.spiritLevel;
+            spiritMultiplier = savedState.spiritMultiplier;
+            reenableAscension = savedState.reenableAscension;
+            bonusAttributes = savedState.bonusAttributes;        
+            baseAttributes = savedState.baseAttributes;
+            // 检查并获取技能
+            if (savedState.ascensionSkill && savedState.ascensionSkill.name) {
+                ascensionSkill = getSkillFromName(savedState.ascensionSkill.name, savedState.ascensionSkill.level);
+            } else {
+                ascensionSkill = null;
+            }
+            
+            if (savedState.secondAscensionSkill && savedState.secondAscensionSkill.name) {
+                secondAscensionSkill = getSkillFromName(savedState.secondAscensionSkill.name, savedState.secondAscensionSkill.level);
+            } else {
+                secondAscensionSkill = null;
+            }
+            if (JSON.stringify(savedState.petStates)) {
+                petStates = JSON.parse(savedState.petStates);
+            }
+            if (savedState.qualityPillCount) {
+                qualityPillCount = savedState.qualityPillCount;
+            } //这是资质仙丹的数值
+            if (savedState.consumedPillCount) {
+                consumedPillCount = savedState.consumedPillCount;
+            } //这是资质仙丹的数值
+            
+            if (savedState.drugBonus0) {
+                drugBonus = savedState.drugBonus0;
+            }
+            if (savedState.drugBonus) {
+                drugBonus = savedState.drugBonus;
+            }
+            if (savedState.wuxingStates) {
+                wuxingStates = JSON.parse(savedState.wuxingStates);
+            }
+            if (savedState.wuxingFragments) {
+                wuxingFragments = savedState.wuxingFragments;
+            }
+            if (savedState.advancementStates) {
+                advancementStates = JSON.parse(savedState.advancementStates);
+            }
+            skillScore = savedState.skillScore;
+            blessGiftClaimed = savedState.blessGiftClaimed;
+            enemyPet = savedState.enemyPet;
+            enemyMaxHealth = savedState.enemyMaxHealth;
+            enemyMaxMana = savedState.enemyMaxMana;
+            enemyInitialState = savedState.enemyInitialState; // 加载敌人的初始状态
+            divinedWeaponStatus = savedState.divinedWeaponStatus;
+            alreadyUseDrug= savedState.alreadyUseDrug; //使用药物提示
+            drugInventory = JSON.parse(savedState.drugInventory); // 恢复药品系统
+            collectCost= savedState.collectCost; //采集药物成本
+            experienceTreasureOpenCount= savedState.experienceTreasureOpenCount; //经验宝箱成本
+    
+            if (awakened && savedState.awakenAttributes) {
+                awakenAttributes = savedState.awakenAttributes;
+            }
+            if (savedState.specializations) {
+                specializations = savedState.specializations;
+            }
+            if (savedState.additionalAttributes) {
+                additionalAttributes = savedState.additionalAttributes;
+            }
+            if (savedState.currentSpecialization !== undefined) {
+                currentSpecialization = savedState.currentSpecialization;
+            }
+            if (savedState.collectedPets) {
+                collectedPets = savedState.collectedPets;
+            }
+            if (savedState.collectedPetCount !== undefined) {
+                collectedPetCount = savedState.collectedPetCount;
+            }
+            //假如存在神器
+            if (savedState.divineWeapons) {
+                divineWeaponManager.setWeaponData(savedState.divineWeapons);
+            }
+            if (savedState.existingSkills) {
+                const skillsArea = document.getElementById("skills-area");
+                skillsArea.innerHTML = ''; // 清空当前技能
+                savedState.existingSkills.forEach(skill => {
+                    const skillDiv = document.createElement('div');
+                    skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+                    skillDiv.onclick = () => {
+                        deleteSkill(skill, skillDiv, skillsArea);
+                    };
+                    if (skill.rarity === 'S') {
+                        skillDiv.classList.add('s-skill');
+                    } else if (skill.rarity === 'SS') {
+                        skillDiv.classList.add('ss-skill');
+                    }
+                    skillsArea.appendChild(skillDiv);
+                });
+            }
+            if (savedState.secondAscensionSkill && savedState.reenableAscension) {
+                secondSkillBox.style.display = 'block';
+                updateSecondAscensionDisplay();
+            }
+            if (savedState.gameItems) {
+                gameItems = savedState.gameItems;
+                restoreItems(); // 恢复道具数据
+            }
+            // 需要重新更新显示的内容
+            updateDisplayContent();
+    
+            // 检查宠物是否已经变异
+            if (currentPet.qualities.mutated) {
+                updateMutatedImg();
+            }
+            //
+            if (savedState.alreadyUnlocked) {
+                alreadyUnlocked = savedState.alreadyUnlocked;
+            }
+            // 如果有其他需要更新的显示内容，也需要在这里添加
         }
-        // 需要重新更新显示的内容
-        updateDisplayContent();
-
-        // 检查宠物是否已经变异
-        if (currentPet.qualities.mutated) {
-            updateMutatedImg();
-        }
-        //
-        if (savedState.alreadyUnlocked) {
-            alreadyUnlocked = savedState.alreadyUnlocked;
-        }
-        // 如果有其他需要更新的显示内容，也需要在这里添加
+        alreadyLoadGameState = true;
+        updateWuxingBonusState();
+        console.log("读档成功！");
     }
-    alreadyLoadGameState = true;
-    updateWuxingBonusState();
-    console.log("读档成功！");
 }
 
 function updateDisplayContent() {

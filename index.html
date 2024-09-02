@@ -8876,6 +8876,10 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点物理伤害。`, 'white');
     }
 
+    if (waterAmuletTriggered) {
+        updateDamageValue(finalDamage,false,'extra-damage')
+    }
+    
     updateDamageValue(finalDamage,false,'damage'); // 显示玩家伤害
 
     // 应用吸血魔刃效果
@@ -8949,6 +8953,11 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         logBattleEvent(`⚔️【玩家攻击】你进行了法术攻击，造成了 ${finalDamage} 点法术伤害，消耗了 ${manaCost} 点法力值。`, 'wheat');
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/668a30dbd9c307b7e9c54fff.gif');
     }
+
+    if (waterAmuletTriggered) {
+        updateDamageValue(finalDamage,false,'extra-damage')
+    }
+    
     updateDamageValue(finalDamage, false, 'damage'); // 显示玩家伤害
     applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
     

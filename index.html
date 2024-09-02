@@ -9792,7 +9792,7 @@ function handleReflectAndHeal(damage) {
             console.error("Heal amount is NaN, setting to 0.");
         }
         battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healAmount);
-        updateDamageValue(-healAmount,false,'extra-damage');
+        updateDamageValue(-healAmount,true,'extra-damage');
         logBattleEvent(`🔮【玩家治疗】仙气护体触发，恢复了 ${healAmount} 点生命值。`, 'aqua');
         showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a5d698d9c307b7e9718c7d.gif');
     }
@@ -12417,12 +12417,15 @@ function autoBattle() {
             }
     
             // 检查玩家是否赢得战斗
-            if (battleState.playerWon === false) {
-                clearAutoBattle();
-                logBattleEvent("本轮失败，终止自动战斗。", 'red');
-                showNextBattlePrompt(false); // 玩家失败，传递失败状态
-                battleState.playerWon = true;
-                return;
+            if (battleAttributes.health <= 0) {
+                if (!resurrectionState) {
+                    clearAutoBattle();
+                    logBattleEvent("本轮失败，终止自动战斗。", 'red');
+                    showNextBattlePrompt(false); // 玩家失败，传递失败状态
+                    return;
+                } else {
+                     handleResurrection(0);
+                }
             }
     
             // 根据玩家生命值和状态进行行动
@@ -12481,7 +12484,6 @@ function autoBattle() {
     } else {
         showInfoBox('聚灵丹数量不足，无法开启自动战斗！',null,null,'red');
     }
-
 }
 
 function clearAutoBattle() {

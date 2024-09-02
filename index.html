@@ -7522,7 +7522,7 @@ function restoreEnemyState() {
 function getEnemyStatus() {
     let status = [];
     if (battleState.enemy.rampaged) status.push("狂暴");
-    if (battleState.enemy.revived) status.push("复活中");
+    if (enemyRivival) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
     if (battleState.enemy.sleep) status.push("沉睡");
     if (battleState.enemy.pierced) status.push("穿透");
@@ -8824,7 +8824,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
 
     const x = battleState.enemy.physicalDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     let baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * effectiveDefense));
 
     // 检查玩家是否处于失明状态
@@ -8865,7 +8865,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         } 
     }
 
-    if (battleState.enemy.revived) {
+    if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
@@ -8916,7 +8916,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
     const x = battleState.enemy.magicDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     
     let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 20 * skillMultiplier) * manaCostMultiplier;
@@ -8944,7 +8944,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         } 
     }
 
-    if (battleState.enemy.revived) {
+    if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
@@ -9008,8 +9008,10 @@ function performIndependentMagicAttack() {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
-    const effectiveDefense = Math.floor(battleState.enemy.magicDefense * defenseFactor * cultivationFactor);
-    let baseDamage = Math.max(0, Math.floor((battleAttributes.magicAttack * 0.8 * skillMultiplier) - effectiveDefense));
+    const x = battleState.enemy.magicDefense * defenseFactor * cultivationFactor;
+    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    
+    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
     let isCritical = checkCriticalHit(playerCritRate);
 
     if (handleMagicDodge('enemy')) {
@@ -9032,7 +9034,7 @@ function performIndependentMagicAttack() {
         } 
     }
 
-    if (battleState.enemy.revived) {
+    if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
     battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
@@ -10273,7 +10275,7 @@ function performEnemyPhysicalAttack(isCritical) {
     const attackMultiplier = 1 + (enemyLevel / 100);
     const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 4);
     const x = battleAttributes.physicalDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     
     let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -10334,7 +10336,7 @@ function performEnemyMagicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 4);
     const x = battleAttributes.magicDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     
     let damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * effectiveDefense));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
@@ -10855,6 +10857,9 @@ function enemyDefense() {
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66d4a22dd9c307b7e9f5faec.gif');
 }
 
+let enemyRivival = false;
+let enemyRivivalCount = 0;
+        
 function handleRampaged() {
     console.log(`handleRampaged called. battleRounds: ${battleRounds}, enemy health: ${battleState.enemy.health}, enemyMaxHealth: ${enemyMaxHealth}`);
 
@@ -10865,13 +10870,6 @@ function handleRampaged() {
         changeEnemyImage("mao");
         setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
         console.log('Enemy is rampaged.');
-    } else if (battleRounds <= 150 && battleRounds % 10 === 0) {
-        enemyCritRate = 1;
-        enemyCritDamage = 2.5;
-        battleState.enemy.rampaged = true;
-        changeEnemyImage("rampaged");
-        setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
-        console.log('Enemy is rampaged.');
     } else if (battleRounds > 150 && battleRounds % 10 === 0) {
         enemyCritRate = 1;
         enemyCritDamage = 3.5;
@@ -10879,38 +10877,43 @@ function handleRampaged() {
         changeEnemyImage("darkShape");
         setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b8ec.webp');
         console.log('Enemy is rampaged.');
+    } else if (battleRounds <= 150 && battleRounds % 10 === 0) {
+        enemyCritRate = 1;
+        enemyCritDamage = 2.5;
+        battleState.enemy.rampaged = true;
+        changeEnemyImage("rampaged");
+        setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
+        console.log('Enemy is rampaged.');
     } else {
-        enemyCritRate = Math.random() * (1 - 0.01) + 0.01;
-        enemyCritDamage = Math.random() * (3 - 1.5) + 1.5;
+        enemyCritRate = Math.random() * (0.99) + 0.01;  // 生成 [0.01, 1) 之间的随机值
+        enemyCritDamage = Math.random() * (1.5) + 1.5;  // 生成 [1.5, 3) 之间的随机值
         battleState.enemy.rampaged = false;
         changeEnemyImage(battleRounds > 150 ? "realShape" : "default");
         setBackgroundImage(battleRounds > 150 ? 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b907.webp' : 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b92d.webp');
         console.log('Enemy is not rampaged.');
     }
 
-    if (!battleState.enemy.revivalCount) {
-        battleState.enemy.revivalCount = 0;
-    }
-
     // 检查并处理敌人复活机制
-    if (battleState.enemy.rampaged && battleState.enemy.health < enemyMaxHealth * 0.2 && battleState.enemy.revivalCount < (battleRounds === 150 ? 3 : 1)) {
-        battleState.enemy.revivalCount += 1;
+    if (battleState.enemy.rampaged && battleState.enemy.health < enemyMaxHealth * 0.2 && enemyRivivalCount <= (battleRounds === 150 ? 3 : 1)) {
+        enemyRivivalCount += 1;
         logBattleEvent("邪佞的生命力正在复苏，请在2秒内击杀它，否则它将复活！", "red");
-        battleState.enemy.revived = true;
-        console.log(`Revival triggered. revivalCount: ${battleState.enemy.revivalCount}`);
+        enemyRivival = true;
+        console.log(`Revival triggered. revivalCount: ${enemyRivivalCount}`);
 
         setTimeout(() => {
-            if (battleState.enemy.health < enemyMaxHealth) {
+            // 重新检查敌人状态
+            if (enemyRivival && battleState.enemy.health < enemyMaxHealth * 0.2) {
                 battleState.enemy.health = enemyMaxHealth;
                 logBattleEvent("邪佞复生成功，生命值恢复到100%！", "red");
-                updateDamageValue(-enemyMaxHealth,false,'damage');
-                battleState.enemy.revived = false;
+                updateDamageValue(-enemyMaxHealth, false, 'damage');
+                enemyRivival = false;
                 updateUI();
                 console.log('Enemy revived to full health.');
             }
         }, 2000);
     }
-} //处理狂暴状态
+}
+ //处理狂暴状态
 
 
 

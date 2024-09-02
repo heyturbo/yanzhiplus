@@ -14,6 +14,7 @@
             color: #6f391c;
             align-items: center;
         }
+
         #petOverview {
             display: none; /* 默认隐藏 */
             position: fixed;
@@ -685,7 +686,7 @@
             text-align: left;
             border: 1px groove aliceblue;
             font-size: 14px;
-            color: rgba(0, 0, 0, 0.8);
+            color: #6f391c;
         }
         .treasure-description-box {
             gap: 4px;
@@ -1683,7 +1684,7 @@
             background: url('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b92d.webp') no-repeat center center;
             background-size: cover;
             color: white;
-            box-shadow: -3px 0 5px rgba(0,0,0,0.2);
+            box-shadow: inset 0px 0 5px 1px rgba(0, 0, 0, 0.1);
             z-index: 1000;
             overflow-y: auto;
             padding: 0px 0px 0px 0px;
@@ -1844,7 +1845,7 @@
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 7px;
+            border-radius: 5px;
             width: 97%;
         }
                 /* 直接针对日志内容的样式 */
@@ -1864,7 +1865,7 @@
         
         .battle-system-actions {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 10px 5px;
             width: 100%;
             margin-top: 10px;
@@ -2100,11 +2101,10 @@
         
         .ascension-modal-content {
             background-color: rgb(0 0 0 / 40%);
-            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
             width: 85%;
-            top: 25%;
+            top: 50%;
             left: 50%;
             position: absolute;
             transform: translate(-50%, -50%);
@@ -3009,13 +3009,13 @@
             </div>
             <div class="battle-system-actions">
                 <button onclick="performAttack('physical')">物攻</button>
-                <button onclick="useDrug()">药品</button>
-                <button onclick="performHeal()">治疗</button>
-                <button onclick="performPoison()">施毒</button>
                 <button onclick="performDefense()">格挡</button>
+                <button onclick="performHeal()">治疗</button>
                 <button onclick="performAttack('magical')">法攻</button>
+                <button onclick="useDrug()">药品</button>
                 <button id="battle-spirit-button">精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升</button>
+                <button onclick="performPoison()">施毒</button>
                 <button onclick="divinedWeapon()">神器</button>
                 <button onclick="levelUpSkill()">技能</button>
                 <button onclick="enemyInfo()">自动</button>
@@ -4130,16 +4130,13 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V20.0.2
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V22.1.1
+                            \n- 模拟海底领悟骑宠系统（目前支持SS级别的物理/法术/释放毒药技能，每种技能有高中低三个加成，可以同时领悟）
+                            \n- 优化技能系统，添加了更多可以发挥实际作用的技能
+                            \n- 优化数值系统，避免数值过大时的平衡问题
+                            \n- 更改部分UI模块，增加夏日限定皮肤
                             \n- 五行符系统优化，升级上限开放至100级且提升仙葫概率
-                            \n- 上线五行符系统，新系统可能不稳定，选择性尝试
                             \n- 重构大量战斗系统代码，战斗系统更加稳定
-                            \n- 优化通灵悬赏、打工系统
-                            \n- 优化、加强神器系统；
-                            \n- 增加大量技能效果，可通过神器开启；
-                            \n- 调整某些战斗时会发生的bug；
-                            \n- 优化新手礼包内容，可在商店界面直接领取；
-                            \n- 优化首页道具显示，现在可以点击数字贩卖了；
                             \n- 优化部分显示效果；
                             \n如果大侠未接触过《天书奇谈》的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。
                             \n以下引导已经过时，请酌情参考。新版引导正在完善中。
@@ -4994,7 +4991,8 @@ const enemyImages = [
     { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
     { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' },
     { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' },
-    { status: 'qiongQi', name: '穷奇', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif' }
+    { status: 'qiongQi', name: '穷奇', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif' },
+    { status: 'baiYin', name: '白银VIP怪', url: 'https://pic.imgdb.cn/item/66d5d91ad9c307b7e95066ac.gif' },
 ];
 
 // 更改敌人图像的函数
@@ -6422,7 +6420,6 @@ let defeatedPets = []; // 记录已阵亡的宠物 { key: 'xiaojin', name: '小�
 let usedPets = []; // 记录所有已出战的宠物 { key: 'xiaojin', name: '小金牛' }
 
 function showNextBattlePrompt(playerWon) {
-    battleState.playerWon = playerWon;
 
     if (playerWon) {
         if (!summonEnemy) {
@@ -6467,7 +6464,6 @@ function handleVictory() {
     goldAmount += reward;
     updateGoldDisplay(goldAmount);
     updateTitle();
-    playerWon = true;
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
     increaseCurrentPetIntimacy(30);
@@ -6478,8 +6474,8 @@ function handleVictory() {
     battleRounds++;
     updateEnemyAttributes();
     gainExp();
-    resetBattleState(playerWon);
-    resetBuffState(playerWon);
+    resetBattleState(true);
+    resetBuffState(true);
     extraShield = 0;
 }
 
@@ -6559,10 +6555,7 @@ function applyDefeatPenalty() {
     usedPets = [];
     resetBattleState(false);
     resetBuffState(false);
-    extraShield = 0;
-    resurrectionTimes = 0;
-    resurrectionState = false;
-    
+    extraShield = 0;    
 }
 
 function calculateExtraReward() {
@@ -6794,6 +6787,8 @@ function resetBattleState(playerWon) {
     clearPlayerEffect();
     enemyHealCount = 0;
     updatePetInfo();
+    resurrectionState = false;
+    resurrectionTimes = 0;
 }
 
 function setBackgroundImage(imageUrl) {
@@ -7072,6 +7067,30 @@ const enemies = {
         rewardMessage: '1个珍贵的洪荒至尊仙葫。在这次艰难的对抗中，你的宠物与你并肩作战，好感大增，亲密度增加了600！',
         specialty: 'qiongQi' // 特殊能力标识符
     },
+    baiYin: {
+        name: '白银VIP怪',
+        level: 180,
+        health: 100000,
+        mana: 20000,
+        physicalAttack: 1500,
+        physicalDefense: 300,
+        magicAttack: 1300,
+        magicDefense: 280,
+        speed: 2024,
+        cultivation: 1024,
+        enemyCritRate: 0.5,
+        enemyCritDamage: 1.5,
+        backgroundImage: 'https://pic.imgdb.cn/item/66d5d9a1d9c307b7e950d6b2.png',
+        reward: () => {
+            const expGainedRatio = Math.round(maxExp * (0.03 + Math.random() * 0.02));
+            if (petLevel < 180) {
+                gainExp(expGainedRatio);
+            }
+            handleBaiYinReward();
+        },
+        rewardMessage: '无',
+        specialty: 'baiYin' // 特殊能力标识符
+    },
 };
 // 定义不同敌人的独特战斗能力
 const specificAttackByEnemy = {
@@ -7115,8 +7134,13 @@ const specificAttackByEnemy = {
                 }
             },30000);
         }
+    },
+    'baiYin': {
+        type: 'instant',
+        action: () => {
+            logBattleEvent('战胜后可得到大量经验值和概率获得提升宠物技能的神秘物质','gold');
+        }
     }
-    // 可以为其他敌人继续添加独特的战斗能力...
 };
 
 function applySpecificAttackByEnemy(summonedEnemyName) {
@@ -7160,8 +7184,8 @@ function handleBattleWithSummonEnemy(playerWon) {
 
     // 重置战斗状态
     summonEnemy = false;
-    resetBattleState(playerWon);
-    resetBuffState(playerWon);
+    resetBattleState(true);
+    resetBuffState(false);
     clearEnemyEffect();
     clearPlayerEffect();
     clearAutoBattle();
@@ -7222,11 +7246,21 @@ function summonEnemyByType(enemyType, manuallySummon = true) {
     } else {
         showInfoBox('正在战斗中或未知错误', null, null, 'red');
     }
+} 
+                
+function handleBaiYinReward() {
+    const chance = getRandomInt(1,100);
+    if (chance <= 90) {
+        generateItemToJinnang('universalAsh','宇宙之尘','https://pic.imgdb.cn/item/66d5dd07d9c307b7e953e4e1.png',price = 10, quantity = 1, description = '击败白银之地怪物的嘉奖，收集一定数量可兑换宇宙之晶');
+        showInfoBox('你获得一个宇宙之尘');
+    } else {
+        addItemToJinnang('universalCrystal',1);
+        showInfoBox('你获得一个宇宙之晶');
+    }
 }
-
+                
 function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
-    
     battleAttributes.health -= healthLost;
     battleState.enemy.health += healthLost * 10;
     logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'red');
@@ -7309,7 +7343,8 @@ function openHongHuangTreasure() {
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
         { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 1 },
         { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
-        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 10 },
+        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 },
+        { displayName: '白银VIP包裹', name: 'baiYinPKG', quantity: 1, chance: 5 },
         { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 5 },
     ];
 
@@ -7841,7 +7876,7 @@ function handleMagicDodge(target) {
         // 玩家魔法闪避逻辑
         cultivationDifference = playerCultivation - enemyPetCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8); // 确保概率不超过80%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家魔法闪避概率为：${dodgeChance}`);
@@ -7849,7 +7884,7 @@ function handleMagicDodge(target) {
         // 敌人魔法闪避逻辑
         cultivationDifference = enemyPetCultivation - playerCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8); // 确保概率不超过80%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('enemy-image');
         console.log(`敌人魔法闪避概率为：${dodgeChance}`);
@@ -8818,7 +8853,7 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage') {
         damageElement.className = '';  // 清除动画类名，防止影响下一次显示
     }, 300);
 }
-        
+     
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     
@@ -8834,6 +8869,8 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     // 检查敌人是否闪避
     if (handleDodge('enemy')) {
+        playerTurn = false;
+        setTimeout(enemyAttack, 350);
         return 0; // 如果敌人闪避成功，物理攻击伤害为0
     }
 
@@ -8913,7 +8950,6 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    
     const x = battleState.enemy.magicDefense * defenseFactor;
     const effectiveDefense = (Math.log(7 * x) / 10) - 1;;
     
@@ -8922,6 +8958,8 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
     if (handleMagicDodge('enemy')) {
+        playerTurn = false;
+        setTimeout(enemyAttack, 350);
         return 0;
     }
     
@@ -9013,6 +9051,8 @@ function performIndependentMagicAttack() {
     let isCritical = checkCriticalHit(playerCritRate);
 
     if (handleMagicDodge('enemy')) {
+        playerTurn = false;
+        setTimeout(enemyAttack, 350);
         return 0;
     }
 
@@ -9812,6 +9852,7 @@ function handleReflectAndHeal(damage) {
 }//处理仙气（包含反弹逻辑）
 
 let resurrectionState = false;
+let resurrectionTimes = 0;
 
 function checkResurrectionState(times) {
     if (times > 0) {
@@ -9820,8 +9861,6 @@ function checkResurrectionState(times) {
         resurrectionState = false;
     }
 }
-
-let resurrectionTimes = 0;
 
 function handleResurrection(damage) {
     if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
@@ -15193,6 +15232,8 @@ let jinnangItems = [
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
     { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' },
     { name: 'enlargeCapacityCard', displayName: '背包扩容卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 1000, quantity: 1, description: '使用后开启1000背包容量' },
+    { name: 'baiYinPKG', displayName: '白银VIP包裹', url: 'https://pic.imgdb.cn/item/66d5e69ed9c307b7e966f716.png', price: 100, quantity: 0, description: '使用后可得到30张试炼之地召唤卡' },
+    { name: 'baiYinCard', displayName: '试炼之地召唤卡', url: 'https://pic.imgdb.cn/item/66d5e7b7d9c307b7e9685315.png', price: 0, quantity: 0, description: '使用后可以召唤白银之地的怪物，每次战斗胜利会获得不菲的经验值' },
     { name: 'attentionValue', displayName: '集中值（4点）', url: 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png', price: 200, quantity: 0, description: '直接使用，给当前宠物增加4点集中值' },
     { name: 'learningValueBook', displayName: '灵兽悟道书', url: 'https://pic.imgdb.cn/item/66d1c3a4d9c307b7e9ddf33e.png', price: 3000, quantity: 0, description: '直接使用，给当前宠物提供20000点学习度，学习度可用于提升技能加成' },
     { name: 'resetAdvancementPill', displayName: '灵兽清心丹', url: 'https://pic.imgdb.cn/item/66d1c416d9c307b7e9de526a.png', price: 500, quantity: 0, description: '在领悟面板进行重置使用，加成重置后，会返还所有的技能点' },
@@ -15599,6 +15640,10 @@ const itemEffects = {
     battleWithExpEnemy: () => summonEnemyByType('expEnemy'),
     noWorkBoss: () => summonEnemyByType('noWorkBoss'),
     qiongQi: () => summonEnemyByType('qiongQi'),
+    baiYinPKG: () => {
+        addItemToJinnang('baiYinCard',30);
+    },
+    baiYinCard: () => summonEnemyByType('baiYin'),
     universalCrystal: () => {
         levelUpSkill();
         addItemToJinnang('universalCrystal',1);
@@ -15667,7 +15712,18 @@ const itemEffects = {
     backToOne: () => {
         addItemToJinnang('infiniteGem',100);
         addItemToJinnang('ignoranceWater',100);
-    }
+    },
+    universalAsh: () => {
+        addItemToJinnang('universalAsh',1);
+        const universalAshItem = jinnangItems.find(item => item.name === 'universalAsh');
+        if (universalAshItem && universalAshItem.quantity < 5) {
+            showInfoBox('你的宇宙之尘数量不足5个，无法合成宇宙之晶！',null,null,'red');
+        } else {
+            useItem('universalAsh',5);
+            addItemToJinnang('universalCrystal',1);
+            showInfoBox('消耗5个宇宙之尘合成一个宇宙之晶！');
+        }
+    }               
 };
 
 let lastUsedItemName = null;
@@ -15742,11 +15798,12 @@ function generateSealCard() {
         ['battleWithExpEnemy', '战神魔魂封印'],
         ['battleWithAncientEvil', '太古魔魂封印'],
         ['noWorkBoss', '無班之魂'],
-        ['qiongQi', '穷奇']
+        ['qiongQi', '穷奇'],
+        ['baiYin', '白银VIP怪']
     ]);
 
     // 封印卡片的英文名称数组
-    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi'];
+    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi','baiYinCard'];
 
     // 随机选择一个封印卡片的英文名称
     const randomIndex = Math.floor(Math.random() * sealCards.length);

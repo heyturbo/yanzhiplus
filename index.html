@@ -1844,7 +1844,7 @@
             overflow-y: clip;
             font-size: 12px;
             background: rgba(0, 0, 0, 0.7);
-            border-radius: 8px;
+            border-radius: 7px;
             width: 97%;
         }
                 /* 直接针对日志内容的样式 */
@@ -8821,11 +8821,10 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage') {
         
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
-
-    const x = battleState.enemy.physicalDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * effectiveDefense));
+    
+    const x = battleState.enemy.physicalDefense * defenseFactor;
+    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
+    let baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
 
     // 检查玩家是否处于失明状态
     if (battleState.player.blindfold) {
@@ -8914,11 +8913,11 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
-    const x = battleState.enemy.magicDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+    const x = battleState.enemy.magicDefense * defenseFactor;
+    const effectiveDefense = (Math.log(7 * x) / 10) - 1;;
+    
+    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 20 * skillMultiplier) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
@@ -9007,11 +9006,10 @@ function performIndependentMagicAttack() {
     }
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.1, Math.log2(enemyPetCultivation / 200) / 4);
-    const x = battleState.enemy.magicDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const x = battleState.enemy.magicDefense * defenseFactor;
+    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
     
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
     let isCritical = checkCriticalHit(playerCritRate);
 
     if (handleMagicDodge('enemy')) {
@@ -10273,11 +10271,11 @@ function performEnemyPhysicalAttack(isCritical) {
     // 确保enemy-level的内容为数字并正确计算attackMultiplier
     const enemyLevel = parseInt(document.getElementById('enemy-level').innerText, 10) || 0;
     const attackMultiplier = 1 + (enemyLevel / 100);
-    const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 4);
-    const x = battleAttributes.physicalDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
     
-    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * effectiveDefense));
+    const x = battleAttributes.physicalDefense * defenseFactor;
+    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
+    
+    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * Math.max(0, 1 - effectiveDefense)));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     
     
@@ -10334,11 +10332,10 @@ function performEnemyMagicalAttack(isCritical) {
     const attackMultiplier = 1 + (enemyLevel / 100);
     
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    const cultivationFactor = Math.max(0.1, Math.log2(playerCultivation / 200) / 4);
-    const x = battleAttributes.magicDefense * defenseFactor * cultivationFactor;
-    const effectiveDefense = Math.max(0.01, Math.min(1, 2.246775 / (Math.log(x) - 7.71255)));
+    const x = battleAttributes.magicDefense * defenseFactor;
+    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
     
-    let damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * effectiveDefense));
+    let damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * Math.max(0, 1 - effectiveDefense)));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
 

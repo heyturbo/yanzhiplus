@@ -17361,12 +17361,12 @@ function exchangeGoldBlock(auto = false) {
     const goldBlockDescription = '价值连城的贵金属，无论在什么时代都是最好的天然货币（你可以低于市场的价格直接出售，也可以点击使用进行市场竞价）';
 
     function createGoldBlock() {
-        goldAmount -= goldBlockPrice;
+        goldAmount -= 200000000;
         updateGoldDisplay(goldAmount);
         generateItemToJinnang('goldBlock', goldBlockName, goldBlockImage, goldBlockPrice, 1, goldBlockDescription);
     }
 
-    if (goldAmount < goldBlockPrice) {
+    if (goldAmount < 200000000) {
         if (!auto) {
             showInfoBox('你的金子不足200锭，无法兑换金锭！', null, null, 'red');
         }

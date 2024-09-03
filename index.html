@@ -9,7 +9,7 @@
         @import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
 
         body {
-            font-family: 'Noto Serif SC','思源宋体', sans-serif;
+            font-family: 'Noto Serif SC', sans-serif;
             display: flex;
             flex-direction: column;
             margin: 0;
@@ -16333,7 +16333,8 @@ function showPetArmsWindow() {
                             color: #E3A73B;
                             cursor: pointer;
                             box-shadow: inset 0px 1px 2px 0px #E3A73B;
-                            border: 1px solid black;`;
+                            border: 1px solid black;
+                            position: relative;`;
     newArmsWindow.appendChild(titleContainer);
 
     const commonButtonStyle = `border: 1px solid #6F391C;
@@ -16363,7 +16364,7 @@ function showPetArmsWindow() {
 
     const closeButton = document.createElement('button');
     closeButton.innerText = 'X';
-    closeButton.style = `position: absolute;
+    closeButton.style = `position: fixed;
                         top: 4px;
                         right: 4px;
                         ${topButtonStyle}`;
@@ -16372,7 +16373,7 @@ function showPetArmsWindow() {
 
     const infoButton = document.createElement('button');
     infoButton.innerText = '?';
-    infoButton.style = `position: absolute;
+    infoButton.style = `position: fixed;
                         top: 4px;
                         left: 4px;
                         ${topButtonStyle}`;
@@ -16411,8 +16412,8 @@ function showPetArmsWindow() {
         armDiv.className = 'petArms-item';
         armDiv.style = `display: flex;
                         align-items: center;
-                        padding: 10px;
-                        gap: 10px;
+                        padding: 5px;
+                        gap: 5px;
                         border: 1px solid rgba(0, 0, 0, 0.8);
                         flex-direction: row;`;
 
@@ -16425,7 +16426,7 @@ function showPetArmsWindow() {
 
         const infoDiv = document.createElement('div');
         infoDiv.style.flexGrow = '1';
-        infoDiv.style.marginLeft = '10px';
+        infoDiv.style.marginLeft = '5px';
         infoDiv.style.fontSize = '14px';
 
         const forgeButton = document.createElement('button');

@@ -3083,7 +3083,7 @@
                     </select>
                 </div>
             </div>
-            <div>玩家称号： <span id="personal-honor">初来乍到</span></div>
+            <div>宠物称号： <span id="personal-honor">初来乍到</span></div>
             <div>游戏时长： <span id="game-timer">00:00</span></div>
             <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
@@ -9992,7 +9992,7 @@ function handleRelieveEffects() {
     for (const jkSkill of jkSkills) {
         const skillLevel = jkSkill.level || 1;
         const skillMultiplier = jkSkill.multiplier || 0.01;
-        const successRate = Math.min(0.4, skillLevel * skillMultiplier); // 成功率，最大值为0.4
+        const successRate = Math.min(0.3, skillLevel * skillMultiplier); // 成功率，最大值为0.3
 
         const randomValue = Math.random(); // 生成 [0, 1) 之间的随机小数
         if (randomValue < successRate) {
@@ -14103,7 +14103,7 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
                 <li>3个红球全中：5两金子</li>
                 <li>2个红球全中且排列顺序一致：10两金子</li>
                 <li>2个红球全中：500文金子</li>
-                <li>只中1个红球：200文金子</li>
+                <li>只中1个红球：100文金子</li>
             </ul>
             <li>蓝球规则：</li>
             <ul>
@@ -14156,9 +14156,9 @@ function performLotteryDraw() {
                 const bonusMultiplier = (luckyAmulet.quantity - 1) * 0.1;
                 bonusAmount = Math.floor(prize * bonusMultiplier);
             }
-            pendingPrize += (prize + bonusAmount);
+            pendingPrize += (originalPrice + bonusAmount);
     
-            showInfoBox(`恭喜你彩票中得${convertPrice(prize)}金子，请速速领取！${bonusAmount > 0 ? `由于你拥有${luckyAmulet.quantity}张财运亨通，本次中奖奖金加码${convertPrice(bonusAmount)}金！` : ''}`);
+            showInfoBox(`恭喜你彩票中得${convertPrice(originalPrice)}金子，请速速领取！${bonusAmount > 0 ? `由于你拥有${luckyAmulet.quantity}张财运亨通，本次中奖奖金加码${convertPrice(bonusAmount)}金！` : ''}`);
         }
     }
     
@@ -14204,7 +14204,7 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         '3:any': 5000,
         '2:exact': 10000,
         '2:any': 500,
-        '1:any': 200
+        '1:any': 100
     };
 
     const matchDetails = getMatchDetails(winningNumbers, lotterySelectedNumbers.slice(0, 5));
@@ -14224,12 +14224,6 @@ function calculateLotteryPrize(winningNumbers, winningBlueBall) {
         setTimeout(() => {
             resultAmountElement.classList.remove('highlight');
         }, 1000);
-    }
-
-    const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
-    if (luckyAmulet && luckyAmulet.quantity >= 2) {
-        const bonusMultiplier = 1 + (luckyAmulet.quantity * 0.1);
-        prize = Math.floor(prize * bonusMultiplier);
     }
 
     document.getElementById('lotteryResultAmount').innerHTML = prize > 0 ? `奖金区: <span style="color: gold; font-weight: bold; text-shadow: 0 0 5px #6f391c;">${convertPrice(prize)}</span>` : '奖金区: 0';

@@ -7043,6 +7043,24 @@ const enemies = {
         rewardMessage: '3000经验值',
         specialty: 'practiceEnemy'
     },
+    practiceEnemyPlus: {
+        name: '高级练习树桩',
+        level: 200,
+        health: 5000000000,
+        mana: 5000000000,
+        physicalAttack: 1000,
+        physicalDefense: 100000,
+        magicAttack: 1000,
+        magicDefense: 100000,
+        speed: 60000,
+        cultivation: 520000,
+        enemyCritRate: 0.8,
+        enemyCritDamage: 2.5,
+        backgroundImage: 'https://pic.imgdb.cn/item/66cc8f01d9c307b7e9c6d2e8.png',
+        reward: () => gainExp(10000), // 奖励：3000经验值
+        rewardMessage: '10000经验值',
+        specialty: 'practiceEnemyPlus'
+    },
     ancientEvil: {
         name: '太古魔魂封印',
         level: 100,
@@ -7197,6 +7215,21 @@ const specificAttackByEnemy = {
             },30000);
         }
     },
+    'practiceEnemyPlus': {
+        type: 'instant',
+        action: () => {
+            let practiceEnemy;
+            practiceEnemy = setTimeout(() => {
+                if (summonEnemy && battleState.enemy.specialty === 'practiceEnemy' && onBattleState) {
+                    battleState.enemy.health += 50000000000;
+                    updateUI();
+                    logBattleEvent('❤️【敌人恢复】加强版树桩恢复了满状态生命值');
+                } else {
+                    clearTimeout(practiceEnemy);
+                }
+            },30000);
+        }
+    },
     'baiYin': {
         type: 'instant',
         action: () => {
@@ -7327,14 +7360,14 @@ function handleBattleWithBaiYin() {
         showInfoBox('试炼之地正在持续中！无法叠加！',null,null,'red');
         return;
     }
-    showInfoBox('试炼之地开始！持续30秒，请勿执行其他操作！',null,null,'red');
+    showInfoBox('试炼之地开始！持续30秒，期间会自动开始战斗，请勿执行其他操作以免造成崩溃！',null,null,'red');
 
     if (!onBattleState && !summonEnemy) {
         baiYinInterval = setInterval(() => {
             summonEnemyByType('baiYin', false);
             addItemToJinnang('hailMonsterPill',1);
             autoBattle();
-        }, 2000);
+        }, 1500);
     } else {
         clearInterval(baiYinInterval);
         baiYinInterval = null;  // 清除后将其重置为 null
@@ -7345,7 +7378,11 @@ function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
     battleAttributes.health -= healthLost;
     battleState.enemy.health += healthLost * 10;
-    logBattleEvent(`永夜大帝の吸血魔刃，吸取了你${healthLost}生命值`, 'red');
+
+    battleAttributes.physicalDefense = 1;
+    battleAttributes.magicDefense = 1;
+    
+    logBattleEvent(`永夜大帝の吸血魔刃，破坏了你的护甲且吸取了你${healthLost}生命值`, 'red');
     updateUI();
 }
         
@@ -7359,6 +7396,9 @@ function handleQiongQiSkill() {
     // 计算损失的生命值和临时护盾
     const healthLost = Math.round(battleAttributes.health * (0.01 + Math.random() * 0.02));
     let temporaryShield = Math.round(healthLost * playerCritDamage);
+
+    battleAttributes.physicalAttack *= 0.01;
+    battleAttributes.magicAttack *= 0.01;
     
     // 清除现有定时器，防止重复运行
     if (qiongQi !== null) {
@@ -7373,18 +7413,18 @@ function handleQiongQiSkill() {
 
         // 创建定时器并延迟2秒启动
         setTimeout(() => {
-            battleState.enemy.physicalDefense = battleAttributes.physicalAttack;
-            battleState.enemy.magicDefense = battleAttributes.magicAttack;
+            battleState.enemy.physicalDefense = battleAttributes.physicalAttack * 100;
+            battleState.enemy.magicDefense = battleAttributes.magicAttack * 100;
 
             qiongQi = setInterval(() => {
                 battleAttributes.health -= healthLost;
-                enemyMaxHealth += healthLost * 10;
-                battleState.enemy.health += healthLost * 10;
+                enemyMaxHealth += healthLost;
+                battleState.enemy.health += healthLost;
                 battleState.enemy.physicalDefense += temporaryShield;
                 battleState.enemy.magicDefense += temporaryShield;
 
-                enemyPetCultivation = playerCultivation + 1;
-                battleState.enemy.speed = battleAttributes.speed + 1;
+                enemyPetCultivation = playerCultivation + 24000;
+                battleState.enemy.speed = battleAttributes.speed + 2400;
 
                 // 更新UI和记录战斗事件
                 updateUI();
@@ -7394,8 +7434,8 @@ function handleQiongQiSkill() {
                     clearInterval(qiongQi);
                     qiongQi = null; // 防止后续错误
                 }
-            }, 800);
-        }, 2000);
+            }, 1000);
+        }, 3000);
         logBattleEvent('穷奇擅长吸收敌人的生命之力转换为自己的护甲', 'gold');
     } else {
         // 如果条件不满足，确保定时器不会运行
@@ -15300,7 +15340,8 @@ let jinnangItems = [
     { name: 'towerGrass', displayName: '融会贯通', url: 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png', price: 50, quantity: 0, description: '在宠物专精面板点击升级可以自动使用，宠物的专精等级到达100级后，可以直接提升1级专精等级' },
     { name: 'angelWings', displayName: '天使之翼', url: 'https://pic.imgdb.cn/item/66cc9406d9c307b7e9cb6f5c.png', price: 500, quantity: 0, description: '在打工界面使用。可以给正在打工的宠物玩耍，永久提升TA的打工速度，同一宠物最多使用10次哦' },
     { name: 'bossSealCard', displayName: '魔魂封印卡', url: 'https://pic.imgdb.cn/item/66cdc955d9c307b7e92c1f56.png', price: 0, quantity: 0, description: '使用后可召唤出各类强大的封印魔魂，挑战成功可能获得各类奖励' },
-    { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
+    { name: 'battleWithTree', displayName: '树桩魔魂封印', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出高级树桩测试战力，会复活，打到爽' },
+    { name: 'practiceEnemyPlus', displayName: '高级树桩封印卡', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出树桩测试战力' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
     { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
@@ -15904,11 +15945,11 @@ function generateSealCard() {
         ['battleWithAncientEvil', '太古魔魂封印'],
         ['noWorkBoss', '無班之魂'],
         ['qiongQi', '穷奇'],
-        ['baiYin', '白银VIP怪']
+        ['practiceEnemyPlus', '高级树桩封印卡']
     ]);
 
     // 封印卡片的英文名称数组
-    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi','baiYinCard'];
+    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi','practiceEnemyPlus'];
 
     // 随机选择一个封印卡片的英文名称
     const randomIndex = Math.floor(Math.random() * sealCards.length);

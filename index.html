@@ -1865,7 +1865,7 @@
         
         .battle-system-actions {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 10px 5px;
             width: 100%;
             margin-top: 10px;
@@ -3071,7 +3071,7 @@
             <img style="width: 180px;height: 180px;" id="pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛">
         </div>
         <div class="info" style="display: flex;flex-direction: column;">
-            <div id="gold-container" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;border: 1px solid #6f391c;">
+            <div id="gold-container" onclick="exchangeGoldBlock()" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;border: 1px solid #6f391c;cursor: pointer;">
                 <div style="background: #B19768;padding: 2px;margin-right: 2px;color: white;box-shadow: inset 0px 0px 2px 1px #E3D8B9;text-shadow: -1px -1px 0 #693331, 1px -1px 0 #693331, -1px 1px 0 #693331, 1px 1px 0 #693331;font-size: 14px;">金子: </div>
                 <span id="gold-amount">50000</span>
             </div> 
@@ -7082,8 +7082,8 @@ const enemies = {
         enemyCritDamage: 1.5,
         backgroundImage: 'https://pic.imgdb.cn/item/66d5d9a1d9c307b7e950d6b2.png',
         reward: () => {
-            const expGainedRatio = Math.round(maxExp * (0.03 + Math.random() * 0.02));
-            if (petLevel < 180) {
+            const expGainedRatio = Math.round(petLevel * (5 + Math.random() * 5));
+            if (petLevel <= 180) {
                 gainExp(expGainedRatio);
             }
             handleBaiYinReward();
@@ -7138,7 +7138,7 @@ const specificAttackByEnemy = {
     'baiYin': {
         type: 'instant',
         action: () => {
-            logBattleEvent('战胜后可得到大量经验值和概率获得提升宠物技能的神秘物质','gold');
+            logBattleEvent('战胜后可得到大量经验值和概率获得提升宠物技能的神秘物质', 'gold');
         }
     }
 };
@@ -7258,7 +7258,27 @@ function handleBaiYinReward() {
         showInfoBox('你获得一个宇宙之晶');
     }
 }
-                
+
+let baiYinInterval = null;  // 在外部作用域定义
+function handleBattleWithBaiYin() {
+    if (baiYinInterval !== null) {
+        showInfoBox('试炼之地正在持续中！无法叠加！',null,null,'red');
+        return;
+    }
+    showInfoBox('试炼之地开始！持续30秒，请勿执行其他操作！',null,null,'red');
+
+    if (!onBattleState && !summonEnemy) {
+        baiYinInterval = setInterval(() => {
+            summonEnemyByType('baiYin', false);
+            addItemToJinnang('hailMonsterPill',1);
+            autoBattle();
+        }, 2000);
+    } else {
+        clearInterval(baiYinInterval);
+        baiYinInterval = null;  // 清除后将其重置为 null
+    }
+}
+        
 function handleExpEnemySkill() {
     const healthLost = Math.round(battleAttributes.health * 0.1);
     battleAttributes.health -= healthLost;
@@ -7802,10 +7822,10 @@ function calculateAndDisplayDodgeRate() {
     // 计算修为差异导致的魔法闪避率
     cultivationDifference = playerCultivation - enemyPetCultivation;
     if (cultivationDifference > 0) {
-        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         enemyMagicDodgeElement.innerText = '0%';
     } else {
-        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 10000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         playerMagicDodgeElement.innerText = '0%';
     }
 }
@@ -15643,7 +15663,25 @@ const itemEffects = {
     baiYinPKG: () => {
         addItemToJinnang('baiYinCard',30);
     },
-    baiYinCard: () => summonEnemyByType('baiYin'),
+    baiYinCard: () => {
+        if (baiYinInterval !== null) {
+            showInfoBox('试炼之地正在持续中，无法叠加！', null, null, 'red');
+            return;
+        }
+        
+        handleBattleWithBaiYin();  // 开始与 'baiYin' 的战斗
+    
+        setTimeout(() => {
+            if (baiYinInterval) {  // 检查 baiYinInterval 是否存在
+                clearInterval(baiYinInterval);
+                baiYinInterval = null;  // 清除后将其重置为 null
+            }
+    
+            summonEnemy = false;  // 设置 `summonEnemy` 为 `false`
+            clearAutoBattle();
+            showInfoBox('试炼之地结束了', null, null, 'black');  // 显示提示框
+        }, 30000);  // 6 秒后执行
+    },
     universalCrystal: () => {
         levelUpSkill();
         addItemToJinnang('universalCrystal',1);
@@ -15723,7 +15761,22 @@ const itemEffects = {
             addItemToJinnang('universalCrystal',1);
             showInfoBox('消耗5个宇宙之尘合成一个宇宙之晶！');
         }
-    }               
+    },
+    goldBlock: ()=> {
+        const basePrice = 200000000;
+        const fluctuationPercentage = 0.02; // 2%
+        const goldBlockPrice = Math.floor(basePrice * (1 + (Math.random() * 2 * fluctuationPercentage - fluctuationPercentage)));
+        const difference = Math.abs(basePrice - goldBlockPrice);
+        
+        goldAmount += goldBlockPrice;
+        updateGoldDisplay(goldAmount);
+        
+        if (goldBlockPrice >= basePrice) {
+            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，赚了${convertPrice(difference)}金！`, null, null, 'red');
+        } else {
+            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，亏了${convertPrice(difference)}金！`, null, null, 'green');
+        }
+    }
 };
 
 let lastUsedItemName = null;
@@ -17287,7 +17340,8 @@ function updateGoldDisplay(goldAmount) {
     // 确保 goldAmount 不超过 999,999,999
     if (goldAmount > 999999999) {
         goldAmount == 999999999;
-        showInfoBox('你的金子数已越界！',null,null,'red');
+        exchangeGoldBlock(true);
+        showInfoBox('你的金子数已越界！已自动为你兑换成一个金锭！',null,null,'red');
     }
 
     const wen = goldAmount % 1000;
@@ -17302,6 +17356,39 @@ function updateGoldDisplay(goldAmount) {
     goldElement.style.fontSize = '12px'; // 兼容性处理
 }
 
+function exchangeGoldBlock(auto = false) {
+    const goldBlockPrice = 180000000;
+    const goldBlockName = '金锭';
+    const goldBlockImage = 'https://pic.imgdb.cn/item/66d68b8dd9c307b7e90ff369.png';
+    const goldBlockDescription = '价值连城的贵金属，无论在什么时代都是最好的天然货币（你可以低于市场的价格直接出售，也可以点击使用进行市场竞价）';
+
+    function createGoldBlock() {
+        goldAmount -= goldBlockPrice;
+        updateGoldDisplay(goldAmount);
+        generateItemToJinnang('goldBlock', goldBlockName, goldBlockImage, goldBlockPrice, 1, goldBlockDescription);
+    }
+
+    if (goldAmount < goldBlockPrice) {
+        if (!auto) {
+            showInfoBox('你的金子不足200锭，无法兑换金锭！', null, null, 'red');
+        }
+    } else {
+        if (!auto) {
+            showInfoBox(
+                '你可以用200锭金子兑换一个金锭，金锭与所花费的金子等值，出售时价格会略微波动，是你资产过多时的良好投资品',
+                () => {
+                    createGoldBlock();
+                    showInfoBox('获得一个金锭！', null, null, 'black');
+                },
+                null,
+                'red'
+            );
+        } else {
+            createGoldBlock();
+        }
+    }
+}
+        
 function toggleShop() {
     const drawer = document.getElementById('shop-drawer');
     const info = document.getElementById('shop-info');
@@ -18465,7 +18552,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
         // 显示信息框，展示对应技能的描述并传入回调函数
         showInfoBox(
-            `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
+            `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n⚠️上述说明仅用于还原原版游戏内容，真实作用：\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
             () => {
                 showInfoBox(`你确定要删除${skill.name}吗？该操作无法恢复！`,
                     onConfirm,

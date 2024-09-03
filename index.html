@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project TS</title>
     <style>
+        @import url('https://fonts.loli.net/css2?family=Libre+Baskerville:wght@400;700&display=swap');
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Libre Baskerville', sans-serif;
             display: flex;
             flex-direction: column;
             margin: 0;
@@ -793,6 +794,7 @@
             align-items: center;
             gap: 5px;
             position: relative;
+            padding: 0px 5px;
         }
         #quality-pill-num-1, #quality-pill-num-2, #quality-pill-num-3, #quality-pill-num-4, #quality-pill-num-5 {
             position: absolute;
@@ -2485,7 +2487,7 @@
     <!-- 五行符管理界面 -->
     <div id="wuxing-display" style="display: flex;flex-direction: column;justify-content: space-between;">
         <div id="wuxing-header">
-            <h3 style="margin:0;" onclick="infoWuxingFu()">玩法指南</h3>
+            <h3 style="margin:0;" onclick="infoWuxingFu()">玩法</h3>
             <p style="margin:0;" id="wuxing-fragments">五行碎片: 0</p>
             <button style="background: transparent;color: white;" id="wuxing-close-button">X</button>
         </div>
@@ -3103,17 +3105,17 @@
                 skills: [
                     { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '物理攻击技能，小金牛使出浑身解数朝邪佞进行致命一击。' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合恢复一定量的法力值' },
-                    { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
-                    { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物可获得一定的耐力提升。' },
-                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
+                    { name: '破军神力', rarity: 'B', type: 'N', multiplier: 3, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
+                    { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，宠物可获得一定的耐力提升。' },
+                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，小金牛天生蛮力，物理攻击有所提升。' },
                     { name: '自然屏障', rarity: 'B', type: 'PD', multiplier: 1.2, description: '防御技能，小金牛的防御能力得到了微量提升。' },
                     { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '治疗技能，得到生命祝福的小金牛治疗能力得到了提升。' },
                     { name: '三倍速冲击', rarity: 'SS', type: 'PA', multiplier: 3, description: '物理攻击技能，愤怒的小金牛超负荷奔跑，对敌人使出致命的冲撞。' },
-                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 1.5, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
                     { name: '灵兽冲刺', rarity: 'B', type: 'MA', multiplier: 3, description: '法术攻击技能，对目标造成法术伤害' },
-                    { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
-                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' }
+                    { name: '野兽外壳', rarity: 'A', type: 'N', multiplier: 1, description: '被动技能，物理和法术防御上升。' },
+                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮上升' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -3136,13 +3138,13 @@
                     { name: '孤独之影', rarity: 'S', type: 'PP', multiplier: 2.5, description: '在孤独时爆发出惊人的攻击力，集中全力进行攻击。' },
                     { name: '静谧守护', rarity: 'A', type: 'JK', multiplier: 0.1, description: '穹的内心宁静，能够更好地抵御敌人的负面效果。' },
                     { name: '禁忌之恋', rarity: 'SS', type: 'MA', multiplier: 3, description: '穹与至亲的感情突破禁忌，激发出强大的攻击力。' },
-                    { name: '银发之美', rarity: 'B', type: 'N', multiplier: 0, description: '穹那银白色的头发令人难以忘怀，赋予她美丽的外表。' },
+                    { name: '银发之美', rarity: 'B', type: 'N', multiplier: 2, description: '穹那银白色的头发令人难以忘怀，赋予她美丽的外表。' },
                     { name: '病弱增幅', rarity: 'S', type: 'HL', multiplier: 0.01, description: '穹的病弱有时反而成为力量的源泉，使她的法力值得到一定的恢复能力。' },
                     { name: '深情守护', rarity: 'A', type: 'SH', multiplier: 1, description: '穹对亲人的深情使她能够更快恢复生命值。' },
                     { name: '心灵枷锁', rarity: 'B', type: 'N', multiplier: 0, description: '穹的内心受到情感的束缚，使她的攻击偶尔受到限制。' },
                     { name: '逆境反击', rarity: 'A', type: 'FH', multiplier: 1, description: '在生命值低于一定比例时，穹的攻击能力会大幅提升。' },
-                    { name: '温柔之心', rarity: 'B', type: 'N', multiplier: 0, description: '穹虽然外表冷淡，但内心温柔，能够为队友提供微弱的生命恢复。' },
-                    { name: '命运羁绊', rarity: 'S', type: 'N', multiplier: 0, description: '穹与亲人的羁绊使她在战斗中获得额外的力量加成。' },
+                    { name: '温柔之心', rarity: 'B', type: 'PH', multiplier: 1.6, description: '穹虽然外表冷淡，但内心温柔，能够为队友提供微弱的生命恢复。' },
+                    { name: '命运羁绊', rarity: 'S', type: 'N', multiplier: 10, description: '穹与亲人的羁绊使她在战斗中获得额外的力量加成。' },
                     { name: '永恒依恋', rarity: 'SS', type: 'PA', multiplier: 3, description: '穹对至亲的依恋化作无尽的力量，爆发出强大的攻击。' }
                 ],
                 qualities: {
@@ -3162,15 +3164,15 @@
                 image: 'https://pic.imgdb.cn/item/66a38e18d9c307b7e996e8b2.gif',
                 skills: [
                     { name: '硬甲壳', rarity: 'B', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
-                    { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 0, description: '法术防御上升' },
+                    { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 1, description: '法术防御上升' },
                     { name: '注魔水冲', rarity: 'A', type: 'PA', multiplier: 1.5, description: '对目标造成物理伤害' },
                     { name: '天生灵性', rarity: 'A', type: 'HL', multiplier: 0.01, description: '法力上限上升' },
                     { name: '水魔爆', rarity: 'A', type: 'PA', multiplier: 2.5, description: '敌全体造成物理伤害' },
-                    { name: '嗜血狂暴', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
-                    { name: '天生蛮力', rarity: 'S', type: 'N', multiplier: 0, description: '物理攻击上升' },
-                    { name: '野性赐福', rarity: 'S', type: 'N', multiplier: 0, description: '耐力上升' },
-                    { name: '长寿', rarity: 'S', type: 'N', multiplier: 0, description: '寿命上限上升' },
-                    { name: '余忆幼时', rarity: 'B', type: 'N', multiplier: 0, description: '当童年成为遗迹里的梦' },
+                    { name: '嗜血狂暴', rarity: 'A', type: 'N', multiplier: 2, description: '物理爆击上升' },
+                    { name: '天生蛮力', rarity: 'S', type: 'N', multiplier: 1, description: '物理攻击上升' },
+                    { name: '野性赐福', rarity: 'S', type: 'N', multiplier: 1, description: '耐力上升' },
+                    { name: '长寿', rarity: 'S', type: 'N', multiplier: 1, description: '寿命上限上升' },
+                    { name: '余忆幼时', rarity: 'B', type: 'N', multiplier: 2, description: '当童年成为遗迹里的梦' },
                     { name: '野性穿刺', rarity: 'A', type: 'PA', multiplier: 1.6, description: '对目标造成物理伤害' }
                 ],
                 qualities: {
@@ -3190,11 +3192,11 @@
                 image: 'https://pic.imgdb.cn/item/66a38e18d9c307b7e996e8c3.gif',
                 skills: [
                     { name: '生命祝福', rarity: 'B', type: 'PH', multiplier: 1.2, description: '生命力上升' },
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '攻击增加' },
-                    { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 0, description: '耐力及生命值上限上升' },
-                    { name: '破军神力', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，在破军星的庇佑下，人类可获得强大的战力，会此技能可使宠物获得大量的物理攻击力和法术攻击力' },
-                    { name: '苦行', rarity: 'A', type: 'N', multiplier: 0, description: '九戒在十万八千里的苦修中大大增加了自身的道行，耐力、敏捷、信仰增加。' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1, description: '攻击增加' },
+                    { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 2, description: '耐力及生命值上限上升' },
+                    { name: '破军神力', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，在破军星的庇佑下，人类可获得强大的战力，会此技能可使宠物获得大量的物理攻击力和法术攻击力' },
+                    { name: '苦行', rarity: 'A', type: 'N', multiplier: 2, description: '九戒在十万八千里的苦修中大大增加了自身的道行，耐力、敏捷、信仰增加。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
                     { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '通过冥想，回合结束时（所有人行动完毕后）恢复自身大量魔法，恢复魔法百分比随技能等级提升而提升' },
                     { name: '天罡三十六变', rarity: 'S', type: 'JK', multiplier: 0.05, description: '九戒会三十六种变化，每回合结束后有一定几率清除自身的异常状态。' },
@@ -3219,16 +3221,16 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/66a38e18d9c307b7e996e8d5.gif',
                 skills: [
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '龙形圣体', rarity: 'B', type: 'N', multiplier: 0, description: '龙形生物特有的，血耐大增的天赋。' },
-                    { name: '魔化鳞甲', rarity: 'B', type: 'N', multiplier: 0, description: '一些附有魔力的鳞片，大大提升了此生物的法术防御。' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '龙形圣体', rarity: 'B', type: 'N', multiplier: 2, description: '龙形生物特有的，血耐大增的天赋。' },
+                    { name: '魔化鳞甲', rarity: 'B', type: 'N', multiplier: 1, description: '一些附有魔力的鳞片，大大提升了此生物的法术防御。' },
                     { name: '生命祝福', rarity: 'B', type: 'PH', multiplier: 1.2, description: '对于生命的赐予是自然最善意的祝福，拥有此种天赋的生物，生命值将大大提高。野兽较容易得到这类祝福。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
-                    { name: '龙族后裔（图腾）', rarity: 'A', type: 'N', multiplier: 0, description: '作为龙族的后裔，对先祖的图腾崇拜，提高了此生物的信仰。' },
+                    { name: '龙族后裔（图腾）', rarity: 'A', type: 'N', multiplier: 1.2, description: '作为龙族的后裔，对先祖的图腾崇拜，提高了此生物的信仰。' },
                     { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '通过冥想，可以使自己的法力大大增加。被动技能，拥有此技能的人每次回合结束时（所有人行动完毕后），法力增加100,每场战斗结束后寿命额外减少1点.' },
-                    { name: '龙族后裔（充沛）', rarity: 'A', type: 'N', multiplier: 0, description: '云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
-                    { name: '风平浪静', rarity: 'S', type: 'N', multiplier: 0, description: '大幅提高自身法术命中，忽视法术闪避。' },
-                    { name: '深渊沉睡', rarity: 'S', type: 'N', multiplier: 0, description: '九翼天龙在深渊沉睡，沉睡中中淬炼出惊奇血脉！极大的提高了自己的耐力、敏捷和智力。' },
+                    { name: '龙族后裔（充沛）', rarity: 'A', type: 'N', multiplier: 1.2, description: '云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
+                    { name: '风平浪静', rarity: 'S', type: 'N', multiplier: 2, description: '大幅提高自身法术命中，忽视法术闪避。' },
+                    { name: '深渊沉睡', rarity: 'S', type: 'N', multiplier: 2, description: '九翼天龙在深渊沉睡，沉睡中中淬炼出惊奇血脉！极大的提高了自己的耐力、敏捷和智力。' },
                     { name: '寒冰风暴', rarity: 'SS', type: 'MA', multiplier: 2.4, description: '九翼天龙挥动翅膀召唤寒冰之力，对敌方6个单位造成法术伤害，机率忽视对方法术防御。' },
                     { name: '龙腾九天', rarity: 'SS', type: 'FH', multiplier: 1, description: '九翼天龙在战斗中受到致命伤害时，体内龙族血统会使其原地复活，并回复一定的血量，每场战斗生效一次！技能11级后会随等级提升降低寿命消耗。重生需消耗最大寿命的30%，如当前寿命不足最大寿命的30%，则不发动重生。' },
                     { name: '幽冥之焰', rarity: 'SS', type: 'PP', multiplier: 2.2, description: '对目标造成大量法术伤害，同时对敌方单位附加一个伤害加深的buff-幽冥之焰，buff持续1回合，伤害加深1%' }
@@ -3249,12 +3251,12 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/66a38e18d9c307b7e996e8e7.gif',
                 skills: [
-                    { name: '战斗专注', rarity: 'B', type: 'N', multiplier: 0, description: '法术暴击上升' },
-                    { name: '灵力充盈', rarity: 'B', type: 'N', multiplier: 0, description: '速度上升' },
+                    { name: '战斗专注', rarity: 'B', type: 'N', multiplier: 1, description: '法术暴击上升' },
+                    { name: '灵力充盈', rarity: 'B', type: 'N', multiplier: 2, description: '速度上升' },
                     { name: '法力灼烧', rarity: 'B', type: 'MA', multiplier: 1.8, description: '单体法术攻击同时消耗目标法力和生命值' },
                     { name: '圣灵济世', rarity: 'A', type: 'PH', multiplier: 1.5, description: '为友方目标及其周围6个单位恢复生命值' },
-                    { name: '法术精通', rarity: 'A', type: 'N', multiplier: 0, description: '法术攻击上升' },
-                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '物理和法术防御上升' },
+                    { name: '法术精通', rarity: 'A', type: 'N', multiplier: 1, description: '法术攻击上升' },
+                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 1, description: '物理和法术防御上升' },
                     { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合法力值恢复' },
                     { name: '智慧守护', rarity: 'S', type: 'SH', multiplier: 1, description: '用法力值抵消部分伤害' },
                     { name: '智慧超群', rarity: 'S', type: 'N', multiplier: 0, description: '智力上升' },
@@ -3277,15 +3279,15 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/66a38e18d9c307b7e996e902.gif',
                 skills: [
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '法术精通', rarity: 'B', type: 'N', multiplier: 0, description: '天生就是使用法术的奇才，如潜心修习法术，法术攻击力必然高于常人。被动技能，法术攻击力增加。' },
-                    { name: '灵力充盈', rarity: 'B', type: 'N', multiplier: 0, description: '此生物充满了灵力能量，速度大幅提升。' },
-                    { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '对于生命的赐予是自然最善意的祝福，拥有此种天赋的生物，生命值将大大提高。野兽较容易得到这类祝福。' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '法术精通', rarity: 'B', type: 'N', multiplier: 1, description: '天生就是使用法术的奇才，如潜心修习法术，法术攻击力必然高于常人。被动技能，法术攻击力增加。' },
+                    { name: '灵力充盈', rarity: 'B', type: 'N', multiplier: 2, description: '此生物充满了灵力能量，速度大幅提升。' },
+                    { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 1, description: '对于生命的赐予是自然最善意的祝福，拥有此种天赋的生物，生命值将大大提高。野兽较容易得到这类祝福。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
-                    { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '提高自身物理和法术闪避。' },
+                    { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 2, description: '提高自身物理和法术闪避。' },
                     { name: '冥想', rarity: 'S', type: 'HL', multiplier: 0.01, description: '通过冥想，可以使自己的法力大大增加。被动技能，拥有此技能的人每次回合结束时（所有人行动完毕后），法力增加100,每场战斗结束后寿命额外减少1点.' },
-                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
-                    { name: '智慧超群', rarity: 'S', type: 'N', multiplier: 0, description: '有此天赋的生物,定是百年一遇的智者，其智力必然高于寻常生物。被动技能，增加智力。' },
+                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
+                    { name: '智慧超群', rarity: 'S', type: 'N', multiplier: 2, description: '有此天赋的生物,定是百年一遇的智者，其智力必然高于寻常生物。被动技能，增加智力。' },
                     { name: '鸟鸣', rarity: 'S', type: 'MA', multiplier: 2.5, description: '五彩鸟的尖叫声足以摧毁敌人的意志，对单个敌人造成法术伤害同时使敌人无法使用法术攻击，效果持续2回合，技能等级越高伤害越高。' },
                     { name: '百鸟朝凤', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '五彩鸟挥动翅膀召唤百鸟冲向敌人，对敌方全体单位造成伤害，敌人沉浸在鸟群中无法躲避。' },
                     { name: '拯救', rarity: 'SS', type: 'PH', multiplier: 2, description: '五彩鸟牺牲自己的寿命拯救别人，恢复目标自身以及目标旁边随机一个目标百分比的血量。' },
@@ -3307,15 +3309,15 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/66728d5cd9c307b7e95481d1.gif',
                 skills: [
-                  { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '生命力上升' },
-                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
-                  { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '攻击增加' },
-                  { name: '战斗韧性', rarity: 'B', type: 'N', multiplier: 0, description: '耐力及防御增加' },
-                  { name: '全面进化', rarity: 'B', type: 'N', multiplier: 0, description: '敏捷、耐力强壮增加' },
+                  { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 1.5, description: '生命力上升' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 1.2, description: '寿命上限上升' },
+                  { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1, description: '攻击增加' },
+                  { name: '战斗韧性', rarity: 'B', type: 'N', multiplier: 1, description: '耐力及防御增加' },
+                  { name: '全面进化', rarity: 'B', type: 'N', multiplier: 1, description: '敏捷、耐力强壮增加' },
                   { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '用法力抵挡部分伤害' },
-                  { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
-                  { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '物理和法术闪避上升' },
-                  { name: '高级强壮', rarity: 'S', type: 'N', multiplier: 0, description: '血量和耐力增加' },
+                  { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 2, description: '物理爆击上升' },
+                  { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 2, description: '物理和法术闪避上升' },
+                  { name: '高级强壮', rarity: 'S', type: 'N', multiplier: 2, description: '血量和耐力增加' },
                   { name: '冥想', rarity: 'S', type: 'HL', multiplier: 0.01, description: '每回合法力值恢复' },
                   { name: '睚眦必报', rarity: 'S', type: 'PP', multiplier: 2.2, description: '极小的怨仇也要报复！任何惹怒比格的邪佞都将受到中毒伤害。' },
                   { name: '狂吼', rarity: 'S', type: 'PA', multiplier: 2.8, description: '比格仰天狂吼，声波对敌方6个目标造成巨大伤害，并有几率对目标造成破甲状态，破甲的几率及效果同召唤者力量有关。' },
@@ -3338,15 +3340,15 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d5d.gif',
                 skills: [
-                  { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '生命力上升' },
-                  { name: '烈焰祝福', rarity: 'B', type: 'N', multiplier: 0, description: '法术攻击上升' },
+                  { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 1.5, description: '生命力上升' },
+                  { name: '烈焰祝福', rarity: 'B', type: 'N', multiplier: 3, description: '法术攻击上升' },
                   { name: '法力灼烧', rarity: 'B', type: 'MA', multiplier: 1.8, description: '单体法术攻击' },
                   { name: '焰灵护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
-                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 2, description: '寿命上限上升' },
                   { name: '浴火重生', rarity: 'B', type: 'FH', multiplier: 1, description: '复活并回复大量生命值' },
                   { name: '智慧祷言', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '火焰甲胄', rarity: 'A', type: 'PD', multiplier: 1.2, description: '物理防御上升' },
-                  { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
+                  { name: '火焰迅捷', rarity: 'A', type: 'N', multiplier: 3, description: '速度上升' },
                   { name: '火焰环绕', rarity: 'S', type: 'PP', multiplier: 1.8, description: '为友军增加一个可以对物理攻击进行反伤状态' },
                   { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2, description: '对敌方全体造成法术伤害并附带灼烧效果' }
                 ],
@@ -3372,11 +3374,11 @@
                   { name: '野性冲撞', rarity: 'B', type: 'PA', multiplier: 1.5, description: '单体攻击有几率令目标晕眩' },
                   { name: '灵力充盈', rarity: 'B', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
                   { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 2, description: '对十字范围造成物理伤害并有几率附带混乱效果' },
-                  { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 0, description: '物理攻击上升' },
+                  { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 2, description: '物理攻击上升' },
                   { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '生命上限上升' },
                   { name: '钢筋铁骨', rarity: 'A', type: 'PD', multiplier: 1.5, description: '强壮上升，耐力上升，速度上升' },
-                  { name: '长寿', rarity: 'A', type: 'N', multiplier: 0, description: '寿命上限上升' },
-                  { name: '战斗狂热', rarity: 'S', type: 'N', multiplier: 0, description: '物理爆击上升' },
+                  { name: '长寿', rarity: 'A', type: 'N', multiplier: 1, description: '寿命上限上升' },
+                  { name: '战斗狂热', rarity: 'S', type: 'N', multiplier: 2, description: '物理爆击上升' },
                   { name: '刀刃旋风', rarity: 'S', type: 'PA', multiplier: 2.2, description: '对敌方全体造成物理伤害并有几率附带流血效果' }
                 ],
                 qualities: {
@@ -3395,18 +3397,18 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d3e.gif',
                 skills: [
-                  { name: '魅影祝福', rarity: 'B', type: 'N', multiplier: 0, description: '物理攻击上升' },
+                  { name: '魅影祝福', rarity: 'B', type: 'N', multiplier: 1.2, description: '物理攻击上升' },
                   { name: '魅影之吻', rarity: 'B', type: 'PA', multiplier: 1.8, description: '对邪佞造成较高的物理伤害，并将邪佞的生命力转移给自己。' },
                   { name: '魅影护体', rarity: 'B', type: 'PD', multiplier: 1.2, description: '法术防御上升' },
-                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '寿命上限上升' },
                   { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.3, description: '生命上限上升' },
                   { name: '魅影甲胄', rarity: 'A', type: 'PD', multiplier: 1.3, description: '物理防御上升' },
-                  { name: '迅捷之鳞', rarity: 'A', type: 'N', multiplier: 0, description: '速度上升' },
-                  { name: '嗜血魔爆', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
+                  { name: '迅捷之鳞', rarity: 'A', type: 'N', multiplier: 1.5, description: '速度上升' },
+                  { name: '嗜血魔爆', rarity: 'A', type: 'N', multiplier: 1.5, description: '物理爆击上升' },
                   { name: '魅影之怒', rarity: 'S', type: 'PA', multiplier: 2.4, description: '对敌方全体造成物理伤害并有几率附带眩晕2回合效果' },
-                  { name: '高级援护', rarity: 'S', type: 'N', multiplier: 0, description: '帮目标队友承担伤害' },
+                  { name: '高级援护', rarity: 'S', type: 'N', multiplier: 2, description: '帮目标队友承担伤害' },
                   { name: '冥想', rarity: 'S', type: 'HL', multiplier: 0.01, description: '每回合法力值恢复' },
-                  { name: '黑暗魅影', rarity: 'S', type: 'N', multiplier: 0, description: '耐力上升，敏捷上升' }
+                  { name: '黑暗魅影', rarity: 'S', type: 'N', multiplier: 1.5, description: '耐力上升，敏捷上升' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -3424,17 +3426,17 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d4b.webp',
                 skills: [
-                  { name: '美腿术', rarity: 'B', type: 'N', multiplier: 0, description: '速度上升' },
-                  { name: '女神外壳', rarity: 'B', type: 'N', multiplier: 0, description: '双防上升' },
-                  { name: '法术精通', rarity: 'B', type: 'N', multiplier: 0, description: '法功上升' },
-                  { name: '妩媚身姿', rarity: 'B', type: 'N', multiplier: 0, description: '双闪上升' },
+                  { name: '美腿术', rarity: 'B', type: 'N', multiplier: 1.2, description: '速度上升' },
+                  { name: '女神外壳', rarity: 'B', type: 'N', multiplier: 1.2, description: '双防上升' },
+                  { name: '法术精通', rarity: 'B', type: 'N', multiplier: 1.2, description: '法功上升' },
+                  { name: '妩媚身姿', rarity: 'B', type: 'N', multiplier: 1.2, description: '双闪上升' },
                   { name: '生命祝福', rarity: 'A', type: 'PH', multiplier: 1.2, description: '生命值上升' },
-                  { name: '长寿', rarity: 'A', type: 'N', multiplier: 0, description: '寿命上升' },
+                  { name: '长寿', rarity: 'A', type: 'N', multiplier: 1, description: '寿命上升' },
                   { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合法力恢复' },
                   { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '用法力抵挡部分伤害' },
                   { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 1.8, description: '单体法术攻击同时消费目标的生命和法力值' },
-                  { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '耐力、敏捷、强壮上升' },
-                  { name: '极速领域', rarity: 'SS', type: 'N', multiplier: 0, description: '我方全体速度上升' },
+                  { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '耐力、敏捷、强壮上升' },
+                  { name: '极速领域', rarity: 'SS', type: 'N', multiplier: 3, description: '我方全体速度上升' },
                   { name: '火魔爆', rarity: 'S', type: 'MA', multiplier: 2, description: '全体法术攻击并附带灼烧效果' },
                   { name: '精气爆裂', rarity: 'S', type: 'MA', multiplier: 2.2, description: '对十字范围造成法术伤害，并同时消耗生命及法力' }
                 ],
@@ -3454,17 +3456,17 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d7b.gif',
                 skills: [
-                  { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 0, description: '法术防御上升' },
-                  { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 0, description: '耐力上升' },
+                  { name: '自然屏障', rarity: 'B', type: 'N', multiplier: 1, description: '法术防御上升' },
+                  { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 1, description: '耐力上升' },
                   { name: '天生灵性', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合自动回复一定法力值' },
-                  { name: '嗜血狂暴', rarity: 'A', type: 'N', multiplier: 0, description: '物理爆击上升' },
+                  { name: '嗜血狂暴', rarity: 'A', type: 'N', multiplier: 1, description: '物理爆击上升' },
                   { name: '撕咬', rarity: 'A', type: 'PA', multiplier: 1.3, description: '对目标造成物理伤害' },
-                  { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 0, description: '物理攻击上升' },
+                  { name: '天生蛮力', rarity: 'A', type: 'N', multiplier: 1, description: '物理攻击上升' },
                   { name: '野性冲撞', rarity: 'S', type: 'PA', multiplier: 1.6, description: '单体攻击有几率令目标晕眩' },
-                  { name: '长寿', rarity: 'S', type: 'N', multiplier: 0, description: '寿命上限上升' },
+                  { name: '长寿', rarity: 'S', type: 'N', multiplier: 1, description: '寿命上限上升' },
                   { name: '生命祝福', rarity: 'S', type: 'PH', multiplier: 1.2, description: '生命值上限上升' },
                   { name: '利爪猛击', rarity: 'S', type: 'MA', multiplier: 2, description: '单体攻击并附加流血效果' },
-                  { name: '三倍速冲击', rarity: 'S', type: 'PA', multiplier: 2.2, description: '对十字范围造成物理伤害并有几率附带混乱效果' }
+                  { name: '三倍速冲击', rarity: 'S', type: 'PA', multiplier: 2.5, description: '对十字范围造成物理伤害并有几率附带混乱效果' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -3482,11 +3484,11 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/6672cb90d9c307b7e9c89d2a.gif',
                 skills: [
-                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                  { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
                   { name: '法术牺牲', rarity: 'B', type: 'MA', multiplier: 2, description: '强力法术攻击' },
                   { name: '魔性毛皮', rarity: 'B', type: 'PD', multiplier: 1.1, description: '法术防御上升' },
-                  { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '耐力上升、敏捷上升、强壮上升' },
-                  { name: '神出鬼没', rarity: 'A', type: 'N', multiplier: 0, description: '灵鼠夜间行动时可大幅提升双闪' },
+                  { name: '全面进化', rarity: 'A', type: 'N', multiplier: 2, description: '耐力上升、敏捷上升、强壮上升' },
+                  { name: '神出鬼没', rarity: 'A', type: 'N', multiplier: 2, description: '灵鼠夜间行动时可大幅提升双闪' },
                   { name: '冥想', rarity: 'A', type: 'HL', multiplier: 0.01, description: '每回合法力值恢复' },
                   { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定.' },
                   { name: '死亡凝视', rarity: 'S', type: 'PP', multiplier: 2, description: '灵鼠被凝视时可大幅提升毒性伤害。' },
@@ -3512,22 +3514,22 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c235d.gif',
                 skills: [
-                    { name: '法术精通', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法术攻击上升' },
+                    { name: '法术精通', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，法术攻击上升' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                    { name: '万法归宗', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，法术暴击上升' },
-                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
+                    { name: '万法归宗', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，法术暴击上升' },
+                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，寿命上限上升' },
                     { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.4, description: '主动技能，对目标造成法术伤害并吸取一定得法力值' },
-                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
-                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
-                    { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
+                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理和法术防御上升。' },
+                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮上升' },
+                    { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
                     { name: '智慧守护', rarity: 'S', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
-                    { name: '月之祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、智力上升' },
+                    { name: '月之祝福', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、智力上升' },
                     { name: '硕果累累', rarity: 'SS', type: 'MA', multiplier: 1.6, description: '主动技能，胭脂抖了抖身，漫天果实坠落，对邪佞造成法术伤害，' },
                     { name: '琼珠玉液', rarity: 'SS', type: 'JK', multiplier: 1.2, description: '主动技能，胭脂小手一挥，有概率解除我方部分减益效果。' },
                     { name: '灼若旭日', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，胭脂单手投掷石榴花给单体目标造成法术伤害。' },
                     { name: '春风徐徐', rarity: 'SS', type: 'JK', multiplier: 0.01, description: '被动技能，胭脂每回合有概率生成霸体护盾，护盾可免疫部分负面状态（破甲，减攻，迟缓，眩晕，中毒，灼烧，流血，混乱，冻伤，沉睡，沉默，虚弱，冷嘲热讽），成功生成时，将消耗一定的寿命。' },
-                    { name: '榴花如丹', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，榴花如丹红似火，源源不断为胭脂永久提升耐力。' }
+                    { name: '榴花如丹', rarity: 'SS', type: 'N', multiplier: 3, description: '被动技能，榴花如丹红似火，源源不断为胭脂永久提升耐力。' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -3546,17 +3548,17 @@
                 image: 'https://pic.imgdb.cn/item/665c7002d9c307b7e9897757.gif',
                 skills: [
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复。' },
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
-                    { name: '破军神力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
-                    { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
-                    { name: '元素力量（宽容）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，减免受到群体攻击的伤害。' },
-                    { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '破军神力', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
+                    { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升。' },
+                    { name: '元素力量（宽容）', rarity: 'A', type: 'PD', multiplier: 1.5, description: '主动技能，减免受到群体攻击的伤害。' },
+                    { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 3, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
                     { name: '法力吸取（物理）', rarity: 'A', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击。' },
                     { name: '离子护盾', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被离子护盾包围。' },
                     { name: '刮痧刃（17式）', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，战神阿毛引以为傲的刀法，给予敌方沉痛打击。' },
-                    { name: '追日', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升。' },
+                    { name: '追日', rarity: 'S', type: 'N', multiplier: 1, description: '被动技能，速度大幅度提升。' },
                     { name: '刮痧刃（奥义）', rarity: 'SS', type: 'PA', multiplier: 2.4, description: '主动技能，刮痧刃最高境界，手中无刃心中也无刃，但可召唤山石从天而降！使邪佞无法躲藏（必中）！对敌方造成大量物理伤害，' },
-                    { name: '誓死守护', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
+                    { name: '誓死守护', rarity: 'SS', type: 'N', multiplier: 2, description: '被动技能，阿毛在场时，可替主人承受部分伤害，技能等级越高，承受伤害越高。' }
                 ],
                 qualities: {
                     endurance: { current: 4500, min: 4500, max: 6500 },
@@ -3574,8 +3576,8 @@
                 skills: [
                     { name: '唯爱结城（法攻）', rarity: 'SS', type: 'MA', multiplier: 2.5, description: '主动技能，如果此生只能爱一人，她的姓，必须是结城。' },
                     { name: '跨国相遇（被动）', rarity: 'A', type: 'JK', multiplier: 0.01, description: '被动技能，在一个异国他乡的采访中，命运让他们相遇，从此开始了一段浪漫的爱情故事。' },
-                    { name: '意外之事（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，一次意外的车祸让他们被困在一个偏远的小镇，爱情在危险中悄然萌芽。' },
-                    { name: '隐瞒身份（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，他隐藏了自己的明星身份，只为在她面前做个普通人，享受片刻的平凡。' },
+                    { name: '意外之事（被动）', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，一次意外的车祸让他们被困在一个偏远的小镇，爱情在危险中悄然萌芽。' },
+                    { name: '隐瞒身份（被动）', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，他隐藏了自己的明星身份，只为在她面前做个普通人，享受片刻的平凡。' },
                     { name: '温柔一面（治疗）', rarity: 'S', type: 'PH', multiplier: 2, description: '主动技能，她在后台看到了他温柔的一面，这让她对他有了新的认识。' },
                     { name: '共同依赖（防御）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，在偏远小镇的日子里，他们面对未知的危险，渐渐彼此依赖。' },
                     { name: '发现真心（回蓝）', rarity: 'A', type: 'HL', multiplier: 0.2, description: '主动技能，在谎言揭穿后，她终于看清了他的真心，两人决定坦然面对所有挑战。' },
@@ -3585,8 +3587,8 @@
                     { name: '继父威胁（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，继父的威胁不断升级，他挺身而出，保护她不受伤害。' },
                     { name: '记忆恢复（治疗）', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，在危机中，她的记忆终于完全恢复，找回了曾经的甜蜜时光。' },
                     { name: '法律制裁（施毒）', rarity: 'B', type: 'PP', multiplier: 1.6, description: '主动技能，他揭穿了继父的阴谋，让继父受到应有的法律制裁。' },
-                    { name: '重返工作（被动）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，她重返《Fantasy!》杂志，继续她的事业，与他一起迎接未来的挑战。' },
-                    { name: '幸福结局（被动）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，经历了无数波折，他们最终找到了真正的幸福，成为彼此生命中最重要的存在。' },
+                    { name: '重返工作（被动）', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，她重返《Fantasy!》杂志，继续她的事业，与他一起迎接未来的挑战。' },
+                    { name: '幸福结局（被动）', rarity: 'SS', type: 'N', multiplier: 3, description: '被动技能，经历了无数波折，他们最终找到了真正的幸福，成为彼此生命中最重要的存在。' },
                     { name: '守护夏奈（守护）', rarity: 'SS', type: 'SH', multiplier: 1.2, description: '主动技能，如果此生只能守护一人，她的名，必须是夏奈。' }
                 ],
                 qualities: {
@@ -3604,19 +3606,19 @@
                 image: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg',
                 skills: [
                 { name: '一见倾心（法攻）', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，李国麟第一次在商法课上看到夏奈，心跳加速，仿佛世界只剩下她一人。' },
-                { name: '球场相遇（被动）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，夏奈被朋友拉去看篮球赛，意外发现李国麟在球场上的魅力，开始对这个憨厚的大男孩产生兴趣。' },
-                { name: '暗恋时光（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，李国麟默默关注夏奈，却不敢表白，只能在远处守护她。' },
-                { name: '商法难题（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，李国麟为了接近夏奈，努力学习商法，虽然笨拙但充满诚意。' },
+                { name: '球场相遇（被动）', rarity: 'A', type: 'N', multiplier: 1, description: '被动技能，夏奈被朋友拉去看篮球赛，意外发现李国麟在球场上的魅力，开始对这个憨厚的大男孩产生兴趣。' },
+                { name: '暗恋时光（被动）', rarity: 'B', type: 'N', multiplier: 1.2, description: '被动技能，李国麟默默关注夏奈，却不敢表白，只能在远处守护她。' },
+                { name: '商法难题（被动）', rarity: 'B', type: 'N', multiplier: 1.2, description: '被动技能，李国麟为了接近夏奈，努力学习商法，虽然笨拙但充满诚意。' },
                 { name: '温柔帮助（治疗）', rarity: 'S', type: 'PH', multiplier: 2, description: '主动技能，夏奈发现李国麟在商法上的困难，主动提出帮助，两人开始了更多接触。' },
                 { name: '球场英雄（防御）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，李国麟在关键比赛中表现出色，赢得全场欢呼，夏奈也为他骄傲。' },
                 { name: '真心告白（回蓝）', rarity: 'A', type: 'HL', multiplier: 0.2, description: '主动技能，在一次篮球赛后，李国麟鼓起勇气向夏奈表白，虽然笨拙但充满真诚。' },
                 { name: '意外受伤（被动）', rarity: 'A', type: 'N', multiplier: 1.5, description: '被动技能，李国麟在比赛中受伤，夏奈细心照顾，两人感情加深。' },
                 { name: '心灵共鸣（被动）', rarity: 'SS', type: 'JK', multiplier: 0.02, description: '被动技能，夏奈发现李国麟的温柔体贴，渐渐被他的真心打动。' },
                 { name: '挺身而出（物攻）', rarity: 'S', type: 'PA', multiplier: 2.75, description: '主动技能，夏奈遇到麻烦，李国麟挺身而出保护她，展现了男子气概。' },
-                { name: '家庭阻挠（被动）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，夏奈家人反对她与李国麟交往，两人面临重重阻碍。' },
+                { name: '家庭阻挠（被动）', rarity: 'B', type: 'N', multiplier: 1.5, description: '被动技能，夏奈家人反对她与李国麟交往，两人面临重重阻碍。' },
                 { name: '坚定信念（治疗）', rarity: 'SS', type: 'PH', multiplier: 1.2, description: '主动技能，面对困难，李国麟和夏奈彼此鼓励，坚定了在一起的决心。' },
                 { name: '篮球梦想（施毒）', rarity: 'B', type: 'N', multiplier: 1.6, description: '主动技能，李国麟为了追随篮球梦想，必须做出艰难的选择。' },
-                { name: '事业起步（被动）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，夏奈在娱乐行业找到了工作，开始了自己的职业生涯。' },
+                { name: '事业起步（被动）', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，夏奈在娱乐行业找到了工作，开始了自己的职业生涯。' },
                 { name: '幸福未来（被动）', rarity: 'SS', type: 'FH', multiplier: 1, description: '被动技能，经历了种种考验，李国麟和夏奈最终携手共度未来，找到了真正的幸福。' },
                 { name: '守护夏奈（守护）', rarity: 'SS', type: 'SH', multiplier: 1.2, description: '主动技能，李国麟发誓要用一生的时间守护夏奈，给她最温暖的爱。' }
                 ],
@@ -3634,14 +3636,14 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/665c7002d9c307b7e98976fe.gif',
                 skills: [
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上升' },
-                    { name: '战斗专注', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，法术暴击上升' },
-                    { name: '法术精通', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，法功上升' },
-                    { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，生命值上升' },
-                    { name: '美腿术', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，速度上升' },
-                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，寿命上升' },
+                    { name: '战斗专注', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，法术暴击上升' },
+                    { name: '法术精通', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，法功上升' },
+                    { name: '生命祝福', rarity: 'B', type: 'N', multiplier: 1.5, description: '被动技能，生命值上升' },
+                    { name: '美腿术', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，速度上升' },
+                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理和法术防御上升' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，法力值抵消一部分受到的伤害' },
-                    { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，敏捷、耐力强壮增加' },
+                    { name: '全面进化', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，敏捷、耐力强壮增加' },
                     { name: '腾蛇突袭', rarity: 'S', type: 'MA', multiplier: 2, description: '主动技能，腾蛇对邪佞进行突袭，对敌方单体目标造成大量法术伤害。' },
                     { name: '火焰反噬', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，腾蛇可以借助火之灵的力量将火焰精华加诸于己方，增加护盾强效。' },
                     { name: '高级冥想', rarity: 'SS', type: 'HL', multiplier: 0.5, description: '主动技能，通过冥想，恢复自身大量法力。' },
@@ -3662,19 +3664,19 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7ab.gif',
                 skills: [
-                { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
+                { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                { name: '意念凝聚', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，竹林隐士集中意念，攻击可大幅度忽略邪佞的物理闪避和物理防御' },
+                { name: '意念凝聚', rarity: 'B', type: 'N', multiplier: 1.4, description: '被动技能，竹林隐士集中意念，攻击可大幅度忽略邪佞的物理闪避和物理防御' },
                 { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，护盾强效上升' },
-                { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升' },
+                { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升' },
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
                 { name: '离子护盾', rarity: 'A', type: 'PD', multiplier: 2, description: '主动技能，护盾强效更加稳固。' },
-                { name: '神威之怒', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力' },
+                { name: '神威之怒', rarity: 'S', type: 'N', multiplier: 3, description: '被动技能，此技能可使宠物获得大量的物理攻击力' },
                 { name: '雷魔爆', rarity: 'S', type: 'PA', multiplier: 2.2, description: '主动技能，群体物理攻击，对敌全体造成物理伤害并有几率附加破甲效果' },
                 { name: '高能电弧', rarity: 'S', type: 'PH', multiplier: 1.2, description: '主动技能，竹林隐士献祭法力回复一定生命值' },
                 { name: '雷霆万钧', rarity: 'SS', type: 'MA', multiplier: 1.5, description: '主动技能，竹林隐士以雷霆万钧之速对敌方单体目标造成毁灭性的一击！' },
-                { name: '静电屏蔽', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，竹林隐士有几率使自身免于一切伤害。' },
-                { name: '怒意能场', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，竹林隐士每成功闪避一次敌方的攻击，就会将自己的怒意转化为自己的物理攻击力，怒意状态最大可叠加三次，被击中则蓄能状态在本回合末结束' },
+                { name: '静电屏蔽', rarity: 'SS', type: 'JK', multiplier: 0.01, description: '主动技能，竹林隐士有几率使自身免于一切伤害。' },
+                { name: '怒意能场', rarity: 'SS', type: 'N', multiplier: 3, description: '被动技能，竹林隐士每成功闪避一次敌方的攻击，就会将自己的怒意转化为自己的物理攻击力，怒意状态最大可叠加三次，被击中则蓄能状态在本回合末结束' },
                 { name: '离子风暴', rarity: 'SS', type: 'PA', multiplier: 3.5, description: '主动技能，竹林隐士将布满雷电的斗笠扔向邪佞，对敌方全体造成极大物理伤害。' }
                 ],
                 qualities: {
@@ -3693,15 +3695,15 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/665433e7d9c307b7e93ac709.gif',
                 skills: [
-                { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
+                { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
                 { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击。' },
-                { name: '元素力量（两仪）', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，白虎身着坚不可摧的的两仪战甲，物理防御、法术防御大幅度上升' },
+                { name: '元素力量（两仪）', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，白虎身着坚不可摧的的两仪战甲，物理防御、法术防御大幅度上升' },
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定' },
-                { name: '元素力量（赐福）', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，智力及强壮上升' },
-                { name: '天神祝福', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，法术攻击力大幅提升' },
+                { name: '元素力量（赐福）', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，智力及强壮上升' },
+                { name: '天神祝福', rarity: 'A', type: 'N', multiplier: 3, description: '被动技能，法术攻击力大幅提升' },
                 { name: '元素力量（四相）', rarity: 'S', type: 'MA', multiplier: 1.8, description: '主动技能，白虎驭四相之力对敌方施加无法躲避的法术攻击！' },
-                { name: '虚无', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，速度大幅度提升' },
+                { name: '虚无', rarity: 'S', type: 'N', multiplier: 1, description: '被动技能，速度大幅度提升' },
                 { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.2, description: '主动技能，被动技能，减免受到敌方攻击的伤害' },
                 { name: '元素力量（结界）', rarity: 'SS', type: 'PD', multiplier: 2, description: '主动技能，使自身免疫大量伤害' },
                 { name: '烈光剑阵', rarity: 'SS', type: 'MA', multiplier: 2.8, description: '主动技能，白虎用法力凝聚成无数灼热的光剑，对敌方横造成巨大法术伤害。' },
@@ -3723,18 +3725,18 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac76d.gif',
                 skills: [
-                { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，物理攻击上升' },
+                { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，物理攻击上升' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理爆击、速度上升' },
-                { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
-                { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升' },
-                { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
+                { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理爆击、速度上升' },
+                { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮上升' },
+                { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升' },
+                { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，寿命上限上升' },
                 { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.2, description: '主动技能，格挡能力上升' },
                 { name: '黄金战甲', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，身着坚不可摧的的黄金战甲。格挡能力大幅度上升' },
                 { name: '法力吸取（物理）', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，单体物理攻击' },
                 { name: '横扫千军', rarity: 'SS', type: 'PA', multiplier: 2, description: '主动技能，净角神将利用手中长刀横扫邪佞，对敌方全体造成物理伤害' },
-                { name: '所向披靡', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将可以吸取灵域力量为自己所用，永久增加自身物理攻击力' },
-                { name: '灵域行者', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，净角神将进入灵域可以快速穿梭于时空之中，增加自身速度' },
+                { name: '所向披靡', rarity: 'SS', type: 'N', multiplier: 1, description: '被动技能，净角神将可以吸取灵域力量为自己所用，永久增加自身物理攻击力' },
+                { name: '灵域行者', rarity: 'SS', type: 'N', multiplier: 2, description: '被动技能，净角神将进入灵域可以快速穿梭于时空之中，增加自身速度' },
                 { name: '饮鸩止渴', rarity: 'S', type: 'PP', multiplier: 5, description: '主动技能，以毒作引突破身体极限，净角神将给邪佞附加跗骨之毒，毒性威震四野' },
                 { name: '灵域处刑', rarity: 'SS', type: 'PA', multiplier: 3.5, description: '主动技能，净角神将可以观察到邪佞灵魂深处的弱点，对敌方单体造成物理伤害' }
                 ],
@@ -3754,15 +3756,15 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif',
                 skills: [
-                { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
+                { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                { name: '风仪玉立', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，上古神藤速度大幅提升' },
-                { name: '高级援护', rarity: 'B', type: 'N', multiplier: 0, description: '援护己方单一目标' },
+                { name: '风仪玉立', rarity: 'B', type: 'N', multiplier: 2, description: '被动技能，上古神藤速度大幅提升' },
+                { name: '高级援护', rarity: 'B', type: 'N', multiplier: 2, description: '援护己方单一目标' },
                 { name: '盘根错节', rarity: 'A', type: 'PA', multiplier: 1.4, description: '主动技能，将自身力量注入大地，大地之子将以树枝穿刺的方法对邪佞造成物理伤害' },
-                { name: '物华天宝', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，上古神藤经年累月的吸收日月精华成为天地间一奇物，强壮、耐力、敏捷大幅度提升' },
+                { name: '物华天宝', rarity: 'A', type: 'N', multiplier: 3, description: '被动技能，上古神藤经年累月的吸收日月精华成为天地间一奇物，强壮、耐力、敏捷大幅度提升' },
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，被动技能,通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定' },
-                { name: '破军神力', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，被动技能，在破军星的庇佑下，人类可获得强大的战力，会此技能可使宠物获得大量的物理攻击力和法术攻击力' },
-                { name: '蚍蜉撼树', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，邪佞的力量在上古神藤前如同蚍蜉撼树。借助大地守护者的力量，在受到群体攻击时，减免部分伤害，减免的额度与技能等级有关' },
+                { name: '破军神力', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，被动技能，在破军星的庇佑下，人类可获得强大的战力，会此技能可使宠物获得大量的物理攻击力和法术攻击力' },
+                { name: '蚍蜉撼树', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，邪佞的力量在上古神藤前如同蚍蜉撼树。借助大地守护者的力量，在受到群体攻击时，减免部分伤害，减免的额度与技能等级有关' },
                 { name: '仁者无敌', rarity: 'SS', type: 'PH', multiplier: 2, description: '主动技能，仁慈的强者通过宽恕邪佞亦可通往无敌之路。' },
                 { name: '木魔爆', rarity: 'SS', type: 'PA', multiplier: 1.8, description: '主动技能，召唤木之灵对敌方全体目标造成巨大伤害' },
                 { name: '一叶障目', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，上古神藤神力凝聚的一片树叶，对单个邪佞造成大量伤害' },
@@ -3786,11 +3788,11 @@
                 skills: [
                     { name: '惊涛骇浪', rarity: 'B', type: 'PA', multiplier: 1.5, description: '主动技能，对十字范围造成物理伤害' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能， 每回合法力值恢复' },
-                    { name: '如鱼得水', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，水中的锦鲤能力有所加强，物理攻击和法术攻击上升' },
-                    { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术闪避上升' },
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
+                    { name: '如鱼得水', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，水中的锦鲤能力有所加强，物理攻击和法术攻击上升' },
+                    { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理和法术闪避上升' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关。' },
                     { name: '法力吸取·法术', rarity: 'B', type: 'MA', multiplier: 1.6, description: '主动技能，对目标造成法术伤害' },
-                    { name: '全面进化', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
+                    { name: '全面进化', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，从神魔大战中存活下来的宠物们，极大的提高了自己的强壮、耐力和敏捷。' },
                     { name: '水魔爆', rarity: 'S', type: 'PA', multiplier: 2.2, description: '主动技能，对敌全体造成物理伤害' },
                     { name: '相濡以沫', rarity: 'S', type: 'FH', multiplier: 1, description: '主动技能，传于危难之时，锦鲤会避免敌人的致命攻击！' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，法术攻击上升' },
@@ -3814,14 +3816,14 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/665425a9d9c307b7e92b8c0b.gif',
                 skills: [
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长，被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: ' 被动技能，每回合法力值恢复' },
                     { name: '三倍速冲击', rarity: 'B', type: 'PA', multiplier: 3, description: '主动技能，以三倍速度对目标发动攻击，以目标为中心的十字范围内所有其他目标都会被冲击的余波刮伤。' },
                     { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '主动技能，此生物具有极高的格挡能力，可大大降低邪佞造成的伤害。' },
-                    { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
-                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '神威之怒', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，此技能可使宠物获得大量的物理攻击力。' },
+                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害.可抵消的比例根据技能等级而定。' },
-                    { name: '元素守护（复仇）', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，拥有此技能的生物,任何针对敌方的攻击都可能触发"元素复仇效果".元素复仇效果可使攻击者释放一种元素类法术技能。' },
+                    { name: '元素守护（复仇）', rarity: 'S', type: 'MA', multiplier: 2.5, description: '被动技能，拥有此技能的生物,任何针对敌方的攻击都可能触发"元素复仇效果".元素复仇效果可使攻击者释放一种元素类法术技能。' },
                     { name: '土魔爆', rarity: 'S', type: 'PA', multiplier: 2, description: '主动技能，召唤土之灵对敌方全体目标造成巨大伤害，土之灵产生的伤害需以召唤者的物理攻击为基础。召唤土之灵需以自身寿命作为祭献。' },
                     { name: '虎视眈眈', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，斑斓公主虎视眈眈盯着邪佞，积蓄力量，如斑斓公主本回合没有使用主动技能，则回合结束时物攻和物理暴击率上升，此状态最大叠加两次，增加值和技能等级有关。' },
                     { name: '如虎添翼', rarity: 'SS', type: 'JK', multiplier: 0.02, description: '被动技能，斑斓公主和主人出场时不会受到沉默、眩晕、混乱、睡眠的影响。免疫几率和技能等级有关。' },
@@ -3844,20 +3846,20 @@
                 rank: 'SR',
                 image: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac7e1.gif',
                 skills: [
-                { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
+                { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加。增加的寿命值与生物种类，技能等级有关' },
                 { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
+                { name: '黄金战甲', rarity: 'B', type: 'N', multiplier: 3, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
                 { name: '牛气冲天', rarity: 'B', type: 'PA', multiplier: 2.2, description: '主动技能，单体攻击有几率令目标晕眩' },
-                { name: '魔灵诀心', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理攻击力和法术攻击力大幅提升' },
-                { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力及生命值上限上升' },
+                { name: '魔灵诀心', rarity: 'A', type: 'N', multiplier: 3, description: '被动技能，物理攻击力和法术攻击力大幅提升' },
+                { name: '高级强壮', rarity: 'A', type: 'N', multiplier: 3, description: '被动技能，耐力及生命值上限上升' },
                 { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定' },
                 { name: '风魔爆', rarity: 'S', type: 'MA', multiplier: 1.8, description: '主动技能，对敌方全体造成法术伤害' },
-                { name: '岳镇渊渟', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，巨灵战姬有无可比拟的防御力。减免战斗中前三回合所受物理伤害，减免比例随技能等级提高而提高' },
+                { name: '岳镇渊渟', rarity: 'S', type: 'N', multiplier: 3, description: '被动技能，巨灵战姬有无可比拟的防御力。减免战斗中前三回合所受物理伤害，减免比例随技能等级提高而提高' },
                 { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.5, description: '主动技能，减免受到的伤害' },
                 { name: '舍生取义', rarity: 'SS', type: 'PP', multiplier: 2.5, description: '主动技能，巨灵战姬借助上古巨灵神之威，对邪佞施加烈性真实伤害' },
                 { name: '霸体援护', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，巨灵擅长在战场上保护队友，一回合内处于霸体状态' },
                 { name: '激浊扬清', rarity: 'SS', type: 'JK', multiplier: 0.01, description: '被动技能，巨灵擅长清除队友的负面状态，驱散的概率视技能等级而定' },
-                { name: '热血图腾', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，巨灵战姬在场时我方斗志昂扬，极大增加我方全体生命上限值，效果随技能等级提高而提高' }
+                { name: '热血图腾', rarity: 'SS', type: 'N', multiplier: 5, description: '被动技能，巨灵战姬在场时我方斗志昂扬，极大增加我方全体生命上限值，效果随技能等级提高而提高' }
                 ],
                 qualities: {
                     tier: '普通',
@@ -3875,18 +3877,18 @@
                 rank: 'R',
                 image: 'https://pic.imgdb.cn/item/6655c106d9c307b7e9dad024.gif',
                 skills: [
-                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，物理攻击上升' },
+                    { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1.5, description: '被动技能，物理攻击上升' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
-                    { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理爆击、速度上升' },
-                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升' },
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，寿命上限上升' },
+                    { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理爆击、速度上升' },
+                    { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，寿命上限上升' },
                     { name: '法力吸取（物理）', type: 'PA', multiplier: 1.5, rarity: 'B', description: '主动技能，单体物理攻击并吸取法力值' },
                     { name: '龙息乱', rarity: 'SS', type: 'MA', multiplier: 2, description: '主动技能，目标十字范围造成法术伤害并附加随机状态' },
-                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮上升' },
-                    { name: '黄金战甲', rarity: 'S', type: 'N', multiplier: 0, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
+                    { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮上升' },
+                    { name: '黄金战甲', rarity: 'S', type: 'N', multiplier: 2, description: '被动技能，身着坚不可摧的的黄金战甲。物理防御、法术防御及生命大幅度上升' },
                     { name: '智慧守护', rarity: 'S', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
-                    { name: '龙族后裔（充沛）', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
-                    { name: '万寿无疆', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，寿命无穷无尽，接近永生。每回合回复寿命' },
+                    { name: '龙族后裔（充沛）', rarity: 'SS', type: 'N', multiplier: 2, description: '被动技能，云从龙，风从虎。龙族后裔特有操作风云的本领。大幅提高自己的速度。' },
+                    { name: '万寿无疆', rarity: 'SS', type: 'N', multiplier: 3, description: '被动技能，寿命无穷无尽，接近永生。每回合回复寿命' },
                     { name: '闻风丧胆', rarity: 'SS', type: 'PP', multiplier: 3, description: '主动技能，对敌方单体施加毒性状态，处在惶恐状态的邪佞行动时会减少大量生命值。施法者物理攻击越高减少数值越大。' },
                     { name: '有恃无恐', rarity: 'SS', type: 'PA', multiplier: 2.5, description: '主动技能，以自身物理攻击为引对敌方全体造成大量物理伤害' },
                 ],
@@ -3906,20 +3908,20 @@
                 rank: 'SSR',
                 image: 'https://pic.imgdb.cn/item/66542639d9c307b7e92c23a4.gif',
                 skills: [
-                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 0, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
+                    { name: '长寿', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，有此天赋的生物寿命得到额外增长。被动技能，寿命上限增加，增加的寿命值与生物种类，技能等级有关' },
                     { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合法力值恢复' },
                     { name: '元素力量（宽容）', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，借助元素的力量，在受到攻击时，减免部分伤害。' },
                     { name: '法力灼烧', rarity: 'A', type: 'MA', multiplier: 2, description: '对敌方单一目标喷吐火焰，将目标生命值蒸发，产生的伤害需以使用者的法术攻击为基础。' },
                     { name: '智慧守护', rarity: 'A', type: 'SH', multiplier: 1, description: '被动技能，通过追随智慧与战斗的守护者，使此生物学会用法力值抵消一部分受到的伤害。可抵消的比例根据技能等级而定。' },
-                    { name: '仙风道骨', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
-                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，物理和法术防御上升。' },
+                    { name: '仙风道骨', rarity: 'SS', type: 'N', multiplier: 2, description: '被动技能，耐力、敏捷、强壮大幅提升。' },
+                    { name: '女神外壳', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，物理和法术防御上升。' },
                     { name: '斑斑之鸠', rarity: 'S', type: 'PH', multiplier: 1.5, description: '主动技能，持有此技能者将自动拥有北京大学外交学院硕士研究生学历（学信网可查/非函授/全日制）。' },
-                    { name: '美腿术', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，一双美腿是她引以为豪的本钱，学会此技能可为她增加速度。' },
-                    { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 0, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
+                    { name: '美腿术', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，一双美腿是她引以为豪的本钱，学会此技能可为她增加速度。' },
+                    { name: '妩媚身姿', rarity: 'A', type: 'N', multiplier: 2, description: '被动技能，身型婀娜。提高自身物理和法术闪避。' },
                     { name: '疗伤解毒', rarity: 'SS', type: 'JK', multiplier: 0.01, description: '被动技能，妲茗儿和在天宫捣药的前辈学到了疗伤解毒技能，战斗中有一定概率解除部分减益效果。' },
                     { name: '上善若水', rarity: 'SS', type: 'PH', multiplier: 1.6, description: '主动技能，会疗伤的妲茗儿治疗能力大大提升，妲茗儿法术攻击越高治疗效果越好。' },
                     { name: '步步生莲', rarity: 'SS', type: 'MA', multiplier: 2.4, description: '主动技能，妲茗儿曼妙的舞姿迷惑邪佞后对敌方所有目标进行攻击，我方血量最低1个单位受到鼓舞恢复一定血量。' },
-                    { name: '气急攻心', rarity: 'SS', type: 'N', multiplier: 0, description: '被动技能，妲茗儿天生是个急性子，每回合结束后消耗当前生命1%，恢复最大生命1%的血量，恢复生命需要以寿命作为献祭，每回合扣除100寿命（技能16级以后不消耗寿命）。' },
+                    { name: '气急攻心', rarity: 'SS', type: 'N', multiplier: 3, description: '被动技能，妲茗儿天生是个急性子，每回合结束后消耗当前生命1%，恢复最大生命1%的血量，恢复生命需要以寿命作为献祭，每回合扣除100寿命（技能16级以后不消耗寿命）。' },
                     { name: '狡兔三窟', rarity: 'SS', type: 'FH', multiplier: 1, description: '被动技能，妲茗儿在战斗中可避免致命性的伤害，避免的次数与技能等级有关。' },
                 ],
                 qualities: {
@@ -6920,7 +6922,9 @@ function calculateSkillAttributes() {
             const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
             if (skill) {
                 const skillLevel = skill.level || 1;
-                const levelMultiplier = 1 + 0.1 * (skillLevel - 1);
+                const skillMultiplier = Math.max(1, skill.multiplier);
+                const levelMultiplier = 0.1 * skillLevel * skillMultiplier;
+
                 skillAttributes.health += Math.round(1168 * levelMultiplier);
                 skillAttributes.mana += Math.round(331 * levelMultiplier);
                 skillAttributes.physicalAttack += Math.round(128 * levelMultiplier);
@@ -6933,6 +6937,7 @@ function calculateSkillAttributes() {
     }
     return skillAttributes;
 }
+
         
 //进入战斗界面更新双方关键信息
 function updatePetInfo() {
@@ -7401,7 +7406,8 @@ function openHongHuangTreasure() {
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
-        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 9.9 },
+        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5.9 },
+        { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4 },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
         { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 1 },
@@ -7421,9 +7427,13 @@ function openHongHuangTreasure() {
     for (let item of treasure) {
         if (randomChance < item.chance) {
             setTimeout(() => {
-                addItemToJinnang(item.name, item.quantity); // 添加奖品到锦囊
-                showInfoBox(`你获得了: ${item.displayName}`,'red');
-            },200);
+                if (item.name === 'tinyGoldBlock') {
+                    generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  1, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
+                } else {
+                    addItemToJinnang(item.name, item.quantity);
+                }
+                showInfoBox(`你获得了: ${item.displayName}`, 'red');
+            }, 200);
             break;
         }
         randomChance -= item.chance; // 递减randomChance，直到找到匹配的奖品
@@ -7773,7 +7783,7 @@ document.getElementById('secondary-attributes-panel').addEventListener('click', 
         skillAttributesMessage += `${displayName}: ${value}\n`;
     }
 
-    showInfoBox(`\n1. 二级属性主要由各一级属性（耐力、智力等）决定 \n2. 被动技能的数量和等级也会增加二级属性 \n3.药材、五行符可以提供额外属性 \n4.精灵和飞升技能提供的属性为战斗属性，脱离战斗状态时将会复位 \n5. 当前技能加成为： \n ${skillAttributesMessage} \n6. 生命值是玩家受到伤害时会扣除的值，战斗过程中玩家的血量会每秒按照上线比例进行减少 \n7. 法力值是玩家使用技能时的必要消耗数值 \n8. 物理攻击决定物理类技能的伤害基础 \n9. 物理防御决定玩家对敌人物理技能的减伤效果 \n10. 法术攻击决定玩家的法术伤害类技能的强度，同时决定了玩家的治疗能力和施毒能力 \n11. 法术防御决定了玩家抵抗敌人法术伤害的减伤效果 \n12.速度决定战斗开始时的出手先后顺序，同时也决定了物理闪避率（根据双方速度之差判断闪避概率）`)
+    showInfoBox(`\n1. 二级属性主要由各一级属性（耐力、智力等）决定 \n2. 被动技能的数量和等级也会增加二级属性 \n3.药材、五行符可以提供额外属性 \n4.精灵和飞升技能提供的属性为战斗属性，脱离战斗状态时将会复位 \n5. 当前技能加成为： \n\n ${skillAttributesMessage} \n6. 生命值是玩家受到伤害时会扣除的值，战斗过程中玩家的血量会每秒按照上线比例进行减少 \n7. 法力值是玩家使用技能时的必要消耗数值 \n8. 物理攻击决定物理类技能的伤害基础 \n9. 物理防御决定玩家对敌人物理技能的减伤效果，请注意，减伤效果并不是线性增加的，当防御数值达到临界值后，减伤效果的增长将会变缓（下同法术防御） \n10. 法术攻击决定玩家的法术伤害类技能的强度，同时决定了玩家的治疗能力和施毒能力 \n11. 法术防御决定了玩家抵抗敌人法术伤害的减伤效果 \n12.速度决定战斗开始时的出手先后顺序，同时也决定了物理闪避率（根据双方速度之差判断闪避概率）`)
 });//点击二级属性面板弹出相关信息
         
 function updateHealthAndManaDisplay() {
@@ -15799,27 +15809,14 @@ const itemEffects = {
             showInfoBox('消耗5个宇宙之尘合成一个宇宙之晶！');
         }
     },
-    goldBlock: ()=> {
-        const basePrice = 200000000;
-        const fluctuationPercentage = 0.02; // 2%
-        const goldBlockPrice = Math.floor(basePrice * (1 + (Math.random() * 2 * fluctuationPercentage - fluctuationPercentage)));
-        const difference = Math.abs(basePrice - goldBlockPrice);
-        
-        goldAmount += goldBlockPrice;
-        updateGoldDisplay(goldAmount);
-        
-        if (goldBlockPrice >= basePrice) {
-            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，赚了${convertPrice(difference)}金！`, null, null, 'red');
-        } else {
-            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，亏了${convertPrice(difference)}金！`, null, null, 'green');
-        }
-    },
+    goldBlock: ()=> sellGoldBlock(200000000),
+    tinyGoldBlock: ()=> sellGoldBlock(8000000),
     qiongmeiCard: () => {
         addPetToSelect('qiongmei', 'かすがのそら');
         showInfoBox('你获得了春日野穹（かすがのそら）',null,null,'blue');
     }
 };
-
+        
 let lastUsedItemName = null;
 
 function useAssignedItem() {
@@ -16536,29 +16533,29 @@ function forgeArm(key, infoDiv, useGold = true) {
         let rand = Math.random();
         if (rand < 0.9) {
             newValue = Math.floor(100 + Math.random() * 0.3 * (
-                attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-                attribute === "magicAttack" ? 38999 :
-                attribute === "speed" ? 18899 :
-                attribute === "health" || attribute === "mana" ? 266666 : // 更新生命值和法力值的范围
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 37998 :
+                attribute === "magicAttack" ? 22999 :
+                attribute === "speed" ? 10899 :
+                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
                 53999
             ));
         } else {
             newValue = Math.floor(100 + Math.random() * (
-                attribute === "physicalDefense" || attribute === "magicDefense" ? 87998 :
-                attribute === "magicAttack" ? 38999 :
-                attribute === "speed" ? 18899 :
-                attribute === "health" || attribute === "mana" ? 266666 : // 更新生命值和法力值的范围
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 37998 :
+                attribute === "magicAttack" ? 22999 :
+                attribute === "speed" ? 10899 :
+                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
                 53999
             ));
         }
     } else {
         const maxRanges = {
-            physicalDefense: 87998,
-            magicDefense: 87998,
-            magicAttack: 38999,
-            speed: 18899,
-            health: 266666,
-            mana: 266666,
+            physicalDefense: 37998,
+            magicDefense: 37998,
+            magicAttack: 22999,
+            speed: 10899,
+            health: 66666,
+            mana: 66666,
             default: 53999
         };
 
@@ -17427,6 +17424,21 @@ function exchangeGoldBlock(auto = false) {
             createGoldBlock();
         }
     }
+}
+
+function sellGoldBlock(basePrice) {
+        const fluctuationPercentage = 0.02; // 2%
+        const goldBlockPrice = Math.floor(basePrice * (1 + (Math.random() * 2 * fluctuationPercentage - fluctuationPercentage)));
+        const difference = Math.abs(basePrice - goldBlockPrice);
+        
+        goldAmount += goldBlockPrice;
+        updateGoldDisplay(goldAmount);
+        
+        if (goldBlockPrice >= basePrice) {
+            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，赚了${convertPrice(difference)}金！`, null, null, 'red');
+        } else {
+            showInfoBox(`你成功出售一个金锭，获得了${convertPrice(goldBlockPrice)}金子，亏了${convertPrice(difference)}金！`, null, null, 'green');
+        }
 }
         
 function toggleShop() {
@@ -18935,8 +18947,6 @@ function getBlessGift() {
     miraculousPill += 10;
     qualityPill += 200;
     highGradePill += 500;
-    goldAmount += 9500000; 
-    updateGoldDisplay(goldAmount);
 
     const itemsToIncrease = [
         'coagulateStone', // 凝魄石
@@ -18959,13 +18969,13 @@ function getBlessGift() {
     addItemToJinnang('summonCharmPaper', 20);
     addItemToJinnang('celebrationCake', 5);
     addItemToJinnang('advancedSkillPill', 1);
-    addItemToJinnang('redEnvelope', 2);
     addItemToJinnang('goldAmuletPackage', 1);
     addItemToJinnang('qualityEnhancePillPKG', 1);
     addItemToJinnang('cultivationPill200', 5);
+    generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  1, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
     updateJinnangItems();
     updateTopBarItems();
-    showInfoBox("您获得了9.5锭金子和新手大礼包！其他物品请检查你的背包！");
+    showInfoBox("您打开了新手大礼包！");
 }
 
 function upgradeWisdomTo() {

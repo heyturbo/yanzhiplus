@@ -6,8 +6,10 @@
     <title>Project TS</title>
     <style>
         @import url('https://fonts.loli.net/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+        @import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+
         body {
-            font-family: 'Libre Baskerville', sans-serif;
+            font-family: 'Noto Serif SC','思源宋体', sans-serif;
             display: flex;
             flex-direction: column;
             margin: 0;
@@ -8904,17 +8906,15 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage') {
             damageElement.style.fontSize = '24px';
             damageElement.style.textShadow = '0 0 2px orange';
             damageElement.style.padding = '10px';
-            
             damageElement.style.borderRadius = '10px';
             damageElement.style.zIndex = '99999';
             damageElement.classList.add('critical-hit-animation');
         } else {
             // 非暴击：黄色，快速渐进渐出
-            damageElement.style.color = 'yellow';
-            damageElement.style.fontSize = '22px';
+            damageElement.style.color = 'white';
+            damageElement.style.fontSize = '20px';
             damageElement.style.textShadow = '0 0 2px black';
             damageElement.style.padding = '10px';
-            
             damageElement.style.borderRadius = '10px';
             damageElement.style.zIndex = '99999';
             damageElement.classList.add('normal-hit-animation');
@@ -8927,7 +8927,6 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage') {
         damageElement.style.fontSize = '22px';
         damageElement.style.textShadow = '0 0 8px lime';
         damageElement.style.padding = '10px';
-        
         damageElement.style.borderRadius = '10px';
         damageElement.style.zIndex = '99999';
         damageElement.classList.add('heal-animation');

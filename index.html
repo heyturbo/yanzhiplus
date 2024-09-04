@@ -6499,8 +6499,10 @@ let defeatedPets = []; // 记录已阵亡的宠物 { key: 'xiaojin', name: '小�
 let usedPets = []; // 记录所有已出战的宠物 { key: 'xiaojin', name: '小金牛' }
 
 function showNextBattlePrompt(playerWon) {
-
     if (playerWon) {
+        const wonValue = Math.floor(0 + Math.random() * 2);
+        decreaseArmsEndurance(key = null, wonValue);
+        
         if (!summonEnemy) {
             handleVictory();
             return;
@@ -6511,6 +6513,9 @@ function showNextBattlePrompt(playerWon) {
             return;
         }
     } else {
+        const failedValue = Math.floor(5 + Math.random() * 5);
+        decreaseArmsEndurance(key = null, failedValue);
+        
         if (!resurrectionState) {
             if (!summonEnemy) {
                 handlePetDefeat();
@@ -7477,12 +7482,14 @@ function openHongHuangTreasure() {
         { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 5 },
         { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 1, chance: 5 },
         { displayName: '仙人醍醐*2', name: 'ultraSkillBoomer', quantity: 2, chance: 5 },
-        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 10 },
+        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 5 },
+        { displayName: '锻造工具', name: 'forgeTool', quantity: 1, chance: 5 },
         { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
-        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5.9 },
+        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5 },
+        { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 0.9 },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4 },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
@@ -15065,6 +15072,9 @@ function collectTreasure() {
         '灵异秘卷': 'mutationScroll',
         '装满的药材箱': 'drugBox',
         '华贵的药材箱': 'fancyDrugBox',
+        '锻造工具': 'forgeTool',
+        '橙色武装原料': 'orangeArmComponents',
+        '蓝色武装原料': 'blueArmComponents',
         '宠物资质仙丹': 'qualityEnhancePill',
         '高级神兽丹': 'advancedSkillPill',
         '魔魂封印卡': 'bossSealCard',
@@ -15310,14 +15320,17 @@ function getRandomReward(type) {
         ],
         '至尊仙葫': [
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
-            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 10 },
+            { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 9.5 },
+            { name: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', chance: 0.1 },
+            { name: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', chance: 0.4 },
             { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 8 },
             { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', chance: 15 },
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 8 },
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 20 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 9 },           
             { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 8.5 },
-            { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 6 },
+            { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 5 },
+            { name: '锻造工具', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e9644942.png', chance: 1 },
             { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 2 },
             { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 0.2 },
             { name: '修为灵丹*3（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 0.1 },
@@ -15367,6 +15380,9 @@ let jinnangItems = [
     { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/669754f1d9c307b7e9bfec8f.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
     { name: 'infiniteGem', displayName: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', price: 2000, quantity: 0, description: '宇宙间最玄妙的宝石，宠物使用后可受到更高阶的指引' },
     { name: 'ignoranceWater', displayName: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
+    { name: 'blueArmComponents', displayName: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', price: 200, quantity: 1000, description: '相对劣质的武装材料，不能直接打造，集齐25个可以合成一个橙色武装原料' },
+    { name: 'orangeArmComponents', displayName: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', price: 1000, quantity: 1000, description: '上好的武装材料，收集25个后用锻造工具可以打造用于解锁任意宠物武装的原始武装，你也可以点击使用分解为25个蓝色武装原料' },
+    { name: 'forgeTool', displayName: '锻造工具', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e9644942.png', price: 1000, quantity: 100, description: '当你的橙色武装原料足够25个时，你可以使用这把工具打造一个原始宠物武装' },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', price: 500, quantity: 0, description: '用于宠物25~30进化' },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', price: 50, quantity: 0, description: '用于宠物1~6进化' },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
@@ -15931,6 +15947,41 @@ const itemEffects = {
     qiongmeiCard: () => {
         addPetToSelect('qiongmei', 'かすがのそら');
         showInfoBox('你获得了春日野穹（かすがのそら）',null,null,'blue','https://pic.imgdb.cn/item/66d7f116d9c307b7e9a009b9.jpg','192px * 108px');
+    },
+    blueArmComponents: () => {
+        addItemToJinnang('blueArmComponents',1);
+        const blueAC = jinnangItems.find(item => item.name === 'blueArmComponents');
+        if (blueAC.quantity >= 25) {
+            useItem('blueArmComponents',25);
+            addItemToJinnang('orangeArmComponents',1);
+            goldAmount -= 20000;
+            updateGoldDisplay(goldAmount);
+            showInfoBox('消耗25个蓝色武装原料和20两金，成功合成1个橙色武装原料',null,null,null,'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png');
+        } else {
+            showInfoBox('原料数量不足，无法合成！',null,null,'red');
+        }
+    },
+    orangeArmComponents: () => {
+        addItemToJinnang('orangeArmComponents',1);
+        const OrangeAC = jinnangItems.find(item => item.name === 'orangeArmComponents');
+        if (OrangeAC.quantity >= 1) {
+            useItem('orangeArmComponents',1);
+            addItemToJinnang('blueArmComponents',25);
+            goldAmount -= 100000;
+            updateGoldDisplay(goldAmount);
+            showInfoBox('消耗1个橙色武装原料和100两金，成功分解为25个蓝色武装原料',null,null,null,'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png');
+        } else {
+            showInfoBox('原料数量不足，无法分解！',null,null,'red');
+        }
+    },
+    forgeTool: () => {
+        addItemToJinnang('forgeTool',1);
+        if (!useItem('orangeArmComponents',25)) {
+            showInfoBox('你的橙色武装原料不足25个，无法合成原始宠物武装！',null,null,'red');
+        } else {
+            generateItemToJinnang('nativePetArms','原始宠物武装','https://pic.imgdb.cn/item/66d87511d9c307b7e9673f68.png', price = 20000, quantity =  1, description = '充满灵力的原始宠物武装，用于给任意的武装解锁，解锁后宠物可得到强大的属性');
+            showInfoBox('消耗25个蓝色武装原料，成功合成1个原始宠物武装',null,null,null,'https://pic.imgdb.cn/item/66d87511d9c307b7e9673f68.png');
+        }
     }
 };
         
@@ -16354,20 +16405,47 @@ function toggleAttributeDrawer() {
 
 //宠物武装
 let armsAttributes = {
-    horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png" },
-    fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" },
-    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png" },
-    claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png" },
-    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png" },
-    husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png" }
+    horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png", enduranceValue: 500, activated: false },
+    fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png", enduranceValue: 500, activated: false },
+    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png", enduranceValue: 500, activated: false },
+    claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png", enduranceValue: 500, activated: false },
+    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png", enduranceValue: 500, activated: false },
+    husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png", enduranceValue: 500, activated: false }
 };
 
 let armsOpened = false;
+        
+function refreshAndCheckAllArmsEndurance() {
+    // 遍历 armsAttributes 中的所有武器
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
 
-document.addEventListener('DOMContentLoaded', () => {
-    //console.log('DOMContentLoaded: armsOpened:', armsOpened); // 调试输出
-});
+        // 检查并设置武器的耐久度，只在未定义或非数字的情况下重置
+        if (typeof arm.enduranceValue === 'undefined' || isNaN(arm.enduranceValue)) {
+            arm.enduranceValue = 500;
+        }
 
+        if (typeof arm.activated === 'undefined' || isNaN(arm.activated)) {
+            arm.activated = false;
+        }
+
+        // 获取对应的 infoDiv 并更新信息
+        const infoDiv = document.querySelector(`.info-${key}`);
+        if (infoDiv) {
+            updateArmInfoDiv(infoDiv, arm);
+        }
+        
+        if (arm.enduranceValue === 0 && arm.activated !== undefined) {
+            arm.activated = false;
+        } else if (arm.enduranceValue === 0) {
+            arm.activated = flase;
+        } else {
+            arm.activated = true;
+        }
+        updateAttributePanel();
+    });
+}
+        
 function handlePetArmsClick() {
     //console.log('petArms clicked: armsOpened:', armsOpened); // 调试输出
 
@@ -16375,6 +16453,7 @@ function handlePetArmsClick() {
         openPetArms();
     } else {
         showPetArmsWindow();
+        setTimeout(()=>refreshAndCheckAllArmsEndurance(),0);
     }
 }
 
@@ -16448,6 +16527,7 @@ function showPetArmsWindow() {
                                color: #F9DE9B;
                                padding: 2px 10px;
                                cursor: pointer;
+                               margin: 2px;
                                transition: transform 0.1s, box-shadow 0.1s;`;
     
         
@@ -16531,18 +16611,31 @@ function showPetArmsWindow() {
         infoDiv.style.flexGrow = '1';
         infoDiv.style.marginLeft = '5px';
         infoDiv.style.fontSize = '14px';
+        infoDiv.classList.add(`info-${key}`); // 用于全局更新时的选择器
+        
+        updateArmInfoDiv(infoDiv, arm); // 显示耐久度信息
+        infoDiv.addEventListener('click', () => {
+            repairArm(infoDiv, arm, key);
+        });
+        armDiv.appendChild(infoDiv);
 
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.flexDirection = 'column';
+        buttonContainer.style.justifyContent = 'space-around';
+        
         const forgeButton = document.createElement('button');
         forgeButton.style = commonButtonStyle;
+        buttonContainer.appendChild(forgeButton);  // 将按钮添加到容器中
 
         const energyForgeButton = document.createElement('button');
         energyForgeButton.innerText = '灵气';
         energyForgeButton.style.display = 'none';
         energyForgeButton.style = commonButtonStyle;
+        buttonContainer.appendChild(energyForgeButton);  // 将按钮添加到容器中
 
         if (index === 0 || arm.unlocked) {
-            const infoText = arm.forgedInfo || `增益: ${arm.value} `;
-            infoDiv.innerHTML = `<div>${arm.type}</div><div>${infoText}</div>`;
+            updateArmInfoDiv(infoDiv, arm, key); // 更新武装信息，包括耐久度
             forgeButton.innerText = '锻造';
             forgeButton.addEventListener('click', () => forgeArm(key, infoDiv));
             energyForgeButton.style.display = 'block';
@@ -16556,12 +16649,12 @@ function showPetArmsWindow() {
 
         armDiv.appendChild(img);
         armDiv.appendChild(infoDiv);
-        armDiv.appendChild(forgeButton);
-        armDiv.appendChild(energyForgeButton);
+        armDiv.appendChild(buttonContainer);
         armsContent.appendChild(armDiv);
     });
 
     newArmsWindow.appendChild(armsContent);
+    refreshAndCheckAllArmsEndurance();
 }
 
 
@@ -16569,28 +16662,25 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
     if (isUnlocked(index)) {
         if (!arm.unlocked) {
             showInfoBox(
-                "武装系统可以增强宠物的二级属性，激活需要200两金子",
-                () => { // onConfirm 回调
-                    if (goldAmount >= 200000) {
-                        goldAmount -= 200000;
-                        showInfoBox("您支付了200两金，为宠物解锁了第一件武装！");
-                        updateGoldDisplay(goldAmount);
-                        arm.unlocked = true; // 更新解锁状态
-                        img.src = arm.url; // 更新图标
-                        infoDiv.innerHTML = `<div>${arm.type}</div><div>增益: 0</div>`;
+                "武装系统可以增强宠物的二级属性，如果你拥有原始宠物武装，你可以直接激活一件",
+                () => {
+                    if (useItem('nativePetArms')) {
+                        showInfoBox("您使用一个原始宠物武装，为宠物解锁了一件新的强力装备！");
+                        arm.unlocked = true;
+                        img.src = arm.url;
+                        showPetArmsWindow();
                         forgeButton.innerText = '锻造';
                         forgeButton.classList.remove('locked');
-                        forgeButton.replaceWith(forgeButton.cloneNode(true)); // 清除解锁事件监听器
-                        forgeButton = infoDiv.nextElementSibling; // 获取新添加的按钮
+                        forgeButton.replaceWith(forgeButton.cloneNode(true));
+                        forgeButton = infoDiv.nextElementSibling;
                         forgeButton.addEventListener('click', () => forgeArm(Object.keys(armsAttributes)[index], infoDiv));
                         energyForgeButton.style.display = 'block';
                         energyForgeButton.addEventListener('click', () => energyForgeArm(Object.keys(armsAttributes)[index], infoDiv));
                     } else {
-                        showInfoBox("金子不足，无法解锁！");
+                        showInfoBox("道具不足，无法解锁！");
                     }
                 },
-                () => { // onCancel 回调
-                }
+                () => {}
             );
         } else if (arm.unlocked) {
             showInfoBox("武装已经解锁！");
@@ -16598,6 +16688,57 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
     } else {
         showInfoBox("宠物等级不足，无法解锁！");
     }
+}
+
+function updateArmInfoDiv(infoDiv, arm, key) {
+    const enduranceText = `(耐久:${arm.enduranceValue}/500)`;
+    const enduranceElement = `<span style="cursor:pointer;" id="endurance-${key}">${enduranceText}</span>`;
+
+    const infoText = arm.forgedInfo || `增益: ${arm.value}`;
+    infoDiv.innerHTML = `<div>${arm.type} ${enduranceElement}</div><div>${infoText}</div>`;
+}
+
+function repairArm(infoDiv, arm, key) {
+    const repairTool = jinnangItems.find(item => item.name === 'blueArmComponents');
+
+    if (arm.enduranceValue >= 500) {
+        showInfoBox('当前耐久度充足，不需要修复！',null,null,'red');
+        return;
+    }
+    
+    if (repairTool.quantity >= 5) {
+        showInfoBox('你将花费5个蓝色武装原料恢复100点耐久度，是否继续？', () => {
+            useItem('blueArmComponents',5);
+            arm.enduranceValue = Math.min(500, arm.enduranceValue + 100); // 修复耐久度，但不超过500
+            refreshAndCheckAllArmsEndurance();
+            updateArmInfoDiv(infoDiv, arm, key);
+        }, null, 'red');
+    } else {
+        showInfoBox('你的蓝色武装原料数量不足5个，无法恢复耐久值！',null,null,'red');
+    }
+    updateAttributePanel();
+}
+        
+// 减少武装的耐久度
+function decreaseArmsEndurance(key = null, value) {
+    if (key) {
+        const arm = armsAttributes[key];
+        if (arm.enduranceValue <= 0) {
+            arm.enduranceValue = 0;
+            
+        }
+        arm.enduranceValue = Math.max(0, arm.enduranceValue - value);
+
+    } else {
+        Object.keys(armsAttributes).forEach(key => {
+            const arm = armsAttributes[key];
+            arm.enduranceValue = Math.max(0, arm.enduranceValue - value);
+
+        });
+    }
+    
+    refreshAndCheckAllArmsEndurance(); // 刷新所有武装显示信息
+    updateAttributePanel();
 }
 
 function isUnlocked(index) {
@@ -16625,10 +16766,71 @@ function closePetArmsWindow() {
 }
 
 function showInfo() {
-    showInfoBox("武装系统功能和操作说明：\n1. 锻造武装可以随机提升宠物的各项属性，并且有极小概率锻造出现“超级武装”（属性暴增至5位数甚至更多）。\n2. 除金子锻造外，可以每次使用100个“天地灵气”进行更有力的锻造。\n3. 当宠物等级达到一定等级后，可以分别解锁后续五个武装栏。\n4. 解锁需要花费200两金，确认后系统会自动扣除金子并完成解锁。\n5. 解锁成功后，武装信息将正常显示，并可以进行锻造，每次锻造收取8两金。\n6. 不同宠物的武装不通用，出售宠物也会丢失武装。");
+    // 初始化累加后的信息对象
+    let armAttributeMessage = {};
+    
+    // 遍历 armsAttributes 对象
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
+
+        // 确保 arm.value 为有效值，如果是 null 或空值，设为 0
+        const value = arm.value != null ? arm.value : 0;
+
+        // 如果 arm.attribute 已存在于 armAttributeMessage 中，则累加其值
+        if (armAttributeMessage[arm.attribute]) {
+            armAttributeMessage[arm.attribute] += value;
+        } else {
+            // 如果 arm.attribute 不存在，初始化该属性
+            armAttributeMessage[arm.attribute] = value;
+        }
+    });
+
+    // 属性名映射表
+    const nameMap = new Map([
+        ['health', '生命值'],
+        ['magicAttack', '法术攻击'],
+        ['magicDefense', '法术防御'],
+        ['mana', '法力值'],
+        ['physicalAttack', '物理攻击'],
+        ['physicalDefense', '物理防御'],
+        ['speed', '速度']
+    ]);
+
+    // 将累加后的信息转换为数组形式，并映射中文名称
+    let armAttributeMessageArray = Object.entries(armAttributeMessage).map(([attribute, value]) => {
+        const translatedAttribute = nameMap.get(attribute) || attribute; // 若无映射，返回原始属性名
+        return `${translatedAttribute}: ${value}`;
+    });
+
+    // 将数组转换为字符串，方便显示
+    const armAttributesString = armAttributeMessageArray.join('\n');
+
+    // 显示信息
+    const message = `
+    当前武装属性：
+    ${armAttributesString}
+    
+    武装系统功能和操作说明：
+    1. 武装是宠物的装备系统，需要由原料打造得来
+    2. 生成武装后，可以通过锻造随机提升宠物的各项属性
+    3. 除金子锻造外，还可以每次使用100个“天地灵气”进行附魔（提升更多的属性）。
+    4. 生成武装需要消耗一个原始宠物武装，你可以通过宝箱等渠道获得它的必要原材料。
+    5. 锻造、战斗等事件会消耗武装的耐久，耐久为0时，将不再提供任何增益
+    6. 玩家可以使用一定数量的蓝色武装原料进行修复
+    7. 不同宠物的武装不通用，出售宠物后也会丢失武装，请知悉
+    `;
+
+    showInfoBox(message);
 }
 
 function forgeArm(key, infoDiv, useGold = true) {
+    const arm = armsAttributes[key];
+
+    if (arm.enduranceValue === 0) {
+        showInfoBox("该武装已经完全损坏，将无法再提供任何增益！",null,null,'red');
+        return;
+    }
+   
     if (useGold) {
         if (goldAmount < 8000) {
             showInfoBox("金子不足，无法锻造！");
@@ -16642,8 +16844,6 @@ function forgeArm(key, infoDiv, useGold = true) {
             return;
         }
     }
-
-    const arm = armsAttributes[key];
     const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
 
     let newValue;
@@ -16658,7 +16858,7 @@ function forgeArm(key, infoDiv, useGold = true) {
                 53999
             ));
         } else {
-            newValue = Math.floor(100 + Math.random() * (
+            newValue = Math.floor(100 + Math.random() * 0.5 * (
                 attribute === "physicalDefense" || attribute === "magicDefense" ? 37998 :
                 attribute === "magicAttack" ? 22999 :
                 attribute === "speed" ? 10899 :
@@ -16706,6 +16906,8 @@ function forgeArm(key, infoDiv, useGold = true) {
     updateSkillScore();
     updateTitle();
     updateAttributePanel();
+    decreaseArmsEndurance(key, 10); // 只减少特定武装的耐久度
+    updateArmInfoDiv(infoDiv, arm); // 更新展示
 }
 
 // 使用金子锻造
@@ -16820,7 +17022,7 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     // 累加武装增益值
     Object.keys(armsAttributes).forEach(key => {
         const arm = armsAttributes[key];
-        if (arm.attribute) {
+        if (arm.attribute && arm.activated) {
             baseSecondaryAttributes[arm.attribute] += arm.value;
         }
     });
@@ -17741,6 +17943,7 @@ function getRandomRareItem(rareCounts) {
         createItem('宠物资质仙丹', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png'),
         createItem('融会贯通', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png'),
         createItem('集中值（4点）', 86788, 129238, 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png'),
+        createItem('蓝色武装原料', 56788, 89238, 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png'),
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -17870,6 +18073,7 @@ function buyItem() {
         '宠物资质仙丹': () => addItemToJinnang('qualityEnhancePill', itemQuantity),
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
         '集中值（4点）': () => addItemToJinnang('attentionValue', itemQuantity),
+        '蓝色武装原料': () => addItemToJinnang('blueArmComponents', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -19077,6 +19281,7 @@ function getBlessGift() {
         'jumpingSoul',
         'hailMonsterPill',
         'hailMonsterAmulet',
+        'blueArmComponents',
         'qualityEnhancePill'
     ];
     for (const item of itemsToIncrease) {
@@ -19089,6 +19294,7 @@ function getBlessGift() {
     addItemToJinnang('advancedSkillPill', 1);
     addItemToJinnang('goldAmuletPackage', 1);
     addItemToJinnang('qualityEnhancePillPKG', 1);
+    addItemToJinnang('forgeTool', 1);
     addItemToJinnang('cultivationPill200', 5);
     generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  1, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
     updateJinnangItems();

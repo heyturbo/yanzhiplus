@@ -8996,7 +8996,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
 
     let baseDamage;
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * effectiveDefense));
+        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * (1 - effectiveDefense)));
     } else {
         baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier));
     }
@@ -9097,7 +9097,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     let baseDamage;
     
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
     } else {
         baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
     }
@@ -9197,7 +9197,7 @@ function performIndependentMagicAttack() {
 
     let baseDamage;
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
     } else {
         baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
     }
@@ -10470,7 +10470,7 @@ function performEnemyPhysicalAttack(isCritical) {
 
     let damage;
     if (effectiveDefense !== 0){
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * effectiveDefense));
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * (1 - effectiveDefense)));
     } else {
         damage = Math.max(0, Math.floor(battleState.enemy.physicalAttack * 1.2 * attackMultiplier));
     }
@@ -10536,7 +10536,7 @@ function performEnemyMagicalAttack(isCritical) {
 
     let damage;
     if (effectiveDefense !== 0){
-        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * effectiveDefense));
+        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * (1 - effectiveDefense)));
     } else {
         damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier));
     }

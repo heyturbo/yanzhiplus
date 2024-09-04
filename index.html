@@ -7368,10 +7368,10 @@ function handleBaiYinReward() {
     const chance = getRandomInt(1,100);
     if (chance <= 90) {
         generateItemToJinnang('universalAsh','宇宙之尘','https://pic.imgdb.cn/item/66d5dd07d9c307b7e953e4e1.png',price = 10, quantity = 1, description = '击败白银之地怪物的嘉奖，收集一定数量可兑换宇宙之晶');
-        showInfoBox('你获得一个宇宙之尘');
+        showInfoBox('你获得一个宇宙之尘',null,null,null,'https://pic.imgdb.cn/item/66d5dd07d9c307b7e953e4e1.png');
     } else {
         addItemToJinnang('universalCrystal',1);
-        showInfoBox('你获得一个宇宙之晶');
+        showInfoBox('你获得一个宇宙之晶',null,null,null,'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png');
     }
 }
 
@@ -15386,7 +15386,7 @@ let jinnangItems = [
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
     { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66cc940dd9c307b7e9cb758d.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
-    { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性30点' },
+    { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性5点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
     { name: 'drugBox', displayName: '装满的药材箱', url: 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57e3.png', price: 3000, quantity: 0, description: '直接使用，装饰精美的箱子，靠近会有一股药材的气息扑面而来。使用可获得随机10~20株药材' },
     { name: 'fancyDrugBox', displayName: '华贵的药材箱', url: 'https://pic.imgdb.cn/item/6656e598d9c307b7e906ca29.png', price: 6000, quantity: 0, description: '直接使用，华丽贵气的箱子，似乎藏着上好的补品。使用可获得随机20~40株药材' },
@@ -15744,8 +15744,8 @@ const itemEffects = {
         const attributeNameInChinese = attributeMap[randomAttribute];
         
         if (additionalAttributes[randomAttribute] <= 1000) {
-            additionalAttributes[randomAttribute] += 30;
-            showInfoBox(`美味蛋糕下肚，您的${attributeNameInChinese}增加了30点。`);
+            additionalAttributes[randomAttribute] += 5;
+            showInfoBox(`美味蛋糕下肚，您的${attributeNameInChinese}增加了5点。`);
         } else {
             additionalAttributes[randomAttribute] = 1000;
             showInfoBox(`蛋糕虽好，吃太多也会发胖哦！${attributeNameInChinese}已经提升至最大值了。`);
@@ -15845,7 +15845,7 @@ const itemEffects = {
             clearAutoBattle();
             showInfoBox('试炼之地结束了', null, null, 'black');  // 显示提示框
             document.getElementById('baiyinOverlay').style.display = 'none';
-        }, 30000);  // 6 秒后执行
+        }, 30000);  
     },
     universalCrystal: () => {
         levelUpSkill();
@@ -15923,14 +15923,14 @@ const itemEffects = {
         } else {
             useItem('universalAsh',5);
             addItemToJinnang('universalCrystal',1);
-            showInfoBox('消耗5个宇宙之尘合成一个宇宙之晶！');
+            showInfoBox('消耗5个宇宙之尘合成一个宇宙之晶！',null,null,null,'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png');
         }
     },
     goldBlock: ()=> sellGoldBlock(200000000),
     tinyGoldBlock: ()=> sellGoldBlock(8000000),
     qiongmeiCard: () => {
         addPetToSelect('qiongmei', 'かすがのそら');
-        showInfoBox('你获得了春日野穹（かすがのそら）',null,null,'blue');
+        showInfoBox('你获得了春日野穹（かすがのそら）',null,null,'blue','https://pic.imgdb.cn/item/66d7f116d9c307b7e9a009b9.jpg','192px * 108px');
     }
 };
         
@@ -19590,7 +19590,7 @@ function updateQualityCard() {
     let color;
     switch (currentPet.qualities.tier) {
         case '优秀':
-            color = 'green';
+            color = 'lime';
             break;
         case '杰出':
             color = 'aqua';
@@ -19608,6 +19608,8 @@ function updateQualityCard() {
             color = 'black';
     }
     tierElement.style.color = color;
+    tierElement.style.fontWeight = 'bold';
+    tierElement.style.textShadow = 'rgba(0, 0, 0, 0.8) 0px 0px 3px';
 
     // 更新各项属性的当前值和最大值，以及进度条
     const endurance = currentPet.qualities.endurance;
@@ -20071,20 +20073,27 @@ function enhanceQuality() {
 
     // 遍历每个维度，生成一个在指定范围内的新资质值。
     dimensions.forEach(dim => {
-        newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max * 0.95);
+        if (Math.random() < 0.995) {
+            newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max * 0.9);
+        } else {
+            newQualities[dim] = getRandomInt(qualities[dim].min, qualities[dim].max-100);
+        }
+        
     });
 
     // 如果宠物的资质未发生变异，
     if (!currentPet.qualities.mutated) {
         // 遍历每个维度，如果随机数小于0.01，将该维度的资质值设为最大值，并添加到maxedDimensions数组。
         dimensions.forEach(dim => {
-            if (Math.random() < 0.01) {
-                newQualities[dim] = Math.max(newQualities[dim], Math.floor(qualities[dim].max) * 0.95);
-                maxedDimensions.push(dim);
+            if (Math.random() < 0.99999) {
+                newQualities[dim] = Math.min(newQualities[dim], Math.floor(qualities[dim].max * 0.8));
+            } else {
+                newQualities[dim] = Math.floor(qualities[dim].max);
             }
+            maxedDimensions.push(dim);
         });
 
-        // 如果有超过1个维度达到最大值，从maxedDimensions数组中弹出一个维度并重新生成该维度的资质值，直到只有2个或更少维度达到最大值。
+        // 如果有超过1个维度达到最大值，从maxedDimensions数组中弹出一个维度并重新生成该维度的资质值，直到只有1个或更少维度达到最大值。
         while (maxedDimensions.length > 1) {
             const dimToReset = maxedDimensions.pop();
             newQualities[dimToReset] = getRandomInt(qualities[dimToReset].min, qualities[dimToReset].max);

@@ -1900,6 +1900,7 @@
             text-align: center;
             border-radius: 5px;
             transition: background-color 0.3s;
+            font-family: 'Noto Serif SC', sans-serif;
         }
         
         .battle-system-actions button:hover {
@@ -3028,11 +3029,11 @@
                 <button onclick="performAttack('physical')">物攻</button>
                 <button onclick="performDefense()">格挡</button>
                 <button onclick="performHeal()">治疗</button>
-                <button onclick="performAttack('magical')">法攻</button>
+               <button onclick="performPoison()">施毒</button>
                 <button onclick="useDrug()">药品</button>
+                 <button onclick="performAttack('magical')">法攻</button>
                 <button id="battle-spirit-button">精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升</button>
-                <button onclick="performPoison()">施毒</button>
                 <button onclick="divinedWeapon()">神器</button>
                 <button onclick="levelUpSkill()">技能</button>
                 <button onclick="enemyInfo()">自动</button>
@@ -5233,7 +5234,7 @@ preloadImages(imageUrls);
 
 let currentInfoBox = null;
 
-function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
+function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C', imageUrl = null, size = '45px * 45px') {
     // 如果已经有一个信息框存在，先关闭它
     if (currentInfoBox) {
         document.body.removeChild(currentInfoBox);
@@ -5259,11 +5260,27 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     infoBox.style.backgroundSize = 'auto';
     infoBox.style.boxShadow = '0px 0px 0px 1px rgb(30, 46, 47), inset 0 0 0px 1px #6f391c';
     infoBox.style.border = '1px solid #EBAC3B';
+    infoBox.style.overflowY = 'auto'; // 处理内容过多时的滚动
+
+    // 如果有传入图片URL，添加图片元素
+    if (imageUrl) {
+        const [width, height] = size.split('*').map(s => s.trim()); // 分解size参数
+
+        const imageElement = document.createElement('img');
+        imageElement.src = imageUrl;
+        imageElement.style.display = 'block';
+        imageElement.style.margin = '0 auto'; // 居中显示
+        imageElement.style.width = width; // 设置图片宽度
+        imageElement.style.height = height; // 设置图片高度
+        imageElement.style.border = '1px solid black'; 
+        imageElement.style.objectFit = 'contain'; // 保持图片比例
+        infoBox.appendChild(imageElement);
+    }
 
     // 创建消息文本元素
     const messageElement = document.createElement('p');
     messageElement.style.margin = '0px';
-    messageElement.style.marginTop = '15px';
+    messageElement.style.marginTop = imageUrl ? '10px' : '15px'; // 如果有图片则减少间距
     messageElement.style.wordBreak = 'auto-phrase';
     messageElement.style.maxHeight = '460px';
     messageElement.style.overflowY = 'scroll';
@@ -5325,6 +5342,8 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C') {
     // 将当前信息框设置为新创建的信息框
     currentInfoBox = infoBox;
 }
+
+
 
 // 显示提示信息的函数
 function showMessage(message, type = 'info') {
@@ -7474,13 +7493,9 @@ function openHongHuangTreasure() {
         { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 5 },
     ];
 
-    // 计算总的概率权重
     const totalChance = treasure.reduce((sum, item) => sum + item.chance, 0);
-
-    // 生成一个随机数，范围在0到totalChance之间
     let randomChance = Math.random() * totalChance;
 
-    // 遍历奖品列表，根据概率选择一个奖品
     for (let item of treasure) {
         if (randomChance < item.chance) {
             setTimeout(() => {
@@ -7489,11 +7504,16 @@ function openHongHuangTreasure() {
                 } else {
                     addItemToJinnang(item.name, item.quantity);
                 }
-                showInfoBox(`你获得了: ${item.displayName}`, 'red');
+
+                // 查找对应奖品的图片 URL
+                const matchedItem = jinnangItems.find(jItem => jItem.name === item.name);
+                const imageUrl = matchedItem ? matchedItem.url : null;
+
+                showInfoBox(`你获得了: ${item.displayName}`, null, null, 'red', imageUrl);
             }, 200);
             break;
         }
-        randomChance -= item.chance; // 递减randomChance，直到找到匹配的奖品
+        randomChance -= item.chance;
     }
 }
         
@@ -9885,8 +9905,8 @@ function performHeal() {
     handleDivineProtection(selectedSkills, skillLevel);
 
     playerTurn = false; // 轮到邪佞回合
+    setTimeout(() => enemyAttack(),300);
     handleManaRecover();
-    enemyAttack();
     applyAscensionEffects();
     getShieldStatus();
     updateUI();

@@ -7221,8 +7221,8 @@ const specificAttackByEnemy = {
         action: () => {
             let practiceEnemy;
             practiceEnemy = setTimeout(() => {
-                if (summonEnemy && battleState.enemy.specialty === 'practiceEnemy' && onBattleState) {
-                    battleState.enemy.health += 50000000000;
+                if (summonEnemy && battleState.enemy.specialty === 'practiceEnemyPlus' && onBattleState) {
+                    battleState.enemy.health = enemyMaxHealth;
                     updateUI();
                     logBattleEvent('❤️【敌人恢复】加强版树桩恢复了满状态生命值');
                 } else {
@@ -7285,6 +7285,7 @@ function handleBattleWithSummonEnemy(playerWon) {
     clearEnemyEffect();
     clearPlayerEffect();
     clearAutoBattle();
+    restoreEnemyState();
     updateUI();
 }
 
@@ -8979,13 +8980,27 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage') {
         damageElement.className = '';  // 清除动画类名，防止影响下一次显示
     }, 300);
 }
-     
+
+function f(x) {
+    // 计算函数值
+    const result = (x / (x + 300000)) - 0.1;
+    
+    // 使用 Math.max 确保结果至少为 0
+    return Math.max(result, 0);
+}
+        
 function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
-    
     const x = battleState.enemy.physicalDefense * defenseFactor;
-    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
+    const effectiveDefense = f(x);
+
+    let baseDamage;
+    if (effectiveDefense !== 0){
+        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * effectiveDefense));
+    } else {
+        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier));
+    }
+    
 
     // 检查玩家是否处于失明状态
     if (battleState.player.blindfold) {
@@ -9077,9 +9092,16 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.magicDefense * defenseFactor;
-    const effectiveDefense = (Math.log(7 * x) / 10) - 1;;
+    const effectiveDefense = f(x);
     
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
+    let baseDamage;
+    
+    if (effectiveDefense !== 0){
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+    } else {
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
+    }
+    
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 20 * skillMultiplier) * manaCostMultiplier;
     battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
@@ -9171,9 +9193,15 @@ function performIndependentMagicAttack() {
 
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.magicDefense * defenseFactor;
-    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
+    const effectiveDefense = f(x);
+
+    let baseDamage;
+    if (effectiveDefense !== 0){
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * effectiveDefense));
+    } else {
+        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
+    }
     
-    let baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * Math.max(0, 1 - effectiveDefense)));
     let isCritical = checkCriticalHit(playerCritRate);
 
     if (handleMagicDodge('enemy')) {
@@ -10055,7 +10083,7 @@ function handleRelieveEffects() {
     for (const jkSkill of jkSkills) {
         const skillLevel = jkSkill.level || 1;
         const skillMultiplier = jkSkill.multiplier || 0.01;
-        const successRate = Math.min(0.3, skillLevel * skillMultiplier); // 成功率，最大值为0.3
+        const successRate = Math.min(0.1, skillLevel * skillMultiplier); // 成功率，最大值为0.1
 
         const randomValue = Math.random(); // 生成 [0, 1) 之间的随机小数
         if (randomValue < successRate) {
@@ -10438,9 +10466,15 @@ function performEnemyPhysicalAttack(isCritical) {
     const attackMultiplier = 1 + (enemyLevel / 100);
     
     const x = battleAttributes.physicalDefense * defenseFactor;
-    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
+    const effectiveDefense = f(x);
+
+    let damage;
+    if (effectiveDefense !== 0){
+        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * effectiveDefense));
+    } else {
+        damage = Math.max(0, Math.floor(battleState.enemy.physicalAttack * 1.2 * attackMultiplier));
+    }
     
-    let damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * Math.max(0, 1 - effectiveDefense)));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     
     
@@ -10498,9 +10532,15 @@ function performEnemyMagicalAttack(isCritical) {
     
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleAttributes.magicDefense * defenseFactor;
-    const effectiveDefense = (Math.log(7 * x) / 10) - 1;
+    const effectiveDefense = f(x);
+
+    let damage;
+    if (effectiveDefense !== 0){
+        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * effectiveDefense));
+    } else {
+        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier));
+    }
     
-    let damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * Math.max(0, 1 - effectiveDefense)));
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
 
 

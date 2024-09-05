@@ -3112,6 +3112,42 @@
     </div>    
     <div class="description-box" id="description-box"></div>
     </div>
+    <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 330px;max-height: 80%;overflow-y: auto;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
+        <div id="gem-container" style="display: flex;flex-direction: column;gap: 10px;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;">
+            <!-- 装备图标和星级 -->
+            <button onclick="closeInlayGemDisplay()" id="closeBtn" style="display: flex;gap: 5px;align-items: center;justify-content: center;padding: 5px;text-align: center;background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);background-repeat: repeat;background-size: contain;color: rgb(227, 167, 59);cursor: pointer;box-shadow: rgb(227, 167, 59) 0px 1px 2px 0px inset;border: 1px solid black;position: relative;">武装详情</button>
+            <div style="margin-top: 5px;display: flex;justify-content: center;gap: 10px;align-items: center;padding: 5px;">
+                星级: <span id="starLevel">0</span> / 13
+            <button id="upgradeStarBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">升星</button>
+            </div>
+            <div style="text-align: center;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+                <img id="zhuang-bei" src="https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" alt="装备图标" style="width: 45px;height: 45px;border: 1px solid #000;">
+            </div>
+            <!-- 基础属性 -->
+            <div style="margin-top: 10px;display: flex;align-items: center;justify-content: center;">
+                <strong>基础属性：</strong>
+                <div id="baseAttribute">+ 12353 物理防御</div>
+            </div>
+            <!-- 宝石孔显示 -->
+            <div style="margin-top: 10px;">
+                <strong>宝石孔：</strong>
+                <div id="gemSlots" style="margin-top: 5px;">
+                    <div style="margin-bottom: 5px;"><span id="slot1" class="slot" style="cursor: pointer;">〇 空</span></div>
+                    <div style="margin-bottom: 5px; display: none;"><span id="slot2" class="slot" style="cursor: pointer;">〇 空</span></div>
+                    <div style="margin-bottom: 5px; display: none;"><span id="slot3" class="slot" style="cursor: pointer;">〇 空</span></div>
+                    <div style="margin-bottom: 5px; display: none;"><span id="slot4" class="slot" style="cursor: pointer;">〇 空</span></div>
+                    <div style="margin-bottom: 5px; display: none;"><span id="slot5" class="slot" style="cursor: pointer;">〇 空</span></div>
+                    <div style="margin-bottom: 5px; display: none;"><span id="slot6" class="slot" style="cursor: pointer;">〇 空</span></div>
+                </div>
+                <button id="punchHoleBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">打孔</button>
+                <button id="refreshSlotsBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">刷新</button>
+            </div>
+            <!-- 镶嵌宝石操作 -->
+            <div style="margin-top: 10px;">
+                <p id="arm-description"></p>
+            </div>
+        </div>
+    </div>
     <script>
         const pets = {
             xiaojin: {
@@ -7103,11 +7139,11 @@ const enemies = {
         reward: () => {
             const items = ['cultivationPill500', 'universalCrystal', 'universalKernel'];
             const randomItem = items[Math.floor(Math.random() * items.length)];
-            const randomQuantity = Math.floor(Math.random() * 6) + 5; // Math.random() * 6 生成 0-5，+5 后得到 5-10
+            const randomQuantity = Math.floor(Math.random() * 4) + 2; // Math.random() * 6 生成 0-5，+5 后得到 5-10
             const itemMap = {
                 'cultivationPill500': '修为灵丹（橙）',
                 'universalCrystal': '天空之晶',
-                'universalKernel': '天空精华'
+                'universalKernel': '天空精华',
             };
             addItemToJinnang(randomItem, randomQuantity);
             showInfoBox(`你获得了${randomQuantity}个${itemMap[randomItem]}，请检查你的背包！`);
@@ -7484,7 +7520,7 @@ function openHongHuangTreasure() {
         { displayName: '仙人醍醐*2', name: 'ultraSkillBoomer', quantity: 2, chance: 5 },
         { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 5 },
         { displayName: '锻造工具', name: 'forgeTool', quantity: 1, chance: 5 },
-        { displayName: '修为灵丹（橙）*6', name: 'earthlyEnergy', quantity: 6, chance: 5 },
+        { displayName: '修为灵丹（橙）*6', name: 'cultivationPill500', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
@@ -7497,7 +7533,8 @@ function openHongHuangTreasure() {
         { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
         { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 },
         { displayName: '白银VIP包裹', name: 'baiYinPKG', quantity: 1, chance: 5 },
-        { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 5 },
+        { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 2 },
+        { displayName: '富贵宝石袋', name: 'wealthyGemBag', quantity: 1, chance: 3 }
     ];
 
     const totalChance = treasure.reduce((sum, item) => sum + item.chance, 0);
@@ -15370,7 +15407,7 @@ let jinnangItems = [
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
     { name: 'supremeWisdomPill', displayName: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', price: 200, quantity: 0, description: '举世无双，灵石点智，宠物悟性到19的关键阶段时可以一举提升至20' },
-    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 300, quantity: 0, description: '神奇的符咒，可以召唤出你喜欢的宠物（可直接使用）' },
+    { name: 'summonCharmPaper', displayName: '召唤灵符', url: 'https://pic.imgdb.cn/item/66d9f78ed9c307b7e94c80c4.png', price: 300, quantity: 0, description: '神奇的符咒，可以召唤出你喜欢的宠物（可直接使用）' },
     { name: 'spiritRefreshStone', displayName: '精灵精炼石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991c04a.png', price: 50, quantity: 0, description: '提升精灵等级，但也可能会失败' },
     { name: 'spiritAwakenStone', displayName: '精灵觉醒石', url: 'https://pic.imgdb.cn/item/6669666cd9c307b7e991bf78.png', price: 80, quantity: 0, description: '刷新精灵的增幅百分比' },
     { name: 'heartStone', displayName: '心鉴之石', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e9630192.png', price: 150, quantity: 0, description: '开启、刷新宠物飞升之术的必要道具' },
@@ -15380,9 +15417,9 @@ let jinnangItems = [
     { name: 'magicPetAmulet', displayName: '灵兽符文', url: 'https://pic.imgdb.cn/item/669754f1d9c307b7e9bfec8f.png', price: 80000, quantity: 0, description: '充满灵力的符文，据传其中封印了上古神兽的灵魂，可以直接开启一个图鉴位' },
     { name: 'infiniteGem', displayName: '无限宝石', url: 'https://pic.imgdb.cn/item/668841dcd9c307b7e9d78092.png', price: 2000, quantity: 0, description: '宇宙间最玄妙的宝石，宠物使用后可受到更高阶的指引' },
     { name: 'ignoranceWater', displayName: '清心酿', url: 'https://pic.imgdb.cn/item/66884213d9c307b7e9d7bad3.png', price: 300, quantity: 0, description: '大音希声，大象无形。真正的修炼不在那点滴提升，而在那瞬悟瞬空' },
-    { name: 'blueArmComponents', displayName: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', price: 200, quantity: 1000, description: '相对劣质的武装材料，不能直接打造，集齐25个可以合成一个橙色武装原料' },
-    { name: 'orangeArmComponents', displayName: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', price: 1000, quantity: 1000, description: '上好的武装材料，收集25个后用锻造工具可以打造用于解锁任意宠物武装的原始武装，你也可以点击使用分解为25个蓝色武装原料' },
-    { name: 'forgeTool', displayName: '锻造工具', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e9644942.png', price: 1000, quantity: 100, description: '当你的橙色武装原料足够25个时，你可以使用这把工具打造一个原始宠物武装' },
+    { name: 'blueArmComponents', displayName: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', price: 200, quantity: 0, description: '相对劣质的武装材料，不能直接打造，集齐25个可以合成一个橙色武装原料' },
+    { name: 'orangeArmComponents', displayName: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', price: 1000, quantity: 0, description: '上好的武装材料，收集25个后用锻造工具可以打造用于解锁任意宠物武装的原始武装，你也可以点击使用分解为25个蓝色武装原料' },
+    { name: 'forgeTool', displayName: '锻造工具', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e9644942.png', price: 1000, quantity: 0, description: '当你的橙色武装原料足够25个时，你可以使用这把工具打造一个原始宠物武装' },
     { name: 'radiantSoul', displayName: '闪耀之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e9098478.png', price: 500, quantity: 0, description: '用于宠物25~30进化' },
     { name: 'shakingSoul', displayName: '颤抖之灵', url: 'https://pic.imgdb.cn/item/6656e821d9c307b7e90988b2.png', price: 50, quantity: 0, description: '用于宠物1~6进化' },
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
@@ -15390,9 +15427,9 @@ let jinnangItems = [
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
     { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
-    { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e14046.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
-    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669d13c6d9c307b7e9e1403e.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
-    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e29d9c307b7e9648ba5.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
+    { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
+    { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
+    { name: 'nirvanaGem', displayName: '定空的灵石·图章', url: 'https://pic.imgdb.cn/item/66a48e2cd9c307b7e9649085.png', price: 30000, quantity: 0, description: '解锁神器「定空的灵石」的关键「钥匙」' },
     { name: 'treasureMap', displayName: '藏宝图', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9369.png', price: 100, quantity: 0, description: '指引财富的藏宝图，凭此道具可进行一次免费十连任意宝箱' },
     { name: 'casinoCoverLetter', displayName: '赌场介绍信', url: 'https://pic.imgdb.cn/item/669ce78ad9c307b7e9aa9342.png', price: 100, quantity: 0, description: '千金散尽还复来，凭此介绍信可免费投注一次500倍以内的彩券' },
     { name: 'liguolin', displayName: '李国麟的爱', url: 'https://pic.imgdb.cn/item/66be21a1d9c307b7e9cc9c98.jpg', price: 0, quantity: 0, description: '如梦幻泡影，如红莲火焰，如从未拥有，如从未失去（可直接使用）' },
@@ -15435,6 +15472,13 @@ let jinnangItems = [
     { name: 'learningValueBook', displayName: '灵兽悟道书', url: 'https://pic.imgdb.cn/item/66d1c3a4d9c307b7e9ddf33e.png', price: 3000, quantity: 0, description: '直接使用，给当前宠物提供20000点学习度，学习度可用于提升技能加成' },
     { name: 'resetAdvancementPill', displayName: '灵兽清心丹', url: 'https://pic.imgdb.cn/item/66d1c416d9c307b7e9de526a.png', price: 500, quantity: 0, description: '在领悟面板进行重置使用，加成重置后，会返还所有的技能点' },
     { name: 'qiongmeiCard', displayName: 'そら召唤卡', url: 'https://pic.imgdb.cn/item/66d698c2d9c307b7e91c47f3.png', price: 5000, quantity: 0, description: '可以召唤隐藏角色：春日野穹（注：无论你有多少张召唤卡，都只能拥有一个同类宠物）' },
+    { name: 'wealthyGemBag', displayName: '富贵宝石袋', url: 'https://pic.imgdb.cn/item/66d9f0a8d9c307b7e9415285.png', price: 1000, quantity: 0, description: '珠光宝气的锦囊，富贵人家常见的款式，打开获得随机宝石' },
+    { name: 'inlayAmulet', displayName: '宝石镶嵌符', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc79.png', price: 2450, quantity: 0, description: '镶嵌宝石时使用可以保证100%成功' },
+    { name: 'removeAmulet', displayName: '宝石摘除符', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc6d.png', price: 300, quantity: 0, description: '用于摘除任意等级的宝石' },
+    { name: 'punchHoleTool', displayName: '任意打孔器', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc61.png', price: 500, quantity: 0, description: '可以直接给装备开启一个可供镶嵌的孔位' },
+    { name: 'starGem', displayName: '升级宝石（极品）', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc86.png', price: 10, quantity: 0, description: '用于给武装升星，成功几率一般' },
+    { name: 'starGemPlus', displayName: '升级宝石（神品）', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc86.png', price: 20, quantity: 0, description: '用于给武装升星，成功几率较好' },
+    { name: 'refreshGemSlot', displayName: '宝石洗孔符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 100, quantity: 0, description: '武装界面刷新孔位的颜色，有可能回到与上次同样的颜色哦' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -15887,7 +15931,7 @@ const itemEffects = {
     },
     redApple: () => {
         additionalPlayerCultivation += 1;
-        showInfoBox('你吃了一个苹果',null,null,'green');
+        showInfoBox(`${currentPet.name}吃了一个苹果`,null,null,'green');
     },
     resetJinnang: async () => {
         await clearOldItems();  // 等待清除旧物品完成
@@ -15895,12 +15939,18 @@ const itemEffects = {
         setTimeout(() => window.location.reload(), 0);  // 立即刷新页面
     },
     chocolate: () => {
+        let currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+        currentPetState.intimacy += 10;
         additionalPlayerCultivation += 2;
-        showInfoBox('你吃了一个费罗列',null,null,'brown'); 
+        updateAdvancement();
+        showInfoBox(`${currentPetState.petName}吃了一个费罗列，增加了10点亲密度`,null,null,'brown'); 
     },
     fancyFlower: () => {
-        additionalPlayerCultivation += 5;
-        showInfoBox(`你向${currentPet.name}送出了一捧花束，${currentPet.name}看到你突然的举动，一时局促地害羞起来`,null,null,'lightred'); 
+        let currentPetState = advancementStates.find(state => state.petName === currentPet.name);
+        currentPetState.intimacy += 100;
+        additionalPlayerCultivation += 2;
+        updateAdvancement();
+        showInfoBox(`你向${currentPetState.petName}送出了一捧花束，${currentPetState.petName}看到你突然的举动，一时局促地害羞起来`,null,null,'lightred'); 
     },
     damoTumbler: () => {
         showInfoBox('快给你最中意的崽玩吧',null,null,'black');
@@ -15982,7 +16032,8 @@ const itemEffects = {
             generateItemToJinnang('nativePetArms','原始宠物武装','https://pic.imgdb.cn/item/66d87511d9c307b7e9673f68.png', price = 20000, quantity =  1, description = '充满灵力的原始宠物武装，用于给任意的武装解锁，解锁后宠物可得到强大的属性');
             showInfoBox('消耗25个蓝色武装原料，成功合成1个原始宠物武装',null,null,null,'https://pic.imgdb.cn/item/66d87511d9c307b7e9673f68.png');
         }
-    }
+    },
+    wealthyGemBag: () => openWealthyGemBag()
 };
         
 let lastUsedItemName = null;
@@ -16405,12 +16456,12 @@ function toggleAttributeDrawer() {
 
 //宠物武装
 let armsAttributes = {
-    horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png", enduranceValue: 500, activated: false },
-    fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png", enduranceValue: 500, activated: false },
-    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png", enduranceValue: 500, activated: false },
-    claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png", enduranceValue: 500, activated: false },
-    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png", enduranceValue: 500, activated: false },
-    husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png", enduranceValue: 500, activated: false }
+    horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png", enduranceValue: 500, activated: false, description:'锐利无比的尖角，能轻易刺穿敌人的弱点' },
+    fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png", enduranceValue: 500, activated: false, description:'手感非凡的护甲之物，能带来不俗的防御能力' },
+    fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png", enduranceValue: 500, activated: false, description:'上古神兽曾用它噬铁碎骨' },
+    claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png", enduranceValue: 500, activated: false, description:'利爪挥过，血流成河' },
+    tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png", enduranceValue: 500, activated: false, description:'虽不如毒鳌般凌厉，仍有破势之力' },
+    husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png", enduranceValue: 500, activated: false, description:'自然之力形成的坚硬盔甲，可抵敌人中伤' }
 };
 
 let armsOpened = false;
@@ -16427,6 +16478,10 @@ function refreshAndCheckAllArmsEndurance() {
 
         if (typeof arm.activated === 'undefined' || isNaN(arm.activated)) {
             arm.activated = false;
+        }
+
+        if (typeof arm.description === 'undefined' || isNaN(arm.description)) {
+            arm.description = '威力不俗的装备，尚有开发空间';
         }
 
         // 获取对应的 infoDiv 并更新信息
@@ -16493,7 +16548,7 @@ function showPetArmsWindow() {
                             justify-content: space-around;
                             align-items: stretch;
                             transform: translate(-50%, -50%);
-                            width: 85%;
+                            width: 360px;
                             max-height: 80%;
                             z-index: 1000;
                             overflow-y: auto;
@@ -16606,6 +16661,14 @@ function showPetArmsWindow() {
         img.style.width = '45px';
         img.style.height = '45px';
         img.style.border = '1px solid black';
+        img.style.cursor = 'pointer';
+        img.addEventListener('click', () => {
+            if (arm.unlocked) {
+                openInlayGemDisplay(key);
+            } else {
+                showInfoBox('从第二件武装开始，点击武装图标可以进入强化页面，对武装进行强化、升星、镶嵌宝石等操作');
+            }
+        });
 
         const infoDiv = document.createElement('div');
         infoDiv.style.flexGrow = '1';
@@ -16657,7 +16720,6 @@ function showPetArmsWindow() {
     refreshAndCheckAllArmsEndurance();
 }
 
-
 function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
     if (isUnlocked(index)) {
         if (!arm.unlocked) {
@@ -16667,6 +16729,30 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
                     if (useItem('nativePetArms')) {
                         showInfoBox("您使用一个原始宠物武装，为宠物解锁了一件新的强力装备！");
                         arm.unlocked = true;
+                        // 初始化 armState（解锁后才创建）
+                        arm.armState = {
+                            starLevel: 0, // 初始化星级为0
+                            gemSlots: {
+                                current: 1, // 初始宝石孔数量为1
+                                max: 6, // 最多6个宝石孔
+                                colors: [randomGemColor()], // 随机初始化第一个宝石孔颜色
+                                inlaid: [null], // 初始化未镶嵌状态
+                                gemAttribute: { // 初始化所有属性为0
+                                    physicalAttack: 0,
+                                    magicAttack: 0,
+                                    physicalDefense: 0,
+                                    magicDefense: 0,
+                                    speed: 0,
+                                    health: 0,
+                                    mana: 0,
+                                    endurance: 0,
+                                    intelligence: 0,
+                                    strength: 0,
+                                    agility: 0,
+                                    faith: 0
+                                }
+                            }
+                        };
                         img.src = arm.url;
                         showPetArmsWindow();
                         forgeButton.innerText = '锻造';
@@ -16694,7 +16780,7 @@ function updateArmInfoDiv(infoDiv, arm, key) {
     const enduranceText = `(耐久:${arm.enduranceValue}/500)`;
     const enduranceElement = `<span style="cursor:pointer;" id="endurance-${key}">${enduranceText}</span>`;
 
-    const infoText = arm.forgedInfo || `增益: ${arm.value}`;
+    const infoText = arm.forgedInfo || `基本增益: ${arm.value}`;
     infoDiv.innerHTML = `<div>${arm.type} ${enduranceElement}</div><div>${infoText}</div>`;
 }
 
@@ -16765,6 +16851,145 @@ function closePetArmsWindow() {
     }
 }
 
+function forgeArm(key, infoDiv, useGold = true) {
+    const gemUI = document.getElementById('inlayGemUI');
+    const arm = armsAttributes[key];
+
+    if (gemUI.style.display !== 'none') {
+        showInfoBox('请先关闭宝石面板！',null,null,'red');
+    }
+
+    if (arm.enduranceValue === 0) {
+        showInfoBox("该武装已经完全损坏，将无法再提供任何增益！",null,null,'red');
+        return;
+    }
+   
+    if (useGold) {
+        if (goldAmount < 8000) {
+            showInfoBox("金子不足，无法锻造！");
+            return;
+        }
+        goldAmount -= 8000;
+        updateGoldDisplay(goldAmount);
+    } else {
+        if (!useItem('earthlyEnergy', 100)) {
+            showInfoBox("您还没有天地灵气，此道具可通过开启武神仙葫或商店购买获得。");
+            return;
+        }
+    }
+    const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
+
+    let newValue;
+    if (useGold) {
+        let rand = Math.random();
+        if (rand < 0.9) {
+            newValue = Math.floor(100 + Math.random() * 0.3 * (
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 10888 :
+                attribute === "magicAttack" ? 6666 :
+                attribute === "speed" ? 3333 :
+                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
+                7777
+            ));
+        } else {
+            newValue = Math.floor(100 + Math.random() * 0.5 * (
+                attribute === "physicalDefense" || attribute === "magicDefense" ? 10888 :
+                attribute === "magicAttack" ? 6666 :
+                attribute === "speed" ? 3333 :
+                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
+                7777
+            ));
+        }
+    } else {
+        const maxRanges = {
+            physicalDefense: 10888,
+            magicDefense: 10888,
+            magicAttack: 6666,
+            speed: 3333,
+            health: 66666,
+            mana: 66666,
+            default: 7777
+        };
+
+        const maxRange = maxRanges[attribute] || maxRanges.default;
+
+        const minValue = 100 + 0.8 * maxRange;  // 80% 的极值
+        const maxValue = 100 + maxRange;        // 100% 的极值
+
+        newValue = Math.floor(minValue + Math.random() * (maxValue - minValue));
+    }
+
+    arm.value = newValue;
+    arm.attribute = attribute;
+    
+    if (arm.armState && typeof arm.armState.starLevel === 'number') {
+        arm.armState.starLevel = 0;
+    } else {
+        // 如果 armState 或 starLevel 无效，可以初始化或其他操作
+        if (!arm.armState) {
+            arm.armState = {
+                starLevel: 0,
+                gemSlots: {
+                    current: 1,
+                    max: 6,
+                    colors: [randomGemColor()],
+                    inlaid: [null]
+                }
+            };
+        }
+    }
+
+    const attributeMap = {
+        physicalAttack: '物攻',
+        magicAttack: '法攻',
+        physicalDefense: '物防',
+        magicDefense: '法防',
+        speed: '速度',
+        health: 'HP',
+        mana: 'MP'
+    };
+
+    const attributeNameInChinese = attributeMap[arm.attribute];
+
+    arm.forgedInfo = `基本增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
+
+    infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
+    updateSkillScore();
+    updateTitle();
+    updateAttributePanel();
+    decreaseArmsEndurance(key, 10); // 只减少特定武装的耐久度
+    updateArmInfoDiv(infoDiv, arm); // 更新展示
+}
+// 使用金子锻造
+function goldForgeArm(key, infoDiv) {
+    forgeArm(key, infoDiv, true);
+}
+// 使用天地灵气锻造
+function energyForgeArm(key, infoDiv) {
+    forgeArm(key, infoDiv, false); // 调用锻造函数
+}
+
+function lockArms() {
+    const armKeys = Object.keys(armsAttributes);
+    armKeys.forEach((key, index) => {
+        if (index > 0) {
+            armsAttributes[key].unlocked = false;
+            armsAttributes[key].activated = false;
+        }
+    });
+    armsOpened = false;
+    //console.log('All arms are now locked.');
+}
+
+function removeArmsAttributes() {
+    const armKeys = Object.keys(armsAttributes);
+    armKeys.forEach(key => {
+        armsAttributes[key].value = 0;
+        armsAttributes[key].attribute = null;
+        armsAttributes[key].forgedInfo = null;
+    });
+    //console.log('All arms attributes have been reset to zero.');
+}
+
 function showInfo() {
     // 初始化累加后的信息对象
     let armAttributeMessage = {};
@@ -16823,124 +17048,498 @@ function showInfo() {
     showInfoBox(message);
 }
 
-function forgeArm(key, infoDiv, useGold = true) {
-    const arm = armsAttributes[key];
+function closeInlayGemDisplay() {
+    const gemUI = document.getElementById('inlayGemUI');
+    gemUI.style.display = 'none'; // 显示镶嵌界面
+    currentKey = null;
+}
 
-    if (arm.enduranceValue === 0) {
-        showInfoBox("该武装已经完全损坏，将无法再提供任何增益！",null,null,'red');
+//生成宝石的函数
+function generateGemToJinnang(color, level, name, attribute, value, quantity = 1) {
+    // 颜色映射
+    const colorMap = {
+        'yellow': '鹅黄色',
+        'pink': '粉红色',
+        'blue': '天蓝色',
+        'purple': '淡紫色'
+    };
+
+    // 等级映射
+    const levelMap = {
+        1: '一级',
+        2: '二级',
+        3: '三级',
+        4: '四级',
+        5: '五级',
+        6: '六级',
+        7: '七级'
+    };
+
+    // 属性映射
+    const attributeMap = {
+        physicalAttack: '物理攻击',
+        magicAttack: '法术攻击',
+        physicalDefense: '物理防御',
+        magicDefense: '法术防御',
+        speed: '速度',
+        health: '生命',
+        mana: '法力',
+        endurance: '耐力',
+        intelligence: '智力',
+        strength: '强壮',
+        agility: '敏捷',
+        faith: '信仰'
+    };
+
+    // 图片 URL 映射（根据颜色和等级映射不同的图片）
+    const imgUrlMap = {
+        'pink_1': 'https://pic.imgdb.cn/item/66d9e89bd9c307b7e93b5c14.png',
+        'pink_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc59.png',
+        'pink_6': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png',
+        'pink_7': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc29.png',
+        'purple_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc4c.png',
+        'purple_6': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png',
+        'yellow_1': 'https://pic.imgdb.cn/item/66d9e89bd9c307b7e93b5c08.png',
+        'yellow_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc35.png',
+        'blue_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc41.png'
+        // ...
+    };
+
+    // 生成宝石的唯一名称 (格式: colorGem_attribute_value)
+    const gemName = `${color}Gem_${attribute}_${value}`;
+
+    // 宝石显示的名称 (格式: 等级+name，例如: "一级天寿石")
+    const displayName = `${levelMap[level]}${name}`;
+
+    // 获取图片 URL
+    const imgUrlKey = `${color}_${level}`;
+    const imgUrl = imgUrlMap[imgUrlKey] || 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc59.png';  // 默认 URL
+
+    // 生成描述信息
+    let description = `${levelMap[level]}${name}，用于镶嵌在${colorMap[color]}宝石孔，可提供${value}点${attributeMap[attribute]}`;
+
+    // 调用现有的函数生成宝石 item
+    generateItemToJinnang(gemName, displayName, imgUrl, 500, quantity, description);
+}
+
+// 示例调用: generateGemToJinnang('pink', 1, '天寿石', 'endurance', 7, 1); 
+
+// 打开宝石袋的逻辑
+function openWealthyGemBag() {
+    // 宝石数据列表
+    const gemData = [
+        { color: 'pink', level: 6, name: '天寿石', attribute: 'endurance', value: 179 },
+        { color: 'pink', level: 6, name: '天机石', attribute: 'intelligence', value: 179 },
+        { color: 'pink', level: 6, name: '天猛石', attribute: 'strength', value: 179 },
+        { color: 'pink', level: 6, name: '天佑石', attribute: 'faith', value: 179 },
+        { color: 'pink', level: 6, name: '天速石', attribute: 'agility', value: 179 },
+        { color: 'pink', level: 3, name: '天寿石', attribute: 'endurance', value: 33 },
+        { color: 'pink', level: 3, name: '天机石', attribute: 'intelligence', value: 33 },
+        { color: 'pink', level: 3, name: '天猛石', attribute: 'strength', value: 33 },
+        { color: 'pink', level: 3, name: '天佑石', attribute: 'faith', value: 33 },
+        { color: 'pink', level: 3, name: '天速石', attribute: 'agility', value: 33 },
+        { color: 'purple', level: 6, name: '天损石', attribute: 'physicalAttack', value: 594 },
+        { color: 'purple', level: 6, name: '天勇石', attribute: 'magicAttack', value: 594 },
+        { color: 'purple', level: 3, name: '天损石', attribute: 'physicalAttack', value: 110 },
+        { color: 'purple', level: 3, name: '天勇石', attribute: 'magicAttack', value: 110 },
+        { color: 'yellow', level: 3, name: '天英石', attribute: 'speed', value: 132 },
+        { color: 'yellow', level: 3, name: '天贵石', attribute: 'health', value: 632 },
+        { color: 'yellow', level: 3, name: '天满石', attribute: 'mana', value: 632 },
+        { color: 'blue', level: 3, name: '天拜石', attribute: 'physicalDefense', value: 70 },
+        { color: 'blue', level: 3, name: '天退石', attribute: 'magicDefense', value: 70 }
+    ];
+
+    // 随机生成 1~2 个宝石
+    const generateRandomGems = (numGems) => {
+        const shuffledGems = gemData.sort(() => 0.5 - Math.random()); // 随机排序
+        return shuffledGems.slice(0, numGems); // 返回前 numGems 个
+    };
+
+    // 随机选择 1~2 个宝石进行生成
+    const gemsToGenerate = generateRandomGems(Math.floor(Math.random() * 2) + 1); // 生成 1 或 2 个宝石
+
+    // 执行生成宝石
+    gemsToGenerate.forEach(gem => {
+        generateGemToJinnang(gem.color, gem.level, gem.name, gem.attribute, gem.value, 1);
+    });
+
+    // 生成简洁的提示信息
+    const gemNames = gemsToGenerate.map(gem => `${gem.level}级${gem.name}`);
+    const gemMessage = gemNames.join('，'); // 使用逗号隔开
+    showInfoBox(`你获得了${gemMessage}`);
+}      
+        
+// 打开镶嵌宝石界面，动态根据传入的 key 显示指定装备的镶嵌界面
+let currentKey = null; // 全局变量用于存储当前的 key
+
+// 打开镶嵌宝石界面
+function openInlayGemDisplay(key) {
+    const arm = armsAttributes[key];
+    if (!arm) {
+        showInfoBox("该装备不存在！");
         return;
     }
-   
-    if (useGold) {
-        if (goldAmount < 8000) {
-            showInfoBox("金子不足，无法锻造！");
-            return;
-        }
-        goldAmount -= 8000;
-        updateGoldDisplay(goldAmount);
-    } else {
-        if (!useItem('earthlyEnergy', 100)) {
-            showInfoBox("您还没有天地灵气，此道具可通过开启武神仙葫或商店购买获得。");
-            return;
-        }
-    }
-    const attribute = arm.attributes[Math.floor(Math.random() * arm.attributes.length)];
 
-    let newValue;
-    if (useGold) {
-        let rand = Math.random();
-        if (rand < 0.9) {
-            newValue = Math.floor(100 + Math.random() * 0.3 * (
-                attribute === "physicalDefense" || attribute === "magicDefense" ? 37998 :
-                attribute === "magicAttack" ? 22999 :
-                attribute === "speed" ? 10899 :
-                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
-                53999
-            ));
+    // 检查装备是否解锁
+    if (!arm.unlocked) {
+        showInfoBox("装备未解锁！");
+        return;
+    }
+
+    currentKey = key;
+
+    // 显示装备的 UI 信息
+    const gemUI = document.getElementById('inlayGemUI');
+    gemUI.style.display = 'block';
+
+    document.getElementById('starLevel').innerText = arm.armState.starLevel || 0;
+    document.getElementById('baseAttribute').innerText = `+ ${Math.floor(arm.value)} ${translateAttribute(arm.attribute)}`;
+    document.getElementById('zhuang-bei').src = `${arm.url}`;
+    document.getElementById('arm-description').innerText = arm.description || '威力不俗的装备，尚有开发空间';
+
+    // 显示当前宝石孔状态
+    displayGemSlots(arm);
+}
+
+// 显示当前宝石孔状态
+function displayGemSlots(arm) {
+    for (let i = 0; i < 6; i++) {
+        const slotElement = document.getElementById(`slot${i + 1}`);
+
+        if (i < arm.armState.gemSlots.current) {
+            slotElement.parentElement.style.display = 'block'; // 显示该槽位
+            const gemSlotColor = arm.armState.gemSlots.colors[i];
+            const inlaid = arm.armState.gemSlots.inlaid[i];
+
+            if (inlaid) {
+                // 已镶嵌宝石时，显示实心圆和宝石信息，保持 class="slot"
+                slotElement.innerHTML = `<span style="color:${gemSlotColor};">●</span> ${translateGem(inlaid.name)}`;
+            } else {
+                // 未镶嵌宝石时，显示空心圆和“空”，保持 class="slot"
+                slotElement.innerHTML = `<span style="color:${gemSlotColor};">〇 ${translateColor(gemSlotColor)}宝石孔</span>`;
+            }
+            slotElement.classList.add('slot'); // 确保 slotElement 仍然有 class="slot"
         } else {
-            newValue = Math.floor(100 + Math.random() * 0.5 * (
-                attribute === "physicalDefense" || attribute === "magicDefense" ? 37998 :
-                attribute === "magicAttack" ? 22999 :
-                attribute === "speed" ? 10899 :
-                attribute === "health" || attribute === "mana" ? 66666 : // 更新生命值和法力值的范围
-                53999
-            ));
+            slotElement.parentElement.style.display = 'none'; // 隐藏未解锁的槽位
         }
+    }
+}
+
+
+function updateGemSlotDisplay(arm, gem, slotIndex) {
+    const slotElement = document.getElementById(`slot${slotIndex + 1}`);
+    const gemSlotColor = arm.armState.gemSlots.colors[slotIndex];
+
+    if (gem) {
+        // 有宝石镶嵌，显示实心圆和宝石信息，保持 class="slot"
+        slotElement.innerHTML = `<span style="color:${gemSlotColor};">●</span> ${translateGem(gem.name)}`;
     } else {
-        const maxRanges = {
-            physicalDefense: 37998,
-            magicDefense: 37998,
-            magicAttack: 22999,
-            speed: 10899,
-            health: 66666,
-            mana: 66666,
-            default: 53999
-        };
+        // 没有宝石，显示空心圆和“空”，保持 class="slot"
+        slotElement.innerHTML = `<span style="color:${gemSlotColor};">〇 ${translateColor(gemSlotColor)}宝石孔</span>`;
+    }
+    slotElement.classList.add('slot'); // 确保 slotElement 仍然有 class="slot"
+}
 
-        const maxRange = maxRanges[attribute] || maxRanges.default;
+// 随机生成宝石孔颜色
+function randomGemColor() {
+    const colors = ["yellow", "blue", "pink", "purple"];
+    const probabilities = [0.4, 0.4, 0.1, 0.1]; // 各种颜色的概率
+    const randomValue = Math.random();
+    let cumulativeProbability = 0;
+    for (let i = 0; i < colors.length; i++) {
+        cumulativeProbability += probabilities[i];
+        if (randomValue < cumulativeProbability) {
+            return colors[i];
+        }
+    }
+    return colors[0]; // 默认返回黄色
+}
 
-        const minValue = 100 + 0.8 * maxRange;  // 80% 的极值
-        const maxValue = 100 + maxRange;        // 100% 的极值
-
-        newValue = Math.floor(minValue + Math.random() * (maxValue - minValue));
+// 刷新宝石孔颜色
+function refreshGemSlots(arm) {
+    const refreshItem = jinnangItems.find(item => item.name === 'refreshGemSlot');
+    if (refreshItem.quantity <= 0) {
+        showInfoBox('你没有宝石洗孔符！',null,null,'red');
+        return;
     }
 
-    arm.value = newValue;
-    arm.attribute = attribute;
+    useItem('refreshGemSlot',1);
+    
+    arm.armState.gemSlots.colors.forEach((color, index) => {
+        if (!arm.armState.gemSlots.inlaid[index]) {  // 仅刷新未镶嵌的孔
+            arm.armState.gemSlots.colors[index] = randomGemColor();
+        }
+    });
+    displayGemSlots(arm);  // 刷新界面显示
+}
 
+// 打孔操作
+function punchHole(arm) {
+    if (arm.armState.gemSlots.current >= arm.armState.gemSlots.max) {
+        showInfoBox("宝石孔已达到最大数量！");
+        return;
+    }
+
+    const punchItem = jinnangItems.find(item => item.name === 'punchHoleTool');
+    if (punchItem.quantity <= 0) {
+        showInfoBox('你没有打孔工具，开孔失败',null,null,'red');
+        return;
+    }
+    
+    useItem('punchHoleTool',1);
+
+    // 增加一个宝石孔
+    arm.armState.gemSlots.current += 1;
+    arm.armState.gemSlots.colors.push(randomGemColor());
+    arm.armState.gemSlots.inlaid.push(null);  // 初始化未镶嵌
+
+    displayGemSlots(arm);  // 刷新界面显示
+}
+
+// 处理镶嵌宝石逻辑
+function handleGemInlay(arm, slotIndex) {
+    const gemSlotColor = arm.armState.gemSlots.colors[slotIndex];
+
+    // 移除之前可能存在的 gemSelectionDiv，防止重复叠加
+    const existingGemSelectionDiv = document.getElementById('gemSelectionDiv');
+    if (existingGemSelectionDiv) {
+        existingGemSelectionDiv.remove();
+    }
+
+    // 筛选符合宝石孔颜色的可用宝石
+    const availableGems = jinnangItems.filter(item => item.name.includes(`${gemSlotColor}Gem`));
+
+    if (availableGems.length === 0) {
+        showInfoBox("没有可用的宝石！");
+        return;
+    }
+
+    // 创建并展示可用宝石，供玩家选择镶嵌
+    const gemSelectionDiv = document.createElement('div');
+    gemSelectionDiv.id = 'gemSelectionDiv';
+    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: row;align-items: center;width: 100%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 1px 1px inset;flex-direction: column;';
+
+    availableGems.forEach(gem => {
+        // 创建每个宝石的容器
+        const gemDetailContainer = document.createElement('div');
+        gemDetailContainer.style = 'display: flex;flex-direction: row;align-items: center;width: 100%;justify-content: space-around;'; // 确保内容居中对齐
+
+        const gemIcon = document.createElement('img');
+        gemIcon.src = gem.url;
+        gemIcon.style = 'width: 45px; height: 45px; margin-right: 10px;';
+        gemDetailContainer.appendChild(gemIcon);
+
+        const gemInfo = document.createElement('span');
+        gemInfo.innerText = `${translateGem(gem.name)}`;
+        gemDetailContainer.appendChild(gemInfo);
+
+        const inlayButton = document.createElement('button');
+        inlayButton.innerText = '镶嵌';
+        inlayButton.style = 'border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 12px; transition: transform 0.1s, box-shadow 0.1s;';
+        inlayButton.addEventListener('click', function() {
+            const inlayAmuletItem = jinnangItems.find(item => item.name === 'inlayAmulet');
+            if (inlayAmuletItem.quantity <= 0) {
+                showInfoBox('你没有镶嵌符文，无法进行镶嵌', null, null, 'red');
+                return;
+            }
+            useItem('inlayAmulet', 1); // 使用镶嵌符文
+            useItem(`${gem.name}`, 1);  // 扣除一个宝石
+            
+            applyGemBonus(arm, gem, slotIndex); // 应用宝石增益
+            updateGemSlotDisplay(arm, gem, slotIndex); // 更新界面
+            gemDetailContainer.remove(); // 移除当前宝石项
+        });
+
+        gemDetailContainer.appendChild(inlayButton);
+        gemSelectionDiv.appendChild(gemDetailContainer);
+    });
+
+    document.getElementById('inlayGemUI').appendChild(gemSelectionDiv);
+}
+
+// 应用宝石增益
+function applyGemBonus(arm, gem, slotIndex) {
+    const bonusMatch = gem.name.match(/(\w+)Gem_(\w+)_(\d+)/);
+    if (bonusMatch) {
+        const attribute = bonusMatch[2];
+        const bonusValue = parseInt(bonusMatch[3]);
+
+        // 更新 gemAttributes 中的对应属性
+        if (arm.armState.gemSlots.gemAttribute[attribute] !== undefined) {
+            arm.armState.gemSlots.gemAttribute[attribute] += bonusValue;
+        }
+
+        // 标记该宝石孔已镶嵌宝石
+        arm.armState.gemSlots.inlaid[slotIndex] = gem;
+
+        // 立即更新显示
+        updateGemSlotDisplay(arm, gem, slotIndex);
+        updateAttributePanel(); // 更新属性面板
+    }
+}
+
+// 摘除已镶嵌的宝石
+function removeGemFromSlot(arm, slotIndex) {
+    const gem = arm.armState.gemSlots.inlaid[slotIndex];
+    const removeAmuletItem = jinnangItems.find(item => item.name === 'removeAmulet');
+    
+    if (removeAmuletItem.quantity <= 0) {
+        showInfoBox('你没有宝石摘除符文，无法摘除已经镶嵌的宝石！',null,null,'red');
+        return;
+    }
+
+    useItem('removeAmulet',1);
+    
+    if (gem) {
+        const bonusMatch = gem.name.match(/(\w+)Gem_(\w+)_(\d+)/);
+        if (bonusMatch) {
+            const attribute = bonusMatch[2];
+            const bonusValue = parseInt(bonusMatch[3]);
+
+            // 从 gemAttributes 中扣除对应属性
+            if (arm.armState.gemSlots.gemAttribute[attribute] !== undefined) {
+                arm.armState.gemSlots.gemAttribute[attribute] -= bonusValue;
+            }
+
+            arm.armState.gemSlots.inlaid[slotIndex] = null; // 清除已镶嵌的宝石
+            addItemToJinnang(`${gem.name}`, 1); // 归还宝石
+
+            // 立即更新显示
+            updateGemSlotDisplay(arm, null, slotIndex);
+            updateAttributePanel(); // 更新属性面板
+        }
+    }
+}
+
+// 翻译宝石
+function translateGem(gemName) {
     const attributeMap = {
         physicalAttack: '物攻',
         magicAttack: '法攻',
         physicalDefense: '物防',
         magicDefense: '法防',
         speed: '速度',
-        health: 'HP',
-        mana: 'MP'
+        health: '生命',
+        mana: '法力',
+        endurance: '耐力',
+        intelligence: '智力',
+        strength: '强壮',
+        agility: '敏捷',
+        faith: '信仰'
     };
 
-    const attributeNameInChinese = attributeMap[arm.attribute];
+    const colorMap = {
+        pink: '粉红色',
+        blue: '天蓝色',
+        yellow: '鹅黄色',
+        purple: '淡紫色'
+    };
 
-    arm.forgedInfo = `增益: ${arm.value} ${attributeNameInChinese}`; // 保存锻造后的增益信息
+    const match = gemName.match(/(\w+)Gem_(\w+)_(\d+)/);
+    if (match) {
+        const color = match[1];
+        const attribute = match[2];
+        const value = match[3];
 
-    infoDiv.innerHTML = `<div>${arm.type}</div><div>${arm.forgedInfo}</div>`;
-    updateSkillScore();
-    updateTitle();
+        return `${colorMap[color]} 宝石 (${attributeMap[attribute]} +${value})`;
+    }
+    return gemName; // 如果没有匹配，返回原始名称
+}
+
+// 翻译宝石孔颜色
+function translateColor(color) {
+    const colorMap = {
+        yellow: '鹅黄色',
+        blue: '天蓝色',
+        pink: '粉红色',
+        purple: '淡紫色'
+    };
+    return colorMap[color] || "未知";
+}
+
+// 翻译属性
+function translateAttribute(attribute) {
+    const attributeMap = {
+        physicalAttack: '物理攻击',
+        magicAttack: '法术攻击',
+        physicalDefense: '物理防御',
+        magicDefense: '法术防御',
+        speed: '速度',
+        health: '生命',
+        mana: '法力',
+        endurance: '耐力',
+        intelligence: '智力',
+        strength: '强壮',
+        agility: '敏捷',
+        faith: '信仰'
+    };
+    return attributeMap[attribute] || "无";
+}
+
+// 升星操作
+function upgradeStar(arm) {
+    if (arm.armState.starLevel >= 13) {
+        showInfoBox("星级已达到最大值！");
+        return;
+    }
+
+    const starBonus = arm.value * arm.armState.starLevel * 0.01;
+    // 升级星级
+    arm.armState.starLevel += 1;
+    arm.value = Math.round(arm.value + starBonus);  // 星级每升1级，增加5%的基础属性
+
+    // 更新显示
+    document.getElementById('starLevel').innerText = arm.armState.starLevel;
+    document.getElementById('baseAttribute').innerText = `+ ${Math.floor(arm.value)} ${translateAttribute(arm.attribute)}`;
     updateAttributePanel();
-    decreaseArmsEndurance(key, 10); // 只减少特定武装的耐久度
-    updateArmInfoDiv(infoDiv, arm); // 更新展示
 }
 
-// 使用金子锻造
-function goldForgeArm(key, infoDiv) {
-    forgeArm(key, infoDiv, true);
-}
 
-// 使用天地灵气锻造
-function energyForgeArm(key, infoDiv) {
-    forgeArm(key, infoDiv, false); // 调用锻造函数
-}
+document.getElementById('upgradeStarBtn').addEventListener('click', function() {
+    if (currentKey) {
+        upgradeStar(armsAttributes[currentKey]);  // 使用当前装备的 key
+    }
+});
 
-function lockArms() {
-    const armKeys = Object.keys(armsAttributes);
-    armKeys.forEach((key, index) => {
-        if (index > 0) {
-            armsAttributes[key].unlocked = false;
+document.getElementById('punchHoleBtn').addEventListener('click', function() {
+    if (currentKey) {
+        punchHole(armsAttributes[currentKey]);  // 使用当前装备的 key
+    }
+});
+
+document.getElementById('refreshSlotsBtn').addEventListener('click', function() {
+    if (currentKey) {
+        refreshGemSlots(armsAttributes[currentKey]);  // 使用当前装备的 key
+    }
+});
+
+document.getElementById('gemSlots').addEventListener('click', function(event) {
+    const target = event.target.closest('.slot'); // 确保找到包含 slot 类的元素
+    if (target) {
+        const slotId = target.id;
+        const slotIndex = parseInt(slotId.replace('slot', '')) - 1;
+        const arm = armsAttributes[currentKey]; // 使用当前打开的装备
+
+        if (slotIndex < arm.armState.gemSlots.current) {
+            const inlaid = arm.armState.gemSlots.inlaid[slotIndex];
+            if (inlaid) {
+                removeGemFromSlot(arm, slotIndex); // 移除已镶嵌的宝石
+            } else {
+                handleGemInlay(arm, slotIndex); // 处理镶嵌逻辑
+            }
         }
-    });
-    armsOpened = false;
-    //console.log('All arms are now locked.');
-}
+    }
+});
 
-function removeArmsAttributes() {
-    const armKeys = Object.keys(armsAttributes);
-    armKeys.forEach(key => {
-        armsAttributes[key].value = 0;
-        armsAttributes[key].attribute = null;
-        armsAttributes[key].forgedInfo = null;
-    });
-    //console.log('All arms attributes have been reset to zero.');
-}
 
+
+
+        
+
+
+
+
+        
 let currentSpecialization = null;
 let specializations = {
     慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.1, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
@@ -16990,7 +17589,7 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     }
 
     const skillAttributes = calculateSkillAttributes();
-    
+
     // 计算基础二级属性
     const baseSecondaryAttributes = {
         health: Math.floor((currentAttributes.endurance * 24 + currentAttributes.intelligence * 1 + currentAttributes.strength * 2 + currentAttributes.agility * 3 + currentAttributes.faith * 3) * multiplier),
@@ -17001,7 +17600,7 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
         magicDefense: Math.floor((currentAttributes.endurance * 2.2 + currentAttributes.intelligence * 0 + currentAttributes.strength * 0 + currentAttributes.agility * 0 + currentAttributes.faith * 0) * multiplier),
         speed: Math.floor((currentAttributes.endurance * 0.2 + currentAttributes.intelligence * 0.1 + currentAttributes.strength * 0.2 + currentAttributes.agility * 2 + currentAttributes.faith * 0.2) * multiplier)
     };
-    
+
     // 图鉴加成
     const hpBonus = 1 + collectedPetCount * 0.05;
     const mpBonus = 1 + collectedPetCount * 0.04;
@@ -17010,7 +17609,7 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     const physicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const speedBonus = 1 + collectedPetCount * 0.005;
-    
+
     baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health + skillAttributes.health + drugBonus0.health;
     baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana + skillAttributes.mana + drugBonus0.mana;
     baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack;
@@ -17019,16 +17618,31 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense;
     baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed + skillAttributes.speed + drugBonus0.speed;
 
-    // 累加武装增益值
+    // 累加武装增益值，只包括二级属性的增益
     Object.keys(armsAttributes).forEach(key => {
         const arm = armsAttributes[key];
         if (arm.attribute && arm.activated) {
-            baseSecondaryAttributes[arm.attribute] += arm.value;
+            // 先增加 arm 本身的属性值
+            if (!['endurance', 'intelligence', 'strength', 'agility', 'faith'].includes(arm.attribute)) {
+                baseSecondaryAttributes[arm.attribute] += arm.value;
+            }
+
+            // 处理 gemAttributes 中的值，只累加二级属性
+            const gemAttributes = arm.armState?.gemSlots?.gemAttribute;
+            if (gemAttributes) {
+                Object.keys(gemAttributes).forEach(attr => {
+                    if (!['endurance', 'intelligence', 'strength', 'agility', 'faith'].includes(attr) && baseSecondaryAttributes[attr] !== undefined) {
+                        baseSecondaryAttributes[attr] += gemAttributes[attr];
+                    }
+                });
+            }
         }
     });
 
     return baseSecondaryAttributes;
 }
+
+
 
 function updateSecondaryAttributes() {
     const currentAttributes = calculateCurrentAttributes();
@@ -17923,7 +18537,9 @@ function getRandomCommonItem() {
         createItem('分解符礼包', 18888, 38880, 'https://pic.imgdb.cn/item/66c60e7cd9c307b7e9ad57d3.png'),
         createItem('聚灵丹', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c9a.png'),
         createItem('唤妖符', 366, 688, 'https://pic.imgdb.cn/item/66c238b6d9c307b7e9e76c26.png'),
-        createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png')
+        createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png'),
+        createItem('宝石镶嵌符', 21388, 31788, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc79.png'),
+        createItem('宝石摘除符', 21388, 31788, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc6d.png')
     ];
 
     if (Math.random() < 0.8) {
@@ -17944,6 +18560,8 @@ function getRandomRareItem(rareCounts) {
         createItem('融会贯通', 86788, 109238, 'https://pic.imgdb.cn/item/66c9d328d9c307b7e9682dbc.png'),
         createItem('集中值（4点）', 86788, 129238, 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png'),
         createItem('蓝色武装原料', 56788, 89238, 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png'),
+        createItem('任意打孔器', 116788, 159238, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc61.png'),
+        createItem('宝石洗孔符', 116788, 159238, 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png')
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -18074,6 +18692,10 @@ function buyItem() {
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
         '集中值（4点）': () => addItemToJinnang('attentionValue', itemQuantity),
         '蓝色武装原料': () => addItemToJinnang('blueArmComponents', itemQuantity),
+        '宝石镶嵌符': () => addItemToJinnang('inlayAmulet', itemQuantity),
+        '宝石摘除符': () => addItemToJinnang('removeAmulet', itemQuantity),
+        '任意打孔器': () => addItemToJinnang('punchHoleTool', itemQuantity),
+        '宝石洗孔符': () => addItemToJinnang('refreshGemSlot', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -19366,7 +19988,6 @@ function upgradeWisdomTo() {
     addItemToJinnang('earthlyEnergy', 9999);
     addItemToJinnang('tejiWisdomPill', 9999);
     addItemToJinnang('ultraSkillBoomer', 9999);
-    increaseCurrentPetIntimacy(21000);
     updateJinnangItems();
     showInfoBox("您获得了超绝白金VIP礼包！");
     return;
@@ -19378,7 +19999,6 @@ function upgradeWisdomTo() {
         addItemToJinnang('earthlyEnergy', 9999);
         addItemToJinnang('attentionValue', 999);
         addItemToJinnang('learningValueBook',999);
-        increaseCurrentPetIntimacy(21000);
         generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1000, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
@@ -19553,23 +20173,78 @@ function calculateQualityByPill() {
 function calculateAttribute(currentValue, growthRate, level) {
     return Math.floor((currentValue / 2000) * growthRate * level);
 }
+
+function getGemFirstAttributes() {
+    const gemFirstAttributes = {
+        endurance: 0,
+        intelligence: 0,
+        strength: 0,
+        agility: 0,
+        faith: 0
+    };
+
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
+        const gemAttributes = arm.armState?.gemSlots?.gemAttribute;
+
+        if (gemAttributes && arm.activated) {
+            // 遍历一级属性并累加
+            Object.keys(gemFirstAttributes).forEach(attr => {
+                if (gemAttributes[attr] !== undefined) {
+                    gemFirstAttributes[attr] += gemAttributes[attr];
+                }
+            });
+        }
+    });
+
+    return gemFirstAttributes;
+}
+        
 // 根据资质仙丹、固有资质、培养属性、觉醒属性、道具属性综合计算的最终属性
 function calculateCurrentAttributes() {
     const qualities = currentPet.qualities;
     const { growthRate } = calculateGrowthRateDisplayAndValue(qualities);
     const pillBonus = calculateQualityByPill(qualityPillCount); // 获取 pillBonus
 
+    // 获取宝石增加的一级属性
+    const gemFirstAttributes = getGemFirstAttributes();
+
+    // 计算五个一级属性，加入宝石增益
     const attributes = {
-        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) + bonusAttributes.endurance + awakenAttributes.endurance + additionalAttributes.endurance + pillBonus,
-        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) + bonusAttributes.intelligence + awakenAttributes.intelligence + additionalAttributes.intelligence + pillBonus,
-        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) + bonusAttributes.strength + awakenAttributes.strength + additionalAttributes.strength + pillBonus,
-        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) + bonusAttributes.agility + awakenAttributes.agility + additionalAttributes.agility + pillBonus,
-        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) + bonusAttributes.faith + awakenAttributes.faith + additionalAttributes.faith + pillBonus
+        endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) 
+            + bonusAttributes.endurance 
+            + awakenAttributes.endurance 
+            + additionalAttributes.endurance 
+            + pillBonus 
+            + gemFirstAttributes.endurance, // 宝石增益
+        intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) 
+            + bonusAttributes.intelligence 
+            + awakenAttributes.intelligence 
+            + additionalAttributes.intelligence 
+            + pillBonus 
+            + gemFirstAttributes.intelligence, // 宝石增益
+        strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) 
+            + bonusAttributes.strength 
+            + awakenAttributes.strength 
+            + additionalAttributes.strength 
+            + pillBonus 
+            + gemFirstAttributes.strength, // 宝石增益
+        agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) 
+            + bonusAttributes.agility 
+            + awakenAttributes.agility 
+            + additionalAttributes.agility 
+            + pillBonus 
+            + gemFirstAttributes.agility, // 宝石增益
+        faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) 
+            + bonusAttributes.faith 
+            + awakenAttributes.faith 
+            + additionalAttributes.faith 
+            + pillBonus 
+            + gemFirstAttributes.faith // 宝石增益
     };
 
     return attributes;
 }
-
 
 //所谓的attributesForTraning就是指支持培养的属性值
 function attributesForTraning() {
@@ -19592,15 +20267,16 @@ function updateAttributePanel() {
     const pet = currentPet;
     const qualities = pet.qualities;
     const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
+    const gemFirstAttributes = getGemFirstAttributes();
 
     const currentAttributes = attributesForTraning();
     // 此数组用于更新显示属性左边的总值
     const totalAttributes = {
-        endurance: currentAttributes.endurance + awakenAttributes.endurance,
-        intelligence: currentAttributes.intelligence + awakenAttributes.intelligence,
-        strength: currentAttributes.strength + awakenAttributes.strength,
-        agility: currentAttributes.agility + awakenAttributes.agility,
-        faith: currentAttributes.faith + awakenAttributes.faith
+        endurance: currentAttributes.endurance + awakenAttributes.endurance + gemFirstAttributes.endurance,
+        intelligence: currentAttributes.intelligence + awakenAttributes.intelligence + gemFirstAttributes.intelligence,
+        strength: currentAttributes.strength + awakenAttributes.strength + gemFirstAttributes.strength,
+        agility: currentAttributes.agility + awakenAttributes.agility + gemFirstAttributes.agility,
+        faith: currentAttributes.faith + awakenAttributes.faith + gemFirstAttributes.faith
     };
 
     //console.log("Total Attributes:", totalAttributes);

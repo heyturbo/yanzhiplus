@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project TS</title>
     <style>
-        @import url('https://fonts.loli.net/css2?family=Libre+Baskerville:wght@400;700&display=swap');
         @import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
 
         body {
@@ -164,6 +163,7 @@
         height: 18px;
         width: 100%;
         text-align: left;
+        overflow: hidden;
     }
 
     .general-window-background {
@@ -910,8 +910,9 @@
             display: grid;
             margin: 0px;
             font-size: 12px;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 2px;
+            overflow-x: hidden;
         }
         .shop-item {
             text-align: center;
@@ -2734,11 +2735,12 @@
     <div class="shop-drawer" id="shop-drawer">
         <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span></div>
         <div class="shop-info" id="shop-info">
-            <div id="shop-info-container"style="max-height: 550px;overflow-y: scroll;">
+            <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;margin-bottom: 20px;">
                 <div class="shop-items" id="shop-items">
                     <!-- 商店商品展示区 -->
                 </div>
             </div>
+            <div id="shop-description" class="jinnang-description-box">点击可以查看其详情和描述，每个物品的售价因其稀有程度而有所不同。</div>
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
                 <button onclick="sellPet()">宠物市场</button>
@@ -3085,8 +3087,8 @@
                     </select>
                 </div>
             </div>
-            <div>宠物称号： <span id="personal-honor">初来乍到</span></div>
-            <div>游戏时长： <span id="game-timer">00:00</span></div>
+            <div>当前称号： <span id="personal-honor">初来乍到</span></div>
+            <div>游戏版本： <span id="game-version">V22.1.1</span></div>
             <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
@@ -5156,20 +5158,6 @@ function validateUnlockCode() {
         document.getElementById('errorMessage').style.display = 'block';
     }
 }
-
-// 页面加载完成后启动加载模拟
-window.addEventListener('load', () => {
-    simulateLoading();
-    if (alreadyUnlocked) {
-        document.getElementById('unlockOverlay').style.display = 'none';
-        return;
-    } else {
-        document.getElementById('unlockButton').addEventListener('click', validateUnlockCode);
-    }
-});
-
-
-
 
 if (window.GestureEvent || (navigator.maxTouchPoints > 0)) {
     let lastTouchEnd = 0;
@@ -15484,6 +15472,9 @@ let jinnangItems = [
     { name: 'starGemPlus', displayName: '升级宝石（神品）', url: 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc86.png', price: 20, quantity: 0, description: '用于给武装升星，武装星级在7~13级时，有概率提升1级，失败则退2级' },
     { name: 'starGemPlusPKG', displayName: '升级宝石礼包（神品）', url: 'https://pic.imgdb.cn/item/66dab9eed9c307b7e92290c5.png', price: 300, quantity: 0, description: '打开后可以获得200升级宝石（神品）' },
     { name: 'refreshGemSlot', displayName: '宝石洗孔符', url: 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png', price: 100, quantity: 0, description: '武装界面刷新孔位的颜色，有可能回到与上次同样的颜色哦' },
+    { name: 'mergeAmulet', displayName: '低级宝石合成符', url: 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c55.png', price: 1000, quantity: 0, description: '上古时代流传的符文，用于合成1~3级宝石' },
+    { name: 'mergeAmuletPlus', displayName: '高级宝石合成符', url: 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c62.png', price: 2000, quantity: 0, description: '上古时代流传的符文，用于合成4~6级宝石' },
+    { name: 'gemLuckyBag', displayName: '宝石袋盲盒', url: 'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png', price: 50, quantity: 0, description: '打开后获得一颗随机的一级宝石' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -16042,7 +16033,8 @@ const itemEffects = {
     starGemPKG: () => addItemToJinnang('starGem',200),
     starGemPlusPKG: () => addItemToJinnang('starGemPlus',200),
     purpleSixthGem: () => getGem('purple', '6', null, null, null, 1),
-    pinkSixthGem: () => getGem('pink', '6', null, null, null, 1)
+    pinkSixthGem: () => getGem('pink', '6', null, null, null, 1),
+    gemLuckyBag: () => getGem(null, '1', null, null, null, 1)
 };
         
 let lastUsedItemName = null;
@@ -16490,7 +16482,7 @@ function refreshAndCheckAllArmsEndurance() {
         }
 
         if (typeof arm.description === 'undefined' || isNaN(arm.description)) {
-            arm.description = '威力不俗的装备，尚有开发空间';
+            arm.description = '威力不俗的装备，只有神兽能够驾驭，灵力若隐若现，还有待进一步开发';
         }
 
         // 获取对应的 infoDiv 并更新信息
@@ -17065,6 +17057,93 @@ function closeInlayGemDisplay() {
     currentKey = null;
 }
 
+
+const gemData = [
+        { color: 'pink', level: 7, name: '天寿石', attribute: 'endurance', value: 233 },
+        { color: 'pink', level: 7, name: '天机石', attribute: 'intelligence', value: 233 },
+        { color: 'pink', level: 7, name: '天猛石', attribute: 'strength', value: 233 },
+        { color: 'pink', level: 7, name: '天佑石', attribute: 'faith', value: 233 },
+        { color: 'pink', level: 7, name: '天速石', attribute: 'agility', value: 233 },
+        { color: 'pink', level: 6, name: '天寿石', attribute: 'endurance', value: 179 },
+        { color: 'pink', level: 6, name: '天机石', attribute: 'intelligence', value: 179 },
+        { color: 'pink', level: 6, name: '天猛石', attribute: 'strength', value: 179 },
+        { color: 'pink', level: 6, name: '天佑石', attribute: 'faith', value: 179 },
+        { color: 'pink', level: 6, name: '天速石', attribute: 'agility', value: 179 },
+        { color: 'pink', level: 5, name: '天寿石', attribute: 'endurance', value: 119 },
+        { color: 'pink', level: 5, name: '天机石', attribute: 'intelligence', value: 119 },
+        { color: 'pink', level: 5, name: '天猛石', attribute: 'strength', value: 119 },
+        { color: 'pink', level: 5, name: '天佑石', attribute: 'faith', value: 119 },
+        { color: 'pink', level: 5, name: '天速石', attribute: 'agility', value: 119 },
+        { color: 'pink', level: 4, name: '天寿石', attribute: 'endurance', value: 66 },
+        { color: 'pink', level: 4, name: '天机石', attribute: 'intelligence', value: 66 },
+        { color: 'pink', level: 4, name: '天猛石', attribute: 'strength', value: 66 },
+        { color: 'pink', level: 4, name: '天佑石', attribute: 'faith', value: 66 },
+        { color: 'pink', level: 4, name: '天速石', attribute: 'agility', value: 66 },
+        { color: 'pink', level: 3, name: '天寿石', attribute: 'endurance', value: 33 },
+        { color: 'pink', level: 3, name: '天机石', attribute: 'intelligence', value: 33 },
+        { color: 'pink', level: 3, name: '天猛石', attribute: 'strength', value: 33 },
+        { color: 'pink', level: 3, name: '天佑石', attribute: 'faith', value: 33 },
+        { color: 'pink', level: 3, name: '天速石', attribute: 'agility', value: 33 },
+        { color: 'pink', level: 2, name: '天寿石', attribute: 'endurance', value: 17 },
+        { color: 'pink', level: 2, name: '天机石', attribute: 'intelligence', value: 17 },
+        { color: 'pink', level: 2, name: '天猛石', attribute: 'strength', value: 17 },
+        { color: 'pink', level: 2, name: '天佑石', attribute: 'faith', value: 17 },
+        { color: 'pink', level: 2, name: '天速石', attribute: 'agility', value: 17 },
+        { color: 'pink', level: 1, name: '天寿石', attribute: 'endurance', value: 9 },
+        { color: 'pink', level: 1, name: '天机石', attribute: 'intelligence', value: 9 },
+        { color: 'pink', level: 1, name: '天猛石', attribute: 'strength', value: 9 },
+        { color: 'pink', level: 1, name: '天佑石', attribute: 'faith', value: 9 },
+        { color: 'pink', level: 1, name: '天速石', attribute: 'agility', value: 9 },
+        { color: 'purple', level: 7, name: '天损石', attribute: 'physicalAttack', value: 772 },
+        { color: 'purple', level: 7, name: '天勇石', attribute: 'magicAttack', value: 772 },
+        { color: 'purple', level: 6, name: '天损石', attribute: 'physicalAttack', value: 594 },
+        { color: 'purple', level: 6, name: '天勇石', attribute: 'magicAttack', value: 594 },
+        { color: 'purple', level: 5, name: '天损石', attribute: 'physicalAttack', value: 396 },
+        { color: 'purple', level: 5, name: '天勇石', attribute: 'magicAttack', value: 396 },
+        { color: 'purple', level: 4, name: '天损石', attribute: 'physicalAttack', value: 220 },
+        { color: 'purple', level: 4, name: '天勇石', attribute: 'magicAttack', value: 220 },
+        { color: 'purple', level: 3, name: '天损石', attribute: 'physicalAttack', value: 110 },
+        { color: 'purple', level: 3, name: '天勇石', attribute: 'magicAttack', value: 110 },
+        { color: 'purple', level: 2, name: '天损石', attribute: 'physicalAttack', value: 55 },
+        { color: 'purple', level: 2, name: '天勇石', attribute: 'magicAttack', value: 55 },
+        { color: 'purple', level: 1, name: '天损石', attribute: 'physicalAttack', value: 28 },
+        { color: 'purple', level: 1, name: '天勇石', attribute: 'magicAttack', value: 28 },
+        { color: 'yellow', level: 7, name: '天英石', attribute: 'speed', value: 330 },
+        { color: 'yellow', level: 7, name: '天贵石', attribute: 'health', value: 1564 },
+        { color: 'yellow', level: 7, name: '天满石', attribute: 'mana', value: 1564 },
+        { color: 'yellow', level: 6, name: '天英石', attribute: 'speed', value: 264 },
+        { color: 'yellow', level: 6, name: '天贵石', attribute: 'health', value: 1264 },
+        { color: 'yellow', level: 6, name: '天满石', attribute: 'mana', value: 1264 },
+        { color: 'yellow', level: 5, name: '天英石', attribute: 'speed', value: 198 },
+        { color: 'yellow', level: 5, name: '天贵石', attribute: 'health', value: 964 },
+        { color: 'yellow', level: 5, name: '天满石', attribute: 'mana', value: 964 },
+        { color: 'yellow', level: 4, name: '天英石', attribute: 'speed', value: 165 },
+        { color: 'yellow', level: 4, name: '天贵石', attribute: 'health', value: 824 },
+        { color: 'yellow', level: 4, name: '天满石', attribute: 'mana', value: 824 },
+        { color: 'yellow', level: 3, name: '天英石', attribute: 'speed', value: 132 },
+        { color: 'yellow', level: 3, name: '天贵石', attribute: 'health', value: 632 },
+        { color: 'yellow', level: 3, name: '天满石', attribute: 'mana', value: 632 },
+        { color: 'yellow', level: 2, name: '天英石', attribute: 'speed', value: 66 },
+        { color: 'yellow', level: 2, name: '天贵石', attribute: 'health', value: 482 },
+        { color: 'yellow', level: 2, name: '天满石', attribute: 'mana', value: 482 },
+        { color: 'yellow', level: 1, name: '天英石', attribute: 'speed', value: 33 },
+        { color: 'yellow', level: 1, name: '天贵石', attribute: 'health', value: 232 },
+        { color: 'yellow', level: 1, name: '天满石', attribute: 'mana', value: 232 },
+        { color: 'blue', level: 7, name: '天拜石', attribute: 'physicalDefense', value: 728 },
+        { color: 'blue', level: 7, name: '天退石', attribute: 'magicDefense', value: 728 },
+        { color: 'blue', level: 6, name: '天拜石', attribute: 'physicalDefense', value: 560 },
+        { color: 'blue', level: 6, name: '天退石', attribute: 'magicDefense', value: 560 },
+        { color: 'blue', level: 5, name: '天拜石', attribute: 'physicalDefense', value: 280 },
+        { color: 'blue', level: 5, name: '天退石', attribute: 'magicDefense', value: 280 },
+        { color: 'blue', level: 4, name: '天拜石', attribute: 'physicalDefense', value: 140 },
+        { color: 'blue', level: 4, name: '天退石', attribute: 'magicDefense', value: 140 },
+        { color: 'blue', level: 3, name: '天拜石', attribute: 'physicalDefense', value: 70 },
+        { color: 'blue', level: 3, name: '天退石', attribute: 'magicDefense', value: 70 },
+        { color: 'blue', level: 2, name: '天拜石', attribute: 'physicalDefense', value: 35 },
+        { color: 'blue', level: 2, name: '天退石', attribute: 'magicDefense', value: 35 },
+        { color: 'blue', level: 1, name: '天拜石', attribute: 'physicalDefense', value: 18 },
+        { color: 'blue', level: 1, name: '天退石', attribute: 'magicDefense', value: 18 }
+    ];
 //生成宝石的函数
 function generateGemToJinnang(color, level, name, attribute, value, quantity = 1) {
     // 颜色映射
@@ -17105,23 +17184,33 @@ function generateGemToJinnang(color, level, name, attribute, value, quantity = 1
     // 图片 URL 映射（根据颜色和等级映射不同的图片）
     const imgUrlMap = {
         'pink_1': 'https://pic.imgdb.cn/item/66d9e89bd9c307b7e93b5c14.png',
+        'pink_2': 'https://pic.imgdb.cn/item/66db0468d9c307b7e9895fc7.png',
         'pink_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc59.png',
         'pink_4': 'https://pic.imgdb.cn/item/66dab4f5d9c307b7e917470a.png',
         'pink_5': 'https://pic.imgdb.cn/item/66dab344d9c307b7e915e434.png',
         'pink_6': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png',
         'pink_7': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc29.png',
         'purple_1': 'https://pic.imgdb.cn/item/66dab5fbd9c307b7e9182384.png',
+        'purple_2': 'https://pic.imgdb.cn/item/66db0468d9c307b7e9895fc0.png',
         'purple_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc4c.png',
+        'purple_4': 'https://pic.imgdb.cn/item/66db0038d9c307b7e980b9ad.png',
         'purple_5': 'https://pic.imgdb.cn/item/66dab2d4d9c307b7e9157e85.png',
         'purple_6': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png',
+        'purple_7': 'https://pic.imgdb.cn/item/66db062fd9c307b7e98aeddb.png',
         'yellow_1': 'https://pic.imgdb.cn/item/66d9e89bd9c307b7e93b5c08.png',
+        'yellow_2': 'https://pic.imgdb.cn/item/66db0468d9c307b7e9895fe9.png',
         'yellow_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc35.png',
         'yellow_4': 'https://pic.imgdb.cn/item/66dab660d9c307b7e9187d69.png',
         'yellow_5': 'https://pic.imgdb.cn/item/66dab47dd9c307b7e916e88c.png',
         'yellow_6': 'https://pic.imgdb.cn/item/66dab404d9c307b7e9167df8.png',
+        'yellow_7': 'https://pic.imgdb.cn/item/66db0469d9c307b7e9895ffb.png',
+        'blue_1': 'https://pic.imgdb.cn/item/66db093dd9c307b7e98dad0d.png',
+        'blue_2': 'https://pic.imgdb.cn/item/66db0468d9c307b7e9895fd1.png',
         'blue_3': 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc41.png',
-        'blue_4': 'https://pic.imgdb.cn/item/66dab561d9c307b7e9179d38.png'
-        // ...
+        'blue_4': 'https://pic.imgdb.cn/item/66dab561d9c307b7e9179d38.png',
+        'blue_5': 'https://pic.imgdb.cn/item/66db0b52d9c307b7e9914fba.png',
+        'blue_6': 'https://pic.imgdb.cn/item/66db0b52d9c307b7e9914f8e.png',
+        'blue_7': 'https://pic.imgdb.cn/item/66db0b52d9c307b7e9914f63.png'
     };
 
     // 生成宝石的唯一名称 (格式: colorGem_attribute_value)
@@ -17142,66 +17231,7 @@ function generateGemToJinnang(color, level, name, attribute, value, quantity = 1
     // 示例调用: generateGemToJinnang('pink', 1, '天寿石', 'endurance', 7, 1); 
 }
 
-    // 打开宝石袋的逻辑
 function getGem(color = null, level = null, name = null, attribute = null, value = null, quantity = null) {
-    // 宝石数据列表
-    const gemData = [
-        { color: 'pink', level: 7, name: '天寿石', attribute: 'endurance', value: 233 },
-        { color: 'pink', level: 7, name: '天机石', attribute: 'intelligence', value: 233 },
-        { color: 'pink', level: 7, name: '天猛石', attribute: 'strength', value: 233 },
-        { color: 'pink', level: 7, name: '天佑石', attribute: 'faith', value: 233 },
-        { color: 'pink', level: 7, name: '天速石', attribute: 'agility', value: 233 },
-        { color: 'pink', level: 6, name: '天寿石', attribute: 'endurance', value: 179 },
-        { color: 'pink', level: 6, name: '天机石', attribute: 'intelligence', value: 179 },
-        { color: 'pink', level: 6, name: '天猛石', attribute: 'strength', value: 179 },
-        { color: 'pink', level: 6, name: '天佑石', attribute: 'faith', value: 179 },
-        { color: 'pink', level: 6, name: '天速石', attribute: 'agility', value: 179 },
-        { color: 'pink', level: 5, name: '天寿石', attribute: 'endurance', value: 119 },
-        { color: 'pink', level: 5, name: '天机石', attribute: 'intelligence', value: 119 },
-        { color: 'pink', level: 5, name: '天猛石', attribute: 'strength', value: 119 },
-        { color: 'pink', level: 5, name: '天佑石', attribute: 'faith', value: 119 },
-        { color: 'pink', level: 5, name: '天速石', attribute: 'agility', value: 119 },
-        { color: 'pink', level: 4, name: '天寿石', attribute: 'endurance', value: 66 },
-        { color: 'pink', level: 4, name: '天机石', attribute: 'intelligence', value: 66 },
-        { color: 'pink', level: 4, name: '天猛石', attribute: 'strength', value: 66 },
-        { color: 'pink', level: 4, name: '天佑石', attribute: 'faith', value: 66 },
-        { color: 'pink', level: 4, name: '天速石', attribute: 'agility', value: 66 },
-        { color: 'pink', level: 3, name: '天寿石', attribute: 'endurance', value: 33 },
-        { color: 'pink', level: 3, name: '天机石', attribute: 'intelligence', value: 33 },
-        { color: 'pink', level: 3, name: '天猛石', attribute: 'strength', value: 33 },
-        { color: 'pink', level: 3, name: '天佑石', attribute: 'faith', value: 33 },
-        { color: 'pink', level: 3, name: '天速石', attribute: 'agility', value: 33 },
-        { color: 'pink', level: 1, name: '天寿石', attribute: 'endurance', value: 9 },
-        { color: 'pink', level: 1, name: '天机石', attribute: 'intelligence', value: 9 },
-        { color: 'pink', level: 1, name: '天猛石', attribute: 'strength', value: 9 },
-        { color: 'pink', level: 1, name: '天佑石', attribute: 'faith', value: 9 },
-        { color: 'pink', level: 1, name: '天速石', attribute: 'agility', value: 9 },
-        { color: 'purple', level: 6, name: '天损石', attribute: 'physicalAttack', value: 594 },
-        { color: 'purple', level: 6, name: '天勇石', attribute: 'magicAttack', value: 594 },
-        { color: 'purple', level: 5, name: '天损石', attribute: 'physicalAttack', value: 396 },
-        { color: 'purple', level: 5, name: '天勇石', attribute: 'magicAttack', value: 396 },
-        { color: 'purple', level: 3, name: '天损石', attribute: 'physicalAttack', value: 110 },
-        { color: 'purple', level: 3, name: '天勇石', attribute: 'magicAttack', value: 110 },
-        { color: 'purple', level: 1, name: '天损石', attribute: 'physicalAttack', value: 28 },
-        { color: 'purple', level: 1, name: '天勇石', attribute: 'magicAttack', value: 28 },
-        { color: 'yellow', level: 6, name: '天英石', attribute: 'speed', value: 264 },
-        { color: 'yellow', level: 6, name: '天贵石', attribute: 'health', value: 1264 },
-        { color: 'yellow', level: 6, name: '天满石', attribute: 'mana', value: 1264 },
-        { color: 'yellow', level: 5, name: '天英石', attribute: 'speed', value: 198 },
-        { color: 'yellow', level: 5, name: '天贵石', attribute: 'health', value: 964 },
-        { color: 'yellow', level: 5, name: '天满石', attribute: 'mana', value: 964 },
-        { color: 'yellow', level: 4, name: '天英石', attribute: 'speed', value: 165 },
-        { color: 'yellow', level: 4, name: '天贵石', attribute: 'health', value: 824 },
-        { color: 'yellow', level: 4, name: '天满石', attribute: 'mana', value: 824 },
-        { color: 'yellow', level: 3, name: '天英石', attribute: 'speed', value: 132 },
-        { color: 'yellow', level: 3, name: '天贵石', attribute: 'health', value: 632 },
-        { color: 'yellow', level: 3, name: '天满石', attribute: 'mana', value: 632 },
-        { color: 'blue', level: 4, name: '天拜石', attribute: 'physicalDefense', value: 140 },
-        { color: 'blue', level: 4, name: '天退石', attribute: 'magicDefense', value: 140 },
-        { color: 'blue', level: 3, name: '天拜石', attribute: 'physicalDefense', value: 70 },
-        { color: 'blue', level: 3, name: '天退石', attribute: 'magicDefense', value: 70 }
-    ];
-
     // 根据传入的参数进行筛选
     let filteredGems = gemData.filter(gem => {
         return (color === null || gem.color === color) &&
@@ -17391,6 +17421,82 @@ function punchHole(arm) {
     displayGemSlots(arm);  // 刷新界面显示
 }
 
+// 合成宝石
+function mergeGem(fullName, refreshCallback) {
+    const levelMap = {
+        '一': 1,
+        '二': 2,
+        '三': 3,
+        '四': 4,
+        '五': 5,
+        '六': 6,
+        '七': 7
+    };
+
+    const gemLevelChinese = fullName.split('级')[0];  // 获取宝石的汉字等级，比如 '二'
+    const gemLevel = levelMap[gemLevelChinese];  // 转换为数字等级
+    const gemName = fullName.split('级')[1];  // 获取宝石的名称，比如 '天寿石'
+
+    // 检查合成符文的数量
+    const mergeAmuletItem = jinnangItems.find(item => item.name === 'mergeAmulet' && item.quantity > 0);
+    const mergeAmuletPlusItem = jinnangItems.find(item => item.name === 'mergeAmuletPlus' && item.quantity > 0);
+
+    if (!gemLevel) {
+        showInfoBox('无法识别宝石的等级。');
+        return;
+    }
+
+    const currentGem = gemData.find(gem => gem.name === gemName && gem.level === gemLevel);
+    if (!currentGem) {
+        showInfoBox('未找到可合成的宝石，或者宝石已经达到最高等级。');
+        return;
+    }
+
+    const nextGem = gemData.find(gem => gem.name === gemName && gem.level === gemLevel + 1);
+    if (!nextGem) {
+        showInfoBox('该宝石已经达到最高等级，无法继续合成。');
+        return;
+    }
+
+    const currentGemItem = jinnangItems.find(item => item.displayName === fullName);
+    if (!currentGemItem || currentGemItem.quantity < 3) {
+        showInfoBox('你没有足够的宝石进行合成，需要3个同级别的宝石。');
+        return;
+    }
+
+    // 合成 1~3 级的宝石时使用 mergeAmuletItem
+    if (gemLevel >= 1 && gemLevel <= 3) {
+        if (!mergeAmuletItem) {
+            showInfoBox('你没有足够的宝石合成符。');
+            return;
+        }
+        useItem('mergeItem', 1); // 使用1个合成符文
+    } 
+    // 合成 4~6 级的宝石时使用 mergeAmuletPlusItem
+    else if (gemLevel >= 4 && gemLevel <= 6) {
+        if (!mergeAmuletPlusItem) {
+            showInfoBox('你没有足够的高级宝石合成符。');
+            return;
+        }
+        useItem('mergeItemPlus', 1); // 使用1个高级合成符文
+    }
+
+    // 扣除3个当前宝石
+    useItem(currentGemItem.name, 3);
+
+    // 生成新宝石
+    generateGemToJinnang(nextGem.color, nextGem.level, nextGem.name, nextGem.attribute, nextGem.value, 1);
+
+    // 显示合成成功的提示
+    showInfoBox(`成功合成了一颗${nextGem.level}级${nextGem.name}！`);
+
+    // 合成成功后调用刷新函数
+    if (refreshCallback) {
+        refreshCallback();
+    }
+}
+
+
 // 处理镶嵌宝石逻辑
 function handleGemInlay(arm, slotIndex) {
     const gemSlotColor = arm.armState.gemSlots.colors[slotIndex];
@@ -17401,18 +17507,10 @@ function handleGemInlay(arm, slotIndex) {
         existingGemSelectionDiv.remove();
     }
 
-    // 筛选符合宝石孔颜色的可用宝石
-    const availableGems = jinnangItems.filter(item => item.name.includes(`${gemSlotColor}Gem`) && item.quantity > 0);
-
-    if (availableGems.length === 0) {
-        showInfoBox("没有可用的宝石！");
-        return;
-    }
-
     // 创建并展示可用宝石，供玩家选择镶嵌
     const gemSelectionDiv = document.createElement('div');
     gemSelectionDiv.id = 'gemSelectionDiv';
-    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: column;align-items: center;width: 95%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 4px 1px;max-height: 300px;overflow-y: scroll;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;flex-direction: column-reverse;';
+    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: column;align-items: center;width: 95%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 4px 1px;max-height: 480px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;';
 
     const cancelInlayBtn = document.createElement('button');
     cancelInlayBtn.innerText = '关闭面板';
@@ -17420,43 +17518,79 @@ function handleGemInlay(arm, slotIndex) {
     cancelInlayBtn.addEventListener('click', function() {
         gemSelectionDiv.remove();
     });
+    gemSelectionDiv.appendChild(cancelInlayBtn);
 
-    availableGems.forEach(gem => {
-        // 创建每个宝石的容器
-        const gemDetailContainer = document.createElement('div');
-        gemDetailContainer.style = 'display: flex;flex-direction: row;align-items: center;width: 100%;justify-content: space-around;border-bottom: 1px solid rgb(135, 67, 31);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;'; // 确保内容居中对齐
+    // 创建容器包裹每个 gemDetailContainer
+    const gemContainer = document.createElement('div');
+    gemContainer.style = 'overflow-y: scroll;width: 100%;display: flex;flex-direction: column;';
+    gemSelectionDiv.appendChild(gemContainer); // 只需添加一次 gemContainer
 
-        const gemIcon = document.createElement('img');
-        gemIcon.src = gem.url;
-        gemIcon.style = 'width: 45px; height: 45px; margin-right: 10px;';
-        gemDetailContainer.appendChild(gemIcon);
+    // 刷新宝石显示内容的函数
+    const refreshGemSelection = () => {
+        // 清空现有的宝石列表
+        gemContainer.innerHTML = '';
 
-        const gemInfo = document.createElement('span');
-        gemInfo.innerText = `${gem.displayName}${translateGem(gem.name)}`;
-        gemDetailContainer.appendChild(gemInfo);
+        const availableGems = jinnangItems.filter(item => item.name.includes(`${gemSlotColor}Gem`) && item.quantity > 0);
 
-        const inlayButton = document.createElement('button');
-        inlayButton.innerText = '镶嵌';
-        inlayButton.style = 'border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 12px; transition: transform 0.1s, box-shadow 0.1s;';
-        inlayButton.addEventListener('click', function() {
-            const inlayAmuletItem = jinnangItems.find(item => item.name === 'inlayAmulet');
-            if (inlayAmuletItem.quantity <= 0) {
-                showInfoBox('你没有镶嵌符文，无法进行镶嵌', null, null, 'red');
-                return;
-            }
-            useItem('inlayAmulet', 1); // 使用镶嵌符文
-            useItem(`${gem.name}`, 1);  // 扣除一个宝石
+        if (availableGems.length === 0) {
+            showInfoBox("没有可用的宝石！");
+            return;
+        }
+
+        availableGems.forEach(gem => {
+            // 创建每个宝石的容器
+            const gemDetailContainer = document.createElement('div');
+            gemDetailContainer.style = 'display: flex;flex-direction: row;align-items: center;width: 100%;justify-content: space-between;border-bottom: 1px solid rgb(135, 67, 31);background-image: url(&quot;https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png&quot;);background-repeat: repeat;background-size: auto;height: 100%;'; // 确保内容居中对齐
+
+            const gemIcon = document.createElement('img');
+            gemIcon.src = gem.url;
+            gemIcon.style = 'width: 45px;height: 45px;margin-right: 10px;border: 1px solid black;margin-left: 5px;';
+            gemDetailContainer.appendChild(gemIcon);
+
+            const gemInfo = document.createElement('span');
+            gemInfo.innerText = `${gem.displayName}${translateGem(gem.name)}`;
+            gemDetailContainer.appendChild(gemInfo);
+
+            const gemButtonContainer = document.createElement('div');
+            gemButtonContainer.style = 'display: flex;gap: 5px;flex-direction: column;padding: 5px;';
             
-            applyGemBonus(arm, gem, slotIndex); // 应用宝石增益
-            updateGemSlotDisplay(arm, gem, slotIndex); // 更新界面
-            gemSelectionDiv.remove(); // 移除宝石详情
+            // 添加镶嵌按钮
+            const inlayButton = document.createElement('button');
+            inlayButton.innerText = '镶嵌';
+            inlayButton.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+            inlayButton.addEventListener('click', function() {
+                const inlayAmuletItem = jinnangItems.find(item => item.name === 'inlayAmulet');
+                if (inlayAmuletItem.quantity <= 0) {
+                    showInfoBox('你没有镶嵌符文，无法进行镶嵌', null, null, 'red');
+                    return;
+                }
+                useItem('inlayAmulet', 1); // 使用镶嵌符文
+                useItem(`${gem.name}`, 1);  // 扣除一个宝石
+                
+                applyGemBonus(arm, gem, slotIndex); // 应用宝石增益
+                updateGemSlotDisplay(arm, gem, slotIndex); // 更新界面
+                gemSelectionDiv.remove(); // 移除宝石详情
+            });
+            gemButtonContainer.appendChild(inlayButton);
+
+            // 添加合成按钮
+            const mergeButton = document.createElement('button');
+            mergeButton.innerText = '合成';
+            mergeButton.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(60, 120, 200), rgb(40, 90, 150), rgb(30, 70, 120));box-shadow: rgb(60, 120, 200) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+            mergeButton.addEventListener('click', function() {
+                const gemFullName = gem.displayName;  // 例如 '二级天寿石'
+                mergeGem(gemFullName, refreshGemSelection);  // 直接传入宝石的完整名字和刷新函数
+            });
+
+            gemButtonContainer.appendChild(inlayButton);
+            gemButtonContainer.appendChild(mergeButton); // 添加合成按钮
+            gemDetailContainer.appendChild(gemButtonContainer);
+
+            gemContainer.appendChild(gemDetailContainer); // 添加 gemDetailContainer 到 gemContainer
         });
+    };
 
-        gemDetailContainer.appendChild(inlayButton);
-        gemSelectionDiv.appendChild(gemDetailContainer);
-        gemSelectionDiv.appendChild(cancelInlayBtn);
-    });
-
+    refreshGemSelection();  // 初次调用以显示宝石列表
     document.getElementById('inlayGemUI').appendChild(gemSelectionDiv);
 }
 
@@ -18600,7 +18734,7 @@ function refreshShop(auto = false) {
         return;
     }
 
-    const numItems = auto ? getRandomInt(1, 8) : getRandomInt(2, 36);
+    const numItems = auto ? getRandomInt(2, 18) : getRandomInt(10, 100);
     const probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
     let rareItemCount = 0;
     let commonBundleCount = 0;
@@ -18630,7 +18764,7 @@ function refreshShop(auto = false) {
 
         if (item.name.includes('包裹')) {
             const bundleCount = isRare ? rareBundleCount : commonBundleCount;
-            const maxBundles = isRare ? 4 : 8;
+            const maxBundles = isRare ? 8 : 8;
 
             if (bundleCount >= maxBundles) {
                 i--;
@@ -18657,8 +18791,8 @@ function generateSpecialItems() {
     const allSSkills = collectSkillsByRarity('S');
 
     return [
-        ...selectRandomItems(allSSSkills, 18),
-        ...selectRandomItems(allSSkills, 18)
+        ...selectRandomItems(allSSSkills, 30),
+        ...selectRandomItems(allSSkills, 30)
     ];
 }
 
@@ -18696,12 +18830,13 @@ function getRandomCommonItem() {
         createItem('特级悟性丹', 1388, 1788, 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png'),
         createItem('宝石镶嵌符', 21388, 31788, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc79.png'),
         createItem('宝石摘除符', 21388, 31788, 'https://pic.imgdb.cn/item/66dac88ed9c307b7e936427c.png'),
+        createItem('低级宝石合成符', 11388, 16788, 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c55.png'),
         createItem('升级宝石礼包（极品）', 21388, 31788, 'https://pic.imgdb.cn/item/66dab9c1d9c307b7e921b767.png')
     ];
 
     if (Math.random() < 0.8) {
         const item = selectRandomItems(commonItems, 1)[0];
-        const quantity = getRandomInt(51, 100);
+        const quantity = getRandomInt(51, 200);
         return createBundleItem(item, quantity, false);
     }
 
@@ -18719,6 +18854,8 @@ function getRandomRareItem(rareCounts) {
         createItem('蓝色武装原料', 56788, 89238, 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png'),
         createItem('任意打孔器', 116788, 159238, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc61.png'),
         createItem('宝石洗孔符', 116788, 159238, 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png'),
+        createItem('高级宝石合成符', 56788, 69238, 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c62.png'),
+        createItem('宝石袋盲盒', 56788, 69238, 'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png'),
         createItem('升级宝石礼包（神品）', 116788, 159238, 'https://pic.imgdb.cn/item/66dab9eed9c307b7e92290c5.png')
     ];
 
@@ -18738,7 +18875,7 @@ function getRandomRareItem(rareCounts) {
             item = selectRandomItems(rareItems, 1)[0];
             break;
         case 'bundle':
-            item = createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 50), true);
+            item = createBundleItem(selectRandomItems(rareItems, 1)[0], getRandomInt(2, 100), true);
             break;
         case 'sSkill':
             item = selectRandomItems(sSkills, 1)[0];
@@ -18788,13 +18925,54 @@ function addItemToShop(item, shopItems) {
             <div class="item-text-top">${item.name}</div>
             <div class="item-text-bottom">${convertPrice(item.price)} 金</div>
         </div>`;
+
     itemDiv.addEventListener('click', () => {
+        const infoBox = document.getElementById('shop-description');
+        const itemName = item.name;
+        const isPackage = itemName.includes('包裹');
+        const itemBaseName = isPackage ? itemName.split(' 包裹 (')[0] : itemName;
+        const itemQuantity = isPackage ? parseInt(itemName.split(' 包裹 (')[1].replace(')', ''), 10) : 1;
+
+        // 特殊道具名称与其对应的ID映射
+        const specialItems = {
+            '高级悟性丹': 'high-grade-pill',
+            '万化灵丹': 'transmutation-pill',
+            '冰魄还童丹': 'bingpo-reborn-pill',
+            '神兽还童丹': 'reborn-pill',
+            '资质重生丹': 'quality-pill',
+            '灵异金丹': 'miraculous-pill',
+            '还童金丹': 'golden-reborn-pill'
+        };
+
+        let description = '';
+
+        // 判断是否为特殊道具
+        if (specialItems[itemBaseName]) {
+            // 获取特殊道具的描述信息
+            description = getTopBarItemDescription(specialItems[itemBaseName]);
+        } else {
+            // 查找1类商品的描述信息
+            const matchingItem = jinnangItems.find(jItem => jItem.displayName === itemBaseName);
+
+            if (matchingItem) {
+                // 1类商品，显示其描述信息
+                description = matchingItem.description;
+            } else {
+                // 2类商品（宠物技能），显示默认描述信息
+                description = '这是一个宠物技能，如果你有对应宠物，可以直接学会此技能。';
+            }
+        }
+
+        // 更新选择的UI效果
         document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
         itemDiv.classList.add('selected');
+
+        // 更新infoBox中的描述信息
+        infoBox.innerText = `${item.name}，售价${convertPrice(item.price)}金。用途：${description}`;
     });
+
     shopItems.appendChild(itemDiv);
 }
-
 
 function buyItem() {
     const selectedItem = document.querySelector('.shop-item.selected');
@@ -18856,6 +19034,9 @@ function buyItem() {
         '宝石洗孔符': () => addItemToJinnang('refreshGemSlot', itemQuantity),
         '升级宝石礼包（极品）': () => addItemToJinnang('starGemPKG', itemQuantity),
         '升级宝石礼包（神品）': () => addItemToJinnang('starGemPlusPKG', itemQuantity),
+        '高级宝石合成符': () => addItemToJinnang('mergeAmuletPlus', itemQuantity),
+        '低级宝石合成符': () => addItemToJinnang('mergeAmulet', itemQuantity),
+        '宝石袋盲盒': () => addItemToJinnang('gemLuckyBag', itemQuantity),
         '还童金丹': () => goldenRebornPill += itemQuantity
     };
 
@@ -21466,81 +21647,17 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStampCount();
 });
         
-// 在页面加载时启动计时器
-document.addEventListener('DOMContentLoaded', (event) => {
-    startGameTimer();
-    updateTitle();
-});
-
-//用于实时更新某些状态的全局时钟变量
-function startGameTimer() {
-    let startTime = Date.now();
-    const timerElement = document.getElementById('game-timer');
-
-    function updateTimer() {
-        let elapsedTime = Date.now() - startTime;
-        let minutes = Math.floor(elapsedTime / 60000);
-        let seconds = Math.floor((elapsedTime % 60000) / 1000);
-
-        let formattedTime = `${padZero(minutes)}:${padZero(seconds)}`;
-        timerElement.innerText = formattedTime;
-
-        // 在30000秒时显示图像框
-        if (Math.floor(elapsedTime / 1000) === 30000) {
-            showImageBox();
-        }
-    }
-
-    setInterval(updateTimer, 1000);
-}
-
-// 在个位数前补零
-function padZero(num) {
-    return num < 10 ? '0' + num : num;
-}
-function showImageBox() {
-    const imageBox = document.createElement('div');
-    imageBox.id = 'image-box';
-    imageBox.style.position = 'fixed';
-    imageBox.style.top = '50%';
-    imageBox.style.left = '50%';
-    imageBox.style.padding = '20px';
-    imageBox.style.transform = 'translate(-50%, -50%) scale(0)'; // 初始大小为0
-    imageBox.style.width = '80vw';
-    imageBox.style.height = '80vh';
-    imageBox.style.maxWidth = '85%';
-    imageBox.style.maxHeight = '70%';
-    imageBox.style.borderRadius = '10px';
-    imageBox.style.background = "url('https://pic.imgdb.cn/item/66758368d9c307b7e98d599f.png') no-repeat center center";
-    imageBox.style.backgroundSize = 'cover';
-    imageBox.style.zIndex = '2000';
-    imageBox.style.transition = 'transform 0.5s ease-out'; // 添加过渡动画
-    document.body.appendChild(imageBox);
-
-    // 延迟一帧后触发动画
-    requestAnimationFrame(() => {
-        imageBox.style.transform = 'translate(-50%, -50%) scale(1)'; // 最终大小为原始大小
-    });
-
-    let clickCount = 0;
-    let clickHandler = () => {
-        clickCount++;
-        if (clickCount > 2) {
-            hideImageBox(imageBox, clickHandler);
-        }
-    };
-
-    document.addEventListener('click', clickHandler);
-
-    // 20秒后自动隐藏图像框
-    setTimeout(() => {
-        hideImageBox(imageBox, clickHandler);
-    }, 20000); // 修改为20秒
-}
-
 // 初始化检查觉醒状态
 window.onload = function() {
     // 加载游戏状态
+    simulateLoading();
+    if (alreadyUnlocked) {
+        document.getElementById('unlockOverlay').style.display = 'none';
+        return;
+    } else {
+        document.getElementById('unlockButton').addEventListener('click', validateUnlockCode);
+    }
+    
     if (localStorage.gameState || localStorage.petData) {
         loadGameState(true);
         setTimeout(() => {
@@ -21593,14 +21710,6 @@ window.onload = function() {
         openTenthTreasureButton.addEventListener("click", openTenthTreasure);
     }
 };
-        
-function hideImageBox(imageBox, clickHandler) {
-    imageBox.style.transform = 'translate(-50%, -50%) scale(0)'; // 缩小图片框
-    setTimeout(() => {
-        document.body.removeChild(imageBox);
-        document.removeEventListener('click', clickHandler);
-    }, 500); // 等待动画完成后移除元素
-}
 
 // 称号数组，从低到高排列
 const titles = [

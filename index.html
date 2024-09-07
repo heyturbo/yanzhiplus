@@ -19403,6 +19403,7 @@ function deal() {
     const petSelect = document.getElementById("pet-select");
     const selectedPetKey = petSelect.value;
     const petToDelete = currentPet.name;
+    clearAdvancementStates(petToDelete); //处理清空宠物的技能加成
     // 从下拉菜单中移除当前宠物
     const optionToRemove = petSelect.querySelector(`option[value="${selectedPetKey}"]`);
         console.log(`出售的是:${selectedPetKey}`);
@@ -19552,9 +19553,6 @@ function resetPet() {
         intelligence: calculateAttribute(currentPet.qualities.intelligence.min, currentPet.qualities.growthRate / 100, petLevel, 0, false),
         strength: calculateAttribute(currentPet.qualities.strength.min, currentPet.qualities.growthRate / 100, petLevel, 0, false)
     };
-
-    const petName = currentPet.name;
-    clearAdvancementStates(petName); //处理清空宠物的技能加成
 
     // 初始化等级和其他基础属性
     additionalPlayerCultivation = 0;

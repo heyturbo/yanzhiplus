@@ -13440,18 +13440,24 @@ const wuxingBonusMap = {
 
 // 初始化五行符管理器
 function addAmuletToManager(amuletType, color, level = 1) {
+    // 首先检查 wuxingStates 的长度是否超过 500
+    if (wuxingStates.length >= 200) {
+        showInfoBox('已超过可拥有的五行符上限！', null, null, 'red');
+        return;  // 终止函数执行，防止继续添加五行符
+    }
+
     const wuxingName = `${amuletType}(${color})`;
     const uniqueTag = `${wuxingName}-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
     // 随机生成 rank，概率均等
-    const rank = Math.ceil(Math.random() * 5);  // 1 - 5等
+    const rank = Math.ceil(Math.random() * 5);  // 1 - 5 等级
 
     const newAmulet = {
         tag: uniqueTag,
         name: wuxingName,
         color: color,
         level: level,
-        rank: rank,  // 新增rank属性
+        rank: rank,  // 新增 rank 属性
         drugBonus: initializeDrugBonus(color, level, rank),
         additionalValues: generateAdditionalValues(color, rank),
         equipped: false,
@@ -13477,7 +13483,6 @@ function closeWuxingDisplay() {
     updateWuxingBonusState();
 }
 
-// 初始化五行符管理器
 // 初始化主条目加成
 function initializeDrugBonus(color, level, rank, selectedBonus = null) {
     const rankMultiplier = [1, 0.8, 0.6, 0.4, 0.2][rank - 1];  // 根据 rank 调整倍率
@@ -13492,11 +13497,11 @@ function initializeDrugBonus(color, level, rank, selectedBonus = null) {
     };
 
     const increment = {
-        red: { physicalAttack: 300, magicAttack: 300 },
-        green: { physicalDefense: 2500 },
+        red: { physicalAttack: 200, magicAttack: 200 },
+        green: { physicalDefense: 1500 },
         blue: { mana: 1000 },
-        orange: { health: 1500 },
-        purple: { magicDefense: 2500 }
+        orange: { health: 1300 },
+        purple: { magicDefense: 1500 }
     };
 
     if (color === 'red' && selectedBonus) {
@@ -13621,7 +13626,7 @@ function updateWuxingDisplay() {
             selectedAmulet.originalBoxShadow = amuletElement.style.boxShadow; // 保存原始的 boxShadow
 
             // 应用新的选中样式
-            selectedAmulet.style.boxShadow = '0px 0px 0px 4px white';
+            selectedAmulet.style.boxShadow = '0px 0px 0px 2px white';
 
             displayAmuletDetails(amulet);
         });
@@ -13692,10 +13697,10 @@ function displayAmuletDetails(amulet) {
         <div id="text-container" style="height: 120px;margin-bottom: 30px;line-height: 28px;">
             <h3 style="margin:0;color: ${amulet.color};">${wuxingTypeMap[amulet.name.split('(')[0]]} (${rankNames[amulet.rank - 1]})<span id="equipped-pet-name"></span></h3>
             <p style="margin:0;">等级: ${amulet.level}</p>
-            <p style="margin:0;">主条目: ${Object.entries(amulet.drugBonus)
+            <p style="margin:0;">主属性: ${Object.entries(amulet.drugBonus)
                 .filter(([key, value]) => value > 0)
                 .map(([key, value]) => `${wuxingBonusMap[key]}: +${value}`).join(', ')}</p>
-            <p style="margin:0;">副条目: ${amulet.additionalValues.map(v => 
+            <p style="margin:0;">副属性: ${amulet.additionalValues.map(v => 
                 v.attribute.startsWith('‰')
                 ? `${v.value}‰ ${wuxingBonusMap[v.attribute.replace('‰', '')]}`
                 : `+${v.value} ${wuxingBonusMap[v.attribute]}`).join(', ')}</p>
@@ -15329,10 +15334,10 @@ function getRandomReward(type) {
             { name: '天地灵气礼包（10）', url: 'https://pic.imgdb.cn/item/666ab20bd9c307b7e96301f6.png', chance: 1 }
         ],
         '五行仙葫': [
-            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af497.png', chance: 5 },
+            { name: '一等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af497.png', chance: 1 },
             { name: '二等分解符', url: 'https://pic.imgdb.cn/item/66cdc7ead9c307b7e92af488.png', chance: 15 },
-            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af447.png', chance: 30 },
-            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af438.png', chance: 10 },
+            { name: '三等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af447.png', chance: 32 },
+            { name: '四等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af438.png', chance: 12 },
             { name: '五等分解符', url: 'https://pic.imgdb.cn/item/66cdc7e9d9c307b7e92af3de.png', chance: 15 },
             { name: '金符（红）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929df01.png', chance: 1 },
             { name: '金符（紫）', url: 'https://pic.imgdb.cn/item/66c5ada9d9c307b7e929dee6.png', chance: 1 },
@@ -17537,7 +17542,7 @@ function mergeGem(fullName, refreshCallback = null) {
     // 合成 1~3 级的宝石时使用 mergeAmuletItem
     if (gemLevel >= 1 && gemLevel <= 3) {
         if (!mergeAmuletItem) {
-            showInfoBox('你没有足够的宝石合成符。');
+            showInfoBox('你没有足够的低级宝石合成符。');
             return;
         }
         useItem('mergeItem', 1); // 使用1个合成符文
@@ -21451,12 +21456,6 @@ function mutatePet() {
 }
         
 function useMutationScroll() {
-
-    // 检查是否有“灵异秘卷”
-    if (!useItem("mutationScroll")) {
-        showInfoBox("灵异秘卷只能通过奇馈宝箱获得，传说中习得灵异秘卷中关于神兽之道的宠物，资质和成长率会获得质的跃迁！");
-        return;
-    }
         
     if (awakened) {
         showInfoBox("您的宠物已经觉醒，使用灵异秘卷没有带来任何效果！");

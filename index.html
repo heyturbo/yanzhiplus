@@ -3097,26 +3097,23 @@
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
-    <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 330px;max-height: 80%;overflow-y: auto;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
+    <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 350px;max-height: 80%;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
         <button onclick="closeInlayGemDisplay()" id="closeBtn" style="display: flex;gap: 5px;align-items: center;justify-content: center;padding: 5px;text-align: center;background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);background-repeat: repeat;background-size: contain;color: rgb(227, 167, 59);cursor: pointer;box-shadow: rgb(227, 167, 59) 0px 1px 2px 0px inset;border: 1px solid black;position: relative;font-size: 16px;width:100%;font-family: 'Noto Serif SC', sans-serif;">武装详情</button>
-        
-        <div id="gem-container" style="display: flex;flex-direction: column;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;">
+        <div id="gem-container" style="display: flex;flex-direction: column;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;overflow-y: auto;">
             <!-- 装备图标和星级 -->
-            <div style="display: flex;justify-content: center;align-items: flex-start;padding: 5px;flex-direction: column;margin-left: 10px;">
-                <span id="arm-name" style="color: red;font-weight: bold;"></span>
-                <div style="display:flex; flex-direction:row; justify-content: space-between;">
-                    <span id="starLevel" style="font-size: 18px;text-shadow: 1px 0px 2px #6f391c;"></span>
-                    <button id="upgradeStarBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">升星</button>
-                </div>
-            </div>
-    
             <div style="text-align: center;display: flex;flex-direction: column;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;">
-                <img id="zhuang-bei" src="https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" alt="装备图标" style="width: 45px;height: 45px;border: 1px solid #000;margin-bottom: 10px;">
+                <img id="zhuang-bei" src="https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" alt="装备图标" style="width: 45px;height: 45px;border: 1px solid #000;margin-bottom: 10px;margin-top: 10px;">
             </div>
-    
             <div id="bottom-detail-container" style="display: flex;flex-direction: column;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);background-repeat: repeat;background-size: auto;height: 100%;color: white;">
                 <!-- 基础属性 -->
-                <div style="display: flex;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;padding: 10px 20px;flex-direction: column; gap:5px;">
+                <div style="display: flex;justify-content: center;align-items: flex-start;padding: 5px;flex-direction: column;margin-left: 10px;">
+                    <span id="arm-name" style="color: orange;font-weight: bold;"></span>
+                    <div style="display:flex; flex-direction:row; justify-content: space-between;">
+                        <span id="starLevel" style="font-size: 18px;text-shadow: 1px 0px 2px #6f391c;"></span>
+                        <button id="upgradeStarBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">升星</button>
+                    </div>
+                </div>
+                <div style="display: flex;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;padding: 5px 20px;flex-direction: column; gap:5px;">
                     <div style="display: flex;justify-content: flex-start;width: 100%;"><strong>装备部位:</strong><span id="arm-type-display" style="margin-left: 10px;"></span></div>
                     <div style="display: flex;justify-content: flex-start;width: 100%;"><strong>耐久度:</strong><span id="endurance-display" style="margin-left: 10px;"></span>/500</div>
                     <div style="display: flex;justify-content: flex-start;width: 100%;gap: 10px;">
@@ -3141,7 +3138,7 @@
     
                 <!-- 镶嵌宝石操作 -->
                 <div style="margin-top: 10px;border-top: 2px dotted #ccc;display: flex;">
-                    <p id="arm-description" style="margin-left: 20px;"></p>
+                    <p id="arm-description" style="margin-left: 20px;text-align: left;"></p>
                 </div>
             </div> <!-- 闭合 bottom-detail-container -->
         </div>
@@ -7193,7 +7190,7 @@ const enemies = {
         specialty: 'qiongQi' // 特殊能力标识符
     },
     baiYin: {
-        name: '白银VIP怪',
+        name: '白银精英怪',
         level: 180,
         health: 100000,
         mana: 20000,
@@ -7252,6 +7249,7 @@ const specificAttackByEnemy = {
             practiceEnemy = setTimeout(() => {
                 if (summonEnemy && battleState.enemy.specialty === 'practiceEnemy' && onBattleState) {
                     battleState.enemy.physicalAttack += 3000000;
+                    battleState.enemy.magicAttack += 3000000;
                     updateUI();
                     showInfoBox('还没死，还得练，再给你上上强度');
                 } else {
@@ -7301,7 +7299,6 @@ function applySpecificAttackByEnemy(summonedEnemyName) {
 // 处理召唤敌人战斗结果的函数
 function handleBattleWithSummonEnemy(playerWon) {
     if (!battleState.enemyKey || !enemies[battleState.enemyKey]) {
-        showInfoBox('没有敌人可处理', null, null, 'red');
         return;
     }
     
@@ -7391,9 +7388,12 @@ function summonEnemyByType(enemyType, manuallySummon = true) {
                 
 function handleBaiYinReward() {
     const chance = getRandomInt(1,100);
-    if (chance <= 90) {
+    if (chance <= 50) {
         generateItemToJinnang('universalAsh','宇宙之尘','https://pic.imgdb.cn/item/66d5dd07d9c307b7e953e4e1.png',price = 10, quantity = 1, description = '击败白银之地怪物的嘉奖，收集一定数量可兑换宇宙之晶');
         showInfoBox('你获得一个宇宙之尘',null,null,null,'https://pic.imgdb.cn/item/66d5dd07d9c307b7e953e4e1.png');
+    } else if (chance <= 90) {
+        addItemToJinnang('gemLuckyBag',1);
+        showInfoBox('你获得一个盲盒宝石袋',null,null,null,'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png');
     } else {
         addItemToJinnang('universalCrystal',1);
         showInfoBox('你获得一个宇宙之晶',null,null,null,'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png');
@@ -7406,14 +7406,14 @@ function handleBattleWithBaiYin() {
         showInfoBox('试炼之地正在持续中！无法叠加！',null,null,'red');
         return;
     }
-    showInfoBox('试炼之地开始！持续30秒，期间会自动开始战斗，请勿执行其他操作以免造成崩溃！',null,null,'red');
+    showInfoBox('试炼之地开始！持续60秒，期间会自动开始战斗，请勿执行其他操作以免造成崩溃！',null,null,'red');
 
     if (!onBattleState && !summonEnemy) {
         baiYinInterval = setInterval(() => {
             summonEnemyByType('baiYin', false);
             addItemToJinnang('hailMonsterPill',1);
             autoBattle();
-        }, 1500);
+        }, 1000);
     } else {
         clearInterval(baiYinInterval);
         baiYinInterval = null;  // 清除后将其重置为 null
@@ -15775,6 +15775,8 @@ function updateJinnangItems() {
 
                 // 将 item 存储到 selectedItem 的 dataset 中，以便出售时使用
                 selectedItem.dataset.itemName = item.name;
+                selectedItem.dataset.itemDisplayName = item.displayName;
+                
             });
 
             jinnangReward.appendChild(itemDiv);
@@ -15901,7 +15903,7 @@ const itemEffects = {
             clearAutoBattle();
             showInfoBox('试炼之地结束了', null, null, 'black');  // 显示提示框
             document.getElementById('baiyinOverlay').style.display = 'none';
-        }, 30000);  
+        }, 60000);  
     },
     universalCrystal: () => {
         levelUpSkill();
@@ -16044,8 +16046,11 @@ function useAssignedItem() {
         showInfoBox("请先选择一个道具。");
         return;
     }
-
     const itemName = selectedItem.dataset.itemName;
+    const itemDisplayName = selectedItem.dataset.itemDisplayName;
+    
+    // 如果 itemDisplayName 包含 "级天"，则将其识别为 availableGemItems
+    const availableGemItems = itemDisplayName.includes('级天') ? itemDisplayName : null;
     lastUsedItemName = itemName; // 更新最近使用的道具名称
 
     // 检查道具是否在映射表中
@@ -16056,8 +16061,10 @@ function useAssignedItem() {
         } else {
             showInfoBox("道具已耗尽。");
         }
+    } else if (itemDisplayName && availableGemItems) {
+        mergeGem(itemDisplayName, null);
     } else {
-        showInfoBox("该道具无法在背包内使用。");
+        showInfoBox('此道具不能直接在背包内使用！')
     }
 }
 
@@ -16993,23 +17000,63 @@ function removeArmsAttributes() {
     //console.log('All arms attributes have been reset to zero.');
 }
 
-function showInfo() {
-    // 初始化累加后的信息对象
-    let armAttributeMessage = {};
-    
+// 计算所有宝石提供的属性
+function calculateGemAttributes() {
+    let gemAttributeMessage = {};
+
     // 遍历 armsAttributes 对象
     Object.keys(armsAttributes).forEach(key => {
         const arm = armsAttributes[key];
 
-        // 确保 arm.value 为有效值，如果是 null 或空值，设为 0
+        // 检查 armState 和 gemSlots 是否存在
+        if (arm.armState && arm.armState.gemSlots && arm.armState.gemSlots.gemAttribute) {
+            const gemAttributes = arm.armState.gemSlots.gemAttribute;
+
+            // 累加每个宝石的属性值
+            Object.keys(gemAttributes).forEach(gemAttr => {
+                const gemAttrValue = gemAttributes[gemAttr] != null ? gemAttributes[gemAttr] : 0;
+                if (gemAttributeMessage[gemAttr]) {
+                    gemAttributeMessage[gemAttr] += gemAttrValue; // 累加宝石属性值
+                } else {
+                    gemAttributeMessage[gemAttr] = gemAttrValue;
+                }
+            });
+        }
+    });
+
+    return gemAttributeMessage;
+}
+
+// 显示武装和宝石属性的总和
+function showInfo() {
+    // 初始化累加后的信息对象
+    let armAttributeMessage = {};
+
+    // 遍历 armsAttributes 对象
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
+
+        // 获取属性名和属性值
+        const attribute = arm.attribute; // 这是一个字符串，例如 'magicAttack'
         const value = arm.value != null ? arm.value : 0;
 
-        // 如果 arm.attribute 已存在于 armAttributeMessage 中，则累加其值
-        if (armAttributeMessage[arm.attribute]) {
-            armAttributeMessage[arm.attribute] += value;
+        // 如果属性名存在，累加其值
+        if (attribute) {
+            if (armAttributeMessage[attribute]) {
+                armAttributeMessage[attribute] += value;
+            } else {
+                armAttributeMessage[attribute] = value;
+            }
+        }
+    });
+
+    // 计算宝石属性并将其累加到 armAttributeMessage 中
+    const gemAttributes = calculateGemAttributes();
+    Object.keys(gemAttributes).forEach(attr => {
+        if (armAttributeMessage[attr]) {
+            armAttributeMessage[attr] += gemAttributes[attr]; // 累加宝石属性到相同类别的武装属性中
         } else {
-            // 如果 arm.attribute 不存在，初始化该属性
-            armAttributeMessage[arm.attribute] = value;
+            armAttributeMessage[attr] = gemAttributes[attr]; // 初始化新的属性
         }
     });
 
@@ -17021,35 +17068,43 @@ function showInfo() {
         ['mana', '法力值'],
         ['physicalAttack', '物理攻击'],
         ['physicalDefense', '物理防御'],
-        ['speed', '速度']
+        ['speed', '速度'],
+        ['endurance', '耐力'],
+        ['intelligence', '智力'],
+        ['agility', '敏捷'],
+        ['strength', '强壮'],
+        ['faith', '信仰']
     ]);
 
-    // 将累加后的信息转换为数组形式，并映射中文名称
-    let armAttributeMessageArray = Object.entries(armAttributeMessage).map(([attribute, value]) => {
-        const translatedAttribute = nameMap.get(attribute) || attribute; // 若无映射，返回原始属性名
-        return `${translatedAttribute}: ${value}`;
-    });
+    // 将累加后的信息转换为数组形式，并映射中文名称，同时过滤掉值为 0 的属性
+    let armAttributeMessageArray = Object.entries(armAttributeMessage)
+        .filter(([attribute, value]) => value !== 0)  // 过滤掉值为 0 的属性
+        .map(([attribute, value]) => {
+            const translatedAttribute = nameMap.get(attribute) || attribute; // 若无映射，返回原始属性名
+            return `${translatedAttribute}: ${value}`;
+        });
 
     // 将数组转换为字符串，方便显示
     const armAttributesString = armAttributeMessageArray.join('\n');
 
     // 显示信息
     const message = `
-    当前武装属性：
-    ${armAttributesString}
-    
-    武装系统功能和操作说明：
-    1. 武装是宠物的装备系统，需要由原料打造得来
-    2. 生成武装后，可以通过锻造随机提升宠物的各项属性
-    3. 除金子锻造外，还可以每次使用100个“天地灵气”进行附魔（提升更多的属性）。
-    4. 生成武装需要消耗一个原始宠物武装，你可以通过宝箱等渠道获得它的必要原材料。
-    5. 锻造、战斗等事件会消耗武装的耐久，耐久为0时，将不再提供任何增益
-    6. 玩家可以使用一定数量的蓝色武装原料进行修复
-    7. 不同宠物的武装不通用，出售宠物后也会丢失武装，请知悉
-    `;
+当前武装属性（包含宝石）：
+${armAttributesString}
+
+武装系统功能和操作说明：
+1. 武装是宠物的装备系统，需要由原料打造得来
+2. 生成武装后，可以通过锻造随机提升宠物的各项属性
+3. 除金子锻造外，还可以每次使用100个“天地灵气”进行附魔（提升更多的属性）。
+4. 生成武装需要消耗一个原始宠物武装，你可以通过宝箱等渠道获得它的必要原材料。
+5. 锻造、战斗等事件会消耗武装的耐久，耐久为0时，将不再提供任何增益
+6. 玩家可以使用一定数量的蓝色武装原料进行修复
+7. 不同宠物的武装不通用，出售宠物后也会丢失武装，请知悉
+`;
 
     showInfoBox(message);
 }
+
 
 function closeInlayGemDisplay() {
     const gemUI = document.getElementById('inlayGemUI');
@@ -17422,7 +17477,7 @@ function punchHole(arm) {
 }
 
 // 合成宝石
-function mergeGem(fullName, refreshCallback) {
+function mergeGem(fullName, refreshCallback = null) {
     const levelMap = {
         '一': 1,
         '二': 2,
@@ -17522,7 +17577,7 @@ function handleGemInlay(arm, slotIndex) {
 
     // 创建容器包裹每个 gemDetailContainer
     const gemContainer = document.createElement('div');
-    gemContainer.style = 'overflow-y: scroll;width: 100%;display: flex;flex-direction: column;';
+    gemContainer.style = 'overflow-y: scroll;width: 100%;display: flex;flex-direction: column;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;';
     gemSelectionDiv.appendChild(gemContainer); // 只需添加一次 gemContainer
 
     // 刷新宝石显示内容的函数
@@ -17531,6 +17586,7 @@ function handleGemInlay(arm, slotIndex) {
         gemContainer.innerHTML = '';
 
         const availableGems = jinnangItems.filter(item => item.name.includes(`${gemSlotColor}Gem`) && item.quantity > 0);
+        
 
         if (availableGems.length === 0) {
             showInfoBox("没有可用的宝石！");
@@ -17548,7 +17604,8 @@ function handleGemInlay(arm, slotIndex) {
             gemDetailContainer.appendChild(gemIcon);
 
             const gemInfo = document.createElement('span');
-            gemInfo.innerText = `${gem.displayName}${translateGem(gem.name)}`;
+            const gemQuantity = gem.quantity;
+            gemInfo.innerText = `${gem.displayName}${translateGem(gem.name)}(${gemQuantity})`;
             gemDetailContainer.appendChild(gemInfo);
 
             const gemButtonContainer = document.createElement('div');

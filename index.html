@@ -8419,7 +8419,7 @@ function initializeAdvancementStates() {
 const applicableSkills = Object.values(pets).flatMap(pet =>
   pet.skills
     .filter(skill => 
-      (skill.type === "PA" || skill.type === "MA" || skill.type === "PP") && skill.rarity === "SS"
+      (skill.type === "PA" || skill.type === "MA") && skill.rarity === "SS"
     )
     .flatMap(skill => [
       { ...skill, rank: '高', multiplier: 0, petName: pet.name, skillName: `${skill.name}[高]` },
@@ -8541,7 +8541,7 @@ function acquireSkill(currentPetState, applicableSkills) {
 
 
 function addLearningValue(currentPetState) {
-  const learningValueGained = Math.floor(Math.random() * 201) + 100; // 100到300之间的随机值
+  const learningValueGained = Math.floor(Math.random() * 301) + 300; // 100到300之间的随机值
   currentPetState.learningValue += learningValueGained;
   showInfoBox(`你的宠物尝试进入冥想，但它逐渐变得焦躁不安，最后勉强获得了${learningValueGained}学习度！`);
 }
@@ -16891,7 +16891,11 @@ function forgeArm(key, infoDiv, useGold = true) {
         showInfoBox("该武装已经完全损坏，将无法再提供任何增益！",null,null,'red');
         return;
     }
-   
+
+    if (arm.type !== '尖角' && arm.armState.starLevel >= 1) {
+        showInfoBox('当前武装已经升过星，重新锻造会重置星级');
+    }
+  
     if (useGold) {
         if (goldAmount < 8000) {
             showInfoBox("金子不足，无法锻造！");
@@ -18933,7 +18937,8 @@ function getRandomRareItem(rareCounts) {
         createItem('宝石洗孔符', 116788, 159238, 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png'),
         createItem('高级宝石合成符', 56788, 69238, 'https://pic.imgdb.cn/item/66dbff82d9c307b7e9b75a35.png'),
         createItem('宝石袋盲盒', 56788, 69238, 'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png'),
-        createItem('升级宝石礼包（神品）', 116788, 159238, 'https://pic.imgdb.cn/item/66dab9eed9c307b7e92290c5.png')
+        createItem('升级宝石礼包（神品）', 116788, 159238, 'https://pic.imgdb.cn/item/66dab9eed9c307b7e92290c5.png'),
+        createItem('橙色武装原料', 1419700, 2230950, 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png')
     ];
 
     const ssSkills = collectSkillsByRarity('SS');
@@ -19105,6 +19110,7 @@ function buyItem() {
         '融会贯通': () => addItemToJinnang('towerGrass', itemQuantity),
         '集中值（4点）': () => addItemToJinnang('attentionValue', itemQuantity),
         '蓝色武装原料': () => addItemToJinnang('blueArmComponents', itemQuantity),
+        '橙色武装原料': () => addItemToJinnang('orangeArmComponents', itemQuantity),
         '宝石镶嵌符': () => addItemToJinnang('inlayAmulet', itemQuantity),
         '宝石摘除符': () => addItemToJinnang('removeAmulet', itemQuantity),
         '任意打孔器': () => addItemToJinnang('punchHoleTool', itemQuantity),
@@ -20321,7 +20327,6 @@ function getBlessGift() {
         'jumpingSoul',
         'hailMonsterPill',
         'hailMonsterAmulet',
-        'blueArmComponents',
         'qualityEnhancePill'
     ];
     for (const item of itemsToIncrease) {
@@ -20333,10 +20338,14 @@ function getBlessGift() {
     addItemToJinnang('celebrationCake', 5);
     addItemToJinnang('advancedSkillPill', 1);
     addItemToJinnang('goldAmuletPackage', 1);
-    addItemToJinnang('qualityEnhancePillPKG', 1);
-    addItemToJinnang('forgeTool', 1);
+    addItemToJinnang('qualityEnhancePillPKG', 20);
+    addItemToJinnang('forgeTool', 3);
     addItemToJinnang('cultivationPill200', 5);
-    generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  1, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
+    addItemToJinnang('hongHuangTreasure', 10);
+    addItemToJinnang('blueArmComponents', 600);
+    generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  10, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
+    generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 100, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石');
+    generateItemToJinnang('pinkSixthGem', '六级粉红色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png', 100, 1, '尚未开光的灵石，使用后可得到一颗随机的6级粉红色宝石');    
     updateJinnangItems();
     updateTopBarItems();
     showInfoBox("您打开了新手大礼包！");

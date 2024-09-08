@@ -8196,6 +8196,16 @@ function levelUpSkill() {
     skillsGrid.style.gap = '10px';
     modal.appendChild(skillsGrid);
 
+    const infoContainer = document.createElement('div');
+    infoContainer.style.display = 'flex';
+    infoContainer.style.marginBottom = '30px';
+    infoContainer.style.height = '30px';
+    infoContainer.style.textAligh = 'center';
+    infoContainer.style.color = 'white';
+    infoContainer.style.fontSize = '12px';
+    infoContainer.style.gap = '10px';
+    modal.appendChild(infoContainer);
+
     function populateSkills() {
         skillsGrid.innerHTML = ''; // 清空技能网格
         const skillsArea = document.getElementById('skills-area');
@@ -8226,6 +8236,7 @@ function levelUpSkill() {
                     skillElement.classList.add('selected-skill');
                     skillElement.style.backgroundColor = '#add8e6';
                     skillElement.style.transform = 'scale(1.05)';
+                    infoContainer.innerText = `${skill.rarity}技能，当前技能倍率为${Math.floor(skill.multiplier * 100)}%（仅供参考）${skill.description}`;
                 };
                 skillsGrid.appendChild(skillElement);
             }
@@ -20071,6 +20082,13 @@ function deleteSkill(skill, skillDiv, skillsArea) {
         // 定义确认删除技能的回调函数
         function onConfirm() {
             // 删除技能的DOM元素
+            
+            const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
+            matchingSkill.level = 1;
+            const deleteResult = calculateSkillLevelAndMultiplier(matchingSkill);
+            skillLevel = deleteResult.skillLevel;
+            skillMultiplier = deleteResult.skillMultiplier;
+            
             skillsArea.removeChild(skillDiv);
 
             // 获取当前技能列表并更新评分
@@ -20078,6 +20096,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
                 const [name, rarity] = div.innerText.split(' (');
                 return { name, rarity: rarity.replace(')', '') };
             });
+
             updateSkillScore(remainingSkills);
         }
 

@@ -3118,7 +3118,7 @@
     <div class="description-box" id="description-box"></div>
     <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 350px;max-height: 80%;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
         <button onclick="closeInlayGemDisplay()" id="closeBtn" style="display: flex;gap: 5px;align-items: center;justify-content: center;padding: 5px;text-align: center;background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);background-repeat: repeat;background-size: contain;color: rgb(227, 167, 59);cursor: pointer;box-shadow: rgb(227, 167, 59) 0px 1px 2px 0px inset;border: 1px solid black;position: relative;font-size: 16px;width:100%;font-family: 'Noto Serif SC', sans-serif;">武装详情</button>
-        <div id="gem-container" style="display: flex;flex-direction: column;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;overflow-y: auto;">
+        <div id="gem-container" style="display: flex;flex-direction: column;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;overflow-y: auto;padding: 2px;">
             <!-- 装备图标和星级 -->
             <div style="text-align: center;display: flex;flex-direction: column;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;">
                 <img id="zhuang-bei" src="https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png" alt="装备图标" style="width: 45px;height: 45px;border: 1px solid #000;margin-bottom: 10px;margin-top: 10px;">
@@ -7726,6 +7726,11 @@ function updateEnemyAttributes() {
 
         return newValue;
     }
+    
+    if (!battleState.enemy.rampaged) {
+        enemyCritRate = Math.random() * (0.99) + 0.01;  // 生成 [0.01, 1) 之间的随机值
+        enemyCritDamage = Math.random() * (1.5) + 1.5;  // 生成 [1.5, 3) 之间的随机值
+    }
 
     enemyPet.health = Math.round(calculateAttributeValue('health', enemyPet.health));
     enemyPet.mana = Math.round(calculateAttributeValue('mana', enemyPet.mana));
@@ -11175,8 +11180,7 @@ function handleRampaged() {
         setBackgroundImage('https://pic.imgdb.cn/item/66bc6806d9c307b7e987b921.webp');
         console.log('Enemy is rampaged.');
     } else {
-        enemyCritRate = Math.random() * (0.99) + 0.01;  // 生成 [0.01, 1) 之间的随机值
-        enemyCritDamage = Math.random() * (1.5) + 1.5;  // 生成 [1.5, 3) 之间的随机值
+
         battleState.enemy.rampaged = false;
         changeEnemyImage(battleRounds > 150 ? "realShape" : "default");
         setBackgroundImage(battleRounds > 150 ? 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b907.webp' : 'https://pic.imgdb.cn/item/66bc6806d9c307b7e987b92d.webp');
@@ -15161,6 +15165,7 @@ function collectTreasure() {
         '蓝色武装原料': 'blueArmComponents',
         '宠物资质仙丹': 'qualityEnhancePill',
         '高级神兽丹': 'advancedSkillPill',
+        '重生露': () => generateItemToJinnang('resetTrainingCount', '重生露', 'https://pic.imgdb.cn/item/66ddb0cdd9c307b7e961ad69.png', price = 3600, quantity = 1, description = '传说由世外高人炼制的秘药，使用后可以将培养次数重置为0，要注意培养到达最大值后将无法带来任何收益！'),
         '魔魂封印卡': 'bossSealCard',
         '一等分解符': 'firstFragments',
         '二等分解符': 'secondFragments',
@@ -15407,8 +15412,9 @@ function getRandomReward(type) {
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 9.5 },
             { name: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', chance: 0.1 },
             { name: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', chance: 0.4 },
-            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 8 },
-            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/66d9f78ed9c307b7e94c80c4.png', chance: 15 },
+            { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 12 },
+            { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/66d9f78ed9c307b7e94c80c4.png', chance: 10 },
+            { name: '重生露', url: 'https://pic.imgdb.cn/item/66ddb0cdd9c307b7e961ad69.png', chance: 1},
             { name: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', chance: 8 },
             { name: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', chance: 20 },
             { name: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', chance: 9 },           
@@ -16094,7 +16100,21 @@ const itemEffects = {
     purpleSixthGem: () => getGem('purple', '6', null, null, null, 1),
     pinkSixthGem: () => getGem('pink', '6', null, null, null, 1),
     gemLuckyBag: () => getGem(null, '1', null, null, null, 1),
-    ignoranceWater: () => resetSpecialization()
+    ignoranceWater: () => resetSpecialization(),
+    resetTrainingCount: () => {
+        if (petLevel < 180) {
+            showInfoBox('你的宠物尚未满级，仍然存在没有开发的培养机会，请满级后培养次数耗尽再使用！',null,null,'red');
+            addItemToJinnang('resetTrainingCount',1);
+            return;
+        }
+        
+        if (trainingCount !== null) {
+            trainingCount = 0;
+            showInfoBox('你的宠物培养次数重置为5次！',null,null,'black');
+        } else {
+            showInfoBox('使用出错！',null,null,'red');
+        }
+    }
 };
         
 let lastUsedItemName = null;
@@ -17502,7 +17522,17 @@ function refreshGemSlots(arm) {
         // 仅刷新未镶嵌的孔
         if (!arm.armState.gemSlots.inlaid[index] || arm.armState.gemSlots.inlaid[index].length === 0) {
             useItem('refreshGemSlot', 1);
-            arm.armState.gemSlots.colors[index] = randomGemColor();
+            
+            let newColor;
+            do {
+                newColor = randomGemColor();
+                const colorCount = arm.armState.gemSlots.colors.filter(c => c === newColor).length;
+                if (colorCount < 3) {
+                    break;
+                }
+            } while (true);
+            
+            arm.armState.gemSlots.colors[index] = newColor;
             hasRefreshed = true; // 标记至少有一个孔位被刷新
         }
     });
@@ -17627,7 +17657,7 @@ function handleGemInlay(arm, slotIndex) {
     // 创建并展示可用宝石，供玩家选择镶嵌
     const gemSelectionDiv = document.createElement('div');
     gemSelectionDiv.id = 'gemSelectionDiv';
-    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: column;align-items: center;width: 95%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 4px 1px;max-height: 480px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;';
+    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: column;align-items: center;width: 95%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 4px 1px;height: 480px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;';
 
     const cancelInlayBtn = document.createElement('button');
     cancelInlayBtn.innerText = '关闭面板';
@@ -17940,15 +17970,7 @@ document.getElementById('gemSlots').addEventListener('click', function(event) {
     }
 });
 
-
-
-
-        
-
-
-
-
-        
+       
 let currentSpecialization = null;
 let specializations = {
     慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
@@ -18420,8 +18442,8 @@ function applySpecialization() {
     updateSkillScore();
 }
 
-let trainingCosts = [2000, 6000, 50000, 100000, 200000]; // 定义每次金子培养所需的金子数量
-let trainingMultipliers = [1.1, 1.05, 1.04, 1.03, 1.02]; // 定义每次金子培养的属性提升倍数
+let trainingCosts = [20000, 60000, 500000, 1000000, 2000000]; // 定义每次金子培养所需的金子数量
+let trainingMultipliers = [1.05, 1.04, 1.03, 1.02, 1.01]; // 定义每次金子培养的属性提升倍数
 let trainingCount = 0; // 初始化已经使用的金子培养次数
 
 function calculateAvailableTrainingCount(petLevel) {
@@ -18586,7 +18608,7 @@ function trainAttributes() {
         trainAttributesAfterFifth();
         return;
     } else if (trainingCount >= availableTrainingCount){
-        showInfoBox("当前没有可用培养次数。\n1. 当等级达到60/120/160/180级时会各获得一次培养机会 \n2. 每次培养会按比固定例增加宠物的属性值 \n3. 第五次培养后可按照每一次4两888文的花费为宠物进行随机属性增长 \n4. 连续随机增长5次会自动执行10秒培养，请注意金子花费 \n5. 随机金子培养值存在上限，宠物资质越好上限越高 ");
+        showInfoBox("当前没有可用培养次数。\n1. 当等级达到60/120/160/180级时会各获得一次培养机会 \n2. 每次培养会按比固定例增加宠物的属性值 \n3. 第五次培养后可按照每一次5两的花费为宠物进行随机属性增长 \n4. 连续随机增长5次会自动执行10秒培养，请注意金子花费 \n5. 随机金子培养值存在上限，宠物资质越好上限越高 ");
         return; // 退出函数
     }
 
@@ -18609,18 +18631,28 @@ function trainAttributes() {
 
         // 获取当前培养的属性提升倍数
         const multiplier = trainingMultipliers[trainingCount];
-
-        // 获取当前属性值
-        const currentAttributes = calculateCurrentAttributes();
+        // 获取可供培养的属性上限
+        const leftAttributes = attributesForTraning();
+    
+        const maxEndurance = Math.round((leftAttributes.endurance - additionalAttributes.endurance) * 0.4);
+        const maxIntelligence = Math.round((leftAttributes.intelligence - additionalAttributes.intelligence) * 0.4);
+        const maxStrength = Math.round((leftAttributes.strength - additionalAttributes.strength) * 0.4);
+        const maxAgility = Math.round((leftAttributes.agility - additionalAttributes.agility) * 0.4);
+        const maxFaith = Math.round((leftAttributes.faith - additionalAttributes.faith) * 0.4);
+    
 
         // 提升bonusAttributes中的值
-        bonusAttributes.endurance += Math.floor(currentAttributes.endurance * (multiplier - 1));
-        bonusAttributes.intelligence += Math.floor(currentAttributes.intelligence * (multiplier - 1));
-        bonusAttributes.strength += Math.floor(currentAttributes.strength * (multiplier - 1));
-        bonusAttributes.agility += Math.floor(currentAttributes.agility * (multiplier - 1));
-        bonusAttributes.faith += Math.floor(currentAttributes.faith * (multiplier - 1));
+        bonusAttributes.endurance += Math.floor(leftAttributes.endurance * (multiplier - 1));
+        bonusAttributes.intelligence += Math.floor(leftAttributes.intelligence * (multiplier - 1));
+        bonusAttributes.strength += Math.floor(leftAttributes.strength * (multiplier - 1));
+        bonusAttributes.agility += Math.floor(leftAttributes.agility * (multiplier - 1));
+        bonusAttributes.faith += Math.floor(leftAttributes.faith * (multiplier - 1));
 
-        //console.log("Updated Bonus Attributes:", bonusAttributes);
+        bonusAttributes.endurance = Math.min(maxEndurance, bonusAttributes.endurance);
+        bonusAttributes.intelligence = Math.min(maxIntelligence, bonusAttributes.intelligence);
+        bonusAttributes.strength = Math.min(maxStrength, bonusAttributes.strength);
+        bonusAttributes.agility = Math.min(maxAgility, bonusAttributes.agility);
+        bonusAttributes.faith = Math.min(maxFaith, bonusAttributes.faith);
 
         // 增加金子培养次数
         trainingCount++;

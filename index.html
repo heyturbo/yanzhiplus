@@ -16093,7 +16093,8 @@ const itemEffects = {
     starGemPlusPKG: () => addItemToJinnang('starGemPlus',200),
     purpleSixthGem: () => getGem('purple', '6', null, null, null, 1),
     pinkSixthGem: () => getGem('pink', '6', null, null, null, 1),
-    gemLuckyBag: () => getGem(null, '1', null, null, null, 1)
+    gemLuckyBag: () => getGem(null, '1', null, null, null, 1),
+    ignoranceWater: () => resetSpecialization()
 };
         
 let lastUsedItemName = null;
@@ -17954,6 +17955,28 @@ let specializations = {
     神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
     坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
+
+function resetSpecialization() {
+    showInfoBox('你将重置所有已开启的专精进度',
+               () => {resetSpec();},
+               () => {
+                   addItemToJinnang('ignoranceWater',1);
+                   showInfoBox('操作已取消！',null,null,'red');
+                   return;},
+               'red');
+    function resetSpec() {
+        if (currentSpecialization !== null && specializations) {
+            specializations = {
+                慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+                神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+                坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+                }
+            transformPet();
+            refreshSpecializationUI();
+            showInfoBox('专精进度已全部重置！',null,null,'red');
+        } 
+    }
+}
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     let multiplier;
@@ -18153,7 +18176,7 @@ function transformPet() {
     const specializationsDiv = document.createElement('div');
     specializationsDiv.className = 'transform-pet-specializations';
 
-    Object.keys(specializations).forEach(key => {
+    Object. keys(specializations).forEach(key => {
         const spec = specializations[key];
         const specDiv = document.createElement('div');
         specDiv.className = 'transform-pet-spec';

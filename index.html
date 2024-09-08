@@ -10473,9 +10473,12 @@ function enemyAttack() {
         console.error("战斗状态未初始化");
         return;
     }
-    
+
+    if (!summonEnemy) {
+        handleRampaged(); //再判断狂暴状态
+    }
+        
     handleRelieveEffects(); //先给玩家解控
-    handleRampaged(); //再判断狂暴状态
     
     if (handleDazed()) return;
     if (handleStunned()) return;
@@ -11161,6 +11164,9 @@ let enemyRivivalCount = 0;
         
 function handleRampaged() {
     console.log(`handleRampaged called. battleRounds: ${battleRounds}, enemy health: ${battleState.enemy.health}, enemyMaxHealth: ${enemyMaxHealth}`);
+    if (summonEnemy) {
+        return;
+    }
 
     if (battleRounds === 150) {
         enemyCritRate = 1;

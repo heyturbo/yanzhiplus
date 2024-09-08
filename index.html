@@ -1615,7 +1615,7 @@
             background-color: #064701;
             transform: scale(1.05);
         }
-        .lottery-controls #lotteryIncreaseHundredBet {
+        .lottery-controls #lotteryIncreaseThousandBet {
             background-color: #0a8c00;
             color: white;
         }
@@ -1706,7 +1706,26 @@
             overflow-y: auto;
             padding: 0px 0px 0px 0px;
         }
-
+        
+        #battle-system-drawer.show {
+            display: block; /* 动画触发时显示 */
+            animation: sliceIn 1s ease forwards;
+        }
+        
+        @keyframes sliceIn {
+            0% {
+                clip-path: inset(0 50% 0 50%);
+                opacity: 0;
+            }
+            50% {
+                clip-path: inset(0 0 0 0);
+                opacity: 1;
+            }
+            100% {
+                clip-path: inset(0 0 0 0);
+                opacity: 1;
+            }
+        }
         
         .battle-system-drawer-toggle {
             font-size: 24px;
@@ -2828,7 +2847,7 @@
             <div class="lottery-controls">
                 <button id="lotteryBetButton">投注</button>
                 <button id="lotteryIncreaseBet">+1</button>
-                <button id="lotteryIncreaseHundredBet">+100</button>
+                <button id="lotteryIncreaseThousandBet">+1000</button>
                 <button id="lotteryDecreaseBet">-1</button>
                 <button id="lotteryRuleButton">规则</button>
                 <!-- 规则信息框 -->
@@ -2879,14 +2898,14 @@
                     <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;box-shadow: 0px 0px 2px 1px #fff;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="your-pet-physical-attack"></span></p>
-                        <p>🛡物防: <span id="your-pet-physical-defense"></span></p>
                         <p>🧙法攻: <span id="your-pet-magic-attack"></span></p>
-                        <p>💠法防: <span id="your-pet-magic-defense"></span></p>
+                        <p>🥊暴击: <span id="player-crit-rate"></span></p>
                         <p>💨速度: <span id="your-pet-speed"></span></p>
+                        <p>🪄修为: <span id="your-pet-cultivation"></span></p>
                     </div>
                     <div style="width: 85px;">
-                        <p>🪄修为: <span id="your-pet-cultivation"></span></p>
-                        <p>🥊暴击: <span id="player-crit-rate"></span></p>
+                        <p>🛡物防: <span id="your-pet-physical-defense"></span></p>
+                        <p>💠法防: <span id="your-pet-magic-defense"></span></p>
                         <p>💥暴伤: <span id="player-crit-damage"></span></p>
                         <p>⭐️物闪: <span id="player-physical-dodge-rate"></span></p>
                         <p>🌟法闪: <span id="player-magic-dodge-rate"></span></p>
@@ -2896,7 +2915,7 @@
                 <div class="battle-system-enemy-info">
                     <h2><span id="enemy-name">邪佞</span> lv<span id="enemy-level">1</span></h2>
                     <div style="display: flex;justify-content: center;position:relative;align-items: center;border-radius: 5px;padding: 2px;height: 60px;">
-                        <img id="enemy-image" onclick="enemyInfo()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
+                        <img id="enemy-image" onclick="autoBattle()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
                         <div id="enemy-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
                             <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
                             <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
@@ -2911,14 +2930,14 @@
                     <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;box-shadow: 0px 0px 2px 1px #fff;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="enemy-pet-physical-attack"></span></p>
-                        <p>🛡物防: <span id="enemy-pet-physical-defense"></span></p>
                         <p>🧙法攻: <span id="enemy-pet-magic-attack"></span></p>
-                        <p>💠法防: <span id="enemy-pet-magic-defense"></span></p>
+                        <p>🥊暴击: <span id="enemy-crit-rate"></span></p>
                         <p>💨速度: <span id="enemy-pet-speed"></span></p>
+                        <p>🪄修为: <span id="enemy-pet-cultivation"></span></p>
                     </div>
                     <div style="width: 85px;">
-                        <p>🪄修为: <span id="enemy-pet-cultivation"></span></p>
-                        <p>🥊暴击: <span id="enemy-crit-rate"></span></p>
+                        <p>🛡物防: <span id="enemy-pet-physical-defense"></span></p>
+                        <p>💠法防: <span id="enemy-pet-magic-defense"></span></p>
                         <p>💥暴伤: <span id="enemy-crit-damage"></span></p>
                         <p>⭐️物闪: <span id="enemy-physical-dodge-rate"></span></p>
                         <p>🌟法闪: <span id="enemy-magic-dodge-rate"></span></p>
@@ -6265,7 +6284,7 @@ let drugInventory = {
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，每1.5秒恢复2%法力值，持续3秒，可叠加生效" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高1%暴击率" },
     "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，20秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高2.5%暴击伤害" },
+    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高1%暴击伤害" },
     "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，20秒内暴击率提高50%" },
     "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，20秒内增加150%物理攻击力。" },
     "延寿露": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },
@@ -6500,7 +6519,7 @@ function startBattle() {
     updateUI();
 
     if (!playerTurn) {
-        setTimeout(enemyAttack, 500);
+        setTimeout(enemyAttack, 350);
     }
 }
 
@@ -6867,12 +6886,12 @@ function resetBattleState(playerWon) {
         }
     }
     
-    if (playerWon && battleRounds === 101) {
+    if (playerWon && battleRounds === 101 && !summonEnemy) {
         addItemToJinnang('magicPetAmulet', 1);
         showInfoBox('恭喜你战胜了第100轮邪佞，获得了1个灵兽符文！');
     }
     
-    if (playerWon && battleRounds === 151) {
+    if (playerWon && battleRounds === 151 && !summonEnemy) {
         changeEnemyImage("realShape");
         showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }
@@ -6944,6 +6963,7 @@ function toggleFightingDrawer() {
     
     const drawer = document.getElementById('fightingDrawer');
     const isOpen = drawer.classList.toggle('open');
+    drawer.classList.add("show");  // 触发动画
 
     if (isOpen) {
         drawer.style.display = "flex";
@@ -8954,9 +8974,13 @@ function performAttack(type) {
         return;
     }
 
+    if (!summonEnemy && battleRounds % 10 === 0) {
+        handleRampaged();
+    }
+    
     playerTurn = false;
     handleManaRecover()
-    setTimeout(enemyAttack, 500);
+    setTimeout(enemyAttack, 350);
     updateUI();
     applyAscensionEffects();
 
@@ -9414,7 +9438,7 @@ function performPoison() {
     
     playerTurn = false;
     handleManaRecover();
-    setTimeout(enemyAttack, 500);
+    setTimeout(enemyAttack, 350);
     applyAscensionEffects();
     updateUI();
 } //中毒伤害函数
@@ -9432,19 +9456,16 @@ function handlePoison(skillMultiplier = 1) {
             clearInterval(poisonInterval);
             return;
         }
-        const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9) * playerCritDamage);
+        const poisonDamage = Math.floor(battleAttributes.magicAttack * 0.5 * skillMultiplier * (Math.random() * (1.1 - 0.9) + 0.9) * (1 + playerCritDamage * 0.1));
         battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
         totalPoisonDamage += poisonDamage; // 累积毒性伤害
         remainingDuration -= 1000; // 每次循环减少1秒
 
-        const remainingSeconds = Math.max(0, Math.round(remainingDuration / 1000)); // 计算剩余秒数
-
-        //logBattleEvent(`邪佞中毒，受到 ${poisonDamage} 点毒性伤害，当前修为加持下，中毒效果还将持续 ${remainingSeconds} 秒。`, '#C10066');
         updateUI();
         updateDamageValue(poisonDamage,false,'extra-damage');
         updateEnemyStatusDisplay();
 
-    }, 100); // 每0.1秒触发一次
+    }, 200); // 每0.2秒触发一次
     
     if (battleState.enemy.health <= 0) {
         clearInterval(poisonInterval);
@@ -11405,8 +11426,8 @@ function useSelectedDrug() {
                 logBattleEvent(`使用狂暴之魂，暴击率永久提高1%。`, 'gold');
                 break;
             case "慧心糖果":
-                playerCritDamage = Math.min(30.0, playerCritDamage + 0.025); // 最大3000%
-                logBattleEvent(`使用慧心糖果，暴击伤害永久提高2.5%。`, 'gold');
+                playerCritDamage = Math.min(30.0, playerCritDamage + 0.01); // 最大3000%
+                logBattleEvent(`使用慧心糖果，暴击伤害永久提高1%。`, 'gold');
                 break;
             case "延寿露":
                 battleAttributes.health = Math.min(maxHealth, battleAttributes.health + Math.floor(maxHealth * 0.2));
@@ -12539,8 +12560,13 @@ function enemyInfo() {
     topContainer.style.marginBottom = '20px';
 
     // 创建图片元素
+    const enemyImage = enemyImages.find(image => image.name === battleState.enemy.name);
     const img = document.createElement('img');
-    img.src = 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif';
+    if (enemyImage) {
+        img.src = enemyImage.url;
+    } else {
+        img.src = 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif';
+    }
     img.style.width = '100px';
     img.style.height = '100px';
     img.style.marginRight = '20px';
@@ -14467,13 +14493,13 @@ document.getElementById('lotteryIncreaseBet').addEventListener('click', () => {
     updateLotteryDisplay();
 });
 
-document.getElementById('lotteryIncreaseHundredBet').addEventListener('click', () => {
+document.getElementById('lotteryIncreaseThousandBet').addEventListener('click', () => {
     if (!canBet) {
         showInfoBox('请等待本次开奖！');
         return;
     }
-    lotteryBetCount += 100; // 使用正确的语法增加100注
-    lotteryBetAmount += 20000; // 对应增加2000
+    lotteryBetCount += 1000; // 使用正确的语法增加100注
+    lotteryBetAmount += 200000; // 对应增加2000
     updateLotteryDisplay();
 });
 
@@ -14919,29 +14945,16 @@ function directlyAbsorbExperience(amount) {
     showInfoBox(`你获得了${amount}点经验，当前为${petLevel}级，当前经验为${currentExp}/${maxExp}`, null, null, 'green');
 }
         
-function absorbExperience() {
+async function absorbExperience() {
     absorbCount++;
 
     const advancedItem = jinnangItems.find(i => i.name === 'advancedExperienceBook');
     const normalItem = jinnangItems.find(i => i.name === 'normalExperienceBook');
 
     if (absorbCount >= 5) {
-        showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", () => {
-            // 玩家选择确认，进入自动使用循环
-            while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
-                if (petLevel >= petMaxLevel || petLevel === 180) {
-                    showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
-                    break;
-                }
-
-                if (advancedItem && advancedItem.quantity > 0) {
-                    useExperienceBook(advancedItem, 30000); // 使用高级经验书
-                } else if (normalItem && normalItem.quantity > 0) {
-                    useExperienceBook(normalItem, 10000); // 使用普通经验书
-                } else {
-                    break;
-                }
-            }
+        showInfoBox("您已连续多次使用经验书，是否需要自动使用现有经验书？", async () => {
+            // 玩家选择确认，进入自动使用异步循环
+            await batchUseExperienceBooks(advancedItem, normalItem);
             showInfoBox(`自动吸收完成，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
             absorbCount = 0; // 重置计数器
         }, () => {
@@ -14954,17 +14967,41 @@ function absorbExperience() {
     }
 }
 
-function performSingleAbsorption(advancedItem, normalItem) {
-    if (advancedItem && advancedItem.quantity > 0) {
-        useExperienceBook(advancedItem, 30000); // 使用高级经验书，增加30000经验值
-        showInfoBox(`自动使用高级经验书，获得30000经验值，当前经验为${currentExp} / ${maxExp}`);
-    } else if (normalItem && normalItem.quantity > 0) {
-        useExperienceBook(normalItem, 10000); // 使用普通经验书，增加10000经验值
-        showInfoBox(`自动使用普通经验书，获得10000经验值，当前经验为${currentExp} / ${maxExp}`);
-    } else {
-        showInfoBox("您的经验书不足，无法吸收经验！");
+// 批量异步使用经验书
+async function batchUseExperienceBooks(advancedItem, normalItem) {
+    while ((advancedItem && advancedItem.quantity > 0) || (normalItem && normalItem.quantity > 0)) {
+        if (petLevel >= petMaxLevel || petLevel === 180) {
+            showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
+            break;
+        }
+
+        if (advancedItem && advancedItem.quantity > 0) {
+            useExperienceBook(advancedItem, 30000); // 使用高级经验书
+        } else if (normalItem && normalItem.quantity > 0) {
+            useExperienceBook(normalItem, 10000); // 使用普通经验书
+        }
+
+        // 每次使用完一批书后，异步等待一段时间
+        await new Promise(resolve => setTimeout(resolve, 100)); // 暂停 100 毫秒，防止阻塞
     }
 }
+
+// 单次吸收逻辑
+function performSingleAbsorption(advancedItem, normalItem) {
+    if (petLevel >= petMaxLevel || petLevel === 180) {
+        showInfoBox(`宠物等级已达上限，当前为${petLevel}级，经验为${currentExp} / ${maxExp}`);
+        return;
+    }
+
+    if (advancedItem && advancedItem.quantity > 0) {
+        useExperienceBook(advancedItem, 30000); // 使用高级经验书
+    } else if (normalItem && normalItem.quantity > 0) {
+        useExperienceBook(normalItem, 10000); // 使用普通经验书
+    } else {
+        showInfoBox("没有经验书可供使用！");
+    }
+}
+
 
 function useExperienceBook(item, expAmount) {
     if (petLevel >= petMaxLevel) {
@@ -17913,9 +17950,9 @@ document.getElementById('gemSlots').addEventListener('click', function(event) {
         
 let currentSpecialization = null;
 let specializations = {
-    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.5, levelIncrement: 0.01, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
-    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.02, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
-    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.02, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.001, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
         
 function calculateSecondaryAttributes(currentAttributes, currentWisdom) {

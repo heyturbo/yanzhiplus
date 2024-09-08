@@ -3132,7 +3132,7 @@
                         <button id="upgradeStarBtn" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;">升星</button>
                     </div>
                 </div>
-                <div style="display: flex;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;padding: 5px 20px;flex-direction: column; gap:5px;">
+                <div style="display: flex;align-items: center;justify-content: center;border-bottom: 2px dotted #ccc;padding: 2px 20px;flex-direction: column;gap: 2px;">
                     <div style="display: flex;justify-content: flex-start;width: 100%;"><strong>装备部位:</strong><span id="arm-type-display" style="margin-left: 10px;"></span></div>
                     <div style="display: flex;justify-content: flex-start;width: 100%;"><strong>耐久度:</strong><span id="endurance-display" style="margin-left: 10px;"></span>/500</div>
                     <div style="display: flex;justify-content: flex-start;width: 100%;gap: 10px;">
@@ -3142,7 +3142,7 @@
                 </div>
                 <!-- 宝石孔显示 -->
                 <div>
-                    <div id="gemSlots" style="display: flex;flex-direction: column;align-items: flex-start;padding: 10px 20px;">
+                    <div id="gemSlots" style="display: flex;flex-direction: column;align-items: flex-start;padding: 0px 20px;margin-top: 5px;">
                         <div style="margin-bottom: 5px;"><span id="slot1" class="slot" style="cursor: pointer;">〇 空</span></div>
                         <div style="margin-bottom: 5px; display: none;"><span id="slot2" class="slot" style="cursor: pointer;">〇 空</span></div>
                         <div style="margin-bottom: 5px; display: none;"><span id="slot3" class="slot" style="cursor: pointer;">〇 空</span></div>
@@ -3160,7 +3160,7 @@
                 </div>
     
                 <!-- 镶嵌宝石操作 -->
-                <div style="margin-top: 10px;border-top: 2px dotted #ccc;display: flex;">
+                <div style="border-top: 2px dotted #ccc;display: flex;">
                     <p id="arm-description" style="margin-left: 20px;text-align: left;"></p>
                 </div>
             </div> <!-- 闭合 bottom-detail-container -->
@@ -17514,9 +17514,12 @@ function randomGemColor() {
 // 刷新宝石孔颜色
 function refreshGemSlots(arm) {
     const refreshItem = jinnangItems.find(item => item.name === 'refreshGemSlot');
+    const inlaidGems = arm.armState.gemSlots.inlaid;
+    const inlaidNums = inlaidGems.filter(gem => gem !== null).length; //find语法只能返回在数组中找到的第一个对象，而filter可以找到所有符合条件的对象
+    const availableSlots = arm.armState.gemSlots.current - inlaidNums;
     
-    if (refreshItem.quantity <= 0) {
-        showInfoBox('你没有宝石洗孔符！', null, null, 'red');
+    if (refreshItem.quantity < availableSlots) {
+        showInfoBox('你没有足够的宝石洗孔符！洗孔符的单次消耗数量与可镶嵌孔数一致，请注意消耗。', null, null, 'red');
         return;
     }
 
@@ -17542,7 +17545,9 @@ function refreshGemSlots(arm) {
     });
 
     if (!hasRefreshed) {
-        showInfoBox('没有可用的孔进行刷新！', null, null, 'red');
+        showInfoBox('当前没有可镶嵌的孔进行刷新！', null, null, 'red');
+    } else {
+        showInfoBox(`你消耗了${availableSlots}个宝石洗孔符，更新了目前所有可镶嵌孔的颜色！`);
     }
 
     displayGemSlots(arm); // 刷新界面显示
@@ -17661,7 +17666,7 @@ function handleGemInlay(arm, slotIndex) {
     // 创建并展示可用宝石，供玩家选择镶嵌
     const gemSelectionDiv = document.createElement('div');
     gemSelectionDiv.id = 'gemSelectionDiv';
-    gemSelectionDiv.style = 'background-color: rgb(231, 190, 98);display: flex;flex-flow: column;align-items: center;width: 95%;justify-content: space-between;box-shadow: rgb(111, 57, 28) 0px 0px 4px 1px;height: 480px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;';
+    gemSelectionDiv.style = 'background-color: #6f391c;display: flex;flex-flow: column;align-items: center;width: 95%;box-shadow: inset rgb(111, 57, 28) 0px 0px 2px 1px;max-height: 480px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);border: 1px solid black;font-size: 14px;flex-direction: column;justify-content: flex-start;padding: 2px;';
 
     const cancelInlayBtn = document.createElement('button');
     cancelInlayBtn.innerText = '关闭面板';
@@ -17673,7 +17678,7 @@ function handleGemInlay(arm, slotIndex) {
 
     // 创建容器包裹每个 gemDetailContainer
     const gemContainer = document.createElement('div');
-    gemContainer.style = 'overflow-y: scroll;width: 100%;display: flex;flex-direction: column;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;';
+    gemContainer.style = 'overflow-y: scroll;width: 99%;display: flex;flex-direction: column;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;';
     gemSelectionDiv.appendChild(gemContainer); // 只需添加一次 gemContainer
 
     // 刷新宝石显示内容的函数
@@ -17692,7 +17697,7 @@ function handleGemInlay(arm, slotIndex) {
         availableGems.forEach(gem => {
             // 创建每个宝石的容器
             const gemDetailContainer = document.createElement('div');
-            gemDetailContainer.style = 'display: flex;flex-direction: row;align-items: center;width: 100%;justify-content: space-between;border-bottom: 1px solid rgb(135, 67, 31);background-image: url(&quot;https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png&quot;);background-repeat: repeat;background-size: auto;height: 100%;'; // 确保内容居中对齐
+            gemDetailContainer.style = 'display: flex;flex-direction: row;align-items: center;width: 100%;justify-content: space-between;border-bottom: 1px solid rgb(135, 67, 31);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;'; // 确保内容居中对齐
 
             const gemIcon = document.createElement('img');
             gemIcon.src = gem.url;
@@ -18886,6 +18891,8 @@ function startShopTimer() {
 
 // 页面加载完成后初始化商店
 let refreshCount = 0; // 全局计数器，记录刷新次数
+let sSkillCount = 0;
+let ssSkillCount = 0;
 
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 1000) {
@@ -18927,7 +18934,7 @@ function refreshShop(auto = false) {
 
     for (let i = 0; i < numItems; i++) {
         let isRare = Math.random() < probabilities[1];
-        if (!auto && isRare && rareItemCount >= 8) isRare = false;
+        if (!auto && isRare && rareItemCount >= 28) isRare = false;
         if (isRare) rareItemCount++;
 
         let item;
@@ -18939,7 +18946,7 @@ function refreshShop(auto = false) {
 
         if (item.name.includes('包裹')) {
             const bundleCount = isRare ? rareBundleCount : commonBundleCount;
-            const maxBundles = isRare ? 8 : 8;
+            const maxBundles = isRare ? 6 : 6;
 
             if (bundleCount >= maxBundles) {
                 i--;
@@ -18957,6 +18964,8 @@ function refreshShop(auto = false) {
 
     // 将排序后的商品添加到商店中
     items.forEach(item => addItemToShop(item, shopItems));
+    sSkillCount = 0;
+    ssSkillCount = 0;
 
     if (auto) startShopTimer();
 }
@@ -19028,7 +19037,7 @@ function getRandomRareItem(rareCounts) {
         createItem('集中值（4点）', 86788, 129238, 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png'),
         createItem('蓝色武装原料', 56788, 89238, 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png'),
         createItem('任意打孔器', 116788, 159238, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc61.png'),
-        createItem('宝石洗孔符', 116788, 159238, 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png'),
+        createItem('宝石洗孔符', 26788, 39238, 'https://pic.imgdb.cn/item/666d688ed9c307b7e903cdfd.png'),
         createItem('高级宝石合成符', 56788, 69238, 'https://pic.imgdb.cn/item/66dbff82d9c307b7e9b75a35.png'),
         createItem('宝石袋盲盒', 56788, 69238, 'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png'),
         createItem('升级宝石礼包（神品）', 116788, 159238, 'https://pic.imgdb.cn/item/66dab9eed9c307b7e92290c5.png'),
@@ -19038,12 +19047,17 @@ function getRandomRareItem(rareCounts) {
     const ssSkills = collectSkillsByRarity('SS');
     const sSkills = collectSkillsByRarity('S');
 
-    const itemTypes = ['item', 'bundle', 'sSkill', 'ssSkill'];
-    let itemType;
+    const itemTypes = ['item', 'bundle'];
 
-    do {
-        itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
-    } while (rareCounts[itemType] >= rareCounts.maxItems); // 确保每类物品不超过四分之一
+    if (sSkillCount < 1) {
+        itemTypes.push('sSkill');
+    }
+
+    if (ssSkillCount < 2) {
+        itemTypes.push('ssSkill');
+    }
+
+    const itemType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
 
     let item;
     switch (itemType) {
@@ -19055,9 +19069,11 @@ function getRandomRareItem(rareCounts) {
             break;
         case 'sSkill':
             item = selectRandomItems(sSkills, 1)[0];
+            sSkillCount++;
             break;
         case 'ssSkill':
             item = selectRandomItems(ssSkills, 1)[0];
+            ssSkillCount++;
             break;
     }
 

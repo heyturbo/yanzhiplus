@@ -9113,15 +9113,15 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.physicalDefense * defenseFactor;
     const effectiveDefense = f(x);
+    const constantDamageReduction = Math.round(battleState.enemy.physicalDefense * 0.1);
 
     let baseDamage;
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier * (1 - effectiveDefense)));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.physicalAttack * skillMultiplier * (1 - effectiveDefense)));
     } else {
-        baseDamage = Math.max(0, Math.floor(battleAttributes.physicalAttack * skillMultiplier));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.physicalAttack * skillMultiplier));
     }
     
-
     // 检查玩家是否处于失明状态
     if (battleState.player.blindfold) {
         logBattleEvent("处于短暂失明，敌人闪避了你的物理攻击。", 'yellow');
@@ -9163,6 +9163,8 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         } 
     }
 
+    finalDamage = Math.max(1, finalDamage - constantDamageReduction);
+    
     if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
@@ -9214,13 +9216,14 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.magicDefense * defenseFactor;
     const effectiveDefense = f(x);
+    const constantDamageReduction = Math.round(battleState.enemy.magicDefense * 0.1);
     
     let baseDamage;
     
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
     } else {
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
     }
     
     const manaCost = Math.floor((Math.random() * (200 - 50 + 1)) + 50 + battleRounds * 20 * skillMultiplier) * manaCostMultiplier;
@@ -9250,6 +9253,8 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         } 
     }
 
+    finalDamage = Math.max(1, finalDamage - constantDamageReduction);
+    
     if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
@@ -9317,12 +9322,13 @@ function performIndependentMagicAttack() {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.magicDefense * defenseFactor;
     const effectiveDefense = f(x);
+    const constantDamageReduction = Math.round(battleState.enemy.magicDefense * 0.1);
 
     let baseDamage;
     if (effectiveDefense !== 0){
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier * (1 - effectiveDefense)));
     } else {
-        baseDamage = Math.max(0, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
+        baseDamage = Math.max(1, Math.floor(battleAttributes.magicAttack * 0.8 * skillMultiplier));
     }
     
     let isCritical = checkCriticalHit(playerCritRate);
@@ -9349,6 +9355,8 @@ function performIndependentMagicAttack() {
         } 
     }
 
+    finalDamage = Math.max(1, finalDamage - constantDamageReduction);
+    
     if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
@@ -10610,16 +10618,17 @@ function performEnemyPhysicalAttack(isCritical) {
     
     const x = battleAttributes.physicalDefense * defenseFactor;
     const effectiveDefense = f(x);
+    const constantDamageReduction = Math.round(battleAttributes.physicalDefense * 0.1);
 
     let damage;
     if (effectiveDefense !== 0){
-        damage = Math.max(0, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * (1 - effectiveDefense)));
+        damage = Math.max(1, Math.floor((battleState.enemy.physicalAttack * 1.2 * attackMultiplier) * (1 - effectiveDefense)));
     } else {
-        damage = Math.max(0, Math.floor(battleState.enemy.physicalAttack * 1.2 * attackMultiplier));
+        damage = Math.max(1, Math.floor(battleState.enemy.physicalAttack * 1.2 * attackMultiplier));
     }
     
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
-    
+    damage = Math.max(1, damage - constantDamageReduction);
     
     if (isCritical) {
         logBattleEvent(`⚔️【敌人攻击】邪佞施放物理技能·黑暗血刃并发起暴击，造成了 ${damage} 的猛烈伤害！`, 'red');
@@ -10676,15 +10685,17 @@ function performEnemyMagicalAttack(isCritical) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleAttributes.magicDefense * defenseFactor;
     const effectiveDefense = f(x);
+    const constantDamageReduction = Math.round(battleAttributes.magicDefense * 0.1);
 
     let damage;
     if (effectiveDefense !== 0){
-        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier * (1 - effectiveDefense)));
+        damage = Math.max(1, Math.floor(battleState.enemy.magicAttack * attackMultiplier * (1 - effectiveDefense)) - constantDamageReduction);
     } else {
-        damage = Math.max(0, Math.floor(battleState.enemy.magicAttack * attackMultiplier));
+        damage = Math.max(1, Math.floor(battleState.enemy.magicAttack * attackMultiplier) - constantDamageReduction);
     }
     
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
+    damage = Math.max(1, damage - constantDamageReduction);
 
 
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;

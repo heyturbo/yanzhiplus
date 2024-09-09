@@ -15680,11 +15680,64 @@ function closeDescriptionBox() {
     }
 }
 
+// 创建或替换进度条元素
+function createOrUpdateProgressBar(item) {
+    // 检查是否已经存在进度条，如果存在则先移除
+    const existingProgressBarWrapper = document.querySelector('.progress-bar-wrapper');
+    if (existingProgressBarWrapper) {
+        existingProgressBarWrapper.remove();
+    }
+
+    // 创建新的进度条容器
+    const progressBarWrapper = document.createElement('div');
+    progressBarWrapper.classList.add('progress-bar-wrapper');
+    progressBarWrapper.style = 'background: rgba(0, 0, 0, 0.8);display: flex;flex-direction: column;align-items: center;position: fixed;left: 50%;top: 40%;transform: translate(-50%, -50%);width: 80%;max-height: 80%;min-height: 10%;z-index: 9999;font-size: 14px;padding: 10px 20px 5px;background-color: rgb(223, 191, 110);color: rgb(146, 52, 28);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;box-shadow: rgb(30, 46, 47) 0px 0px 0px 1px, rgb(111, 57, 28) 0px 0px 0px 1px inset;border: 1px solid rgb(235, 172, 59);';
+
+
+    // 创建进度条
+    const progressBar = document.createElement('input');
+    progressBar.type = 'range';
+    progressBar.min = '0';
+    progressBar.max = '100';
+    progressBar.value = '0';  // 初始值为0
+    progressBar.style.width = '100%';
+    progressBar.style.height = '14px';  // 设置高度以容纳文字
+    progressBar.classList.add('progress-bar');
+
+    // 显示进度条当前选择的数量
+    const progressValueDisplay = document.createElement('span');
+    progressValueDisplay.classList.add('progress-value-display');
+    progressValueDisplay.style.color = 'black';
+    progressValueDisplay.style.marginTop = '5px';
+    progressValueDisplay.textContent = `${item.displayName}，0 / ${item.quantity} 个`;
+
+    progressBarWrapper.appendChild(progressBar);
+    progressBarWrapper.appendChild(progressValueDisplay);
+
+    // 监听进度条的拖动事件，实时更新数量显示
+    progressBar.addEventListener('input', () => {
+        const progressPercentage = progressBar.value;
+        const quantityToSell = Math.floor((progressPercentage / 100) * item.quantity);
+        progressValueDisplay.textContent = `${item.displayName}，${quantityToSell} / ${item.quantity} 个，可售${convertPrice(item.price * quantityToSell)}金`;
+    });
+
+    document.body.appendChild(progressBarWrapper);  // 将进度条添加到页面上
+
+    return progressBarWrapper;
+}
+
+// 删除进度条
+function removeProgressBar() {
+    const existingProgressBarWrapper = document.querySelector('.progress-bar-wrapper');
+    if (existingProgressBarWrapper) {
+        existingProgressBarWrapper.remove();
+    }
+}
+
+// 更新后的sellItem函数
 function sellItem() {
     if (!selectedItem) {
-        // 没有选中物品，提示是否出售所有背包内的道具
         showInfoBox("你没有选中道具，是否出售所有背包内的道具？", () => {
-            // 用户确认后执行以下代码
             let totalSoldItems = 0;
             let totalGoldEarned = 0;
 
@@ -15692,7 +15745,7 @@ function sellItem() {
                 if (item.quantity > 0) {
                     totalGoldEarned += item.quantity * item.price;
                     totalSoldItems += item.quantity;
-                    item.quantity = 0; // 将所有物品数量设置为0
+                    item.quantity = 0;  // 将所有物品数量设置为0
                 }
             });
 
@@ -15712,31 +15765,39 @@ function sellItem() {
     const itemIndex = jinnangItems.findIndex(i => i.name === itemName);
 
     if (itemIndex !== -1) {
-        let quantityToSell = prompt('请输入要出售的数量:');
-        if (quantityToSell !== null) {
-            quantityToSell = parseInt(quantityToSell, 10);
-            if (isNaN(quantityToSell) || quantityToSell <= 0) {
-                showInfoBox('请输入有效的数量');
-                return;
-            }
-            if (quantityToSell > jinnangItems[itemIndex].quantity) {
-                showInfoBox('您没有足够的道具数量');
-                return;
+        const selectedItem = jinnangItems[itemIndex];
+        
+        // 创建或更新进度条
+        const progressBarWrapper = createOrUpdateProgressBar(selectedItem);
+
+        // 显示出售确认框
+        showInfoBox('拖动进度条选择出售数量的比例，并点击确认', () => {
+            const progressBar = progressBarWrapper.querySelector('input[type="range"]');
+            const sellPercentage = progressBar.value;  // 获取用户拖动的比例
+            const quantityToSell = Math.floor((sellPercentage / 100) * selectedItem.quantity);
+
+            if (quantityToSell > 0) {
+                selectedItem.quantity -= quantityToSell;
+                const totalPrice = quantityToSell * selectedItem.price;
+                goldAmount += totalPrice;
+                showInfoBox(`成功出售${quantityToSell}个${selectedItem.displayName}，获得${convertPrice(totalPrice)}金子`);
+
+                updateJinnangItems();
+                updateGoldDisplay(goldAmount);
+            } else {
+                showInfoBox('没有选择有效的出售数量');
             }
 
-            jinnangItems[itemIndex].quantity -= quantityToSell;
-            let totalPrice = quantityToSell * jinnangItems[itemIndex].price;
-            goldAmount += totalPrice;
-            showInfoBox(`成功出售${quantityToSell}个${jinnangItems[itemIndex].displayName}，获得${convertPrice(totalPrice)}金子`);
-
-            updateJinnangItems();
-            updateGoldDisplay(goldAmount);
-        }
+            // 无论成功或失败，都移除进度条
+            removeProgressBar();
+        }, () => removeProgressBar(),'black');
+            
     } else {
         showInfoBox("请先选择需要出售的物品！");
     }
-}//拓展背包
+}
 
+//拓展背包
 function enlargeJinnangCapacity(amount) {
     jinnangCapacity += amount;
     showInfoBox(`容量已增加${amount}，当前容量为${jinnangCapacity}`);
@@ -16137,8 +16198,6 @@ const itemEffects = {
         }
     }
 };
-        
-let lastUsedItemName = null;
 
 function useAssignedItem() {
     if (!selectedItem || !selectedItem.dataset.itemName) {
@@ -16168,15 +16227,17 @@ function useAssignedItem() {
 }
 
 function useAllItems() {
-    if (!lastUsedItemName) {
-        showInfoBox("请先选择一个道具并使用一次。");
+    if (!selectedItem || !selectedItem.dataset.itemName) {
+        showInfoBox("请先选择一个道具。");
         return;
     }
+    const itemName = selectedItem.dataset.itemName;
+    const itemDisplayName = selectedItem.dataset.itemDisplayName;
 
     showInfoBox(
         '这是一个不稳定的功能，因为并不是所有道具都可以批量使用。比如武装合成、挑战魔魂封印卡等。一旦执行全部使用无法停止，请酌情尝试本功能，避免道具意外丢失',
         () => { // 这是 onConfirm 回调
-            useItemsInBatches(lastUsedItemName);
+            useItemsInBatches(itemName);
         },
         () => { // 这是 onCancel 回调
             return;
@@ -16201,7 +16262,7 @@ function useItemsInBatches(itemName) {
             // 如果还有剩余道具，继续异步处理
             setTimeout(processNextBatch, 0);
         } else {
-            lastUsedItemName = null; // 重置最近使用的道具名称
+            selectedItem = null; // 重置最近使用的道具名称
         }
     }
 

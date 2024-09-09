@@ -16266,7 +16266,7 @@ function useAllItems() {
         // 创建或更新进度条
         const progressBarWrapper = createOrUpdateProgressBar(selectedItem, true);
 
-        showInfoBox('此功能不稳定，如非必要请尽量手动使用道具！拖动进度条选择使用数量的比例，并点击确认', () => {
+        showInfoBox('此功能不稳定，如非必要请手动使用！', () => {
             const progressBar = progressBarWrapper.querySelector('input[type="range"]');
             const usePercentage = progressBar.value;  // 获取用户拖动的比例
             const quantityToUse = Math.min(Math.floor((usePercentage / 100) * selectedItem.quantity), selectedItem.quantity); // 计算数量并确保不超过现有数量
@@ -16300,7 +16300,7 @@ function useItemsInBatches(itemName, totalAmount) {
         const batchSize = Math.min(10, totalAmount - itemsProcessed);  // 每次批处理最多10个道具
         let itemsInThisBatch = 0;
 
-        while (itemsInThisBatch < batchSize && itemsProcessed < totalAmount && useItem(itemName)) {
+        while (itemsInThisBatch < batchSize && itemsProcessed < totalAmount) {
             itemEffects[itemName]();  // 执行道具效果
             itemsProcessed++;
             itemsInThisBatch++;

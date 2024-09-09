@@ -2827,7 +2827,7 @@
         <div class="treasure-action">
             <button onclick="sellItem()">出售道具</button>
             <button onclick="useAssignedItem()">使用道具</button>
-            <button onclick="useAllItems()">全部使用</button>
+            <button onclick="useAllItems()">批量使用</button>
             <button onclick="deleteItems()">丢弃道具</button>
             <button onclick="openWuxingDisplay()">五行面板</button>
         </div>
@@ -10110,14 +10110,10 @@ function handleReflectAndHeal(damage) {
 }//处理仙气（包含反弹逻辑）
 
 let resurrectionState = false;
-let resurrectionTimes = 0;
+let resurrectionTimesMap = new Map();  // 用 Map 来存储每个技能的复活次数
 
 function checkResurrectionState(times) {
-    if (times > 0) {
-        resurrectionState = true;
-    } else {
-        resurrectionState = false;
-    }
+    resurrectionState = times > 0;
 }
 
 function handleResurrection(damage) {
@@ -10151,22 +10147,40 @@ function handleResurrection(damage) {
         const skillLevel = fhSkill.level || 1;
         const skillMultiplier = fhSkill.multiplier || 1;
         const resurrectionAllowedTimes = Math.ceil(skillMultiplier + skillLevel * 0.01);
+
+        // 使用 Map 来跟踪每个技能的复活次数
+        if (!resurrectionTimesMap.has(fhSkill.name)) {
+            resurrectionTimesMap.set(fhSkill.name, 0);
+        }
+        let resurrectionTimes = resurrectionTimesMap.get(fhSkill.name);
+
         let remainResurrectionTimes = resurrectionAllowedTimes - resurrectionTimes;
-        
-        if (resurrectionTimes <= resurrectionAllowedTimes && battleAttributes.health <= 0) {
+
+        if (resurrectionTimes < resurrectionAllowedTimes && battleAttributes.health <= 0) {
             const healthRecovered = Math.round(maxHealth * (0.1 * skillMultiplier));
             battleAttributes.health += healthRecovered;
-            resurrectionTimes++;
+            resurrectionTimes++;  // 只增加该技能的复活次数
+            resurrectionTimesMap.set(fhSkill.name, resurrectionTimes);  // 更新 Map 中的次数
+
             updateDamageValue(-healthRecovered, false, 'damage');
             logBattleEvent(`${fhSkill.name} ${skillLevel}级触发，复活并恢复 ${healthRecovered} 点生命值，本局战斗还能再生效${remainResurrectionTimes}次`, 'lime');
             checkResurrectionState(remainResurrectionTimes);
-        } else {
-            resurrectionTimes = 0;
-            checkResurrectionState(remainResurrectionTimes);
+        } else if (resurrectionTimes >= resurrectionAllowedTimes) {
+            resurrectionState = false;
+            resetResurrectionState();
+            logBattleEvent(`${fhSkill.name} 已经无法再触发复活。`, 'gray');
         }
+        
         updateUI();
     }
 }
+
+// 在战斗结束时重置复活状态和次数
+function resetResurrectionState() {
+    resurrectionTimesMap.clear();
+    checkResurrectionState(0);
+}
+
         
 function handleRelieveEffects() {
     const jkSkills = [];
@@ -15683,50 +15697,7 @@ function closeDescriptionBox() {
 }
 
 // 创建或替换进度条元素
-function createOrUpdateProgressBar(item) {
-    // 检查是否已经存在进度条，如果存在则先移除
-    const existingProgressBarWrapper = document.querySelector('.progress-bar-wrapper');
-    if (existingProgressBarWrapper) {
-        existingProgressBarWrapper.remove();
-    }
 
-    // 创建新的进度条容器
-    const progressBarWrapper = document.createElement('div');
-    progressBarWrapper.classList.add('progress-bar-wrapper');
-    progressBarWrapper.style = 'background: rgba(0, 0, 0, 0.8);display: flex;flex-direction: column;align-items: center;position: fixed;left: 50%;top: 40%;transform: translate(-50%, -50%);width: 80%;max-height: 80%;min-height: 10%;z-index: 9999;font-size: 14px;padding: 10px 20px 5px;background-color: rgb(223, 191, 110);color: rgb(146, 52, 28);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;box-shadow: rgb(30, 46, 47) 0px 0px 0px 1px, rgb(111, 57, 28) 0px 0px 0px 1px inset;border: 1px solid rgb(235, 172, 59);';
-
-
-    // 创建进度条
-    const progressBar = document.createElement('input');
-    progressBar.type = 'range';
-    progressBar.min = '0';
-    progressBar.max = '100';
-    progressBar.value = '0';  // 初始值为0
-    progressBar.style.width = '100%';
-    progressBar.style.height = '14px';  // 设置高度以容纳文字
-    progressBar.classList.add('progress-bar');
-
-    // 显示进度条当前选择的数量
-    const progressValueDisplay = document.createElement('span');
-    progressValueDisplay.classList.add('progress-value-display');
-    progressValueDisplay.style.color = 'black';
-    progressValueDisplay.style.marginTop = '5px';
-    progressValueDisplay.textContent = `${item.displayName}，0 / ${item.quantity} 个`;
-
-    progressBarWrapper.appendChild(progressBar);
-    progressBarWrapper.appendChild(progressValueDisplay);
-
-    // 监听进度条的拖动事件，实时更新数量显示
-    progressBar.addEventListener('input', () => {
-        const progressPercentage = progressBar.value;
-        const quantityToSell = Math.floor((progressPercentage / 100) * item.quantity);
-        progressValueDisplay.textContent = `${item.displayName}，${quantityToSell} / ${item.quantity} 个，可售${convertPrice(item.price * quantityToSell)}金`;
-    });
-
-    document.body.appendChild(progressBarWrapper);  // 将进度条添加到页面上
-
-    return progressBarWrapper;
-}
 
 // 删除进度条
 function removeProgressBar() {
@@ -15883,7 +15854,7 @@ function updateJinnangItems() {
     }
 
     // 按照时间戳排序，确保最早获得的物品显示在前面
-    const sortedItems = [...jinnangItems].sort((a, b) => a.timestamp - b.timestamp);
+    const sortedItems = [...jinnangItems].sort((a, b) => b.price - a.price);
 
     sortedItems.forEach(item => {
         if (item.quantity > 0) {
@@ -15900,8 +15871,8 @@ function updateJinnangItems() {
             itemDiv.innerHTML = `
                 <img src="${item.url}" alt="${item.name}" style="border: 1px solid black;height: 45px;width: 45px;">
                 <div class="item-text-container">
-                <div class="item-text-top">${item.displayName}</div>
-                <div class="item-text-bottom">${item.quantity}个</div>
+                <div id="jinnang-item-name" class="item-text-top">${item.displayName}</div>
+                <div id="jinnang-item-quantity" class="item-text-bottom">${item.quantity}个</div>
                 </div>
             `;
 
@@ -16228,48 +16199,126 @@ function useAssignedItem() {
     }
 }
 
+function createOrUpdateProgressBar(item, useMode = false) {
+    // 检查是否已经存在进度条，如果存在则先移除
+    const existingProgressBarWrapper = document.querySelector('.progress-bar-wrapper');
+    if (existingProgressBarWrapper) {
+        existingProgressBarWrapper.remove();
+    }
+
+    // 创建新的进度条容器
+    const progressBarWrapper = document.createElement('div');
+    progressBarWrapper.classList.add('progress-bar-wrapper');
+    progressBarWrapper.style = 'background: rgba(0, 0, 0, 0.8);display: flex;flex-direction: column;align-items: center;position: fixed;left: 50%;top: 40%;transform: translate(-50%, -50%);width: 80%;max-height: 80%;min-height: 10%;z-index: 9999;font-size: 14px;padding: 10px 20px 5px;background-color: rgb(223, 191, 110);color: rgb(146, 52, 28);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;box-shadow: rgb(30, 46, 47) 0px 0px 0px 1px, rgb(111, 57, 28) 0px 0px 0px 1px inset;border: 1px solid rgb(235, 172, 59);';
+
+
+    // 创建进度条
+    const progressBar = document.createElement('input');
+    progressBar.style = 'width: 100%;height: 16px;appearance: none;background-color: rgb(255 255 255 / 90%);cursor: grabbing;border: 1px solid white;border-radius: 50px;';
+    progressBar.type = 'range';
+    progressBar.min = '0';
+    progressBar.max = '100';
+    progressBar.value = '0';  // 初始值为0
+    progressBar.classList.add('progress-bar');
+
+    // 显示进度条当前选择的数量
+    const progressValueDisplay = document.createElement('span');
+    progressValueDisplay.classList.add('progress-value-display');
+    progressValueDisplay.style.color = 'black';
+    progressValueDisplay.style.marginTop = '5px';
+    progressValueDisplay.textContent = `${item.displayName}，0 / ${item.quantity} 个`;
+
+    progressBarWrapper.appendChild(progressBar);
+    progressBarWrapper.appendChild(progressValueDisplay);
+
+    if (useMode) {
+        progressBar.addEventListener('input', () => {
+            const progressPercentage = progressBar.value;
+            const quantityToUse = Math.floor((progressPercentage / 100) * item.quantity);
+            progressValueDisplay.textContent = `${item.displayName}，${quantityToUse} / ${item.quantity} 个`;
+        });
+    } else {
+    // 监听进度条的拖动事件，实时更新数量显示
+        progressBar.addEventListener('input', () => {
+            const progressPercentage = progressBar.value;
+            const quantityToSell = Math.floor((progressPercentage / 100) * item.quantity);
+            progressValueDisplay.textContent = `${item.displayName}，${quantityToSell} / ${item.quantity} 个，可售${convertPrice(item.price * quantityToSell)}金`;
+        });
+    }
+    
+    document.body.appendChild(progressBarWrapper);  // 将进度条添加到页面上
+
+    return progressBarWrapper;
+}
+        
 function useAllItems() {
     if (!selectedItem || !selectedItem.dataset.itemName) {
         showInfoBox("请先选择一个道具。");
         return;
     }
-    const itemName = selectedItem.dataset.itemName;
-    const itemDisplayName = selectedItem.dataset.itemDisplayName;
 
-    showInfoBox(
-        '这是一个不稳定的功能，因为并不是所有道具都可以批量使用。比如武装合成、挑战魔魂封印卡等。一旦执行全部使用无法停止，请酌情尝试本功能，避免道具意外丢失',
-        () => { // 这是 onConfirm 回调
-            useItemsInBatches(itemName);
-        },
-        () => { // 这是 onCancel 回调
-            return;
-        }
-    );
+    const itemName = selectedItem.dataset.itemName;
+    const itemIndex = jinnangItems.findIndex(i => i.name === itemName);
+
+    if (itemIndex !== -1) {
+        const selectedItem = jinnangItems[itemIndex];
+        
+        // 创建或更新进度条
+        const progressBarWrapper = createOrUpdateProgressBar(selectedItem, true);
+
+        showInfoBox('此功能不稳定，如非必要请尽量手动使用道具！拖动进度条选择使用数量的比例，并点击确认', () => {
+            const progressBar = progressBarWrapper.querySelector('input[type="range"]');
+            const usePercentage = progressBar.value;  // 获取用户拖动的比例
+            const quantityToUse = Math.min(Math.floor((usePercentage / 100) * selectedItem.quantity), selectedItem.quantity); // 计算数量并确保不超过现有数量
+
+            if (quantityToUse >= 500) {
+                showInfoBox('道具数量过多！请控制在500个以内，以防止卡死或道具丢失！',null,null,'red');
+                removeProgressBar();
+                return;
+            }
+            
+            if (quantityToUse > 0) {
+                selectedItem.quantity -= quantityToUse;
+                useItemsInBatches(itemName, quantityToUse);  // 批量使用道具
+                updateJinnangItems();
+            } else {
+                showInfoBox('没有选择有效的使用数量');
+            }
+    
+            // 移除进度条
+            removeProgressBar();
+        }, () => removeProgressBar(), 'black');  
+    } else {
+        showInfoBox("未知错误！");
+    }        
 }
 
-function useItemsInBatches(itemName) {
-    function processNextBatch() {
-        // 每次批量处理一部分道具，避免阻塞主线程
-        let batchSize = 100; // 可以根据实际情况调整批处理的量
-        let itemsProcessed = 0;
+function useItemsInBatches(itemName, totalAmount) {
+    let itemsProcessed = 0;
 
-        while (itemsProcessed < batchSize && useItem(itemName)) {
-            itemEffects[itemName](); // 执行对应道具的效果
+    function processNextBatch() {
+        const batchSize = Math.min(10, totalAmount - itemsProcessed);  // 每次批处理最多10个道具
+        let itemsInThisBatch = 0;
+
+        while (itemsInThisBatch < batchSize && itemsProcessed < totalAmount && useItem(itemName)) {
+            itemEffects[itemName]();  // 执行道具效果
             itemsProcessed++;
+            itemsInThisBatch++;
         }
 
-        updateJinnangItems(); // 更新锦囊内容显示
+        updateJinnangItems();  // 更新锦囊显示
 
-        if (useItem(itemName)) {
-            // 如果还有剩余道具，继续异步处理
+        if (itemsProcessed < totalAmount) {
+            // 还有剩余道具未处理，继续异步处理
             setTimeout(processNextBatch, 0);
         } else {
-            selectedItem = null; // 重置最近使用的道具名称
+            selectedItem = null;  // 所有道具使用完毕后重置选中状态
         }
     }
 
-    processNextBatch();
+    processNextBatch();  // 开始异步批处理
 }
+
 
 function generateSealCard() {
     // 定义封印卡片的英文名称和对应的汉字名称映射

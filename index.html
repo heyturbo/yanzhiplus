@@ -14483,8 +14483,10 @@ function generateLotteryWinningNumbers() {
     const hasLuckyAmulet = luckyAmulet && luckyAmulet.quantity > 0;
 
     const availableSelectedNumbers = lotterySelectedNumbers.slice(0, 5);
+    const luckyRate = Math.min(1, luckyAmulet.quantity * 0.02);
+    console.log(luckyRate);
 
-    if (hasLuckyAmulet && availableSelectedNumbers.length > 0) {
+    if (hasLuckyAmulet && availableSelectedNumbers.length > 0 && Math.random() < luckyRate) {
         const randomIndex = Math.floor(Math.random() * availableSelectedNumbers.length);
         const selectedNumber = availableSelectedNumbers[randomIndex];
         numbers.push(selectedNumber);
@@ -14626,43 +14628,56 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
         showInfoBox('请等待当前开奖结束');
         return;
     }
-    if (lotterySelectedNumbers.length === 6) {
-        if (lotteryBetCount === 0) {
-            showInfoBox('请加注后点击投注按钮进行投注！');
-            return;
-        }
 
-        const casinoCoverLetterItem = jinnangItems.find(i => i.name === 'casinoCoverLetter');
-        const hasCasinoCoverLetter = casinoCoverLetterItem && casinoCoverLetterItem.quantity > 0;
-
-        if (hasCasinoCoverLetter && lotteryBetCount <= 500) {
-            useItem('casinoCoverLetter', 1);
-            lastSelectedNumbers = [...lotterySelectedNumbers];
-            canBet = false;
-            document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
-            updateLotteryDisplay();
-            hasPlacedBet = true;
-            setTimeout(() => {
-                performLotteryDraw(); // 立即执行开奖
-            }, 1000);
-        } else {
-            if (goldAmount >= lotteryBetAmount) {
-                goldAmount -= lotteryBetAmount;
-                updateGoldDisplay(goldAmount);
-                lastSelectedNumbers = [...lotterySelectedNumbers];
-                canBet = false;
-                document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
-                updateLotteryDisplay();
-                hasPlacedBet = true;
-                setTimeout(() => {
-                    performLotteryDraw(); // 立即执行开奖
-                }, 1000);
-            } else {
-                showInfoBox('余额不足');
-            }
-        }
-    } else {
+    if (lotterySelectedNumbers.length !== 6) {
         showInfoBox('请选择6个数字');
+        return;
+    }
+
+    if (lotteryBetCount === 0) {
+        showInfoBox('请加注后点击投注按钮进行投注！');
+        return;
+    }
+
+    // 检查是否有 casinoCoverLetter 道具或足够的金钱
+    const casinoCoverLetterItem = jinnangItems.find(i => i.name === 'casinoCoverLetter');
+    const hasCasinoCoverLetter = casinoCoverLetterItem && casinoCoverLetterItem.quantity > 0;
+
+    if (hasCasinoCoverLetter && lotteryBetCount <= 500) {
+        // 使用 casinoCoverLetter 道具，减少数量
+        useItem('casinoCoverLetter', 1);
+        startLotterySimulation();
+    } else if (goldAmount >= lotteryBetAmount) {
+        // 如果没有道具，但有足够的金钱，扣除金钱
+        goldAmount -= lotteryBetAmount;
+        updateGoldDisplay(goldAmount);
+        startLotterySimulation();
+    } else {
+        // 道具和金钱都不足时，提示余额不足
+        showInfoBox('余额不足');
+    }
+
+    // 模拟彩票出号的函数
+    function startLotterySimulation() {
+        lastSelectedNumbers = [...lotterySelectedNumbers];
+        canBet = false;
+        document.getElementById('lastSelectedNumbers').innerHTML = `已选: ${lastSelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${lastSelectedNumbers[5]}</span>`;
+        updateLotteryDisplay();
+        hasPlacedBet = true;
+
+        // 每0.2秒生成一组6个随机数，显示给玩家
+        const generateRandomNumbers = () => {
+            const randomNumSeries = Array.from({ length: 6 }, () => Math.floor(Math.random() * 30 + 1));  // 生成6个1到30之间的随机数
+            showInfoBox(`正在摇奖中: ${randomNumSeries.join(', ')}`);  // 显示生成的数字
+        };
+
+        const generatingNumber = setInterval(generateRandomNumbers, 100);  // 每0.2秒生成一次随机数
+
+        // 2秒后停止模拟生成，并执行实际开奖
+        setTimeout(() => {
+            clearInterval(generatingNumber);  // 停止生成随机数
+            performLotteryDraw();  // 立即执行实际开奖
+        }, 2000);  // 2秒后开奖
     }
 });
 
@@ -21271,7 +21286,7 @@ function updateQualityCard() {
     }
     tierElement.style.color = color;
     tierElement.style.fontWeight = 'bold';
-    tierElement.style.textShadow = 'rgba(0, 0, 0, 0.8) 0px 0px 2px';
+    tierElement.style.textShadow = 'rgba(0, 0, 0, 0.8) 0px 0px 1px';
 
     // 更新各项属性的当前值和最大值，以及进度条
     const endurance = currentPet.qualities.endurance;

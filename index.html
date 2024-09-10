@@ -19966,6 +19966,8 @@ function resetPet() {
         skillsArea.innerHTML = ""; // 清空技能区域
     }
 
+    resetArmsState(); //重置武装
+
     // 更新显示的各项数值
     updateAscensionButton();
     updateQualityDisplayWithPillBonus();
@@ -19978,6 +19980,18 @@ function resetPet() {
     updateTopBarItems();
 }
 
+function resetArmsState() {
+    armsAttributes = [];
+    armsAttributes = {
+        horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png", enduranceValue: 500, activated: false, description:'锐利无比的尖角，能轻易刺穿敌人的弱点' },
+        fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png", enduranceValue: 500, activated: false, description:'手感非凡的护甲之物，能带来不俗的防御能力' },
+        fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png", enduranceValue: 500, activated: false, description:'上古神兽曾用它噬铁碎骨' },
+        claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png", enduranceValue: 500, activated: false, description:'利爪挥过，血流成河' },
+        tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png", enduranceValue: 500, activated: false, description:'虽不如毒鳌般凌厉，仍有破势之力' },
+        husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png", enduranceValue: 500, activated: false, description:'自然之力形成的坚硬盔甲，可抵敌人中伤' }
+    };
+}
+        
 function setInnerText(id, value) {
     const element = document.getElementById(id);
     if (element) {
@@ -20718,15 +20732,7 @@ function upgradeWisdomTo() {
     }
 
     if (target === "武装重置") {
-        armsAttributes = [];
-        armsAttributes = {
-            horn: { type: "尖角", value: 0, attributes: ["physicalAttack", "magicAttack", "health", "mana"], url: "https://pic.imgdb.cn/item/666f194ed9c307b7e907bfb2.png", enduranceValue: 500, activated: false, description:'锐利无比的尖角，能轻易刺穿敌人的弱点' },
-            fur: { type: "毛皮", value: 0, attributes: ["physicalDefense", "magicDefense", "health"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bf7b.png", enduranceValue: 500, activated: false, description:'手感非凡的护甲之物，能带来不俗的防御能力' },
-            fang: { type: "獠牙", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907bed6.png", enduranceValue: 500, activated: false, description:'上古神兽曾用它噬铁碎骨' },
-            claw: { type: "利爪", value: 0, attributes: ["physicalAttack", "speed", "magicAttack", "mana"], url: "https://pic.imgdb.cn/item/666f194dd9c307b7e907be47.png", enduranceValue: 500, activated: false, description:'利爪挥过，血流成河' },
-            tailWhip: { type: "尾鞭", value: 0, attributes: ["physicalAttack", "speed", "magicAttack"], url: "https://pic.imgdb.cn/item/666f194cd9c307b7e907bdd1.png", enduranceValue: 500, activated: false, description:'虽不如毒鳌般凌厉，仍有破势之力' },
-            husk: { type: "甲壳", value: 0, attributes: ["physicalDefense", "speed", "magicDefense"], url: "https://pic.imgdb.cn/item/667fc40cd9c307b7e941f3bd.png", enduranceValue: 500, activated: false, description:'自然之力形成的坚硬盔甲，可抵敌人中伤' }
-        };
+        resetArmsState();
         return;
     }
 

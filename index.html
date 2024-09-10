@@ -3116,7 +3116,7 @@
         </div>
     </div>    
     <div class="description-box" id="description-box"></div>
-    <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: none;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 350px;max-height: 80%;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
+    <div id="inlayGemUI" style="z-index: 9999;text-align: center;display: block;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 350px;border-radius: 2px;color: rgb(146, 52, 28);background: rgb(176, 118, 56);padding: 2px;box-shadow: rgb(146, 52, 28) 0px 0px 3px 1px inset;border: 1px solid black;">
         <button onclick="closeInlayGemDisplay()" id="closeBtn" style="display: flex;gap: 5px;align-items: center;justify-content: center;padding: 5px;text-align: center;background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);background-repeat: repeat;background-size: contain;color: rgb(227, 167, 59);cursor: pointer;box-shadow: rgb(227, 167, 59) 0px 1px 2px 0px inset;border: 1px solid black;position: relative;font-size: 16px;width:100%;font-family: 'Noto Serif SC', sans-serif;">武装详情</button>
         <div id="gem-container" style="font-size: 14px;display: flex;flex-direction: column;background-color: rgb(223, 191, 110);box-shadow: rgb(111, 57, 28) 0px 0px 0px 1px inset;color: black;background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;height: 100%;overflow-y: auto;padding: 2px;">
             <!-- 装备图标和星级 -->
@@ -17653,15 +17653,29 @@ function displayGemSlots(arm) {
 function updateGemSlotDisplay(arm, gem, slotIndex) {
     const slotElement = document.getElementById(`slot${slotIndex + 1}`);
     const gemSlotColor = arm.armState.gemSlots.colors[slotIndex];
+    const slotsDetail = document.getElementById('button-detail');
+
+    // 检查传入的 arm 中的 gemSlots.inlaid 数组
+    const inlaidSlotsNums = arm.armState.gemSlots.inlaid
+        .filter(slot => slot === null || slot.length === 0) // 筛选出未镶嵌的孔
+        .length;
+    console.log(inlaidSlotsNums);
+
+    // 根据未镶嵌的孔位数量调整 slotsDetail 的显示状态
+    if (inlaidSlotsNums === 0) {
+        slotsDetail.style.display = 'none';
+    } else {
+        slotsDetail.style.display = 'flex';
+    }
 
     if (gem) {
-        // 有宝石镶嵌，显示实心圆和宝石信息，保持 class="slot"
+        // 有宝石镶嵌，显示实心圆和宝石信息
         slotElement.innerHTML = `<span style="color:${gemSlotColor};">●</span> ${gem.displayName}${translateGem(gem.name)}`;
     } else {
-        // 没有宝石，显示空心圆和“空”，保持 class="slot"
+        // 没有宝石，显示空心圆和宝石孔信息
         slotElement.innerHTML = `<span style="color:${gemSlotColor};">〇 ${translateColor(gemSlotColor)}宝石孔</span>`;
     }
-    slotElement.classList.add('slot'); // 确保 slotElement 仍然有 class="slot"
+    slotElement.classList.add('slot');  // 确保 slotElement 仍然有 class="slot"
 }
 
 // 随机生成宝石孔颜色

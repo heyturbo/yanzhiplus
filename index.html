@@ -5316,7 +5316,6 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C', imageU
         imageElement.style.margin = '0 auto'; // 居中显示
         imageElement.style.width = width; // 设置图片宽度
         imageElement.style.height = height; // 设置图片高度
-        imageElement.style.border = '1px solid black'; 
         imageElement.style.objectFit = 'contain'; // 保持图片比例
         infoBox.appendChild(imageElement);
     }
@@ -14461,7 +14460,7 @@ function performLotteryDraw() {
             const luckyAmulet = jinnangItems.find(i => i.name === 'luckyAmulet');
             let bonusAmount = 0;
             if (luckyAmulet && luckyAmulet.quantity >= 2) {
-                const bonusMultiplier = (luckyAmulet.quantity - 1) * 0.05;
+                const bonusMultiplier = (luckyAmulet.quantity - 1) * 0.02;
                 bonusAmount = Math.floor(prize * bonusMultiplier);
             }
             pendingPrize += (originalPrice + bonusAmount);
@@ -14696,7 +14695,6 @@ document.getElementById('lotteryClaimPrize').addEventListener('click', () => {
         updateLotteryDisplay();
     }
 });
-
 
 function updateLotteryDisplay() {
     document.getElementById('lotteryPrizePool').textContent = `奖金池: ${lotteryPrizePool}`;
@@ -16133,11 +16131,21 @@ const itemEffects = {
         additionalPlayerCultivation += 1;
         showInfoBox(`${currentPet.name}吃了一个苹果`,null,null,'green');
     },
-    resetJinnang: async () => {
-        await clearOldItems();  // 等待清除旧物品完成
-        await saveGameState();  // 等待保存游戏状态完成
-        setTimeout(() => window.location.reload(), 0);  // 立即刷新页面
-    },
+    resetJinnang: () => showInfoBox(
+        '\n此操作会清空背包所有内容并刷新页面，请务必知悉！\n\n（仅当背包信息错误时才推荐使用，道具一经丢失无法恢复！\n\n⚠️⚠️⚠️如果你确认背包存在不可描述的问题，请点击确认键清空并刷新！）',
+        async () => {  // 直接使用 async 函数
+            await clearOldItems();  // 等待清除旧物品完成
+            await saveGameState();  // 等待保存游戏状态完成
+            window.location.reload();  // 刷新页面
+        },
+        () => {
+            showInfoBox('取消成功！');
+            addItemToJinnang('resetJinnang',1);
+        },
+        'red',
+        'https://pic.imgdb.cn/item/66e043bad9c307b7e94c14df.gif',
+        '192px * 108px'
+    ),
     chocolate: () => {
         let currentPetState = advancementStates.find(state => state.petName === currentPet.name);
         currentPetState.intimacy += 10;

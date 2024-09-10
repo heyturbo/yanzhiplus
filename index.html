@@ -8514,17 +8514,14 @@ function getBlessSkills() {
     );
 
     const currentPetSkill = availableSkills.filter(skill => skill.petName === currentPet.name);
-    const talentedItem = jinnangItems.find(item => item.name === 'talentedBless' && item.quantity > 0);
-
 
     if (availableSkills.length === 0) {
         showInfoBox('已领悟所有可用技能!');
         return null;
     }
     
-    if (currentPetSkill.length !== 0 && talentedItem) {
+    if (currentPetSkill.length !== 0) {
         const acquiredSkill = currentPetSkill[Math.floor(Math.random() * currentPetSkill.length)];
-        useItem('talentedBless', 1);  // 正确消耗天赋赐福道具
         currentPetState.appliedSkills.push({
           ...acquiredSkill,
           level: 1,

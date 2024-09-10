@@ -9204,8 +9204,10 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     // 记录日志
     if (isCritical) {
         logBattleEvent(`⚔️【玩家攻击】暴击！！本次对敌方造成了 ${finalDamage} 点物理伤害！`, 'red');
+        updateDamageValue(finalDamage,false,'damage',true); // 显示玩家伤害
         showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
     } else {
+        updateDamageValue(finalDamage,false,'damage'); // 显示玩家伤害
         logBattleEvent(`⚔️【玩家攻击】你造成了 ${finalDamage} 点物理伤害。`, 'white');
     }
 
@@ -9213,7 +9215,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
         updateDamageValue(finalDamage,false,'extra-damage')
     }
     
-    updateDamageValue(finalDamage,false,'damage'); // 显示玩家伤害
+    
 
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {

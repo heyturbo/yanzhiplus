@@ -6618,6 +6618,7 @@ function handleVictory() {
     logBattleEvent(`您赢得了此次战斗，获得${convertPrice(reward)}金子！进入下一轮战斗！您已经胜利了 ${battleRounds} 轮次`, "pink");
     showBattleOverlay("https://pic.imgdb.cn/item/6672bf9fd9c307b7e9b189e0.png", 500, 1, 1000);
     increaseCurrentPetIntimacy(30);
+    increaseCurrentPetAttention(1);
     increaseCurrentPetLearningValue(200);
 
     defeatedPets = [];
@@ -7557,9 +7558,10 @@ function openHongHuangTreasure() {
         { displayName: '修为灵丹（橙）*6', name: 'cultivationPill500', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
-        { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 5 },
+        { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 4 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5 },
         { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 1.8 },
+        { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4, specialAction: () => generateItemToJinnang('tinyGoldBlock', '小金锭', 'https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', 8000000, 1, '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价') },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
@@ -8473,7 +8475,7 @@ function initializeAdvancementStates() {
 const applicableSkills = Object.values(pets).flatMap(pet =>
   pet.skills
     .filter(skill => 
-      (skill.type === "PA" || skill.type === "MA") && skill.rarity === "SS"
+      (skill.type === "PA" || skill.type === "MA"|| skill.type === "PP") && skill.rarity === "SS"
     )
     .flatMap(skill => [
       { ...skill, rank: '高', multiplier: 0, petName: pet.name, skillName: `${skill.name}[高]` },
@@ -8503,6 +8505,38 @@ const applicableSkills = Object.values(pets).flatMap(pet =>
   return { currentPetState, applicableSkills };
 }
 
+function getBlessSkills() {
+    const currentPetState = initializeAdvancementStates().currentPetState;
+    const applicableSkills = initializeAdvancementStates().applicableSkills;
+    
+    const availableSkills = applicableSkills.filter(skill => 
+        !currentPetState.appliedSkills.some(applied => applied.skillName === skill.skillName)
+    );
+
+    const currentPetSkill = availableSkills.filter(skill => skill.petName === currentPet.name);
+    const talentedItem = jinnangItems.find(item => item.name === 'talentedBless' && item.quantity > 0);
+
+
+    if (availableSkills.length === 0) {
+        showInfoBox('已领悟所有可用技能!');
+        return null;
+    }
+    
+    if (currentPetSkill.length !== 0 && talentedItem) {
+        const acquiredSkill = currentPetSkill[Math.floor(Math.random() * currentPetSkill.length)];
+        useItem('talentedBless', 1);  // 正确消耗天赋赐福道具
+        currentPetState.appliedSkills.push({
+          ...acquiredSkill,
+          level: 1,
+          applied: false
+        });
+        currentPetState.skillPoints = calculateSkillPoints(currentPetState); // 更新技能点数
+        updateAdvancement();
+        showInfoBox(`${currentPet.name}领悟到神圣天赋赐福内的字字箴言，学会了${acquiredSkill.name}（${acquiredSkill.rank}）加成之术，你可以打开加成面板进行查看`,null,null,'green');
+    } else {
+        showInfoBox('当前宠物已经领悟了所有可用加成，使用神圣天赋赐福失败！',null,null,'red');
+    }
+}
 
 function calculateSkillPointsForPet() {
   return Math.floor(petLevel / 9);
@@ -8572,25 +8606,25 @@ function aquireSkillAdvancement(currentPetState, applicableSkills) {
 }
 
 function acquireSkill(currentPetState, applicableSkills) {
-  // 过滤掉已领会的技能
-  const availableSkills = applicableSkills.filter(skill => 
-    !currentPetState.appliedSkills.some(applied => applied.skillName === skill.skillName)
-  );
+    // 过滤掉已领会的技能
+    const availableSkills = applicableSkills.filter(skill => 
+        !currentPetState.appliedSkills.some(applied => applied.skillName === skill.skillName)
+    );
 
-  if (availableSkills.length === 0) {
-    showInfoBox('已领会所有可用技能的该等级');
-    return null;
-  }
+    if (availableSkills.length === 0) {
+        showInfoBox('已领悟所有可用技能!');
+        return null;
+    }
 
-  const acquiredSkill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
-  currentPetState.appliedSkills.push({
-    ...acquiredSkill,
-    level: 1,
-    applied: false
-  });
-  
-  currentPetState.skillPoints = calculateSkillPoints(currentPetState); // 更新技能点数
-  return acquiredSkill;
+    const acquiredSkill = availableSkills[Math.floor(Math.random() * availableSkills.length)];
+        currentPetState.appliedSkills.push({
+        ...acquiredSkill,
+        level: 1,
+        applied: false
+    });
+        
+    currentPetState.skillPoints = calculateSkillPoints(currentPetState); // 更新技能点数
+    return acquiredSkill;
 }
 
 
@@ -16203,7 +16237,8 @@ const itemEffects = {
         } else {
             showInfoBox('使用出错！',null,null,'red');
         }
-    }
+    },
+    talentedBless: () => getBlessSkills()
 };
 
 function useAssignedItem() {
@@ -16310,8 +16345,8 @@ function useAllItems() {
             const usePercentage = progressBar.value;  // 获取用户拖动的比例
             const quantityToUse = Math.min(Math.floor((usePercentage / 100) * selectedItem.quantity), selectedItem.quantity); // 计算数量并确保不超过现有数量
 
-            if (quantityToUse >= 500) {
-                showInfoBox('道具数量过多！请控制在500个以内，以防止卡死或道具丢失！',null,null,'red');
+            if (quantityToUse >= 1000) {
+                showInfoBox('道具数量过多！请控制在1000个以内，以防止卡死或道具丢失！',null,null,'red');
                 removeProgressBar();
                 return;
             }

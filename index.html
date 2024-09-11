@@ -1484,7 +1484,9 @@
             background-image: url(https://pic.imgdb.cn/item/66ceec7fd9c307b7e9851687.gif);
             background-size: contain;
             background-repeat: no-repeat;
+            display: flex;
             background-position: center;
+            flex-direction: column;
         }
         
         .lottery-drawer.open {
@@ -1503,7 +1505,7 @@
         
         .lottery-top {
             margin-bottom: 0px;
-            width: 100%;
+            display: flex;
         }
         .lottery-middle {
             margin-bottom: 0px;
@@ -1519,7 +1521,7 @@
             width: 100%;
             display: flex;
         }
-        .lottery-box, .lottery-number-box {
+        .lottery-box {
             border: 1px solid #e0e0e0;
             border-radius: 5px;
             padding: 0px;
@@ -1529,9 +1531,11 @@
             font-weight: bold;
         }
         .lottery-number-box {
-            border: 1px solid #ccc;
+            font-weight: bold;
+            width: 100%;
+        }
+        .lottery-number-box {
             border-radius: 5px;
-            padding: 10px;
             margin: 15px 0;
             text-align: center;
             background-color: hwb(0deg 98% 2% / 50%);
@@ -1542,7 +1546,9 @@
             grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
             gap: 5px;
             padding: 0px;
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
         
         #lotteryNumberButtons button {
@@ -2839,8 +2845,8 @@
             <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
         </div>
         <div class="lottery-section lottery-middle">
-            <div class="lottery-box" id="lotteryDrawResults">开奖区: </div>
-            <div class="lottery-box" id="lastSelectedNumbers">上次选号: </div>
+            <div class="lottery-number-box" id="lotteryDrawResults">开奖区: </div>
+            <div class="lottery-number-box" id="lastSelectedNumbers">上次选号: </div>
             <div class="lottery-number-box" id="lotteryAvailableNumbers">备选区: 
                 <div id="lotteryNumberButtons"></div>
             </div>
@@ -14666,7 +14672,7 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
         // 每0.2秒生成一组6个随机数，显示给玩家
         const generateRandomNumbers = () => {
             const randomNumSeries = Array.from({ length: 6 }, () => Math.floor(Math.random() * 30 + 1));  // 生成6个1到30之间的随机数
-            showInfoBox(`正在摇奖中: ${randomNumSeries.join(', ')}`);  // 显示生成的数字
+            document.getElementById('lotteryDrawResults').innerHTML = `开奖中: ${randomNumSeries.join(', ')}`;
         };
 
         const generatingNumber = setInterval(generateRandomNumbers, 100);  // 每0.2秒生成一次随机数

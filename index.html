@@ -2847,7 +2847,7 @@
         <div class="lottery-section lottery-middle">
             <div class="lottery-number-box" id="lotteryDrawResults">开奖区: </div>
             <div class="lottery-number-box" id="lastSelectedNumbers">上次选号: </div>
-            <div class="lottery-number-box" id="lotteryAvailableNumbers">备选区: 
+            <div class="lottery-number-box" id="lotteryAvailableNumbers" style="display: flex;flex-direction: column;">备选区: 
                 <div id="lotteryNumberButtons"></div>
             </div>
             <div class="lottery-controls">
@@ -14675,13 +14675,15 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
             document.getElementById('lotteryDrawResults').innerHTML = `开奖中: ${randomNumSeries.join(', ')}`;
         };
 
-        const generatingNumber = setInterval(generateRandomNumbers, 100);  // 每0.2秒生成一次随机数
+        const generatingNumber = setInterval(generateRandomNumbers, 100);  // 每0.1秒生成一次随机数
+        const simulationDuration = Math.floor(Math.random() * 3000 + 2000);
+        console.log(simulationDuration);
 
-        // 2秒后停止模拟生成，并执行实际开奖
+        // 随机时间后停止模拟生成，并执行实际开奖
         setTimeout(() => {
             clearInterval(generatingNumber);  // 停止生成随机数
             performLotteryDraw();  // 立即执行实际开奖
-        }, 2000);  // 2秒后开奖
+        }, simulationDuration);  // 2秒后开奖
     }
 });
 

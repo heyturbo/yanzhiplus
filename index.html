@@ -679,6 +679,14 @@
             background-color: hsl(190deg 60% 55% / 50%);
             font-weight: bold;
         }
+        .core-area .skills .sss-skill {
+            border: 2px double #e8f3ee;
+            box-shadow: 0px 0px 5px 2px rgb(0 0 0 / 50%);
+            background-color: hwb(211deg 0% 56% / 60%);
+            font-weight: bold;
+            color: #f1f8ff;
+            text-shadow: 0 0 5px gold;
+        }
         .bottom-bar .info {
             display: flex;
             flex-direction: column;
@@ -5909,6 +5917,8 @@ function restorePetData(petName) {
                     skillDiv.classList.add('s-skill');
                 } else if (skill.rarity === 'SS') {
                     skillDiv.classList.add('ss-skill');
+                } else if (skill.rarity === 'SSS') {
+                    skillDiv.classList.add('sss-skill');
                 }
                 skillsArea.appendChild(skillDiv);
             });
@@ -7574,12 +7584,13 @@ function openHongHuangTreasure() {
         { displayName: '神圣天赋赐福', name: 'talentedBless', quantity: 1, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4, specialAction: () => generateItemToJinnang('tinyGoldBlock', '小金锭', 'https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', 8000000, 1, '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价') },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
-        { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
+        { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 4.5 },
         { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 0.1 },
         { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
         { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 },
         { displayName: '白银VIP包裹', name: 'baiYinPKG', quantity: 1, chance: 5 },
         { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 2 },
+        { displayName: '高级天赋技能', name: 'advancedSkillBook', quantity: 1, chance: 0.5 , specialAction: () => generateItemToJinnang('advancedSkillBook', '高级天赋技能', 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', 12500, 1, '打开后可获得一本所有宠物都可学习的极稀有SSS技能') },
         { displayName: '六级淡紫色灵石', name: 'purpleSixthGem', quantity: 1, chance: 3, specialAction: () => generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 500, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石') },
         { displayName: '六级粉红色灵石', name: 'pinkSixthGem', quantity: 1, chance: 3, specialAction: () => generateItemToJinnang('pinkSixthGem', '六级粉红色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png', 500, 1, '尚未开光的灵石，使用后可得到一颗随机的6级粉红色宝石') }
     ];
@@ -7809,6 +7820,8 @@ function getEnemyStatus() {
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (enemyRivival) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
+    if (battleState.enemy.bleeding) status.push("流血");
+    if (battleState.enemy.corrode) status.push("腐蚀");
     if (battleState.enemy.sleep) status.push("沉睡");
     if (battleState.enemy.pierced) status.push("穿透");
     if (battleState.enemy.silenced) status.push("沉默");
@@ -7828,7 +7841,7 @@ function updateEnemyStatusDisplay() {
     const statusElement = document.getElementById('enemy-status');
     if (statusElement) {
         statusElement.innerText = getEnemyStatus();
-    }
+    } 
 }
 
 function getPlayerStatus() {
@@ -8392,7 +8405,6 @@ function handleLevelUp() {
     updateUI();
 }
 
-
 function handleBulkLevelUp() {
     const skillMessages = [];
     currentPet.skills.forEach(skill => {
@@ -8610,7 +8622,6 @@ function acquireSkill(currentPetState, applicableSkills) {
     return acquiredSkill;
 }
 
-
 function addLearningValue(currentPetState) {
   const learningValueGained = Math.floor(Math.random() * 301) + 300; // 100到300之间的随机值
   currentPetState.learningValue += learningValueGained;
@@ -8651,7 +8662,6 @@ function increaseCurrentPetAttention(amount) {
   updateAdvancement();
 }
 
-
 function test() {
     increaseCurrentPetLearningValue(200000);
     increaseCurrentPetIntimacy(6000);
@@ -8680,7 +8690,6 @@ function calculateSkillPoints(currentPetState) {
 
   return totalSkillPoints - usedSkillPoints;
 }
-
 
 function updateAdvancement() {
   let { currentPetState, applicableSkills } = initializeAdvancementStates();
@@ -8730,7 +8739,6 @@ function updateAdvancement() {
     });
   });
 }
-
 
 const aquireSkillBtn = document.getElementById('aquire-skill-btn');
 aquireSkillBtn.addEventListener('click', () => {
@@ -8917,7 +8925,6 @@ function handleApplyAdvancement(skill, applied) {
     showInfoBox(`${currentPet.name}并不会释放${skill.name}，应用或禁用后不会产生任何效果！`, null, null, 'red');
   }
 }
-
         
 function selectSkillAndCalculateMultiplier(type) {
     let selectedSkills = [];
@@ -8931,17 +8938,18 @@ function selectSkillAndCalculateMultiplier(type) {
         const skillName = skillDiv.innerText.split(' ')[0];
         const skill = currentPet.skills.find(skill => skill.name === skillName);
         if (skill) {
-            if (type === 'physical' && skill.type === 'PA') {
+            if (type === 'physical' && (skill.type === 'PA' || skill.type ==='PAE')) {
                 selectedSkills.push(skill);
-            } else if (type === 'magical' && skill.type === 'MA') {
+            } else if (type === 'magical' && (skill.type === 'MA' || skill.type === 'MAE')) {
                 selectedSkills.push(skill);
             }
         }
     });
-
+    
+    const randomIndex = Math.floor(Math.random() * selectedSkills.length);
+    const selectedSkill = selectedSkills[randomIndex];
+    
     if (selectedSkills.length > 0) {
-        const randomIndex = Math.floor(Math.random() * selectedSkills.length);
-        const selectedSkill = selectedSkills[randomIndex];
         const result = calculateSkillLevelAndMultiplier(selectedSkill);
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
@@ -8964,7 +8972,7 @@ function selectSkillAndCalculateMultiplier(type) {
         }
     }
 
-    return { skillMultiplier, isSkillUsed };
+    return { skillMultiplier, isSkillUsed, selectedSkill };
 } 
         
 let waterAmuletTriggered = false; // 新增标志变量
@@ -8994,13 +9002,13 @@ function performAttack(type) {
         attackType = 'physical';
     }
     
-    const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(attackType);
+    const { skillMultiplier, isSkillUsed, selectedSkill } = selectSkillAndCalculateMultiplier(attackType);
     let damageResult;
 
     if (attackType === 'physical') {
-        damageResult = performPhysicalAttack(skillMultiplier, isSkillUsed);
+        damageResult = performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
     } else if (attackType === 'magical') {
-        const result = performMagicalAttack(skillMultiplier, isSkillUsed);
+        const result = performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
         if (result.retryPhysical) {
             logBattleEvent("⚔️【玩家攻击】法力值不足，自动转为物理攻击。", 'red');
             performAttack('physical');
@@ -9126,7 +9134,7 @@ function f(x) {
     return Math.max(result, 0);
 }
         
-function performPhysicalAttack(skillMultiplier, isSkillUsed) {
+function performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
     const x = battleState.enemy.physicalDefense * defenseFactor;
     const effectiveDefense = f(x);
@@ -9185,6 +9193,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     if (enemyRivival) {
         finalDamage = Math.floor(0.1 * finalDamage);
     }
+    
     battleState.enemy.health = Math.max(0, battleState.enemy.health - finalDamage);
     
     // 记录日志
@@ -9202,7 +9211,6 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
     
     
-
     // 应用吸血魔刃效果
     if (ascensionSkill.name === '吸血魔刃' || secondAscensionSkill.name === '吸血魔刃') {
         const bloodSuckPercentage = (ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).increment((ascensionSkill.name === '吸血魔刃' ? ascensionSkill : secondAscensionSkill).level) / 100;
@@ -9217,11 +9225,15 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed) {
     }
     
     applyPhysicalAttackEffects(isSkillUsed ? skillMultiplier : 1); // 确保正确执行物理攻击效果
+    if (selectedSkill.type === "PAE") {
+        applySpecialSkillEffects(selectedSkill);
+    }
+    console.log(selectedSkill);
     return finalDamage;
 }
 
 
-function performMagicalAttack(skillMultiplier, isSkillUsed) {
+function performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     let manaCostMultiplier = 1;
     if (battleState.player.spellSlow) {
         manaCostMultiplier = 500;
@@ -9294,9 +9306,6 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
         updateDamageValue(finalDamage,false,'extra-damage')
     }
     
-    
-    applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
-    
     if (battleState.enemy.pierced) {
         handlePierced(); // 处理穿透效果
     }
@@ -9304,6 +9313,11 @@ function performMagicalAttack(skillMultiplier, isSkillUsed) {
     if ((ascensionSkill.name === '法术精通' || secondAscensionSkill.name === '法术精通') &&
         Math.random() * 100 < (battleState.player.spellMasteryChance)) {
         performIndependentMagicAttack();
+    }
+    
+    applyMagicAttackEffects(finalDamage, isSkillUsed ? skillMultiplier : 1);
+    if (selectedSkill.type === "MAE") {
+        applySpecialSkillEffects(selectedSkill);
     }
 
     return { damage: finalDamage, retryPhysical: false };
@@ -11239,6 +11253,10 @@ function handleRampaged() {
     console.log(`handleRampaged called. battleRounds: ${battleRounds}, enemy health: ${battleState.enemy.health}, enemyMaxHealth: ${enemyMaxHealth}`);
     if (summonEnemy) {
         return;
+    }
+
+    if (enemyRivival) {
+        enemyRivival = false;
     }
 
     if (battleRounds === 150) {
@@ -15664,6 +15682,8 @@ let jinnangItems = [
     { name: 'mergeAmulet', displayName: '低级宝石合成符', url: 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c55.png', price: 1000, quantity: 0, description: '上古时代流传的符文，用于合成1~3级宝石' },
     { name: 'mergeAmuletPlus', displayName: '高级宝石合成符', url: 'https://pic.imgdb.cn/item/66dbff82d9c307b7e9b75a35.png', price: 2000, quantity: 0, description: '上古时代流传的符文，用于合成4~6级宝石' },
     { name: 'gemLuckyBag', displayName: '宝石袋盲盒', url: 'https://pic.imgdb.cn/item/66db2daed9c307b7e9c7508a.png', price: 50, quantity: 0, description: '打开后获得一颗随机的一级宝石' },
+    { name: 'lizhuamengji', displayName: '利爪猛击天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：利爪猛击' },
+    { name: 'huoyanchongji', displayName: '火焰冲击天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：火焰冲击' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -16269,7 +16289,15 @@ const itemEffects = {
             showInfoBox('使用出错！',null,null,'red');
         }
     },
-    talentedBless: () => getBlessSkills()
+    talentedBless: () => getBlessSkills(),
+    advancedSkillBook: () => {
+        const item = ['lizhuamengji', 'huoyanchongji'];
+        const randomIndex = Math.floor(Math.random() * item.length);
+        const selectedItem = item[randomIndex];
+        addItemToJinnang(selectedItem, 1);
+    },
+    lizhuamengji: () => createSkills('利爪猛击', 'SSS', 'PAE', 1, 3, '凶狠的近战之术，运用自身尖锐利爪给予敌人舍命一击，造成大量物理伤害的同时附加百分百流血效果'),
+    huoyanchongji: () => createSkills('火焰冲击', 'SSS', 'MAE', 1, 3, '精通元素之力的宠物懂得如何将致命元素化为己用，掌握此技能将会运用高温火焰喷向敌人，造成猛烈伤害并大幅腐蚀敌人护甲')
 };
 
 function useAssignedItem() {
@@ -20303,10 +20331,53 @@ function updateSkillsArea(selectedSkills) {
                 skillDiv.classList.add('s-skill');
             } else if (skill.rarity === 'SS') {
                 skillDiv.classList.add('ss-skill');
+            } else if (skill.rarity === 'SSS') {
+                skillDiv.classList.add('sss-skill');
             }
             skillsArea.appendChild(skillDiv);
         }
     });
+}
+
+function createSkills(name, rarity, type, level, multiplier, description) {
+    // 使用函数参数的实际值，而不是字符串
+    const skillsArea = document.getElementById("skills-area");
+    const skillDiv = document.createElement("div");
+    const existingSkills = Array.from(skillsArea.children).map(skillDiv => skillDiv.innerText.split(' ')[0]);
+    
+    if (existingSkills.length >= 12) {
+        showInfoBox('已超过可拥有的技能数量上限！',null,null,'red');
+        return;
+    }
+    
+    if (!existingSkills.includes(name)) {
+        currentPet.skills.push({ 
+            name: name, 
+            rarity: rarity, 
+            type: type, 
+            level: level, 
+            multiplier: multiplier, 
+            description: description,
+            byLearned: true
+        });
+    } else {
+        showInfoBox('此技能你已经学会，无法重复学习！',null,null,'red');
+        return;
+    }
+    
+    const skill = currentPet.skills.find(s => s.name === name);
+    skillDiv.innerText = `${name} (${rarity})`;  // 在页面上显示技能名称和稀有度
+    skillDiv.onclick = () => {
+        deleteSkill(skill, skillDiv, skillsArea);
+    };
+    if (rarity === 'S') {
+        skillDiv.classList.add('s-skill');
+    } else if (rarity === 'SS') {
+        skillDiv.classList.add('ss-skill');
+    } else if (rarity === 'SSS') {
+        skillDiv.classList.add('sss-skill');
+    }
+    skillsArea.appendChild(skillDiv);
 }
 
 function deleteSkill(skill, skillDiv, skillsArea) {
@@ -20320,7 +20391,9 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
         const skillTypeMap = {
             "PA": "物理攻击技能，与物理攻击力相关",
+            "PAE": "高级物理攻击技能，通常带有特殊效果或更高的技能伤害",
             "MA": "法术攻击技能，与法术攻击力相关",
+            "MAE": "高级法术攻击技能，通常带有特殊效果或更高的技能伤害",
             "PP": "施毒技能，与法术攻击力和修为有关",
             "PH": "治疗技能，与法术攻击力和修为有关",
             "PD": "防御技能，会根据技能系数增加防御的伤害抵消数值",
@@ -20380,6 +20453,66 @@ function deleteSkill(skill, skillDiv, skillsArea) {
     }
 }
 
+function applySpecialSkillEffects(skill) {
+    const skillDetail = calculateSkillLevelAndMultiplier(skill); //得到skillLevel, skillMultiplier
+    // 定义特殊技能及其对应的效果
+    const specialSkills = {
+        "利爪猛击": () => {
+            // 如果敌人已经出血，直接返回
+            if (battleState.enemy.bleeding) {
+                return;
+            }
+
+            // 设定敌人为出血状态
+            battleState.enemy.bleeding = true;
+
+            // 设置出血效果，每500ms对敌人造成一次伤害
+            const bleedinginterval = setInterval(() => {
+                const bleedingDamage = Math.round(battleAttributes.physicalAttack * skillDetail.skillMultiplier * (Math.random() * 0.1) + 1);
+                battleState.enemy.health = Math.max(0, battleState.enemy.health - bleedingDamage);
+                updateDamageValue(bleedingDamage, false, 'damage', true);
+                updateUI();
+            }, 500);
+
+            // 出血效果持续3秒
+            setTimeout(() => {
+                clearInterval(bleedinginterval);  // 停止出血伤害
+                battleState.enemy.bleeding = false;  // 敌人不再出血
+            }, 3000);
+        },
+        "火焰冲击": () => {
+            if (battleState.enemy.corrode) {
+                return;
+            }
+            
+            battleState.enemy.corrode = true;
+            const originalEnemyPD = battleState.enemy.physicalDefense;
+            const originalEnemyMD = battleState.enemy.magicDefense;
+            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.01 * (battleState.enemy.physicalDefense + battleState.enemy.magicDefense));
+            console.log(corrodedDefenseValue);
+            battleState.enemy.physicalDefense = Math.max(0, battleState.enemy.physicalDefense - corrodedDefenseValue);
+            battleState.enemy.magicDefense = Math.max(0, battleState.enemy.magicDefense - corrodedDefenseValue);
+
+            // 腐蚀效果持续3秒
+            setTimeout(() => {
+                battleState.enemy.corrode = false;  // 敌人不再腐蚀护甲
+                battleState.enemy.physicalDefense = originalEnemyPD;
+                battleState.enemy.magicDefense = originalEnemyMD;
+            }, 3000);
+        }
+        // "某技能": () => {...}
+    };
+
+    // 检查技能名是否在 specialSkills 中存在
+    if (specialSkills[skill.name]) {
+        // 如果技能存在，执行该技能的效果
+        specialSkills[skill.name]();
+    } else {
+        console.log(`技能 "${skill.name}" 不存在特殊效果`);
+    }
+}
+
+        
 let cultivationTime;
 let isOngoingCultivate = false;
 let totalGainedCultivation = 0; // 仅在修炼期间累加修为值
@@ -20731,7 +20864,8 @@ function getBlessGift() {
     addItemToJinnang('qualityEnhancePillPKG', 20);
     addItemToJinnang('forgeTool', 3);
     addItemToJinnang('cultivationPill200', 5);
-    generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
+    generateItemToJinnang('advancedSkillBook', '高级天赋技能', 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', 12500, 1, '打开后可获得一本所有宠物都可学习的极稀有SSS技能');
+    generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 10, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
     addItemToJinnang('blueArmComponents', 600);
     generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  10, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
     generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 100, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石');
@@ -22596,6 +22730,8 @@ function loadGameState(auto = false) {
                         skillDiv.classList.add('s-skill');
                     } else if (skill.rarity === 'SS') {
                         skillDiv.classList.add('ss-skill');
+                    } else if (skill.rarity === 'SSS') {
+                        skillDiv.classList.add('sss-skill');
                     }
                     skillsArea.appendChild(skillDiv);
                 });

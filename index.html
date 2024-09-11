@@ -20342,6 +20342,7 @@ function createSkills(name, rarity, type, level, multiplier, description) {
     
     const skill = currentPet.skills.find(s => s.name === name);
     skillDiv.innerText = `${name} (${rarity})`;  // 在页面上显示技能名称和稀有度
+    showInfoBox(`成功学会${name}，技能效果：${description}`);
     skillDiv.onclick = () => {
         deleteSkill(skill, skillDiv, skillsArea);
     };
@@ -20440,12 +20441,13 @@ function applySpecialSkillEffects(skill) {
 
             // 设定敌人为出血状态
             battleState.enemy.bleeding = true;
+            const bleedingDuration = Math.max(100, skillDetail.skillLevel * 200);
 
             // 设置出血效果，每500ms对敌人造成一次伤害
             const bleedinginterval = setInterval(() => {
                 const bleedingDamage = Math.round(battleAttributes.physicalAttack * skillDetail.skillMultiplier * (Math.random() * 0.1) + 1);
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - bleedingDamage);
-                updateDamageValue(bleedingDamage, false, 'damage', true);
+                updateDamageValue(bleedingDamage, false, 'extra-damage', true);
                 updateUI();
             }, 500);
 
@@ -20453,7 +20455,7 @@ function applySpecialSkillEffects(skill) {
             setTimeout(() => {
                 clearInterval(bleedinginterval);  // 停止出血伤害
                 battleState.enemy.bleeding = false;  // 敌人不再出血
-            }, 3000);
+            }, bleedingDuration);
         },
         "火焰冲击": () => {
             if (battleState.enemy.corrode) {
@@ -20463,10 +20465,11 @@ function applySpecialSkillEffects(skill) {
             battleState.enemy.corrode = true;
             const originalEnemyPD = battleState.enemy.physicalDefense;
             const originalEnemyMD = battleState.enemy.magicDefense;
-            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.02 * (originalEnemyPD + originalEnemyMD));
+            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.01 * (originalEnemyPD + originalEnemyMD));
             console.log(corrodedDefenseValue);
             battleState.enemy.physicalDefense = Math.max(0, battleState.enemy.physicalDefense - corrodedDefenseValue);
             battleState.enemy.magicDefense = Math.max(0, battleState.enemy.magicDefense - corrodedDefenseValue);
+            logBattleEvent(`带有灵力的火焰腐蚀了敌人的护甲，敌人双防降低了${corrodedDefenseValue}点`, 'purple');
 
             // 腐蚀效果持续3秒
             setTimeout(() => {

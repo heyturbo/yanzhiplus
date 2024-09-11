@@ -6250,6 +6250,7 @@ function showPetShop() {
                         
                         petDiv.remove(); // 移除已购买的宠物
                         updateStampCount();
+                        showPetShop();
                     } else {
                         showInfoBox('印花数量不足!');
                     }
@@ -6299,7 +6300,6 @@ document.getElementById('buySummonCharmButton').addEventListener('click', () => 
 document.getElementById('closeMissionPanel').addEventListener('click', () => {
     document.getElementById('missionPanel').style.display = 'none';
 });
-
 
 
 
@@ -6922,6 +6922,9 @@ function resetBattleState(playerWon) {
     
     if (playerWon && battleRounds === 151 && !summonEnemy) {
         changeEnemyImage("realShape");
+        if (autoBattleInterval !== null) {
+            clearAutoBattle;
+        }
         showInfoBox("你已经成功挑战150轮！你的爱宠经受住了魔王的考验，恭喜你！继续挑战会进入无尽模式。");
     }
 
@@ -7560,7 +7563,7 @@ function openHongHuangTreasure() {
         { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 4 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5 },
         { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 1.8 },
-        { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
+        { displayName: '神圣天赋赐福', name: 'talentedBless', quantity: 1, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4, specialAction: () => generateItemToJinnang('tinyGoldBlock', '小金锭', 'https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', 8000000, 1, '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价') },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
@@ -7855,7 +7858,7 @@ function showEffect(effectId, imageUrl) {
     setTimeout(() => {
         effect.classList.remove('show-effect');
         effect.style.backgroundImage = ''; // 移除背景图，避免残留
-    }, 500); // 显示0.5秒
+    }, 350); // 显示0.35秒
 } //展示战斗中技能特效
 
 function updateUI() {
@@ -8074,19 +8077,15 @@ function handleDodge(target) {
         // 触发闪避
         // 应用视觉效果
         if (target === 'player') {
-            
             dodgeElement.style.opacity = '0.5';
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         } else {
-            
             dodgeElement.style.opacity = '0.5';
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         }
 
         // 0.1秒后复原
         setTimeout(() => {
-            dodgeElement.style.marginRight = '';
-            dodgeElement.style.marginLeft = '';
             dodgeElement.style.opacity = '';
         }, 100);
 
@@ -8130,19 +8129,15 @@ function handleMagicDodge(target) {
     if (isDodge) {
         // 触发闪避，应用视觉效果
         if (target === 'player') {
-            
             dodgeElement.style.opacity = '0.5';
             showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         } else {
-            
             dodgeElement.style.opacity = '0.5';
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66bb115dd9c307b7e9a6c2d0.png');
         }
 
         // 0.1秒后复原
         setTimeout(() => {
-            dodgeElement.style.marginRight = '';
-            dodgeElement.style.marginLeft = '';
             dodgeElement.style.opacity = '';
         }, 100);
 
@@ -8175,18 +8170,7 @@ function levelUpSkill() {
 
     // 创建弹出界面
     const modal = document.createElement('div');
-    modal.style.width = '85%';
-    modal.style.height = '60%';
-    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
-    modal.style.color = 'white';
-    modal.style.border = '1px solid #ddd';
-    modal.style.borderRadius = '10px';
-    modal.style.padding = '20px';
-    modal.style.overflowY = 'scroll';
-    modal.style.position = 'relative';
-    modal.style.display = 'flex';
-    modal.style.flexDirection = 'column';
-    modal.style.justifyContent = 'space-between';
+    modal.style = 'width: 85%;max-height: 80%;background-color: rgba(0, 0, 0, 0.1);color: white;border: 1px solid rgb(221, 221, 221);border-radius: 5px;padding: 20px;overflow-y: scroll;position: relative;display: flex;flex-direction: column;justify-content: center;align-items: stretch;';
     
     // 创建标题和关闭按钮
     const title = document.createElement('h2');
@@ -8208,7 +8192,6 @@ function levelUpSkill() {
     // 创建技能显示区
     const skillsGrid = document.createElement('div');
     skillsGrid.style.display = 'grid';
-    skillsGrid.style.marginBottom = '60px';
     skillsGrid.style.color = 'black';
     skillsGrid.style.fontSize = '12px';
     skillsGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
@@ -8216,13 +8199,8 @@ function levelUpSkill() {
     modal.appendChild(skillsGrid);
 
     const infoContainer = document.createElement('div');
-    infoContainer.style.display = 'flex';
-    infoContainer.style.marginBottom = '30px';
-    infoContainer.style.height = '30px';
-    infoContainer.style.textAligh = 'center';
-    infoContainer.style.color = 'white';
-    infoContainer.style.fontSize = '12px';
-    infoContainer.style.gap = '10px';
+    infoContainer.innerText = '点击技能可查看技能详细说明。'
+    infoContainer.style = 'display: flex;color: white;font-size: 14px;gap: 10px;padding: 20px;height: 110px;align-items: center;border: 1px solid #fff;margin-top: 10px;border-radius: 2px;';
     modal.appendChild(infoContainer);
 
     function populateSkills() {
@@ -8255,7 +8233,8 @@ function levelUpSkill() {
                     skillElement.classList.add('selected-skill');
                     skillElement.style.backgroundColor = '#add8e6';
                     skillElement.style.transform = 'scale(1.05)';
-                    infoContainer.innerText = `${skill.rarity}技能，当前技能倍率为${Math.floor(skill.multiplier * 100)}%（仅供参考）${skill.description}`;
+                    const skillMultiplier = calculateSkillLevelAndMultiplier(skill).skillMultiplier;
+                    infoContainer.innerText = `${skill.rarity}技能，当前技能基础倍率为${Math.floor(skillMultiplier * 100)}%（目前技能倍率仅攻击类技能为直接相乘，其他类型技能都是加权相乘）说明：${skill.description}`;
                 };
                 skillsGrid.appendChild(skillElement);
             }
@@ -8269,7 +8248,7 @@ function levelUpSkill() {
     buttonContainer.style.marginTop = '20px';
     buttonContainer.style.display = 'flex';
     buttonContainer.style.flexDirection = 'row';
-    buttonContainer.style.justifyContent = 'space-evenly';
+    buttonContainer.style.justifyContent = 'space-between';
     buttonContainer.style.textAlign = 'center';
     modal.appendChild(buttonContainer);
 
@@ -11352,6 +11331,24 @@ function updateDrugGrid() {
     }
 }
 
+function addDrugToInventory(drugKey, quantity = 1) {
+    // 检查 drugInventory 中是否已有该药品
+    if (drugInventory[drugKey]) {
+        // 如果药品已经存在，增加数量
+        drugInventory[drugKey].quantity += quantity;
+    } else {
+        // 如果药品不存在，创建新的药品并设定数量
+        drugInventory[drugKey] = {
+            quantity: quantity,
+            url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png',
+            tier: 0,
+            description: '珍贵的神秘药材'
+        };
+    }
+    updateDrugGrid();
+    console.log(`${drugKey} 的数量已更新，当前数量: ${drugInventory[drugKey].quantity}`);
+}
+        
 function closeDrugModal() {
     document.getElementById('drug-modal').style.display = 'none';
     selectedDrug = null;
@@ -11815,9 +11812,9 @@ function mergeDrug() {
     const selectedDrugTier = selectedDrugDetails.tier;
 
     if (selectedDrugTier === 0) {
-        const requiredQuantity = 2;
+        const requiredQuantity = 3;
         if (selectedDrugDetails.quantity < requiredQuantity) {
-            showInfoBox("你至少需要2个同类药品才能进行合成！");
+            showInfoBox("你至少需要3个同类药品才能进行合成！");
             return;
         }
 
@@ -11829,10 +11826,10 @@ function mergeDrug() {
         let message = '';
 
         if (probability < 0.1) {
-            message = `你使用2个${selectedDrug}但没有成功合成任何药品`;
+            message = `你使用3个${selectedDrug}尝试合成，但没有产出任何事物`;
         } else if (probability < 0.2) {
             drugInventory[selectedDrug].quantity += 1;
-            message = `你使用2个${selectedDrug}进行炼制，但只得到了1个${selectedDrug}`;
+            message = `你使用3个${selectedDrug}进行炼制，但只得到了1个${selectedDrug}`;
         } else if (probability < 0.5) {
             const tier1Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 1);
             const newDrugs = [];
@@ -11841,7 +11838,7 @@ function mergeDrug() {
                 drugInventory[newDrug].quantity += 1;
                 newDrugs.push(newDrug);
             }
-            message = `你使用2个${selectedDrug}成功炼制出了3个随机紫色品阶药品：${newDrugs.join(', ')}`;
+            message = `你使用3个${selectedDrug}成功炼制出了3个随机紫色品阶药品：${newDrugs.join(', ')}`;
         } else {
             const tier0Drugs = Object.keys(drugInventory).filter(drug => drugInventory[drug].tier === 0);
             const newDrugs = [];
@@ -11850,14 +11847,14 @@ function mergeDrug() {
                 drugInventory[newDrug].quantity += 1;
                 newDrugs.push(newDrug);
             }
-            message = `你使用2个${selectedDrug}成功炼制出了2个随机橙色品阶药品：${newDrugs.join(', ')}`;
+            message = `你使用3个${selectedDrug}成功炼制出了2个随机橙色品阶药品：${newDrugs.join(', ')}`;
         }
 
         document.getElementById('drug-description').innerText = message;
     } else {
-        const requiredQuantity = 3;
+        const requiredQuantity = 5;
         if (selectedDrugDetails.quantity < requiredQuantity) {
-            showInfoBox("你至少需要3个同类药品才能进行合成！");
+            showInfoBox("你至少需要5个同类药品才能进行合成！（橙色品阶需要3个）");
             return;
         }
 
@@ -11872,7 +11869,7 @@ function mergeDrug() {
         // 增加高级药品数量
         drugInventory[newDrug].quantity += 1;
 
-        document.getElementById('drug-description').innerText = `你使用3个${selectedDrug}成功炼制出了1个${newDrug}`;
+        document.getElementById('drug-description').innerText = `你使用5个${selectedDrug}成功炼制出了1个${newDrug}`;
     }
 
     updateDrugGrid();
@@ -16369,7 +16366,7 @@ function useAllItems() {
             const usePercentage = progressBar.value;  // 获取用户拖动的比例
             const quantityToUse = Math.min(Math.floor((usePercentage / 100) * selectedItem.quantity), selectedItem.quantity); // 计算数量并确保不超过现有数量
 
-            if (quantityToUse >= 1000) {
+            if (quantityToUse > 1000) {
                 showInfoBox('道具数量过多！请控制在1000个以内，以防止卡死或道具丢失！',null,null,'red');
                 removeProgressBar();
                 return;
@@ -16465,8 +16462,7 @@ function useSpiritWine() {
                 showInfoBox(`成功提升2级精灵等级，当前精灵为${spiritLevel}级`, null, null, 'green');
             },
             () => {
-                jinnangItems[51].quantity += 1;
-                updateJinnangItems();
+                addItemToJinnang('spiritWine', 1);
             },
             'yellow'
         );
@@ -19157,7 +19153,7 @@ function refreshShop(auto = false) {
         return;
     }
 
-    const numItems = auto ? getRandomInt(2, 18) : getRandomInt(10, 100);
+    const numItems = auto ? getRandomInt(2, 18) : getRandomInt(10, 60);
     const probabilities = auto ? [0.8, 0.2] : [0.7, 0.3];
     let rareItemCount = 0;
     let commonBundleCount = 0;
@@ -19187,7 +19183,7 @@ function refreshShop(auto = false) {
 
         if (item.name.includes('包裹')) {
             const bundleCount = isRare ? rareBundleCount : commonBundleCount;
-            const maxBundles = isRare ? 6 : 6;
+            const maxBundles = isRare ? 3 : 3;
 
             if (bundleCount >= maxBundles) {
                 i--;
@@ -19256,7 +19252,11 @@ function getRandomCommonItem() {
         createItem('宝石镶嵌符', 21388, 31788, 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc79.png'),
         createItem('宝石摘除符', 21388, 31788, 'https://pic.imgdb.cn/item/66dc001bd9c307b7e9b8bb5c.png'),
         createItem('低级宝石合成符', 11388, 16788, 'https://pic.imgdb.cn/item/66db2caed9c307b7e9c66c55.png'),
-        createItem('升级宝石礼包（极品）', 21388, 31788, 'https://pic.imgdb.cn/item/66dab9c1d9c307b7e921b767.png')
+        createItem('升级宝石礼包（极品）', 21388, 31788, 'https://pic.imgdb.cn/item/66dab9c1d9c307b7e921b767.png'),
+        createItem('延寿露', 3888, 3999, 'https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png'),
+        createItem('天山雪莲', 3888, 3999, 'https://pic.imgdb.cn/item/666d311dd9c307b7e996b5a8.png'),
+        createItem('忘忧水', 1888, 1999, 'https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef9c.png'),
+        createItem('三花丸', 1888, 1999, 'https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png')
     ];
 
     if (Math.random() < 0.8) {
@@ -19386,10 +19386,13 @@ function addItemToShop(item, shopItems) {
         } else {
             // 查找1类商品的描述信息
             const matchingItem = jinnangItems.find(jItem => jItem.displayName === itemBaseName);
+            const drugItem = drugInventory[itemBaseName];
 
             if (matchingItem) {
                 // 1类商品，显示其描述信息
                 description = matchingItem.description;
+            } else if (drugItem) {
+                description = `战斗中使用，${drugItem.description}`;
             } else {
                 // 2类商品（宠物技能），显示默认描述信息
                 description = '这是一个宠物技能，如果你有对应宠物，可以直接学会此技能。';
@@ -19471,7 +19474,11 @@ function buyItem() {
         '高级宝石合成符': () => addItemToJinnang('mergeAmuletPlus', itemQuantity),
         '低级宝石合成符': () => addItemToJinnang('mergeAmulet', itemQuantity),
         '宝石袋盲盒': () => addItemToJinnang('gemLuckyBag', itemQuantity),
-        '还童金丹': () => goldenRebornPill += itemQuantity
+        '还童金丹': () => goldenRebornPill += itemQuantity,
+        '延寿露': () => addDrugToInventory('延寿露', itemQuantity),
+        '天山雪莲': () => addDrugToInventory('天山雪莲', itemQuantity),
+        '忘忧水': () => addDrugToInventory('忘忧水', itemQuantity),
+        '三花丸': () => addDrugToInventory('三花丸', itemQuantity)
     };
 
     if (itemHandlers[itemBaseName]) {

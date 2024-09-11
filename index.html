@@ -20445,7 +20445,7 @@ function applySpecialSkillEffects(skill) {
 
             // 设置出血效果，每500ms对敌人造成一次伤害
             const bleedinginterval = setInterval(() => {
-                const bleedingDamage = Math.round(battleAttributes.physicalAttack * skillDetail.skillMultiplier * (Math.random() * 0.1) + 1);
+                const bleedingDamage = Math.round(battleAttributes.physicalAttack * skillDetail.skillMultiplier * ((Math.random() * 0.1) + 1));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - bleedingDamage);
                 updateDamageValue(bleedingDamage, false, 'extra-damage', true);
                 updateUI();
@@ -20455,7 +20455,7 @@ function applySpecialSkillEffects(skill) {
             setTimeout(() => {
                 clearInterval(bleedinginterval);  // 停止出血伤害
                 battleState.enemy.bleeding = false;  // 敌人不再出血
-            }, bleedingDuration);
+            }, bleedingDuration + 1000);
         },
         "火焰冲击": () => {
             if (battleState.enemy.corrode) {
@@ -20475,8 +20475,14 @@ function applySpecialSkillEffects(skill) {
             // 腐蚀效果持续3秒
             setTimeout(() => {
                 battleState.enemy.corrode = false;  // 敌人不再腐蚀护甲
-                battleState.enemy.physicalDefense = enemyInitialState.physicalDefense;
-                battleState.enemy.magicDefense = enemyInitialState.magicDefense;
+                if (!summonEnemy) {
+                    battleState.enemy.physicalDefense = enemyInitialState.physicalDefense;
+                    battleState.enemy.magicDefense = enemyInitialState.magicDefense;
+                } else {
+                    battleState.enemy.physicalDefense = originalEnemyPD;
+                    battleState.enemy.magicDefense = originalEnemyMD;
+                }
+
             }, corrodegDuration + 1000);
         }
         // "某技能": () => {...}

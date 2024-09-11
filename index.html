@@ -1492,7 +1492,7 @@
         .lottery-drawer.open {
             transform: translateY(0);
         }
-        
+
         .lottery-section {
             padding: 5px 0px 10px 0px;
             display: flex;
@@ -2838,7 +2838,8 @@
             <button onclick="openWuxingDisplay()">五行面板</button>
         </div>
     </div>
-    <div class="lottery-drawer" id="lotteryDrawer">
+
+    <div class="lottery-drawer" id="lotteryDrawer">        
         <div class="lottery-section lottery-top">
             <div class="lottery-box" id="lotteryPrizePool">奖池: 无上限奖池</div>
             <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
@@ -2871,6 +2872,7 @@
         </div>
         <div class="lottery-section lottery-footer">
             <button id="lotteryClaimPrize">领取奖金</button>
+            <button id="closeLottry" onclick="toggleLotteryDrawer()">我不玩了</button>
         </div>
     </div>
     <div id="fightingDrawer" class="battle-system-drawer">
@@ -14715,7 +14717,7 @@ function clearSelections() {
     document.getElementById('lotterySelectedNumbers').textContent = '已选: ';
     updateLotteryDisplay();
 }
-
+        
 document.addEventListener('DOMContentLoaded', () => {
     const numberButtons = document.getElementById('lotteryNumberButtons');
     for (let i = 1; i <= 30; i++) {

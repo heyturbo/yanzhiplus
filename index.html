@@ -20488,7 +20488,7 @@ function applySpecialSkillEffects(skill) {
             battleState.enemy.corrode = true;
             const originalEnemyPD = battleState.enemy.physicalDefense;
             const originalEnemyMD = battleState.enemy.magicDefense;
-            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.01 * (battleState.enemy.physicalDefense + battleState.enemy.magicDefense));
+            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.02 * (originalEnemyPD + originalEnemyMD));
             console.log(corrodedDefenseValue);
             battleState.enemy.physicalDefense = Math.max(0, battleState.enemy.physicalDefense - corrodedDefenseValue);
             battleState.enemy.magicDefense = Math.max(0, battleState.enemy.magicDefense - corrodedDefenseValue);
@@ -20496,8 +20496,8 @@ function applySpecialSkillEffects(skill) {
             // 腐蚀效果持续3秒
             setTimeout(() => {
                 battleState.enemy.corrode = false;  // 敌人不再腐蚀护甲
-                battleState.enemy.physicalDefense = originalEnemyPD;
-                battleState.enemy.magicDefense = originalEnemyMD;
+                battleState.enemy.physicalDefense = enemyInitialState.physicalDefense;
+                battleState.enemy.magicDefense = enemyInitialState.magicDefense;
             }, 3000);
         }
         // "某技能": () => {...}

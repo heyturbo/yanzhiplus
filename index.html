@@ -7047,19 +7047,44 @@ function calculateSkillAttributes() {
         const skillDivs = Array.from(skillsArea.children);
         skillDivs.forEach(skillDiv => {
             const skillName = skillDiv.innerText.split(' ')[0];
-            const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === 'N');
+            const skill = currentPet.skills.find(skill => skill.name === skillName && (skill.type === 'N' || skill.type === 'NE'));
+                          
             if (skill) {
                 const skillLevel = skill.level || 1;
                 const skillMultiplier = Math.max(1, skill.multiplier);
                 const levelMultiplier = 0.1 * skillLevel * skillMultiplier;
 
-                skillAttributes.health += Math.round(1168 * levelMultiplier);
-                skillAttributes.mana += Math.round(331 * levelMultiplier);
-                skillAttributes.physicalAttack += Math.round(128 * levelMultiplier);
-                skillAttributes.physicalDefense += Math.round(84 * levelMultiplier);
-                skillAttributes.magicAttack += Math.round(128 * levelMultiplier);
-                skillAttributes.magicDefense += Math.round(84 * levelMultiplier);
-                skillAttributes.speed += Math.round(11 * levelMultiplier);
+                const NESkillsAndValue = {
+                    "天神祝福": {
+                        health: 2000,
+                        speed: 200,
+                        maxLevel: 6
+                    },
+                    
+                    // 未来拓展更多...
+                };               
+                
+                if (skill.type === 'N') {
+                    skillAttributes.health += Math.round(1168 * levelMultiplier);
+                    skillAttributes.mana += Math.round(331 * levelMultiplier);
+                    skillAttributes.physicalAttack += Math.round(128 * levelMultiplier);
+                    skillAttributes.physicalDefense += Math.round(84 * levelMultiplier);
+                    skillAttributes.magicAttack += Math.round(128 * levelMultiplier);
+                    skillAttributes.magicDefense += Math.round(84 * levelMultiplier);
+                    skillAttributes.speed += Math.round(11 * levelMultiplier);
+                } else if (skill.type === 'NE') {
+                    const neSkill = NESkillsAndValue[skillName];
+                    if (neSkill) {
+                        const maxLevel = neSkill.maxLevel || skillLevel;
+                        const limitedSkillLevel = Math.min(maxLevel, skillLevel);
+                        
+                        for (const attr in neSkill) {
+                            if (attr !== 'maxLevel') {
+                                skillAttributes[attr] += neSkill[attr] * limitedSkillLevel;
+                            }
+                        }
+                    }
+                }
             }
         });
     }
@@ -15722,6 +15747,7 @@ let jinnangItems = [
     { name: 'tiankongshouhu', displayName: '天空守护天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天空守护' },
     { name: 'suohou', displayName: '锁喉天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：锁喉' },
     { name: 'jiyanggangqi', displayName: '极阳罡气天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：极阳罡气' },
+    { name: 'tianshenzhufu', displayName: '天神祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天神祝福' },
     { name: 'hongHuang', displayName: '洪荒至尊仙葫', url: 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price: 8000, quantity: 0, description: '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 1, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -16334,7 +16360,7 @@ const itemEffects = {
     },
     talentedBless: () => getBlessSkills(),
     advancedSkillBook: () => {
-        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi'];
+        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi', 'tianshenzhufu'];
         const randomIndex = Math.floor(Math.random() * item.length);
         const selectedItem = item[randomIndex];
         addItemToJinnang(selectedItem, 1);
@@ -16344,6 +16370,7 @@ const itemEffects = {
     tiankongshouhu: () => createSkills('天空守护', 'SSS', 'PHE', 1, 2.5, '为我方恢复大量生命值，并附加持续治疗效果。持续治疗效果根据技能等级和玩家法术攻击力、修为决定。'),
     suohou: () => createSkills('锁喉', 'SSS', 'PPE', 1, 2.5, '敌人中毒时，将按照毒伤永久降低敌人的生命值上限（战局刷新后失效）。'),
     jiyanggangqi: () => createSkills('极阳罡气', 'SSS', 'PDE', 1, 0.01, '为自身增加一个用于接受并放大敌人伤害的罡气环绕状态，敌人造成伤害时会以非常大的比例进行反弹。'),
+    tianshenzhufu: () => createSkills('天神祝福', 'SSS', 'NE', 1, 1, '大幅度增加宠物的生命值和速度，增值随技能等级提升而提升。'),
 };
 
 function useAssignedItem() {
@@ -20543,6 +20570,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
 
 function applySpecialSkillEffects(skill, value = null) {
     // value参数用于传递各行动函数具备潜再处理的结果数值，比如再处理伤害数值、恢复数值等
+    // 这个函数主要处理战斗事件，非战斗事件的NE技能将独立处理
     const skillDetail = calculateSkillLevelAndMultiplier(skill); //得到skillLevel, skillMultiplier
     // 定义特殊技能及其对应的效果
     const specialSkills = {
@@ -20637,7 +20665,7 @@ function applySpecialSkillEffects(skill, value = null) {
                 battleState.player.reflecting = false;
                 GQreflectPercentage = null;
             },reflectDuration);
-        }
+        },
     };
 
     // 检查技能名是否在 specialSkills 中存在

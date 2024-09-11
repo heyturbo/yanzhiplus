@@ -20463,6 +20463,7 @@ function applySpecialSkillEffects(skill) {
             }
             
             battleState.enemy.corrode = true;
+            const corrodegDuration = Math.max(100, skillDetail.skillLevel * 200);
             const originalEnemyPD = battleState.enemy.physicalDefense;
             const originalEnemyMD = battleState.enemy.magicDefense;
             const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.01 * (originalEnemyPD + originalEnemyMD));
@@ -20476,7 +20477,7 @@ function applySpecialSkillEffects(skill) {
                 battleState.enemy.corrode = false;  // 敌人不再腐蚀护甲
                 battleState.enemy.physicalDefense = enemyInitialState.physicalDefense;
                 battleState.enemy.magicDefense = enemyInitialState.magicDefense;
-            }, 3000);
+            }, corrodegDuration + 1000);
         }
         // "某技能": () => {...}
     };

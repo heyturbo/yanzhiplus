@@ -19596,7 +19596,7 @@ function getMissingSkills(allSkills) {
     const currentSkillNames = Array.from(document.querySelectorAll("#skills-area div"))
         .map(div => div.innerText.split(" (")[0]);
 
-    return allSkills.filter(skill => !currentSkillNames.includes(skill.name));
+    return allSkills.filter(skill => !currentSkillNames.includes(skill.name) && !currentSkillNames.byLearned);
 }
         
 // 初始化商店和倒计时
@@ -20208,21 +20208,8 @@ function trainSkills() {
         showInfoBox("你拥有极为珍贵的仙人醍醐，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
         () => {
             if (useItem('ultraSkillBoomer', 1)) {
-                const maxSkills = Math.min(12, currentPet.skills.length);
-                const skillNum = Math.min(Math.floor(Math.random() * 3) + 10, currentPet.skills.length); // 10到12个技能，且不超过现有技能数量
-                const selectedSkills = [];
-                
-                while (selectedSkills.length < skillNum) {
-                    const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
-                    if (!selectedSkills.includes(randomSkill)) {
-                        selectedSkills.push(randomSkill);
-                    }
-                }
-
-                updateSkillsArea(selectedSkills);
-                updateSkillScore(selectedSkills);
-                updateTitle();
-                showInfoBox("你的爱宠如醍醐灌顶般得到仙人点化！");
+                const selectedSkills = selectRandomSkills(10, 12, currentPet.skills.length);
+                updateSkillsAndNotify(selectedSkills);
             } else {
                 executeTransmutationPillLogic();
             }
@@ -20231,7 +20218,6 @@ function trainSkills() {
             executeTransmutationPillLogic();
         });
     } else {
-        // 当背包没有ultraSkillBoomer时执行transmutationPill逻辑
         executeTransmutationPillLogic();
     }
 }
@@ -20258,51 +20244,40 @@ function executeTransmutationPillLogic() {
         skillNum = Math.max(3, Math.min(getRandomSkillNum([0.80, 0.05, 0.05, 0.02, 0.02, 0.02, 0.01, 0.01, 0.008, 0.002]), currentPet.skills.length));
     }
 
-    const selectedSkills = [];
-    for (let i = 0; i < skillNum; i++) {
-        let skill;
-        do {
-            const rarityRoll = Math.random() * 100;
-            if (currentWisdom < 7) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-            } else if (currentWisdom < 13) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-            } else if (currentWisdom < 17) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-            } else if (currentWisdom < 20) {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-            } else {
-                if (rarityRoll < 80) skill = currentPet.skills.filter(s => s.rarity === 'B')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'B').length)];
-                else if (rarityRoll < 95) skill = currentPet.skills.filter(s => s.rarity === 'A')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'A').length)];
-                else if (rarityRoll < 97.5) skill = currentPet.skills.filter(s => s.rarity === 'S')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'S').length)];
-                else skill = currentPet.skills.filter(s => s.rarity === 'SS')[Math.floor(Math.random() * currentPet.skills.filter(s => s.rarity === 'SS').length)];
-            }
-        } while (!skill || selectedSkills.includes(skill));
-        selectedSkills.push(skill);
-    }
+    const selectedSkills = selectRandomSkills(skillNum, skillNum, currentPet.skills.length);
 
     if (selectedSkills.length >= 8) {
         showInfoBox("你把技能洗爆了,点击确定查看!", () => {
-            updateSkillsArea(selectedSkills);
-            updateSkillScore(selectedSkills);
-            updateTitle();
+            updateSkillsAndNotify(selectedSkills);
         });
         return;
     }
 
+    updateSkillsAndNotify(selectedSkills);
+}
+
+// 封装技能随机选择逻辑，并确保不选中已学习的技能
+function selectRandomSkills(minSkillNum, maxSkillNum, maxPossibleSkills) {
+    const skillNum = Math.min(Math.floor(Math.random() * (maxSkillNum - minSkillNum + 1)) + minSkillNum, maxPossibleSkills);
+    const selectedSkills = [];
+    
+    while (selectedSkills.length < skillNum) {
+        const randomSkill = currentPet.skills[Math.floor(Math.random() * currentPet.skills.length)];
+        // 添加 byLearned 检查，确保技能没有被学习
+        if (!randomSkill.byLearned && !selectedSkills.includes(randomSkill)) {
+            selectedSkills.push(randomSkill);
+        }
+    }
+    return selectedSkills;
+}
+
+// 更新技能区域并显示通知
+function updateSkillsAndNotify(selectedSkills) {
     updateSkillsArea(selectedSkills);
     updateSkillScore(selectedSkills);
     updateTitle();
 }
+
 
 function getRandomSkillNum(probabilities) {
     const total = probabilities.reduce((sum, prob) => sum + prob, 0);

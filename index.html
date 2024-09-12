@@ -20659,7 +20659,7 @@ function applySpecialSkillEffects(skill, value = null) {
     const specialSkills = {
         "利爪猛击": () => {
             // 如果敌人已经出血，直接返回
-            if (battleState.enemy.bleeding && bleedingInterval !== null) {
+            if (battleState.enemy.bleeding || bleedingInterval !== null) {
                 return;
             }
 
@@ -20711,7 +20711,7 @@ function applySpecialSkillEffects(skill, value = null) {
             }, corrodegDuration + 1000);
         },
         "天空守护": () => {
-            if (battleState.player.healing && healingInterval !== null) {
+            if (battleState.player.healing || healingInterval !== null) {
                 return;
             }
             

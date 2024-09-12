@@ -957,6 +957,91 @@
             cursor: pointer;
             transition: transform 0.1s, box-shadow 0.1s;
         }
+        .scalping-display {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 95%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: #6f391c;
+            padding: 2px;
+            border-radius: 2px;
+            color: #92341c;
+            font-size: 16px;
+        }
+        .scalping-head-button {
+            background: transparent;
+            color: #fff;
+            box-shadow: 0px 0px 2px 1px azure;
+        }
+        .scalping-container {
+            width: 97%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
+            padding: 5px;
+        }
+
+        .scalping-top-bar {
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            font-weight: bold;
+        }
+        .scalping-asset-area {
+            width: 95%;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            align-items: center;
+            border: 1px solid #87431f;
+        }
+        .scalping-middle-wrap {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .scalping-detail-list {
+            width: 45%;
+            display: flex;
+            border-radius: 2px;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #6f391c;
+            padding: 2px;
+            min-height: 100px;
+        }
+        
+        .scalping-warehouse {
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #6f391c;
+            min-height: 100px;
+            padding: 2px;
+        }
+        
+        .scalping-bottom-area {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            align-items: center;
+        }
         .quality-info button:active {
             background-color: #074b02;
         }
@@ -1232,7 +1317,7 @@
             margin-top: 15px;
             margin-bottom: 15px;
         }
-        .treasure-action button {
+        .treasure-action, .scalping-container button {
             border: 1px solid #6F391C;
             background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
             box-shadow: inset 0px 0px 2px 1px #87431F;
@@ -1404,7 +1489,6 @@
         .jinnang-drawer.open {
             transform: translateY(0);
             background: #6f391c;
-            padding: 2px;
             border-radius: 2px;
             color: #92341c;
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
@@ -2778,8 +2862,56 @@
                 <button onclick="buyItem()">购买道具</button>
                 <button onclick="sellPet()">宠物市场</button>
                 <button id="bless-gift-button" onclick="claimBlessGift()">新手礼包</button>
-                <button onclick="scalping()">倒买倒卖</button>
+                <button onclick="openScalping()">倒买倒卖</button>
                 <button onclick="refreshShop()">刷新商品</button>
+            </div>
+        </div>
+    </div>
+    <div class="scalping-display" id="scalping-display" style="display:none;">
+        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商</div><button id="close-scalping-button" onclick="openScalping()" class="scalping-head-button" style="margin-right:5px">x</button></div>
+        <div class="scalping-container" id="scalping-container">
+            <div class="scalping-top-bar" id="scalping-top-bar">
+                <div>时间已过:</div>
+                <div>第<span id="current-selling-week">1</span>周/<span id="max-selling-week">52</span>周</div>
+                <div>声望：<span id="player-reputation">0</span></div>
+            </div>
+            <div class="scalping-asset-area" id="scalping-asset-area">
+                <div style="display: flex;flex-direction: column;gap: 5px;">
+                    <div>当前现金：<span id="current-cash">0</span></div>
+                    <div>总资产：<span id="net-asset">0</span></div>
+                </div>
+                <div><button id="add-investment" onclick="increaseInverstment()">增加投资</button></div>
+            </div>
+            <div class="scalping-middle-wrap">
+                <div class="scalping-detail-list" id="market-info">
+                    <strong style="height: 30px;">市场</strong>
+                    <div id="scalping-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
+                        <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
+                            <div>货物</div>
+                            <div>价格</div>
+                        </div>
+                    <div id="scalping-item-info" style="padding: 5px;">
+                        <!-- 动态生成商品 -->
+                    </div>
+                    </div>
+                </div>
+                <div class="scalping-warehouse" id="warehouse-info">
+                    <strong style="display: flex;gap: 5px;flex-direction: row;height: 30px;">仓库<div>(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button">➕</button></div></strong>
+                    <div id="warehouse-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
+                        <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
+                            <div>货物</div>
+                            <div>买入价</div>
+                            <div>数量</div>
+                        </div>
+                        <div id="warehouse-item-info" style="padding: 5px;">
+                            <!-- 动态生成仓库商品 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="scalping-bottom-area" id="scalping-bottom-area">
+                <div><button id="quit-scalping" onclick="quitScalping()">提前退市</button></div>
+                <div><button id="enter-next-week" onclick="refreshSaleWeek()">刷新一周</button></div>
             </div>
         </div>
     </div>
@@ -19334,6 +19466,12 @@ function toggleShop() {
     drawer.classList.toggle('open');
     info.classList.toggle('open');
 
+    const buttonElement = document.getElementById("bless-gift-button");
+    
+    if (blessGiftClaimed) {
+        buttonElement.style.display = "none";
+    }
+
     const discountElement = document.getElementById('discount-detail');
     const eightyDiscountCard = jinnangItems.find(i => i.name === 'eightyDiscountCard');
     const titleElement = document.getElementById('personal-honor');
@@ -19372,15 +19510,455 @@ function startShopTimer() {
     }, 1000);
 }
 
+let scalpingState = {
+    currentSellingWeek: 0,
+    maxSellingWeek: 52,
+    playerReputation: 0,
+    currentCash: 0, // 示例初始现金
+    netAsset: 0, 
+    usedWarehouseCapacity: 0,
+    maxWarehouseCapacity: 100, // 初始仓库容量
+    warehouseUpdateCount: 0,
+    holdItems: {} // 存放玩家购买的商品
+};
+
+const scalpingItems = [
+    {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', tier: 0, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, description: '陈酿女儿红，酒饕的盛宴'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', tier: 1, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, description: '形若钻石的灵玉，收藏古玩者的高端入门品'},
+    {name: '上古神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', tier: 2, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
+    {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', tier: 3, basePrice: 600, bonusPrice: 1200, fluctuation: 0.05, description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
+    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', tier: 4, basePrice: 1000, bonusPrice: 2400, fluctuation: 0.15, description: '上好的玉珏，古玩界常青树'},
+    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', tier: 2, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, description: '天长地久，爱无止休'}
+];
+        
+//倒买倒卖的逻辑
+function openScalping() {
+    const scalpingWindow = document.getElementById('scalping-display');
+    const isOpen = scalpingWindow.style.display === 'flex';  // 使用 `===` 来比较
+    
+    if (!isOpen) {
+        scalpingWindow.style.display = 'flex';  // 打开 scalping 窗口
+    } else {
+        scalpingWindow.style.display = 'none';  // 关闭 scalping 窗口
+    }
+    updateScalpingPanel();
+}
+
+function showInfoScalping() {
+    showInfoBox('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周市面上的道具和需求都会变化 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
+}
+        
+function increaseInverstment() {
+    if (goldAmount >= 5000000) {
+        showInfoBox('\n在自由市场，100文金子=1元，每次最少投资50000元。\n\n当总资产到达20万时，将不允许追加投资。\n\n准备好注资50000元了吗？',
+                   () => {
+                       if (calculateNetAsset() >= 200000) {
+                           showInfoBox('当前总资产超过20万，不支持天使投资！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                           return;
+                       } else {
+                           goldAmount -= 5000000;
+                           scalpingState.currentCash += 50000;
+                           updateScalpingPanel();
+                           updateGoldDisplay(goldAmount);
+                           showInfoBox('注入一笔天使投资，祝你的生意做大做强！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                       }
+                   },
+                   () => {
+                       showInfoBox('天使投资人，期待你的眼光能带来真正的价值！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                   },
+                   null,
+                   'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png',
+                   '88px * 88px');
+    } else {
+        showInfoBox('你的启动资金还不足5000两金子，尚不能成为天使投资人',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+    }
+}
+        
+// 根据波动计算商品价格
+function getScalpableItemsPrice(item) {
+    const fluctuationRange = item.basePrice * item.fluctuation;
+    const price = item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange);
+    return Math.floor(price);
+}
+
+// 生成随机商品并展示到市场板块
+function getRandomScalpableItem() {
+    const marketPanel = document.getElementById('scalping-item-info');
+    marketPanel.innerHTML = ''; // 清空现有内容
+    
+    // 随机选择1到4个商品
+    const itemsToDisplay = [];
+    const numberOfItems = Math.floor(Math.random() * 4) + 1;
+    
+    while (itemsToDisplay.length < numberOfItems) {
+        const randomItem = scalpingItems[Math.floor(Math.random() * scalpingItems.length)];
+        if (!itemsToDisplay.includes(randomItem)) {
+            itemsToDisplay.push(randomItem);
+        }
+    }
+
+    // 生成HTML结构
+    itemsToDisplay.forEach(item => {
+        const price = getScalpableItemsPrice(item);
+
+        // 创建商品元素
+        const itemElement = document.createElement('div');
+        itemElement.className = 'scalping-item';
+        itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
+        itemElement.innerHTML = `
+            <div id="${item.name}-container">
+                <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
+                <div>${item.name}</div>
+            </div>
+            <div id="price-${item.name}">${price} 元</div>
+        `;
+
+        // 点击商品时弹出购买进度条
+        itemElement.addEventListener('click', () => {
+            handleItemPurchase(item, price);
+        });
+
+        marketPanel.appendChild(itemElement);
+    });
+}
+
+function refreshSaleWeek() {
+    let currentWeek = scalpingState.currentSellingWeek;
+    const maxWeek = scalpingState.maxSellingWeek;
+    const refreshButton = document.getElementById('enter-next-week');
+
+    if (currentWeek < maxWeek) {  // 只允许当前周小于最大周数时继续
+        getRandomScalpableItem();  // 获取新的可交易商品
+        scalpingState.currentSellingWeek++;  // 直接修改全局状态中的当前周数
+        if (scalpingState.currentSellingWeek === scalpingState.maxSellingWeek) {
+            refreshButton.innerText = '结算收益';
+        }
+        updateScalpingPanel();  // 更新面板
+    } else if (currentWeek === maxWeek) {        
+        const netAssets = calculateNetAsset();
+        const goldGot = Math.floor(Math.max(0, netAssets * 100));
+        
+        goldAmount += goldGot;
+        updateGoldDisplay(goldAmount);
+        resetScalping();
+        showInfoBox(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！`,null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');   
+    }
+}
+
+function resetScalping() {
+    const marketPanel = document.getElementById('scalping-item-info');
+    const warehousePanel = document.getElementById('warehouse-item-info');
+    marketPanel.innerHTML = ''; // 清空现有内容
+    warehousePanel.innerHTML = ''; // 清空现有仓库内容
+    
+    scalpingState = {
+        currentSellingWeek: 0,
+        maxSellingWeek: 52,
+        playerReputation: 0,
+        currentCash: 0, // 示例初始现金
+        netAsset: calculateNetAsset(), 
+        usedWarehouseCapacity: 0,
+        maxWarehouseCapacity: 100, // 初始仓库容量
+        warehouseUpdateCount: 0,
+        holdItems: {} // 存放玩家购买的商品
+    };
+    updateScalpingPanel();
+    document.getElementById('enter-next-week').innerText = '刷新一周';
+}
+        
+function quitScalping() {
+    if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
+        showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损，是否继续？',
+                   () => {
+                        const netAssets = calculateNetAsset();
+                        const goldGot = Math.floor(Math.max(0, netAssets * 100 * 0.8));
+                        goldAmount += goldGot;
+                        updateGoldDisplay(goldAmount);
+                        showInfoBox(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`,null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                        resetScalping();
+                        openScalping();
+                   },
+                   () => showInfoBox('取消交易！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px'),
+                   'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+    } else {
+        refreshSaleWeek();
+    }
+}
+        
+let currentSlider = null;
+// 通用进度条创建和处理函数
+function handleItemTransaction(item, itemInfo, actionType) {
+    // 判断行为类型：购买或出售
+    const isPurchase = actionType === 'purchase';
+
+    if (currentSlider) {
+        document.body.removeChild(currentSlider);
+        currentSlider = null;
+    }
+
+    // 获取或创建进度条
+    let sliderContainer = document.getElementById(`${actionType}-slider-container`);
+    if (!sliderContainer) {
+        sliderContainer = document.createElement('div');
+        sliderContainer.id = `${actionType}-slider-container`;
+        sliderContainer.style = 'display: flex;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 80%;max-height: 80%;min-height: 10%;z-index: 9999;font-size: 14px;padding: 10px 20px 5px;background-color: rgb(223, 191, 110);color: rgb(146, 52, 28);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;box-shadow: rgb(30, 46, 47) 0px 0px 0px 1px, rgb(111, 57, 28) 0px 0px 0px 1px inset;border: 1px solid rgb(235, 172, 59);overflow-y: auto;flex-direction: column;align-items: center;gap: 5px;';
+
+        const sliderLabel = document.createElement('label');
+        sliderLabel.innerText = `选择${isPurchase ? '购买' : '出售'}数量：`;
+        sliderContainer.appendChild(sliderLabel);
+
+        const slider = document.createElement('input');
+        slider.id = `${actionType}-slider`;
+        slider.type = 'range';
+        slider.min = 0;
+        slider.max = 100;
+        slider.value = 0;
+        slider.style.width = '200px';
+        sliderContainer.appendChild(slider);
+
+        const quantityLabel = document.createElement('div');
+        quantityLabel.id = `${actionType}-quantity`;
+        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: 0`;
+        sliderContainer.appendChild(quantityLabel);
+
+        const itemDescription = document.createElement('div');
+        itemDescription.id = `${actionType}-quantity`;
+        itemDescription.innerText = `商品说明: ${item.description}`;
+        sliderContainer.appendChild(itemDescription);
+
+        const confirmButton = document.createElement('button');
+        confirmButton.id = `confirm-${actionType}-button`;
+        confirmButton.style = 'border: 1px solid #6F391C;background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);box-shadow: inset 0px 0px 2px 1px #87431F;font-size: 14px;border-radius: 5px;color: #F9DE9B;padding: 4px 6px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+        confirmButton.innerText = `确认${isPurchase ? '购买' : '出售'}`;
+        sliderContainer.appendChild(confirmButton);
+        
+
+        document.body.appendChild(sliderContainer);
+    }
+    
+    sliderContainer.style.display = 'block'; // 显示进度条
+    const slider = document.getElementById(`${actionType}-slider`);
+    const quantityLabel = document.getElementById(`${actionType}-quantity`);
+    
+    currentSlider = sliderContainer;
+
+    let maxQuantity, price;
+
+    if (isPurchase) {
+        // 获取 UI 上的固定价格
+        price = parseInt(document.getElementById(`price-${item.name}`).innerText); 
+        maxQuantity = Math.floor(scalpingState.currentCash / price); // 最大可购买数量
+    } else {
+        const itemInfo = scalpingState.holdItems[item.name];
+        const itemName = scalpingItems.find(i => i.name === item.name);
+        const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
+        console.log({itemInfo, marketItemPriceElement, itemName});
+        if (!marketItemPriceElement) {
+            showInfoBox('市场目前没有该商品的销售渠道，无法出售',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+            return;
+        }
+        price = parseInt(document.getElementById(`price-${item.name}`).innerText); // 获取市场价格
+        maxQuantity = itemInfo.quantity; // 最大可出售数量
+    }
+
+    // 监听进度条变化
+    slider.addEventListener('input', (event) => {
+        const percentage = event.target.value;
+        const quantity = Math.floor((percentage / 100) * maxQuantity);
+        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: ${quantity}`;
+    });
+
+    // 点击确认购买/出售
+    document.getElementById(`confirm-${actionType}-button`).addEventListener('click', () => {
+        const quantity = Math.floor((slider.value / 100) * maxQuantity);
+        if (quantity > 0) {
+            if (isPurchase) {
+                // 执行购买逻辑
+                const totalCost = quantity * price;
+                if (scalpingState.usedWarehouseCapacity + quantity <= scalpingState.maxWarehouseCapacity) {
+                    scalpingState.currentCash -= totalCost;
+                    scalpingState.usedWarehouseCapacity += quantity;
+
+                    if (!scalpingState.holdItems[item.name]) {
+                        scalpingState.holdItems[item.name] = { averagePrice: price, quantity };
+                    } else {
+                        const currentHold = scalpingState.holdItems[item.name];
+                        const newTotalQuantity = currentHold.quantity + quantity;
+                        const newAveragePrice = Math.floor(((currentHold.averagePrice * currentHold.quantity) + (price * quantity)) / newTotalQuantity);
+                        scalpingState.holdItems[item.name] = { averagePrice: newAveragePrice, quantity: newTotalQuantity };
+                    }
+                    updateScalpingPanel();
+                    updateWarehouseItems();
+                } else {
+                    showInfoBox('仓库容量不足，无法购买',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                }
+            } else {
+                // 执行出售逻辑
+                const totalSaleValue = quantity * price;
+                scalpingState.currentCash += totalSaleValue;
+                itemInfo.quantity -= quantity;
+                scalpingState.usedWarehouseCapacity -= quantity; // 更新仓库容量
+                
+                if (itemInfo.quantity === 0) {
+                    delete scalpingState.holdItems[item.name]; // 移除卖完的物品
+                }
+
+                updateScalpingPanel();
+                updateWarehouseItems();
+            }
+            sliderContainer.style.display = 'none'; // 完成后隐藏进度条
+        } else if (currentSlider) {
+                document.body.removeChild(currentSlider);
+                currentSlider = null;
+        }
+    });
+}
+
+
+// 触发购买
+function handleItemPurchase(item, price) {
+    handleItemTransaction(item, null, 'purchase');
+}
+
+// 触发出售
+function handleItemSell(item, itemInfo) {
+    const holdItem = scalpingState.holdItems[item.name];
+    const itemName = scalpingItems.find(i => i.name === item.name);
+    const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
+    if (!marketItemPriceElement) {
+        showInfoBox('市场目前没有该商品的销售渠道，无法出售',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+        return;
+    }
+    handleItemTransaction(item, itemInfo, 'sell');
+}
+
+// 更新仓库持有物品
+function updateWarehouseItems() {
+    const warehousePanel = document.getElementById('warehouse-item-info');
+    warehousePanel.innerHTML = ''; // 清空现有仓库内容
+    
+    Object.keys(scalpingState.holdItems).forEach(itemName => {
+        const itemInfo = scalpingState.holdItems[itemName];
+        const item = scalpingItems.find(i => i.name === itemName);
+
+        // 创建仓库物品元素
+        const itemElement = document.createElement('div');
+        itemElement.className = 'warehouse-item';
+        itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
+        itemElement.innerHTML = `
+            <div id="${item.name}-warehouse-container">
+                <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
+                <div>${item.name}</div>
+            </div>
+            <div>${itemInfo.averagePrice} 元</div>
+            <div>${itemInfo.quantity}个</div>
+        `;
+        
+        // 点击物品进行出售
+        itemElement.addEventListener('click', () => {
+            handleItemSell(item, itemInfo);
+        });
+
+        warehousePanel.appendChild(itemElement);
+    });
+}
+
+
+// 仓库扩展按钮逻辑
+document.getElementById('enlarge-warehouse-button').addEventListener('click', () => {
+    const upgradeCost = 20000 * (scalpingState.warehouseUpdateCount + 1);
+    showInfoBox(`你可以花费${upgradeCost}元开启100个仓库`,
+               () => {
+                    if (scalpingState.currentCash >= upgradeCost) {
+                        scalpingState.currentCash -= upgradeCost;
+                        scalpingState.maxWarehouseCapacity += 100;
+                        scalpingState.warehouseUpdateCount++;
+                    } else {
+                        showInfoBox('现金不足！',null,null,'red');
+                    }
+               },
+               null,
+               'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+    
+    updateScalpingPanel();
+});
+
+function calculateNetAsset() {
+    let netAsset = 0;
+
+    Object.keys(scalpingState.holdItems).forEach(itemName => {
+        const itemInfo = scalpingState.holdItems[itemName];
+        const item = scalpingItems.find(i => i.name === itemName);
+        
+        if (!item) {
+            return; // 如果找不到该物品，跳过该商品
+        }
+
+        // 查找市场上是否存在该商品的元素
+        const marketItemPriceElement = document.getElementById(`price-${itemName}`);
+        let marketPrice = null;
+
+        if (marketItemPriceElement) {
+            // 从市场元素中获取价格
+            marketPrice = parseInt(marketItemPriceElement.innerText);
+        }
+
+        // 计算当前商品的资产值
+        let itemAssetValue = 0;
+
+        if (marketPrice) {
+            // 如果市场上有该商品，按市场价格计算
+            itemAssetValue += itemInfo.quantity * marketPrice;
+        } else {
+            // 计算剩余部分按平均价格计算的资产
+            const remainingQuantity = itemInfo.quantity;
+            itemAssetValue += remainingQuantity * itemInfo.averagePrice;
+        }
+
+        // 累加到总资产
+        netAsset += itemAssetValue;
+    });
+    netAsset += scalpingState.currentCash;
+    return netAsset;
+}
+        
+//用于更新细节，避免重复函数
+function updateScalpingPanel() {
+    const currentSellingWeek = document.getElementById('current-selling-week');
+    const maxSellingWeek = document.getElementById('max-selling-week');
+    const playerReputation = document.getElementById('player-reputation');
+    const currentCash = document.getElementById('current-cash');
+    const netAsset = document.getElementById('net-asset');
+    const usedWarehouseCapacity = document.getElementById('used-warehouse-capacity');
+    const maxWarehouseCapacity = document.getElementById('max-warehouse-capacity');
+
+    currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
+    maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
+    playerReputation.innerText = scalpingState.playerReputation;  // 更新声望
+    currentCash.innerText = scalpingState.currentCash;      // 更新当前现金
+    netAsset.innerText = calculateNetAsset();        // 更新总资产
+    usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量
+    maxWarehouseCapacity.innerText = scalpingState.maxWarehouseCapacity;  // 更新最大仓库容量
+}
+
+
+    // 我想要构造一个根据scalpingItems数组来随机出现1~4个商品的函数，商品由45px * 45px的图片，图片下方显示其名字，图片元素右边是价格，价格由getScalpableItemsPrice()函数返回得到，图片元素和价格元素space-between
+    // getScalpableItemsPrice()是一个根据商品basePrice和fluctuation计算并返回价格的函数，所谓的fluctuation即在商品的basePrice基础上，计算基于fluctuation定义的倍数上下浮动之后的价格区间，并在这个区间里随机取值
+    // 在确认商品数量和价格后，需要在html上利用forEach遍历构造每个商品元素，你需要在'scalping-item-info'元素内向下构造，添加到市场板块内
+    // 每个商品元素允许被点击，点击事件触发：弹出可直接拖拉的进度条，并根据拖拉停留的位置判断玩家可能想要购买的商品数量，并在玩家确认购买后执行购买逻辑判断
+    // 玩家购买商品的进度条宽度公式为：货物单价 * 数量 / 当前现金 = 100%，玩家悬停的宽度可计算得出商品数量，点击确认后，当前现金扣除相应价格，并更新scalpingState.holdItems，这是一个子对象，包含每个购买商品的averagePrice, quantity
+    // 商品每次刷新时，可能会刷新出不同价格的同一种商品，玩家如果购买不同价格的同类商品，在scalpingState.holdItems中需要更新这个holdItems[key].averagePrice，即计算所有价格下最终的平均价格，并将这个价格更新在仓库元素里
+    // 玩家购买商品后，warehouse-item-info元素需要遍历构造玩家当前的holdItems，包含商品图像（与商品名字上下组合为整体），平均价和数量三者，横向呈space-between展开
+    // 仓库中的商品元素点击事件：同样地，根据弹出的进度条来指示玩家滑动，进度条最大宽度为max-width * holdItems[key].quantity = 100%，当玩家滑动确认后，商品将会被出售，请特别注意，玩家出售时该商品的价格，为市场板块所显示的同名商品的价格
+    // 如果市场板块当前并没有刷新出玩家选定的商品，将不能出售。出售成功时，商品数量会对应减少，并同时更新界面元素updateScalpingPanel()
+    // 仓库存在容量限制，玩家拥有的所有商品数量之和为scalpingState.usedWarehouseCapacity，这个值不能超过scalpingState.maxWarehouseCapacity，当玩家仓库容量不足时，购买商品将会失败
+    // 玩家可以点击'enlarge-warehouse-button'按钮增加仓库容量，初始增加价格为20000，每次增加时，scalpingState.warehouseUpdateCount ++，maxWarehouseCapacity += 100，此后价格为20000 * warehouseUpdateCount
+
+        
 // 页面加载完成后初始化商店
 let refreshCount = 0; // 全局计数器，记录刷新次数
 let sSkillCount = 0;
 let ssSkillCount = 0;
-
-//倒买倒卖的逻辑
-function scalping() {
-    showInfoBox(null,null,null,null,'https://pic.imgdb.cn/item/66e29f7dd9c307b7e9ac3d94.png','300px * 130px');
-}
         
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 1000) {
@@ -21094,8 +21672,6 @@ function updateSkillScore(selectedSkills = []) {
 let blessGiftClaimed = false;
 
 function claimBlessGift() {
-    const buttonElement = document.getElementById("bless-gift-button");
-    
     if (!blessGiftClaimed) {
         addItemToJinnang('blessGift',1);
         showInfoBox('获得新手礼包，请前往背包检查！');
@@ -21103,8 +21679,6 @@ function claimBlessGift() {
     } else {
         showInfoBox('新手礼包只能领取一次！');
     }
-
-    buttonElement.style.display = "none";
 }
         
 function getBlessGift() {

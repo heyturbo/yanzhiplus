@@ -20668,7 +20668,7 @@ function applySpecialSkillEffects(skill, value = null) {
             const bleedingDuration = Math.max(100, skillDetail.skillLevel * 200);
 
             // 设置出血效果，每500ms对敌人造成一次伤害
-            bleedinginterval = setInterval(() => {
+            bleedingInterval = setInterval(() => {
                 const bleedingDamage = Math.round(battleAttributes.physicalAttack * skillDetail.skillMultiplier * ((Math.random() * 0.1) + 1));
                 battleState.enemy.health = Math.max(0, battleState.enemy.health - bleedingDamage);
                 updateDamageValue(bleedingDamage, false, 'extra-damage', true);
@@ -20677,7 +20677,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             // 出血效果持续3秒
             setTimeout(() => {
-                clearInterval(bleedinginterval);  // 停止出血伤害
+                clearInterval(bleedingInterval);  // 停止出血伤害
                 bleedingInterval = null;
                 battleState.enemy.bleeding = false;  // 敌人不再出血
             }, bleedingDuration + 1000);

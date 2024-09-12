@@ -2935,6 +2935,10 @@
                         <div id="enemy-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
                             <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
                             <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
+                            <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="enemy-speed-container">
+                                <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 0%; background: linear-gradient(rgb(249, 222, 155), rgb(246, 255, 0), rgb(249, 222, 155)); cursor: pointer;" id="enemy-speed-bar"></div>
+                                <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="speed-text"></span>
+                            </div>
                         </div>
                     </div>
                     <div class="player-damage-display" id="player-damage-display"><span id="player-damage-value"></span></div>
@@ -6427,10 +6431,15 @@ let spiritMultiplier = 1.00;
 const maxSpiritLevel = 120;
 const minSpiritMultiplier = 0.01;
 const maxSpiritMultiplier = 4.15;
+let playerTurn = false;
+const obj = {
+    get enemyTurn() {
+        return !playerTurn;  // 每次访问 b 时，返回 a 的取反值
+    }
+};
 let spiritPowerActive = false;
 let attributesFetched = false;
 let battleState;
-let playerTurn;
 let battleInterval;
 let battleAttributes; // 用于存储战斗属性的独立容器
 let maxHealth, maxMana; // 独立的最大值变量
@@ -6519,25 +6528,6 @@ function startBattle() {
                 showNextBattlePrompt(true);
                 return;
             }
-    
-            let delayPenalty;
-            if (battleRounds >= 151) {
-                delayPenalty = Math.round(maxHealth * 0.017);
-            } else {
-                delayPenalty = Math.round(maxHealth * 0.01);
-            }
-    
-            if (extraShield > 0) {
-                if (delayPenalty <= extraShield) {
-                    extraShield -= delayPenalty;
-                    delayPenalty = 0;
-                } else {
-                    delayPenalty -= extraShield;
-                    extraShield = 0;
-                }
-            }
-    
-            battleAttributes.health = Math.max(0, battleAttributes.health - delayPenalty);
 
             if (summonEnemy) {
                 const summonedEnemyName = battleState.enemy.specialty;
@@ -6563,6 +6553,7 @@ function startBattle() {
 
     playerTurn = battleAttributes.speed >= battleState.enemy.speed;
     updateUI();
+    decideEnemyCanPerform();
 
     if (!playerTurn) {
         setTimeout(enemyAttack, 350);
@@ -6572,6 +6563,7 @@ function startBattle() {
 
 function stopBattle() {
     onBattleState = false;
+    stopEnemyAction();
     clearInterval(battleInterval); // 战斗结束，停止定时器
     if (summonEnemy) {
         handleBattleWithSummonEnemy(false);
@@ -9046,6 +9038,10 @@ function performAttack(type) {
         return;
     }
 
+    if (!playerTurn) {
+        return;
+    }
+        
     let attackType = type; // 标志变量
     // 检查 taunt 状态并执行物理攻击
     if (battleState.player.taunt) {
@@ -9485,6 +9481,10 @@ function performPoison() {
         return;
     } else if (battleState.enemy.health <= 0) {
         showNextBattlePrompt(true);
+        return;
+    }
+
+    if (!playerTurn) {
         return;
     }
     
@@ -10043,6 +10043,10 @@ function performHeal() {
         showNextBattlePrompt(true);
         return;
     }
+
+    if (!playerTurn) {
+        return;
+    }
     
     if (battleState.player.taunt) {
         performAttack('physical');
@@ -10106,7 +10110,7 @@ function performHeal() {
     }
 
     playerTurn = false; // 轮到邪佞回合
-    setTimeout(() => enemyAttack(),300);
+    setTimeout(() => enemyAttack(),350);
     handleManaRecover();
     applyAscensionEffects();
     getShieldStatus();
@@ -10351,7 +10355,11 @@ function performDefense() {
         showNextBattlePrompt(true);
         return;
     }
-    
+
+    if (!playerTurn) {
+        return;
+    }
+        
     if (battleState.player.taunt) {
         performAttack('physical');
         return;
@@ -10617,8 +10625,52 @@ function handleManaRecover() {
     }
 } //被动回复法力值
 
+let enemyActionInterval;  // 存储计时器ID
 
+function decideEnemyCanPerform() {
+    if (!battleState || !battleAttributes || !battleState.enemy) {
+        console.error("战斗状态未初始化");
+        return;
+    }
 
+    // 如果计时器已经存在，先清除它，避免重复触发
+    if (enemyActionInterval) {
+        clearInterval(enemyActionInterval);
+    }
+
+    const progressElement = document.getElementById('enemy-speed-bar');
+    const barText = document.getElementById('speed-text');
+    
+    enemyActionInterval = setInterval(() => {
+        if (playerTurn) {
+            const enemySpeedFactor = Math.max(0, battleState.enemy.speed * 2 / (battleState.enemy.speed + 100000));
+            // 获取当前的宽度并去掉百分号
+            const currentWidth = parseFloat(progressElement.style.width.replace('%', '')) || 0;
+            // 更新进度条宽度
+            progressElement.style.width = `${Math.min(100, currentWidth + enemySpeedFactor)}%`;
+
+            // 当进度条满了（宽度 >= 100%）时，敌人发动攻击
+            if (parseFloat(progressElement.style.width.replace('%', '')) >= 100) {
+                progressElement.style.width = '0%';  // 重置进度条
+                playerTurn = false;
+                enemyAttack();  // 执行敌人的攻击行为
+            }
+            updateUI();  // 更新UI
+        }
+    }, 20);  // 每 20 毫秒执行一次
+}
+
+document.getElementById('enemy-speed-container').addEventListener('click', () => {
+    showInfoBox('这是敌人的行动条，当轮到玩家回合但玩家未行动时，此行动条积满敌人将会行动。行动条的积累速度与敌人的当前速度有关。关闭战斗界面会停止积累。');
+});
+
+function stopEnemyAction() {
+    // 清除计时器，停止敌人行动
+    if (enemyActionInterval) {
+        clearInterval(enemyActionInterval);
+        enemyActionInterval = null;  // 重置计时器ID
+    }
+}
         
 // 【怪物战斗】怪物伤害函数（物理/物理效果、法术/法术效果）
 function enemyAttack() {
@@ -10630,7 +10682,12 @@ function enemyAttack() {
     if (!summonEnemy) {
         handleRampaged(); //再判断狂暴状态
     }
-        
+
+    if (playerTurn) {
+        return;
+    }
+
+    playerTurn = true;
     handleRelieveEffects(); //先给玩家解控
     
     if (handleDazed()) return;
@@ -10694,7 +10751,6 @@ function enemyAttack() {
         return;
     } else {
         updateUI();
-        playerTurn = true;
     }
 
     // 首先处理伤害减免
@@ -10766,7 +10822,6 @@ function performEnemyPhysicalAttack(isCritical) {
     if (!battleState.enemy.silenced || damage !== 0) {
         applyEnemyPhysicalEffects(damage); // 仅在未被沉默或有伤害时应用物理效果
     }
-    
     
     return damage;
 }
@@ -11310,7 +11365,8 @@ function enemyDefense() {
         battleState.enemy.magicDefense = enemyMD;
         updateUI();
     },2000);
-
+    
+    playerTurn = true; // 轮到玩家回合
     logBattleEvent('🛡【敌人防御】敌人释放了能量场，双防得到了提升！','orange');
     showEffect('playerEffect', 'https://pic.imgdb.cn/item/66d4a22dd9c307b7e9f5faec.gif');
 }
@@ -21159,6 +21215,7 @@ function upgradeWisdomTo() {
         addItemToJinnang('luckyAmulet',1);
         addItemToJinnang('resetJinnang',1);
         addItemToJinnang('earthlyEnergy', 9999);
+        addItemToJinnang('advancedSkillBook', 1000);
         generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1000, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
         updateGoldDisplay(goldAmount);
         showInfoBox("您获得了一大袋金子！");
@@ -21170,7 +21227,6 @@ function upgradeWisdomTo() {
         return;
     }
 
-    
     const targetValue = parseInt(target, 10);
     if (isNaN(targetValue) || targetValue < 1 || targetValue > (awakened ? 25 : 20)) {
         showInfoBox(`无效输入，请输入1到${awakened ? 25 : 20}之间的数字`);

@@ -2766,7 +2766,7 @@
         </div>
     </div>
     <div class="shop-drawer" id="shop-drawer">
-        <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span></div>
+        <div class="drawer-toggle" onclick="toggleShop()">商店<span id="discount-detail"></span><span id="shop-timer">05:00</span></div>
         <div class="shop-info" id="shop-info">
             <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;margin-bottom: 20px;">
                 <div class="shop-items" id="shop-items">
@@ -2777,11 +2777,9 @@
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
                 <button onclick="sellPet()">宠物市场</button>
-                <button onclick="claimBlessGift()">新手礼包</button>
-                <div class="shop-timer">
-                    <span id="shop-timer">05:00</span>
-                    <button onclick="refreshShop()">刷新商品</button>
-                </div>
+                <button id="bless-gift-button" onclick="claimBlessGift()">新手礼包</button>
+                <button onclick="scalping()">倒买倒卖</button>
+                <button onclick="refreshShop()">刷新商品</button>
             </div>
         </div>
     </div>
@@ -12994,6 +12992,10 @@ function autoBattle() {
                      handleResurrection(0);
                 }
             }
+
+            if(!playerTurn) {
+                return;
+            }
     
             // 根据玩家生命值和状态进行行动
             if (battleAttributes.health / maxHealth < 0.5 && playerTurn) {
@@ -19377,6 +19379,11 @@ let refreshCount = 0; // 全局计数器，记录刷新次数
 let sSkillCount = 0;
 let ssSkillCount = 0;
 
+//倒买倒卖的逻辑
+function scalping() {
+    showInfoBox(null,null,null,null,'https://pic.imgdb.cn/item/66e29f7dd9c307b7e9ac3d94.png','300px * 130px');
+}
+        
 function refreshShop(auto = false) {
     if (!auto && goldAmount < 1000) {
         return showInfoBox("您的金子不足1两，无法刷新！");
@@ -20654,7 +20661,7 @@ function applySpecialSkillEffects(skill, value = null) {
     const specialSkills = {
         "利爪猛击": () => {
             // 如果敌人已经出血，直接返回
-            if (battleState.enemy.bleeding) {
+            if (battleState.enemy.bleeding && bleedingInterval !== null) {
                 return;
             }
 
@@ -20673,6 +20680,7 @@ function applySpecialSkillEffects(skill, value = null) {
             // 出血效果持续3秒
             setTimeout(() => {
                 clearInterval(bleedinginterval);  // 停止出血伤害
+                bleedingInterval = null;
                 battleState.enemy.bleeding = false;  // 敌人不再出血
             }, bleedingDuration + 1000);
         },
@@ -20705,7 +20713,7 @@ function applySpecialSkillEffects(skill, value = null) {
             }, corrodegDuration + 1000);
         },
         "天空守护": () => {
-            if (battleState.player.healing) {
+            if (battleState.player.healing && healingInterval !== null) {
                 return;
             }
             
@@ -20721,6 +20729,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             setTimeout(() => {
                 clearInterval(healingInterval); 
+                healingInterval = null;
                 battleState.player.healing = false;  
             }, healingDuration);
         },
@@ -21087,6 +21096,8 @@ function updateSkillScore(selectedSkills = []) {
 let blessGiftClaimed = false;
 
 function claimBlessGift() {
+    const buttonElement = document.getElementById("bless-gift-button");
+    
     if (!blessGiftClaimed) {
         addItemToJinnang('blessGift',1);
         showInfoBox('获得新手礼包，请前往背包检查！');
@@ -21094,6 +21105,8 @@ function claimBlessGift() {
     } else {
         showInfoBox('新手礼包只能领取一次！');
     }
+
+    buttonElement.style.display = "none";
 }
         
 function getBlessGift() {
@@ -22582,11 +22595,6 @@ window.onload = function() {
     const autoBattleButton = document.getElementById('autoBattleButton');
     if (autoBattleButton) {
         autoBattleButton.addEventListener('click', autoBattle);
-    }
-    
-    const blessGiftButton = document.getElementById("bless-gift-button");
-    if (blessGiftButton) {
-        blessGiftButton.addEventListener("click", blessGift);
     }
     
     const openTenthTreasureButton = document.getElementById("open-tenth-treasure-button");

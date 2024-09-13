@@ -962,24 +962,25 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            background: #6f391c;
+            background: rgba(0, 0, 0, 0.6);
             padding: 2px;
             border-radius: 2px;
-            color: #92341c;
+            color: #87431f;
             font-size: 16px;
+            height: 100%;
         }
         .scalping-head-button {
             background: transparent;
             color: #fff;
-            box-shadow: 0px 0px 2px 1px azure;
+            box-shadow: 0px 0px 2px 1px #6f391c;
         }
         .scalping-container {
-            width: 97%;
+            width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -2881,12 +2882,15 @@
             <div class="scalping-top-bar" id="scalping-top-bar">
                 <div>时间已过:</div>
                 <div>第<span id="current-selling-week">1</span>周/<span id="max-selling-week">52</span>周</div>
-                <div>声望：<span id="player-reputation">0</span></div>
+                <div style="display: flex;flex-direction: column;font-size: 14px;">
+                    <div>🏆声望：<span id="player-reputation">0</span></div>
+                    <div style="cursor: pointer;">🏄‍♂️精力：<span id="player-energy">100</span></div>
+                </div>
             </div>
             <div class="scalping-asset-area" id="scalping-asset-area">
                 <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
-                    <div>当前现金：<span id="current-cash">0</span></div>
-                    <div>总资产：<span id="net-asset">0</span></div>
+                    <div>💵当前现金：<span id="current-cash">0</span></div>
+                    <div>🗃资产总值：<span id="net-asset">0</span></div>
                 </div>
                 <div><button id="add-investment" onclick="increaseInverstment()">增加投资</button></div>
             </div>
@@ -2898,7 +2902,7 @@
                             <div>货物</div>
                             <div>价格</div>
                         </div>
-                    <div id="scalping-item-info" style="padding: 5px;border-top: 2px solid #6f391c;">
+                    <div id="scalping-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;">
                         <!-- 动态生成商品 -->
                     </div>
                     </div>
@@ -2911,7 +2915,7 @@
                             <div>买入价</div>
                             <div>数量</div>
                         </div>
-                        <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;">
+                        <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;">
                             <!-- 动态生成仓库商品 -->
                         </div>
                     </div>
@@ -2919,6 +2923,7 @@
             </div>
             <div class="scalping-bottom-area" id="scalping-bottom-area">
                 <div><button id="quit-scalping" onclick="quitScalping()">提前退市</button></div>
+                <div><button id="relax-byweek" style="display: none">休息两周</button></div>
                 <div><button id="enter-next-week" onclick="refreshSaleWeek()">刷新一周</button></div>
             </div>
         </div>
@@ -9334,6 +9339,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     // 检查玩家是否处于失明状态
     if (battleState.player.blindfold) {
         logBattleEvent("处于短暂失明，敌人闪避了你的物理攻击。", 'yellow');
+        playerTurn = false;
         setTimeout(enemyAttack, 350);
         return 0; // 物理攻击无法造成伤害
     }
@@ -10970,10 +10976,6 @@ function performEnemyMagicalAttack(isCritical) {
         return 0;
     }
 
-    if (handleMagicDodge('player')) {
-        return 0;
-    }
-
     const enemyLevel = parseInt(document.getElementById('enemy-level').innerText, 10) || 0;
     const attackMultiplier = 1 + (enemyLevel / 100);
     
@@ -10992,7 +10994,10 @@ function performEnemyMagicalAttack(isCritical) {
     damage = calculateDamage(damage, isCritical, enemyCritDamage);
     damage = Math.max(1, damage - constantDamageReduction);
 
-
+    if (handleMagicDodge('player')) {
+        return 0;
+    }
+    
     const manaCost = Math.floor(Math.random() * (100 - 50 + 1)) + 500;
     battleState.enemy.mana = Math.max(0, battleState.enemy.mana - manaCost);
     if (isCritical) {
@@ -19522,6 +19527,7 @@ let scalpingState = {
     currentSellingWeek: 0,
     maxSellingWeek: 52,
     playerReputation: 0,
+    playerEnergy: 100,
     currentCash: 0, // 示例初始现金
     netAsset: 0, 
     usedWarehouseCapacity: 0,
@@ -19539,7 +19545,7 @@ const scalpingItems = [
     {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 1000, bonusPrice: 2400, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
     {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
     {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
-    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 20000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'}
+    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 80000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'}
 ];
         
 //倒买倒卖的逻辑
@@ -19562,9 +19568,8 @@ function openScalping(closeButton = false) {
     );
 }
 
-
 function showInfoScalping() {
-    showInfoBox('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周会根据仓库容量收取一定租金 \n\n 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
+    showMerchant('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周会根据仓库容量收取一定租金 \n\n 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
 }
         
 function increaseInverstment() {
@@ -19604,7 +19609,7 @@ function getScalpableItemsPrice(item, isSpecial = false) {
     let fluctuationRange = 0;
     let price = 0;
     if (isSpecial) {
-        if (Math.random() < 0.8){
+        if (Math.random() < 0.7){
             fluctuationRange = item.basePrice * item.fluctuation;
             price = Math.floor((item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange)) * 0.2 * item.downRate);
             showMerchant(`${item.badEvent}`);
@@ -19653,7 +19658,7 @@ function getRandomScalpableItem() {
         itemElement.className = 'scalping-item';
         itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
         itemElement.innerHTML = `
-            <div id="${item.name}-container">
+            <div id="${item.name}-container" style="cursor: pointer;">
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
@@ -19733,8 +19738,10 @@ function getReputationEvent() {
         
 function refreshSaleWeek() {
     let currentWeek = scalpingState.currentSellingWeek;
+    let energy = scalpingState.playerEnergy;
     
     const maxWeek = scalpingState.maxSellingWeek;
+    const energyCost = Math.floor(Math.random() * 3 + 1);
     const refreshButton = document.getElementById('enter-next-week');
     const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
 
@@ -19757,6 +19764,9 @@ function refreshSaleWeek() {
         getRandomScalpableItem();  // 获取新的可交易商品
         scalpingState.currentSellingWeek++;  // 直接修改全局状态中的当前周数
         scalpingState.currentCash -= refreshCost;
+        energy = Math.max(0, energy - energyCost);
+        scalpingState.playerEnergy = energy;
+        
         
         if (scalpingState.currentSellingWeek === scalpingState.maxSellingWeek) {
             refreshButton.innerText = '结算收益';
@@ -19770,24 +19780,31 @@ function refreshSaleWeek() {
     } else if (currentWeek === maxWeek) {        
         const netAssets = calculateNetAsset();
         const goldGot = Math.floor(Math.max(0, netAssets * 10));
+        const initialCost = scalpingState.investmentCount * 50000 * 10;
         
         goldAmount += goldGot;
         updateGoldDisplay(goldAmount);
+        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！净利润为${convertPrice(Math.max(0, goldGot - initialCost))}金！`);   
         resetScalping();
-        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！`);   
     }
 }
 
 function resetScalping() {
     const marketPanel = document.getElementById('scalping-item-info');
     const warehousePanel = document.getElementById('warehouse-item-info');
+    const relaxButton = document.getElementById('relax-byweek');
     marketPanel.innerHTML = ''; // 清空现有内容
     warehousePanel.innerHTML = ''; // 清空现有仓库内容
+    
+    if (relaxButton.style.display !== 'none'){
+        relaxButton.style.display = 'none';
+    }
     
     scalpingState = {
         currentSellingWeek: 0,
         maxSellingWeek: 52,
         playerReputation: 0,
+        playerEnergy: 100,
         currentCash: 0, // 示例初始现金
         netAsset: calculateNetAsset(), 
         usedWarehouseCapacity: 0,
@@ -19798,6 +19815,7 @@ function resetScalping() {
     };
     updateScalpingPanel();
     document.getElementById('enter-next-week').innerText = '刷新一周';
+    
 }
         
 function quitScalping() {
@@ -19949,6 +19967,10 @@ function handleItemTransaction(item, itemInfo, actionType) {
 
 // 触发购买
 function handleItemPurchase(item, price) {
+    if (scalpingState.playerEnergy <= 60) {
+        showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
+        return;
+    }
     if (scalpingState.usedWarehouseCapacity === scalpingState.maxWarehouseCapacity) {
         showMerchant('你的仓库已满！');
         return;
@@ -19961,13 +19983,36 @@ function handleItemSell(item, itemInfo) {
     const holdItem = scalpingState.holdItems[item.name];
     const itemName = scalpingItems.find(i => i.name === item.name);
     const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
+    if (scalpingState.playerEnergy <= 60) {
+        showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
+        return;
+    }
     if (!marketItemPriceElement) {
         showMerchant('市场目前没有该商品的销售渠道，无法出售');
         return;
     }
     handleItemTransaction(item, itemInfo, 'sell');
 }
+        
+document.getElementById('player-energy').addEventListener('click', () => {
+    const energy = scalpingState.playerEnergy;
+    const cash = scalpingState.currentCash;
+    const recoverCostRatio = 100 - energy;
+    const recoverCost = Math.pow(recoverCostRatio, 4);
 
+    if (cash >= recoverCost) {
+        showInfoBox(`你可以花费${recoverCost}元立即恢复到满精力状态`,
+                    () => {
+                        scalpingState.currentCash -= recoverCost;
+                        scalpingState.playerEnergy = 100;
+                        updateScalpingPanel();
+                        showMerchant('一根上好的参汤进补，你又焕发了龙马精神');
+                    },null,'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px')
+    } else {
+        showMerchant(`当前需要${recoverCost}元来恢复精力，你的现金不足！`);
+    }
+});
+        
 // 更新仓库持有物品
 function updateWarehouseItems() {
     const warehousePanel = document.getElementById('warehouse-item-info');
@@ -19982,7 +20027,7 @@ function updateWarehouseItems() {
         itemElement.className = 'warehouse-item';
         itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
         itemElement.innerHTML = `
-            <div id="${item.name}-warehouse-container">
+            <div id="${item.name}-warehouse-container" style="cursor: pointer;">
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
@@ -20070,34 +20115,45 @@ function calculatePlayerReputation() {
 function updateScalpingPanel() {
     const currentSellingWeek = document.getElementById('current-selling-week');
     const maxSellingWeek = document.getElementById('max-selling-week');
+    const playerEnergy = document.getElementById('player-energy');
     const playerReputation = document.getElementById('player-reputation');
     const currentCash = document.getElementById('current-cash');
     const netAsset = document.getElementById('net-asset');
     const usedWarehouseCapacity = document.getElementById('used-warehouse-capacity');
     const maxWarehouseCapacity = document.getElementById('max-warehouse-capacity');
+    const relaxButton = document.getElementById('relax-byweek'); 
 
     currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
+    playerEnergy.innerText = scalpingState.playerEnergy;
     playerReputation.innerText = calculatePlayerReputation();  // 更新声望
     currentCash.innerText = scalpingState.currentCash;      // 更新当前现金
     netAsset.innerText = calculateNetAsset();        // 更新总资产
     usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量
     maxWarehouseCapacity.innerText = scalpingState.maxWarehouseCapacity;  // 更新最大仓库容量
+
+    if (scalpingState.playerEnergy <= 60) {
+        relaxButton.style.display = 'flex';
+        document.getElementById('player-energy').innerText = `${scalpingState.playerEnergy}💉`;
+        document.getElementById('player-energy').style.color = 'red';
+    } else {
+        relaxButton.style.display = 'none';
+        document.getElementById('player-energy').innerText = scalpingState.playerEnergy;
+        document.getElementById('player-energy').style.color = 'white';
+    }
 }
 
-
-    // 我想要构造一个根据scalpingItems数组来随机出现1~4个商品的函数，商品由45px * 45px的图片，图片下方显示其名字，图片元素右边是价格，价格由getScalpableItemsPrice()函数返回得到，图片元素和价格元素space-between
-    // getScalpableItemsPrice()是一个根据商品basePrice和fluctuation计算并返回价格的函数，所谓的fluctuation即在商品的basePrice基础上，计算基于fluctuation定义的倍数上下浮动之后的价格区间，并在这个区间里随机取值
-    // 在确认商品数量和价格后，需要在html上利用forEach遍历构造每个商品元素，你需要在'scalping-item-info'元素内向下构造，添加到市场板块内
-    // 每个商品元素允许被点击，点击事件触发：弹出可直接拖拉的进度条，并根据拖拉停留的位置判断玩家可能想要购买的商品数量，并在玩家确认购买后执行购买逻辑判断
-    // 玩家购买商品的进度条宽度公式为：货物单价 * 数量 / 当前现金 = 100%，玩家悬停的宽度可计算得出商品数量，点击确认后，当前现金扣除相应价格，并更新scalpingState.holdItems，这是一个子对象，包含每个购买商品的averagePrice, quantity
-    // 商品每次刷新时，可能会刷新出不同价格的同一种商品，玩家如果购买不同价格的同类商品，在scalpingState.holdItems中需要更新这个holdItems[key].averagePrice，即计算所有价格下最终的平均价格，并将这个价格更新在仓库元素里
-    // 玩家购买商品后，warehouse-item-info元素需要遍历构造玩家当前的holdItems，包含商品图像（与商品名字上下组合为整体），平均价和数量三者，横向呈space-between展开
-    // 仓库中的商品元素点击事件：同样地，根据弹出的进度条来指示玩家滑动，进度条最大宽度为max-width * holdItems[key].quantity = 100%，当玩家滑动确认后，商品将会被出售，请特别注意，玩家出售时该商品的价格，为市场板块所显示的同名商品的价格
-    // 如果市场板块当前并没有刷新出玩家选定的商品，将不能出售。出售成功时，商品数量会对应减少，并同时更新界面元素updateScalpingPanel()
-    // 仓库存在容量限制，玩家拥有的所有商品数量之和为scalpingState.usedWarehouseCapacity，这个值不能超过scalpingState.maxWarehouseCapacity，当玩家仓库容量不足时，购买商品将会失败
-    // 玩家可以点击'enlarge-warehouse-button'按钮增加仓库容量，初始增加价格为20000，每次增加时，scalpingState.warehouseUpdateCount ++，maxWarehouseCapacity += 100，此后价格为20000 * warehouseUpdateCount
-
+//修养两周具体实现
+document.getElementById('relax-byweek').addEventListener('click', ()=> {
+    if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
+        scalpingState.currentSellingWeek += 2;
+        scalpingState.playerEnergy = 100;
+        updateScalpingPanel();
+        showMerchant('美美休息半个月，你的状态重回巅峰！');
+    } else {
+        showMerchant('你在市场的租期马上就要到了，不能执行休息动作了哦');
+    }
+})
         
 // 页面加载完成后初始化商店
 let refreshCount = 0; // 全局计数器，记录刷新次数
@@ -21413,8 +21469,8 @@ function applySpecialSkillEffects(skill, value = null) {
             const corrodegDuration = Math.max(100, skillDetail.skillLevel * 200);
             const originalEnemyPD = battleState.enemy.physicalDefense;
             const originalEnemyMD = battleState.enemy.magicDefense;
-            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.01 * (originalEnemyPD + originalEnemyMD));
-            console.log(corrodedDefenseValue);
+            const corrodedDefenseValue = Math.floor(skillDetail.skillMultiplier * 0.02 * (originalEnemyPD + originalEnemyMD));
+
             battleState.enemy.physicalDefense = Math.max(0, battleState.enemy.physicalDefense - corrodedDefenseValue);
             battleState.enemy.magicDefense = Math.max(0, battleState.enemy.magicDefense - corrodedDefenseValue);
             logBattleEvent(`带有灵力的火焰腐蚀了敌人的护甲，敌人双防降低了${corrodedDefenseValue}点`, 'purple');

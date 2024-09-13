@@ -983,7 +983,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
+            gap: 10px;
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
             background-repeat: repeat;
             background-size: auto;
@@ -992,12 +992,18 @@
         }
 
         .scalping-top-bar {
+            font-weight: bold;
+            width: 95%;
+            overflow: hidden;
             display: flex;
-            width: 100%;
+            margin-bottom: 0px;
             flex-direction: row;
             justify-content: space-around;
             align-items: center;
-            font-weight: bold;
+            color: white;
+            background: rgb(57, 87, 89);
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            height: 45px;
         }
         .scalping-asset-area {
             width: 95%;
@@ -1013,7 +1019,7 @@
             flex-direction: row;
             justify-content: center;
             align-items: flex-start;
-            gap: 5px;
+            gap: 10px;
         }
         .scalping-detail-list {
             width: 45%;
@@ -1041,6 +1047,8 @@
             justify-content: space-around;
             width: 100%;
             align-items: center;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
         .quality-info button:active {
             background-color: #074b02;
@@ -1317,7 +1325,7 @@
             margin-top: 15px;
             margin-bottom: 15px;
         }
-        .treasure-action, .scalping-container button {
+        .treasure-action button, .scalping-container button {
             border: 1px solid #6F391C;
             background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
             box-shadow: inset 0px 0px 2px 1px #87431F;
@@ -2890,20 +2898,20 @@
                             <div>货物</div>
                             <div>价格</div>
                         </div>
-                    <div id="scalping-item-info" style="padding: 5px;">
+                    <div id="scalping-item-info" style="padding: 5px;border-top: 1px solid #6f391c;">
                         <!-- 动态生成商品 -->
                     </div>
                     </div>
                 </div>
                 <div class="scalping-warehouse" id="warehouse-info">
-                    <strong style="display: flex;gap: 5px;flex-direction: row;height: 30px;">仓库<div>(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button">➕</button></div></strong>
+                    <strong style="display: flex;gap: 5px;flex-direction: row;height: 30px;align-items: flex-start;">仓库<div style="display: flex;flex-direction: row;align-items: flex-start;">(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button">➕</button></div></strong>
                     <div id="warehouse-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
                         <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
                             <div>货物</div>
                             <div>买入价</div>
                             <div>数量</div>
                         </div>
-                        <div id="warehouse-item-info" style="padding: 5px;">
+                        <div id="warehouse-item-info" style="padding: 5px;border-top: 1px solid #6f391c;">
                             <!-- 动态生成仓库商品 -->
                         </div>
                     </div>
@@ -19622,10 +19630,27 @@ function getRandomScalpableItem() {
     });
 }
 
+//构造的简便消息函数，仅用于倒买倒卖
+function showMerchant(message) {
+    const merchantUrl = 'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png';
+    const merchantSize = '88px * 88px';
+
+    showInfoBox(message,null,null,null,merchantUrl,merchantSize);
+}
+        
 function refreshSaleWeek() {
     let currentWeek = scalpingState.currentSellingWeek;
     const maxWeek = scalpingState.maxSellingWeek;
     const refreshButton = document.getElementById('enter-next-week');
+
+    if (calculateNetAsset() <= 0) {
+        showInfoBox('进入市场买卖交易，钱是必须的，先投资才能刷新哦',null,null,'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+    }
+    
+    if (currentSlider) {
+        document.body.removeChild(currentSlider);
+        currentSlider = null;
+    }
 
     if (currentWeek < maxWeek) {  // 只允许当前周小于最大周数时继续
         getRandomScalpableItem();  // 获取新的可交易商品
@@ -19866,23 +19891,22 @@ function updateWarehouseItems() {
 
 // 仓库扩展按钮逻辑
 document.getElementById('enlarge-warehouse-button').addEventListener('click', () => {
-    const upgradeCost = 20000 * (scalpingState.warehouseUpdateCount + 1);
+    const upgradeCost = 20000 * Math.max(1, (scalpingState.warehouseUpdateCount * 2));
     showInfoBox(`你可以花费${upgradeCost}元开启100个仓库`,
                () => {
                     if (scalpingState.currentCash >= upgradeCost) {
                         scalpingState.currentCash -= upgradeCost;
                         scalpingState.maxWarehouseCapacity += 100;
                         scalpingState.warehouseUpdateCount++;
+                        updateScalpingPanel();
                     } else {
                         showInfoBox('现金不足！',null,null,'red');
                     }
                },
                null,
                'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
-    
-    updateScalpingPanel();
 });
-
+        
 function calculateNetAsset() {
     let netAsset = 0;
 
@@ -19921,6 +19945,14 @@ function calculateNetAsset() {
     netAsset += scalpingState.currentCash;
     return netAsset;
 }
+
+function calculatePlayerReputation() {
+    const netAsset = calculateNetAsset();
+    let reputation = 0;
+    reputation = Math.max(0, Math.floor((netAsset - 200000) / 12.5));
+    
+    return reputation;
+}
         
 //用于更新细节，避免重复函数
 function updateScalpingPanel() {
@@ -19934,7 +19966,7 @@ function updateScalpingPanel() {
 
     currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
-    playerReputation.innerText = scalpingState.playerReputation;  // 更新声望
+    playerReputation.innerText = calculatePlayerReputation();  // 更新声望
     currentCash.innerText = scalpingState.currentCash;      // 更新当前现金
     netAsset.innerText = calculateNetAsset();        // 更新总资产
     usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量

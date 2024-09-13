@@ -1011,7 +1011,7 @@
             flex-direction: row;
             justify-content: space-around;
             align-items: center;
-            border: 1px solid #87431f;
+            border: 2px solid #87431f;
         }
         .scalping-middle-wrap {
             width: 100%;
@@ -1027,7 +1027,7 @@
             border-radius: 2px;
             flex-direction: column;
             align-items: center;
-            border: 1px solid #6f391c;
+            border: 2px solid #6f391c;
             padding: 2px;
             min-height: 100px;
         }
@@ -1037,7 +1037,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 1px solid #6f391c;
+            border: 2px solid #6f391c;
             min-height: 100px;
             padding: 2px;
         }
@@ -2876,7 +2876,7 @@
         </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
-        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商</div><button id="close-scalping-button" onclick="openScalping()" class="scalping-head-button" style="margin-right:5px">x</button></div>
+        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
         <div class="scalping-container" id="scalping-container">
             <div class="scalping-top-bar" id="scalping-top-bar">
                 <div>时间已过:</div>
@@ -2884,7 +2884,7 @@
                 <div>声望：<span id="player-reputation">0</span></div>
             </div>
             <div class="scalping-asset-area" id="scalping-asset-area">
-                <div style="display: flex;flex-direction: column;gap: 5px;">
+                <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
                     <div>当前现金：<span id="current-cash">0</span></div>
                     <div>总资产：<span id="net-asset">0</span></div>
                 </div>
@@ -2898,7 +2898,7 @@
                             <div>货物</div>
                             <div>价格</div>
                         </div>
-                    <div id="scalping-item-info" style="padding: 5px;border-top: 1px solid #6f391c;">
+                    <div id="scalping-item-info" style="padding: 5px;border-top: 2px solid #6f391c;">
                         <!-- 动态生成商品 -->
                     </div>
                     </div>
@@ -2911,7 +2911,7 @@
                             <div>买入价</div>
                             <div>数量</div>
                         </div>
-                        <div id="warehouse-item-info" style="padding: 5px;border-top: 1px solid #6f391c;">
+                        <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;">
                             <!-- 动态生成仓库商品 -->
                         </div>
                     </div>
@@ -19527,65 +19527,97 @@ let scalpingState = {
     usedWarehouseCapacity: 0,
     maxWarehouseCapacity: 100, // 初始仓库容量
     warehouseUpdateCount: 0,
+    investmentCount: 0,
     holdItems: {} // 存放玩家购买的商品
 };
 
 const scalpingItems = [
-    {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', tier: 0, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, description: '陈酿女儿红，酒饕的盛宴'},
-    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', tier: 1, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, description: '形若钻石的灵玉，收藏古玩者的高端入门品'},
-    {name: '上古神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', tier: 2, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
-    {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', tier: 3, basePrice: 600, bonusPrice: 1200, fluctuation: 0.05, description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
-    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', tier: 4, basePrice: 1000, bonusPrice: 2400, fluctuation: 0.15, description: '上好的玉珏，古玩界常青树'},
-    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', tier: 2, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, description: '天长地久，爱无止休'}
+    {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至高价', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
+    {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
+    {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', downRate: 1, basePrice: 600, bonusPrice: 1200, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
+    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 1000, bonusPrice: 2400, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
+    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
+    {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
+    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 20000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'}
 ];
         
 //倒买倒卖的逻辑
-function openScalping() {
+function openScalping(closeButton = false) {
     const scalpingWindow = document.getElementById('scalping-display');
-    const isOpen = scalpingWindow.style.display === 'flex';  // 使用 `===` 来比较
-    
-    if (!isOpen) {
-        scalpingWindow.style.display = 'flex';  // 打开 scalping 窗口
-    } else {
-        scalpingWindow.style.display = 'none';  // 关闭 scalping 窗口
+    const isOpen = scalpingWindow.style.display === 'flex';
+    const toggleWindow = () => {
+        scalpingWindow.style.display = isOpen ? 'none' : 'flex'; // 根据状态切换显示
+        updateScalpingPanel();
+    };
+
+    if (closeButton) {
+        toggleWindow(); // 点击关闭按钮时，直接切换显示状态
+        return;
     }
-    updateScalpingPanel();
+
+    showInfoBox(
+        '人生在世，利字当头。逐鹿沙场固然澎湃，商场沉浮亦令人执迷。\n\n在这个系统内，你将花费一年时间（52周）体验投资的经历 \n\n中途离开不会删除数据，但刷新页面会清空你的仓库和资产，请知悉',
+        toggleWindow  // 信息框确认后，执行窗口切换
+    );
 }
 
+
 function showInfoScalping() {
-    showInfoBox('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周市面上的道具和需求都会变化 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
+    showInfoBox('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周会根据仓库容量收取一定租金 \n\n 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
 }
         
 function increaseInverstment() {
-    if (goldAmount >= 5000000) {
-        showInfoBox('\n在自由市场，100文金子=1元，每次最少投资50000元。\n\n当总资产到达20万时，将不允许追加投资。\n\n准备好注资50000元了吗？',
+    if (goldAmount >= 500000) {
+        showInfoBox(`\n在自由市场，10文金子=1元，每次最少投资50000元。\n\n当总资产到达20万或投资次数达到5次时，将不允许追加投资。\n\n你还可以投资${Math.max(0, 5-scalpingState.investmentCount)}次，准备好注资50000元了吗？`,
                    () => {
+                       if (scalpingState.investmentCount >= 5) {
+                           showMerchant('本年度投资次数已经耗尽！');
+                           return;
+                       }
+                       
                        if (calculateNetAsset() >= 200000) {
-                           showInfoBox('当前总资产超过20万，不支持天使投资！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                           showMerchant('当前总资产超过20万，不支持天使投资！');
                            return;
                        } else {
-                           goldAmount -= 5000000;
+                           goldAmount -= 500000;
                            scalpingState.currentCash += 50000;
+                           scalpingState.investmentCount ++;
                            updateScalpingPanel();
                            updateGoldDisplay(goldAmount);
-                           showInfoBox('注入一笔天使投资，祝你的生意做大做强！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                           showMerchant('注入一笔天使投资，祝你的生意做大做强！');
                        }
                    },
                    () => {
-                       showInfoBox('天使投资人，期待你的眼光能带来真正的价值！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                       showMerchant('天使投资人，期待你的眼光能带来真正的价值！');
                    },
                    null,
                    'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png',
                    '88px * 88px');
     } else {
-        showInfoBox('你的启动资金还不足5000两金子，尚不能成为天使投资人',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+        showMerchant('你的启动资金还不足500两金子，尚不能成为天使投资人');
     }
 }
-        
+
 // 根据波动计算商品价格
-function getScalpableItemsPrice(item) {
-    const fluctuationRange = item.basePrice * item.fluctuation;
-    const price = item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange);
+function getScalpableItemsPrice(item, isSpecial = false) {
+    let fluctuationRange = 0;
+    let price = 0;
+    if (isSpecial) {
+        if (Math.random() < 0.8){
+            fluctuationRange = item.basePrice * item.fluctuation;
+            price = Math.floor((item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange)) * 0.2 * item.downRate);
+            showMerchant(`${item.badEvent}`);
+        } else {
+            fluctuationRange = item.bonusPrice * item.fluctuation;
+            price = item.bonusPrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange);
+            showMerchant(`${item.goodEvent}`);
+        }
+    } else {
+        fluctuationRange = item.basePrice * item.fluctuation;
+        price = item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange);
+    }
+
     return Math.floor(price);
 }
 
@@ -19593,10 +19625,11 @@ function getScalpableItemsPrice(item) {
 function getRandomScalpableItem() {
     const marketPanel = document.getElementById('scalping-item-info');
     marketPanel.innerHTML = ''; // 清空现有内容
+    let specialEvents = false;
     
     // 随机选择1到4个商品
     const itemsToDisplay = [];
-    const numberOfItems = Math.floor(Math.random() * 4) + 1;
+    const numberOfItems = Math.floor(Math.random() * 5) + 1;
     
     while (itemsToDisplay.length < numberOfItems) {
         const randomItem = scalpingItems[Math.floor(Math.random() * scalpingItems.length)];
@@ -19607,7 +19640,13 @@ function getRandomScalpableItem() {
 
     // 生成HTML结构
     itemsToDisplay.forEach(item => {
-        const price = getScalpableItemsPrice(item);
+        let price = getScalpableItemsPrice(item);
+
+        // 检查是否触发特殊事件
+        if (Math.random() < 0.1 && !specialEvents) {
+            price = getScalpableItemsPrice(item, true);  // 特殊事件价格
+            specialEvents = true;  // 标记已生成特殊事件
+        }
 
         // 创建商品元素
         const itemElement = document.createElement('div');
@@ -19637,14 +19676,69 @@ function showMerchant(message) {
 
     showInfoBox(message,null,null,null,merchantUrl,merchantSize);
 }
+
+function getReputationEvent() {
+    const reputation = calculatePlayerReputation();
+    const repEvents = [
+        {value: 1000, cashIn: 1000, description: '行走商场，小有名气，季度商场新人奖颁发给你'},
+        {value: 5000, cashIn: 5000, description: '崭露头角的小商贩——不对，小商贩已经不能称呼你了，应该叫你老板先生'},
+        {value: 10000, cashIn: 10000, description: '声望越来越高了，附近的商会特邀你作为本季度代言人'},
+        {value: 15000, cashIn: 15000, description: '《三界商报》特别访谈了你的致富之道，你的精彩发言感染了在座的所有人'},
+        {value: 20000, cashIn: 20000, description: '家业越来越大，在街头现身都会纷纷引来传闻"这家店被他光顾了，一定是个值得投资的优质资产"'},
+        {value: 25000, cashIn: 30000, description: '你的商业帝国初具规模，各地商贾都争相与你合作，希望能分得一杯羹'},
+        {value: 30000, cashIn: 35000, description: '你的商业头脑备受推崇，受邀为商场新人做了一场精彩的演讲，获得了满堂喝彩'},
+        {value: 35000, cashIn: 40000, description: '你的产业遍布三界，成为了商界的传奇人物，无数人以你为榜样'},
+        {value: 40000, cashIn: 45000, description: '你的商业版图不断扩张，各地竞相邀请你前去投资，你的财富与日俱增'},
+        {value: 45000, cashIn: 50000, description: '你的商业帝国已然成型，成为了三界首屈一指的商业巨头，无人不晓'},
+        {value: 50000, cashIn: 60000, description: '你的生意遍布各个领域，从日常用品到高端奢侈品，无一不涉足，成为了商界的王者'},
+        {value: 100000, cashIn: 100000, description: '你的商业版图不断扩大，甚至延伸到了其他界，成为了跨界商业的先驱'},
+        {value: 200000, cashIn: 200000, description: '你的财富已经达到了一个新的高度，成为了三界首富，你的一举一动都备受瞩目'},
+        {value: 300000, cashIn: 300000, description: '你的商业帝国已经无人能及，你成为了商界的传奇，你的故事被编入了教科书'},
+        {value: 400000, cashIn: 400000, description: '你的商业版图遍布三界，甚至延伸到了未知的领域，你的财富已经无法估量'},
+        {value: 500000, cashIn: 500000, description: '你的商业帝国已经达到了前所未有的高度，你成为了商界的神话，万人敬仰'},
+        {value: 600000, cashIn: 600000, description: '你的财富已经超越了所有人的想象，你成为了三界首富中的首富，你的传奇故事被世代传颂'},
+        {value: 700000, cashIn: 700000, description: '你的商业版图已经覆盖了所有已知的领域，你的财富已经达到了一个难以想象的地步'},
+        {value: 800000, cashIn: 800000, description: '你的商业帝国已经成为了一个传说，你的名字已经成为了商业的代名词，无人不知无人不晓'},
+        {value: 1000000, cashIn: 1000000, description: '你的财富已经达到了一个前所未有的高度，你已经成为了传说中的存在，你的故事将永远流传下去'}
+    ];
+
+    // 声望小于等于0时，没有事件触发
+    if (reputation <= 0) {
+        showMerchant('本季度你的表现平平，默默无闻');
+        return;
+    }
+
+    // 查找声望对应的事件，向下匹配最接近的事件
+    let selectedEvent = null;
+    for (let i = repEvents.length - 1; i >= 0; i--) {
+        if (reputation >= repEvents[i].value) {
+            selectedEvent = repEvents[i];
+            break;
+        }
+    }
+
+    // 如果找到了合适的事件，增加现金并显示事件
+    if (selectedEvent) {
+        scalpingState.currentCash += selectedEvent.cashIn;
+        showMerchant(`本季度回顾：${selectedEvent.description}，奖励金${selectedEvent.cashIn}元`);
+    }
+}
         
 function refreshSaleWeek() {
     let currentWeek = scalpingState.currentSellingWeek;
+    
     const maxWeek = scalpingState.maxSellingWeek;
     const refreshButton = document.getElementById('enter-next-week');
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
 
     if (calculateNetAsset() <= 0) {
-        showInfoBox('进入市场买卖交易，钱是必须的，先投资才能刷新哦',null,null,'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+        showMerchant('进入市场买卖交易，钱是必须的，先投资才能刷新哦');
+        return;
+    }
+
+    if (scalpingState.currentCash < refreshCost) {
+        showMerchant(`本周店租为${refreshCost}元，你的现金不足以支付！请筹集足够资金后再续租进入下一周！`);
+        return;
     }
     
     if (currentSlider) {
@@ -19655,18 +19749,25 @@ function refreshSaleWeek() {
     if (currentWeek < maxWeek) {  // 只允许当前周小于最大周数时继续
         getRandomScalpableItem();  // 获取新的可交易商品
         scalpingState.currentSellingWeek++;  // 直接修改全局状态中的当前周数
+        scalpingState.currentCash -= refreshCost;
+        
         if (scalpingState.currentSellingWeek === scalpingState.maxSellingWeek) {
             refreshButton.innerText = '结算收益';
         }
+
+        if (scalpingState.currentSellingWeek > 0 && scalpingState.currentSellingWeek % 10 === 0) {
+            getReputationEvent();
+        }
+        
         updateScalpingPanel();  // 更新面板
     } else if (currentWeek === maxWeek) {        
         const netAssets = calculateNetAsset();
-        const goldGot = Math.floor(Math.max(0, netAssets * 100));
+        const goldGot = Math.floor(Math.max(0, netAssets * 10));
         
         goldAmount += goldGot;
         updateGoldDisplay(goldAmount);
         resetScalping();
-        showInfoBox(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！`,null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');   
+        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！`);   
     }
 }
 
@@ -19685,6 +19786,7 @@ function resetScalping() {
         usedWarehouseCapacity: 0,
         maxWarehouseCapacity: 100, // 初始仓库容量
         warehouseUpdateCount: 0,
+        investmentCount: 0,
         holdItems: {} // 存放玩家购买的商品
     };
     updateScalpingPanel();
@@ -19696,14 +19798,13 @@ function quitScalping() {
         showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损，是否继续？',
                    () => {
                         const netAssets = calculateNetAsset();
-                        const goldGot = Math.floor(Math.max(0, netAssets * 100 * 0.8));
+                        const goldGot = Math.floor(Math.max(0, netAssets * 10 * 0.8));
                         goldAmount += goldGot;
                         updateGoldDisplay(goldAmount);
-                        showInfoBox(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`,null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                        showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`);
                         resetScalping();
-                        openScalping();
                    },
-                   () => showInfoBox('取消交易！',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px'),
+                   () => showMerchant('取消交易！'),
                    'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
     } else {
         refreshSaleWeek();
@@ -19729,7 +19830,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
         sliderContainer.style = 'display: flex;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 80%;max-height: 80%;min-height: 10%;z-index: 9999;font-size: 14px;padding: 10px 20px 5px;background-color: rgb(223, 191, 110);color: rgb(146, 52, 28);background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);background-repeat: repeat;background-size: auto;box-shadow: rgb(30, 46, 47) 0px 0px 0px 1px, rgb(111, 57, 28) 0px 0px 0px 1px inset;border: 1px solid rgb(235, 172, 59);overflow-y: auto;flex-direction: column;align-items: center;gap: 5px;';
 
         const sliderLabel = document.createElement('label');
-        sliderLabel.innerText = `选择${isPurchase ? '购买' : '出售'}数量：`;
+        sliderLabel.innerText = `拖动${isPurchase ? '购买' : '出售'}数量：`;
         sliderContainer.appendChild(sliderLabel);
 
         const slider = document.createElement('input');
@@ -19738,7 +19839,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
         slider.min = 0;
         slider.max = 100;
         slider.value = 0;
-        slider.style.width = '200px';
+        slider.style = 'width: 90%;appearance: none;border-radius: 20px;border: 1px groove #0475ff;box-shadow: inset 0px 0px 2px 1px #0475ff;';
         sliderContainer.appendChild(slider);
 
         const quantityLabel = document.createElement('div');
@@ -19757,11 +19858,10 @@ function handleItemTransaction(item, itemInfo, actionType) {
         confirmButton.innerText = `确认${isPurchase ? '购买' : '出售'}`;
         sliderContainer.appendChild(confirmButton);
         
-
         document.body.appendChild(sliderContainer);
     }
     
-    sliderContainer.style.display = 'block'; // 显示进度条
+    sliderContainer.style.display = 'flex'; // 显示进度条
     const slider = document.getElementById(`${actionType}-slider`);
     const quantityLabel = document.getElementById(`${actionType}-quantity`);
     
@@ -19771,15 +19871,16 @@ function handleItemTransaction(item, itemInfo, actionType) {
 
     if (isPurchase) {
         // 获取 UI 上的固定价格
+        const availableRoom = Math.max(0, scalpingState.maxWarehouseCapacity - scalpingState.usedWarehouseCapacity);
         price = parseInt(document.getElementById(`price-${item.name}`).innerText); 
-        maxQuantity = Math.floor(scalpingState.currentCash / price); // 最大可购买数量
+        maxQuantity = Math.min(availableRoom, Math.floor(scalpingState.currentCash / price)); // 最大可购买数量
     } else {
         const itemInfo = scalpingState.holdItems[item.name];
         const itemName = scalpingItems.find(i => i.name === item.name);
         const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
         console.log({itemInfo, marketItemPriceElement, itemName});
         if (!marketItemPriceElement) {
-            showInfoBox('市场目前没有该商品的销售渠道，无法出售',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+            showMerchant('市场目前没有该商品的销售渠道，无法出售');
             return;
         }
         price = parseInt(document.getElementById(`price-${item.name}`).innerText); // 获取市场价格
@@ -19815,7 +19916,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
                     updateScalpingPanel();
                     updateWarehouseItems();
                 } else {
-                    showInfoBox('仓库容量不足，无法购买',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+                    showMerchant('仓库容量不足，无法购买');
                 }
             } else {
                 // 执行出售逻辑
@@ -19839,9 +19940,12 @@ function handleItemTransaction(item, itemInfo, actionType) {
     });
 }
 
-
 // 触发购买
 function handleItemPurchase(item, price) {
+    if (scalpingState.usedWarehouseCapacity === scalpingState.maxWarehouseCapacity) {
+        showMerchant('你的仓库已满！');
+        return;
+    }
     handleItemTransaction(item, null, 'purchase');
 }
 
@@ -19851,7 +19955,7 @@ function handleItemSell(item, itemInfo) {
     const itemName = scalpingItems.find(i => i.name === item.name);
     const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
     if (!marketItemPriceElement) {
-        showInfoBox('市场目前没有该商品的销售渠道，无法出售',null,null,null,'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px');
+        showMerchant('市场目前没有该商品的销售渠道，无法出售');
         return;
     }
     handleItemTransaction(item, itemInfo, 'sell');
@@ -19888,10 +19992,10 @@ function updateWarehouseItems() {
     });
 }
 
-
 // 仓库扩展按钮逻辑
 document.getElementById('enlarge-warehouse-button').addEventListener('click', () => {
     const upgradeCost = 20000 * Math.max(1, (scalpingState.warehouseUpdateCount * 2));
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
     showInfoBox(`你可以花费${upgradeCost}元开启100个仓库`,
                () => {
                     if (scalpingState.currentCash >= upgradeCost) {
@@ -19899,8 +20003,9 @@ document.getElementById('enlarge-warehouse-button').addEventListener('click', ()
                         scalpingState.maxWarehouseCapacity += 100;
                         scalpingState.warehouseUpdateCount++;
                         updateScalpingPanel();
+                        showMerchant(`你的仓库扩充为${scalpingState.maxWarehouseCapacity}个了！现在每周需要支付${refreshCost}元场地租金哦！`);
                     } else {
-                        showInfoBox('现金不足！',null,null,'red');
+                        showMerchant('现金不足！');
                     }
                },
                null,

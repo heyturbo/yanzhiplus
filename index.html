@@ -6657,7 +6657,7 @@ function startBattle() {
     onBattleState = true;
 
     if (!firstStartBattle) {
-        logBattleEvent("模拟回合制，为了防止作弊，每秒玩家会固定掉血1%，请及时操作！");
+        logBattleEvent("这里是战斗面板");
         firstStartBattle = true;
     }
     
@@ -6781,6 +6781,12 @@ function handleVictory() {
     resetBattleState(true);
     resetBuffState(true);
     extraShield = 0;
+    if (battleAttributes.speed >= battleState.enemy.speed) {
+        playerTurn = true;
+    } else {
+        playerTurn = false;
+        setTimeout(enemyAttack(), 350);
+    }
 }
 
 function handlePetDefeat() {
@@ -6803,6 +6809,7 @@ function handlePetDefeat() {
         applyDefeatPenalty();
         logBattleEvent('没有其他宠物可以更换，本次战斗已失败！');
     }
+
 }
 
 function promptPetSwitch(petSelect, selectedPetKey) {
@@ -6859,8 +6866,14 @@ function applyDefeatPenalty() {
     usedPets = [];
     resetBattleState(false);
     resetBuffState(false);
-    extraShield = 0;    
-}
+    extraShield = 0;
+    if (battleAttributes.speed >= battleState.enemy.speed) {
+        playerTurn = true;
+    } else {
+        playerTurn = false;
+        setTimeout(enemyAttack(), 350);
+    }
+} 
 
 function calculateExtraReward() {
     // 额外奖励计算逻辑
@@ -9182,6 +9195,7 @@ function performAttack(type) {
     }
 
     if (!playerTurn) {
+        enemyAttack();
         return;
     }
         
@@ -9629,6 +9643,7 @@ function performPoison() {
     }
 
     if (!playerTurn) {
+        enemyAttack();
         return;
     }
     
@@ -10189,6 +10204,7 @@ function performHeal() {
     }
 
     if (!playerTurn) {
+        enemyAttack();
         return;
     }
     
@@ -10306,9 +10322,9 @@ function handleReflectAndHeal(damage) {
 
     // 处理以牙还牙技能的反弹逻辑
     if (ascensionSkill.name === '以牙还牙' || secondAscensionSkill.name === '以牙还牙') {
-        const baseReflectPercentage = (ascensionSkill.baseValue + ascensionSkill.increment(ascensionSkill.level)) / 100;
-        const randomAddition = Math.random() * 0.15;
-        const reflectPercentage = baseReflectPercentage + randomAddition;
+        const baseReflectPercentage = (45 + 2 * ascensionSkill.level) / 100;
+        const randomAddition = Math.random() * 15;
+        const reflectPercentage = baseReflectPercentage + randomAddition / 100;
     
         if (!isNaN(reflectPercentage) && reflectPercentage > 0) {
             let reflectDamage = Math.floor(damage * reflectPercentage);
@@ -10458,7 +10474,7 @@ function handleRelieveEffects() {
     if (skillsArea) {
         Array.from(skillsArea.children).forEach(skillDiv => {
             const skillName = skillDiv.innerText.split(' ')[0];
-            const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === "JK");
+            const skill = currentPet.skills.find(skill => skill.name === skillName && (skill.type === "JK" || skill.type === "JKE"));
             if (skill) {
                 jkSkills.push(skill);
             }
@@ -10476,6 +10492,11 @@ function handleRelieveEffects() {
         if (randomValue < successRate) {
             clearEnemyEffect();
             logBattleEvent(`${jkSkill.name} ${skillLevel}级触发，成功解除敌人的控制效果！`, 'lime');
+            console.log(jkSkill);
+            
+            if (jkSkill.type === "JKE") {
+                applySpecialSkillEffects(jkSkill, value = null);
+            }
         }
         updateUI();
     }
@@ -10501,6 +10522,7 @@ function performDefense() {
     }
 
     if (!playerTurn) {
+        enemyAttack();
         return;
     }
         
@@ -10830,13 +10852,14 @@ function enemyAttack() {
     if (playerTurn) {
         return;
     }
-
-    playerTurn = true;
+    
     handleRelieveEffects(); //先给玩家解控
     
     if (handleDazed()) return;
     if (handleStunned()) return;
+    
     if (battleState.enemy.sleep) {
+        playerTurn = true;
         return;
     }
 
@@ -10859,10 +10882,11 @@ function enemyAttack() {
         
     if (handleEnemySteal(enemyHealthPercentage, enemyManaPercentage)) {
         updateUI();
+        playerTurn = true;
         return;
     }
 
-    let damage;
+    let damage = 0;
     let isCritical = checkCriticalHit(enemyCritRate);
 
     if (battleState.enemy.intimidated) {
@@ -10877,14 +10901,16 @@ function enemyAttack() {
     } else {
         logBattleEvent("邪佞被沉默，无法进行法术攻击。", 'white');
     }
-    
     handleBurnt();
 
     // 检查 damage 是否有效
     if (isNaN(damage) || damage <= 0) {
         console.error("Invalid damage value before reduction:", damage);
-        return;
+        damage = 0;
     }
+    
+    damage = handleDamageReduction(damage, isCritical); //计算伤害减免
+    handleResurrection(damage); //判断玩家是否复活
     
     // 检查玩家和敌人的血量，更新战斗状态
     if (battleAttributes.health <= 0) {
@@ -10896,13 +10922,8 @@ function enemyAttack() {
     } else {
         updateUI();
     }
-
-    // 首先处理伤害减免
-    damage = handleDamageReduction(damage, isCritical);
-
-    // 然后计算最终伤害，包括暴击和其他修正
-    damage = calculateDamage(damage, isCritical, enemyCritDamage);
-    handleResurrection(damage);
+    
+    playerTurn = true; //轮到玩家回合
 }
 
 
@@ -15964,6 +15985,7 @@ let jinnangItems = [
     { name: 'beimingshengong', displayName: '北冥神功天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：北冥神功' },
     { name: 'tianshenzhufu', displayName: '天神祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天神祝福' },
     { name: 'tianwanghuwei', displayName: '天王护卫天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天王护卫' },
+    { name: 'xingzhizhufu', displayName: '星之祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：星之祝福' },
     { name: 'hongHuang', displayName: '洪荒至尊仙葫', url: 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price: 8000, quantity: 0, description: '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -16576,7 +16598,7 @@ const itemEffects = {
     },
     talentedBless: () => getBlessSkills(),
     advancedSkillBook: () => {
-        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi', 'tianshenzhufu', 'tianwanghuwei', 'beimingshengong'];
+        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi', 'tianshenzhufu', 'tianwanghuwei', 'beimingshengong', 'xingzhizhufu'];
         const randomIndex = Math.floor(Math.random() * item.length);
         const selectedItem = item[randomIndex];
         addItemToJinnang(selectedItem, 1);
@@ -16589,6 +16611,7 @@ const itemEffects = {
     beimingshengong: () => createSkills('北冥神功', 'SSS', 'PHE', 1, 2, '来自北冥之地的修炼之术，运用无上念力治愈自身的同时随机附加一个属性增益。'),
     tianshenzhufu: () => createSkills('天神祝福', 'SSS', 'NE', 1, 1, '大幅度增加宠物的生命值和速度，每级提升2000点。'),
     tianwanghuwei: () => createSkills('天王护卫', 'SSS', 'NE', 1, 1, '大幅度增加宠物的物理防御和法术防御，每级提升500点。'),
+    xingzhizhufu: () => createSkills('星之祝福', 'SSS', 'JKE', 1, 0.025, '敌人攻击我方时有概率解除自身减益效果，并恢复一定生命值。'),
 };
 
 function useAssignedItem() {
@@ -21371,6 +21394,7 @@ function deleteSkill(skill, skillDiv, skillsArea) {
             "HL": "法力回复技能，在战斗中会根据等级每回合回复一定比例的法力值",
             "FH": "复活技能，拥有该技能的宠物会根据技能等级计算在战局中的复活次数和恢复血量",
             "JK": "解除控制技能，拥有该技能的宠物会根据技能等级，按照一定概率解除来自敌人的控制效果",
+            "JKE": "高级辅助技能，拥有该技能的宠物会根据技能等级，按照技能说明为玩家提供增益",
             "N": "被动属性加成技能，将会按照固定值为玩家提供二级属性",
             "NE": "高级被动技能，通常会增强宠物的专有属性，此类技能最高可升至6级"
         };
@@ -21430,6 +21454,7 @@ let bleedingInterval = null;
 let healingInterval = null;
         
 function applySpecialSkillEffects(skill, value = null) {
+    // skill是一个数组，不是一个单独的变量名
     // value参数用于传递各行动函数具备潜再处理的结果数值，比如再处理伤害数值、恢复数值等
     // 这个函数主要处理战斗事件，非战斗事件的NE技能将独立处理
     const skillDetail = calculateSkillLevelAndMultiplier(skill); //得到skillLevel, skillMultiplier
@@ -21551,6 +21576,12 @@ function applySpecialSkillEffects(skill, value = null) {
                 }
                  battleState.player.beiming = false;
             }, enhancingDuration);
+        },
+        "星之祝福": () => {
+            const healingAmount = Math.floor(battleAttributes.magicAttack * 0.5 * skillDetail.skillLevel);
+            battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healingAmount);
+            updateDamageValue(-healingAmount, true, 'extra-damage');
+            updateUI();
         }
     };
 

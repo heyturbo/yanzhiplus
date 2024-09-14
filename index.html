@@ -17420,9 +17420,19 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
 }
 
 function updateArmInfoDiv(infoDiv, arm, key) {
-    const enduranceText = `(耐久:${arm.enduranceValue}/500)`;
-    const enduranceElement = `<span style="cursor:pointer;" id="endurance-${key}">${enduranceText}</span>`;
+    let enduranceElement;  // 在函数作用域内声明
+
+    if (arm.enduranceValue <= 200) {
+        const enduranceText = `(耐久:${arm.enduranceValue}/500)🔨`;
+        enduranceElement = `<span style="cursor:pointer;color:red;" id="endurance-${key}">${enduranceText}</span>`;
+    } else {
+        const enduranceText = `(耐久:${arm.enduranceValue}/500)`;
+        enduranceElement = `<span style="cursor:pointer;" id="endurance-${key}">${enduranceText}</span>`;
+    }
+    
     const infoText = `增益: + ${arm.value}${translateAttribute(arm.attribute)}`;
+    
+    // 使用构建的 enduranceElement 和 infoText 更新 infoDiv
     infoDiv.innerHTML = `<div>${arm.type} ${enduranceElement}</div><div>${infoText}</div>`;
 }
 

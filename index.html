@@ -19856,8 +19856,8 @@ function quitScalping() {
     if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
         showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损，是否继续？',
                    () => {
-                        const goldGot = sellAssetsAndExchangeCash();
-                        goldAmount += Math.floor(goldGot * 0.8);
+                        const goldGot = Math.floor(sellAssetsAndExchangeCash() * 0.8);
+                        goldAmount += goldGot;
                         updateGoldDisplay(goldAmount);
                         showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`);
                         resetScalping();

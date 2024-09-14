@@ -8199,9 +8199,9 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
 //总伤害计算函数
 function calculateDamage(baseDamage, isCritical, critDamage) {
     if (isCritical) {
-        baseDamage = Math.floor(baseDamage * critDamage);
+        baseDamage = Math.floor(baseDamage * critDamage * ratio);
     }
-
+    
     return baseDamage;
 }
 
@@ -21658,7 +21658,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             let damage = battleAttributes.physicalAttack * skillDetail.skillMultiplier * Math.max(0, (Math.min(3, battleAttributes.speed / battleState.enemy.speed)));
             let isCritical = checkCriticalHit(playerCritRate);
-        
+            
             // 在所有效果应用后计算最终伤害
             damage = calculateDamage(damage, isCritical, playerCritDamage);
             // 如果存在火符的效果则还需要计算一层
@@ -21673,7 +21673,7 @@ function applySpecialSkillEffects(skill, value = null) {
                     logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
                 } 
             }
-            
+        
             damage = Math.floor(Math.max(1, damage - battleState.enemy.physicalDefense));  
             
             if (isCritical) {
@@ -21682,8 +21682,10 @@ function applySpecialSkillEffects(skill, value = null) {
                 updateDamageValue(damage, false, 'damage');
             }
             
-            logBattleEvent(`绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
-            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+        
+            logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
+            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
         }
     };
 

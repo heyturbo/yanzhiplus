@@ -6852,8 +6852,12 @@ function applyDefeatPenalty() {
 
     showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
     increaseCurrentPetIntimacy(-5);
-    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
+    onBattleState = false;
+    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！点击任意按钮重置战斗！`,
+               () => onBattleState = true,
+               () => onBattleState = true);
     updateGoldDisplay(goldAmount);
+    clearAutoBattle();
     defeatedPets = [];
     usedPets = [];
     resetBattleState(false);
@@ -6864,7 +6868,6 @@ function applyDefeatPenalty() {
     } else {
         playerTurn = false;
     }
-
 } 
 
 function calculateExtraReward() {
@@ -10789,6 +10792,10 @@ function decideEnemyCanPerform() {
     const barText = document.getElementById('speed-text');
     
     enemyActionInterval = setInterval(() => {
+        if (!onBattleState) {
+            return;
+        }
+        
         if (playerTurn) {
             const enemySpeedFactor = Math.max(0, battleState.enemy.speed * 2 / (battleState.enemy.speed + 100000));
             // 获取当前的宽度并去掉百分号
@@ -13126,14 +13133,6 @@ function autoBattle() {
             if (!battleState || !battleState.enemy) {
                 console.error("战斗状态未初始化");
                 clearAutoBattle();
-                return;
-            }
-    
-            // 检查玩家是否赢得战斗
-            if (!resurrectionState && battleAttributes.health <= 0) {
-                clearAutoBattle();
-                logBattleEvent("本轮失败，终止自动战斗。", 'red');
-                showNextBattlePrompt(false); // 玩家失败，传递失败状态
                 return;
             }
 

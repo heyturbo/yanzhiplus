@@ -6671,7 +6671,7 @@ function startBattle() {
                 showNextBattlePrompt(true);
                 return;
             }
-
+            
             if (summonEnemy) {
                 const summonedEnemyName = battleState.enemy.specialty;
 
@@ -6733,9 +6733,9 @@ function showNextBattlePrompt(playerWon) {
         }
     } else {
         const failedValue = Math.floor(5 + Math.random() * 5);
-        decreaseArmsEndurance(key = null, failedValue);
-        
+        handleResurrection(battleAttributes.health);
         if (!resurrectionState) {
+            decreaseArmsEndurance(key = null, failedValue);
             if (!summonEnemy) {
                 handlePetDefeat();
                 return;
@@ -6745,8 +6745,6 @@ function showNextBattlePrompt(playerWon) {
                 summonEnemy = false;
                 return;
             }
-        } else {
-            handleResurrection(0);
         }
     }
 }
@@ -7107,8 +7105,7 @@ function resetBattleState(playerWon) {
     clearPlayerEffect();
     enemyHealCount = 0;
     updatePetInfo();
-    resurrectionState = false;
-    resurrectionTimes = 0;
+    resetResurrectionState();
 }
 
 function setBackgroundImage(imageUrl) {
@@ -9186,14 +9183,6 @@ function performAttack(type) {
         return;
     }
 
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
-
     if (!playerTurn) {
         enemyAttack();
         return;
@@ -9236,14 +9225,21 @@ function performAttack(type) {
         return;
     }
     
-    playerTurn = false;
-    handleManaRecover()
-    setTimeout(enemyAttack, 350);
+    
+    handleManaRecover();
     updateUI();
     applyAscensionEffects();
-
     // 重置标志变量
     waterAmuletTriggered = false;
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
+    playerTurn = false;
+    setTimeout(enemyAttack, 350);
 }
 
 function checkWaterAmuletChance() {
@@ -9634,14 +9630,6 @@ function performPoison() {
         return;
     }
 
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
-
     if (!playerTurn) {
         enemyAttack();
         return;
@@ -9718,11 +9706,18 @@ function performPoison() {
         handlePoison(skillMultiplier,selectedSkill); // 传递技能增益参数
     }
     
-    playerTurn = false;
     handleManaRecover();
-    setTimeout(enemyAttack, 350);
     applyAscensionEffects();
     updateUI();
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
+    playerTurn = false;
+    setTimeout(enemyAttack, 350);
 } //中毒伤害函数
 
 function handlePoison(skillMultiplier = 1, selectedSkill = null) {
@@ -10195,14 +10190,6 @@ function performHeal() {
         return;
     }
 
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
-
     if (!playerTurn) {
         enemyAttack();
         return;
@@ -10269,12 +10256,19 @@ function performHeal() {
         applySpecialSkillEffects(selectedSkill, healAmount);
     }
 
-    playerTurn = false; // 轮到邪佞回合
-    setTimeout(() => enemyAttack(),350);
     handleManaRecover();
     applyAscensionEffects();
     getShieldStatus();
     updateUI();
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
+    playerTurn = false; // 轮到邪佞回合
+    setTimeout(() => enemyAttack(),350);
 }
 
 
@@ -10452,7 +10446,6 @@ function handleResurrection(damage) {
             checkResurrectionState(remainResurrectionTimes);
         } else if (resurrectionTimes >= resurrectionAllowedTimes) {
             resurrectionState = false;
-            resetResurrectionState();
             logBattleEvent(`${fhSkill.name} 已经无法再触发复活。`, 'gray');
         }
         
@@ -10513,14 +10506,6 @@ function performDefense() {
         return;
     }
 
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
-
     if (!playerTurn) {
         enemyAttack();
         return;
@@ -10567,12 +10552,19 @@ function performDefense() {
     }
 
     applyDefenseBonus(selectedSkillName);
-    playerTurn = false;
     handleManaRecover();
-    setTimeout(enemyAttack, 350);
     getShieldStatus();
     applyAscensionEffects();
     updateUI();
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
+    playerTurn = false;
+    setTimeout(enemyAttack, 350);
 }
 
 function handleDamageReduction(damage, isCritical = false) {
@@ -10910,7 +10902,6 @@ function enemyAttack() {
     }
     
     damage = handleDamageReduction(damage, isCritical); //计算伤害减免
-    handleResurrection(damage); //判断玩家是否复活
     
     // 检查玩家和敌人的血量，更新战斗状态
     if (battleAttributes.health <= 0) {
@@ -11217,14 +11208,6 @@ function handleSlaughter() {
         console.log("玩家已经处于杀戮状态，无法叠加。");
         return;
     }
-
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
     
     battleState.player.slaughter = true;
     effectCooldowns.slaughter = true;
@@ -11249,12 +11232,19 @@ function handleSlaughter() {
         } else if (cultivationDifference < 0 && battleAttributes.health <= Math.abs(cultivationDifference)) {
             battleAttributes.health = 0;
             logBattleEvent(`⚔️【敌人攻击】道高一尺，魔高一丈，你低于敌人的修为，施法时损失${battleAttributes.health}点生命值，被当即斩杀！`, '#FFDD55');
-            resurrectionState = false;
             updateDamageValue(battleState.enemy.health,true,'damage');
             updateUI();
             updatePlayerStatusDisplay();
         }
     }, 500);
+
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
     
     setTimeout(() => {
         battleState.player.slaughter = false;
@@ -11300,14 +11290,6 @@ function handleSeal() {
 } //处理封印状态
 
 function handleTorn() {
-    if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false); // 玩家失败，传递失败状态
-        return;
-    } else if (battleState.enemy.health <= 0) {
-        showNextBattlePrompt(true);
-        return;
-    }
-    
     battleState.player.torn = true;
     showEffect('enemyEffect', 'https://pic.imgdb.cn/item/669c8a9ed9c307b7e94f5766.gif');
     effectCooldowns.torn = true;
@@ -11325,6 +11307,14 @@ function handleTorn() {
         updatePlayerStatusDisplay();
         
     }, 500);
+    
+    if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false); // 玩家失败，传递失败状态
+        return;
+    } else if (battleState.enemy.health <= 0) {
+        showNextBattlePrompt(true);
+        return;
+    }
 
     setTimeout(() => {
         battleState.player.torn = false;
@@ -13148,18 +13138,15 @@ function autoBattle() {
             }
     
             // 检查玩家是否赢得战斗
-            if (battleAttributes.health <= 0) {
-                if (!resurrectionState) {
-                    clearAutoBattle();
-                    logBattleEvent("本轮失败，终止自动战斗。", 'red');
-                    showNextBattlePrompt(false); // 玩家失败，传递失败状态
-                    return;
-                } else {
-                     handleResurrection(0);
-                }
+            if (!resurrectionState && battleAttributes.health <= 0) {
+                clearAutoBattle();
+                logBattleEvent("本轮失败，终止自动战斗。", 'red');
+                showNextBattlePrompt(false); // 玩家失败，传递失败状态
+                return;
             }
 
             if(!playerTurn) {
+                enemyAttack();
                 return;
             }
     
@@ -19562,12 +19549,12 @@ let scalpingState = {
 
 const scalpingItems = [
     {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
-    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至高价', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2, basePrice: 2000, bonusPrice: 500000, fluctuation: 0.3, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
     {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
     {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', downRate: 1, basePrice: 600, bonusPrice: 1200, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
-    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 1000, bonusPrice: 2400, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
+    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 1000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
     {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
-    {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
+    {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 600, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
     {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 80000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'}
 ];
         
@@ -19586,7 +19573,7 @@ function openScalping(closeButton = false) {
     }
 
     showInfoBox(
-        '人生在世，利字当头。逐鹿沙场固然澎湃，商场沉浮亦令人执迷。\n\n在这个系统内，你将花费一年时间（52周）体验投资的经历 \n\n中途离开不会删除数据，但刷新页面会清空你的仓库和资产，请知悉',
+        '人生在世，利字当头。逐鹿沙场固然澎湃，商场沉浮亦令人执迷。\n\n在这个系统内，你将花费一年时间（52周）体验投资的经历 \n\n中途离开不会删除数据，但刷新页面会清空你的仓库和资产，请知悉 \n\n游戏中的现金可以无手续费兑换为金子，但尚未变现的资产（仓库货物）在游戏结束时将会以一定折扣进行变卖',
         toggleWindow  // 信息框确认后，执行窗口切换
     );
 }
@@ -19758,6 +19745,21 @@ function getReputationEvent() {
         }
     }
 }
+
+//修养两周具体实现
+document.getElementById('relax-byweek').addEventListener('click', ()=> {
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
+    if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
+        scalpingState.currentSellingWeek += 2;
+        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * 2));
+        scalpingState.playerEnergy = 100;
+        getRandomScalpableItem();
+        updateScalpingPanel();
+        showMerchant('美美休息半个月，你的状态重回巅峰！');
+    } else {
+        showMerchant('你在市场的租期马上就要到了，不能执行休息动作了哦');
+    }
+})
         
 function refreshSaleWeek() {
     let currentWeek = scalpingState.currentSellingWeek;
@@ -19801,8 +19803,7 @@ function refreshSaleWeek() {
         
         updateScalpingPanel();  // 更新面板
     } else if (currentWeek === maxWeek) {        
-        const netAssets = calculateNetAsset();
-        const goldGot = Math.floor(Math.max(0, netAssets * 10));
+        const goldGot = sellAssetsAndExchangeCash();
         const initialCost = scalpingState.investmentCount * 50000 * 10;
         
         goldAmount += goldGot;
@@ -19840,14 +19841,23 @@ function resetScalping() {
     document.getElementById('enter-next-week').innerText = '刷新一周';
     
 }
+
+function sellAssetsAndExchangeCash() {
+    const netAssets = calculateNetAsset();
+    const cash = scalpingState.currentCash;
+    let cashChangeNum = cash * 10;
+    let assetValue = Math.floor((netAssets - cash) * (Math.max(5, Math.random() * 7)));
+    let totalValue = Math.max(0, cashChangeNum + assetValue);
+
+    return totalValue;
+}
         
 function quitScalping() {
     if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
         showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损，是否继续？',
                    () => {
-                        const netAssets = calculateNetAsset();
-                        const goldGot = Math.floor(Math.max(0, netAssets * 10 * 0.8));
-                        goldAmount += goldGot;
+                        const goldGot = sellAssetsAndExchangeCash();
+                        goldAmount += Math.floor(goldGot * 0.8);
                         updateGoldDisplay(goldAmount);
                         showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`);
                         resetScalping();
@@ -20165,19 +20175,6 @@ function updateScalpingPanel() {
         document.getElementById('player-energy').style.color = 'white';
     }
 }
-
-//修养两周具体实现
-document.getElementById('relax-byweek').addEventListener('click', ()=> {
-    if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
-        scalpingState.currentSellingWeek += 2;
-        scalpingState.playerEnergy = 100;
-        getRandomScalpableItem();
-        updateScalpingPanel();
-        showMerchant('美美休息半个月，你的状态重回巅峰！');
-    } else {
-        showMerchant('你在市场的租期马上就要到了，不能执行休息动作了哦');
-    }
-})
         
 // 页面加载完成后初始化商店
 let refreshCount = 0; // 全局计数器，记录刷新次数

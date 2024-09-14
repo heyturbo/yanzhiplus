@@ -6647,7 +6647,6 @@ const effectCooldowns = {
     slaughter:false,
 };
 
-
 function startBattle() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -6697,12 +6696,11 @@ function startBattle() {
     playerTurn = battleAttributes.speed >= battleState.enemy.speed;
     updateUI();
     decideEnemyCanPerform();
-
+    
     if (!playerTurn) {
         setTimeout(enemyAttack, 350);
     }
 }
-
 
 function stopBattle() {
     onBattleState = false;
@@ -6733,18 +6731,15 @@ function showNextBattlePrompt(playerWon) {
         }
     } else {
         const failedValue = Math.floor(5 + Math.random() * 5);
-        handleResurrection(battleAttributes.health);
-        if (!resurrectionState) {
-            decreaseArmsEndurance(key = null, failedValue);
-            if (!summonEnemy) {
-                handlePetDefeat();
-                return;
-            } else {
-                toggleFightingDrawer();
-                handleBattleWithSummonEnemy(false);
-                summonEnemy = false;
-                return;
-            }
+        decreaseArmsEndurance(key = null, failedValue);
+        if (!summonEnemy) {
+            handlePetDefeat();
+            return;
+        } else {
+            toggleFightingDrawer();
+            handleBattleWithSummonEnemy(false);
+            summonEnemy = false;
+            return;
         }
     }
 }
@@ -6783,7 +6778,6 @@ function handleVictory() {
         playerTurn = true;
     } else {
         playerTurn = false;
-        setTimeout(enemyAttack(), 350);
     }
 }
 
@@ -6856,9 +6850,9 @@ function applyDefeatPenalty() {
         goldAmount = Math.max(0, goldAmount - penalty);
     }
 
-    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
     showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
     increaseCurrentPetIntimacy(-5);
+    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！请再接再厉，点击任意按钮重置战斗！`);
     updateGoldDisplay(goldAmount);
     defeatedPets = [];
     usedPets = [];
@@ -6869,8 +6863,8 @@ function applyDefeatPenalty() {
         playerTurn = true;
     } else {
         playerTurn = false;
-        setTimeout(enemyAttack(), 350);
     }
+
 } 
 
 function calculateExtraReward() {
@@ -7991,6 +7985,7 @@ function getEnemyStatus() {
     let status = [];
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (enemyRivival) status.push("复活中");
+    if (!playerTurn) status.push("⚔️");
     if (battleState.enemy.armorBreak) status.push("破甲");
     if (battleState.enemy.bleeding) status.push("流血");
     if (battleState.enemy.corrode) status.push("腐蚀");
@@ -8019,6 +8014,7 @@ function updateEnemyStatusDisplay() {
 function getPlayerStatus() {
     let status = [];
     if (battleState.player.defensing) status.push("蓄力中");
+    if (playerTurn) status.push("⚔️");
     if (battleState.player.shielded) status.push("护盾");
     if (battleState.player.reflecting) status.push("反弹伤害");
     if (battleState.player.healing) status.push("持续回血");
@@ -9183,8 +9179,7 @@ function performAttack(type) {
         return;
     }
 
-    if (!playerTurn) {
-        enemyAttack();
+    if(!playerTurn) {
         return;
     }
         
@@ -9239,7 +9234,6 @@ function performAttack(type) {
         return;
     }
     playerTurn = false;
-    setTimeout(enemyAttack, 350);
 }
 
 function checkWaterAmuletChance() {
@@ -9350,14 +9344,12 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     if (battleState.player.blindfold) {
         logBattleEvent("处于短暂失明，敌人闪避了你的物理攻击。", 'yellow');
         playerTurn = false;
-        setTimeout(enemyAttack, 350);
         return 0; // 物理攻击无法造成伤害
     }
 
     // 检查敌人是否闪避
     if (handleDodge('enemy')) {
         playerTurn = false;
-        setTimeout(enemyAttack, 350);
         return 0; // 如果敌人闪避成功，物理攻击伤害为0
     }
 
@@ -9462,7 +9454,6 @@ function performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
 
     if (handleMagicDodge('enemy')) {
         playerTurn = false;
-        setTimeout(enemyAttack, 350);
         return 0;
     }
     
@@ -9568,7 +9559,6 @@ function performIndependentMagicAttack() {
 
     if (handleMagicDodge('enemy')) {
         playerTurn = false;
-        setTimeout(enemyAttack, 350);
         return 0;
     }
 
@@ -9630,8 +9620,7 @@ function performPoison() {
         return;
     }
 
-    if (!playerTurn) {
-        enemyAttack();
+    if(!playerTurn) {
         return;
     }
     
@@ -9681,7 +9670,6 @@ function performPoison() {
 
     if (handleMagicDodge('enemy')) {
         playerTurn = false;
-        setTimeout(enemyAttack, 350);
         return;
     }
 
@@ -9717,7 +9705,6 @@ function performPoison() {
         return;
     }
     playerTurn = false;
-    setTimeout(enemyAttack, 350);
 } //中毒伤害函数
 
 function handlePoison(skillMultiplier = 1, selectedSkill = null) {
@@ -10190,8 +10177,7 @@ function performHeal() {
         return;
     }
 
-    if (!playerTurn) {
-        enemyAttack();
+    if(!playerTurn) {
         return;
     }
     
@@ -10395,7 +10381,17 @@ function checkResurrectionState(times) {
     resurrectionState = times > 0;
 }
 
+// 在战斗结束时重置复活状态和次数
+function resetResurrectionState() {
+    resurrectionTimesMap.clear();
+    checkResurrectionState(0);
+}
+
 function handleResurrection(damage) {
+    if (battleAttributes.health > damage) {
+        return;
+    }
+    
     if (battleAttributes.health <= 0 && (ascensionSkill.name === '向死而生' || secondAscensionSkill.name === '向死而生')) {
         let skill = ascensionSkill.name === '向死而生' ? ascensionSkill : secondAscensionSkill;
         const manaCostPercentage = skill.baseValue + skill.increment(skill.level);
@@ -10406,6 +10402,7 @@ function handleResurrection(damage) {
             logBattleEvent('向死而生触发，生命值恢复至1，消耗大量法力值。', 'red');
             updateUI();
         }
+        return;
     }
 
     const fhSkills = [];
@@ -10447,18 +10444,12 @@ function handleResurrection(damage) {
         } else if (resurrectionTimes >= resurrectionAllowedTimes) {
             resurrectionState = false;
             logBattleEvent(`${fhSkill.name} 已经无法再触发复活。`, 'gray');
+            showNextBattlePrompt(false);
         }
         
         updateUI();
     }
 }
-
-// 在战斗结束时重置复活状态和次数
-function resetResurrectionState() {
-    resurrectionTimesMap.clear();
-    checkResurrectionState(0);
-}
-
         
 function handleRelieveEffects() {
     const jkSkills = [];
@@ -10506,8 +10497,7 @@ function performDefense() {
         return;
     }
 
-    if (!playerTurn) {
-        enemyAttack();
+    if(!playerTurn) {
         return;
     }
         
@@ -10564,7 +10554,6 @@ function performDefense() {
         return;
     }
     playerTurn = false;
-    setTimeout(enemyAttack, 350);
 }
 
 function handleDamageReduction(damage, isCritical = false) {
@@ -10815,7 +10804,7 @@ function decideEnemyCanPerform() {
             }
             updateUI();  // 更新UI
         } else {
-            setTimeout(enemyAttack(),350);
+            setTimeout(enemyAttack, 350);
         }
     }, 20);  // 每 20 毫秒执行一次
 }
@@ -10904,6 +10893,7 @@ function enemyAttack() {
     }
     
     damage = handleDamageReduction(damage, isCritical); //计算伤害减免
+    handleResurrection(damage);
     
     // 检查玩家和敌人的血量，更新战斗状态
     if (battleAttributes.health <= 0) {
@@ -13147,8 +13137,7 @@ function autoBattle() {
                 return;
             }
 
-            if(!playerTurn) {
-                enemyAttack();
+            if (!playerTurn) {
                 return;
             }
     

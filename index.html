@@ -10443,6 +10443,7 @@ function handleResurrection(damage) {
 
             updateDamageValue(-healthRecovered, false, 'damage');
             logBattleEvent(`${fhSkill.name} ${skillLevel}级触发，复活并恢复 ${healthRecovered} 点生命值，本局战斗还能再生效${remainResurrectionTimes}次`, 'lime');
+            playerTurn = battleAttributes.speed > battleState.enemy.speed;
             checkResurrectionState(remainResurrectionTimes);
         } else if (resurrectionTimes >= resurrectionAllowedTimes) {
             resurrectionState = false;
@@ -10814,6 +10815,8 @@ function decideEnemyCanPerform() {
                 enemyAttack();  // 执行敌人的攻击行为
             }
             updateUI();  // 更新UI
+        } else {
+            setTimeout(enemyAttack(),350);
         }
     }, 20);  // 每 20 毫秒执行一次
 }

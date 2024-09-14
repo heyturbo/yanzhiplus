@@ -14777,7 +14777,7 @@ function generateLotteryWinningNumbers() {
     const hasLuckyAmulet = luckyAmulet && luckyAmulet.quantity > 0;
 
     const availableSelectedNumbers = lotterySelectedNumbers.slice(0, 5);
-    const luckyRate = Math.min(1, luckyAmulet.quantity * 0.02);
+    const luckyRate = Math.min(1, luckyAmulet.quantity * 0.015);
     console.log(luckyRate);
 
     if (hasLuckyAmulet && availableSelectedNumbers.length > 0 && Math.random() < luckyRate) {
@@ -14787,13 +14787,13 @@ function generateLotteryWinningNumbers() {
     }
 
     while (numbers.length < 5) {
-        const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+        const num = String(Math.floor(Math.random() * 36) + 1).padStart(2, '0');
         if (!numbers.includes(num)) {
             numbers.push(num);
         }
     }
 
-    const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+    const blueBall = String(Math.floor(Math.random() * 36) + 1).padStart(2, '0');
 
     return { numbers, blueBall };
 }
@@ -14961,7 +14961,7 @@ document.getElementById('lotteryBetButton').addEventListener('click', () => {
 
         // 每0.2秒生成一组6个随机数，显示给玩家
         const generateRandomNumbers = () => {
-            const randomNumSeries = Array.from({ length: 6 }, () => Math.floor(Math.random() * 30 + 1));  // 生成6个1到30之间的随机数
+            const randomNumSeries = Array.from({ length: 6 }, () => Math.floor(Math.random() * 36 + 1));  // 生成6个1到36之间的随机数
             document.getElementById('lotteryDrawResults').innerHTML = `开奖中: ${randomNumSeries.join(', ')}`;
         };
 
@@ -15008,7 +15008,7 @@ function clearSelections() {
         
 document.addEventListener('DOMContentLoaded', () => {
     const numberButtons = document.getElementById('lotteryNumberButtons');
-    for (let i = 1; i <= 30; i++) {
+    for (let i = 1; i <= 36; i++) {
         const button = document.createElement('button');
         button.textContent = String(i).padStart(2, '0');
         button.addEventListener('click', () => {
@@ -15032,12 +15032,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         lotterySelectedNumbers = [];
         while (lotterySelectedNumbers.length < 5) {
-            const num = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+            const num = String(Math.floor(Math.random() * 36) + 1).padStart(2, '0');
             if (!lotterySelectedNumbers.includes(num)) {
                 lotterySelectedNumbers.push(num);
             }
         }
-        const blueBall = String(Math.floor(Math.random() * 30) + 1).padStart(2, '0');
+        const blueBall = String(Math.floor(Math.random() * 36) + 1).padStart(2, '0');
         lotterySelectedNumbers.push(blueBall);
         document.getElementById('lotterySelectedNumbers').innerHTML = `已选: ${lotterySelectedNumbers.slice(0, 5).join(', ')} <span style="color: blue;">${blueBall}</span>`;
         hasPlacedBet = false;

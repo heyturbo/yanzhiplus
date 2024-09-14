@@ -3190,22 +3190,22 @@
             </div>
             <div class="battle-pet-selector"><select id="battle-pet-select" onchange="changeBattlePet()"><option value="xiaojin"></option></select></div>
             <div class="battle-system-log">
-                <h2>战斗记录（第<span id="battleRounds"></span>轮）</h2>
+                <h2 id="battle-log-head" style="cursor:pointer;">战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
             </div>
             <div class="battle-system-actions">
                 <button onclick="performAttack('physical')">物攻</button>
                 <button onclick="performDefense()">格挡</button>
                 <button onclick="performHeal()">治疗</button>
-               <button onclick="performPoison()">施毒</button>
-                <button onclick="useDrug()">药品</button>
-                 <button onclick="performAttack('magical')">法攻</button>
+                <button onclick="performPoison()">施毒</button>
+                <button onclick="performTrumpCard()">绝技</button>
+                <button onclick="performAttack('magical')">法攻</button>
                 <button id="battle-spirit-button">精灵</button>
                 <button id="ascension-skill-button" class="ascension-button">飞升</button>
                 <button onclick="divinedWeapon()">神器</button>
                 <button onclick="levelUpSkill()">技能</button>
                 <button onclick="enemyInfo()">自动</button>
-                <button onclick="clearBattleLog()">清屏</button>
+                <button onclick="useDrug()">药品</button>
             </div>            
         </div>
     </div>
@@ -7142,6 +7142,8 @@ function clearBattleLog() {
     }
 }
 
+document.getElementById('battle-log-head').addEventListener('click',() => clearBattleLog());
+        
 function toggleFightingDrawer() {
     if (!attributesFetched) {
         showInfoBox("请先从属性面板获取属性。");
@@ -9322,6 +9324,62 @@ function updateDamageValue(damage, enemy = false, damageType = 'damage', isCriti
     }, 240);
 }
 
+// 检查是否存在必杀技
+function checkTrumpCardState() {
+    const tcSkills = [];
+    const skillsArea = document.getElementById("skills-area");
+    
+    if (skillsArea) {
+        // 遍历技能区域中的每个技能
+        Array.from(skillsArea.children).forEach(skillDiv => {
+            const skillName = skillDiv.innerText.split(' ')[0];
+            const skill = currentPet.skills.find(skill => skill.name === skillName && skill.type === "TC");
+            if (skill) {
+                tcSkills.push(skill); // 将符合条件的必杀技推入数组
+            }
+        });
+    }
+    
+    if (tcSkills.length === 0) return { exists: false, skill: null }; // 如果没有必杀技，返回false和null
+    
+    let selectedSkill = tcSkills[0]; // 默认选择第一个必杀技
+
+    if (tcSkills.length > 1) {
+        // 如果有多个必杀技，随机选择一个
+        const randomIndex = Math.floor(Math.random() * tcSkills.length);
+        selectedSkill = tcSkills[randomIndex];
+    }
+
+    // 返回true和选择的技能
+    return { exists: true, skill: selectedSkill };
+}
+
+// 执行必杀技
+function performTrumpCard() {
+    const checkResult = checkTrumpCardState(); // 调用检查函数
+    
+    if (!checkResult.exists) {
+        // 如果没有必杀技，记录战斗事件并退出
+        logBattleEvent('你还没有解锁任何必杀技！', 'red');
+        return;
+    }
+    
+    if (!playerTurn) {
+        // 如果不是玩家回合，退出
+        return;
+    }
+    
+    // 在这里处理使用必杀技的逻辑
+    const selectedSkill = checkResult.skill;
+    const skillDetail = calculateSkillLevelAndMultiplier(selectedSkill);
+    
+
+    applySpecialSkillEffects(selectedSkill);
+    logBattleEvent(`必杀！ ${selectedSkill.name} ${skillDetail.skillLevel}级`, 'crimson');
+    playerTurn = false;
+}
+
+        
 function f(x) {
     // 计算函数值
     const result = (x / (x + 300000)) - 0.1;
@@ -15963,6 +16021,7 @@ let jinnangItems = [
     { name: 'tianshenzhufu', displayName: '天神祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天神祝福' },
     { name: 'tianwanghuwei', displayName: '天王护卫天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：天王护卫' },
     { name: 'xingzhizhufu', displayName: '星之祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：星之祝福' },
+    { name: '震爆神拳', displayName: '震爆神拳天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：震爆神拳' },
     { name: 'hongHuang', displayName: '洪荒至尊仙葫', url: 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price: 8000, quantity: 0, description: '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -16575,7 +16634,7 @@ const itemEffects = {
     },
     talentedBless: () => getBlessSkills(),
     advancedSkillBook: () => {
-        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi', 'tianshenzhufu', 'tianwanghuwei', 'beimingshengong', 'xingzhizhufu'];
+        const item = ['lizhuamengji', 'huoyanchongji', 'tiankongshouhu', 'suohou', 'jiyanggangqi', 'tianshenzhufu', 'tianwanghuwei', 'beimingshengong', 'xingzhizhufu', 'zhenbaoshenquan'];
         const randomIndex = Math.floor(Math.random() * item.length);
         const selectedItem = item[randomIndex];
         addItemToJinnang(selectedItem, 1);
@@ -16589,6 +16648,7 @@ const itemEffects = {
     tianshenzhufu: () => createSkills('天神祝福', 'SSS', 'NE', 1, 1, '大幅度增加宠物的生命值和速度，每级提升2000点。'),
     tianwanghuwei: () => createSkills('天王护卫', 'SSS', 'NE', 1, 1, '大幅度增加宠物的物理防御和法术防御，每级提升500点。'),
     xingzhizhufu: () => createSkills('星之祝福', 'SSS', 'JKE', 1, 0.025, '敌人攻击我方时有概率解除自身减益效果，并恢复一定生命值。'),
+    zhenbaoshenquan: () => createSkills('震爆神拳', 'SSS', 'TC', 1, 10, '降下天雷惩戒敌人，造成大量伤害的同时会对自身造成一定损伤，双方速度之差越大，伤害越大。'),
 };
 
 function useAssignedItem() {
@@ -21394,7 +21454,8 @@ function deleteSkill(skill, skillDiv, skillsArea) {
             "JK": "解除控制技能，拥有该技能的宠物会根据技能等级，按照一定概率解除来自敌人的控制效果",
             "JKE": "高级辅助技能，拥有该技能的宠物会根据技能等级，按照技能说明为玩家提供增益",
             "N": "被动属性加成技能，将会按照固定值为玩家提供二级属性",
-            "NE": "高级被动技能，通常会增强宠物的专有属性，此类技能最高可升至6级"
+            "NE": "高级被动技能，通常会增强宠物的专有属性，此类技能最高可升至6级",
+            "TC": "十分罕见的必杀技！拥有这种技能的宠物能在战场所向披靡"
         };
         
         const skillDescription = matchingSkill.description;
@@ -21580,6 +21641,49 @@ function applySpecialSkillEffects(skill, value = null) {
             battleAttributes.health = Math.min(maxHealth, battleAttributes.health + healingAmount);
             updateDamageValue(-healingAmount, true, 'extra-damage');
             updateUI();
+        },
+        "震爆神拳": () => {
+            const healthCost = Math.floor(maxHealth * (0.8 - (skillDetail.skillLevel / 100)));
+            const manaCost = Math.floor(maxMana * 0.8 - (skillDetail.skillLevel / 100));
+            
+            if (battleAttributes.health <= healthCost || battleAttributes.mana <= manaCost) {
+                logBattleEvent('震爆神拳对自身伤害巨大，你目前的状况无法释放，已自动转换至普通攻击！', 'red');
+                playerTurn = true;
+                performAttack('physical');
+                return;
+            }
+
+            battleAttributes.health = Math.max(0, battleAttributes.health - healthCost);
+            battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
+
+            let damage = battleAttributes.physicalAttack * skillDetail.skillMultiplier * Math.max(0, (Math.min(3, battleAttributes.speed / battleState.enemy.speed)));
+            let isCritical = checkCriticalHit(playerCritRate);
+        
+            // 在所有效果应用后计算最终伤害
+            damage = calculateDamage(damage, isCritical, playerCritDamage);
+            // 如果存在火符的效果则还需要计算一层
+            const activeEffects = applyWuxingEffects();
+            let fireEffect = 0;
+            if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+                const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.fireAmulet];
+                fireEffect = Math.floor(damage * damageBoostPercentage);
+                damage = Math.floor(damage * (1 + damageBoostPercentage));
+        
+                if (!isNaN(fireEffect) && fireEffect > 0) {
+                    logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
+                } 
+            }
+            
+            damage = Math.floor(Math.max(1, damage - battleState.enemy.physicalDefense));  
+            
+            if (isCritical) {
+                updateDamageValue(damage, false, 'damage', true);
+            } else {
+                updateDamageValue(damage, false, 'damage');
+            }
+            
+            logBattleEvent(`绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
+            showEffect('enemyEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
         }
     };
 

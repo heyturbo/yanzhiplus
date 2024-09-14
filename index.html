@@ -10443,7 +10443,6 @@ function handleResurrection(damage) {
 
             updateDamageValue(-healthRecovered, false, 'damage');
             logBattleEvent(`${fhSkill.name} ${skillLevel}级触发，复活并恢复 ${healthRecovered} 点生命值，本局战斗还能再生效${remainResurrectionTimes}次`, 'lime');
-            playerTurn = battleAttributes.speed > battleState.enemy.speed;
             checkResurrectionState(remainResurrectionTimes);
         } else if (resurrectionTimes >= resurrectionAllowedTimes) {
             resurrectionState = false;

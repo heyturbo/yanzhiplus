@@ -991,7 +991,28 @@
             border: 1px solid black;
             padding: 5px;
         }
-
+        .select-gadgets {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-height: 80%;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #6f391c;
+            padding: 10px;
+            border-radius: 2px;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: scroll;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 2px double black;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.8);
+        }
+        
         .scalping-top-bar {
             font-weight: bold;
             width: 95%;
@@ -1011,8 +1032,8 @@
             display: flex;
             flex-direction: row;
             justify-content: space-around;
-            align-items: center;
             border: 2px solid #87431f;
+            align-items: center;
         }
         .scalping-middle-wrap {
             width: 100%;
@@ -1047,9 +1068,9 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            align-items: center;
             margin-top: 5px;
             margin-bottom: 5px;
+            align-items: center;
         }
         .quality-info button:active {
             background-color: #074b02;
@@ -2877,7 +2898,7 @@
         </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
-        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
+        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商（积分：<span id="scalping-score">0</span>）</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
         <div class="scalping-container" id="scalping-container">
             <div class="scalping-top-bar" id="scalping-top-bar">
                 <div>时间已过:</div>
@@ -2891,6 +2912,33 @@
                 <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
                     <div>💵当前现金：<span id="current-cash">0</span></div>
                     <div>🗃资产总值：<span id="net-asset">0</span></div>
+                </div>
+                <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
+                    <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: column;align-items: center;">
+                        <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">经商法宝</button>
+                        <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
+                            <!-- 动态生成法宝 -->
+                        </div>
+                    </div>
+                    <div id="gadgets-selector" class="select-gadgets" style="display:none;">
+                        <div style="display:flex;width: 100%;justify-content:space-between;align-items: center;font-size:16px;">
+                        <p>选择你所拥有的法宝</p>
+                        <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
+                        <button onclick="closeGagdetsPanel()">x</button>
+                        </div>
+                        <div id="selected-gadgets">
+                            <!-- 遍历法宝并在此处显示 -->
+                        </div>
+                    </div>
+                    <div id="gadget-store-panel" class="select-gadgets" style="display:none;">
+                        <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: space-between;align-items: center;">
+                        <p>你可以使用经商积分点击图标兑换法宝</p>
+                        <button id="close-gagdet-store">x</button>
+                        </div>
+                        <div id="gadget-items">
+                            <!-- 此处函数生成 -->
+                        </div>
+                    </div>
                 </div>
                 <div><button id="add-investment" onclick="increaseInverstment()">增加投资</button></div>
             </div>
@@ -15642,6 +15690,7 @@ function collectTreasure() {
         '蓝色武装原料': 'blueArmComponents',
         '宠物资质仙丹': 'qualityEnhancePill',
         '高级神兽丹': 'advancedSkillPill',
+        '经商积分卡': 'merchantPointsCard',
         '重生露': () => generateItemToJinnang('resetTrainingCount', '重生露', 'https://pic.imgdb.cn/item/66ddb0cdd9c307b7e961ad69.png', price = 3600, quantity = 1, description = '传说由世外高人炼制的秘药，使用后可以将培养次数重置为0，要注意培养到达最大值后将无法带来任何收益！'),
         '魔魂封印卡': 'bossSealCard',
         '一等分解符': 'firstFragments',
@@ -15888,7 +15937,7 @@ function getRandomReward(type) {
             { name: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', chance: 6 },
             { name: '灵异金丹', url: 'https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png', chance: 9.5 },
             { name: '橙色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e96449c0.png', chance: 0.1 },
-            { name: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', chance: 0.4 },
+            { name: '蓝色武装原料', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e964497d.png', chance: 0.3 },
             { name: '举世无双悟性丹', url: 'https://pic.imgdb.cn/item/665ef0845e6d1bfa055800c7.png', chance: 12 },
             { name: '召唤灵符', url: 'https://pic.imgdb.cn/item/66d9f78ed9c307b7e94c80c4.png', chance: 10 },
             { name: '重生露', url: 'https://pic.imgdb.cn/item/66ddb0cdd9c307b7e961ad69.png', chance: 1},
@@ -15898,6 +15947,7 @@ function getRandomReward(type) {
             { name: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', chance: 5.5 },
             { name: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 5 },
             { name: '锻造工具', url: 'https://pic.imgdb.cn/item/66d8732dd9c307b7e9644942.png', chance: 1 },
+            { name: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', chance: 0.1 },
             { name: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 2 },
             { name: '修为灵丹*3（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', chance: 0.2 },
             { name: '修为灵丹*3（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', chance: 0.1 },
@@ -16028,6 +16078,13 @@ let jinnangItems = [
     { name: 'xingzhizhufu', displayName: '星之祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：星之祝福' },
     { name: 'zhenbaoshenquan', displayName: '震爆神拳天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：震爆神拳' },
     { name: 'hongHuang', displayName: '洪荒至尊仙葫', url: 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price: 8000, quantity: 0, description: '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具' },
+    { name: 'rareEventBooster', displayName: '八方来财', url: 'https://pic.imgdb.cn/item/66e683eed9c307b7e9551be4.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，你在经商时遇到市场特殊事件的概率提升10%' },
+    { name: 'fitnessPowder', displayName: '强身散', url: 'https://pic.imgdb.cn/item/66e683eed9c307b7e9551bdf.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，每周精力下降的幅度减少30%' },
+    { name: 'heroToken', displayName: '英雄令', url: 'https://pic.imgdb.cn/item/66e6841ad9c307b7e9554384.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）作为对英雄的尊敬，应用此法宝时，每周店租下降30%' },
+    { name: 'extensionCharter', displayName: '续租契', url: 'https://pic.imgdb.cn/item/66e68b4ed9c307b7e962b841.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，经商时间可特许延长一个月（4周）' },
+    { name: 'treasureWood', displayName: '珍宝案', url: 'https://pic.imgdb.cn/item/66e68b4dd9c307b7e962b7ca.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）此法宝应用后可降低20%未变现的资产缩水幅度' },
+    { name: 'investmentCharter', displayName: '特许招商令', url: 'https://pic.imgdb.cn/item/66e68c8ed9c307b7e963c42d.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝后，可额外增加一次投资次数' },
+    { name: 'merchantPointsCard', displayName: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', price: 1000, quantity: 5, description: '打开后可以获得2000点经商积分。经商积分用于在商店-倒买倒卖购买经商法宝，增加你的资产运作能力' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -16654,6 +16711,10 @@ const itemEffects = {
     tianwanghuwei: () => createSkills('天王护卫', 'SSS', 'NE', 1, 1, '大幅度增加宠物的物理防御和法术防御，每级提升500点。'),
     xingzhizhufu: () => createSkills('星之祝福', 'SSS', 'JKE', 1, 0.025, '敌人攻击我方时有概率解除自身减益效果，并恢复一定生命值。'),
     zhenbaoshenquan: () => createSkills('震爆神拳', 'SSS', 'TC', 1, 10, '降下天雷惩戒敌人，造成大量伤害的同时会对自身造成一定损伤，双方速度之差越大，伤害越大。'),
+    merchantPointsCard: () => {
+        scalpingScore += 2000;
+        showMerchant(`你的经商积分增加了2000，当前积分为${scalpingScore}。`);
+    }
 };
 
 function useAssignedItem() {
@@ -19494,12 +19555,12 @@ function sellGoldBlock(basePrice) {
             if (Math.random() < 0.6) {
                 randomlyEventAfterSellingBlock();
             }
-        },1000);
+        },200);
 }
 
 function randomlyEventAfterSellingBlock() {
     const rareItemName = ['universalHeart', 'luckyAmulet', 'qiongmeiCard', 'advancedSkillBook', 'hongHuang']; // 可拓展更多物品
-    const canChangeTinyGoldBlock = [15, 10, 50, 20, 2];  // 对应的物品价格
+    const canChangeTinyGoldBlock = [5, 10, 50, 20, 2];  // 对应的物品价格
 
     // 随机选择一个物品
     const randomIndex = Math.floor(Math.random() * rareItemName.length);
@@ -19614,8 +19675,10 @@ let scalpingState = {
     maxWarehouseCapacity: 100, // 初始仓库容量
     warehouseUpdateCount: 0,
     investmentCount: 0,
-    holdItems: {} // 存放玩家购买的商品
+    holdItems: {}, // 存放玩家购买的商品
+    gadgets: [] //玩家使用的增益道具
 };
+let scalpingScore = 0; //用于兑换法宝
 
 const scalpingItems = [
     {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
@@ -19649,7 +19712,7 @@ function openScalping(closeButton = false) {
 }
 
 function showInfoScalping() {
-    showMerchant('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周会根据仓库容量收取一定租金 \n\n 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格 \n\n你可以在任何时刻补充你的启动资金 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
+    showMerchant('\n欢迎来到自由经商的功能面板！\n\n你可以在此处刷新商品，在低位时购入，高位时果断抛出 \n\n每次经商时长为52周，每周会根据仓库容量收取一定租金 \n\n 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格 \n\n你可以在任何时刻补充你的启动资金 \n\n使用法宝可以让你的经商之路更加顺利 \n\n经商时间结束时，将无法再刷新道具 \n\n如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚 \n\n在经商面板购买的商品都只供销售使用哦');
 }
         
 function increaseInverstment() {
@@ -19684,6 +19747,160 @@ function increaseInverstment() {
     }
 }
 
+function closeGagdetsPanel() {
+    const gadgetsContainer = document.getElementById('gadgets-selector');
+    gadgetsContainer.style.display = 'none';
+}
+
+function selectSaclpingGadgets() {
+    const gadgets = jinnangItems.filter(item => item.description.includes('【经商法宝】') && item.quantity >= 1);
+    const gadgetsWholeContainer = document.getElementById('gadgets-selector');
+    const gadgetsContainer = document.getElementById('selected-gadgets');
+    gadgetsContainer.innerHTML = ''; // 清空现有内容
+    
+    // 使用 gadgets 数组直接，不需要额外赋值给 selectedGadgets
+    if (gadgets.length === 0) {
+        showMerchant('暂时没有可用法宝，你可以在法宝商店使用经商积分进行购买');
+    }
+    gadgetsWholeContainer.style.display = 'flex';
+    
+    gadgets.forEach(gadget => {
+        const gadgetElement = document.createElement('div');
+        gadgetElement.className = 'selected-gadgets';
+        gadgetElement.style = 'display: flex;justify-content: space-between;font-size: 14px;align-items: center;margin-bottom: 10px;border: 1px solid #6f391c;padding: 5px;';
+        gadgetElement.innerHTML = `
+            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 150px;">
+                <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
+                <div>${gadget.displayName}</div>
+            </div>
+            <div id="description-${gadget.name}">${gadget.description} 拥有：${gadget.quantity}个 </div>
+        `;
+
+        // 点击法宝时弹出应用面板
+        gadgetElement.addEventListener('click', () => {
+            const appliedGadgetsContainer = document.getElementById('applied-scalping-gadgets');
+            // 修改为 < 3，避免等于3时继续添加
+            if (scalpingState.gadgets.length < 3 && !scalpingState.gadgets.includes(gadget.displayName)) {
+                scalpingState.gadgets.push(gadget.displayName);
+                const appliedGadgetsElement = document.createElement('div');
+                appliedGadgetsElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
+                
+                // 修复：只更新子元素，而不是整个 gadgetElement 的内容
+                const imgElement = document.createElement('img');
+                imgElement.src = gadget.url;
+                imgElement.alt = gadget.name;
+                imgElement.style = 'width: 25px; height: 25px; border: 1px solid #6f391c; cursor: pointer;';
+                appliedGadgetsElement.appendChild(imgElement);
+                imgElement.addEventListener('click',() => {
+                    showMerchant(`${gadget.description}`);
+                })
+                
+                appliedGadgetsContainer.appendChild(appliedGadgetsElement);
+                gadgetsWholeContainer.style.display = 'none';
+                useItem(`${gadget.name}`,1);
+                showMerchant(`你成功应用了${gadget.displayName}!`);
+                applyGadgetEffect(gadget);
+                updateScalpingPanel();
+            } else {
+                showMerchant('当前法宝应用数量已达上限或已有同类法宝生效！');
+            }
+        });
+
+        gadgetsContainer.appendChild(gadgetElement);
+        
+    });
+}
+
+function applyGadgetEffect(gadget) {
+    const appliedGadget = scalpingState.gadgets.find(g => g === gadget.displayName);
+
+    if (!appliedGadget) {
+        console.error(`未找到法宝: ${gadget}`);
+        return;
+    }
+    const gadgetEffects = {
+        '续租契': () => {
+            scalpingState.maxSellingWeek += 4;
+            updateScalpingPanel();
+        },
+        '特许招商令': () => {
+            scalpingState.investmentCount -= 1;
+            updateScalpingPanel();
+        }
+    };
+
+    // 检查法宝是否有对应的效果并调用
+    if (gadgetEffects[appliedGadget]) {
+        gadgetEffects[appliedGadget]();
+    } else {
+        console.error(`没有找到 ${appliedGadget} 的效果定义`);
+    }
+}
+
+function exchangeGadgets() {
+    const storeElement = document.getElementById('gadget-store-panel');
+    storeElement.style.display = 'flex';
+    updateGadgetStorePanel();
+}     
+
+function updateGadgetStorePanel() {
+    const gadgets = jinnangItems.filter(item => item.description.includes('【经商法宝】'));
+    const gadgetItemsArea = document.getElementById('gadget-items');
+    gadgetItemsArea.innerHTML = ''; // 清空现有内容
+
+    const gadgetPrice = [
+        {name: '八方来财', price: 5000},
+        {name: '强身散', price: 5000},
+        {name: '英雄令', price: 8000},
+        {name: '续租契', price: 15000},
+        {name: '珍宝案', price: 5000},
+        {name: '特许招商令', price: 3000},
+    ];
+
+    gadgets.forEach(gadget => {
+        const priceInfo = gadgetPrice.find(p => p.name === gadget.displayName);
+        const price = priceInfo ? priceInfo.price : '未知'; // 如果找不到价格则显示"未知"
+
+        const gadgetElement = document.createElement('div');
+        gadgetElement.className = 'selected-gadgets';
+        gadgetElement.style = 'display: flex;justify-content: space-between;font-size: 14px;align-items: center;margin-bottom: 10px;border: 1px solid #6f391c;padding: 5px;';
+        gadgetElement.innerHTML = `
+            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 150px;">
+                <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
+                <div>${gadget.displayName}</div>
+            </div>
+            <div id="description-${gadget.name}">${gadget.description} 价格：${price} 积分 </div>
+        `;
+        gadgetItemsArea.appendChild(gadgetElement);
+        
+        gadgetElement.addEventListener('click', () => {
+            if (price === '未知') {
+                showMerchant('此法宝无法购买，价格未知！');
+                return;
+            }
+
+            showInfoBox(`是否花费${price}积分购买一个${gadget.displayName}？`,
+                       () => {
+                           if (scalpingScore < price) {
+                               showMerchant('你的经商积分不足！请多多使用经商功能积累积分！');
+                           } else {
+                               scalpingScore -= price;
+                               addItemToJinnang(gadget.name, 1);
+                               showMerchant(`成功花费${price}积分购买一个${gadget.displayName}！剩余积分${scalpingScore}。`);
+                               selectSaclpingGadgets();
+                               updateScalpingPanel(); // 在成功购买后更新面板
+                           }
+                       },
+                       null, null, 'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png', '88px * 88px');
+        });
+    });
+}
+        
+document.getElementById('close-gagdet-store').addEventListener('click', () => {
+    const storeElement = document.getElementById('gadget-store-panel');
+    storeElement.style.display = 'none';
+})
+        
 // 根据波动计算商品价格
 function getScalpableItemsPrice(item, isSpecial = false) {
     let fluctuationRange = 0;
@@ -19726,9 +19943,16 @@ function getRandomScalpableItem() {
     // 生成HTML结构
     itemsToDisplay.forEach(item => {
         let price = getScalpableItemsPrice(item);
+        let rareEventChance = 0.1;
+        const rareEventBooster = scalpingState.gadgets.find(gadget => gadget === '八方来财');
+
+        if (rareEventBooster) {
+            rareEventChance = 0.2;
+        }
+        console.log(`当前稀有事件触发概率${rareEventChance}`);
 
         // 检查是否触发特殊事件
-        if (Math.random() < 0.1 && !specialEvents) {
+        if (Math.random() < rareEventChance && !specialEvents) {
             price = getScalpableItemsPrice(item, true);  // 特殊事件价格
             specialEvents = true;  // 标记已生成特殊事件
         }
@@ -19819,9 +20043,16 @@ function getReputationEvent() {
 //修养两周具体实现
 document.getElementById('relax-byweek').addEventListener('click', ()=> {
     const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
+    const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
+    let refreshCostRatio = 1;
+    
+    if (heroToken) {
+        refreshCostRatio = 0.7;
+    }
+    
     if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
         scalpingState.currentSellingWeek += 2;
-        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * 2));
+        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * 2) * refreshCostRatio);
         scalpingState.playerEnergy = 100;
         getRandomScalpableItem();
         updateScalpingPanel();
@@ -19834,11 +20065,24 @@ document.getElementById('relax-byweek').addEventListener('click', ()=> {
 function refreshSaleWeek() {
     let currentWeek = scalpingState.currentSellingWeek;
     let energy = scalpingState.playerEnergy;
+    let eneygyCostRatio = 1;
+    let refreshCostRatio = 1;
+
+    const fitnessPowder = scalpingState.gadgets.find(gadget => gadget === '强身散');
+    const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
+    
+    if (fitnessPowder) {
+        eneygyCostRatio = 0.7;
+    } 
+    
+    if (heroToken) {
+        refreshCostRatio = 0.7;
+    }
     
     const maxWeek = scalpingState.maxSellingWeek;
-    const energyCost = Math.floor(Math.random() * 3 + 1);
+    const energyCost = Math.floor((Math.random() * 3 + 1) * eneygyCostRatio);
     const refreshButton = document.getElementById('enter-next-week');
-    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10 * refreshCostRatio));
 
     if (calculateNetAsset() <= 0) {
         showMerchant('进入市场买卖交易，钱是必须的，先投资才能刷新哦');
@@ -19875,10 +20119,12 @@ function refreshSaleWeek() {
     } else if (currentWeek === maxWeek) {        
         const goldGot = sellAssetsAndExchangeCash();
         const initialCost = scalpingState.investmentCount * 50000 * 10;
+        const scoreToAdd = Math.min(5000, Math.floor(goldGot / 1000));
         
+        scalpingScore += scoreToAdd;
         goldAmount += goldGot;
         updateGoldDisplay(goldAmount);
-        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩，所有资产已兑换为${convertPrice(goldGot)}金子！净利润为${convertPrice(Math.max(0, goldGot - initialCost))}金！`);   
+        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩：\n\n所有资产已兑换为${convertPrice(goldGot)}金子！\n\n净利润为${convertPrice(Math.max(0, goldGot - initialCost))}金！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}。`);   
         resetScalping();
     }
 }
@@ -19905,18 +20151,29 @@ function resetScalping() {
         maxWarehouseCapacity: 100, // 初始仓库容量
         warehouseUpdateCount: 0,
         investmentCount: 0,
-        holdItems: {} // 存放玩家购买的商品
+        holdItems: {}, // 存放玩家购买的商品
+        gadgets: []
     };
+    
     updateScalpingPanel();
     document.getElementById('enter-next-week').innerText = '刷新一周';
+    document.getElementById('applied-scalping-gadgets').innerHTML = '';
     
 }
 
 function sellAssetsAndExchangeCash() {
     const netAssets = calculateNetAsset();
     const cash = scalpingState.currentCash;
+    const treasureWood = scalpingState.gadgets.find(gadget => gadget === '珍宝案');
+    
+    let propertyRatio = 1;
+    
+    if (treasureWood) {
+        propertyRatio = 1.2;
+    }
+    
     let cashChangeNum = cash * 10;
-    let assetValue = Math.floor((netAssets - cash) * (Math.max(5, Math.random() * 7)));
+    let assetValue = Math.floor((netAssets - cash) * (Math.max(5, Math.random() * 7)) * propertyRatio);
     let totalValue = Math.max(0, cashChangeNum + assetValue);
 
     return totalValue;
@@ -19924,7 +20181,7 @@ function sellAssetsAndExchangeCash() {
         
 function quitScalping() {
     if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
-        showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损，是否继续？',
+        showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损且不会获得经商积分，是否继续？',
                    () => {
                         const goldGot = Math.floor(sellAssetsAndExchangeCash() * 0.8);
                         goldAmount += goldGot;
@@ -20225,6 +20482,8 @@ function updateScalpingPanel() {
     const usedWarehouseCapacity = document.getElementById('used-warehouse-capacity');
     const maxWarehouseCapacity = document.getElementById('max-warehouse-capacity');
     const relaxButton = document.getElementById('relax-byweek'); 
+    const gadgetButton = document.getElementById('add-scalping-gadgets');
+    const scalpingScoreElement = document.getElementById('scalping-score');
 
     currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
@@ -20234,6 +20493,7 @@ function updateScalpingPanel() {
     netAsset.innerText = calculateNetAsset();        // 更新总资产
     usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量
     maxWarehouseCapacity.innerText = scalpingState.maxWarehouseCapacity;  // 更新最大仓库容量
+    scalpingScoreElement.innerText = scalpingScore;
 
     if (scalpingState.playerEnergy <= 60) {
         relaxButton.style.display = 'flex';
@@ -20243,6 +20503,12 @@ function updateScalpingPanel() {
         relaxButton.style.display = 'none';
         document.getElementById('player-energy').innerText = scalpingState.playerEnergy;
         document.getElementById('player-energy').style.color = 'white';
+    }
+
+    if (scalpingState.gadgets.length === 3) {
+        gadgetButton.style.display = 'none';
+    } else {
+        gadgetButton.style.display = 'flex';
     }
 }
         
@@ -21701,7 +21967,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
-            showBattleOverlay('https://pic.imgdb.cn/item/66e6579ad9c307b7e92331f2.gif', 2, 1, 1000);
+            showBattleOverlay('https://pic.imgdb.cn/item/66e661fed9c307b7e92bf194.gif', 1500, 0.9, 1000);
             setTimeout(()=> {
                  battleState.enemy.wounded = false;
                  damageRatio = 1;
@@ -21986,6 +22252,7 @@ function updateSkillScore(selectedSkills = []) {
     let aSkillCount = 0;
     let sSkillCount = 0;
     let ssSkillCount = 0;
+    let sssSkillCount = 0;
 
     selectedSkills.forEach(skill => {
         switch (skill.rarity) {
@@ -22004,12 +22271,17 @@ function updateSkillScore(selectedSkills = []) {
                 skillsScore += 10000;
                 ssSkillCount++;
                 break;
+            case 'SSS':
+                skillsScore += 60000;
+                sssSkillCount++;
+                break;
         }
     });
 
     if (aSkillCount > 1) skillsScore += 1000;
     if (sSkillCount > 1) skillsScore += 10000;
     if (ssSkillCount > 1) skillsScore += 50000;
+    if (sssSkillCount > 1) skillsScore += 100000;
 
     // 计算总评分
     const totalScore = qualityScore + skillsScore + secondaryAttributeScore;
@@ -23686,6 +23958,7 @@ function saveGameState() {
         experienceTreasureOpenCount: experienceTreasureOpenCount, //经验宝箱成本
         gameItems: gameItems, // 保存道具数据
         alreadyUnlocked: alreadyUnlocked,
+        scalpingScore: scalpingScore //保存经商积分
     };
 
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -23901,6 +24174,9 @@ function loadGameState(auto = false) {
             }
             if (savedState.advancementStates) {
                 advancementStates = JSON.parse(savedState.advancementStates);
+            }
+            if (savedState.scalpingScore) {
+                scalpingScore = savedState.scalpingScore;
             }
             skillScore = savedState.skillScore;
             blessGiftClaimed = savedState.blessGiftClaimed;

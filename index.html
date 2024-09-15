@@ -4091,7 +4091,7 @@
                 { name: '风魔爆', rarity: 'S', type: 'MA', multiplier: 1.8, description: '主动技能，对敌方全体造成法术伤害' },
                 { name: '岳镇渊渟', rarity: 'S', type: 'N', multiplier: 3, description: '被动技能，巨灵战姬有无可比拟的防御力。减免战斗中前三回合所受物理伤害，减免比例随技能等级提高而提高' },
                 { name: '元素力量（宽容）', rarity: 'S', type: 'PD', multiplier: 1.5, description: '主动技能，减免受到的伤害' },
-                { name: '舍生取义', rarity: 'SS', type: 'PP', multiplier: 2.5, description: '主动技能，巨灵战姬借助上古巨灵神之威，对邪佞施加烈性真实伤害' },
+                { name: '舍生取义', rarity: 'SS', type: 'TC', multiplier: 2.5, description: '主动技能，巨灵战姬借助上古巨灵神之威，牺牲自身一定生命值，对邪佞施加烈性真实伤害' },
                 { name: '霸体援护', rarity: 'SS', type: 'PD', multiplier: 1.5, description: '主动技能，巨灵擅长在战场上保护队友，一回合内处于霸体状态' },
                 { name: '激浊扬清', rarity: 'SS', type: 'JK', multiplier: 0.01, description: '被动技能，巨灵擅长清除队友的负面状态，驱散的概率视技能等级而定' },
                 { name: '热血图腾', rarity: 'SS', type: 'N', multiplier: 5, description: '被动技能，巨灵战姬在场时我方斗志昂扬，极大增加我方全体生命上限值，效果随技能等级提高而提高' }
@@ -7992,6 +7992,7 @@ function getEnemyStatus() {
     if (enemyRivival) status.push("复活中");
     if (!playerTurn) status.push("⚔️");
     if (battleState.enemy.armorBreak) status.push("破甲");
+    if (battleState.enemy.wounded) status.push("重伤");
     if (battleState.enemy.bleeding) status.push("流血");
     if (battleState.enemy.corrode) status.push("腐蚀");
     if (battleState.enemy.sleep) status.push("沉睡");
@@ -8195,16 +8196,20 @@ function updateDisplay(currentId, maxId, type, warningThreshold, warningColor) {
     maxElement.style.display = 'none';
 }
 
-
+let damageRatio = 1;
 //总伤害计算函数
-function calculateDamage(baseDamage, isCritical, critDamage) {
+function calculateDamage(baseDamage, isCritical, critDamage ,playerEffect = false) {
     if (isCritical) {
         baseDamage = Math.floor(baseDamage * critDamage);
     }
     
+    if (playerEffect) {
+        baseDamage *= Math.floor(Math.max(0, damageRatio));
+    }
+    
     return baseDamage;
 }
-
+        
 function checkCriticalHit(critRate) {
     return Math.random() < critRate;
 }
@@ -9427,7 +9432,7 @@ function performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     let isCritical = checkCriticalHit(playerCritRate);
 
     // 在所有效果应用后计算最终伤害
-    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage, true);
     // 如果存在火符的效果则还需要计算一层
     const activeEffects = applyWuxingEffects();
     let fireEffect = 0;
@@ -9521,7 +9526,7 @@ function performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     let isCritical = checkCriticalHit(playerCritRate);
 
     // 在所有效果应用后计算最终伤害
-    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage, true);
 
     // 如果存在火符的效果则还需要计算一层
     const activeEffects = applyWuxingEffects();
@@ -9624,7 +9629,7 @@ function performIndependentMagicAttack() {
     }
 
     // 在所有效果应用后计算最终伤害
-    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage);
+    let finalDamage = calculateDamage(baseDamage, isCritical, playerCritDamage, true);
 
     // 如果存在火符的效果则还需要计算一层
     const activeEffects = applyWuxingEffects();
@@ -17530,8 +17535,13 @@ function decreaseArmsEndurance(key = null, value) {
     } else {
         Object.keys(armsAttributes).forEach(key => {
             const arm = armsAttributes[key];
-            arm.enduranceValue = Math.max(0, arm.enduranceValue - value);
+            if (arm.value !== 0) {
+                arm.enduranceValue = Math.max(0, arm.enduranceValue - value);
+            }
 
+            if (arm.enduranceValue === 0) {
+                logBattleEvent(`${currentPet.name}的${arm.type}已经完全损坏，将无法再提供任何属性增益！`,'red');
+            }
         });
     }
     
@@ -21660,7 +21670,7 @@ function applySpecialSkillEffects(skill, value = null) {
             let isCritical = checkCriticalHit(playerCritRate);
             
             // 在所有效果应用后计算最终伤害
-            damage = calculateDamage(damage, isCritical, playerCritDamage);
+            damage = calculateDamage(damage, isCritical, playerCritDamage, true);
             // 如果存在火符的效果则还需要计算一层
             const activeEffects = applyWuxingEffects();
             let fireEffect = 0;
@@ -21683,9 +21693,29 @@ function applySpecialSkillEffects(skill, value = null) {
             }
             
             battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
-        
+            
+            if (!battleState.enemy.wounded && damageRatio === 1) {
+                battleState.enemy.wounded = true;
+                damageRatio = 1.2;
+            }
+
             logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
+            showBattleOverlay('https://pic.imgdb.cn/item/66e6579ad9c307b7e92331f2.gif', 2, 1, 1000);
+            setTimeout(()=> {
+                 battleState.enemy.wounded = false;
+                 damageRatio = 1;
+            }, 4000);
+        },
+        "舍生取义": () => {
+            const healthCost = Math.floor(battleAttributes.health * (skillDetail.skillLevel + 30) * 0.1);
+            const enemyDamageValue = Math.floor(healthCost * skillDetail.skillMultiplier);
+            let isCritical = checkCriticalHit(playerCritRate);
+            let damage = enemyDamageValue;
+            damage = calculateDamage(damage, isCritical, playerCritDamage, true);
+
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+            logBattleEvent(`【玩家释放绝技】绝杀·舍生取义，燃烧自身生命之力，夺去敌人${damage}点生命值！`, 'red');
         }
     };
 

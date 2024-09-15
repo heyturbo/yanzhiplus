@@ -19784,7 +19784,8 @@ function openScalping(closeButton = false) {
 }
 
 function showInfoScalping() {
-    showMerchant(`\n欢迎来到自由经商的功能面板！当前你的最高记录是${highestAsset}元！ \n\n1. 你可以在此处刷新商品，在低位时购入，高位时果断抛出。 \n2. 每次经商时长为52周，每周会根据仓库容量收取一定租金。 \n3. 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格。 \n4. 你可以在任何时刻补充你的启动资金。 \n5. 使用法宝可以让你的经商之路更加顺利。 \n6. 经商时间结束时，将无法再刷新道具。 \n7. 如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚。 \n8. 在经商面板购买的商品都只供销售使用哦。`);
+    const comment = updateHighestAssetDisplay(highestAsset, false);
+    showMerchant(`\n欢迎来到自由经商的功能面板！当前你的最高记录是${highestAsset.toLocaleString('en-US')}元，商界人士对你的评价是：${comment} ！\n\n1. 你可以在此处刷新商品，在低位时购入，高位时果断抛出。 \n2. 每次经商时长为52周，每周会根据仓库容量收取一定租金。 \n3. 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格。 \n4. 你可以在任何时刻补充你的启动资金。 \n5. 使用法宝可以让你的经商之路更加顺利。 \n6. 经商时间结束时，将无法再刷新道具。 \n7. 如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚。 \n8. 在经商面板购买的商品都只供销售使用哦。`);
 }
         
 function increaseInverstment() {
@@ -20191,7 +20192,7 @@ function refreshSaleWeek() {
     } else if (currentWeek === maxWeek) {        
         const goldGot = sellAssetsAndExchangeCash();
         const initialCost = scalpingState.investmentCount * 50000 * 10;
-        const scoreToAdd = Math.min(100000, Math.floor(goldGot / 1000));
+        const scoreToAdd = Math.min(10000, Math.floor(goldGot / 1000));
         const netAsset = calculateNetAsset();
 
         if (highestAsset < netAsset) {
@@ -20207,10 +20208,33 @@ function refreshSaleWeek() {
     }
 }
 
-function updateHighestAssetDisplay(highestAsset) {
+function updateHighestAssetDisplay(highestAsset, display = true) {
     const scalpingDisplayElement = document.getElementById('scalping-display');
+    const commentsByAsset = [
+        {value: 100000, comments: '虽不至于腰缠万贯，但也有一套独属于你的经商之道'},
+        {value: 500000, comments: '经商有道，财富渐长，你的事业正在蒸蒸日上'},
+        {value: 1000000, comments: '白手起家，积累了一定的财富，你已成为商界的新秀'},
+        {value: 3000000, comments: '商海沉浮多年，你已是商界的中流砥柱，财富积累颇丰'},
+        {value: 8000000, comments: '财富积累已达到一个新的高度，你的商业帝国正在崛起'},
+        {value: 10000000, comments: '商业帝国初具规模，你的财富已经超过了大多数人一生的积累'},
+        {value: 20000000, comments: '财富如山，商业版图遍布各地，你已成为商界的翘楚'},
+        {value: 50000000, comments: '富可敌国，商业帝国盖世无双，你是当之无愧的商业巨头'},
+        {value: 100000000, comments: '你的财富已经达到了常人难以想象的地步，传奇的商业人生谱写着新的篇章'},
+        {value: 500000000, comments: '站在财富之巅，俯瞰商界，你已成为这个时代的商业传奇'},
+        {value: 1000000000, comments: '你在一年之内积累了富可敌国的财富，索罗斯提到你时都会骄傲地挺胸告诉别人：他就是我的金融恩师！'}
+    ];
 
     // 检查是否已经存在 recordOverlay，避免重复添加
+    let selectedComment = null;
+    for (let i = commentsByAsset.length - 1; i >= 0; i--) {
+        if (highestAsset >= commentsByAsset[i].value) {
+            selectedComment = commentsByAsset[i].comments;
+            break;
+        }
+    }
+
+    if (!display) return selectedComment;
+    highestAsset = highestAsset.toLocaleString('en-US');
     
     const existingContainer = document.getElementById('scalping-record-overlay-container');
     if (existingContainer) {
@@ -20240,24 +20264,31 @@ function updateHighestAssetDisplay(highestAsset) {
     recordOverlay.style.alignItems = 'center';
     recordOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
     recordOverlay.style.color = 'white';
-    recordOverlay.style.fontSize = '28px';
+    recordOverlay.style.fontSize = '24px';
     recordOverlay.style.fontWeight = 'bold';
     recordOverlay.style.justifyContent = 'center';  // 添加居中对齐
 
     const recordText = document.createElement('div');
     recordText.id = 'scalping-record-text';
     recordText.style = 'position: absolute;top: 50%; left: 50%; transform: translate(-50% , -50%); color: crimson; font-size: 24px; font-weight: bold; text-align: center;max-width:200px;';
-    recordText.innerText = `创造新的历史记录：${highestAsset}元！你就是生来经商的神！`;
+    if (selectedComment) {
+        recordText.innerText = `创造新的历史记录：${highestAsset}元！${selectedComment}！`;
+    } else {
+        recordText.innerText = `创造新的历史记录：${highestAsset}元！你的经商头脑无人能敌！`;
+    }
     
     recordOverlay.appendChild(recordText);
     overlayContainer.appendChild(recordOverlay);
     scalpingDisplayElement.appendChild(overlayContainer);
     
 
-    // 设置 3 秒后移除覆盖层
+    // 设置 20 秒后移除覆盖层
     setTimeout(() => {
-        scalpingDisplayElement.removeChild(overlayContainer);  // 完全移除覆盖层
+        if (existingContainer) {
+            scalpingDisplayElement.removeChild(existingContainer);
+        }
     }, 20000);
+
 }
         
 function resetScalping() {

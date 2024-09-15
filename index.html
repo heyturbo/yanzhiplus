@@ -996,21 +996,20 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 90%;
+            width: 95%;
             max-height: 80%;
             background-color: rgba(0, 0, 0, 0.8);
             color: #6f391c;
-            padding: 10px;
+            padding: 1px 2px;
             border-radius: 2px;
             justify-content: center;
             flex-direction: column;
             align-items: center;
-            overflow-y: scroll;
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
             background-repeat: repeat;
             background-size: auto;
             border: 2px double black;
-            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.8);
+            box-shadow: inset 0px 0px 2px 1px #6f391c;
         }
         
         .scalping-top-bar {
@@ -2921,21 +2920,21 @@
                         </div>
                     </div>
                     <div id="gadgets-selector" class="select-gadgets" style="display:none;">
+                        <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
                         <div style="display:flex;width: 100%;justify-content:space-between;align-items: center;font-size:16px;">
                         <p>选择你所拥有的法宝</p>
                         <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
-                        <button onclick="closeGagdetsPanel()">x</button>
                         </div>
-                        <div id="selected-gadgets">
+                        <div id="selected-gadgets" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
                             <!-- 遍历法宝并在此处显示 -->
                         </div>
                     </div>
                     <div id="gadget-store-panel" class="select-gadgets" style="display:none;">
-                        <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: space-between;align-items: center;">
+                        <div id="gadgets-store-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>兑换法宝<button id="close-gagdet-store">x</button></div>
+                        <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: space-between;align-items: center;width:100%;">
                         <p>你可以使用经商积分点击图标兑换法宝</p>
-                        <button id="close-gagdet-store">x</button>
                         </div>
-                        <div id="gadget-items">
+                        <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
                             <!-- 此处函数生成 -->
                         </div>
                     </div>
@@ -5302,33 +5301,7 @@ function infoWuxing() {
     showInfoBox("\n1.悟性对宠物的成长至关重要 \n2.悟性越高，洗练所得高级技能的概率就越大 \n3.悟性能够给二级属性百分比的加成");
 }  
  
-// 敌人图像信息
-const enemyImages = [
-    { status: 'default', name: '邪佞', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
-    { status: 'rampaged', name: '狂暴的心魔', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
-    { status: 'mao', name: '上古心魔', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' },
-    { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
-    { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
-    { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
-    { status: 'practiceEnemyPlus', name: '高级树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
-    { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
-    { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' },
-    { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' },
-    { status: 'qiongQi', name: '穷奇', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif' },
-    { status: 'baiYin', name: '白银VIP怪', url: 'https://pic.imgdb.cn/item/66d5d91ad9c307b7e95066ac.gif' },
-];
 
-// 更改敌人图像的函数
-function changeEnemyImage(status) {
-    const enemyImage = enemyImages.find(image => image.status === status);
-
-    if (enemyImage) {
-        document.getElementById("enemy-image").src = enemyImage.url;
-        document.getElementById("enemy-name").innerText = enemyImage.name;
-    } else {
-        console.error(`Status '${status}' not found in enemyImages.`);
-    }
-}
 
 
 function showBattleOverlay(imageUrl, duration = 500, opacity = 1, zIndex = -1) {
@@ -7356,6 +7329,35 @@ function updatePetInfo() {
 // 全局敌人对象数组
 let summonEnemy = false;
 
+// 敌人图像信息
+const enemyImages = [
+    { status: 'default', name: '邪佞', url: 'https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif' },
+    { status: 'rampaged', name: '狂暴的心魔', url: 'https://pic.imgdb.cn/item/669e973ad9c307b7e9381309.gif' },
+    { status: 'mao', name: '上古心魔', url: 'https://pic.imgdb.cn/item/66a0d383d9c307b7e93a3779.gif' },
+    { status: 'realShape', name: '大渊神真身', url: 'https://pic.imgdb.cn/item/66a616f4d9c307b7e9b24c97.gif' },
+    { status: 'darkShape', name: '暗黑大渊神', url: 'https://pic.imgdb.cn/item/66a61b8cd9c307b7e9b71e30.gif' },
+    { status: 'practiceEnemy', name: '练习树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
+    { status: 'practiceEnemyPlus', name: '高级树桩', url: 'https://pic.imgdb.cn/item/665433e8d9c307b7e93ac758.gif' },
+    { status: 'ancientEvil', name: '太古魔魂', url: 'https://pic.imgdb.cn/item/66cc999fd9c307b7e9d7ca2a.gif' },
+    { status: 'expEnemy', name: '永夜大帝', url: 'https://pic.imgdb.cn/item/66cd62b1d9c307b7e9afcf5b.gif' },
+    { status: 'noWorkBoss', name: '無班之魂', url: 'https://pic.imgdb.cn/item/66cdda7cd9c307b7e941d522.gif' },
+    { status: 'qiongQi', name: '穷奇', url: 'https://pic.imgdb.cn/item/66d07119d9c307b7e93234a9.gif' },
+    { status: 'baiYin', name: '白银VIP怪', url: 'https://pic.imgdb.cn/item/66d5d91ad9c307b7e95066ac.gif' },
+    { status: 'stoneDragon', name: '岩龙', url: 'https://pic.imgdb.cn/item/66e6d18fd9c307b7e9c12e52.gif' },
+];
+
+// 更改敌人图像的函数
+function changeEnemyImage(status) {
+    const enemyImage = enemyImages.find(image => image.status === status);
+
+    if (enemyImage) {
+        document.getElementById("enemy-image").src = enemyImage.url;
+        document.getElementById("enemy-name").innerText = enemyImage.name;
+    } else {
+        console.error(`Status '${status}' not found in enemyImages.`);
+    }
+}
+        
 // 全局敌人信息对象
 const enemies = {
     practiceEnemy: {
@@ -7504,6 +7506,24 @@ const enemies = {
         rewardMessage: '无',
         specialty: 'baiYin' // 特殊能力标识符
     },
+    stoneDragon: {
+        name: '岩龙',
+        level: 180,
+        health: 3800000000,
+        mana: 125000,
+        physicalAttack: 3450,
+        physicalDefense: 60000,
+        magicAttack: 1128,
+        magicDefense: 60000,
+        speed: 2400,
+        cultivation: 471200,
+        enemyCritRate: 0.65,
+        enemyCritDamage: 3.8,
+        backgroundImage: 'https://pic.imgdb.cn/item/66e6d194d9c307b7e9c131d3.png',
+        reward: () => addItemToJinnang('wealthyGemBag', 1),
+        rewardMessage: '一个富贵宝石袋',
+        specialty: 'stoneDragon' // 特殊能力标识符
+    },
 };
 // 定义不同敌人的独特战斗能力
 const specificAttackByEnemy = {
@@ -7569,7 +7589,27 @@ const specificAttackByEnemy = {
         action: () => {
             logBattleEvent('战胜后可得到大量经验值和概率获得提升宠物技能的神秘物质', 'gold');
         }
+    },
+    'stoneDragon': {
+        type: 'interval',
+        action: () => {
+        if (summonEnemy && battleState.enemy.name === '岩龙' && onBattleState) {
+            if (battleState.enemy.health >= enemyMaxHealth * 0.2) {
+                battleState.enemy.physicalDefense += 60000;
+                battleState.enemy.magicDefense += 60000;
+                updateUI();
+            } else {
+                battleState.enemy.physicalAttack += Math.floor(Math.random() * 1500 + 1500);
+                if (battleState.player.shocked) {
+                    return;
+                } else {
+                    battleState.player.shocked = true;
+                    logBattleEvent('岩龙开始汲取雷电的力量，你被附加了触电效果，每次攻击岩龙将大幅削减你的物理防御和法术防御。', 'grey');
+                }
+            }
+        }
     }
+}
 };
 
 function applySpecificAttackByEnemy(summonedEnemyName) {
@@ -8036,9 +8076,9 @@ function restoreEnemyState() {
 
 function getEnemyStatus() {
     let status = [];
+    if (!playerTurn) status.push("⚔️");
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (enemyRivival) status.push("复活中");
-    if (!playerTurn) status.push("⚔️");
     if (battleState.enemy.armorBreak) status.push("破甲");
     if (battleState.enemy.wounded) status.push("重伤");
     if (battleState.enemy.bleeding) status.push("流血");
@@ -8067,8 +8107,9 @@ function updateEnemyStatusDisplay() {
 
 function getPlayerStatus() {
     let status = [];
-    if (battleState.player.defensing) status.push("蓄力中");
     if (playerTurn) status.push("⚔️");
+    if (battleState.player.defensing) status.push("蓄力中");
+    if (battleState.player.shocked) status.push("触电");
     if (battleState.player.shielded) status.push("护盾");
     if (battleState.player.reflecting) status.push("反弹伤害");
     if (battleState.player.healing) status.push("持续回血");
@@ -9278,7 +9319,7 @@ function performAttack(type) {
         return;
     }
     
-    
+    handleShocked();
     handleManaRecover();
     updateUI();
     applyAscensionEffects();
@@ -9808,6 +9849,7 @@ function performPoison() {
         handlePoison(skillMultiplier,selectedSkill); // 传递技能增益参数
     }
     
+    handleShocked();
     handleManaRecover();
     applyAscensionEffects();
     updateUI();
@@ -11365,6 +11407,13 @@ function handleSlaughter() {
     }, 10000); // 杀戮效果持续10秒
 } //处理杀戮状态
 
+function handleShocked() {
+    if (battleState.player.shocked) {
+        battleAttributes.physicalDefense = Math.max(0, Math.floor(battleAttributes.physicalDefense * 0.8));
+        battleAttributes.magicDefense = Math.max(0, Math.floor(battleAttributes.physicalDefense * 0.8));
+    }
+}
+        
 function handleSeal() {
     if (battleState.player.seal) {
         return;
@@ -12571,6 +12620,10 @@ function handleSpiritHeal() {
     if (!awakened){
         return;
     }
+
+    if (summonEnemy) {
+        return;
+    }
     
     const baseProbability = 0.01;
     const finalProbability = baseProbability + spiritMultiplier / 400;
@@ -12589,6 +12642,10 @@ function handleSpiritHeal() {
 
 function handleSpiritPower() {
     if (!awakened){
+        return;
+    }
+
+    if (summonEnemy) {
         return;
     }
     
@@ -12634,6 +12691,10 @@ function handleSpiritPower() {
 
 function handleSpiritAttack() {
     if (!awakened){
+        return;
+    }
+
+    if (summonEnemy) {
         return;
     }
     
@@ -13860,7 +13921,7 @@ function clearTaunt() {
 }
 
 function clearEnemyEffect() {
-    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal', 'slaughter'];
+    const effects = ['drunken', 'healingBan', 'soulCapture', 'blindfold', 'spellSlow', 'torn', 'suppressed', 'taunt', 'seal', 'slaughter', 'shocked'];
 
     effects.forEach(effect => {
         if (battleState.player[effect]) {
@@ -13904,6 +13965,9 @@ function clearEnemyEffect() {
                     updateAscensionDisplay();
                     updateSecondAscensionDisplay();
                     updateUI();
+                    break;
+                case 'shocked':
+                    // 设置为false
                     break;
             }
         }
@@ -16040,6 +16104,7 @@ let jinnangItems = [
     { name: 'practiceEnemyPlus', displayName: '高级树桩封印卡', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出高级树桩测试战力，会复活，打到爽' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
+    { name: 'stoneDragon', displayName: '岩龙封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的岩龙，战胜后可获得一个富贵宝石袋' },
     { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
     { name: 'noWorkBoss', displayName: '無班之魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
@@ -16509,6 +16574,7 @@ const itemEffects = {
     noWorkBoss: () => summonEnemyByType('noWorkBoss'),
     qiongQi: () => summonEnemyByType('qiongQi'),
     practiceEnemyPlus: () => summonEnemyByType('practiceEnemyPlus'),
+    stoneDragon: () => summonEnemyByType('stoneDragon'),
     baiYinPKG: () => {
         addItemToJinnang('baiYinCard',30);
     },
@@ -16878,11 +16944,12 @@ function generateSealCard() {
         ['battleWithAncientEvil', '太古魔魂封印'],
         ['noWorkBoss', '無班之魂'],
         ['qiongQi', '穷奇'],
-        ['practiceEnemyPlus', '高级树桩封印卡']
+        ['practiceEnemyPlus', '高级树桩封印卡'],
+        ['stoneDragon', '岩龙封印卡']
     ]);
 
     // 封印卡片的英文名称数组
-    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi','practiceEnemyPlus'];
+    const sealCards = ['battleWithTree', 'battleWithExpEnemy', 'battleWithAncientEvil', 'noWorkBoss', 'qiongQi','practiceEnemyPlus','stoneDragon'];
 
     // 随机选择一个封印卡片的英文名称
     const randomIndex = Math.floor(Math.random() * sealCards.length);
@@ -21667,6 +21734,15 @@ function createSkills(name, rarity, type, level, multiplier, description) {
     const skillsArea = document.getElementById("skills-area");
     const skillDiv = document.createElement("div");
     const existingSkills = Array.from(skillsArea.children).map(skillDiv => skillDiv.innerText.split(' ')[0]);
+    const sssSkills = currentPet.skills.filter(skill => {
+        // 匹配 existingSkills 中的技能名称
+        return existingSkills.includes(skill.name) && skill.rarity === 'SSS';
+    });
+
+    if (rarity === 'SSS' && sssSkills.length > 2) {
+        showInfoBox('SSS技能最多只能同时拥有三个！',null,null,'red');
+        return;
+    }
     
     if (existingSkills.length >= 12) {
         showInfoBox('已超过可拥有的技能数量上限！',null,null,'red');
@@ -21932,7 +22008,7 @@ function applySpecialSkillEffects(skill, value = null) {
             battleAttributes.health = Math.max(0, battleAttributes.health - healthCost);
             battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
 
-            let damage = battleAttributes.physicalAttack * skillDetail.skillMultiplier * Math.max(0, (Math.min(3, battleAttributes.speed / battleState.enemy.speed)));
+            let damage = battleAttributes.physicalAttack * skillDetail.skillMultiplier * Math.max(1, (Math.min(3, battleAttributes.speed / battleState.enemy.speed)));
             let isCritical = checkCriticalHit(playerCritRate);
             
             // 在所有效果应用后计算最终伤害
@@ -21966,7 +22042,6 @@ function applySpecialSkillEffects(skill, value = null) {
             }
 
             logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
-            showEffect('playerEffect', 'https://pic.imgdb.cn/item/66a0d3e8d9c307b7e93a8108.gif');
             showBattleOverlay('https://pic.imgdb.cn/item/66e661fed9c307b7e92bf194.gif', 1500, 0.9, 1000);
             setTimeout(()=> {
                  battleState.enemy.wounded = false;
@@ -21982,6 +22057,12 @@ function applySpecialSkillEffects(skill, value = null) {
 
             battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
             logBattleEvent(`【玩家释放绝技】绝杀·舍生取义，燃烧自身生命之力，夺去敌人${damage}点生命值！`, 'red');
+            if (isCritical) {
+                updateDamageValue(damage, false, 'damage', true);
+            } else {
+                updateDamageValue(damage, false, 'damage');
+            }
+            showBattleOverlay('https://pic.imgdb.cn/item/66e6cd5dd9c307b7e9b95f1b.gif', 1500, 0.9, 1000);
         }
     };
 

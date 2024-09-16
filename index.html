@@ -12,7 +12,7 @@
             display: flex;
             flex-direction: column;
             margin: 0;
-            padding: 0;
+            padding: 5px;
             color: #6f391c;
             align-items: center;
             font-size: 14px;
@@ -472,7 +472,7 @@
         }
         .core-area-for-skills {
             width: 90%;
-            margin: 20px 0px 5px 0px;
+            margin: 15px 0px 5px 0px;
             padding: 5px;
             background-color: hsl(0deg 0% 100% / 40%);
             display: flex;
@@ -3325,7 +3325,7 @@
                 </div>
             </div>
             <div>当前称号： <span id="personal-honor">初来乍到</span></div>
-            <div>游戏版本： <span id="game-version">V22.1.1</span></div>
+            <div>游戏版本： <span id="game-version">V2.1.2</span></div>
             <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">
                 <button class="saveAndLoadGameState" onclick="saveGameState()">存档</button>
                 <button class="saveAndLoadGameState" onclick="loadGameState()">读档</button>
@@ -4492,15 +4492,13 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V22.1.1
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V2.1.2
+                            \n- 上线高级天赋技能、游商和倒买倒卖小游戏（赚钱新方式！）
+                            \n- 继续重构战斗代码（仍存在大量不稳定，技术有限）
                             \n- 上线宝石系统和相关道具，玩家可以在解锁第二件武装后，点击武装图标进行体验
-                            \n- 修复已知bug；
-                            \n- 模拟海底领悟骑宠系统（目前支持SS级别的物理/法术/释放毒药技能，每种技能有高中低三个加成，可以同时领悟）
-                            \n- 优化技能系统，添加了更多可以发挥实际作用的技能
+                            \n- 优化加成领悟系统
                             \n- 优化数值系统，避免数值过大时的平衡问题
                             \n- 更改部分UI模块，增加夏日限定皮肤
-                            \n- 五行符系统优化，升级上限开放至100级且提升仙葫概率
-                            \n- 重构大量战斗系统代码，战斗系统更加稳定
                             \n- 优化部分显示效果；
                             \n如果大侠未接触过《天书奇谈》的宠物养成系统，您可能需要花费几分钟时间来阅读这些引导。
                             \n以下引导已经过时，请酌情参考。新版引导正在完善中。
@@ -6457,7 +6455,7 @@ function showPetShop() {
 
     const ownedPets = Array.from(document.getElementById('pet-select').options).map(option => option.value);
 
-    const excludedPets = ["金珉奎", "Guolin·Li", "かすがのそら"]; // 定义不可购买的宠物名称列表
+    const excludedPets = ["金珉奎", "Guolin·Li", "かすがのそら", "结城夏奈"]; // 定义不可购买的宠物名称列表
 
     Object.keys(pets).forEach(key => {
         const pet = pets[key];
@@ -8026,11 +8024,11 @@ function updateEnemyAttributes() {
     const maxValues = {
         health: 300000000,
         mana: 150000000,
-        physicalAttack: 680000,
-        physicalDefense: 350000,
-        magicAttack: 650000,
-        magicDefense: 350000,
-        speed: 108020,
+        physicalAttack: 340000,
+        physicalDefense: 230000,
+        magicAttack: 270000,
+        magicDefense: 230000,
+        speed: 64000,
         cultivation: 520000
     };
 
@@ -8395,10 +8393,12 @@ function calculateAndDisplayDodgeRate() {
     let enemyPhysicalDodgeElement = document.getElementById('enemy-physical-dodge-rate');
     let enemyMagicDodgeElement = document.getElementById('enemy-magic-dodge-rate');
 
+    let playerSkillEnhancementRate = 0;
+    if (battleState.player.hidden) playerSkillEnhancementRate = 0.2;
     // 计算速度差异导致的物理闪避率
     speedDifference = battleAttributes.speed - battleState.enemy.speed;
     if (speedDifference > 0) {
-        playerPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        playerPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 2500) * 0.01 + playerSkillEnhancementRate, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         enemyPhysicalDodgeElement.innerText = '0%';
     } else {
         enemyPhysicalDodgeElement.innerText = (Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
@@ -8408,7 +8408,7 @@ function calculateAndDisplayDodgeRate() {
     // 计算修为差异导致的魔法闪避率
     cultivationDifference = playerCultivation - enemyPetCultivation;
     if (cultivationDifference > 0) {
-        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
+        playerMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 35000) * 0.01 + playerSkillEnhancementRate, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
         enemyMagicDodgeElement.innerText = '0%';
     } else {
         enemyMagicDodgeElement.innerText = (Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8) * 100).toFixed(2) + '%'; // 确保概率不超过80%
@@ -8420,15 +8420,14 @@ function handleDodge(target) {
     let speedDifference;
     let dodgeChance = 0; // 默认闪避概率为 0
     let dodgeElement; // 对应的图片元素：玩家图片或敌人图片
+    let playerSkillEnhancementRate = 0;
+    if (battleState.player.hidden) playerSkillEnhancementRate = 0.2;
 
     if (target === 'player') {
         // 玩家闪避逻辑
         speedDifference = battleAttributes.speed - battleState.enemy.speed;
         if (speedDifference > 0) {
-            dodgeChance = Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8); // 确保概率不超过80%
-        }
-        if (battleState.player.hidden) {
-            dodgeChance = Math.min(0.8, dodgeChance + 0.2);
+            dodgeChance = Math.min((Math.abs(speedDifference) / 2500) * 0.01 + playerSkillEnhancementRate, 0.8); // 确保概率不超过80%
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家闪避概率为：${dodgeChance}`);
@@ -8476,12 +8475,14 @@ function handleMagicDodge(target) {
     let cultivationDifference;
     let dodgeChance = 0; // 默认闪避概率为 0
     let dodgeElement; // 对应的图片元素：玩家图片或敌人图片
+    let playerSkillEnhancementRate = 0;
+    if (battleState.player.hidden) playerSkillEnhancementRate = 0.2;
 
     if (target === 'player') {
         // 玩家魔法闪避逻辑
         cultivationDifference = playerCultivation - enemyPetCultivation;
         if (cultivationDifference > 0) {
-            dodgeChance = Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8); // 确保概率不超过80%
+            dodgeChance = Math.min((Math.abs(cultivationDifference) / 35000) * 0.01 + playerSkillEnhancementRate, 0.8); // 确保概率不超过80%
         }
         if (battleState.player.hidden) {
             dodgeChance = Math.min(0.8, dodgeChance + 0.2);
@@ -18872,9 +18873,9 @@ document.getElementById('gemSlots').addEventListener('click', function(event) {
        
 let currentSpecialization = null;
 let specializations = {
-    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
-    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
-    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+    慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+    神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+    坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
 };
 
 function resetSpecialization() {
@@ -18888,9 +18889,9 @@ function resetSpecialization() {
     function resetSpec() {
         if (currentSpecialization !== null && specializations) {
             specializations = {
-                慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
-                神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
-                坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.1, levelIncrement: 0.003, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
+                慧光辉耀: { level: 0, attribute: 'intelligence', baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94ce.png' },
+                神魔之力: { level: 0, attributes: ['strength', 'agility'], baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d9458.png' },
+                坚韧之心: { level: 0, attributes: ['endurance', 'faith'], baseMultiplier: 0.055, levelIncrement: 0.0035, url: 'https://pic.imgdb.cn/item/6688dc1ed9c307b7e99d94db.png' }
                 }
             currentSpecialization = null;
             transformPet();
@@ -19235,13 +19236,14 @@ function refreshSpecializationUI() {
 
         // 更新进度条
         const progressBar = document.querySelector(`#${key}-buttons`).previousElementSibling.firstChild;
-        const progressPercentage = (spec.level / 300) * 100; // 300为假定的最大等级
+        const progressPercentage = (spec.level / 1000) * 100; // 1000为假定的最大等级
         progressBar.style.width = `${progressPercentage}%`;
 
         const buttons = document.querySelectorAll(`#${key}-buttons button`);
         buttons.forEach(button => {
             if (button.innerText === '开启' || button.innerText === '已开') {
                 button.innerText = currentSpecialization === key ? '已开' : '开启';
+                button.style.backgroundColor = currentSpecialization === key ? 'grey' : 'linear-gradient(to bottom, #E47F47, #CE6633, #963D1C)';
             }
         });
     });
@@ -19267,7 +19269,7 @@ function handleSpecializationChange(newSpec) {
 
 function upgradeSpecialization(key) {
     const spec = specializations[key];
-    if (spec.level >= 300) {
+    if (spec.level >= 1000) {
         showInfoBox("专精等级已达上限！");
         return;
     }
@@ -19317,7 +19319,7 @@ function upgradeToMax(key) {
     let projectedGold = goldAmount;
 
     // 计算玩家当前金币能升级到的最大等级以及所需总费用
-    while (tempLevel < 300 && projectedGold >= (tempLevel >= 100 ? (tempLevel - 99) * 5000 : tempLevel * 200 + 200)) {
+    while (tempLevel < 1000 && projectedGold >= (tempLevel >= 100 ? (tempLevel - 99) * 5000 : tempLevel * 200 + 200)) {
         let upgradeCost = (tempLevel >= 100 ? (tempLevel - 99) * 5000 : tempLevel * 200 + 200);
         totalCost += upgradeCost;
         projectedGold -= upgradeCost;
@@ -19326,7 +19328,7 @@ function upgradeToMax(key) {
 
     // 提示玩家确认
     showInfoBox(`确定花费共计${convertPrice(totalCost)}金子将${key}升级到Lv${tempLevel}吗？`, () => {
-        while (spec.level < 300 && goldAmount >= (spec.level >= 100 ? (spec.level - 99) * 5000 : spec.level * 200 + 200)) {
+        while (spec.level < 1000 && goldAmount >= (spec.level >= 100 ? (spec.level - 99) * 5000 : spec.level * 200 + 200)) {
             upgradeSpecialization(key);
         }
         refreshSpecializationUI();
@@ -21775,7 +21777,7 @@ function resetPet() {
     reenableAscension = false; // 第二个飞升之术关闭
     remainingPoints = 0;
     removeArmsAttributes();
-    if (!onBattleState) {
+    if (!onBattleState && enemyInitialState !== null) {
         restoreEnemyState();
     }
     secondAscensionSkill = {
@@ -22465,13 +22467,14 @@ function applySpecialSkillEffects(skill, value = null) {
         },
         "幻影迷踪": () => {
             const hiddenChance = skillDetail.skillLevel * 0.02;
+            const originalSpeed = battleAttributes.speed;
             
             if (Math.random() < hiddenChance && !battleState.player.hidden) {
                 battleState.player.hidden = true;//新状态需要添加--隐身
                 battleAttributes.speed += battleAttributes.speed * hiddenChance;
                 setTimeout(() => {
                     battleState.player.hidden = false;
-                    battleAttributes.speed = battleAttributes.speed / hiddenChance;
+                    battleAttributes.speed = originalSpeed;
                 }, 5000);
             }
         },
@@ -22981,7 +22984,6 @@ function upgradeWisdomTo() {
         goldAmount += 999999;
         addItemToJinnang('luckyAmulet',1);
         addItemToJinnang('resetJinnang',1);
-        addItemToJinnang('jiechengxianai',1);
         addItemToJinnang('earthlyEnergy', 9999);
         addItemToJinnang('advancedSkillBook', 1000);
         generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1000, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
@@ -23600,9 +23602,33 @@ function checkSpecialRole() {
         'liguo': 'https://pic.imgdb.cn/item/66e8589dd9c307b7e9c3b0b4.jpg'
     };
 
+    // 移除现有的遮罩层（如果存在）
+    const existingOverlay = document.getElementById('special-role-overlay');
+    if (existingOverlay) {
+        document.body.removeChild(existingOverlay);
+    }
+
     if (designatedImg.hasOwnProperty(currentPetKey)) {
+        // 设置背景图片
         document.body.style.background = `url('${designatedImg[currentPetKey]}') no-repeat center center fixed`;
         document.body.style.backgroundSize = 'cover';
+
+        // 创建新的遮罩层
+        const imageOverlay = document.createElement('div');
+        imageOverlay.id = 'special-role-overlay';
+        imageOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 允许点击穿透 */
+            opacity: 0.5;
+            z-index: -1000;
+            background-color: rgb(255 255 255 / 50%);
+        `;
+
+        document.body.appendChild(imageOverlay);
         return true;
     }
     return false;

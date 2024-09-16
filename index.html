@@ -11360,7 +11360,7 @@ function applyEnemyMagicEffects(damage) {
 function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
     if (enemyHealthPercentage < 0.05 && Math.random() < 0.5 && drugInventory['延寿露'] && drugInventory['延寿露'].quantity > 0) {
         if (Math.random() < 0.8) {
-            const healthRecovered = Math.floor(enemyMaxHealth * 0.2);
+            const healthRecovered = Math.min(100000000, Math.floor(enemyMaxHealth * 0.2));
             battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
             drugInventory['延寿露'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
@@ -11373,7 +11373,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
         return true;
     } else if (enemyManaPercentage < 0.05 && Math.random() < 0.5 && drugInventory['天山雪莲'] && drugInventory['天山雪莲'].quantity > 0) {
         if (Math.random() < 0.8) {
-            const manaRecovered = Math.floor(enemyMaxMana * 0.2);
+            const manaRecovered = Math.min(50000000, Math.floor(enemyMaxMana * 0.2));
             battleState.enemy.mana = Math.min(enemyMaxMana, battleState.enemy.mana + manaRecovered);
             drugInventory['天山雪莲'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
@@ -16137,8 +16137,8 @@ let jinnangItems = [
     { name: 'practiceEnemyPlus', displayName: '高级树桩封印卡', url: 'https://pic.imgdb.cn/item/66cc9408d9c307b7e9cb7162.png', price: 0, quantity: 0, description: '使用可召唤出高级树桩测试战力，会复活，打到爽' },
     { name: 'battleWithAncientEvil', displayName: '战神魔魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的太古魔魂，战胜后可获得不菲的奖励' },
     { name: 'battleWithExpEnemy', displayName: '永夜大帝封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的永夜大帝，战胜后可获得不菲的经验值' },
-    { name: 'stoneDragon', displayName: '岩龙封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的岩龙，战胜后可获得一个富贵宝石袋' },
-    { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得珍贵的天地灵气' },
+    { name: 'stoneDragon', displayName: '岩龙封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的岩龙，战胜后可获得一个洪荒至尊仙葫' },
+    { name: 'qiongQi', displayName: '穷奇封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出强大的穷奇，战胜后可获得一个富贵宝石袋' },
     { name: 'noWorkBoss', displayName: '無班之魂封印', url: 'https://pic.imgdb.cn/item/66cc940ad9c307b7e9cb72e8.png', price: 20, quantity: 0, description: '使用可召唤出不想上班的無班之魂，战胜后可获得培养更强壮的牛马的秘诀' },
     { name: 'universalCrystal', displayName: '宇宙之晶', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb752e.png', price: 1000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在24级~27级时才能使用）' },
     { name: 'universalKernel', displayName: '宇宙精华', url: 'https://pic.imgdb.cn/item/66cc940cd9c307b7e9cb74d1.png', price: 2000, quantity: 0, description: '凝聚宇宙间万物生长之力的晶石，集齐一定数量后有概率提升1级宠物的技能等级（技能等级在28级~29级时才能使用）' },

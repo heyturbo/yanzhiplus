@@ -3418,6 +3418,36 @@
                     mutated: false
                 },
             },
+            jiecheng: {
+                name: '结城夏奈',
+                rank: 'SSR',
+                image: 'https://pic.imgdb.cn/item/66e83fc7d9c307b7e9977eda.png',
+                skills: [
+                    { name: '咒炎爆破', rarity: 'SSS', type: 'MAE', multiplier: 5, description: '結城夏柰凝聚咒术之力，释放出强烈的火焰冲击，对范围内的敌人造成高额魔法伤害。' },
+                    { name: '冰封禁锢', rarity: 'SS', type: 'TC', multiplier: 2, description: '以咒术唤出寒冰之力，将敌人禁锢在冰块之中，使其短时间内无法行动。' },
+                    { name: '魔音扰神', rarity: 'S', type: 'MAE', multiplier: 2, description: '弹奏古琴，发出扰人心神的魔音，使敌人陷入混乱，攻击方向出现错乱' },
+                    { name: '灵力护盾', rarity: 'A', type: 'PD', multiplier: 1.5, description: '結城夏柰为自己和队友施加一层灵力护盾，吸收一定量的伤害。' },
+                    { name: '咒术弱化', rarity: 'A', type: 'MAE', multiplier: 1.8, description: '对敌人施加咒术，降低其攻击力和防御力。' },
+                    { name: '琴音治愈', rarity: 'B', type: 'PH', multiplier: 1.35, description: '弹奏舒缓的琴音，为自己和队友恢复一定量的生命值。' },
+                    { name: '灵魂冲击', rarity: 'S', type: 'MAE', multiplier: 2, description: '释放强大的灵魂之力，对敌人的灵魂造成重创，使其陷入虚弱状态。' },
+                    { name: '幻影迷踪', rarity: 'SS', type: 'PHE', multiplier: 1.5, description: '結城夏柰制造出多个幻影，自身进入隐身状态并提升移动速度。' },
+                    { name: '诅咒降临', rarity: 'A', type: 'PPE', multiplier: 1.5, description: '降下诅咒，使敌人的技能冷却时间延长。' },
+                    { name: '魅心咒缚', rarity: 'SS', type: 'TC', multiplier: 1, description: '結城夏柰施展极致魅惑之术，以强大的咒力牵引敌人的心智。被魅惑的敌人会在一段时间内无法攻击' },
+                    { name: '智慧守护', rarity: 'B', type: 'SH', multiplier: 1, description: '学会智慧守护的宠物可用法力抵消一定比例的伤害' },
+                    { name: '永远挚爱麟', rarity: 'B', type: 'HL', multiplier: 0.03, description: '被动技能，在挚爱的隐隐关注下，每回合恢复一定的法力值。' },
+                    { name: '姐就是女王', rarity: 'B', type: 'NE', multiplier: 0, description: '被动技能，生命值大幅提升' }
+                ],
+                qualities: {
+                    tier: '普通',
+                    growthRate: 100,
+                    endurance: { current: 5400, min: 5400, max: 9200 },
+                    strength: { current: 3200, min: 3200, max: 5400 },
+                    faith: { current: 1150, min: 1150, max: 2250 },
+                    agility: { current: 1100, min: 1100, max: 2200 },
+                    intelligence: { current: 4200, min: 4200, max: 7800 },
+                    mutated: false
+                },
+            },
             qiongmei: {
                 name: 'かすがのそら',
                 rank: 'SSR',
@@ -4232,6 +4262,11 @@
                 "1️⃣————该宠物无传记",
                 "2️⃣————说了没有传记",
                 "3️⃣————真的没有传记"
+            ],
+            jiecheng: [
+                "1️⃣————等待主人公编撰",
+                "2️⃣————等待主人公编撰",
+                "3️⃣————等待主人公编撰"
             ],
             qiongmei: [
                 "1️⃣————从我记事起，世界就只有我和哥哥两个人。在那个偌大却空旷的家里，哥哥就是我的全世界。他是我唯一的亲人，我的保护者，我的玩伴，我的老师。我们形影不离，共同度过了无数个日日夜夜。我还记得，每个清晨，哥哥都会轻轻地叫醒我，为我准备早餐。他的手艺并不精湛，但那略显笨拙的爱意，总能让我感到温暖。放学后，他总是第一个出现在校门口，牵着我的手一起回家。那时的我，单纯地以为这样的日子会一直持续下去。然而，随着年龄的增长，我渐渐意识到，我对哥哥的感情似乎与普通的兄妹之情有些不同。每当他微笑着看向我时，我的心跳就会不由自主地加速。我开始幻想着能和哥哥永远在一起，不被任何人打扰。这种感情让我既欣喜又恐惧。我知道这是不被世俗接受的，但我无法控制自己的心。",
@@ -5373,6 +5408,11 @@ function validateUnlockCode() {
     if (code === 'boy') {
         alreadyUnlocked = true;
         document.getElementById('unlockOverlay').style.display = 'none';
+    } else if (code === 'boy'){
+        alreadyUnlocked = true;
+        document.getElementById('unlockOverlay').style.display = 'none';
+        addItemToJinnang('jiechengxianai', 1);
+        showMerchant('好像有女明星降临此地了');
     } else {
         document.getElementById('errorMessage').style.display = 'block';
     }
@@ -5687,7 +5727,7 @@ function petCollection() {
     collectionContent.style.margin = '10px 10px 20px';
 
     Object.keys(pets).forEach(petKey => {
-        if (petKey !== 'jinmin' && petKey !== "liguo") {
+        if (petKey !== 'jinmin' && petKey !== "liguo" && petKey !== "jiecheng") {
             const pet = pets[petKey];
             const petDiv = document.createElement('div');
             petDiv.className = 'pet-item';
@@ -6286,7 +6326,7 @@ function handleSummonPet() {
             summonedRank = 'R';
         }
 
-        const eligiblePets = Object.keys(pets).filter(key => pets[key].rank === summonedRank && pets[key] !== 'liguo' && pets[key] !== 'jinmin' && pets[key] !== 'qiongmei');
+        const eligiblePets = Object.keys(pets).filter(key => pets[key].rank === summonedRank && pets[key] !== 'liguo' && pets[key] !== 'jinmin' && pets[key] !== 'qiongmei' && pets[key] !== 'jiecheng');
         const randomPetKey = eligiblePets[Math.floor(Math.random() * eligiblePets.length)];
         summonedPet = pets[randomPetKey];
 
@@ -7249,8 +7289,13 @@ function calculateSkillAttributes() {
                     },
                     "天王护卫": {
                         physicalDefense: 500,
-                        magicDefense: 500
+                        magicDefense: 500,
+                        maxLevel: 6
                     },
+                    "姐就是女王" : {
+                        health: 10000,
+                        maxLevel: 6
+                    }
                     // 未来拓展更多...
                 };               
                 
@@ -7545,7 +7590,7 @@ const enemies = {
         },
         rewardMessage: '1个珍贵的洪荒至尊仙葫。在这次艰难的对抗中，你的宠物与你并肩作战，好感大增，亲密度增加了600！',
         specialty: 'stoneDragon' // 特殊能力标识符
-    },
+    }
 };
 // 定义不同敌人的独特战斗能力
 const specificAttackByEnemy = {
@@ -7706,7 +7751,7 @@ function summonEnemyByType(enemyType, manuallySummon = true) {
                 setBackgroundImage(enemy.backgroundImage);
                 document.getElementById('enemy-level').innerText = enemy.level;
                 updateUI();
-                storeEnemyInitialState();
+                storeSummonEnemyInitialState();
 
                 // 如果敌人类型为 'instant'，立即执行一次特殊攻击
                 const enemyAttack = specificAttackByEnemy[enemy.specialty];
@@ -8093,12 +8138,30 @@ function restoreEnemyState() {
     }
 }
 
+function storeSummonEnemyInitialState() {
+    if (summonEnemy) summonEnemyInitialState = JSON.parse(JSON.stringify(battleState.enemy));
+}
+
+function restoreSummonEnemyState() {
+    if (summonEnemyInitialState) {
+        enemyPet = JSON.parse(JSON.stringify(enemyInitialState));
+        enemyMaxHealth = enemyPet.health;
+        enemyMaxMana = enemyPet.mana;
+        enemyPetCultivation = enemyPet.cultivation;
+        battleState.enemy = { ...enemyPet };
+        clearPlayerEffect();
+        enemyLevel = battleRounds;
+        document.getElementById('enemy-level').innerText = enemyLevel;
+    }
+}//暂不启用
+
 function getEnemyStatus() {
     let status = [];
     if (!playerTurn) status.push("⚔️");
     if (battleState.enemy.rampaged) status.push("狂暴");
     if (enemyRivival) status.push("复活中");
     if (battleState.enemy.armorBreak) status.push("破甲");
+    if (battleState.enemy.weaken) status.push("虚弱");
     if (battleState.enemy.wounded) status.push("重伤");
     if (battleState.enemy.bleeding) status.push("流血");
     if (battleState.enemy.corrode) status.push("腐蚀");
@@ -8130,6 +8193,7 @@ function getPlayerStatus() {
     if (battleState.player.defensing) status.push("蓄力中");
     if (battleState.player.shocked) status.push("触电");
     if (battleState.player.shielded) status.push("护盾");
+    if (battleState.player.hidden) status.push("隐身");
     if (battleState.player.reflecting) status.push("反弹伤害");
     if (battleState.player.healing) status.push("持续回血");
     if (battleState.player.beiming) status.push("北冥");
@@ -8363,6 +8427,9 @@ function handleDodge(target) {
         if (speedDifference > 0) {
             dodgeChance = Math.min((Math.abs(speedDifference) / 2500) * 0.01, 0.8); // 确保概率不超过80%
         }
+        if (battleState.player.hidden) {
+            dodgeChance = Math.min(0.8, dodgeChance + 0.2);
+        }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家闪避概率为：${dodgeChance}`);
     } else if (target === 'enemy') {
@@ -8415,6 +8482,9 @@ function handleMagicDodge(target) {
         cultivationDifference = playerCultivation - enemyPetCultivation;
         if (cultivationDifference > 0) {
             dodgeChance = Math.min((Math.abs(cultivationDifference) / 35000) * 0.01, 0.8); // 确保概率不超过80%
+        }
+        if (battleState.player.hidden) {
+            dodgeChance = Math.min(0.8, dodgeChance + 0.2);
         }
         dodgeElement = document.getElementById('your-pet-image');
         console.log(`玩家魔法闪避概率为：${dodgeChance}`);
@@ -10251,7 +10321,7 @@ function handleDazed() {
         if (Math.random() < 0.5) {
             const selfDamage = battleState.enemy.physicalAttack;
             battleState.enemy.health = Math.max(0, battleState.enemy.health - selfDamage);
-            logBattleEvent(`混乱状态下，邪佞攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
+            logBattleEvent(`混乱状态下，敌人攻击了自己，造成了 ${selfDamage} 点伤害。`, 'white');
             updateDamageValue(selfDamage, false, 'damage');
             playerTurn = true;
             return true;
@@ -16185,6 +16255,9 @@ let jinnangItems = [
     { name: 'merchantPointsCard', displayName: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', price: 1000, quantity: 5, description: '打开后可以获得2000点经商积分。经商积分用于在商店-倒买倒卖购买经商法宝，增加你的资产运作能力' },
     { name: 'wealthOfNations', displayName: '国富论', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e8c.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）亚当斯密作为经济学大师，认为管理者应当一定程度干涉市场，本年度市场每周商品数量下限将提升1' },
     { name: 'revokeSand', displayName: '唤神砂', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e59.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）在精力不支时，仍然能够支持你进行一次买卖行为，生效后自动失效' },
+    { name: 'qianKunBag', displayName: '乾坤袋', url: 'https://pic.imgdb.cn/item/66e82554d9c307b7e96cab02.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）即使市面并没有仓库内的货物，仍能够以进货价出售一次，生效后自动失效' },
+    { name: 'doubleLuck', displayName: '双喜临门', url: 'https://pic.imgdb.cn/item/66e8256dd9c307b7e96cc570.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）经商结束时，积分结算翻倍' },
+    { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -16568,6 +16641,10 @@ const itemEffects = {
         setTimeout(handleSummonPet, 0);
     },
     liguolin: () => useLiguolin(),
+    jiechengxianai: () => {
+        addPetToSelect('jiecheng', '结城夏奈');
+        addItemToJinnang('liguolin', 1);
+    },
     mutationScroll: () => {
         useMutationScroll();
         addItemToJinnang('mutationScroll',1);
@@ -19978,6 +20055,8 @@ function updateGadgetStorePanel() {
         {name: '特许招商令', price: 3000},
         {name: '国富论', price: 24000},
         {name: '唤神砂', price: 2000},
+        {name: '乾坤袋', price: 2500},
+        {name: '双喜临门', price: 5000},
     ];
 
     gadgets.forEach(gadget => {
@@ -20246,8 +20325,13 @@ function refreshSaleWeek() {
     } else if (currentWeek === maxWeek) {        
         const goldGot = sellAssetsAndExchangeCash();
         const initialCost = scalpingState.investmentCount * 50000;
-        const scoreToAdd = Math.min(10000, Math.floor(goldGot / 10000));
         const netAsset = calculateNetAsset();
+        
+        const doubleLuck = scalpingState.gadgets.includes('双喜临门');
+        let scoreRatio = 1;
+        if (doubleLuck) scoreRatio = 2;
+        
+        const scoreToAdd = Math.min(20000, Math.floor(goldGot / 10000) * scoreRatio);
 
         if (highestAsset < netAsset) {
             highestAsset = netAsset;
@@ -20445,7 +20529,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
 
         const quantityLabel = document.createElement('div');
         quantityLabel.id = `${actionType}-quantity`;
-        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: 0`;
+        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: 0, 预计金额: 0`;
         sliderContainer.appendChild(quantityLabel);
 
         const itemDescription = document.createElement('div');
@@ -20481,18 +20565,19 @@ function handleItemTransaction(item, itemInfo, actionType) {
         const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
         console.log({itemInfo, marketItemPriceElement, itemName});
         if (!marketItemPriceElement) {
-            showMerchant('市场目前没有该商品的销售渠道，无法出售');
-            return;
+            price = itemInfo.averagePrice;
+            maxQuantity = itemInfo.quantity; // 最大可出售数量
+        } else {
+            price = parseInt(document.getElementById(`price-${item.name}`).innerText); // 获取市场价格
+            maxQuantity = itemInfo.quantity; // 最大可出售数量
         }
-        price = parseInt(document.getElementById(`price-${item.name}`).innerText); // 获取市场价格
-        maxQuantity = itemInfo.quantity; // 最大可出售数量
     }
 
     // 监听进度条变化
     slider.addEventListener('input', (event) => {
         const percentage = event.target.value;
         const quantity = Math.floor((percentage / 100) * maxQuantity);
-        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: ${quantity}`;
+        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'}数量: ${quantity}, 预计金额: ${price * quantity}`;
     });
 
     // 点击确认购买/出售
@@ -20590,14 +20675,17 @@ function handleItemSell(item, itemInfo) {
         return;
     }
 
+    const qianKunBagIndex = scalpingState.gadgets.indexOf('乾坤袋');
     // 检查市场中是否有该商品的销售渠道
-    if (!marketItemPriceElement) {
+    if (!marketItemPriceElement && qianKunBagIndex === -1) {
         showMerchant('市场目前没有该商品的销售渠道，无法出售');
         return;
+    } else if (!marketItemPriceElement && qianKunBagIndex !== -1) {
+        handleItemTransaction(item, itemInfo, 'sell');
+        scalpingState.gadgets.splice(qianKunBagIndex, 1);
+    } else {
+        handleItemTransaction(item, itemInfo, 'sell');
     }
-
-    // 正常处理物品出售
-    handleItemTransaction(item, itemInfo, 'sell');
 }
         
 document.getElementById('player-energy').addEventListener('click', () => {
@@ -20740,7 +20828,8 @@ function updateScalpingPanel() {
     usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量
     maxWarehouseCapacity.innerText = scalpingState.maxWarehouseCapacity;  // 更新最大仓库容量
     scalpingScoreElement.innerText = scalpingScore;
-
+    checkGagdetsState(); //更新法宝应用情况
+    
     if (scalpingState.playerEnergy <= 60) {
         relaxButton.style.display = 'flex';
         document.getElementById('player-energy').innerText = `${scalpingState.playerEnergy}💉`;
@@ -20756,6 +20845,49 @@ function updateScalpingPanel() {
     } else {
         gadgetButton.style.display = 'flex';
     }
+}
+
+function checkGagdetsState() {
+    const gadgetsElement = document.getElementById('applied-scalping-gadgets');
+
+    // 确保 gadgetsElement 存在
+    if (!gadgetsElement) {
+        console.error('gadgetsElement not found');
+        return;
+    }
+
+    // 获取 gadgetsElement 中的所有子元素 (包含 img 元素的 div)
+    const appliedGadgetsDivs = Array.from(gadgetsElement.children);
+
+    // 提取每个子元素的 img.alt 属性，并根据 alt 查找 jinnangItems 中对应的道具
+    const existingGadgets = appliedGadgetsDivs.map(div => {
+        const img = div.querySelector('img'); // 获取 div 中的 img 元素
+        if (img && img.alt) {
+            // 根据 img 的 alt 属性查找 jinnangItems 中对应的道具
+            const jinnangItem = jinnangItems.find(item => item.name === img.alt);
+            if (jinnangItem) {
+                return jinnangItem.displayName; // 返回道具的中文映射 displayName
+            }
+        }
+        return null; // 如果没有找到匹配的，返回 null
+    }).filter(Boolean); // 过滤掉 null 值
+
+    // 保留 stillExistingGadgets 中存在于 scalpingState.gadgets 的道具
+    const stillExistingGadgets = scalpingState.gadgets.filter(gadget => {
+        return existingGadgets.includes(gadget);
+    });
+
+    // 遍历 appliedGadgetsDivs，移除那些不再存在于 stillExistingGadgets 中的元素
+    appliedGadgetsDivs.forEach(div => {
+        const img = div.querySelector('img'); // 获取 img 元素
+        if (img && img.alt) {
+            const jinnangItem = jinnangItems.find(item => item.name === img.alt);
+            if (jinnangItem && !stillExistingGadgets.includes(jinnangItem.displayName)) {
+                // 如果道具不在 stillExistingGadgets 中，移除该元素
+                gadgetsElement.removeChild(div);
+            }
+        }
+    });
 }
         
 // 页面加载完成后初始化商店
@@ -22230,6 +22362,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
             showBattleOverlay('https://pic.imgdb.cn/item/66e661fed9c307b7e92bf194.gif', 1500, 0.9, 1000);
+            updateUI();
             playerTurn = false;
             setTimeout(()=> {
                  battleState.enemy.wounded = false;
@@ -22252,6 +22385,7 @@ function applySpecialSkillEffects(skill, value = null) {
             damage = calculateDamage(damage, isCritical, playerCritDamage, true);
 
             battleState.enemy.health = Math.max(0, battleState.enemy.health - damage);
+            updateUI();
             logBattleEvent(`【玩家释放绝技】绝杀·舍生取义，燃烧自身生命之力，夺去敌人${damage}点生命值！`, 'red');
             if (isCritical) {
                 updateDamageValue(damage, false, 'damage', true);
@@ -22260,6 +22394,113 @@ function applySpecialSkillEffects(skill, value = null) {
             }
             showBattleOverlay('https://pic.imgdb.cn/item/66e6cd5dd9c307b7e9b95f1b.gif', 1500, 0.9, 1000);
             playerTurn = false;
+        },
+        "咒炎爆破": () => {
+            if (battleState.enemy.burnt) {
+                return;
+            }
+            
+            battleState.enemy.burnt = true;
+            setTimeout(() => {
+                battleState.enemy.burnt = false;
+            }, 5000);
+        },
+        "冰封禁锢": () => {
+            const speedDecreased = Math.floor(Math.max(0, battleAttributes.magicAttack * 0.01 * skillDetail.skillMultiplier));
+            const lifeSpanCost = Math.floor(10 * skillDetail.skillLevel);
+            let isCritical = checkCriticalHit(playerCritRate);
+            let damageValue = Math.floor(battleAttributes.magicAttack * skillDetail.skillMultiplier);
+
+            if (!checkLifeSpan(lifeSpanCost)) {
+                logBattleEvent(`本次释放绝技将消耗${lifeSpanCost}点，宠物当前寿命不足！`, 'red');
+                performAttack('physical');
+                return;
+            }
+            
+            damageValue = applyFireAmulet(damageValue);
+            damageValue = calculateDamage(damageValue, isCritical, playerCritDamage, true);
+            
+            battleState.enemy.health = Math.max(0, battleState.enemy.health - damageValue);
+            updateUI();
+            logBattleEvent(`【玩家释放绝技】绝杀·冰封禁锢，敌人陷入被冰冻导致晕眩！夺去敌人${damageValue}点生命值！`, 'red');
+            if (isCritical) {
+                updateDamageValue(damageValue, false, 'damage', true);
+            } else {
+                updateDamageValue(damageValue, false, 'damage');
+            }
+            if (!battleState.enemy.stunned) battleState.enemy.stunned = true;
+            playerTurn = false;
+
+            setTimeout(() => battleState.enemy.stunned = false, 5000);
+        },
+        "魔音扰神": () => {
+            if (!battleState.enemy.dazed) battleState.enemy.dazed = true;
+            setTimeout(() => battleState.enemy.dazed = false, 5000);
+        },
+        "咒术弱化": () => {
+            if (!battleState.enemy.weaken) battleState.enemy.weaken = true;
+            handleWeaken(skillDetail.skillMultiplier);
+            setTimeout(() => {
+                if (battleState.enemy.weaken) {
+                    battleState.enemy.weaken = false;
+                    battleState.enemy.physicalAttack = summonEnemy? summonEnemyInitialState.physicalAttack : enemyInitialState.physicalAttack;
+                    battleState.enemy.magicAttack = summonEnemy? summonEnemyInitialState.magicAttack : enemyInitialState.magicAttack;
+                    battleState.enemy.physicalDefense = summonEnemy? summonEnemyInitialState.physicalDefense : enemyInitialState.physicalDefense;
+                    battleState.enemy.magicDefense = summonEnemy? summonEnemyInitialState.magicDefense : enemyInitialState.magicDefense;
+                }
+            }, 5000); //新状态虚弱要加入
+        },
+        "灵魂冲击": () => {
+            if (!battleState.enemy.weaken) battleState.enemy.weaken = true;
+            handleWeaken(skillDetail.skillMultiplier);
+            setTimeout(() => {
+                if (battleState.enemy.weaken) {
+                    battleState.enemy.weaken = false;
+                    battleState.enemy.physicalAttack = summonEnemy? summonEnemyInitialState.physicalAttack : enemyInitialState.physicalAttack;
+                    battleState.enemy.magicAttack = summonEnemy? summonEnemyInitialState.magicAttack : enemyInitialState.magicAttack;
+                    battleState.enemy.physicalDefense = summonEnemy? summonEnemyInitialState.physicalDefense : enemyInitialState.physicalDefense;
+                    battleState.enemy.magicDefense = summonEnemy? summonEnemyInitialState.magicDefense : enemyInitialState.magicDefense;
+                }
+            }, 5000); //新状态虚弱要加入
+        },
+        "幻影迷踪": () => {
+            const hiddenChance = skillDetail.skillLevel * 0.02;
+            
+            if (Math.random() < hiddenChance && !battleState.player.hidden) {
+                battleState.player.hidden = true;//新状态需要添加--隐身
+                battleAttributes.speed += battleAttributes.speed * hiddenChance;
+                setTimeout(() => {
+                    battleState.player.hidden = false;
+                    battleAttributes.speed = battleAttributes.speed / hiddenChance;
+                }, 5000);
+            }
+        },
+        "诅咒降临": () => {
+            if (!battleState.enemy.slow) {
+                battleState.enemy.slow = true;
+                const cultivationBonus = getCultivationBonusDuration();
+                handleSlow(cultivationBonus);
+            }
+        },
+        "魅心咒缚": () => {
+            const silencedChance = skillDetail.skillLevel * 0.03;
+            const lifeSpanCost = Math.floor(10 * skillDetail.skillLevel);
+
+            if (!checkLifeSpan(lifeSpanCost)) {
+                logBattleEvent(`本次释放绝技将消耗${lifeSpanCost}点，宠物当前寿命不足！`, 'red');
+                performAttack('physical');
+                return;
+            }
+            
+            if (!battleState.enemy.silenced) {
+                if (Math.random() < silencedChance) {
+                    battleState.enemy.silenced = true;
+                    logBattleEvent('【玩家释放绝技】结城夏奈的魅惑术令怪物的心智陷入迷茫，令其打断了施法吟唱');
+                    setTimeout(() => battleState.enemy.silenced = false, 5000);
+                } else {
+                    logBattleEvent('【玩家释放绝技】结城夏奈的尝试通过魅惑术令怪物的心智陷入迷茫，但是怪物不吃这一套');
+                }
+            }
         }
     };
 
@@ -22272,6 +22513,32 @@ function applySpecialSkillEffects(skill, value = null) {
     }
 }
 
+function handleWeaken(multiplier) {
+    const attackDecreased = Math.floor(Math.max(0, battleAttributes.magicAttack * 0.01 * multiplier));
+    const defenseDecreased = Math.floor(Math.max(0, battleAttributes.magicAttack * 0.02 * multiplier));
+    
+    if (battleState.enemy.weaken) {
+        battleState.enemy.physicalAttack = Math.max(battleState.enemy.physicalAttack/4, battleState.enemy.physicalAttack - attackDecreased);
+        battleState.enemy.magicAttack = Math.max(battleState.enemy.magicAttack/4, battleState.enemy.magicAttack - attackDecreased);
+        battleState.enemy.physicalDefense = Math.max(battleState.enemy.physicalDefense/2, battleState.enemy.physicalDefense - defenseDecreased);
+        battleState.enemy.magicDefense = Math.max(battleState.enemy.magicDefense/2, battleState.enemy.magicDefense - defenseDecreased);
+    }
+}
+        
+function applyFireAmulet(damage) {
+    const activeEffects = applyWuxingEffects();
+    let fireEffect = 0;
+    if (activeEffects.fireAmulet && activeEffects.fireAmulet > 0) {
+        const damageBoostPercentage = [0, 0.02, 0.05, 0.07, 0.12, 0.20, 0.22, 0.25, 0.28, 0.4][activeEffects.fireAmulet];
+        fireEffect = Math.floor(damage * damageBoostPercentage);
+        damage = Math.floor(damage * (1 + damageBoostPercentage));
+
+        if (!isNaN(fireEffect) && fireEffect > 0) {
+            logBattleEvent(`🔴奥义·火之易伤！伤害增加了 ${fireEffect} 点。`, 'pink');
+        } 
+    }
+    return damage || 0;
+}
         
 let cultivationTime;
 let isOngoingCultivate = false;
@@ -22714,6 +22981,7 @@ function upgradeWisdomTo() {
         goldAmount += 999999;
         addItemToJinnang('luckyAmulet',1);
         addItemToJinnang('resetJinnang',1);
+        addItemToJinnang('jiechengxianai',1);
         addItemToJinnang('earthlyEnergy', 9999);
         addItemToJinnang('advancedSkillBook', 1000);
         generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1000, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
@@ -23310,6 +23578,7 @@ function useBingpoRebornPill() {
 }
 
 function updateMutatedImg() {
+    if (checkSpecialRole()) return;
     if (currentPet.qualities.mutated) {
         // 设置变异背景
         document.body.style.backgroundImage = "url('https://pic.imgdb.cn/item/66d2bf00d9c307b7e9f8b50a.gif')";
@@ -23325,6 +23594,19 @@ function updateMutatedImg() {
     }
 }
 
+function checkSpecialRole() {
+    const designatedImg = {
+        'jiecheng': 'https://pic.imgdb.cn/item/66e85ca3d9c307b7e9cdc5df.jpg',
+        'liguo': 'https://pic.imgdb.cn/item/66e8589dd9c307b7e9c3b0b4.jpg'
+    };
+
+    if (designatedImg.hasOwnProperty(currentPetKey)) {
+        document.body.style.background = `url('${designatedImg[currentPetKey]}') no-repeat center center fixed`;
+        document.body.style.backgroundSize = 'cover';
+        return true;
+    }
+    return false;
+}
         
 function resetPetQualitiesAndSkills() {
     // 重置宠物的品质和成长率

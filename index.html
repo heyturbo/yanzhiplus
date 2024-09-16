@@ -7496,11 +7496,8 @@ const enemies = {
         enemyCritRate: 0,
         enemyCritDamage: 0,
         backgroundImage: 'https://pic.imgdb.cn/item/66d071cbd9c307b7e9344927.png',
-        reward: () => {
-            generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
-            increaseCurrentPetIntimacy(600);
-        },
-        rewardMessage: '1个珍贵的洪荒至尊仙葫。在这次艰难的对抗中，你的宠物与你并肩作战，好感大增，亲密度增加了600！',
+        reward: () => addItemToJinnang('wealthyGemBag', 1),
+        rewardMessage: '一个富贵宝石袋',
         specialty: 'qiongQi' // 特殊能力标识符
     },
     baiYin: {
@@ -7541,8 +7538,11 @@ const enemies = {
         enemyCritRate: 0.65,
         enemyCritDamage: 3.8,
         backgroundImage: 'https://pic.imgdb.cn/item/66e6d194d9c307b7e9c131d3.png',
-        reward: () => addItemToJinnang('wealthyGemBag', 1),
-        rewardMessage: '一个富贵宝石袋',
+        reward: () => {
+            generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 1, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
+            increaseCurrentPetIntimacy(600);
+        },
+        rewardMessage: '1个珍贵的洪荒至尊仙葫。在这次艰难的对抗中，你的宠物与你并肩作战，好感大增，亲密度增加了600！',
         specialty: 'stoneDragon' // 特殊能力标识符
     },
 };
@@ -7852,25 +7852,22 @@ function openHongHuangTreasure() {
         { displayName: '灵兽悟道书', name: 'learningValueBook', quantity: 1, chance: 5 },
         { displayName: '灵兽清心丹', name: 'resetAdvancementPill', quantity: 1, chance: 5 },
         { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 5 },
-        { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 1, chance: 5 },
+        { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 2.5, chance: 5 },
         { displayName: '经商积分卡', name: 'merchantPointsCard', quantity: 1, chance: 5 },
-        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 5 },
+        { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 6.5 },
         { displayName: '锻造工具', name: 'forgeTool', quantity: 1, chance: 5 },
         { displayName: '修为灵丹（橙）*6', name: 'cultivationPill500', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
-        { displayName: '华贵的药材箱', name: 'fancyDrugBox', quantity: 1, chance: 4 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5 },
-        { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 1.8 },
+        { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 4.9 },
         { displayName: '神圣天赋赐福', name: 'talentedBless', quantity: 1, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4, specialAction: () => generateItemToJinnang('tinyGoldBlock', '小金锭', 'https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', 8000000, 1, '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价') },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
-        { displayName: '财运亨通', name: 'luckyAmulet', quantity: 1, chance: 0.1 },
-        { displayName: '魔魂封印卡*5', name: 'bossSealCard', quantity: 5, chance: 4 },
         { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 },
         { displayName: '白银VIP包裹', name: 'baiYinPKG', quantity: 1, chance: 5 },
-        { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 2 },
+        { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 4 },
         { displayName: '六级淡紫色灵石', name: 'purpleSixthGem', quantity: 1, chance: 3, specialAction: () => generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 500, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石') },
         { displayName: '六级粉红色灵石', name: 'pinkSixthGem', quantity: 1, chance: 3, specialAction: () => generateItemToJinnang('pinkSixthGem', '六级粉红色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png', 500, 1, '尚未开光的灵石，使用后可得到一颗随机的6级粉红色宝石') }
     ];
@@ -9505,7 +9502,6 @@ function performTrumpCard() {
     
 
     applySpecialSkillEffects(selectedSkill);
-    playerTurn = false;
 }
 
         
@@ -16179,13 +16175,15 @@ let jinnangItems = [
     { name: 'xingzhizhufu', displayName: '星之祝福天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：星之祝福' },
     { name: 'zhenbaoshenquan', displayName: '震爆神拳天赋书', url: 'https://pic.imgdb.cn/item/66e142acd9c307b7e9acc8b9.png', price: 10000, quantity: 0, description: '教会你的宠物释放高级天赋技能：震爆神拳' },
     { name: 'hongHuang', displayName: '洪荒至尊仙葫', url: 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price: 8000, quantity: 0, description: '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具' },
-    { name: 'rareEventBooster', displayName: '八方来财', url: 'https://pic.imgdb.cn/item/66e683eed9c307b7e9551be4.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，你在经商时遇到市场特殊事件的概率提升10%' },
+    { name: 'rareEventBooster', displayName: '八方来财', url: 'https://pic.imgdb.cn/item/66e683eed9c307b7e9551be4.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，你在经商时遇到市场特殊事件的概率提升50%' },
     { name: 'fitnessPowder', displayName: '强身散', url: 'https://pic.imgdb.cn/item/66e683eed9c307b7e9551bdf.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，每周精力下降的幅度减少30%' },
     { name: 'heroToken', displayName: '英雄令', url: 'https://pic.imgdb.cn/item/66e6841ad9c307b7e9554384.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）作为对英雄的尊敬，应用此法宝时，每周店租下降30%' },
     { name: 'extensionCharter', displayName: '续租契', url: 'https://pic.imgdb.cn/item/66e68b4ed9c307b7e962b841.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，经商时间可特许延长一个月（4周）' },
     { name: 'treasureWood', displayName: '珍宝案', url: 'https://pic.imgdb.cn/item/66e68b4dd9c307b7e962b7ca.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）此法宝应用后可降低20%未变现的资产缩水幅度' },
     { name: 'investmentCharter', displayName: '特许招商令', url: 'https://pic.imgdb.cn/item/66e68c8ed9c307b7e963c42d.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝后，可额外增加一次投资次数' },
     { name: 'merchantPointsCard', displayName: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', price: 1000, quantity: 5, description: '打开后可以获得2000点经商积分。经商积分用于在商店-倒买倒卖购买经商法宝，增加你的资产运作能力' },
+    { name: 'wealthOfNations', displayName: '国富论', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e8c.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）亚当斯密作为经济学大师，认为管理者应当一定程度干涉市场，本年度市场每周商品数量下限将提升1' },
+    { name: 'revokeSand', displayName: '唤神砂', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e59.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）在精力不支时，仍然能够支持你进行一次买卖行为，生效后自动失效' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -19790,13 +19788,15 @@ let highestAsset = 0;
 
 const scalpingItems = [
     {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
-    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2, basePrice: 2000, bonusPrice: 500000, fluctuation: 0.3, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2, basePrice: 2000, bonusPrice: 500000, fluctuation: 0.2, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
     {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
     {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', downRate: 1, basePrice: 600, bonusPrice: 1200, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
     {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 1000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
-    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.3, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
+    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.35, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
     {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 600, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
-    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 80000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'}
+    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 80000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'},
+    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', downRate: 3, basePrice: 4000, bonusPrice: 8000, fluctuation: 0.1, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
+    {name: '月饼', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4eae.png', downRate: 1, basePrice: 100, bonusPrice: 2000, fluctuation: 0.15, goodEvent: '中秋佳节，月饼也成了走亲访友的送礼佳品，所谓贵的就是好的，月饼也在节日氛围里身价倍涨', badEvent: '现代人崇尚低碳水、低糖的饮食作风，月饼大量临期，折价处理', description: '农历八月十五，是万家灯火共团圆的日子'}
 ];
         
 //倒买倒卖的逻辑
@@ -19820,8 +19820,19 @@ function openScalping(closeButton = false) {
 }
 
 function showInfoScalping() {
-    const comment = updateHighestAssetDisplay(highestAsset, false);
-    showMerchant(`\n欢迎来到自由经商的功能面板！当前你的最高记录是${highestAsset.toLocaleString('en-US')}元，商界人士对你的评价是：${comment} ！\n\n1. 你可以在此处刷新商品，在低位时购入，高位时果断抛出。 \n2. 每次经商时长为52周，每周会根据仓库容量收取一定租金。 \n3. 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格。 \n4. 你可以在任何时刻补充你的启动资金。 \n5. 使用法宝可以让你的经商之路更加顺利。 \n6. 经商时间结束时，将无法再刷新道具。 \n7. 如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚。 \n8. 在经商面板购买的商品都只供销售使用哦。`);
+    const comment = updateHighestAssetDisplay(highestAsset, false) || '目前你还没有收到任何评价！';
+    const message = `
+        欢迎来到自由经商的功能面板！当前你的最高记录是${highestAsset.toLocaleString('en-US')}元，商界人士对你的评价是：${comment}！
+        
+        1. 你可以在此处刷新商品，在低位时购入，高位时果断抛出。
+        2. 每次经商时长为52周，每周会根据仓库容量收取一定租金。
+        3. 每周市面上的道具和需求都会变化，还会有各种随机事件影响价格。
+        4. 你可以在任何时刻补充你的启动资金。
+        5. 使用法宝可以让你的经商之路更加顺利。
+        6. 经商时间结束时，将无法再刷新道具。
+        7. 如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚。
+        8. 在经商面板购买的商品都只供销售使用哦。`;
+    showMerchant(message);
 }
         
 function increaseInverstment() {
@@ -19958,12 +19969,14 @@ function updateGadgetStorePanel() {
     gadgetItemsArea.innerHTML = ''; // 清空现有内容
 
     const gadgetPrice = [
-        {name: '八方来财', price: 5000},
-        {name: '强身散', price: 5000},
-        {name: '英雄令', price: 8000},
+        {name: '八方来财', price: 8000},
+        {name: '强身散', price: 6000},
+        {name: '英雄令', price: 6000},
         {name: '续租契', price: 15000},
         {name: '珍宝案', price: 5000},
         {name: '特许招商令', price: 3000},
+        {name: '国富论', price: 24000},
+        {name: '唤神砂', price: 2000},
     ];
 
     gadgets.forEach(gadget => {
@@ -20037,10 +20050,14 @@ function getRandomScalpableItem() {
     const marketPanel = document.getElementById('scalping-item-info');
     marketPanel.innerHTML = ''; // 清空现有内容
     let specialEvents = false;
-    
+
     // 随机选择1到4个商品
     const itemsToDisplay = [];
-    const numberOfItems = Math.floor(Math.random() * 5) + 1;
+    const wealthOfNations = scalpingState.gadgets.find(gadget => gadget === '国富论');
+    let itemToAdd = 0;
+
+    if (wealthOfNations) numberRatio = 1;
+    const numberOfItems = Math.floor(Math.random() * 5) + 1 + itemToAdd;
     
     while (itemsToDisplay.length < numberOfItems) {
         const randomItem = scalpingItems[Math.floor(Math.random() * scalpingItems.length)];
@@ -20228,7 +20245,7 @@ function refreshSaleWeek() {
     } else if (currentWeek === maxWeek) {        
         const goldGot = sellAssetsAndExchangeCash();
         const initialCost = scalpingState.investmentCount * 50000 * 10;
-        const scoreToAdd = Math.min(10000, Math.floor(goldGot / 1000));
+        const scoreToAdd = Math.min(10000, Math.floor(goldGot / 10000));
         const netAsset = calculateNetAsset();
 
         if (highestAsset < netAsset) {
@@ -20525,30 +20542,60 @@ function handleItemTransaction(item, itemInfo, actionType) {
 
 // 触发购买
 function handleItemPurchase(item, price) {
-    if (scalpingState.playerEnergy <= 60) {
-        showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
-        return;
-    }
+    const revokeSandIndex = scalpingState.gadgets.indexOf('唤神砂');
+    
+    // 先检查仓库容量
     if (scalpingState.usedWarehouseCapacity === scalpingState.maxWarehouseCapacity) {
         showMerchant('你的仓库已满！');
         return;
     }
+
+    // 再检查玩家精力
+    if (scalpingState.playerEnergy <= 60) {
+        if (revokeSandIndex !== -1) {
+            handleItemTransaction(item, null, 'purchase');
+            // 使用 splice 来删除 "唤神砂"
+            scalpingState.gadgets.splice(revokeSandIndex, 1);
+        } else {
+            showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
+        }
+        return;
+    }
+    
+    // 若通过所有检查，处理购买
     handleItemTransaction(item, null, 'purchase');
 }
 
 // 触发出售
 function handleItemSell(item, itemInfo) {
+    // 查找是否有 "唤神砂"
+    const revokeSandIndex = scalpingState.gadgets.indexOf('唤神砂');
+    
+    // 获取玩家持有的物品和市场中该物品的相关信息
     const holdItem = scalpingState.holdItems[item.name];
     const itemName = scalpingItems.find(i => i.name === item.name);
     const marketItemPriceElement = document.getElementById(`price-${itemName.name}`);
+
+    // 检查玩家精力
     if (scalpingState.playerEnergy <= 60) {
-        showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
+        if (revokeSandIndex !== -1) {
+            // 拥有 "唤神砂"，允许继续出售并删除 "唤神砂"
+            handleItemTransaction(item, itemInfo, 'sell');
+            scalpingState.gadgets.splice(revokeSandIndex, 1);  // 删除唤神砂
+        } else {
+            // 没有 "唤神砂"，提示玩家休息
+            showMerchant('不要这么殚精竭虑，你需要好好休息一下！');
+        }
         return;
     }
+
+    // 检查市场中是否有该商品的销售渠道
     if (!marketItemPriceElement) {
         showMerchant('市场目前没有该商品的销售渠道，无法出售');
         return;
     }
+
+    // 正常处理物品出售
     handleItemTransaction(item, itemInfo, 'sell');
 }
         
@@ -20604,8 +20651,8 @@ function updateWarehouseItems() {
 
 // 仓库扩展按钮逻辑
 document.getElementById('enlarge-warehouse-button').addEventListener('click', () => {
-    const upgradeCost = 20000 * Math.max(1, (scalpingState.warehouseUpdateCount * 2));
-    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
+    const upgradeCost = 10000 * Math.max(1, (Math.pow(scalpingState.warehouseUpdateCount , 2)));
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 20));
     showInfoBox(`你可以花费${upgradeCost}元开启100个仓库`,
                () => {
                     if (scalpingState.currentCash >= upgradeCost) {
@@ -22134,14 +22181,12 @@ function applySpecialSkillEffects(skill, value = null) {
             
             if (battleAttributes.health <= healthCost || battleAttributes.mana <= manaCost) {
                 logBattleEvent('震爆神拳对自身伤害巨大，你目前的状况无法释放，已自动转换至普通攻击！', 'red');
-                playerTurn = true;
                 performAttack('physical');
                 return;
             }
 
             if (!checkLifeSpan(lifeSpanCost)) {
                 logBattleEvent(`本次释放绝技将消耗${lifeSpanCost}点，宠物当前寿命不足！`, 'red');
-                playerTurn = true;
                 performAttack('physical');
                 return;
             }
@@ -22184,6 +22229,7 @@ function applySpecialSkillEffects(skill, value = null) {
 
             logBattleEvent(`【玩家释放绝技】绝杀·震爆神拳，一道天雷轰鸣而过，对敌人降下巨量伤害，敌人失去${damage}点生命值！`, 'red');
             showBattleOverlay('https://pic.imgdb.cn/item/66e661fed9c307b7e92bf194.gif', 1500, 0.9, 1000);
+            playerTurn = false;
             setTimeout(()=> {
                  battleState.enemy.wounded = false;
                  damageRatio = 1;
@@ -22196,7 +22242,6 @@ function applySpecialSkillEffects(skill, value = null) {
             
             if (!checkLifeSpan(lifeSpanCost)) {
                 logBattleEvent(`本次释放绝技将消耗${lifeSpanCost}点，宠物当前寿命不足！`, 'red');
-                playerTurn = true;
                 performAttack('physical');
                 return;
             }
@@ -22213,6 +22258,7 @@ function applySpecialSkillEffects(skill, value = null) {
                 updateDamageValue(damage, false, 'damage');
             }
             showBattleOverlay('https://pic.imgdb.cn/item/66e6cd5dd9c307b7e9b95f1b.gif', 1500, 0.9, 1000);
+            playerTurn = false;
         }
     };
 

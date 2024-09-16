@@ -19836,8 +19836,8 @@ function showInfoScalping() {
 }
         
 function increaseInverstment() {
-    if (goldAmount >= 500000) {
-        showInfoBox(`\n在自由市场，10文金子=1元，每次最少投资50000元。\n\n当总资产到达20万或投资次数达到5次时，将不允许追加投资。\n\n你还可以投资${Math.max(0, 5-scalpingState.investmentCount)}次，准备好注资50000元了吗？`,
+    if (goldAmount >= 50000) {
+        showInfoBox(`\n在自由市场，1文金子=1元，每次最少投资50000元。\n\n当总资产到达20万或投资次数达到5次时，将不允许追加投资。\n\n你还可以投资${Math.max(0, 5-scalpingState.investmentCount)}次，准备好注资50000元了吗？`,
                    () => {
                        if (scalpingState.investmentCount >= 5) {
                            showMerchant('本年度投资次数已经耗尽！');
@@ -19848,7 +19848,7 @@ function increaseInverstment() {
                            showMerchant('当前总资产超过20万，不支持天使投资！');
                            return;
                        } else {
-                           goldAmount -= 500000;
+                           goldAmount -= 50000;
                            scalpingState.currentCash += 50000;
                            scalpingState.investmentCount ++;
                            updateScalpingPanel();
@@ -19863,7 +19863,7 @@ function increaseInverstment() {
                    'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png',
                    '88px * 88px');
     } else {
-        showMerchant('你的启动资金还不足500两金子，尚不能成为天使投资人');
+        showMerchant('你的启动资金还不足50两金子，尚不能成为天使投资人');
     }
 }
 
@@ -20056,8 +20056,8 @@ function getRandomScalpableItem() {
     const wealthOfNations = scalpingState.gadgets.find(gadget => gadget === '国富论');
     let itemToAdd = 0;
 
-    if (wealthOfNations) numberRatio = 1;
-    const numberOfItems = Math.floor(Math.random() * 5) + 1 + itemToAdd;
+    if (wealthOfNations) itemToAdd = 1;
+    const numberOfItems = Math.min(5, Math.floor(Math.random() * 5) + 1 + itemToAdd);
     
     while (itemsToDisplay.length < numberOfItems) {
         const randomItem = scalpingItems[Math.floor(Math.random() * scalpingItems.length)];
@@ -20244,7 +20244,7 @@ function refreshSaleWeek() {
         updateScalpingPanel();  // 更新面板
     } else if (currentWeek === maxWeek) {        
         const goldGot = sellAssetsAndExchangeCash();
-        const initialCost = scalpingState.investmentCount * 50000 * 10;
+        const initialCost = scalpingState.investmentCount * 50000;
         const scoreToAdd = Math.min(10000, Math.floor(goldGot / 10000));
         const netAsset = calculateNetAsset();
 
@@ -20387,7 +20387,7 @@ function sellAssetsAndExchangeCash() {
         propertyRatio = 1.2;
     }
     
-    let cashChangeNum = cash * 10;
+    let cashChangeNum = cash * 1;
     let assetValue = Math.floor((netAssets - cash) * (Math.max(5, Math.random() * 7)) * propertyRatio);
     let totalValue = Math.max(0, cashChangeNum + assetValue);
 

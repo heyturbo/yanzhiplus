@@ -1071,7 +1071,6 @@
             justify-content: space-between;
             width: 95%;
             padding: 5px;
-            margin-bottom: 5px;
             align-items: center;
         }
 
@@ -20210,7 +20209,8 @@ function handleStockTransaction(item, actionType) {
         const percentage = event.target.value;
         const quantity = Math.floor((percentage / 100) * maxQuantity);
         const totalPrice = Math.floor(price * quantity);
-        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'} ${quantity} 手, 预计金额: ${totalPrice}`;
+    
+        quantityLabel.innerText = `${isPurchase ? '购买' : '出售'} ${quantity} 手, 预计金额: ${totalPrice}元, ${isPurchase ? '' : `税费预估为${(totalPrice * 0.1).toFixed(2)}元`}`;
     });
 
     // 点击确认购买/出售
@@ -21207,16 +21207,18 @@ function calculateNetAsset() {
     
     // 计算持有的股票的资产
     const stocksOwned = stockList.filter(s => s.quantity > 0);
+    const kaimanzhizhao = scalpingState.gadgets.find(gadget => gadget === '开曼岛执照');
+    let tax = 0.9;
+    if (kaimanzhizhao) tax = 0.95;
     stocksOwned.forEach(stock => {
         // 确保 stockValue 是数值类型
-        const stockValue = stock.quantity * stock.basePrice;
+        const stockValue = stock.quantity * stock.basePrice * tax;
         netAsset += stockValue;  // 不需要 toFixed()，保持为数值类型
     });
     
     // 将现金加入到总资产
     netAsset += scalpingState.currentCash;
 
-    // 返回总资产，并保留两位小数
     return Math.floor(netAsset);
 }
 

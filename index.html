@@ -1958,7 +1958,10 @@
                 transform: translateY(-20px);
             }
         }
-
+        .frozen-effect {
+            background-color: linear-gradient(to bottom, #477AD6, #8FF1FD, #477AD6);
+            text-align: center;
+        }
         .player-damage-display {
             color: #f6ff00;
             position: absolute;
@@ -6944,11 +6947,6 @@ function applyDefeatPenalty() {
     resetBattleState(false);
     resetBuffState(false);
     extraShield = 0;
-    if (battleAttributes.speed >= battleState.enemy.speed) {
-        playerTurn = true;
-    } else {
-        playerTurn = false;
-    }
 } 
 
 function calculateExtraReward() {
@@ -11067,7 +11065,7 @@ function decideEnemyCanPerform() {
             }
             updateUI();  // 更新UI
         } else {
-            setTimeout(enemyAttack, 350);
+            setTimeout(enemyAttack(), 350);
         }
     }, 20);  // 每 20 毫秒执行一次
 }
@@ -11563,7 +11561,6 @@ function handleTorn() {
         }
         const tornDamage = Math.floor(battleState.enemy.physicalAttack * 0.1);
         battleAttributes.health = Math.max(0, battleAttributes.health - tornDamage);
-        logBattleEvent(`⚔️【敌人攻击】身中邪佞充满毒性的撕裂伤害，正在持续失血，受到 ${tornDamage} 点伤害。`, 'red');
         updateDamageValue(tornDamage,true,'extra-damage');
         updateUI();
         updatePlayerStatusDisplay();
@@ -13466,7 +13463,7 @@ function autoBattle() {
                     performAttack('physical');
                 }
             }
-        }, 350);
+        }, 300);
         
     } else {
         showInfoBox('聚灵丹数量不足，无法开启自动战斗！',null,null,'red');
@@ -13622,11 +13619,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('lostBook')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -13638,11 +13635,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('fragmentedMap')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -13654,11 +13651,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('nirvanaGem')" style="background: green; color: white; font-size: 16px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
+                    <button onclick="divineWeaponManager.description('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -18880,7 +18877,7 @@ let specializations = {
 
 function resetSpecialization() {
     showInfoBox('你将重置所有已开启的专精进度',
-               () => {resetSpec();},
+               () => resetSpec(),
                () => {
                    addItemToJinnang('ignoranceWater',1);
                    showInfoBox('操作已取消！',null,null,'red');
@@ -19134,7 +19131,7 @@ function transformPet() {
         `;
 
         const progressBar = document.createElement('div');
-        const progressPercentage = (spec.level / 300) * 100; // 300为假定的最大等级
+        const progressPercentage = (spec.level / 1000) * 100; // 1000为假定的最大等级
         progressBar.style = `
             height: 100%;
             background: linear-gradient(to bottom, #34773D, #34773D, #69E055, #69E055, #34773D, #34773D);
@@ -22425,6 +22422,7 @@ function applySpecialSkillEffects(skill, value = null) {
             battleState.enemy.health = Math.max(0, battleState.enemy.health - damageValue);
             updateUI();
             logBattleEvent(`【玩家释放绝技】绝杀·冰封禁锢，敌人陷入被冰冻导致晕眩！夺去敌人${damageValue}点生命值！`, 'red');
+            showBattleOverlay('https://pic.imgdb.cn/item/66e90000d9c307b7e99735a0.gif', 1500, 1, 1000);
             if (isCritical) {
                 updateDamageValue(damageValue, false, 'damage', true);
             } else {
@@ -22433,7 +22431,9 @@ function applySpecialSkillEffects(skill, value = null) {
             if (!battleState.enemy.stunned) battleState.enemy.stunned = true;
             playerTurn = false;
 
-            setTimeout(() => battleState.enemy.stunned = false, 5000);
+            setTimeout(() => {
+                battleState.enemy.stunned = false;
+            }, 5000);
         },
         "魔音扰神": () => {
             if (!battleState.enemy.dazed) battleState.enemy.dazed = true;
@@ -22445,6 +22445,7 @@ function applySpecialSkillEffects(skill, value = null) {
             setTimeout(() => {
                 if (battleState.enemy.weaken) {
                     battleState.enemy.weaken = false;
+                    showEffect('playerEffect','https://pic.imgdb.cn/item/66e9018ed9c307b7e998b887.gif');
                     battleState.enemy.physicalAttack = summonEnemy? summonEnemyInitialState.physicalAttack : enemyInitialState.physicalAttack;
                     battleState.enemy.magicAttack = summonEnemy? summonEnemyInitialState.magicAttack : enemyInitialState.magicAttack;
                     battleState.enemy.physicalDefense = summonEnemy? summonEnemyInitialState.physicalDefense : enemyInitialState.physicalDefense;
@@ -22458,6 +22459,7 @@ function applySpecialSkillEffects(skill, value = null) {
             setTimeout(() => {
                 if (battleState.enemy.weaken) {
                     battleState.enemy.weaken = false;
+                    showEffect('playerEffect','https://pic.imgdb.cn/item/66e9018ed9c307b7e998b887.gif');
                     battleState.enemy.physicalAttack = summonEnemy? summonEnemyInitialState.physicalAttack : enemyInitialState.physicalAttack;
                     battleState.enemy.magicAttack = summonEnemy? summonEnemyInitialState.magicAttack : enemyInitialState.magicAttack;
                     battleState.enemy.physicalDefense = summonEnemy? summonEnemyInitialState.physicalDefense : enemyInitialState.physicalDefense;
@@ -22471,6 +22473,7 @@ function applySpecialSkillEffects(skill, value = null) {
             
             if (Math.random() < hiddenChance && !battleState.player.hidden) {
                 battleState.player.hidden = true;//新状态需要添加--隐身
+                showEffect('enemyEffect','https://pic.imgdb.cn/item/66e90000d9c307b7e997361a.gif');
                 battleAttributes.speed += battleAttributes.speed * hiddenChance;
                 setTimeout(() => {
                     battleState.player.hidden = false;
@@ -22503,6 +22506,7 @@ function applySpecialSkillEffects(skill, value = null) {
                 } else {
                     logBattleEvent('【玩家释放绝技】结城夏奈的尝试通过魅惑术令怪物的心智陷入迷茫，但是怪物不吃这一套');
                 }
+                showBattleOverlay('https://pic.imgdb.cn/item/66e90098d9c307b7e997cb6b.gif', 1500, 1, 1000);
             }
         }
     };

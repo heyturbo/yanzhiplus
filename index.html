@@ -1044,6 +1044,8 @@
             justify-content: center;
             align-items: flex-start;
             gap: 10px;
+            max-height: 420px;
+            overflow-y: scroll;
         }
         .scalping-detail-list {
             width: 45%;
@@ -1071,6 +1073,7 @@
             justify-content: space-between;
             width: 95%;
             padding: 5px;
+            height: 40px;
             align-items: center;
         }
 
@@ -2984,8 +2987,9 @@
                 </div>
             </div>
             <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: space-between;flex-wrap: wrap;">
-                <div class="scalping-bottom-area" id="stock-area" style="background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;border-radius: 5px;color: white;width: 95%;padding: 5px;">
-                    <div style="display:flex;align-items: center;font-size: 14px;text-wrap: nowrap;overflow: hidden;width: 100%;justify-content: space-between;"><button id="open-stock-button" onclick="openStockPanel()">购买股票</button><div id="stock-info-display" style="width: 100%;display: flex;justify-content: center;">当前没有投资任何股票</div></div>
+                <div class="scalping-bottom-area" id="stock-area" style="border-radius: 5px;color: white;width: 95%;padding: 5px;">
+                    <div style="display: flex;align-items: center;flex-direction: row;"><button id="open-stock-button" onclick="openStockPanel()">购买股票</button></div>
+                    <div id="stock-info-display" style="display:flex;font-size: 14px;text-wrap: nowrap;overflow: hidden;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: white;width: 75%;align-items: center;flex-direction: row;padding: 5px;justify-content: center;">当前没有投资任何股票</div>
                     <div class= "stock-panel" id="stock-panel" style="display:none">
                         <!-- 动态生成股票信息 -->
                     </div>
@@ -20016,7 +20020,7 @@ function updateStockPanelDisplay() {
 
     const stockPanel = document.createElement('div');
     stockPanel.id = 'general-stock-panel';
-    stockPanel.style = 'display: flex;flex-flow: column wrap;width: 90%;padding: 10px;align-content: space-between;border: 2px solid #6f391c;gap: 5px;'; // 设置股票面板显示
+    stockPanel.style = 'display: flex;flex-flow: column wrap;width: 90%;padding: 10px;align-content: space-between;border: 2px solid #6f391c;gap: 5px;max-height:420px;overflow-y:scroll;'; // 设置股票面板显示
     stockPanel.innerHTML = ''; // 清空现有内容
 
     stockList.forEach(stock => {
@@ -20098,7 +20102,7 @@ function handleStockPurchase(stock) {
     }
     
     // 检查用户的现金是否足够
-    if (scalpingState.currentCash < stock.threshold) {
+    if (scalpingState.currentCash < stock.threshold && stock.quantity < 1) {
         showMerchant(`投资有风险，没有一定的本金抵御风险可不行！这支股票要求你的本金至少为${stock.threshold}元！`);
         return;
     }
@@ -20280,6 +20284,7 @@ function showInfoScalping() {
         4. 你可以在任何时刻补充你的启动资金。
         5. 使用法宝可以让你的经商之路更加顺利。
         6. 经商时间结束时，将无法再刷新道具。
+        7. 仓库的货品、未出售的股票在游戏结束时，会作为未变现资产产生折扣
         7. 如果不想玩了，可以点击提前退市计算收益，但会受到一定的违约金惩罚。
         8. 现金积累到一定程度，可以尝试投资股票。
         9. 在经商面板购买的商品都只供销售使用哦。`;
@@ -20629,131 +20634,113 @@ function getReputationEvent() {
     }
 }
 
-//修养两周具体实现
-document.getElementById('relax-byweek').addEventListener('click', ()=> {
-    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10));
-    const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
-    let refreshCostRatio = 1;
-    
-    if (heroToken) {
-        refreshCostRatio = 0.7;
+function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
+    const refreshButton = document.getElementById('enter-next-week');
+    const maxWeek = scalpingState.maxSellingWeek;
+
+    // 计算花费
+    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10 * cashCostRatio));
+    const energyCost = Math.floor((Math.random() * 3 + 1) * energyCostRatio);
+
+    if (scalpingState.currentSellingWeek === 0 && scalpingState.currentCash === 0) {
+        showMerchant(`开业第一天，没有一点启动资金可不行，目前最小的仓库每周租金${refreshCost}元，请确认你的账户资金充足`);
+        return;
     }
     
-    if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
-        scalpingState.currentSellingWeek += 2;
-        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * 2) * refreshCostRatio);
-        scalpingState.playerEnergy = 100;
+    // 检查资金是否足够
+    if (scalpingState.currentCash < refreshCost) {
+        showMerchant(`本周店租为${refreshCost}元，你的现金不足以支付！`);
+        return;
+    }
 
-        let stockOwned = stockList.filter(s => s.quantity > 0);  // 获取持有的股票
-        let canDealCountDown;
-        
-        if (stockOwned.length > 0) {  // 确认是否持有股票
-            let firstStock = stockOwned[0];  // 取第一个持有的股票
-            canDealCountDown = firstStock.dealWeek;
-            canDealCountDown -= 2;
-        
-            // 确保 dealWeek 不会小于 0
-            firstStock.dealWeek = Math.max(0, canDealCountDown);
+    // 扣除周数
+    if (scalpingState.currentSellingWeek + weekIncrement <= maxWeek) {
+        scalpingState.currentSellingWeek += weekIncrement;
+        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * weekIncrement));
+        scalpingState.playerEnergy = Math.max(0, scalpingState.playerEnergy - energyCost);
+
+        // 更新股票持有状态
+        let stockOwned = stockList.filter(s => s.quantity > 0);
+        if (stockOwned.length > 0) {
+            let firstStock = stockOwned[0];
+            firstStock.dealWeek = Math.max(0, firstStock.dealWeek - weekIncrement);
         }
-        
-        getRandomScalpableItem();
+
+        // 更新 UI 和事件
         updateScalpingPanel();
         updateStockPrice();
+        getRandomScalpableItem();
+
+        // 更新按钮文字
+        if (scalpingState.currentSellingWeek === maxWeek) {
+            refreshButton.innerText = '结算收益';
+        } else {
+            refreshButton.innerText = '刷新一周';
+        }
+
+        // 执行声望事件每10周
+        if (scalpingState.currentSellingWeek % 10 === 0) {
+            getReputationEvent();
+        }
+
+    } else {
+        showMerchant('已经到达最大周数，不能继续。');
+    }
+}
+
+function finalizeScalping() {
+    const goldGot = sellAssetsAndExchangeCash();
+    const initialCost = scalpingState.investmentCount * 50000;
+    const netAsset = calculateNetAsset();
+
+    const doubleLuck = scalpingState.gadgets.includes('双喜临门');
+    let scoreRatio = 1;
+    if (doubleLuck) scoreRatio = 2;
+
+    const scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot.totalValue / 10000) * scoreRatio);
+
+    if (highestAsset < netAsset) {
+        highestAsset = netAsset;
+        updateHighestAssetDisplay(highestAsset);
+    }
+
+    scalpingScore += scoreToAdd;
+    goldAmount += goldGot.totalValue;
+    updateGoldDisplay(goldAmount);
+    showMerchant(`你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，经过核算：\n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}。`);   
+    resetScalping();
+}
+
+// 调整“修养两周”的事件监听器
+document.getElementById('relax-byweek').addEventListener('click', () => {
+    const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
+    const refreshCostRatio = heroToken ? 0.7 : 1;
+    
+    if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
+        processSaleWeek(2, 1, refreshCostRatio);  // 休养两周
+        scalpingState.playerEnergy = 100;
         showMerchant('美美休息半个月，你的状态重回巅峰！');
+        updateScalpingPanel();
     } else {
         showMerchant('你在市场的租期马上就要到了，不能执行休息动作了哦');
     }
-})
-        
-function refreshSaleWeek() {
-    let currentWeek = scalpingState.currentSellingWeek;
-    let energy = scalpingState.playerEnergy;
-    let eneygyCostRatio = 1;
-    let refreshCostRatio = 1;
+});
 
+// 调整 refreshSaleWeek 函数
+function refreshSaleWeek() {
     const fitnessPowder = scalpingState.gadgets.find(gadget => gadget === '强身散');
     const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
-    
-    
-    if (fitnessPowder) {
-        eneygyCostRatio = 0.7;
-    } 
-    
-    if (heroToken) {
-        refreshCostRatio = 0.7;
-    }
-    
-    const maxWeek = scalpingState.maxSellingWeek;
-    const energyCost = Math.floor((Math.random() * 3 + 1) * eneygyCostRatio);
-    const refreshButton = document.getElementById('enter-next-week');
-    const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10 * refreshCostRatio));
+    const energyCostRatio = fitnessPowder ? 0.7 : 1;
+    const refreshCostRatio = heroToken ? 0.7 : 1;
 
-    if (calculateNetAsset() <= 0) {
-        showMerchant('进入市场买卖交易，钱是必须的，先投资才能刷新哦');
-        return;
-    }
-
-    if (scalpingState.currentCash < refreshCost) {
-        showMerchant(`本周店租为${refreshCost}元，你的现金不足以支付！请筹集足够资金后再续租进入下一周！`);
-        return;
-    }
-    
-    if (currentSlider) {
-        document.body.removeChild(currentSlider);
-        currentSlider = null;
-    }
-        
-    if (currentWeek < maxWeek) {  // 只允许当前周小于最大周数时继续
-        getRandomScalpableItem();  // 获取新的可交易商品
-        scalpingState.currentSellingWeek++;  // 直接修改全局状态中的当前周数
-        scalpingState.currentCash -= refreshCost;
-        energy = Math.max(0, energy - energyCost);
-        scalpingState.playerEnergy = energy;
-
-        let stockOwned = stockList.filter(s => s.quantity > 0);  // 获取持有的股票
-        let canDealCountDown;
-        
-        if (stockOwned.length > 0) {  // 确认是否持有股票
-            let firstStock = stockOwned[0];  // 取第一个持有的股票
-            canDealCountDown = firstStock.dealWeek;
-            canDealCountDown -= 1;
-        
-            // 确保 dealWeek 不会小于 0
-            firstStock.dealWeek = Math.max(0, canDealCountDown);
-        }
-        
-        if (scalpingState.currentSellingWeek === scalpingState.maxSellingWeek) {
-            refreshButton.innerText = '结算收益';
-        }
-
-        if (scalpingState.currentSellingWeek > 0 && scalpingState.currentSellingWeek % 10 === 0) {
-            getReputationEvent();
-        }
-        updateStockPrice();
-        updateScalpingPanel();  // 更新面板
-    } else if (currentWeek === maxWeek) {        
-        const goldGot = sellAssetsAndExchangeCash();
-        const initialCost = scalpingState.investmentCount * 50000;
-        const netAsset = calculateNetAsset();
-        
-        const doubleLuck = scalpingState.gadgets.includes('双喜临门');
-        let scoreRatio = 1;
-        if (doubleLuck) scoreRatio = 2;
-        
-        const scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot / 10000) * scoreRatio);
-
-        if (highestAsset < netAsset) {
-            highestAsset = netAsset;
-            updateHighestAssetDisplay(highestAsset);
-        }
-        
-        scalpingScore += scoreToAdd;
-        goldAmount += goldGot;
-        updateGoldDisplay(goldAmount);
-        showMerchant(`你经历${currentWeek}周的商场鏖战，创造了不俗的销售业绩：\n\n所有资产已兑换为${convertPrice(goldGot)}金子！\n\n净利润为${convertPrice(Math.max(0, goldGot - initialCost))}金！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}。`);   
-        resetScalping();
+    if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
+        processSaleWeek(1, energyCostRatio, refreshCostRatio);  // 常规更新一周
+    } else {
+        finalizeScalping();  // 达到最大周数时进行结算
     }
 }
+
+
 
 function updateHighestAssetDisplay(highestAsset, display = true) {
     const scalpingDisplayElement = document.getElementById('scalping-display');
@@ -20878,23 +20865,37 @@ function sellAssetsAndExchangeCash() {
     const treasureWood = scalpingState.gadgets.find(gadget => gadget === '珍宝案');
     
     let propertyRatio = 1;
-    
+
+    // 如果有"珍宝案"，提升资产价值
     if (treasureWood) {
         propertyRatio = 1.2;
     }
-    
-    let cashChangeNum = cash * 1;
-    let assetValue = Math.floor((netAssets - cash) * (Math.max(5, Math.random() * 7)) * propertyRatio);
+
+    // 现金部分
+    let cashChangeNum = cash;
+
+    // 计算原始未变现资产的总价值
+    let originalAssetValue = netAssets - cash;
+
+    // 计算资产波动系数，假设波动范围在 80% 到 120% 之间
+    let assetValue = Math.floor(originalAssetValue * (Math.min(1, Math.random() * 0.2 + 0.7) * propertyRatio));
+
+    // 计算缩水值
+    let shrinkValue = originalAssetValue - assetValue;
+    let assetShrinkValue = Math.max(0, shrinkValue); // 确保缩水值不为负数
+
+    // 总价值 = 现金 + 变动后资产的价值
     let totalValue = Math.max(0, cashChangeNum + assetValue);
 
-    return totalValue;
+    return { totalValue, assetShrinkValue }; // 返回总价值和缩水值
 }
         
 function quitScalping() {
     if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
         showInfoBox('提前退市可以立即结算你的总资产，但是会带来20%的折损且不会获得经商积分，是否继续？',
                    () => {
-                        const goldGot = Math.floor(sellAssetsAndExchangeCash() * 0.8);
+                        const cash = sellAssetsAndExchangeCash();
+                        const goldGot = Math.floor(cash.totalValue * 0.8);
                         goldAmount += goldGot;
                         updateGoldDisplay(goldAmount);
                         showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`);

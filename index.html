@@ -19908,6 +19908,12 @@ let isStock = false;
 function openStockPanel() {
     const middleWrap = document.getElementById('scalping-middle-wrap');
     const stockButton = document.getElementById('open-stock-button');
+
+    if (scalpingState.currentSellingWeek === 0) {
+        showMerchant('至少在市场积累一周的经商经验才能进入股市！');
+        return;
+    }
+    
     if (!isStock) {
         hideMiddleWrapElement();
         setTimeout(() => updateStockPanelDisplay(), 0); // 使用箭头函数，确保函数在setTimeout后执行

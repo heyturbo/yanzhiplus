@@ -19890,7 +19890,7 @@ const scalpingItems = [
     {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.35, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
     {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 600, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
     {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 10000, bonusPrice: 80000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'},
-    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', downRate: 3, basePrice: 4000, bonusPrice: 8000, fluctuation: 0.1, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
+    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', downRate: 3, basePrice: 4000, bonusPrice: 20000, fluctuation: 0.2, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
     {name: '月饼', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4eae.png', downRate: 1, basePrice: 100, bonusPrice: 2000, fluctuation: 0.15, goodEvent: '中秋佳节，月饼也成了走亲访友的送礼佳品，所谓贵的就是好的，月饼也在节日氛围里身价倍涨', badEvent: '现代人崇尚低碳水、低糖的饮食作风，月饼大量临期，折价处理', description: '农历八月十五，是万家灯火共团圆的日子'}
 ];
 
@@ -20005,6 +20005,8 @@ function updateStockPrice() {
 
         // 计算基础价格，波动与累积的影响
         let stockPrice = basePrice + (basePrice * fluctuation * ratio) + (fixedAccumulation * ratio);
+
+        if (Math.random() < 0.1 && !currentInfoBox) stockPrice = generateStockRandomEvent(stock);
         
         if (basePrice <= stockPrice) {
             stock.state = 'higher';
@@ -20102,6 +20104,88 @@ function updateStockPanelDisplay() {
     });
 }
 
+function generateStockRandomEvent(stock) {
+    const stockName = stock.name;
+    const stockOriginalPrice = stock.basePrice;
+    let stockPriceAfterEvent = stockOriginalPrice;
+
+    // 随机生成是好事件还是坏事件，50%几率
+    const isGoodEvent = Math.random() < 0.5;
+    let eventEffect = 0;
+    let detail = '';
+
+    const showDetail = () => {
+        showInfoBox(`【证券要闻】${detail}`, null, null, `${isGoodEvent ? 'red' : 'green'}`, stock.url, '88px * 88px');
+    };
+
+    if (isGoodEvent) {
+        // 好事件：根据 fluctuation 和 flow 调整价格
+        switch (stockName) {
+            case '北影月纺织公司':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.5 + 0.5) + stock.flow;
+                detail = `${stockName} 在政府环保政策的扶持下，推出了绿色纺织项目，得到了市场的广泛欢迎，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+            case '黑色水域水产':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.7 + 0.3) + stock.flow;
+                detail = `${stockName} 近期大闸蟹的市场需求大增，销量创下新高，公司的收益大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+            case '黄金港口外贸':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.0 + 0.5) + stock.flow;
+                detail = `${stockName} 获得大量的国际贸易订单，外贸业务激增，带来了可观的利润，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+            case '百鸟树林旅游会社':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.2 + 0.8) + stock.flow;
+                detail = `${stockName} 的旅游业务在假期高峰期中蓬勃发展，旅游区人满为患，收入大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+            case '皇城地产集团':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.5 + 1.0) + stock.flow;
+                detail = `${stockName} 在房地产政策宽松的背景下，投资热潮推动了地产股的强劲上涨，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+            case '海底掘金集团':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 2.0 + 1.5) + stock.flow;
+                detail = `${stockName} 的海底开采技术取得突破，开采效率大幅提高，利润翻倍，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                break;
+        }
+        stockPriceAfterEvent += eventEffect;
+    } else {
+        // 坏事件：根据 fluctuation 和 flow 调整价格
+        switch (stockName) {
+            case '北影月纺织公司':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.5 + 0.5) - stock.flow;
+                detail = `${stockName} 的野生森林资源遭到破坏，导致纺织原材料短缺，公司业绩下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+            case '黑色水域水产':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.7 + 0.3) - stock.flow;
+                detail = `${stockName} 的水域受到污染，导致水产减产，公司利润大幅减少，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+            case '黄金港口外贸':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.0 + 0.5) - stock.flow;
+                detail = `${stockName} 遭遇国际贸易摩擦，出口订单大幅减少，收入骤减，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+            case '百鸟树林旅游会社':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.2 + 0.8) - stock.flow;
+                detail = `${stockName} 的旅游区遭遇了天灾，游客量锐减，公司收入受到严重影响，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+            case '皇城地产集团':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.5 + 1.0) - stock.flow;
+                detail = `${stockName} 遭遇房地产市场泡沫破裂，投资者纷纷撤资，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+            case '海底掘金集团':
+                eventEffect = stock.fluctuation * stock.flow * (Math.random() * 2.0 + 1.5) - stock.flow;
+                detail = `${stockName} 的海底资源逐渐枯竭，导致公司的开采成本激增，利润急剧下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                break;
+        }
+        stockPriceAfterEvent = Math.max(0, stockPriceAfterEvent - eventEffect); // 确保股价不为负数
+    }
+
+    // 展示详细事件信息
+    showDetail();
+
+    return stockPriceAfterEvent; // 返回两位小数的股价
+}
+
+
+        
 function handleStockPurchase(stock) {
     const revokeSandIndex = scalpingState.gadgets.indexOf('唤神砂');
     // 再检查玩家精力
@@ -20768,7 +20852,7 @@ function generateRandomEvents() {
             unit: 1, 
             display: '新月村刘大爷想让你捐款50000，兴建一所村民小学，是否愿意？', 
             cost: 50000, 
-            bias: 0.3, 
+            bias: 0.5, 
             goodEvent: '村民小学成功兴建，你在新月村声名远播（声望+3000），受到村政府表彰，奖励2万', 
             goodReward: 20000, 
             energyReward: 0,
@@ -20776,22 +20860,24 @@ function generateRandomEvents() {
             badEvent: '你的善款被开发商挪用，豆腐渣工程一阵风就吹倒了，你不得不再追加1万帮助修缮', 
             badPenalty: 10000,
             energyPenalty: 0,
-            reputationPenalty: 0
+            reputationPenalty: 0,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f793.png'
         }, //刘大伯捐小学
         {
             unit: 2, 
-            display: '听说黑色水域的大闸蟹很有养殖前景，钱南山邀请你投资入股10万元，是否应邀？', 
+            display: '听说黑色水域的大闸蟹很有养殖前景，宋柏邀请你投资入股10万元，是否应邀？', 
             cost: 100000, 
-            bias: 0.4, 
-            goodEvent: '作为天书第一批养螃蟹的人，你确实捞到了第一桶金，连本带利获得15万现金收入', 
-            goodReward: 150000, 
+            bias: 0.5, 
+            goodEvent: '作为天书第一批养螃蟹的人，你确实捞到了第一桶金，连本带利获得30万现金收入', 
+            goodReward: 300000, 
             energyReward: 0,
             reputationReward: 0,
             badEvent: '黑色水域被毒蛇入侵，虽然螃蟹安然无恙，但是无人敢去捕捞，错过最佳捕蟹季节，损失3万', 
             badPenalty: 30000,
             energyPenalty: 0,
-            reputationPenalty: 0
-        }, //钱南山养螃蟹
+            reputationPenalty: 0,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f787.png'
+        }, //宋柏养螃蟹
         {
             unit: 3, 
             display: '黄一凡发来挑战书，“近来新学了几招刀法，邀请来与我一战！”，是否应战？', 
@@ -20804,13 +20890,14 @@ function generateRandomEvents() {
             badEvent: '长久伏案不曾活动，不慎在切磋中伤了筋骨，精力大减（-20）', 
             badPenalty: 0,
             energyPenalty: 20,
-            reputationPenalty: 0
+            reputationPenalty: 0,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f762.png'
         }, //黄一凡打架
         {
             unit: 4, 
             display: '上官红新研制了一种可使宠物变色的无毒染剂，她异常兴奋地想要你给她投资20万元，承诺会给你超值的分红比例', 
             cost: 200000, 
-            bias: 0.2, 
+            bias: 0.3, 
             goodEvent: '黑科技染料一经推出市场，顷刻间风靡各大养宠家庭，纷纷给自己的爱宠染上了五光十色。你在此次投资中获得50万的分红收益', 
             goodReward: 500000, 
             energyReward: 0,
@@ -20818,7 +20905,8 @@ function generateRandomEvents() {
             badEvent: '由于未知添加物，染料未过朝云质监局，投资付诸东流，白费10点精力', 
             badPenalty: 0,
             energyPenalty: 10,
-            reputationPenalty: 0
+            reputationPenalty: 0,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f770.png'
         }, //上官红拉投资
         {
             unit: 5, 
@@ -20832,7 +20920,8 @@ function generateRandomEvents() {
             badEvent: '赞助商太多，无人在意，白费10点精力', 
             badPenalty: 0,
             energyPenalty: 10,
-            reputationPenalty: 0
+            reputationPenalty: 0,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f753.png'
         }, //银月商会拉赞助
         {
             unit: 6, 
@@ -20846,13 +20935,15 @@ function generateRandomEvents() {
             badEvent: '贿赂失败，不留手在审问中供出了你的名字，不仅罚款惨重（-20万）还令你声望大减（-10000）', 
             badPenalty: 200000,
             energyPenalty: 0,
-            reputationPenalty: 10000
+            reputationPenalty: 10000,
+            img: 'https://pic.imgdb.cn/item/66eadcbdf21886ccc0e7f77b.png'
         }, //不留手盗宝
     ];
     
     // 修正随机选择逻辑
     const selectedRandomEvent = randomEvent[Math.floor(Math.random() * randomEvent.length)];
     const eventMessage = selectedRandomEvent.display;
+    const imgUrl = selectedRandomEvent.img;
 
     // 确认按钮的处理函数
     const confirmAction = () => {
@@ -20888,7 +20979,7 @@ function generateRandomEvents() {
     };
 
     // 显示事件信息，并传递确认操作
-    showInfoBox(eventMessage, confirmAction, null, null, 'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png', '88px * 88px');
+    showInfoBox(eventMessage, confirmAction, null, null, imgUrl, '88px * 88px');
 }     
 
 function updateHighestAssetDisplay(highestAsset, display = true) {
@@ -21026,8 +21117,8 @@ function sellAssetsAndExchangeCash() {
     // 计算原始未变现资产的总价值
     let originalAssetValue = netAssets - cash;
 
-    // 计算资产波动系数，假设波动范围在 80% 到 120% 之间
-    let assetValue = Math.floor(originalAssetValue * (Math.min(1, Math.random() * 0.2 + 0.7) * propertyRatio));
+    // 计算资产波动系数
+    let assetValue = Math.floor(originalAssetValue * (Math.min(1, Math.random() * 0.2 + 0.6) * propertyRatio));
 
     // 计算缩水值
     let shrinkValue = originalAssetValue - assetValue;
@@ -21386,7 +21477,7 @@ function calculateNetAsset() {
 function calculatePlayerReputation() {
     const netAsset = calculateNetAsset();
     let reputation = 0;
-    reputation = Math.max(0, Math.floor(Math.max(0, (netAsset - 200000) / 12.5)) + scalpingState.playerReputation);
+    reputation = Math.max(0, Math.floor(Math.max(0, (netAsset - 200000) / 125)) + scalpingState.playerReputation);
     
     return reputation;
 }

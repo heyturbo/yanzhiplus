@@ -1015,8 +1015,7 @@
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
             background-repeat: repeat;
             background-size: auto;
-            border: 2px double black;
-            box-shadow: inset 0px 0px 2px 1px #6f391c;
+            border: 1px solid #6f391c;
         }
         
         .scalping-top-bar {
@@ -2919,11 +2918,11 @@
         <div class="scalping-container" id="scalping-container">
             <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
                 <div class="scalping-top-bar" id="scalping-top-bar">
-                    <div>时间已过:</div>
+                    <div>🕰时间已过:</div>
                     <div>第<span id="current-selling-week">1</span>周/<span id="max-selling-week">52</span>周</div>
                     <div style="display: flex;flex-direction: column;font-size: 14px;">
-                        <div>🏆声望：<span id="player-reputation">0</span></div>
-                        <div style="cursor: pointer;">🏄‍♂️精力：<span id="player-energy">100</span></div>
+                        <div>🏆 声望：<span id="player-reputation">0</span></div>
+                        <div style="cursor: pointer;">🏄‍♂️ 精力：<span id="player-energy">100</span></div>
                     </div>
                 </div>
                 <div class="scalping-asset-area" id="scalping-asset-area">
@@ -19897,12 +19896,12 @@ const scalpingItems = [
 ];
 
 let stockList = [
-    {unit: 1, name: '北影月纺织公司', threshold: 100000, dealWeek: 2, quantity: 0, basePrice: 0.5, flow: 0.05, fluctuation: 0.03, quality: 'bad', url:'https://pic.imgdb.cn/item/66e9380df21886ccc0ca0085.png', des:'靠山吃山，靠水吃水。北影月村民坐拥两大野生森林，大力发展纺织业，男耕女织自给自足' },
-    {unit: 2, name: '黑色水域水产', threshold: 500000, dealWeek: 3, quantity: 0, basePrice: 10, flow: 0.15, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0060.png', des:'灵仙岛岛民在仙人飞升成名前一直以捕鱼为业，黑色水域靠近岛内，此处盛产大闸蟹，但偶尔有毒蛇伤人事件' },
-    {unit: 3, name: '黄金港口外贸', threshold: 1500000, dealWeek: 3, quantity: 0, basePrice: 60, flow: 3, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0045.png', des:'作为朝云国最繁华的港口，是资本主义萌芽的地方。广负盛名的朝云商会在此地驻扎，令外贸成为朝云国的支柱产业之一' },
-    {unit: 4, name: '百鸟树林旅游会社', threshold: 3000000, dealWeek: 3, quantity: 0, basePrice: 150, flow: 7, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66ea482af21886ccc02b21b3.png', des:'受天空眷顾的一族——羽族聚居地，此处由悬空浮岛组成，是天书大陆旅游业最繁荣的地方' },
-    {unit: 5, name: '皇城地产集团', threshold: 5000000, dealWeek: 5, quantity: 0, basePrice: 300, flow: 15, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca001a.png', des:'无论过去还是未来，房地产都是永恒的王牌' },
-    {unit: 6, name: '海底掘金集团', threshold: 10000000, dealWeek: 5, quantity: 0, basePrice: 1000, flow: 30, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0c9ffba.png', des:'天书大航海时代来临，投资你的海底掘金企业，征战星辰和大海' },
+    {unit: 1, name: '北影月纺织公司', threshold: 100000, dealWeek: 2, quantity: 0, basePrice: 0.5, flow: 0.05, state: null, fluctuation: 0.03, quality: 'bad', url:'https://pic.imgdb.cn/item/66e9380df21886ccc0ca0085.png', des:'靠山吃山，靠水吃水。北影月村民坐拥两大野生森林，大力发展纺织业，男耕女织自给自足' },
+    {unit: 2, name: '黑色水域水产', threshold: 500000, dealWeek: 3, quantity: 0, basePrice: 10, flow: 0.15, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0060.png', des:'灵仙岛岛民在仙人飞升成名前一直以捕鱼为业，黑色水域靠近岛内，此处盛产大闸蟹，但偶尔有毒蛇伤人事件' },
+    {unit: 3, name: '黄金港口外贸', threshold: 1500000, dealWeek: 3, quantity: 0, basePrice: 60, flow: 3, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0045.png', des:'作为朝云国最繁华的港口，是资本主义萌芽的地方。广负盛名的朝云商会在此地驻扎，令外贸成为朝云国的支柱产业之一' },
+    {unit: 4, name: '百鸟树林旅游会社', threshold: 3000000, dealWeek: 3, quantity: 0, basePrice: 150, flow: 7, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66ea482af21886ccc02b21b3.png', des:'受天空眷顾的一族——羽族聚居地，此处由悬空浮岛组成，是天书大陆旅游业最繁荣的地方' },
+    {unit: 5, name: '皇城地产集团', threshold: 5000000, dealWeek: 5, quantity: 0, basePrice: 300, flow: 15, state: null, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca001a.png', des:'无论过去还是未来，房地产都是永恒的王牌' },
+    {unit: 6, name: '海底掘金集团', threshold: 10000000, dealWeek: 5, quantity: 0, basePrice: 1000, flow: 30, state: null, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0c9ffba.png', des:'天书大航海时代来临，投资你的海底掘金企业，征战星辰和大海' },
 ];
 
 let isStock = false;
@@ -19939,12 +19938,12 @@ function showMiddleWrapElement() {
         
 function resetStockState() {
     stockList = [
-        {unit: 1, name: '北影月纺织公司', threshold: 100000, dealWeek: 2, quantity: 0, basePrice: 0.5, flow: 0.05, fluctuation: 0.03, quality: 'bad', url:'https://pic.imgdb.cn/item/66e9380df21886ccc0ca0085.png', des:'靠山吃山，靠水吃水。北影月村民坐拥两大野生森林，大力发展纺织业，男耕女织自给自足' },
-        {unit: 2, name: '黑色水域水产', threshold: 500000, dealWeek: 3, quantity: 0, basePrice: 10, flow: 0.15, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0060.png', des:'灵仙岛岛民在仙人飞升成名前一直以捕鱼为业，黑色水域靠近岛内，此处盛产大闸蟹，但偶尔有毒蛇伤人事件' },
-        {unit: 3, name: '黄金港口外贸', threshold: 1500000, dealWeek: 3, quantity: 0, basePrice: 60, flow: 3, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0045.png', des:'作为朝云国最繁华的港口，是资本主义萌芽的地方。广负盛名的朝云商会在此地驻扎，令外贸成为朝云国的支柱产业之一' },
-        {unit: 4, name: '百鸟树林旅游会社', threshold: 3000000, dealWeek: 3, quantity: 0, basePrice: 150, flow: 7, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66ea482af21886ccc02b21b3.png', des:'受天空眷顾的一族——羽族聚居地，此处由悬空浮岛组成，是天书大陆旅游业最繁荣的地方' },
-        {unit: 5, name: '皇城地产集团', threshold: 5000000, dealWeek: 5, quantity: 0, basePrice: 300, flow: 15, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca001a.png', des:'无论过去还是未来，房地产都是永恒的王牌' },
-        {unit: 6, name: '海底掘金集团', threshold: 10000000, dealWeek: 5, quantity: 0, basePrice: 1000, flow: 30, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0c9ffba.png', des:'天书大航海时代来临，投资你的海底掘金企业，征战星辰和大海' },
+        {unit: 1, name: '北影月纺织公司', threshold: 100000, dealWeek: 2, quantity: 0, basePrice: 0.5, flow: 0.05, state: null, fluctuation: 0.03, quality: 'bad', url:'https://pic.imgdb.cn/item/66e9380df21886ccc0ca0085.png', des:'靠山吃山，靠水吃水。北影月村民坐拥两大野生森林，大力发展纺织业，男耕女织自给自足' },
+        {unit: 2, name: '黑色水域水产', threshold: 500000, dealWeek: 3, quantity: 0, basePrice: 10, flow: 0.15, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0060.png', des:'灵仙岛岛民在仙人飞升成名前一直以捕鱼为业，黑色水域靠近岛内，此处盛产大闸蟹，但偶尔有毒蛇伤人事件' },
+        {unit: 3, name: '黄金港口外贸', threshold: 1500000, dealWeek: 3, quantity: 0, basePrice: 60, flow: 3, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca0045.png', des:'作为朝云国最繁华的港口，是资本主义萌芽的地方。广负盛名的朝云商会在此地驻扎，令外贸成为朝云国的支柱产业之一' },
+        {unit: 4, name: '百鸟树林旅游会社', threshold: 3000000, dealWeek: 3, quantity: 0, basePrice: 150, flow: 7, state: null, fluctuation: 0.03, quality: 'medium', url:'https://pic.imgdb.cn/item/66ea482af21886ccc02b21b3.png', des:'受天空眷顾的一族——羽族聚居地，此处由悬空浮岛组成，是天书大陆旅游业最繁荣的地方' },
+        {unit: 5, name: '皇城地产集团', threshold: 5000000, dealWeek: 5, quantity: 0, basePrice: 300, flow: 15, state: null, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0ca001a.png', des:'无论过去还是未来，房地产都是永恒的王牌' },
+        {unit: 6, name: '海底掘金集团', threshold: 10000000, dealWeek: 5, quantity: 0, basePrice: 1000, flow: 30, state: null, fluctuation: 0.03, quality: 'good', url:'https://pic.imgdb.cn/item/66e9380cf21886ccc0c9ffba.png', des:'天书大航海时代来临，投资你的海底掘金企业，征战星辰和大海' },
     ];
 }
 
@@ -20002,12 +20001,17 @@ function updateStockPrice() {
         // 计算基础价格，波动与累积的影响
         let stockPrice = basePrice + (basePrice * fluctuation * ratio) + (fixedAccumulation * ratio);
         
+        if (basePrice <= stockPrice) {
+            stock.state = 'higher';
+        } else {
+            stock.state = 'lower';
+        }
+        
         // 确保价格不会跌到负数
         stock.basePrice = Math.max(parseFloat(stockPrice.toFixed(2)), 0);
         info.push(`${stock.name}: ${stock.basePrice}`);
     });
     updateStockPanelDisplay();
-    //console.log(info);
 }
         
 function updateStockPanelDisplay() { 
@@ -20025,7 +20029,7 @@ function updateStockPanelDisplay() {
 
     const stockPanel = document.createElement('div');
     stockPanel.id = 'general-stock-panel';
-    stockPanel.style = 'display: flex;flex-flow: column wrap;width: 90%;padding: 10px;border: 2px solid rgb(111, 57, 28);gap: 5px;max-height: 360px;overflow-y: scroll;flex-direction: column;flex-wrap: nowrap;'; // 设置股票面板显示
+    stockPanel.style = 'display: flex;width: 90%;padding: 10px;border: 2px solid rgb(111, 57, 28);gap: 5px;max-height: 360px;overflow-y: scroll;flex-flow: column;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;'; // 设置股票面板显示
     stockPanel.innerHTML = ''; // 清空现有内容
 
     stockList.forEach(stock => {
@@ -20057,7 +20061,8 @@ function updateStockPanelDisplay() {
 
         // 股票基础价格
         const stockPrice = document.createElement('div');
-        stockPrice.innerText = `${stock.basePrice}元/股`;
+        stockPrice.innerText = `${stock.basePrice}元 ${stock.state === 'higher'? '↑' : '↓'}`;
+        stockPrice.style.color = `${stock.state === 'higher'? 'pink' : 'lime'}`;
         stockDetail.appendChild(stockPrice);
 
         const stockOwned = document.createElement('div');
@@ -20565,7 +20570,7 @@ function getRandomScalpableItem() {
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
-            <div id="price-${item.name}">${price} 元</div>
+            <div id="price-${item.name}" style="color:${price > item.basePrice? 'pink' : 'lime'};">${price}元 ${price > item.basePrice? '↑' : '↓'}</div>
         `;
 
         // 点击商品时弹出购买进度条
@@ -20827,7 +20832,7 @@ function generateRandomEvents() {
             unit: 6, 
             display: '不留手鬼鬼祟祟地跟你说要去皇宫盗宝，想找你借1万现金打点禁卫', 
             cost: 10000, 
-            bias: 0.2, 
+            bias: 0.3, 
             goodEvent: '不留手不愧是江洋大盗，连姜太后的贴身宝玉都能盗得，找了家不怕死的当铺典当之后，分得你30万元', 
             goodReward: 300000, 
             energyReward: 0,
@@ -21411,7 +21416,7 @@ function updateScalpingPanel() {
     
     if (scalpingState.playerEnergy <= 60) {
         relaxButton.style.display = 'flex';
-        document.getElementById('player-energy').innerText = `${scalpingState.playerEnergy}💉`;
+        document.getElementById('player-energy').innerText = `${scalpingState.playerEnergy} 补💉`;
         document.getElementById('player-energy').style.color = 'red';
     } else {
         relaxButton.style.display = 'none';

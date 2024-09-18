@@ -19909,7 +19909,7 @@ function openStockPanel() {
     const middleWrap = document.getElementById('scalping-middle-wrap');
     const stockButton = document.getElementById('open-stock-button');
 
-    if (scalpingState.currentSellingWeek === 0) {
+    if (scalpingState.currentSellingWeek === 0 && stockButton.innerText === '购买股票') {
         showMerchant('至少在市场积累一周的经商经验才能进入股市！');
         return;
     }
@@ -19982,6 +19982,7 @@ function resetDealWeek(stock) {
         
 function updateStockPrice() {
     let info = [];
+    let randomActivate = false;
     stockList.forEach(stock => {
         const basePrice = parseFloat(stock.basePrice) || 1;
         
@@ -20004,11 +20005,16 @@ function updateStockPrice() {
         }
 
         // 计算基础价格，波动与累积的影响
-        let stockPrice = basePrice + (basePrice * fluctuation * ratio) + (fixedAccumulation * ratio);
+        let stockPrice; 
 
-        if (Math.random() < 0.1 && !currentInfoBox) stockPrice = generateStockRandomEvent(stock);
+        if (Math.random() < 0.1 && !currentInfoBox && !randomActivate) {
+            stockPrice = basePrice + generateStockRandomEvent(stock);
+            randomActivate = true;
+        } else {
+            stockPrice = basePrice + (basePrice * fluctuation * ratio) + (fixedAccumulation * ratio);
+        }
         
-        if (basePrice <= stockPrice) {
+        if (basePrice < stockPrice) {
             stock.state = 'higher';
         } else {
             stock.state = 'lower';
@@ -20016,8 +20022,9 @@ function updateStockPrice() {
         
         // 确保价格不会跌到负数
         stock.basePrice = Math.max(parseFloat(stockPrice.toFixed(2)), 0);
-        info.push(`${stock.name}: ${stock.basePrice}`);
+        info.push(`${stock.name}: 上周股价${basePrice},本周股价${stock.basePrice},股价状态为${stock.state === 'higher' ? '涨' : '跌'}`);
     });
+    // console.log(info);
     updateStockPanelDisplay();
 }
         
@@ -20068,8 +20075,8 @@ function updateStockPanelDisplay() {
 
         // 股票基础价格
         const stockPrice = document.createElement('div');
-        stockPrice.innerText = `${stock.basePrice}元 ${stock.state === 'higher'? '↑' : '↓'}`;
-        stockPrice.style.color = `${stock.state === 'higher'? '#FF4500' : 'lime'}`;
+        stockPrice.innerText = `${stock.basePrice}元 ${stock.state === 'higher' ? '↑' : '↓'}`;
+        stockPrice.style.color = `${stock.state === 'higher' ? '#FF4500' : 'lime'}`;
         stockDetail.appendChild(stockPrice);
 
         const stockOwned = document.createElement('div');
@@ -20146,7 +20153,7 @@ function generateStockRandomEvent(stock) {
                 detail = `${stockName} 的海底开采技术取得突破，开采效率大幅提高，利润翻倍，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
         }
-        stockPriceAfterEvent += eventEffect;
+        stockPriceAfterEvent = eventEffect;
     } else {
         // 坏事件：根据 fluctuation 和 flow 调整价格
         switch (stockName) {
@@ -20175,7 +20182,7 @@ function generateStockRandomEvent(stock) {
                 detail = `${stockName} 的海底资源逐渐枯竭，导致公司的开采成本激增，利润急剧下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
         }
-        stockPriceAfterEvent = Math.max(0, stockPriceAfterEvent - eventEffect); // 确保股价不为负数
+        stockPriceAfterEvent =  eventEffect;
     }
 
     // 展示详细事件信息
@@ -20183,8 +20190,6 @@ function generateStockRandomEvent(stock) {
 
     return stockPriceAfterEvent; // 返回两位小数的股价
 }
-
-
         
 function handleStockPurchase(stock) {
     const revokeSandIndex = scalpingState.gadgets.indexOf('唤神砂');
@@ -21072,7 +21077,7 @@ function resetScalping() {
     marketPanel.innerHTML = ''; // 清空现有内容
     warehousePanel.innerHTML = ''; // 清空现有仓库内容
     
-    if (relaxButton.style.display !== 'none'){
+    if (relaxButton.style.display !== 'none') {
         relaxButton.style.display = 'none';
     }
     
@@ -21090,13 +21095,14 @@ function resetScalping() {
         holdItems: {}, // 存放玩家购买的商品
         gadgets: [],
     };
+
+    if (isStock) openStockPanel();
     
     resetStockState();
     updateStockPanelDisplay();
     updateScalpingPanel();
     document.getElementById('enter-next-week').innerText = '刷新一周';
     document.getElementById('applied-scalping-gadgets').innerHTML = '';
-    
 }
 
 function sellAssetsAndExchangeCash() {

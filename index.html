@@ -20668,7 +20668,6 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
         }
 
         // 更新 UI 和事件
-        updateScalpingPanel();
         updateStockPrice();
         getRandomScalpableItem();
 
@@ -20683,10 +20682,10 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
         if (scalpingState.currentSellingWeek % 10 === 0) {
             getReputationEvent();
         }
-
     } else {
         showMerchant('已经到达最大周数，不能继续。');
     }
+    updateScalpingPanel();
 }
 
 function finalizeScalping() {
@@ -21013,7 +21012,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
                         const newAveragePrice = Math.floor(((currentHold.averagePrice * currentHold.quantity) + (price * quantity)) / newTotalQuantity);
                         scalpingState.holdItems[item.name] = { averagePrice: newAveragePrice, quantity: newTotalQuantity };
                     }
-                    updateScalpingPanel();
+                    
                     updateWarehouseItems();
                 } else {
                     showMerchant('仓库容量不足，无法购买');
@@ -21029,7 +21028,6 @@ function handleItemTransaction(item, itemInfo, actionType) {
                     delete scalpingState.holdItems[item.name]; // 移除卖完的物品
                 }
 
-                updateScalpingPanel();
                 updateWarehouseItems();
             }
             sliderContainer.style.display = 'none'; // 完成后隐藏进度条
@@ -21149,6 +21147,7 @@ function updateWarehouseItems() {
 
         warehousePanel.appendChild(itemElement);
     });
+    updateScalpingPanel();
 }
 
 // 仓库扩展按钮逻辑
@@ -21173,7 +21172,9 @@ document.getElementById('enlarge-warehouse-button').addEventListener('click', ()
         
 function calculateNetAsset() {
     let netAsset = 0;
+    let itemsValue = 0;
 
+    // 计算持有的物品的资产
     Object.keys(scalpingState.holdItems).forEach(itemName => {
         const itemInfo = scalpingState.holdItems[itemName];
         const item = scalpingItems.find(i => i.name === itemName);
@@ -21182,7 +21183,7 @@ function calculateNetAsset() {
             return; // 如果找不到该物品，跳过该商品
         }
 
-        // 查找市场上是否存在该商品的元素
+        // 查找市场上是否存在该商品的价格元素
         const marketItemPriceElement = document.getElementById(`price-${itemName}`);
         let marketPrice = null;
 
@@ -21191,38 +21192,52 @@ function calculateNetAsset() {
             marketPrice = parseInt(marketItemPriceElement.innerText);
         }
 
-        // 计算当前商品的资产值
+        // 计算当前商品的资产值，确保只使用市场价格或平均价格之一
         let itemAssetValue = 0;
 
         if (marketPrice) {
-            // 如果市场上有该商品，按市场价格计算
-            itemAssetValue += itemInfo.quantity * marketPrice;
+            // 使用市场价格
+            itemAssetValue = itemInfo.quantity * marketPrice;
+        } else if (itemInfo.averagePrice) {
+            // 如果市场价格不存在，则使用平均价格
+            itemAssetValue = itemInfo.quantity * itemInfo.averagePrice;
         } else {
-            // 计算剩余部分按平均价格计算的资产
-            const remainingQuantity = itemInfo.quantity;
-            itemAssetValue += remainingQuantity * itemInfo.averagePrice;
+            console.warn(`商品 ${itemName} 没有市场价格和平均价格，跳过计算`);
+            return; // 没有价格的情况下跳过该商品的计算
         }
 
         // 累加到总资产
-        netAsset += itemAssetValue;
+        itemsValue += itemAssetValue;
     });
+
+    
     
     // 计算持有的股票的资产
     const stocksOwned = stockList.filter(s => s.quantity > 0);
     const kaimanzhizhao = scalpingState.gadgets.find(gadget => gadget === '开曼岛执照');
+    let stockValue = 0;
     let tax = 0.9;
     if (kaimanzhizhao) tax = 0.95;
+
     stocksOwned.forEach(stock => {
-        // 确保 stockValue 是数值类型
-        const stockValue = stock.quantity * stock.basePrice * tax;
-        netAsset += stockValue;  // 不需要 toFixed()，保持为数值类型
+        // 确保 stock.basePrice 是最新的市场价格
+        if (typeof stock.basePrice !== 'number') {
+            console.warn(`股票 ${stock.name} 的基础价格无效，跳过计算`);
+            return;
+        }
+        // 计算股票价值并考虑税率
+        stockValue += stock.quantity * stock.basePrice * tax;
     });
     
+    
+    
     // 将现金加入到总资产
-    netAsset += scalpingState.currentCash;
+    netAsset = Math.floor(scalpingState.currentCash + itemsValue + stockValue);
+    
 
-    return Math.floor(netAsset);
+    return netAsset;
 }
+
 
 function calculatePlayerReputation() {
     const netAsset = calculateNetAsset();

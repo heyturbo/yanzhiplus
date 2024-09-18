@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project TS</title>
     <style>
-        @import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&display=swap');
+        /* @import url('https://fonts.loli.net/css2?family=Noto+Serif+SC:wght@400;700&display=swap'); */
 
         body {
             font-family: 'Noto Serif SC', sans-serif;
@@ -1006,7 +1006,6 @@
             max-height: 80%;
             background-color: rgba(0, 0, 0, 0.8);
             color: #6f391c;
-            padding: 1px 2px;
             border-radius: 2px;
             justify-content: center;
             flex-direction: column;
@@ -2936,19 +2935,19 @@
                                 <!-- 动态生成法宝 -->
                             </div>
                         </div>
-                        <div id="gadgets-selector" class="select-gadgets" style="display:none;">
-                            <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
-                            <div style="display:flex;width: 100%;justify-content:space-between;align-items: center;font-size:16px;">
+                        <div id="gadgets-selector" class="select-gadgets" style="display:none;padding: 0px 10px;">
+                            <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;width: 100%;height: 10px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size: 16px;padding: 10px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
+                            <div style="display:flex;width: 95%;justify-content: center;align-items: center;font-size:16px;padding: 5px;flex-direction: row;gap: 20px;">
                             <p>选择你所拥有的法宝</p>
                             <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
                             </div>
-                            <div id="selected-gadgets" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
+                            <div id="selected-gadgets" style="max-height: 420px;padding: 10px;overflow-y: scroll;min-height: 300px;border: 2px double #87431f;margin-bottom: 20px;width:95%">
                                 <!-- 遍历法宝并在此处显示 -->
                             </div>
                         </div>
                         <div id="gadget-store-panel" class="select-gadgets" style="display:none;">
                             <div id="gadgets-store-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>兑换法宝<button id="close-gagdet-store">x</button></div>
-                            <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: space-between;align-items: center;width:100%;">
+                            <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: center;align-items: center;width:100%;">
                             <p>你可以使用经商积分点击图标兑换法宝</p>
                             </div>
                             <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
@@ -20130,27 +20129,27 @@ function generateStockRandomEvent(stock) {
         switch (stockName) {
             case '北影月纺织公司':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.5 + 0.5) + stock.flow;
-                detail = `${stockName} 在政府环保政策的扶持下，推出了绿色纺织项目，得到了市场的广泛欢迎，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}在政府环保政策的扶持下，推出了绿色纺织项目，得到了市场的广泛欢迎，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
             case '黑色水域水产':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.7 + 0.3) + stock.flow;
-                detail = `${stockName} 近期大闸蟹的市场需求大增，销量创下新高，公司的收益大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}近期大闸蟹的市场需求大增，销量创下新高，公司的收益大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
             case '黄金港口外贸':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.0 + 0.5) + stock.flow;
-                detail = `${stockName} 获得大量的国际贸易订单，外贸业务激增，带来了可观的利润，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}获得大量的国际贸易订单，外贸业务激增，带来了可观的利润，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
             case '百鸟树林旅游会社':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.2 + 0.8) + stock.flow;
-                detail = `${stockName} 的旅游业务在假期高峰期中蓬勃发展，旅游区人满为患，收入大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的旅游业务在假期高峰期中蓬勃发展，旅游区人满为患，收入大幅增长，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
             case '皇城地产集团':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.5 + 1.0) + stock.flow;
-                detail = `${stockName} 在房地产政策宽松的背景下，投资热潮推动了地产股的强劲上涨，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}在房地产政策宽松的背景下，投资热潮推动了地产股的强劲上涨，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
             case '海底掘金集团':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 2.0 + 1.5) + stock.flow;
-                detail = `${stockName} 的海底开采技术取得突破，开采效率大幅提高，利润翻倍，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的海底开采技术取得突破，开采效率大幅提高，利润翻倍，股价强劲上涨: +${eventEffect.toFixed(2)}元。`;
                 break;
         }
         stockPriceAfterEvent = eventEffect;
@@ -20159,27 +20158,27 @@ function generateStockRandomEvent(stock) {
         switch (stockName) {
             case '北影月纺织公司':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.5 + 0.5) - stock.flow;
-                detail = `${stockName} 的野生森林资源遭到破坏，导致纺织原材料短缺，公司业绩下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的野生森林资源遭到破坏，导致纺织原材料短缺，公司业绩下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
             case '黑色水域水产':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 0.7 + 0.3) - stock.flow;
-                detail = `${stockName} 的水域受到污染，导致水产减产，公司利润大幅减少，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的水域受到污染，导致水产减产，公司利润大幅减少，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
             case '黄金港口外贸':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.0 + 0.5) - stock.flow;
-                detail = `${stockName} 遭遇国际贸易摩擦，出口订单大幅减少，收入骤减，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}遭遇国际贸易摩擦，出口订单大幅减少，收入骤减，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
             case '百鸟树林旅游会社':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.2 + 0.8) - stock.flow;
-                detail = `${stockName} 的旅游区遭遇了天灾，游客量锐减，公司收入受到严重影响，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的旅游区遭遇了天灾，游客量锐减，公司收入受到严重影响，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
             case '皇城地产集团':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 1.5 + 1.0) - stock.flow;
-                detail = `${stockName} 遭遇房地产市场泡沫破裂，投资者纷纷撤资，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}遭遇房地产市场泡沫破裂，投资者纷纷撤资，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
             case '海底掘金集团':
                 eventEffect = stock.fluctuation * stock.flow * (Math.random() * 2.0 + 1.5) - stock.flow;
-                detail = `${stockName} 的海底资源逐渐枯竭，导致公司的开采成本激增，利润急剧下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
+                detail = `${stockName}的海底资源逐渐枯竭，导致公司的开采成本激增，利润急剧下滑，股价大幅下跌: ${eventEffect.toFixed(2)}元。`;
                 break;
         }
         stockPriceAfterEvent =  eventEffect;
@@ -20449,11 +20448,11 @@ function selectSaclpingGadgets() {
         gadgetElement.className = 'selected-gadgets';
         gadgetElement.style = 'display: flex;justify-content: space-between;font-size: 14px;align-items: center;margin-bottom: 10px;border: 1px solid #6f391c;padding: 5px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 150px;">
+            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 20%;height: 100%;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}">${gadget.description} 拥有：${gadget.quantity}个 </div>
+            <div id="description-${gadget.name}" style="width: 80%;height: 100%;text-align: start;">${gadget.description}，拥有：${gadget.quantity}个 </div>
         `;
 
         // 点击法宝时弹出应用面板
@@ -20557,13 +20556,13 @@ function updateGadgetStorePanel() {
 
         const gadgetElement = document.createElement('div');
         gadgetElement.className = 'selected-gadgets';
-        gadgetElement.style = 'display: flex;justify-content: space-between;font-size: 14px;align-items: center;margin-bottom: 10px;border: 1px solid #6f391c;padding: 5px;';
+        gadgetElement.style = 'display: flex; justify-content: space-between; font-size: 14px; align-items: center; margin-bottom: 10px; border: 1px solid rgb(111, 57, 28); padding: 5px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 150px;">
+            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 20%;height: 100%;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}">${gadget.description} 价格：${price} 积分 </div>
+            <div id="description-${gadget.name}" style="width: 80%;height: 100%;text-align: start;">${gadget.description}，售价：${price} 积分。</div>
         `;
         gadgetItemsArea.appendChild(gadgetElement);
         

@@ -974,6 +974,10 @@
             color: #87431f;
             font-size: 16px;
             height: 100%;
+            background-image: url('https://pic.imgdb.cn/item/66ea60acf21886ccc04b6877.jpg');
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
         }
         .scalping-head-button {
             background: transparent;
@@ -20227,7 +20231,7 @@ function handleStockTransaction(item, actionType) {
                 const totalCost = quantity * price;
                 scalpingState.currentCash -= Math.floor(totalCost);
                 item.quantity += quantity;
-                document.getElementById('stock-info-display').innerText = `当前拥有${item.quantity}手${item.name}的股票`;
+                document.getElementById('stock-info-display').innerText = `当前持有${item.quantity}手${item.name}的股票`;
                 updateScalpingPanel();
                 updateStockPanelDisplay();
             } else {
@@ -20242,7 +20246,7 @@ function handleStockTransaction(item, actionType) {
                 item.quantity -= quantity;
 
                 if (item.quantity === 0) resetDealWeek(item);
-                document.getElementById('stock-info-display').innerText = `当前拥有${item.quantity}手${item.name}的股票`;
+                document.getElementById('stock-info-display').innerText = `当前持有${item.quantity}手${item.name}的股票`;
                 updateScalpingPanel();
                 updateStockPanelDisplay();
             }
@@ -20682,6 +20686,12 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
         if (scalpingState.currentSellingWeek % 10 === 0) {
             getReputationEvent();
         }
+        
+        let randomEventRate = 1; //预留法宝位置
+        if (!currentInfoBox && Math.random() < 0.2) {
+            generateRandomEvents();
+        }
+        
     } else {
         showMerchant('已经到达最大周数，不能继续。');
     }
@@ -20740,7 +20750,129 @@ function refreshSaleWeek() {
     }
 }
 
+function generateRandomEvents() {
+    const randomEvent = [
+        {
+            unit: 1, 
+            display: '新月村刘大爷想让你捐款50000，兴建一所村民小学，是否愿意？', 
+            cost: 50000, 
+            bias: 0.3, 
+            goodEvent: '村民小学成功兴建，你在新月村声名远播，受到村政府表彰，奖励2万', 
+            goodReward: 20000, 
+            energyReward: 0,
+            badEvent: '你的善款被开发商挪用，豆腐渣工程一阵风就吹倒了，你不得不再追加1万帮助修缮', 
+            badPenalty: 10000,
+            energyPenalty: 0
+        }, //刘大伯捐小学
+        {
+            unit: 2, 
+            display: '听说黑色水域的大闸蟹很有养殖前景，钱南山邀请你投资入股10万元，是否应邀？', 
+            cost: 100000, 
+            bias: 0.4, 
+            goodEvent: '作为天书第一批养螃蟹的人，你确实捞到了第一桶金，增加了15万现金收入', 
+            goodReward: 150000, 
+            energyReward: 0,
+            badEvent: '黑色水域被毒蛇入侵，虽然螃蟹安然无恙，但是无人敢去捕捞，错过最佳捕蟹季节，损失3万', 
+            badPenalty: 30000,
+            energyPenalty: 0
+        }, //钱南山养螃蟹
+        {
+            unit: 3, 
+            display: '黄一凡发来挑战书，“近来新学了几招刀法，邀请来与我一战！”，是否应战？', 
+            cost: 0, 
+            bias: 0.5, 
+            goodEvent: '痛快的打完一架，反而精力充沛了起来（+20）', 
+            goodReward: 0, 
+            energyReward: 20,
+            badEvent: '长久伏案不曾活动，不慎在切磋中伤了筋骨，精力大减（-20）', 
+            badPenalty: 0,
+            energyPenalty: 20
+        }, //黄一凡打架
+        {
+            unit: 4, 
+            display: '上官红新研制了一种可使宠物变色的无毒染剂，她异常兴奋地想要你给她投资20万元，承诺会给你超值的分红比例', 
+            cost: 200000, 
+            bias: 0.2, 
+            goodEvent: '黑科技染料一经推出市场，顷刻间风靡各大养宠家庭，纷纷给自己的爱宠染上了五光十色。你在此次投资中获得50万的分红收益', 
+            goodReward: 500000, 
+            energyReward: 0,
+            badEvent: '由于未知添加物，染料未过朝云质监局，投资付诸东流，白费10点精力', 
+            badPenalty: 0,
+            energyPenalty: 10
+        }, //上官红拉投资
+        {
+            unit: 5, 
+            display: '银月商会将要举办四年一届的三国贸易论坛，邀请你赞助20万元成为特约赞助商', 
+            cost: 200000, 
+            bias: 0.7, 
+            goodEvent: '银月商会是三界最知名的贸易协定组织，在此次大会中，你的大名被赫然放在特别赞助商名单中，不少大商人见此纷纷与你磋商经贸之事(-10精力)，你的声望提高10000点', 
+            goodReward: 0, 
+            energyReward: -10,
+            reputationReward: 10000,
+            badEvent: '赞助商太多，无人在意，白费10点精力', 
+            badPenalty: 0,
+            energyPenalty: 10,
+            reputationPenalty: 0
+        }, //银月商会拉赞助
+        {
+            unit: 6, 
+            display: '不留手鬼鬼祟祟地跟你说要去皇宫盗宝，想找你借1万现金打点禁卫', 
+            cost: 10000, 
+            bias: 0.2, 
+            goodEvent: '不留手不愧是江洋大盗，连姜太后的贴身宝玉都能盗得，找了家不怕死的当铺典当之后，分得你30万元', 
+            goodReward: 300000, 
+            energyReward: 0,
+            reputationReward: 0,
+            badEvent: '贿赂失败，不留手在审问中供出了你的名字，不仅罚款惨重（-20万）还令你声望大减（-10000）', 
+            badPenalty: 200000,
+            energyPenalty: 0,
+            reputationPenalty: 10000
+        }, //银月商会拉赞助
+    ];
+    
+    // 修正随机选择逻辑
+    const selectedRandomEvent = randomEvent[Math.floor(Math.random() * randomEvent.length)];
+    const eventMessage = selectedRandomEvent.display;
 
+    // 确认按钮的处理函数
+    const confirmAction = () => {
+        // 扣除事件费用
+        if (scalpingState.currentCash < selectedRandomEvent.cost) {
+            showMerchant('你的现金不足！');
+            return;
+        }
+        
+        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - selectedRandomEvent.cost);
+        let extraBias = 0; //此处预留法宝的作用
+        
+        // 根据 bias 确定是好事件还是坏事件
+        if (Math.random() < selectedRandomEvent.bias + extraBias) {
+            // 好事件：给予奖励
+            scalpingState.currentCash += selectedRandomEvent.goodReward;
+            scalpingState.playerEnergy = Math.min(100, scalpingState.playerEnergy + selectedRandomEvent.energyReward);
+            
+            if (selectedRandomEvent.reputationReward) scalpingState.playerReputation += selectedRandomEvent.reputationReward;
+            
+            showMerchant(selectedRandomEvent.goodEvent);
+        } else {
+            // 坏事件：给予惩罚
+            scalpingState.currentCash = Math.max(0, scalpingState.currentCash - selectedRandomEvent.badPenalty);
+            scalpingState.playerEnergy = Math.max(0, scalpingState.playerEnergy - selectedRandomEvent.energyPenalty);
+            
+            if (selectedRandomEvent.reputationPenalty) scalpingState.playerReputation -= selectedRandomEvent.reputationPenalty;
+            
+            showMerchant(selectedRandomEvent.badEvent);
+        }
+        // 更新面板
+        updateScalpingPanel();
+    };
+
+    // 显示事件信息，并传递确认操作
+    showInfoBox(eventMessage, confirmAction, null, null, 'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png', '88px * 88px');
+}
+
+
+        
 
 function updateHighestAssetDisplay(highestAsset, display = true) {
     const scalpingDisplayElement = document.getElementById('scalping-display');
@@ -21210,8 +21342,6 @@ function calculateNetAsset() {
         itemsValue += itemAssetValue;
     });
 
-    
-    
     // 计算持有的股票的资产
     const stocksOwned = stockList.filter(s => s.quantity > 0);
     const kaimanzhizhao = scalpingState.gadgets.find(gadget => gadget === '开曼岛执照');
@@ -21229,11 +21359,8 @@ function calculateNetAsset() {
         stockValue += stock.quantity * stock.basePrice * tax;
     });
     
-    
-    
     // 将现金加入到总资产
     netAsset = Math.floor(scalpingState.currentCash + itemsValue + stockValue);
-    
 
     return netAsset;
 }
@@ -21242,7 +21369,7 @@ function calculateNetAsset() {
 function calculatePlayerReputation() {
     const netAsset = calculateNetAsset();
     let reputation = 0;
-    reputation = Math.max(0, Math.floor((netAsset - 200000) / 12.5));
+    reputation = Math.max(0, Math.floor((netAsset - 200000) / 12.5)) + scalpingState.playerReputation;
     
     return reputation;
 }

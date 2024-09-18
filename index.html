@@ -21378,7 +21378,7 @@ function calculateNetAsset() {
 function calculatePlayerReputation() {
     const netAsset = calculateNetAsset();
     let reputation = 0;
-    reputation = Math.max(0, Math.floor((netAsset - 200000) / 12.5) + scalpingState.playerReputation);
+    reputation = Math.max(0, Math.floor(Math.max(0, (netAsset - 200000) / 12.5)) + scalpingState.playerReputation);
     
     return reputation;
 }

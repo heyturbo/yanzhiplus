@@ -20757,24 +20757,28 @@ function generateRandomEvents() {
             display: '新月村刘大爷想让你捐款50000，兴建一所村民小学，是否愿意？', 
             cost: 50000, 
             bias: 0.3, 
-            goodEvent: '村民小学成功兴建，你在新月村声名远播，受到村政府表彰，奖励2万', 
+            goodEvent: '村民小学成功兴建，你在新月村声名远播（声望+3000），受到村政府表彰，奖励2万', 
             goodReward: 20000, 
             energyReward: 0,
+            reputationReward: 3000,
             badEvent: '你的善款被开发商挪用，豆腐渣工程一阵风就吹倒了，你不得不再追加1万帮助修缮', 
             badPenalty: 10000,
-            energyPenalty: 0
+            energyPenalty: 0,
+            reputationPenalty: 0
         }, //刘大伯捐小学
         {
             unit: 2, 
             display: '听说黑色水域的大闸蟹很有养殖前景，钱南山邀请你投资入股10万元，是否应邀？', 
             cost: 100000, 
             bias: 0.4, 
-            goodEvent: '作为天书第一批养螃蟹的人，你确实捞到了第一桶金，增加了15万现金收入', 
+            goodEvent: '作为天书第一批养螃蟹的人，你确实捞到了第一桶金，连本带利获得15万现金收入', 
             goodReward: 150000, 
             energyReward: 0,
+            reputationReward: 0,
             badEvent: '黑色水域被毒蛇入侵，虽然螃蟹安然无恙，但是无人敢去捕捞，错过最佳捕蟹季节，损失3万', 
             badPenalty: 30000,
-            energyPenalty: 0
+            energyPenalty: 0,
+            reputationPenalty: 0
         }, //钱南山养螃蟹
         {
             unit: 3, 
@@ -20784,9 +20788,11 @@ function generateRandomEvents() {
             goodEvent: '痛快的打完一架，反而精力充沛了起来（+20）', 
             goodReward: 0, 
             energyReward: 20,
+            reputationReward: 0,
             badEvent: '长久伏案不曾活动，不慎在切磋中伤了筋骨，精力大减（-20）', 
             badPenalty: 0,
-            energyPenalty: 20
+            energyPenalty: 20,
+            reputationPenalty: 0
         }, //黄一凡打架
         {
             unit: 4, 
@@ -20796,9 +20802,11 @@ function generateRandomEvents() {
             goodEvent: '黑科技染料一经推出市场，顷刻间风靡各大养宠家庭，纷纷给自己的爱宠染上了五光十色。你在此次投资中获得50万的分红收益', 
             goodReward: 500000, 
             energyReward: 0,
+            reputationReward: 0,
             badEvent: '由于未知添加物，染料未过朝云质监局，投资付诸东流，白费10点精力', 
             badPenalty: 0,
-            energyPenalty: 10
+            energyPenalty: 10,
+            reputationPenalty: 0
         }, //上官红拉投资
         {
             unit: 5, 
@@ -20827,7 +20835,7 @@ function generateRandomEvents() {
             badPenalty: 200000,
             energyPenalty: 0,
             reputationPenalty: 10000
-        }, //银月商会拉赞助
+        }, //不留手盗宝
     ];
     
     // 修正随机选择逻辑

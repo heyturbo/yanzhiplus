@@ -995,7 +995,6 @@
             background-size: auto;
             border: 1px solid black;
             padding: 5px;
-            min-height: 480px;
             justify-content: space-between;
         }
         .select-gadgets {
@@ -20062,7 +20061,7 @@ function updateStockPanelDisplay() {
         // 股票基础价格
         const stockPrice = document.createElement('div');
         stockPrice.innerText = `${stock.basePrice}元 ${stock.state === 'higher'? '↑' : '↓'}`;
-        stockPrice.style.color = `${stock.state === 'higher'? 'pink' : 'lime'}`;
+        stockPrice.style.color = `${stock.state === 'higher'? '#FF4500' : 'lime'}`;
         stockDetail.appendChild(stockPrice);
 
         const stockOwned = document.createElement('div');
@@ -20546,6 +20545,7 @@ function getRandomScalpableItem() {
 
     // 生成HTML结构
     itemsToDisplay.forEach(item => {
+        const originalPrice = document.getElementById(`price-${item.name}`) ? parseInt(document.getElementById(`price-${item.name}`).innerText) : item.basePrice;
         let price = getScalpableItemsPrice(item);
         let rareEventChance = 0.1;
         const rareEventBooster = scalpingState.gadgets.find(gadget => gadget === '八方来财');
@@ -20570,13 +20570,13 @@ function getRandomScalpableItem() {
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
-            <div id="price-${item.name}" style="color:${price > item.basePrice? 'pink' : 'lime'};">${price}元 ${price > item.basePrice? '↑' : '↓'}</div>
+            <div id="price-${item.name}" style="color:${price > originalPrice? '#FF4500' : 'lime'};">${price}元 ${price > originalPrice? '↑' : '↓'}</div>
         `;
 
         // 点击商品时弹出购买进度条
         itemElement.addEventListener('click', () => {
             handleItemPurchase(item, price);
-        });
+            });
 
         marketPanel.appendChild(itemElement);
     });
@@ -20883,10 +20883,7 @@ function generateRandomEvents() {
 
     // 显示事件信息，并传递确认操作
     showInfoBox(eventMessage, confirmAction, null, null, 'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png', '88px * 88px');
-}
-
-
-        
+}     
 
 function updateHighestAssetDisplay(highestAsset, display = true) {
     const scalpingDisplayElement = document.getElementById('scalping-display');

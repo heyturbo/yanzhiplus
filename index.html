@@ -2959,7 +2959,7 @@
                 </div>
                 <div class="scalping-middle-wrap" id="scalping-middle-wrap">
                     <div class="scalping-detail-list" id="market-info">
-                        <strong style="height: 30px;">市场</strong>
+                        <strong style="height: 30px;">市场<button id="select-item-to-display" onclick="generateItemToDisplay()">➕</button></strong>
                         <div id="scalping-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
                             <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
                                 <div>货物</div>
@@ -19880,17 +19880,19 @@ let scalpingState = {
 let scalpingScore = 0; //用于兑换法宝
 let highestAsset = 0;
 
-const scalpingItems = [
-    {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
-    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', downRate: 2.5, basePrice: 20000, bonusPrice: 500000, fluctuation: 0.1, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
-    {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
-    {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', downRate: 1, basePrice: 200, bonusPrice: 4000, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
-    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', downRate: 1.5, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
-    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.35, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
-    {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
-    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', downRate: 2, basePrice: 20000, bonusPrice: 40000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'},
-    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', downRate: 3, basePrice: 4000, bonusPrice: 300000, fluctuation: 0.3, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
-    {name: '月饼', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4eae.png', downRate: 1, basePrice: 100, bonusPrice: 2000, fluctuation: 0.15, goodEvent: '中秋佳节，月饼也成了走亲访友的送礼佳品，所谓贵的就是好的，月饼也在节日氛围里身价倍涨', badEvent: '现代人崇尚低碳水、低糖的饮食作风，月饼大量临期，折价处理', description: '农历八月十五，是万家灯火共团圆的日子'}
+let scalpingItems = [
+    {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', itemActivate: false, downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', itemActivate: false, downRate: 2.5, basePrice: 20000, bonusPrice: 500000, fluctuation: 0.1, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
+    {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', itemActivate: false, downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
+    {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', itemActivate: false, downRate: 1, basePrice: 200, bonusPrice: 4000, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
+    {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', itemActivate: false, downRate: 1.5, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
+    {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', itemActivate: false, downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.35, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
+    {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', itemActivate: false, downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
+    {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', itemActivate: false, downRate: 2, basePrice: 20000, bonusPrice: 40000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'},
+    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', itemActivate: false, downRate: 3, basePrice: 4000, bonusPrice: 300000, fluctuation: 0.3, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
+    {name: '月饼', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4eae.png', itemActivate: false, downRate: 1, basePrice: 100, bonusPrice: 2000, fluctuation: 0.15, goodEvent: '中秋佳节，月饼也成了走亲访友的送礼佳品，所谓贵的就是好的，月饼也在节日氛围里身价倍涨', badEvent: '现代人崇尚低碳水、低糖的饮食作风，月饼大量临期，折价处理', description: '农历八月十五，是万家灯火共团圆的日子'},
+    {name: '浪四海', url: 'https://pic.imgdb.cn/item/66ebc319f21886ccc0a21f39.png', itemActivate: false, downRate: 1, basePrice: 3000, bonusPrice: 6000, fluctuation: 0.8, goodEvent: '小长假，踏上浪四海云游四方成为越来越多修仙者的生活方式，浪四海价格走俏', badEvent: '由于羽族开发了“共享羽翼”，浪四海因成本过高问题失去人们青睐', description: '不仅拥有飞剑的霸气造型，更有一个响亮的名字：“浪四海！'},
+    {name: '灵雨', url: 'https://pic.imgdb.cn/item/66ebc319f21886ccc0a21f10.png', itemActivate: false, downRate: 1, basePrice: 15000, bonusPrice: 30000, fluctuation: 0.4, goodEvent: '一年一度的赛级大猫出圈三界——更柔顺的毛皮和更美的品相！带动灵雨全线价格上升', badEvent: '大猫固然可爱，千篇一律终让人审美疲劳，价格回归低位', description: '外形出众，性格温顺的灵猫，擅长为修仙者提供各种增益和情绪价值'}
 ];
 
 let stockList = [
@@ -20616,8 +20618,89 @@ function getScalpableItemsPrice(item, isSpecial = false) {
     return Math.floor(price);
 }
 
+function generateItemToDisplay() {
+    if (scalpingState.currentSellingWeek !== 0) {
+        showMerchant('当前正在本年度的商品运作中，无法更换商品！');
+        return;
+    }
+    const selectedItems = scalpingItems.filter(i => i.itemActivate);
+    const parentPanel = document.getElementById('scalping-display');
+    const existingPanel = document.getElementById('select-scalping-item-panel');
+    if (existingPanel) parentPanel.removeChild(existingPanel);
+
+    const selectPanel = document.createElement('div');
+    selectPanel.id = "select-scalping-item-panel";
+    selectPanel.innerText = `选择需要添加的商品 ${selectedItems.length} / 6`;
+    selectPanel.style = 'position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);display: flex;background: rgba(0, 0, 0, 0.8);flex-flow: wrap;padding: 20px;width: 300px;height: 300px;overflow-y: scroll;color: white;align-items: center;gap: 10px;justify-content: center;border-radius: 5px;border: 1px solid white;';
+
+    const selectPanelContainer = document.createElement('div');
+    selectPanelContainer.style = "display: grid;grid-template-columns: repeat(3,1fr);align-content: space-between;width: 100%;";
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+    closeBtn.innerText = '关闭窗口';
+    closeBtn.addEventListener('click', () => {
+        parentPanel.removeChild(selectPanel);
+    });
+    selectPanel.appendChild(closeBtn);
+    
+    scalpingItems.forEach(item => {
+        // 创建容器
+        const itemContainer = document.createElement('div');
+        itemContainer.id = `${item.name}-option`;
+        itemContainer.style = "display: flex;height: 100px;width: 80px;flex-direction: column;flex-wrap: nowrap;align-items: center;justify-content: space-between;padding: 5px;";
+        
+        // 创建内部容器
+        const innerContainer = document.createElement('div');
+        innerContainer.style = "display: flex;flex-direction: column;align-items: center;align-content: center;justify-content: space-between;flex-wrap: wrap;text-wrap: nowrap;text-overflow: ellipsis;gap: 5px; font-size:14px;";
+        
+        // 创建图片元素
+        const imgElement = document.createElement('img');
+        imgElement.src = item.url;
+        imgElement.alt = item.name;
+        imgElement.style = "width:45px;height:45px;cursor:pointer;";
+        imgElement.addEventListener('click', () => {
+            showMerchant(`${item.name}: 单品均价${item.basePrice}元, 一般波动较${item.fluctuation <= 0.2 && item.downRate <= 1.5 ? '小' : '大'}。特殊情况下属于${item.bonusPrice >= item.basePrice * 3 ? '风投产品，风险与收益并存' : '一般产品，可用于资产保值'}。`);
+        })
+        
+        // 创建文本元素
+        const nameDiv = document.createElement('div');
+        nameDiv.textContent = item.name;
+        
+        // 组装元素
+        innerContainer.appendChild(imgElement);
+        innerContainer.appendChild(nameDiv);
+        itemContainer.appendChild(innerContainer);
+
+        const activateBtn = document.createElement('button');
+        activateBtn.id = `${item.name}-activate-button`;
+        activateBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+        activateBtn.innerText = `${item.itemActivate ? '取消' : '激活'}`;
+        activateBtn.addEventListener('click', () => {
+            if (!item.itemActivate && selectedItems.length < 6) {
+                item.itemActivate = true;
+                showMerchant(`已激活${item.name}。`);
+                activateBtn.innerText = '取消';
+                generateItemToDisplay();
+            } else if (item.itemActivate) {
+                item.itemActivate = false;
+                showMerchant(`已取消售卖${item.name}。`);
+                activateBtn.innerText = '激活';
+                generateItemToDisplay();
+            } else {
+                showMerchant('只能同时运作6个商品！');
+            }
+        });
+        itemContainer.appendChild(activateBtn);
+        selectPanelContainer.appendChild(itemContainer);
+
+    });
+    selectPanel.appendChild(selectPanelContainer);
+    parentPanel.appendChild(selectPanel);
+}
+        
 // 生成随机商品并展示到市场板块
-function getRandomScalpableItem() {
+function getRandomScalpableItem() {    
     const marketPanel = document.getElementById('scalping-item-info');
     marketPanel.innerHTML = ''; // 清空现有内容
     let specialEvents = false;
@@ -20629,9 +20712,11 @@ function getRandomScalpableItem() {
 
     if (wealthOfNations) itemToAdd = 1;
     const numberOfItems = Math.min(5, Math.floor(Math.random() * 5) + 1 + itemToAdd);
+    const selectedItems = scalpingItems.filter(i => i.itemActivate);
+
     
     while (itemsToDisplay.length < numberOfItems) {
-        const randomItem = scalpingItems[Math.floor(Math.random() * scalpingItems.length)];
+        const randomItem = selectedItems[Math.floor(Math.random() * selectedItems.length)];
         if (!itemsToDisplay.includes(randomItem)) {
             itemsToDisplay.push(randomItem);
         }
@@ -20825,6 +20910,11 @@ function finalizeScalping() {
 document.getElementById('relax-byweek').addEventListener('click', () => {
     const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
     const refreshCostRatio = heroToken ? 0.7 : 1;
+
+    if (currentSlider) {
+        document.body.removeChild(currentSlider);
+        currentSlider = null;
+    }
     
     if (scalpingState.maxSellingWeek - scalpingState.currentSellingWeek >= 2) {
         processSaleWeek(2, 1, refreshCostRatio);  // 休养两周
@@ -20842,7 +20932,19 @@ function refreshSaleWeek() {
     const heroToken = scalpingState.gadgets.find(gadget => gadget === '英雄令');
     const energyCostRatio = fitnessPowder ? 0.7 : 1;
     const refreshCostRatio = heroToken ? 0.7 : 1;
+    const selectedItems = scalpingItems.filter(i => i.itemActivate);
 
+    if (currentSlider) {
+        document.body.removeChild(currentSlider);
+        currentSlider = null;
+    }
+
+    if (selectedItems.length <= 0) {
+        showMerchant(`你需要选择激活6个商品才能在市场进行运作！现在还差${6 - selectedItems.length}个待激活商品！`);
+        generateItemToDisplay();
+        return;
+    }
+        
     if (scalpingState.currentSellingWeek < scalpingState.maxSellingWeek) {
         processSaleWeek(1, energyCostRatio, refreshCostRatio);  // 常规更新一周
     } else {

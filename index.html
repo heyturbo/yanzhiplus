@@ -20823,11 +20823,11 @@ function getReputationEvent() {
         if (currentInfoBox) {
             setTimeout(() => {
                 scalpingState.currentCash += selectedEvent.cashIn;
-                showMerchant(`本季度回顾：${selectedEvent.description}，奖励金${selectedEvent.cashIn}元`);
+                showMerchant(`本季度回顾：${selectedEvent.description}，奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元`);
             },1000);
         } else {
             scalpingState.currentCash += selectedEvent.cashIn;
-            showMerchant(`本季度回顾：${selectedEvent.description}，奖励金${selectedEvent.cashIn}元`);
+            showMerchant(`本季度回顾：${selectedEvent.description}，奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元`);
         }
     }
     updateScalpingPanel();
@@ -21593,7 +21593,7 @@ function calculateNetAsset() {
 function calculatePlayerReputation() {
     const netAsset = calculateNetAsset();
     let reputation = 0;
-    reputation = Math.max(0, Math.floor(Math.max(0, (netAsset - 200000) / 125)) + scalpingState.playerReputation);
+    reputation = Math.max(0, Math.floor(Math.max(0, (netAsset - 200000) / 500)) + scalpingState.playerReputation);
     
     return reputation;
 }

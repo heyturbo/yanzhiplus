@@ -20637,7 +20637,7 @@ function generateItemToDisplay() {
     selectPanelContainer.style = "display: grid;grid-template-columns: repeat(3,1fr);align-content: space-between;width: 100%;";
     
     const closeBtn = document.createElement('button');
-    closeBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+    closeBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 14px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
     closeBtn.innerText = '关闭窗口';
     closeBtn.addEventListener('click', () => {
         parentPanel.removeChild(selectPanel);
@@ -20648,7 +20648,7 @@ function generateItemToDisplay() {
         // 创建容器
         const itemContainer = document.createElement('div');
         itemContainer.id = `${item.name}-option`;
-        itemContainer.style = "display: flex;height: 100px;width: 80px;flex-direction: column;flex-wrap: nowrap;align-items: center;justify-content: space-between;padding: 5px;";
+        itemContainer.style = "display: flex;height: 100px;width: 80px;flex-flow: column;justify-content: space-between;padding: 5px;gap: 2px;align-items: center;";
         
         // 创建内部容器
         const innerContainer = document.createElement('div');
@@ -20674,7 +20674,7 @@ function generateItemToDisplay() {
 
         const activateBtn = document.createElement('button');
         activateBtn.id = `${item.name}-activate-button`;
-        activateBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+        activateBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;fon;font-size: 14px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
         activateBtn.innerText = `${item.itemActivate ? '取消' : '激活'}`;
         activateBtn.addEventListener('click', () => {
             if (!item.itemActivate && selectedItems.length < 6) {

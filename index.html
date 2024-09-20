@@ -16276,7 +16276,7 @@ let jinnangItems = [
     { name: 'kaimanzhizhao', displayName: '开曼岛执照', url: 'https://pic.imgdb.cn/item/66e994f2f21886ccc04fd099.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）将企业注册在避税天堂，交易股票时税费减少50%' },
     { name: 'jiazuxintuo', displayName: '家族信托', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007aa0b.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）来自权贵家族的委托基金，每周将随机获得5000~10000元现金' },
     { name: 'caopanjubo', displayName: '操盘巨擘', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9ff.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，将延长50%股票周期的持续时间（无论牛市/熊市都会延长）' },
-    { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有20%概率在每周刷新时不更新时间' },
+    { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不更新时间' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -20948,19 +20948,29 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
 
     // 扣除周数
     if (scalpingState.currentSellingWeek + weekIncrement <= maxWeek) {
-        if (timeMachine && Math.random() < 0.2) {
+        if (timeMachine && Math.random() < 0.15) {
             const existingContainer = document.getElementById('baida-feili');
             if (existingContainer) document.getElementById('scalping-container').removeChild(existingContainer);
             
             const textContainer = document.createElement('p');
             textContainer.id = 'baida-feili';
-            textContainer.style = 'display: flex;color: white;width: 240px;padding: 10px;border-radius: 5px;background-color: rgba(0, 0, 0, 0.8);height: 100px;top: 50%;left: 50%;transform: translate(-50%, -50%);position: fixed;align-items: center;flex-direction: column;justify-content: center;';
-            textContainer.innerText = '百达翡丽拥有将时空凝滞的功能，在此次刷新中，你的时间没有更新';
+            textContainer.style = 'display: flex;color: white;cursor:pointer;z-index: 1000;padding: 20px;gap: 10px;background-color: rgba(0, 0, 0, 0.8);border-radius: 2px;top: 50%;left: 50%;transform: translate(-50%, -50%);position: fixed;align-items: center;flex-direction: column-reverse;justify-content: center;font-style: italic;text-align: center;font-size: 14px;';
+            textContainer.innerText = '百达翡丽拥有将时空凝滞的功能，在此次刷新中，时间没有增长';
+            textContainer.addEventListener('click', () => {
+                textContainer.style.display = 'none';
+            })
+
+            const imgElement = document.createElement('img');
+            imgElement.src = 'https://pic.imgdb.cn/item/66ed55f0f21886ccc0145d08.png';
+            imgElement.style = 'width: 240px;height: 144px;box-shadow: 0px 0px 2px 0px #fff;'
+            textContainer.appendChild(imgElement);
 
             document.getElementById('scalping-container').appendChild(textContainer);
             setTimeout(() => {
-                document.getElementById('scalping-container').removeChild(textContainer);
-            },1500);
+                if (textContainer) {
+                    document.getElementById('scalping-container').removeChild(textContainer);
+                }
+            },3000);
         } else {
             scalpingState.currentSellingWeek += weekIncrement;
             scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * weekIncrement));

@@ -1037,6 +1037,8 @@
             justify-content: space-around;
             border: 2px solid #87431f;
             align-items: center;
+            flex-wrap: nowrap;
+            height: 55px;
         }
         .scalping-middle-wrap {
             width: 100%;
@@ -2916,7 +2918,7 @@
         <div class="scalping-container" id="scalping-container">
             <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
                 <div class="scalping-top-bar" id="scalping-top-bar">
-                    <div>🕰时间已过:</div>
+                    <div>📅 时间已过:</div>
                     <div>第<span id="current-selling-week">1</span>周/<span id="max-selling-week">52</span>周</div>
                     <div style="display: flex;flex-direction: column;font-size: 14px;">
                         <div>🏆 声望：<span id="player-reputation">0</span></div>
@@ -2925,11 +2927,11 @@
                 </div>
                 <div class="scalping-asset-area" id="scalping-asset-area">
                     <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
-                        <div>💵当前现金：<span id="current-cash">0</span></div>
-                        <div>🗃资产总值：<span id="net-asset">0</span></div>
+                        <div>💵 现金流：<span id="current-cash">0</span></div>
+                        <div>🗃 总资产：<span id="net-asset">0</span></div>
                     </div>
                     <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
-                        <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: column;align-items: center;">
+                        <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: row;align-items: center;">
                             <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">经商法宝</button>
                             <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
                                 <!-- 动态生成法宝 -->
@@ -2959,7 +2961,7 @@
                 </div>
                 <div class="scalping-middle-wrap" id="scalping-middle-wrap">
                     <div class="scalping-detail-list" id="market-info">
-                        <strong style="height: 30px;">市场<button id="select-item-to-display" onclick="generateItemToDisplay()">➕</button></strong>
+                        <strong style="height: 30px;display: flex;align-items: center;">市场<button id="select-item-to-display" onclick="generateItemToDisplay()" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
                         <div id="scalping-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
                             <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
                                 <div>货物</div>
@@ -2971,11 +2973,11 @@
                         </div>
                     </div>
                     <div class="scalping-warehouse" id="warehouse-info">
-                        <strong style="display: flex;gap: 5px;flex-direction: row;height: 30px;align-items: flex-start;">仓库<div style="display: flex;flex-direction: row;align-items: flex-start;">(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button">➕</button></div></strong>
+                        <strong style="height: 30px;display: flex;align-items: center;">仓库(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
                         <div id="warehouse-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
                             <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
                                 <div>货物</div>
-                                <div>买入价</div>
+                                <div>均价</div>
                                 <div>数量</div>
                             </div>
                             <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;max-height: 300px;overflow-y: scroll;">
@@ -16272,6 +16274,9 @@ let jinnangItems = [
     { name: 'doubleLuck', displayName: '双喜临门', url: 'https://pic.imgdb.cn/item/66e8256dd9c307b7e96cc570.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）经商结束时，积分结算翻倍' },
     { name: 'zibenyunzuo', displayName: '资本运作', url: 'https://pic.imgdb.cn/item/66e99553f21886ccc0502e94.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）通过高效的资本运作，投资股票后减少一周收益等待时间' },
     { name: 'kaimanzhizhao', displayName: '开曼岛执照', url: 'https://pic.imgdb.cn/item/66e994f2f21886ccc04fd099.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）将企业注册在避税天堂，交易股票时税费减少50%' },
+    { name: 'jiazuxintuo', displayName: '家族信托', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007aa0b.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）来自权贵家族的委托基金，每周将随机获得5000~10000元现金' },
+    { name: 'caopanjubo', displayName: '操盘巨擘', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9ff.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，将延长50%股票周期的持续时间（无论牛市/熊市都会延长）' },
+    { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有20%概率在每周刷新时不更新时间' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -19989,8 +19994,12 @@ function updateStockPrice() {
     let randomActivate = false;
     stockList.forEach(stock => {
         const basePrice = parseFloat(stock.basePrice) || 1;
+        const caopanjubo = scalpingState.gadgets.find(gadget => gadget === '操盘巨擘');
+
+        let gadgetBonus = 0;
+        if (caopanjubo) gadgetBonus = 3;
         
-        if (scalpingState.currentSellingWeek > 30 && scalpingState.currentSellingWeek <= 36) {
+        if (scalpingState.currentSellingWeek > 30 && scalpingState.currentSellingWeek <= 36 + gadgetBonus) {
             
             stock.basePrice = enterStockKeyPhase(stock);
             
@@ -20612,9 +20621,20 @@ function updateGadgetStorePanel() {
         {name: '乾坤袋', price: 2500},
         {name: '双喜临门', price: 3000},
         {name: '资本运作', price: 10000},
-        {name: '开曼岛执照', price: 10000}
+        {name: '开曼岛执照', price: 10000},
+        {name: '家族信托', price: 15000},
+        {name: '操盘巨擘', price: 18000},
+        {name: '百达翡丽', price: 25000}
     ];
 
+    // 对 gadgets 按照价格从低到高进行排序
+    gadgets.sort((a, b) => {
+        const priceA = gadgetPrice.find(p => p.name === a.displayName)?.price || 0;
+        const priceB = gadgetPrice.find(p => p.name === b.displayName)?.price || 0;
+        return priceA - priceB;
+    });
+
+    // 生成 gadget 元素
     gadgets.forEach(gadget => {
         const priceInfo = gadgetPrice.find(p => p.name === gadget.displayName);
         const price = priceInfo ? priceInfo.price : '未知'; // 如果找不到价格则显示"未知"
@@ -20630,7 +20650,7 @@ function updateGadgetStorePanel() {
             <div id="description-${gadget.name}" style="width: 80%;height: 100%;text-align: start;">${gadget.description}，售价：${price} 积分。</div>
         `;
         gadgetItemsArea.appendChild(gadgetElement);
-        
+
         gadgetElement.addEventListener('click', () => {
             if (price === '未知') {
                 showMerchant('此法宝无法购买，价格未知！');
@@ -20653,6 +20673,7 @@ function updateGadgetStorePanel() {
         });
     });
 }
+
         
 document.getElementById('close-gagdet-store').addEventListener('click', () => {
     const storeElement = document.getElementById('gadget-store-panel');
@@ -20693,7 +20714,7 @@ function generateItemToDisplay() {
 
     const selectPanel = document.createElement('div');
     selectPanel.id = "select-scalping-item-panel";
-    selectPanel.innerText = `选择本年度运作的商品 ${selectedItems.length} / 6`;
+    selectPanel.innerText = `请为你的企业选品 ${selectedItems.length} / 6`;
     selectPanel.style = "flex-flow: wrap;gap: 10px;position: fixed;top: 50%;left: 50%;transform: translate(-50%, -50%);width: 100%;display: flex;background: url('https://pic.imgdb.cn/item/66ea60acf21886ccc04b6877.jpg') center center / cover no-repeat rgba(0, 0, 0, 0.8);padding: 2px;border-radius: 2px;color: #fff;font-size: 16px;height: 100%;align-items: center;place-content: center;text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;";
 
     const selectPanelContainer = document.createElement('div');
@@ -20905,10 +20926,14 @@ function getReputationAndShareEvent() {
 function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
     const refreshButton = document.getElementById('enter-next-week');
     const maxWeek = scalpingState.maxSellingWeek;
+    const currentWeek = scalpingState.currentSellingWeek;
 
     // 计算花费
     const refreshCost = Math.max(0, Math.floor(scalpingState.maxWarehouseCapacity * 10 * cashCostRatio));
     const energyCost = Math.floor((Math.random() * 3 + 1) * energyCostRatio);
+
+    const jiazuxintuo = scalpingState.gadgets.find(gadget => gadget === '家族信托');
+    const timeMachine = scalpingState.gadgets.find(gadget => gadget === '百达翡丽');
 
     if (scalpingState.currentSellingWeek === 0 && scalpingState.currentCash === 0) {
         showMerchant(`开业第一天，没有一点启动资金可不行，目前最小的仓库每周租金${refreshCost}元，请确认你的账户资金充足`);
@@ -20923,9 +20948,26 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
 
     // 扣除周数
     if (scalpingState.currentSellingWeek + weekIncrement <= maxWeek) {
-        scalpingState.currentSellingWeek += weekIncrement;
-        scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * weekIncrement));
-        scalpingState.playerEnergy = Math.max(0, scalpingState.playerEnergy - energyCost);
+        if (timeMachine && Math.random() < 0.2) {
+            const existingContainer = document.getElementById('baida-feili');
+            if (existingContainer) document.getElementById('scalping-container').removeChild(existingContainer);
+            
+            const textContainer = document.createElement('p');
+            textContainer.id = 'baida-feili';
+            textContainer.style = 'display: flex;color: white;width: 240px;padding: 10px;border-radius: 5px;background-color: rgba(0, 0, 0, 0.8);height: 100px;top: 50%;left: 50%;transform: translate(-50%, -50%);position: fixed;align-items: center;flex-direction: column;justify-content: center;';
+            textContainer.innerText = '百达翡丽拥有将时空凝滞的功能，在此次刷新中，你的时间没有更新';
+
+            document.getElementById('scalping-container').appendChild(textContainer);
+            setTimeout(() => {
+                document.getElementById('scalping-container').removeChild(textContainer);
+            },1500);
+        } else {
+            scalpingState.currentSellingWeek += weekIncrement;
+            scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * weekIncrement));
+            scalpingState.playerEnergy = Math.max(0, scalpingState.playerEnergy - energyCost);
+        }
+        
+        if (jiazuxintuo) scalpingState.currentCash += Math.floor(Math.random() * 5000 + 5000) * weekIncrement; //应用家族信托
 
         // 更新股票持有状态
         let stockOwned = stockList.filter(s => s.quantity > 0);

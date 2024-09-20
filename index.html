@@ -20390,11 +20390,7 @@ function handleStockTransaction(item, actionType) {
                 const totalCost = quantity * price;
                 scalpingState.currentCash -= Math.floor(totalCost);
                 item.quantity += quantity;
-                if (stockList.filter(s => s.quantity > 0).length === 1) {
-                    document.getElementById('stock-info-display').innerText = `当前持有${item.quantity}手${item.name}的股票`;
-                } else {
-                    document.getElementById('stock-info-display').innerText = `当前总计持有${stockList.filter(s => s.quantity > 0).length}支股票`;
-                }
+     
                 updateScalpingPanel();
                 updateStockPanelDisplay();
             } else {
@@ -21055,7 +21051,7 @@ function recordAchivements() {
         {description: '在1亿小目标的半山腰睥睨尘世', type: 'netAsset', reqValue: '50000000'},
         {description: '你的资产第一次突破1亿，实现人生的小目标', type: 'netAsset', reqValue: '100000000'},
         {description: '你赚到了10亿，实现了人生的财富自由，开始追求更高阶的精神自由', type: 'netAsset', reqValue: '1000000000'},
-        {description: '你投资的第一支股票开始产生收益', type: 'stock', reqValue: '1'},
+        {description: '你投资的第一支股票开始产生收益，初尝资产配置的快感', type: 'stock', reqValue: '1'},
         {description: '你超越了过去的自己，财富积累达到了当前最高记录', type: 'highestScore', reqValue: '1'},
     ];
 
@@ -21750,7 +21746,6 @@ function updateScalpingPanel() {
     const relaxButton = document.getElementById('relax-byweek'); 
     const gadgetButton = document.getElementById('add-scalping-gadgets');
     const scalpingScoreElement = document.getElementById('scalping-score');
-    const stockInfo = document.getElementById('stock-info-display');
 
     currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
@@ -21763,6 +21758,7 @@ function updateScalpingPanel() {
     scalpingScoreElement.innerText = scalpingScore;
     checkGagdetsState(); //更新法宝应用情况
     recordAchivements(); //更新实时记录
+    checkStockPhaseAndDisplay();
     
     if (scalpingState.playerEnergy <= 60) {
         relaxButton.style.display = 'flex';
@@ -21778,13 +21774,34 @@ function updateScalpingPanel() {
         gadgetButton.style.display = 'none';
     } else {
         gadgetButton.style.display = 'flex';
-    }
-    
-    const hasStock = stockList.filter(s => s.quantity > 0);
-    if (hasStock.length === 0) stockInfo.innerText = '当前没有投资任何股票';
-        
+    } 
 }
 
+function checkStockPhaseAndDisplay() {
+    const stockInfo = document.getElementById('stock-info-display');
+    const hasStock = stockList.filter(s => s.quantity > 0);
+    
+    if (hasStock.length === 0 && keyPhaseCount === 0) {
+        stockInfo.innerText = '当前没有投资任何股票';
+    } else if (hasStock.length === 0 && keyPhaseCount > 0) {
+        stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛市周期】' : '【熊市周期】'}当前没有投资任何股票`;
+    } 
+    
+    if (hasStock.length === 1) {
+        if (keyPhaseCount === 0) {
+            stockInfo.innerText = `当前持有${hasStock.find(h => h.quantity > 0).quantity}手${hasStock.find(h => h.quantity > 0).name}的股票`;
+        } else {
+            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛】' : '【熊】'}当前持有${hasStock.find(h => h.quantity > 0).quantity}手${hasStock.find(h => h.quantity > 0).name}的股票`;
+        }
+    } else if (hasStock.length > 1) { 
+        if (keyPhaseCount === 0) {
+            stockInfo.innerText = `当前总计持有${hasStock.length}支股票`;
+        } else {
+            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛】' : '【熊】'}当前总计持有${hasStock.length}支股票`;
+        }
+    }  
+}
+        
 function checkGagdetsState() {
     const gadgetsElement = document.getElementById('applied-scalping-gadgets');
 

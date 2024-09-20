@@ -2921,7 +2921,7 @@
                     <div>📅 时间已过:</div>
                     <div>第<span id="current-selling-week">1</span>周/<span id="max-selling-week">52</span>周</div>
                     <div style="display: flex;flex-direction: column;font-size: 14px;">
-                        <div>🏆 声望：<span id="player-reputation">0</span></div>
+                        <div>🏆 声望：<span id="player-reputation" style="cursor:pointer;">0</span></div>
                         <div style="cursor: pointer;">🏄‍♂️ 精力：<span id="player-energy">100</span></div>
                     </div>
                 </div>
@@ -20183,9 +20183,11 @@ function generateStockRandomEvent(stock) {
     const stockName = stock.name;
     const stockOriginalPrice = stock.basePrice;
     let stockPriceAfterEvent = stockOriginalPrice;
+    const playerReputation = calculatePlayerReputation();
+    const repBonus = playerReputation * 0.000001; //定义声望的正向影响
 
     // 随机生成是好事件还是坏事件，50%几率
-    const isGoodEvent = Math.random() < 0.5;
+    const isGoodEvent = Math.random() < Math.min(0.8, 0.5 + repBonus);
     let eventEffect = 0;
     let detail = '';
 
@@ -20613,16 +20615,16 @@ function updateGadgetStorePanel() {
         {name: '八方来财', price: 6000},
         {name: '强身散', price: 4500},
         {name: '英雄令', price: 4500},
-        {name: '续租契', price: 13000},
+        {name: '续租契', price: 16000},
         {name: '珍宝案', price: 3000},
         {name: '特许招商令', price: 3000},
         {name: '国富论', price: 15000},
         {name: '唤神砂', price: 2000},
         {name: '乾坤袋', price: 2500},
         {name: '双喜临门', price: 3000},
-        {name: '资本运作', price: 10000},
-        {name: '开曼岛执照', price: 10000},
-        {name: '家族信托', price: 15000},
+        {name: '资本运作', price: 7000},
+        {name: '开曼岛执照', price: 7000},
+        {name: '家族信托', price: 8000},
         {name: '操盘巨擘', price: 18000},
         {name: '百达翡丽', price: 25000}
     ];
@@ -20684,8 +20686,10 @@ document.getElementById('close-gagdet-store').addEventListener('click', () => {
 function getScalpableItemsPrice(item, isSpecial = false) {
     let fluctuationRange = 0;
     let price = 0;
+    const playerReputation = calculatePlayerReputation();
+    const repBonus = playerReputation * 0.000001; //定义声望的正向影响
     if (isSpecial) {
-        if (Math.random() < 0.5){
+        if (Math.random() < Math.min(0.8, 0.5 + repBonus)) {
             fluctuationRange = item.basePrice * item.fluctuation;
             price = Math.floor((item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange)) * 0.2 * item.downRate);
             showMerchant(`${item.badEvent}`);
@@ -21255,10 +21259,13 @@ function generateRandomEvents() {
         }
         
         scalpingState.currentCash = Math.max(0, scalpingState.currentCash - selectedRandomEvent.cost);
-        let extraBias = 0; //此处预留法宝的作用
+        
+        const playerReputation = calculatePlayerReputation();
+        const repBonus = playerReputation * 0.000001; //定义声望的正向影响
+        let extraBias = repBonus; //此处预留法宝的作用
         
         // 根据 bias 确定是好事件还是坏事件
-        if (Math.random() < selectedRandomEvent.bias + extraBias) {
+        if (Math.random() < Math.min(0.8, selectedRandomEvent.bias + extraBias)) {
             // 好事件：给予奖励
             scalpingState.currentCash += selectedRandomEvent.goodReward;
             scalpingState.playerEnergy = Math.min(100, scalpingState.playerEnergy + selectedRandomEvent.energyReward);
@@ -21641,6 +21648,10 @@ function handleItemSell(item, itemInfo) {
         handleItemTransaction(item, itemInfo, 'sell');
     }
 }
+
+document.getElementById('player-reputation').addEventListener('click', () => {
+    showMerchant('\n1. 声望是你在资本增长过程中积累的数值。 \n2. 声望越高，每个季度（每10周）回顾时会得到特殊奖励。 \n3. 声望还会对特殊事件的走向产生影响。');
+});
         
 document.getElementById('player-energy').addEventListener('click', () => {
     const energy = scalpingState.playerEnergy;
@@ -21649,13 +21660,13 @@ document.getElementById('player-energy').addEventListener('click', () => {
     const recoverCost = Math.pow(recoverCostRatio, 4);
 
     if (cash >= recoverCost) {
-        showInfoBox(`你可以花费${recoverCost}元立即恢复到满精力状态`,
+        showInfoBox(`\n1. 每周刷新时会扣除精力，精力低于60时将无法进行任何交易。\n\n2. 精力不足时可以选择休息两周或在此对话框内点击确认花费现金补充。 \n\n3. 你可以花费${recoverCost}元立即恢复到满精力状态，是否确认？`,
                     () => {
                         scalpingState.currentCash -= recoverCost;
                         scalpingState.playerEnergy = 100;
                         updateScalpingPanel();
                         showMerchant('一根上好的参汤进补，你又焕发了龙马精神');
-                    },null,'red','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px')
+                    },null,'crimson','https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png','88px * 88px')
     } else {
         showMerchant(`当前需要${recoverCost}元来恢复精力，你的现金不足！`);
     }

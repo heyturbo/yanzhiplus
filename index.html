@@ -19981,12 +19981,26 @@ function resetDealWeek(stock) {
 
     console.log(stock.dealWeek);
 }
+
+let keyPhaseCount = 0;
         
 function updateStockPrice() {
     let info = [];
     let randomActivate = false;
     stockList.forEach(stock => {
         const basePrice = parseFloat(stock.basePrice) || 1;
+        
+        if (scalpingState.currentSellingWeek > 30 && scalpingState.currentSellingWeek <= 36) {
+            
+            stock.basePrice = enterStockKeyPhase(stock);
+            
+            if (basePrice < stock.basePrice) {
+                stock.state = 'higher';
+            } else {
+                stock.state = 'lower';
+            } 
+            return;
+        }
         
         // 计算波动幅度，确保波动的方向有可能为负（即下跌）
         const fluctuation = Math.random() * stock.fluctuation * (Math.random() < 0.5 ? -1 : 1);
@@ -20025,9 +20039,35 @@ function updateStockPrice() {
         // 确保价格不会跌到负数
         stock.basePrice = Math.max(parseFloat(stockPrice.toFixed(2)), 0);
         info.push(`${stock.name}: 上周股价${basePrice},本周股价${stock.basePrice},股价状态为${stock.state === 'higher' ? '涨' : '跌'}`);
+        
+        if (keyPhaseCount !== 0) keyPhaseCount = 0;
     });
+    
     // console.log(info);
     updateStockPanelDisplay();
+}
+
+function enterStockKeyPhase(stock) {
+    const goodPhase = calculateNetAsset() > 5000000;
+    if (goodPhase) {
+        stock.basePrice *= (Math.random() * 0.05 + 1.01);
+    } else {
+        stock.basePrice *= (Math.random() * 0.05 + 0.8);
+    }
+
+    if (keyPhaseCount === 0) {
+        if (!currentInfoBox) {
+            showMerchant(goodPhase ? '【证券要闻】经济强势，证券市场进入牛市周期！' : '【证券要闻】经济萧条，证券市场进入熊市周期！');
+        } else {
+            setTimeout(() => {
+                showMerchant(goodPhase ? '【证券要闻】经济强势，证券市场进入牛市周期！' : '【证券要闻】经济萧条，证券市场进入熊市周期！');
+            }, 1000);
+        }
+        
+        keyPhaseCount ++;
+    }
+    
+    return parseFloat(stock.basePrice.toFixed(2)); //parseFloat处理小数，int处理字符串
 }
         
 function updateStockPanelDisplay() { 
@@ -20685,7 +20725,6 @@ function generateItemToDisplay() {
         const imgElement = document.createElement('img');
         imgElement.src = item.url;
         imgElement.alt = item.name;
-        imgElement.style.opacity = `${item.itemActivate? '0.8' : '1'}`;
         imgElement.style.width = "45px";
         imgElement.style.height = "45px";
         imgElement.style.cursor = "pointer";
@@ -20832,14 +20871,9 @@ function getReputationAndShareEvent() {
         dividend += Math.floor(stock.basePrice * stock.quantity * 0.05);
     });
     console.log(`当前股息分红为${dividend}`);
-
     scalpingState.currentCash += dividend;
-    // 声望小于等于0时，没有事件触发
-    if (reputation <= 0 && !currentInfoBox) {
-        showMerchant(`本季度你按部就班地经营，较为低调${hasOwnedStock ? `，你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
-        return;
-    }
-
+    
+    
     // 查找声望对应的事件，向下匹配最接近的事件
     let selectedEvent = null;
     for (let i = repEvents.length - 1; i >= 0; i--) {
@@ -20848,19 +20882,27 @@ function getReputationAndShareEvent() {
             break;
         }
     }
-
+    
     // 如果找到了合适的事件，增加现金并显示事件
-    if (selectedEvent) {
-        if (currentInfoBox) {
+    if (!selectedEvent) {
+        if (!currentInfoBox) {
+            showMerchant(`本季度你按部就班地经营，较为低调${hasOwnedStock.length !== 0 ? `，你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
+        } else {
+            setTimeout(() => {
+                showMerchant(`本季度你按部就班地经营，较为低调${hasOwnedStock.length !== 0 ? `，你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
+            }, 1000);
+        } 
+    } else {
+        if (!currentInfoBox) {
+            scalpingState.currentCash += selectedEvent.cashIn;
+            showMerchant(`本季度回顾：${selectedEvent.description}，声望奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元${hasOwnedStock.length !== 0 ? `,你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
+        } else {
             setTimeout(() => {
                 scalpingState.currentCash += selectedEvent.cashIn;
-                showMerchant(`本季度回顾：${selectedEvent.description}，声望奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元${hasOwnedStock ? `，你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
-            },1000);
-        } else {
-            scalpingState.currentCash += selectedEvent.cashIn;
-            showMerchant(`本季度回顾：${selectedEvent.description}，声望奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元${hasOwnedStock ? `，你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
+                showMerchant(`本季度回顾：${selectedEvent.description}，声望奖励金${Math.min(selectedEvent.cashIn * 3, selectedEvent.cashIn + reputation)}元${hasOwnedStock.length !== 0 ? `,你持有的${hasOwnedStock.length}支股票共计股息分红${dividend}元。` : '。'}`);
+            }, 1000);
         }
-    }
+    } 
     updateScalpingPanel();
 }
 
@@ -21304,7 +21346,7 @@ function resetScalping() {
     };
 
     if (isStock) openStockPanel();
-    
+    keyPhaseCount = 0;
     resetStockState();
     updateStockPanelDisplay();
     updateScalpingPanel();

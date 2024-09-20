@@ -21070,7 +21070,7 @@ function recordAchivements() {
             scalpingState.achievements.push(arrayOfAchievements);
         }
 
-        if (goal.type === 'stock' && stockList.find(s => s.quantity >= parseInt(goal.reqValue)) && s.dealWeek === 0) {
+        if (goal.type === 'stock' && stockList.find(s => s.quantity >= parseInt(goal.reqValue) && s.dealWeek === 0)) {
             const achievedWeek = scalpingState.currentSellingWeek;
             const arrayOfAchievements = {description: goal.description, week: achievedWeek};
             scalpingState.achievements.push(arrayOfAchievements);

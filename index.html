@@ -33,6 +33,41 @@
             overflow-y: scroll;
             z-index: 1000;
         }
+
+        /* 设置 input[type=range] 的基础样式 */
+        input[type="range"] {
+            -webkit-appearance: none;  /* 移除默认样式，适用于 WebKit 浏览器（如 Chrome, Safari） */
+              /* 设置宽度为 100% */
+            height: 25px;  /* 轨道高度 */
+            background: linear-gradient(90deg, #4caf50 0%, #d20505 100%); /* 渐变背景色 */
+             /* 轨道圆角 */
+            outline: none;  /* 移除点击时的外框 */
+            opacity: 0.7;  /* 设置透明度 */
+            transition: opacity .2s;  /* 增加过渡效果 */
+            width: 90%;
+            appearance: none;
+            border-radius: 25px;
+            border: 1px groove #fff;
+            box-shadow: rgba(0, 0, 0, 0.8) 0px 0px 2px 1px inset;
+        }
+
+        /* 鼠标悬停时不透明 */
+        input[type="range"]:hover {
+            opacity: 1;
+        }
+
+        /* 自定义滑块 (thumb) 样式 */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;  /* 移除默认样式 */
+            appearance: none;
+            width: 20px;  /* 滑块的宽度 */
+            height: 20px;  /* 滑块的高度 */
+            background: #ff5722;  /* 滑块颜色 */
+            cursor: pointer;  /* 鼠标悬停时的指针样式 */
+            border-radius: 50%;  /* 滑块圆角 */
+            box-shadow: 0 0 5px rgba(0,0,0,0.2);  /* 滑块阴影 */
+        }
+        
         .close-button {
             display: flex;
             /* width: 100%; */
@@ -1005,7 +1040,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 95%;
+            width: 380px;
             max-height: 80%;
             background-color: rgba(0, 0, 0, 0.8);
             color: #6f391c;
@@ -1021,7 +1056,7 @@
         
         .scalping-top-bar {
             font-weight: bold;
-            width: 95%;
+            width: 390px;
             overflow: hidden;
             display: flex;
             margin-bottom: 0px;
@@ -1034,20 +1069,20 @@
             height: 45px;
         }
         .scalping-asset-area {
-            width: 95%;
+            width: 382px;
             display: flex;
             flex-direction: row;
             justify-content: space-around;
-            border: 2px solid #87431f;
+            border: 4px double #87431f;
             align-items: center;
             flex-wrap: nowrap;
             height: 55px;
         }
         .scalping-middle-wrap {
-            width: 100%;
+            width: 390px;
             display: flex;
             flex-direction: row;
-            justify-content: center;
+            justify-content: space-between;
             align-items: flex-start;
             gap: 10px;
         }
@@ -1057,7 +1092,7 @@
             border-radius: 2px;
             flex-direction: column;
             align-items: center;
-            border: 2px solid #6f391c;
+            border: 4px double #87431f;
             padding: 2px;
             min-height: 100px;
         }
@@ -1067,7 +1102,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            border: 2px solid #6f391c;
+            border: 4px double #87431f;
             min-height: 100px;
             padding: 2px;
         }
@@ -2920,91 +2955,93 @@
         </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
-        <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:5px;width:95%;height:20px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商（积分：<span id="scalping-score">0</span>）</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
-        <div class="scalping-container" id="scalping-container">
-            <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
-                <div class="scalping-top-bar" id="scalping-top-bar">
-                    <div>📅 时间已过:</div>
-                    <div>第<span id="current-selling-week">0</span>周/<span id="max-selling-week">52</span>周</div>
-                    <div style="display: flex;flex-direction: column;font-size: 14px;">
-                        <div>🏆 声望：<span id="player-reputation" style="cursor:pointer;">0</span></div>
-                        <div style="cursor: pointer;">🏄‍♂️ 精力：<span id="player-energy">100</span></div>
+        <div id="scalping-display-container" style="max-height: 768px;width: 420px;">
+            <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:5px;width:95%;height:20px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商（积分：<span id="scalping-score">0</span>）</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
+            <div class="scalping-container" id="scalping-container">
+                <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
+                    <div class="scalping-top-bar" id="scalping-top-bar">
+                        <div>📅 时间已过:</div>
+                        <div>第<span id="current-selling-week">0</span>周/<span id="max-selling-week">52</span>周</div>
+                        <div style="display: flex;flex-direction: column;font-size: 14px;">
+                            <div>🏆 声望：<span id="player-reputation" style="cursor:pointer;">0</span></div>
+                            <div style="cursor: pointer;">🏄‍♂️ 精力：<span id="player-energy">100</span></div>
+                        </div>
+                    </div>
+                    <div class="scalping-asset-area" id="scalping-asset-area">
+                        <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
+                            <div>💵 现金流：<span id="current-cash">0</span></div>
+                            <div>🗃 总资产：<span id="net-asset">0</span></div>
+                        </div>
+                        <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
+                            <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: row;align-items: center;">
+                                <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">经商法宝</button>
+                                <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
+                                    <!-- 动态生成法宝 -->
+                                </div>
+                            </div>
+                            <div id="gadgets-selector" class="select-gadgets" style="display:none;padding: 0px 10px;">
+                                <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;width: 100%;height: 10px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size: 16px;padding: 10px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
+                                <div style="display:flex;width: 95%;justify-content: center;align-items: center;font-size:16px;padding: 5px;flex-direction: row;gap: 20px;">
+                                <p>选择你所拥有的法宝</p>
+                                <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
+                                </div>
+                                <div id="selected-gadgets" style="max-height: 420px;padding: 10px;overflow-y: scroll;min-height: 300px;border: 2px double #87431f;margin-bottom: 20px;width:95%">
+                                    <!-- 遍历法宝并在此处显示 -->
+                                </div>
+                            </div>
+                            <div id="gadget-store-panel" class="select-gadgets" style="display:none;">
+                                <div id="gadgets-store-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>兑换法宝<button id="close-gagdet-store">x</button></div>
+                                <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: center;align-items: center;width:100%;">
+                                <p>你可以使用经商积分点击图标兑换法宝</p>
+                                </div>
+                                <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
+                                    <!-- 此处函数生成 -->
+                                </div>
+                            </div>
+                        </div>
+                        <div><button id="add-investment" onclick="increaseInverstment()">增加投资</button></div>
+                    </div>
+                    <div class="scalping-middle-wrap" id="scalping-middle-wrap">
+                        <div class="scalping-detail-list" id="market-info">
+                            <strong id="market-title" style="height: 30px;display: flex;align-items: center;">市场<button id="select-item-to-display" onclick="generateItemToDisplay()" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
+                            <div id="scalping-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
+                                <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
+                                    <div id="market-item">货物</div>
+                                    <div>价格</div>
+                                </div>
+                            <div id="scalping-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;max-height: 300px;overflow-y: scroll;">
+                                <!-- 动态生成商品 -->
+                            </div>
+                            </div>
+                        </div>
+                        <div class="scalping-warehouse" id="warehouse-info">
+                            <strong style="height: 30px;display: flex;align-items: center;">仓库(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
+                            <div id="warehouse-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
+                                <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
+                                    <div>货物</div>
+                                    <div>均价</div>
+                                    <div>数量</div>
+                                </div>
+                                <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;max-height: 300px;overflow-y: scroll;">
+                                    <!-- 动态生成仓库商品 -->
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="scalping-asset-area" id="scalping-asset-area">
-                    <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
-                        <div>💵 现金流：<span id="current-cash">0</span></div>
-                        <div>🗃 总资产：<span id="net-asset">0</span></div>
-                    </div>
-                    <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
-                        <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: row;align-items: center;">
-                            <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">经商法宝</button>
-                            <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
-                                <!-- 动态生成法宝 -->
-                            </div>
-                        </div>
-                        <div id="gadgets-selector" class="select-gadgets" style="display:none;padding: 0px 10px;">
-                            <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;width: 100%;height: 10px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size: 16px;padding: 10px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
-                            <div style="display:flex;width: 95%;justify-content: center;align-items: center;font-size:16px;padding: 5px;flex-direction: row;gap: 20px;">
-                            <p>选择你所拥有的法宝</p>
-                            <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
-                            </div>
-                            <div id="selected-gadgets" style="max-height: 420px;padding: 10px;overflow-y: scroll;min-height: 300px;border: 2px double #87431f;margin-bottom: 20px;width:95%">
-                                <!-- 遍历法宝并在此处显示 -->
-                            </div>
-                        </div>
-                        <div id="gadget-store-panel" class="select-gadgets" style="display:none;">
-                            <div id="gadgets-store-head" class="drawer-toggle" style="font-weight:bold;padding:0px;width:100%;height:30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size:16px;"><div>v1.1</div>兑换法宝<button id="close-gagdet-store">x</button></div>
-                            <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: center;align-items: center;width:100%;">
-                            <p>你可以使用经商积分点击图标兑换法宝</p>
-                            </div>
-                            <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
-                                <!-- 此处函数生成 -->
-                            </div>
+                <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: space-between;flex-wrap: wrap;">
+                    <div class="scalping-bottom-area" id="stock-area" style="border-radius: 5px;color: white;width: 95%;padding: 5px;">
+                        <div style="display: flex;align-items: center;flex-direction: row;"><button id="open-stock-button" onclick="openStockPanel()">投资股票</button></div>
+                        <div id="stock-info-display" style="display:flex;font-size: 14px;text-wrap: nowrap;overflow: hidden;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: white;width: 75%;align-items: center;flex-direction: row;padding: 5px;justify-content: center;">当前没有投资任何股票</div>
+                        <div class= "stock-panel" id="stock-panel" style="display:none">
+                            <!-- 动态生成股票信息 -->
                         </div>
                     </div>
-                    <div><button id="add-investment" onclick="increaseInverstment()">增加投资</button></div>
-                </div>
-                <div class="scalping-middle-wrap" id="scalping-middle-wrap">
-                    <div class="scalping-detail-list" id="market-info">
-                        <strong style="height: 30px;display: flex;align-items: center;">市场<button id="select-item-to-display" onclick="generateItemToDisplay()" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
-                        <div id="scalping-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
-                            <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
-                                <div>货物</div>
-                                <div>价格</div>
-                            </div>
-                        <div id="scalping-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;max-height: 300px;overflow-y: scroll;">
-                            <!-- 动态生成商品 -->
-                        </div>
-                        </div>
+                    <div class="scalping-bottom-area" id="scalping-bottom-area">
+                        <div><button id="quit-scalping" onclick="quitScalping()">提前退市</button></div>
+                        <div><button id="relax-byweek" style="display: none">休息两周</button></div>
+                        <div><button id="enter-next-week" onclick="refreshSaleWeek()">刷新一周</button></div>
                     </div>
-                    <div class="scalping-warehouse" id="warehouse-info">
-                        <strong style="height: 30px;display: flex;align-items: center;">仓库(<span id="used-warehouse-capacity">0</span>/<span id="max-warehouse-capacity">100</span>)<button id="enlarge-warehouse-button" style="margin-left:5px;font-weight: bolder;padding: 0px 2px;">＋</button></strong>
-                        <div id="warehouse-item-info-container" style="width: 100%;gap: 10px;display: flex;flex-direction: column;">
-                            <div style="display: flex;width: 100%;flex-direction: row;justify-content: space-around;">
-                                <div>货物</div>
-                                <div>均价</div>
-                                <div>数量</div>
-                            </div>
-                            <div id="warehouse-item-info" style="padding: 5px;border-top: 2px solid #6f391c;background-image: url(https://pic.imgdb.cn/item/66da9042d9c307b7e9e14b2b.png);color: white;max-height: 300px;overflow-y: scroll;">
-                                <!-- 动态生成仓库商品 -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div style="width: 100%;display: flex;flex-direction: column;align-items: center;align-content: space-between;flex-wrap: wrap;">
-                <div class="scalping-bottom-area" id="stock-area" style="border-radius: 5px;color: white;width: 95%;padding: 5px;">
-                    <div style="display: flex;align-items: center;flex-direction: row;"><button id="open-stock-button" onclick="openStockPanel()">投资股票</button></div>
-                    <div id="stock-info-display" style="display:flex;font-size: 14px;text-wrap: nowrap;overflow: hidden;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: white;width: 75%;align-items: center;flex-direction: row;padding: 5px;justify-content: center;">当前没有投资任何股票</div>
-                    <div class= "stock-panel" id="stock-panel" style="display:none">
-                        <!-- 动态生成股票信息 -->
-                    </div>
-                </div>
-                <div class="scalping-bottom-area" id="scalping-bottom-area">
-                    <div><button id="quit-scalping" onclick="quitScalping()">提前退市</button></div>
-                    <div><button id="relax-byweek" style="display: none">休息两周</button></div>
-                    <div><button id="enter-next-week" onclick="refreshSaleWeek()">刷新一周</button></div>
                 </div>
             </div>
         </div>
@@ -19899,20 +19936,25 @@ let scalpingState = {
 };
 let scalpingScore = 0; //用于兑换法宝
 let highestAsset = 0;
+let randomMode = false;
 
 let scalpingItems = [
     {name: '陈酿女儿红', url: 'https://pic.imgdb.cn/item/66e2e21ed9c307b7e9177f3f.png', itemActivate: false, downRate: 2, basePrice: 1500, bonusPrice: 8000, fluctuation: 0.2, goodEvent: '本周适逢三界最轰动的神仙品酒大会，女儿红被炒作至新高！', badEvent: '全面禁酒周，美酒虽好，仍不能贪杯哦', description: '陈酿女儿红，酒饕的盛宴'},
-    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', itemActivate: false, downRate: 1.5, basePrice: 20000, bonusPrice: 500000, fluctuation: 0.3, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
+    {name: '归元灵玉', url: 'https://pic.imgdb.cn/item/66e2ded9d9c307b7e9132d0f.png', itemActivate: false, downRate: 2.5, basePrice: 20000, bonusPrice: 500000, fluctuation: 0.3, goodEvent: '仙人江灵子近日凭靠归元灵玉的灵压成功跃升修仙者，三界上下立即掀起修仙热，归元灵玉被炒至历史新高', badEvent: '姜太后下令罢黜百家，修仙者因鼓励无为而被列入重点打击对象，归元灵玉价格遇冷', description: '形若钻石的灵玉，修炼功法的绝佳媒介'},
     {name: '神器碎片', url: 'https://pic.imgdb.cn/item/66e2dfdfd9c307b7e9149cda.png', itemActivate: false, downRate: 1, basePrice: 400, bonusPrice: 1000, fluctuation: 0.1, goodEvent: '最近朝廷动荡，似乎有政变发生，各路豪杰纷纷带上趁手的武器去一探究竟，锻造所用的神器碎片价格攀升', badEvent: '举世太平，武器装备无人问津，原材料神器碎片暴跌', description: '传言取自伏羲琴的一丝灵力凝结而成的碎片，是锻造神兵的必备材料'},
     {name: '金龙蛋', url: 'https://pic.imgdb.cn/item/66e2e105d9c307b7e91616e1.png', itemActivate: false, downRate: 1, basePrice: 200, bonusPrice: 4000, fluctuation: 0.05, goodEvent: '“是真的小金龙！”头条一经发布，金龙蛋的“割韭菜”谣言不攻自破，销量长虹', badEvent: '“什么啊，原来是小鸭子！”1818黄金眼揭露金龙蛋骗局，竟是小鸭子伪装小金龙藏匿其中！骗局一经拆穿，金龙蛋价格也随名声跌落神坛', description: '神奇的一颗蛋，似乎有幼小的生命正在孕育，不少侠士正在收购以窥究竟'},
     {name: '翡翠玉珏', url: 'https://pic.imgdb.cn/item/66e2e180d9c307b7e916b19f.png', itemActivate: false, downRate: 1.5, basePrice: 2000, bonusPrice: 4000, fluctuation: 0.15, goodEvent: '玉珏就是朝云国的黄金！这句slogan一经打响，引来各界人士对古玩的强烈兴趣', badEvent: '黄金永远是黄金，尤其在真的黄金面前，你会选谁？这句辩论很快警醒了抢购玉珏的民众，纷纷抛售之', description: '上好的玉珏，古玩界不乏狂热的拥趸'},
     {name: '玫瑰花束', url: 'https://pic.imgdb.cn/item/66e3240bd9c307b7e994944b.png', itemActivate: false, downRate: 1, basePrice: 600, bonusPrice: 3000, fluctuation: 0.35, goodEvent: '本周是三界情人周，花束一经上市便被抢购一空', badEvent: '经济下行，民众都不过情人节了，花束价格一落千丈', description: '天长地久，爱无止休'},
     {name: '拇指生煎', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f14e.png', itemActivate: false, downRate: 1, basePrice: 200, bonusPrice: 500, fluctuation: 0.5, goodEvent: '朝云国盛产各路网红，拇指生煎是带货的王牌产品，一经推出火爆全网！', badEvent: '网红永远是网红，口味不好说什么都是白搭，拇指生煎不是跌价，只是回到了它应得的价位', description: '状如拇指的小个头生煎包，曾在各大城市小吃街风靡一时'},
     {name: '珍贵皮草', url: 'https://pic.imgdb.cn/item/66e3c0f6d9c307b7e954f131.png', itemActivate: false, downRate: 2, basePrice: 20000, bonusPrice: 40000, fluctuation: 0.15, goodEvent: '时装周来袭，高定？设计师品牌？拼接元素？没有原材料统统都不行！本周谁拥有皮草谁就是最大赢家！', badEvent: '没有买卖，就没有杀害————哪怕你杀的是巨大的棕熊。皮草市场被肃清，商人们纷纷甩货', description: '不知是取自哪种凶狠野兽之身，毛发绵密柔软，保温效果极好'},
-    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', itemActivate: false, downRate: 2.5, basePrice: 20000, bonusPrice: 300000, fluctuation: 0.05, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
+    {name: '南非水晶', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e9e.png', itemActivate: false, downRate: 4, basePrice: 150000, bonusPrice: 300000, fluctuation: 0.05, goodEvent: '街头传言来自非洲大陆的水晶原石开石后会露出金矿，一时间南非水晶被狂热的淘金客一举收罄', badEvent: '作为工艺品的原材料，南非水晶是好东西；作为淘金客的美梦，它只能沦为破碎，南非水晶大跳水', description: '朝云船队抵达好望角，在当地开采了不少这种形制坚硬透亮的矿石，论密度又比传统水晶更大，似乎有秘密在其中'},
     {name: '月饼', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4eae.png', itemActivate: false, downRate: 1, basePrice: 100, bonusPrice: 2000, fluctuation: 0.15, goodEvent: '中秋佳节，月饼也成了走亲访友的送礼佳品，所谓贵的就是好的，月饼也在节日氛围里身价倍涨', badEvent: '现代人崇尚低碳水、低糖的饮食作风，月饼大量临期，折价处理', description: '农历八月十五，是万家灯火共团圆的日子'},
+    {name: '胭脂', url: 'https://pic.imgdb.cn/item/66eee14af21886ccc092b967.png', itemActivate: false, downRate: 3, basePrice: 800, bonusPrice: 3200, fluctuation: 0.05, goodEvent: '朝云国举办"绝色佳人"选美大赛，胭脂成为参赛女子们的抢手货，价格飙升。', badEvent: '传言胭脂中含有有害成分，导致容颜衰退，消费者纷纷退避，价格大跌。', description: '百年秘制的胭脂，能使女子容颜更胜三分，闺中必备之物。' }, 
+    {name: '侠客佩刀', url: 'https://pic.imgdb.cn/item/66eee14af21886ccc092b97e.png', itemActivate: false, downRate: 2.5, basePrice: 3000, bonusPrice: 5500, fluctuation: 0.1, goodEvent: '魔族再度入侵，侠客们集结抵抗，佩刀需求猛增，价格一路上涨。', badEvent: '朝廷颁布禁武令，收缴民间武器，佩刀价格应声下跌。', description: '由名匠打造的佩刀，刀身寒光闪烁，是侠客行走江湖的必备武器。' }, 
+    {name: '大闸蟹', url: 'https://pic.imgdb.cn/item/66eee14af21886ccc092b996.png', itemActivate: false, downRate: 0.5, basePrice: 350, bonusPrice: 2200, fluctuation: 0.25, goodEvent: '天下美食节开幕，大闸蟹荣获金奖，名声大噪，价格暴涨。', badEvent: '传言大闸蟹产地污染，食用后有害健康，消费者减少，价格下跌。', description: '鲜美肥嫩的大闸蟹，是秋日不可错过的美味。' }, 
+    {name: '海洋原油', url: 'https://pic.imgdb.cn/item/66eee14af21886ccc092b99c.png', itemActivate: false, downRate: 0.25, basePrice: 200000, bonusPrice: 600000, fluctuation: 0.3, goodEvent: '炼器宗师发现海洋原油可大幅提升法宝威力，引发修仙界疯狂抢购，价格飙升。', badEvent: '新型灵石能源面世，替代海洋原油的部分用途，需求下降，价格下滑。', description: '深海开采的稀有原油，是工业和炼器的珍贵资源。' },
     {name: '浪四海', url: 'https://pic.imgdb.cn/item/66ebc319f21886ccc0a21f39.png', itemActivate: false, downRate: 2, basePrice: 3000, bonusPrice: 6000, fluctuation: 0.4, goodEvent: '小长假，踏上浪四海云游四方成为越来越多修仙者的生活方式，浪四海价格走俏', badEvent: '由于羽族开发了“共享羽翼”，浪四海因成本过高问题失去人们青睐', description: '不仅拥有飞剑的霸气造型，更有一个响亮的名字：“浪四海！'},
-    {name: '灵雨', url: 'https://pic.imgdb.cn/item/66ebc319f21886ccc0a21f10.png', itemActivate: false, downRate: 4, basePrice: 15000, bonusPrice: 30000, fluctuation: 0.4, goodEvent: '一年一度的赛级大猫出圈三界——更柔顺的毛皮和更美的品相！带动灵雨全线价格上升', badEvent: '大猫固然可爱，千篇一律终让人审美疲劳，价格回归低位', description: '外形出众，性格温顺的灵猫，擅长为修仙者提供各种增益和情绪价值'}
+    {name: '灵雨', url: 'https://pic.imgdb.cn/item/66ebc319f21886ccc0a21f10.png', itemActivate: false, downRate: 2, basePrice: 15000, bonusPrice: 30000, fluctuation: 0.4, goodEvent: '一年一度的赛级大猫出圈三界——更柔顺的毛皮和更美的品相！带动灵雨全线价格上升', badEvent: '大猫固然可爱，千篇一律终让人审美疲劳，价格回归低位', description: '外形出众，性格温顺的灵猫，擅长为修仙者提供各种增益和情绪价值'}
 ];
 
 let stockList = [
@@ -20358,7 +20400,6 @@ function handleStockTransaction(item, actionType) {
         slider.min = 0;
         slider.max = 100;
         slider.value = 0;
-        slider.style = 'width: 90%;appearance: none;border-radius: 20px;border: 1px groove #0475ff;box-shadow: inset 0px 0px 2px 1px #0475ff;';
         sliderContainer.appendChild(slider);
 
         const quantityLabel = document.createElement('div');
@@ -20702,7 +20743,7 @@ function getScalpableItemsPrice(item, isSpecial = false) {
     const playerReputation = calculatePlayerReputation();
     const repBonus = playerReputation * 0.000001; //定义声望的正向影响
     if (isSpecial) {
-        if (Math.random() < Math.min(0.8, 0.5 + repBonus)) {
+        if (Math.random() < Math.min(0.3, 0.7 - repBonus )) {
             fluctuationRange = item.basePrice * item.fluctuation;
             price = Math.floor((item.basePrice + (Math.random() * (2 * fluctuationRange) - fluctuationRange)) * 0.2 * item.downRate);
             showMerchant(`${item.badEvent}`);
@@ -20721,7 +20762,7 @@ function getScalpableItemsPrice(item, isSpecial = false) {
 
 function generateItemToDisplay() {
     if (scalpingState.currentSellingWeek !== 0) {
-        showMerchant('正在本年度的商品运作中，无法更换商品！');
+        showMerchant('本年度的选品正在运作中，无法执行更换！');
         return;
     }
     const selectedItems = scalpingItems.filter(i => i.itemActivate);
@@ -20765,7 +20806,7 @@ function generateItemToDisplay() {
         imgElement.style.border = "1px solid black";
         imgElement.style.boxShadow = `${item.itemActivate? '#f5fffa 0px 0px 2px 2px' : ''}`;
         imgElement.addEventListener('click', () => {
-            showMerchant(`${item.name}: 单品均价${item.basePrice}元, 一般波动较${item.fluctuation <= 0.2 && item.downRate <= 1.5 ? '小' : '大'}。特殊情况下属于${item.bonusPrice >= item.basePrice * 3 ? '风投产品，风险与收益并存' : '一般产品，可用于资产保值'}。`);
+            showMerchant(`${item.name}: 单品均价${item.basePrice}元, 正常情况下价格变动幅度较${item.fluctuation <= 0.2 && item.downRate <= 1.5 ? '小' : '大'}。在遇到专属特殊事件时，属于${item.bonusPrice >= item.basePrice * 3 ? '风投产品，风险与收益并存' : '一般产品，可用于资产保值'}。商品说明：${item.description}`);
         })
         
         // 创建文本元素
@@ -20784,12 +20825,10 @@ function generateItemToDisplay() {
         activateBtn.addEventListener('click', () => {
             if (!item.itemActivate && selectedItems.length < 6) {
                 item.itemActivate = true;
-                showMerchant(`已激活${item.name}。`);
                 activateBtn.innerText = '取消';
                 generateItemToDisplay();
             } else if (item.itemActivate) {
                 item.itemActivate = false;
-                showMerchant(`已取消售卖${item.name}。`);
                 activateBtn.innerText = '激活';
                 generateItemToDisplay();
             } else {
@@ -20817,9 +20856,30 @@ function getRandomScalpableItem() {
 
     if (wealthOfNations) itemToAdd = 1;
     const numberOfItems = Math.min(5, Math.floor(Math.random() * 5) + 1 + itemToAdd);
-    const selectedItems = scalpingItems.filter(i => i.itemActivate);
-
     
+    let selectedItems; 
+    
+    if (!randomMode) {
+        selectedItems = scalpingItems.filter(i => i.itemActivate);
+    } else {
+        const a = scalpingItems; // 示例数组
+        selectedItems = [];
+        // 使用 Set 来确保唯一性
+        const selected = new Set();
+        
+        // 使用 for 循环随机取 6 项
+        for (let i = 0; i < 6; i++) {
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * a.length);  // 生成随机索引
+            } while (selected.has(randomIndex));  // 确保未选取过该索引
+        
+            selected.add(randomIndex);  // 添加索引到 Set
+            selectedItems.push(a[randomIndex]);  // 根据索引选取元素并添加到数组 b
+            selectedItems.forEach(item => item.itemActivate = true);
+        }
+    }
+        
     while (itemsToDisplay.length < numberOfItems) {
         const randomItem = selectedItems[Math.floor(Math.random() * selectedItems.length)];
         if (!itemsToDisplay.includes(randomItem)) {
@@ -20847,12 +20907,13 @@ function getRandomScalpableItem() {
         // 创建商品元素
         const itemElement = document.createElement('div');
         itemElement.className = 'scalping-item';
-        itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;';
+        itemElement.style = 'display: flex;justify-content: space-between;align-items: center;font-size: 14px;position:relative;';
         itemElement.innerHTML = `
             <div id="${item.name}-container" style="cursor: pointer;">
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
+            <div id="difference-${item.name}" style="position:absolute;color:${price > originalPrice? '#FF4500' : 'lime'};text-shadow:-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;top: 20%;left: 5px;font-size: 12px;opacity:0.8;">${price > originalPrice ? `+${price - originalPrice}` : `-${originalPrice - price}`}</div>
             <div id="price-${item.name}" style="color:${price > originalPrice? '#FF4500' : 'lime'};">${price}元 ${price > originalPrice? '↑' : '↓'}</div>
         `;
 
@@ -20876,26 +20937,26 @@ function showMerchant(message) {
 function getReputationAndShareEvent() {
     const reputation = calculatePlayerReputation();
     const repEvents = [
-        {value: 1000, cashIn: 1000, description: '行走商场,小有名气,季度商场新人奖颁发给你'},
-        {value: 5000, cashIn: 5000, description: '崭露头角的小商贩——不对,小商贩已经不能称呼你了,应该叫你老板先生'},
-        {value: 10000, cashIn: 10000, description: '声望越来越高了,附近的商会特邀你作为本季度代言人'},
-        {value: 15000, cashIn: 15000, description: '《三界商报》特别访谈了你的致富之道,你的精彩发言感染了在座的所有人'},
-        {value: 20000, cashIn: 20000, description: '家业越来越大,在街头现身都会纷纷引来传闻"这家店被他光顾了,一定是个值得投资的优质资产"'},
-        {value: 25000, cashIn: 30000, description: '商业帝国初具规模,各路商贾趋之若鹜,争相合作,希望能分得一杯羹'},
-        {value: 30000, cashIn: 35000, description: '商海智者,为商场新人传道授业,言语间珠玑璀璨,博得满堂喝彩'},
-        {value: 35000, cashIn: 40000, description: '三界商圣,产业遍布,商界传奇,后生楷模'},
-        {value: 40000, cashIn: 45000, description: '商业版图不断扩张,各地竞相邀约投资,财富如涓涓细流汇成江河'},
-        {value: 45000, cashIn: 50000, description: '三界首屈一指商业巨头,商业帝国巍然耸立,无人不晓'},
-        {value: 50000, cashIn: 60000, description: '从针头到飞机,从日用到奢侈,商业触角无所不及,君临商界之巅'},
-        {value: 100000, cashIn: 100000, description: '商业版图突破三界,跨界开疆拓土,开创全新商业时代'},
-        {value: 200000, cashIn: 200000, description: '财富积累到了新的高度,荣登三界首富宝座,一举一动皆是焦点'},
-        {value: 300000, cashIn: 300000, description: '商业帝国盖世无双,商界传奇名垂青史,故事被编入教科书广为流传'},
-        {value: 400000, cashIn: 400000, description: '商业版图遍布已知未知,触角延伸至每一个角落,财富之多难以估量'},
-        {value: 500000, cashIn: 500000, description: '商业帝国达到前所未有的高度,商界神话降世,万人景仰膜拜'},
-        {value: 600000, cashIn: 600000, description: '财富超越想象,傲视群雄,成为传奇中的传奇,故事口口相传'},
-        {value: 700000, cashIn: 700000, description: '商业疆域覆盖所有已知领域,财富积累到令人难以置信的地步'},
-        {value: 800000, cashIn: 800000, description: '商业帝国化为传说,名字成为商业的代名词,妇孺皆知'},
-        {value: 1000000, cashIn: 1000000, description: '财富积累到无人企及的高度,超凡脱俗,传说中的存在,故事流芳百世'}
+        {value: 1000, cashIn: 1000, description: '你在商场中崭露头角,一笔精明的交易让你获得了季度新人奖,这是你商业征途的第一步'},
+        {value: 5000, cashIn: 5000, description: '你的生意蒸蒸日上,口碑在商圈内不胫而走,人们开始尊称你为"老板",你的故事激励着许多年轻的商贩'},
+        {value: 10000, cashIn: 10000, description: '你的慧眼和魄力让商会瞩目,他们邀请你成为代言人,你的形象出现在各大宣传板上,带动了一片商机'},
+        {value: 15000, cashIn: 15000, description: '《三界商报》派出资深记者专访你的致富之道,你的言辞闪耀着智慧的光芒,鼓舞了无数创业者'},
+        {value: 20000, cashIn: 20000, description: '你的商业版图不断扩张,每一家被你青睐的店铺都成了城中热点,投资者趋之若鹜,争相洽谈合作'},
+        {value: 25000, cashIn: 30000, description: '你的产业如雨后春笋般壮大,触角延伸到三界各地,传言你正在筹建一个空前绝后的商业帝国'},
+        {value: 30000, cashIn: 35000, description: '你受邀在商会大会上发表演讲,讲述自己的创业历程,句句金言,字字珠玑,全场起立鼓掌,掌声经久不息'},
+        {value: 35000, cashIn: 40000, description: '你的名号响彻三界,无数商贾慕名而来,希望能得到你的指点,你的一举一动都成了商界的风向标'},
+        {value: 40000, cashIn: 45000, description: '你的财富如涓涓细流汇聚成汪洋大海,各路诸侯争相邀请你参与投资,你的商业版图正以前所未有的速度扩张'},
+        {value: 45000, cashIn: 50000, description: '你成为了三界公认的商业巨头,身价直逼王侯将相,你的传奇故事被编纂成书,激励着一代又一代的创业者'},
+        {value: 50000, cashIn: 60000, description: '你的商业帝国横跨各行各业,从平民百姓的柴米油盐到达官贵人的奢侈品,无一不有你的身影,你成为了商界的王者'},
+        {value: 100000, cashIn: 100000, description: '你的足迹遍布三界每一个角落,开创了全新的商业时代,人们赞叹你的远见卓识,你的传奇被载入史册'},
+        {value: 200000, cashIn: 200000, description: '你登上了三界首富的宝座,一举一动都成为万众瞩目的焦点,你的财富传说激励着无数有志之士'},
+        {value: 300000, cashIn: 300000, description: '你的商业帝国如日中天,光芒四射,你的故事被编入教科书,成为商界的必修课,你的名字将永远铭刻在历史上'},
+        {value: 400000, cashIn: 400000, description: '你的商业版图已经超越了所有人的想象,触角延伸到每一个已知和未知的领域,你的财富难以估量,如同一个神话'},
+        {value: 500000, cashIn: 500000, description: '你的商业帝国已经达到了前所未有的高度,你被尊为商界的神话,万人敬仰,你的一言一行都成为商界的圭臬'},
+        {value: 600000, cashIn: 600000, description: '你的财富已经超越了凡人的想象力,传说中的神话在你面前也黯然失色,你的故事成为了三界的传奇,口口相传'},
+        {value: 700000, cashIn: 700000, description: '你的商业疆域已经覆盖了所有已知的领域,你的财富积累到了一个令人难以置信的地步,似乎没有什么是你不能拥有的'},
+        {value: 800000, cashIn: 800000, description: '你的商业帝国已经化为传说,你的名字已经成为商业的代名词,从帝王将相到平民百姓,无人不知无人不晓'},
+        {value: 1000000, cashIn: 1000000, description: '你的财富已经积累到了一个无人企及的高度,你已经超脱凡俗,成为了传说中的存在,你的故事将流芳百世,直到时间的尽头'}
     ];
     const hasOwnedStock = stockList.filter(s => s.quantity > 0);
     
@@ -21038,7 +21099,9 @@ function finalizeScalping() {
     let scoreRatio = 1;
     if (doubleLuck) scoreRatio = 2;
 
-    const scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot.totalValue / 10000) * scoreRatio);
+    let scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot.totalValue / 10000) * scoreRatio);
+
+    if (randomMode) scoreToAdd *= 2;
 
     // 修正赋值逻辑，生成换行的 recordMessage
     let recordMessage = '';
@@ -21055,7 +21118,7 @@ function finalizeScalping() {
     goldAmount += goldGot.totalValue;
     updateGoldDisplay(goldAmount);
 
-    showMerchant(`你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}。`);
+    showMerchant(`你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}${randomMode ? '，由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
     resetScalping();
 }
 
@@ -21094,10 +21157,22 @@ function refreshSaleWeek() {
         document.body.removeChild(currentSlider);
         currentSlider = null;
     }
-
+        
     if (selectedItems.length < 6) {
-        showMerchant(`你需要选择激活6个商品才能在市场进行运作！还需要${6 - selectedItems.length}个待激活商品！`);
-        generateItemToDisplay();
+        showInfoBox(`\n1. 【点击确认键】激活6个商品以在市场进行运作，当前还需要${6 - selectedItems.length}个待激活商品。 \n\n2.【点击取消键】进入随机配货模式，随机配货模式下，商品将随机选择6种，结束后积分翻3倍。`,
+                   () => {
+                       generateItemToDisplay();
+                       return;
+                   },
+                   () => {
+                       if (scalpingState.currentCash === 0) {
+                           showMerchant('请你先至少准备50000元启动资金，随机配货开启失败！');
+                           return;
+                       } else {
+                           randomMode = true;
+                           processSaleWeek(1, energyCostRatio, refreshCostRatio);  // 常规更新一周
+                       }
+                   });
         return;
     }
         
@@ -21395,7 +21470,12 @@ function resetScalping() {
     if (relaxButton.style.display !== 'none') {
         relaxButton.style.display = 'none';
     }
-    
+
+    if (randomMode) {
+        randomMode = false;
+        scalpingItems.forEach(item => item.itemActivate = false);
+    }
+        
     scalpingState = {
         currentSellingWeek: 0,
         maxSellingWeek: 52,
@@ -21460,7 +21540,7 @@ function quitScalping() {
                         const goldGot = Math.floor(cash.totalValue * 0.8);
                         goldAmount += goldGot;
                         updateGoldDisplay(goldAmount);
-                        showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！`);
+                        showMerchant(`所有商品已经结算完毕，你总计卖出了${convertPrice(goldGot)}金子！${randomMode ? '由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
                         resetScalping();
                    },
                    () => showMerchant('取消交易！'),
@@ -21499,7 +21579,6 @@ function handleItemTransaction(item, itemInfo, actionType) {
         slider.min = 0;
         slider.max = 100;
         slider.value = 0;
-        slider.style = 'width: 90%;appearance: none;border-radius: 20px;border: 1px groove #0475ff;box-shadow: inset 0px 0px 2px 1px #0475ff;';
         sliderContainer.appendChild(slider);
 
         const quantityLabel = document.createElement('div');
@@ -21509,7 +21588,7 @@ function handleItemTransaction(item, itemInfo, actionType) {
 
         const itemDescription = document.createElement('div');
         itemDescription.id = `${actionType}-quantity`;
-        itemDescription.innerText = `商品说明: ${item.description}`;
+        itemDescription.innerText = `商品说明: ${item.description} \n\n（商品所显示的差值是针对此商品的平均价格而言的涨跌幅，不代表玩家实际的盈亏情况）`;
         sliderContainer.appendChild(itemDescription);
 
         const confirmButton = document.createElement('button');
@@ -21821,6 +21900,7 @@ function updateScalpingPanel() {
     const relaxButton = document.getElementById('relax-byweek'); 
     const gadgetButton = document.getElementById('add-scalping-gadgets');
     const scalpingScoreElement = document.getElementById('scalping-score');
+    const marketItem = document.getElementById('market-item');
 
     currentSellingWeek.innerText = scalpingState.currentSellingWeek;  // 例如更新当前周
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
@@ -21849,7 +21929,13 @@ function updateScalpingPanel() {
         gadgetButton.style.display = 'none';
     } else {
         gadgetButton.style.display = 'flex';
-    } 
+    }
+
+    if (!randomMode) {
+        marketItem.innerText = '市场';
+    } else {
+        marketItem.innerText = '市场(随机配货)';
+    }
 }
 
 function checkStockPhaseAndDisplay() {

@@ -480,7 +480,6 @@
             flex-wrap: nowrap;
             justify-content: space-between;
             border: 1px groove white;
-            z-index: -1;
         }
         
         .bottom-bar div {
@@ -21979,7 +21978,13 @@ function checkStockPhaseAndDisplay() {
         } else {
             stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛市】' : '【熊市】'}当前总计持有${hasStock.length}支股票`;
         }
-    }  
+    }
+
+    if (keyPhaseCount !== 0) {
+        stockInfo.style.border = `${calculateNetAsset() > 5000000 ? '4px double red' : '4px double lime'}`;
+    } else {
+        stockInfo.style.border = '';
+    }
 }
         
 function checkGagdetsState() {

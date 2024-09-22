@@ -1041,8 +1041,6 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 80%;
-            max-height: 80%;
             background-color: rgba(0, 0, 0, 0.8);
             color: #6f391c;
             border-radius: 2px;
@@ -1058,7 +1056,7 @@
         
         .scalping-top-bar {
             font-weight: bold;
-            width: 390px;
+            width: 370px;
             overflow: hidden;
             display: flex;
             margin-bottom: 0px;
@@ -1071,17 +1069,17 @@
             height: 45px;
         }
         .scalping-asset-area {
-            width: 382px;
+            width: 362px;
             display: flex;
             flex-direction: row;
             justify-content: space-around;
             border: 4px double #87431f;
             align-items: center;
             flex-wrap: nowrap;
-            height: 55px;
+            height: auto;
         }
         .scalping-middle-wrap {
-            width: 390px;
+            width: 370px;
             display: flex;
             flex-direction: row;
             justify-content: space-between;
@@ -2957,7 +2955,7 @@
         </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
-        <div id="scalping-display-container" style="max-height: 768px;max-width: 400px;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+        <div id="scalping-display-container" style="max-height: 768px;width: 385px;display: flex;flex-direction: column;align-items: center;justify-content: center;">
             <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:5px;width: 100%;height:20px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商（积分：<span id="scalping-score">0</span>）</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
             <div class="scalping-container" id="scalping-container">
                 <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
@@ -2970,7 +2968,7 @@
                         </div>
                     </div>
                     <div class="scalping-asset-area" id="scalping-asset-area">
-                        <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;">
+                        <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;width: 30%;overflow: hidden;">
                             <div>💵 现金流：<span id="current-cash">0</span></div>
                             <div>🗃 总资产：<span id="net-asset">0</span></div>
                         </div>
@@ -2987,7 +2985,7 @@
                                 <p>选择你所拥有的法宝</p>
                                 <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
                                 </div>
-                                <div id="selected-gadgets" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 5px;background-color: rgba(0, 0, 0, 0.1);">
+                                <div id="selected-gadgets" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 10px;background-color: rgba(0, 0, 0, 0.1);">
                                     <!-- 遍历法宝并在此处显示 -->
                                 </div>
                             </div>
@@ -2996,7 +2994,7 @@
                                 <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: center;align-items: center;width:100%;">
                                 <p>你可以使用经商积分点击图标兑换法宝</p>
                                 </div>
-                                <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 5px;background-color: rgba(0, 0, 0, 0.1);">
+                                <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 10px;background-color: rgba(0, 0, 0, 0.1);">
                                     <!-- 此处函数生成 -->
                                 </div>
                             </div>
@@ -20584,13 +20582,13 @@ function selectSaclpingGadgets() {
     gadgets.forEach(gadget => {
         const gadgetElement = document.createElement('div');
         gadgetElement.className = 'selected-gadgets';
-        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 200px;width: 150px;';
+        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 180px;width: 150px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;">
+            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;font-size:14px;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;overflow-y:scroll;">${gadget.description}，拥有：${gadget.quantity}个 </div>
+            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;font-size:12px;">${gadget.description}，<div style="color:lime;">拥有：${gadget.quantity}个。</div></div>
         `;
 
         // 点击法宝时弹出应用面板
@@ -20724,13 +20722,13 @@ function updateGadgetStorePanel() {
 
         const gadgetElement = document.createElement('div');
         gadgetElement.className = 'selected-gadgets';
-        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 200px;width: 150px;';
+        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 180px;width: 150px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;">
+            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;font-size:14px;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;overflow-y:scroll;">${gadget.description}，售价：${price} 积分。</div>
+            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;font-size:12px;">${gadget.description}，<div style="color:lime;">售价：${price} 积分。</div></div>
         `;
         gadgetItemsArea.appendChild(gadgetElement);
 

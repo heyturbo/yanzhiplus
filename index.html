@@ -1041,7 +1041,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 380px;
+            width: 80%;
             max-height: 80%;
             background-color: rgba(0, 0, 0, 0.8);
             color: #6f391c;
@@ -2981,13 +2981,13 @@
                                     <!-- 动态生成法宝 -->
                                 </div>
                             </div>
-                            <div id="gadgets-selector" class="select-gadgets" style="display:none;padding: 0px 10px;">
-                                <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;width: 100%;height: 10px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size: 16px;padding: 10px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
+                            <div id="gadgets-selector" class="select-gadgets" style="display:none;padding: 0px;">
+                                <div id="gadgets-selector-head" class="drawer-toggle" style="font-weight:bold;width: 100%;height: 30px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;font-size: 16px;padding: 0px;"><div>v1.1</div>经商法宝<button onclick="closeGagdetsPanel()">x</button></div>
                                 <div style="display:flex;width: 95%;justify-content: center;align-items: center;font-size:16px;padding: 5px;flex-direction: row;gap: 20px;">
                                 <p>选择你所拥有的法宝</p>
                                 <button id="exchange-gadgets" onclick="exchangeGadgets()">兑换法宝</button>
                                 </div>
-                                <div id="selected-gadgets" style="max-height: 420px;padding: 10px;overflow-y: scroll;min-height: 300px;border: 2px double #87431f;margin-bottom: 20px;width:95%">
+                                <div id="selected-gadgets" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 5px;background-color: rgba(0, 0, 0, 0.1);">
                                     <!-- 遍历法宝并在此处显示 -->
                                 </div>
                             </div>
@@ -2996,7 +2996,7 @@
                                 <div style="display:flex;font-size: 16px;flex-direction: row;justify-content: center;align-items: center;width:100%;">
                                 <p>你可以使用经商积分点击图标兑换法宝</p>
                                 </div>
-                                <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;">
+                                <div id="gadget-items" style="max-height: 480px;padding: 10px;overflow-y: scroll;display: grid;grid-template-columns: repeat(2,1fr);gap: 5px;background-color: rgba(0, 0, 0, 0.1);">
                                     <!-- 此处函数生成 -->
                                 </div>
                             </div>
@@ -16327,9 +16327,10 @@ let jinnangItems = [
     { name: 'doubleLuck', displayName: '双喜临门', url: 'https://pic.imgdb.cn/item/66e8256dd9c307b7e96cc570.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）经商结束时，积分结算翻倍' },
     { name: 'zibenyunzuo', displayName: '资本运作', url: 'https://pic.imgdb.cn/item/66e99553f21886ccc0502e94.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）通过高效的资本运作，投资股票后减少一周收益等待时间' },
     { name: 'kaimanzhizhao', displayName: '开曼岛执照', url: 'https://pic.imgdb.cn/item/66e994f2f21886ccc04fd099.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）将企业注册在避税天堂，交易股票时税费减少50%' },
-    { name: 'jiazuxintuo', displayName: '家族信托', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007aa0b.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）来自权贵家族的委托基金，每周将随机获得5000~10000元现金' },
+    { name: 'jiazuxintuo', displayName: '家族信托', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007aa0b.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）来自权贵家族的委托基金，每周将随机获得2000~5000元现金' },
     { name: 'caopanjubo', displayName: '操盘巨擘', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9ff.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，将延长50%股票周期的持续时间（无论牛市/熊市都会延长）' },
     { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不更新时间' },
+    { name: 'getLoan', displayName: '霸王贷款', url: 'https://pic.imgdb.cn/item/66f029d1f21886ccc0c125da.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）使用后立即获得10万元贷款，但5周后需要偿还20万元，若无力偿还将结束游戏' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -20583,13 +20584,13 @@ function selectSaclpingGadgets() {
     gadgets.forEach(gadget => {
         const gadgetElement = document.createElement('div');
         gadgetElement.className = 'selected-gadgets';
-        gadgetElement.style = 'display: flex;justify-content: space-between;font-size: 14px;align-items: center;margin-bottom: 10px;border: 1px solid #6f391c;padding: 5px;';
+        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 200px;width: 150px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 20%;height: 100%;">
+            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}" style="width: 80%;height: 100%;text-align: start;">${gadget.description}，拥有：${gadget.quantity}个 </div>
+            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;overflow-y:scroll;">${gadget.description}，拥有：${gadget.quantity}个 </div>
         `;
 
         // 点击法宝时弹出应用面板
@@ -20650,6 +20651,10 @@ function applyGadgetEffect(gadget) {
                 }
             });
             updateScalpingPanel();
+        },
+        '霸王贷款': () => {
+            scalpingState.currentCash += 100000;
+            updateScalpingPanel();
         }
     };
 
@@ -20661,6 +20666,20 @@ function applyGadgetEffect(gadget) {
     }
 }
 
+let loanCountDown = 0; //这个变量和下面这个函数也可以用来做其他道具的时间计数函数
+
+function handleGetLoanCount(count = 0) {    
+    if (!count) count = 0;
+    
+    if (loanCountDown < count) {
+        loanCountDown ++;
+        return false;
+    } else {
+        loanCountDown = 0;
+        return true;
+    }
+}
+        
 function exchangeGadgets() {
     const storeElement = document.getElementById('gadget-store-panel');
     storeElement.style.display = 'flex';
@@ -20687,7 +20706,8 @@ function updateGadgetStorePanel() {
         {name: '开曼岛执照', price: 7000},
         {name: '家族信托', price: 8000},
         {name: '操盘巨擘', price: 18000},
-        {name: '百达翡丽', price: 25000}
+        {name: '百达翡丽', price: 25000},
+        {name: '霸王贷款', price: 1000}
     ];
 
     // 对 gadgets 按照价格从低到高进行排序
@@ -20704,13 +20724,13 @@ function updateGadgetStorePanel() {
 
         const gadgetElement = document.createElement('div');
         gadgetElement.className = 'selected-gadgets';
-        gadgetElement.style = 'display: flex; justify-content: space-between; font-size: 14px; align-items: center; margin-bottom: 10px; border: 1px solid rgb(111, 57, 28); padding: 5px;';
+        gadgetElement.style = 'display: flex;font-size: 14px;align-items: center;border: 1px solid #87431f;padding: 5px;flex-direction: column;justify-content: space-between;gap: 5px;height: 200px;width: 150px;';
         gadgetElement.innerHTML = `
-            <div id="${gadget.name}-container" style="cursor: pointer;margin-right: 10px;width: 20%;height: 100%;">
+            <div id="${gadget.name}-container" style="cursor: pointer;width: 150px;height: 50px;display: flex;flex-direction: row;align-items: center;gap: 5px;justify-content: center;padding: 5px;border-bottom: 1px solid #87431f;">
                 <img src="${gadget.url}" alt="${gadget.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${gadget.displayName}</div>
             </div>
-            <div id="description-${gadget.name}" style="width: 80%;height: 100%;text-align: start;">${gadget.description}，售价：${price} 积分。</div>
+            <div id="description-${gadget.name}" style="width: 100%;height: 100%;text-align: start;overflow-y:scroll;">${gadget.description}，售价：${price} 积分。</div>
         `;
         gadgetItemsArea.appendChild(gadgetElement);
 
@@ -21028,12 +21048,20 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
 
     const jiazuxintuo = scalpingState.gadgets.find(gadget => gadget === '家族信托');
     const timeMachine = scalpingState.gadgets.find(gadget => gadget === '百达翡丽');
+    const getLoan = scalpingState.gadgets.find(gadget => gadget === '霸王贷款');
 
     if (scalpingState.currentSellingWeek === 0 && scalpingState.currentCash === 0) {
         showMerchant(`开业第一天，没有一点启动资金可不行，目前最小的仓库每周租金${refreshCost}元，请确认你的账户资金充足`);
         return;
     }
     
+    if (getLoan && handleGetLoanCount(5)) scalpingState.currentCash -= 200000;
+        
+    if (scalpingState.currentCash <= 0 && getLoan) {
+        finalizeScalping();
+        return;
+    }   
+        
     // 检查资金是否足够
     if (scalpingState.currentCash < refreshCost) {
         showMerchant(`本周店租为${refreshCost}元，你的现金不足以支付！`);
@@ -21069,9 +21097,10 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
             scalpingState.currentSellingWeek += weekIncrement;
             scalpingState.currentCash = Math.max(0, scalpingState.currentCash - (refreshCost * weekIncrement));
             scalpingState.playerEnergy = Math.max(0, scalpingState.playerEnergy - energyCost);
+            
         }
         
-        if (jiazuxintuo) scalpingState.currentCash += Math.floor(Math.random() * 5000 + 5000) * weekIncrement; //应用家族信托
+        if (jiazuxintuo) scalpingState.currentCash += Math.floor(Math.random() * 3000 + 2000) * weekIncrement; //应用家族信托
 
         // 更新股票持有状态
         let stockOwned = stockList.filter(s => s.quantity > 0);
@@ -21113,6 +21142,7 @@ function finalizeScalping() {
     const netAsset = calculateNetAsset();
 
     const doubleLuck = scalpingState.gadgets.includes('双喜临门');
+    const getLoan = scalpingState.gadgets.find(gadget => gadget === '霸王贷款');
     let scoreRatio = 1;
     if (doubleLuck) scoreRatio = 2;
 
@@ -21135,7 +21165,7 @@ function finalizeScalping() {
     goldAmount += goldGot.totalValue;
     updateGoldDisplay(goldAmount);
 
-    showMerchant(`你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}${randomMode ? '，由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
+    showMerchant(`${getLoan && scalpingState.currentSellingWeek < scalpingState.maxSellingWeek ? `由于你无力偿还霸王贷款，游戏在第${scalpingState.currentSellingWeek}周时提前结束了，` : `你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，`}经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}${randomMode ? '，由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
     resetScalping();
 }
 
@@ -21206,7 +21236,7 @@ function recordAchivements() {
     let achivementsGoal = [
         {description: '你的资产突破100万，初尝中产的滋味', type: 'netAsset', reqValue: '1000000'},
         {description: '你的资产突破500万，“彩票头奖亦不过如此”', type: 'netAsset', reqValue: '5000000'},
-        {description: '你的总资产达到1000万，人们提起你也要加一个“千万富翁”，', type: 'netAsset', reqValue: '10000000'},
+        {description: '你的总资产达到1000万，人们提起你也要加一个“千万富翁”的前缀', type: 'netAsset', reqValue: '10000000'},
         {description: '你赚到了3000万，“若水三千，尽入我袋”', type: 'netAsset', reqValue: '30000000'},
         {description: '“先赚他半个小目标”达成，怀揣5000万资产睥睨四方', type: 'netAsset', reqValue: '50000000'},
         {description: '你的资产突破1亿，终于实现人生的小目标', type: 'netAsset', reqValue: '100000000'},
@@ -25754,10 +25784,10 @@ function restoreItems() {
         if (item) {
             // 如果道具已存在，更新数量和其他属性
             item.quantity = savedItem.quantity;
-            item.displayName = savedItem.displayName;
-            item.url = savedItem.url;
-            item.price = savedItem.price;
-            item.description = savedItem.description;
+            item.displayName = item.displayName;
+            item.url = item.url;
+            item.price = item.price;
+            item.description = item.description;
             item.timestamp = savedItem.timestamp; // 恢复时间戳
         } else {
             // 如果道具不存在，创建新的道具

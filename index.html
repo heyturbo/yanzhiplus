@@ -480,6 +480,7 @@
             flex-wrap: nowrap;
             justify-content: space-between;
             border: 1px groove white;
+            z-index: -1;
         }
         
         .bottom-bar div {
@@ -1015,7 +1016,7 @@
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
-            z-index: 9999;
+            z-index: 9;
             align-content: center;
         }
         .scalping-head-button {
@@ -1053,6 +1054,7 @@
             background-repeat: repeat;
             background-size: auto;
             border: 1px solid #6f391c;
+            z-index: 9999;
         }
         
         .scalping-top-bar {
@@ -21923,8 +21925,8 @@ function updateScalpingPanel() {
     maxSellingWeek.innerText = scalpingState.maxSellingWeek;     // 更新最大周数
     playerEnergy.innerText = scalpingState.playerEnergy;
     playerReputation.innerText = calculatePlayerReputation();  // 更新声望
-    currentCash.innerText = scalpingState.currentCash;      // 更新当前现金
-    netAsset.innerText = calculateNetAsset();        // 更新总资产
+    currentCash.innerText = `${scalpingState.currentCash.toLocaleString('en-US')}`;      // 更新当前现金
+    netAsset.innerText = `${calculateNetAsset().toLocaleString('en-US')}`;        // 更新总资产
     usedWarehouseCapacity.innerText = scalpingState.usedWarehouseCapacity;  // 更新已使用仓库容量
     maxWarehouseCapacity.innerText = scalpingState.maxWarehouseCapacity;  // 更新最大仓库容量
     scalpingScoreElement.innerText = scalpingScore;

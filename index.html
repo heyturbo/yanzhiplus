@@ -7966,20 +7966,20 @@ function openHongHuangTreasure() {
         { displayName: '灵兽悟道书', name: 'learningValueBook', quantity: 1, chance: 5 },
         { displayName: '灵兽清心丹', name: 'resetAdvancementPill', quantity: 1, chance: 5 },
         { displayName: '琼浆玉露', name: 'spiritWine', quantity: 1, chance: 5 },
-        { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 2.5, chance: 5 },
+        { displayName: '背包扩容卡', name: 'enlargeCapacityCard', quantity: 1, chance: 6.5 },
         { displayName: '经商积分卡', name: 'merchantPointsCard', quantity: 1, chance: 5 },
         { displayName: '天地灵气*100', name: 'earthlyEnergy', quantity: 100, chance: 6.5 },
         { displayName: '锻造工具', name: 'forgeTool', quantity: 1, chance: 5 },
         { displayName: '修为灵丹（橙）*6', name: 'cultivationPill500', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
         { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
-        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 5 },
+        { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 8 },
         { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 4.9 },
         { displayName: '神圣天赋赐福', name: 'talentedBless', quantity: 1, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
         { displayName: '小金锭', name: 'tinyGoldBlock', quantity: 1, chance: 4, specialAction: () => generateItemToJinnang('tinyGoldBlock', '小金锭', 'https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', 8000000, 1, '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价') },
         { displayName: 'そら召唤卡', name: 'qiongmeiCard', quantity: 1, chance: 0.1 },
         { displayName: '天使之翼', name: 'angelWings', quantity: 1, chance: 5 },
-        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 5 },
+        { displayName: '庆典蛋糕', name: 'celebrationCake', quantity: 1, chance: 10 },
         { displayName: '白银VIP包裹', name: 'baiYinPKG', quantity: 1, chance: 5 },
         { displayName: '穿越时光套餐', name: 'backToOne', quantity: 1, chance: 4 },
         { displayName: '六级淡紫色灵石', name: 'purpleSixthGem', quantity: 1, chance: 3, specialAction: () => generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 500, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石') },
@@ -20079,11 +20079,11 @@ function updateStockPrice() {
         let ratio = 1;
         
         if (stock.quality === 'bad') {
-            ratio = randomVal < 0.5 ? -1 : 1;  // bad 质量有 50% 可能跌价
+            ratio = randomVal < 0.6 ? -1 : 1;  // bad 质量有 60% 可能跌价
         } else if (stock.quality === 'medium') {
-            ratio = randomVal < 0.3 ? -1 : 1;  // medium 质量有 30% 可能跌价
+            ratio = randomVal < 0.4 ? -1 : 1;  // medium 质量有 40% 可能跌价
         } else {
-            ratio = randomVal < 0.1 ? -1 : 1;  // good 质量有 10% 可能跌价
+            ratio = randomVal < 0.2 ? -1 : 1;  // good 质量有 20% 可能跌价
         }
 
         // 计算基础价格，波动与累积的影响
@@ -20367,6 +20367,11 @@ function handleStockSell(stock) {
         return;
     }
 
+    if (stock.quantity < 1) {
+        showMerchant(`当前该股票的持有量为0 ←_←`);
+        return;
+    }
+        
     if (stock.dealWeek > 0) {
         showMerchant(`你投资的企业还在建设中，需要${stock.dealWeek}周后才能交易！`);
         return;
@@ -20547,13 +20552,13 @@ function increaseInverstment() {
                        }
                    },
                    () => {
-                       showMerchant('天使投资人，期待你的眼光能带来真正的价值！');
+                       showMerchant('取消兑换！');
                    },
                    null,
                    'https://pic.imgdb.cn/item/66e32523d9c307b7e995cf28.png',
                    '88px * 88px');
     } else {
-        showMerchant('你的启动资金还不足50两金子，尚不能成为天使投资人');
+        showMerchant('你的启动资金还不足50两金子，尚不能成为进行投资经商');
     }
 }
 
@@ -20805,7 +20810,7 @@ function generateItemToDisplay() {
         imgElement.style.height = "45px";
         imgElement.style.cursor = "pointer";
         imgElement.style.border = "1px solid black";
-        imgElement.style.boxShadow = `${item.itemActivate? '#f5fffa 0px 0px 2px 2px' : ''}`;
+        imgElement.style.boxShadow = `${item.itemActivate? '#f5fffa 0px 0px 6px 4px' : ''}`;
         imgElement.addEventListener('click', () => {
             showMerchant(`${item.name}: 单品均价${item.basePrice}元, 正常情况下价格变动幅度较${item.fluctuation <= 0.2 && item.downRate <= 1.5 ? '小' : '大'}。在遇到专属特殊事件时，属于${item.bonusPrice >= item.basePrice * 3 ? '风投产品，风险与收益并存' : '一般产品，可用于资产保值'}。商品说明：${item.description}`);
         })
@@ -20821,8 +20826,12 @@ function generateItemToDisplay() {
 
         const activateBtn = document.createElement('button');
         activateBtn.id = `${item.name}-activate-button`;
-        activateBtn.style = 'border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;fon;font-size: 14px;border-radius: 5px;color: rgb(249, 222, 155);padding: 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
         activateBtn.innerText = `${item.itemActivate ? '取消' : '激活'}`;
+        activateBtn.style = 'font-size: 14px;border-radius: 5px;padding: 4px;cursor: pointer;transition: transform 0.1s, box-shadow 0.1s;';
+        activateBtn.style.border = `${item.itemActivate ? '1px solid rgba(0, 0, 0, 0.8)' : '1px solid rgb(111, 57, 28)'}`;
+        activateBtn.style.color = `${item.itemActivate ? 'white' : 'rgb(249, 222, 155)'}`;
+        activateBtn.style.boxShadow = `${item.itemActivate ? 'rgba(0, 0, 0, 0.5) 0px 0px 2px 1px inset' : 'rgb(135, 67, 31) 0px 0px 2px 1px inset;'}`;
+        activateBtn.style.background = `${item.itemActivate ? 'linear-gradient(#545454, #a49f9f, #545454)' : 'linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28))'}`;
         activateBtn.addEventListener('click', () => {
             if (!item.itemActivate && selectedItems.length < 6) {
                 item.itemActivate = true;
@@ -20843,6 +20852,8 @@ function generateItemToDisplay() {
     selectPanel.appendChild(selectPanelContainer);
     parentPanel.appendChild(selectPanel);
 }
+
+let selectedItems = null; 
         
 // 生成随机商品并展示到市场板块
 function getRandomScalpableItem() {    
@@ -20858,26 +20869,30 @@ function getRandomScalpableItem() {
     if (wealthOfNations) itemToAdd = 1;
     const numberOfItems = Math.min(5, Math.floor(Math.random() * 5) + 1 + itemToAdd);
     
-    let selectedItems; 
+
     
     if (!randomMode) {
         selectedItems = scalpingItems.filter(i => i.itemActivate);
     } else {
-        const a = scalpingItems; // 示例数组
-        selectedItems = [];
-        // 使用 Set 来确保唯一性
-        const selected = new Set();
-        
-        // 使用 for 循环随机取 6 项
-        for (let i = 0; i < 6; i++) {
-            let randomIndex;
-            do {
-                randomIndex = Math.floor(Math.random() * a.length);  // 生成随机索引
-            } while (selected.has(randomIndex));  // 确保未选取过该索引
-        
-            selected.add(randomIndex);  // 添加索引到 Set
-            selectedItems.push(a[randomIndex]);  // 根据索引选取元素并添加到数组 b
-            selectedItems.forEach(item => item.itemActivate = true);
+        if (selectedItems !== null) {
+            selectedItems = scalpingItems.filter(i => i.itemActivate);
+        } else {
+            const a = scalpingItems; // 示例数组
+            selectedItems = [];
+            // 使用 Set 来确保唯一性
+            const selected = new Set();
+            
+            // 使用 for 循环随机取 6 项
+            for (let i = 0; i < 6; i++) {
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * a.length);  // 生成随机索引
+                } while (selected.has(randomIndex));  // 确保未选取过该索引
+            
+                selected.add(randomIndex);  // 添加索引到 Set
+                selectedItems.push(a[randomIndex]);  // 根据索引选取元素并添加到数组 b
+                selectedItems.forEach(item => item.itemActivate = true);
+            }
         }
     }
         
@@ -20914,7 +20929,7 @@ function getRandomScalpableItem() {
                 <img src="${item.url}" alt="${item.name}" style="width: 45px; height: 45px; border: 1px solid #6f391c" />
                 <div>${item.name}</div>
             </div>
-            <div id="difference-${item.name}" style="position:absolute;color:${price > originalPrice? '#FF4500' : 'lime'};text-shadow:-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;top: 20%;left: 5px;font-size: 12px;opacity:0.8;">${price > originalPrice ? `+${price - originalPrice}` : `-${originalPrice - price}`}</div>
+            <div id="difference-${item.name}" style="position:absolute;color:${price > originalPrice? '#FF4500' : 'lime'};text-shadow:-1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;top: 30px;left: 5px;font-size: 12px;opacity:0.8;">${price > originalPrice ? `+${price - originalPrice}` : `-${originalPrice - price}`}</div>
             <div id="price-${item.name}" style="color:${price > originalPrice? '#FF4500' : 'lime'};">${price}元 ${price > originalPrice? '↑' : '↓'}</div>
         `;
 
@@ -21102,7 +21117,7 @@ function finalizeScalping() {
 
     let scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot.totalValue / 10000) * scoreRatio);
 
-    if (randomMode) scoreToAdd *= 2;
+    if (randomMode) scoreToAdd *= 3;
 
     // 修正赋值逻辑，生成换行的 recordMessage
     let recordMessage = '';
@@ -21188,13 +21203,13 @@ function refreshSaleWeek() {
 function recordAchivements() {
     const netAsset = calculateNetAsset(); // 获取当前资产
     let achivementsGoal = [
-        {description: '你的资产第一次突破100万，初尝中产的滋味', type: 'netAsset', reqValue: '1000000'},
+        {description: '你的资产突破100万，初尝中产的滋味', type: 'netAsset', reqValue: '1000000'},
         {description: '你的资产突破500万，“彩票头奖亦不过如此”', type: 'netAsset', reqValue: '5000000'},
-        {description: '你加入了千万富翁俱乐部', type: 'netAsset', reqValue: '10000000'},
-        {description: '坐拥第一个三千万，小目标得以实现小半', type: 'netAsset', reqValue: '30000000'},
-        {description: '在1亿小目标的半山腰睥睨尘世', type: 'netAsset', reqValue: '50000000'},
-        {description: '你的资产第一次突破1亿，实现人生的小目标', type: 'netAsset', reqValue: '100000000'},
-        {description: '你赚到了10亿，实现了人生的财富自由，开始追求更高阶的精神自由', type: 'netAsset', reqValue: '1000000000'},
+        {description: '你的总资产达到1000万，人们提起你也要加一个“千万富翁”，', type: 'netAsset', reqValue: '10000000'},
+        {description: '你赚到了3000万，“若水三千，尽入我袋”', type: 'netAsset', reqValue: '30000000'},
+        {description: '“先赚他半个小目标”达成，怀揣5000万资产睥睨四方', type: 'netAsset', reqValue: '50000000'},
+        {description: '你的资产突破1亿，终于实现人生的小目标', type: 'netAsset', reqValue: '100000000'},
+        {description: '你赚到了10亿，实现了毕生的财富自由，商业帝国有序运转，你就是时代的代名词', type: 'netAsset', reqValue: '1000000000'},
         {description: '你投资的第一支股票开始产生收益，初尝资产配置的快感', type: 'stock', reqValue: '1'},
         {description: '你超越了过去的自己，财富积累达到了当前最高记录', type: 'highestScore', reqValue: '1'},
     ];
@@ -21475,6 +21490,7 @@ function resetScalping() {
     if (randomMode) {
         randomMode = false;
         scalpingItems.forEach(item => item.itemActivate = false);
+        selectedItems = null; 
     }
         
     scalpingState = {
@@ -21749,7 +21765,7 @@ document.getElementById('player-energy').addEventListener('click', () => {
     const energy = scalpingState.playerEnergy;
     const cash = scalpingState.currentCash;
     const recoverCostRatio = 100 - energy;
-    const recoverCost = Math.pow(recoverCostRatio, 4);
+    const recoverCost = Math.min(3000000, Math.max(20000, Math.pow(recoverCostRatio, 4)));
 
     if (cash >= recoverCost) {
         showInfoBox(`\n1. 每周刷新时会扣除精力，精力低于60时将无法进行任何交易。\n\n2. 精力不足时可以选择休息两周或在此对话框内点击确认花费现金补充。 \n\n3. 你可以花费${recoverCost}元立即恢复到满精力状态，是否确认？`,
@@ -21953,13 +21969,13 @@ function checkStockPhaseAndDisplay() {
         if (keyPhaseCount === 0) {
             stockInfo.innerText = `当前持有${hasStock.find(h => h.quantity > 0).quantity}手${hasStock.find(h => h.quantity > 0).name}的股票`;
         } else {
-            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛】' : '【熊】'}当前持有${hasStock.find(h => h.quantity > 0).quantity}手${hasStock.find(h => h.quantity > 0).name}的股票`;
+            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛市】' : '【熊市】'}当前持有${hasStock.find(h => h.quantity > 0).quantity}手${hasStock.find(h => h.quantity > 0).name}的股票`;
         }
     } else if (hasStock.length > 1) { 
         if (keyPhaseCount === 0) {
             stockInfo.innerText = `当前总计持有${hasStock.length}支股票`;
         } else {
-            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛】' : '【熊】'}当前总计持有${hasStock.length}支股票`;
+            stockInfo.innerText = `${calculateNetAsset() > 5000000 ? '【牛市】' : '【熊市】'}当前总计持有${hasStock.length}支股票`;
         }
     }  
 }

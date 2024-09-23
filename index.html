@@ -21144,13 +21144,14 @@ function finalizeScalping() {
     const goldGot = sellAssetsAndExchangeCash();
     const initialCost = scalpingState.investmentCount * 50000;
     const netAsset = calculateNetAsset();
+    const ROI = Math.floor(netAsset / initialCost); //计算杠杆
 
     const doubleLuck = scalpingState.gadgets.includes('双喜临门');
     const getLoan = scalpingState.gadgets.find(gadget => gadget === '霸王贷款');
     let scoreRatio = 1;
     if (doubleLuck) scoreRatio = 2;
 
-    let scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(goldGot.totalValue / 10000) * scoreRatio);
+    let scoreToAdd = Math.min(20000 * scoreRatio, Math.floor(Math.max(200, ROI) * scoreRatio));
 
     if (randomMode) scoreToAdd *= 3;
 
@@ -21169,7 +21170,7 @@ function finalizeScalping() {
     goldAmount += goldGot.totalValue;
     updateGoldDisplay(goldAmount);
 
-    showMerchant(`${getLoan && scalpingState.currentSellingWeek < scalpingState.maxSellingWeek ? `由于你无力偿还霸王贷款，游戏在第${scalpingState.currentSellingWeek}周时提前结束了，` : `你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，`}经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}${randomMode ? '，由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
+    showMerchant(`${getLoan && scalpingState.currentSellingWeek < scalpingState.maxSellingWeek ? `由于你无力偿还霸王贷款，游戏在第${scalpingState.currentSellingWeek}周时提前结束了，` : `你经历${scalpingState.currentSellingWeek}周的商场鏖战，创造了不俗的经商业绩，`}经过核算：\n\n${recordMessage} \n\n未变现的资产缩水了${convertPrice(goldGot.assetShrinkValue)}金子，净利润为${convertPrice(Math.max(0, goldGot.totalValue - initialCost))}金子，投资回报率为${ROI * 100}%。\n\n所有资产已兑换为${convertPrice(goldGot.totalValue)}金子！\n\n本次经商你的积分增长了${scoreToAdd}，当前总积分为${scalpingScore}${randomMode ? '，由于你开启了随机配货，当前随机配货模式已关闭' : '。'}`);
     resetScalping();
 }
 

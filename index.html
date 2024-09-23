@@ -21054,12 +21054,17 @@ function processSaleWeek(weekIncrement, energyCostRatio, cashCostRatio) {
         return;
     }
     
-    if (getLoan && handleGetLoanCount(5)) scalpingState.currentCash -= 200000;
+    if (getLoan && handleGetLoanCount(5)) {
+        scalpingState.currentCash -= 200000;
         
-    if (scalpingState.currentCash <= 0 && getLoan) {
-        finalizeScalping();
-        return;
-    }   
+        if (scalpingState.currentCash < 0) {
+            finalizeScalping();
+            return;
+        }
+        
+        scalpingState.gadgets.splice(getLoan , 1);
+        updateScalpingPanel();
+    }
         
     // 检查资金是否足够
     if (scalpingState.currentCash < refreshCost) {

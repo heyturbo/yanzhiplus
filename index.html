@@ -1264,12 +1264,13 @@
             border: 1px black;
             justify-items: center;
             gap: 10px;
+            text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
         }
 
         .skills-in-drawer div{
             height: 38px;
             width: 38px;
-            border: 1px double rgb(255 255 255 / 90%);
+            border: 1px double #ccc;
             box-shadow: rgb(30, 46, 47) 0px 0px 5px 1px inset;
             overflow: hidden;
             font-size: 10px;
@@ -1280,6 +1281,8 @@
             flex-direction: row;
             background-color: #666666;  /* 默认灰色背景 */
             cursor: pointer;
+            background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0c.png);
+            background-position: center;
         }
         
         .image-frame {
@@ -9528,7 +9531,7 @@ function performAttack(type) {
         return;
     }
     
-    setTimeout(500, playerTurn = false);
+    playerTurn = false;
 }
 
 function checkWaterAmuletChance() {
@@ -11159,7 +11162,7 @@ function decideEnemyCanPerform() {
         }
         
         if (playerTurn) {
-            const enemySpeedFactor = Math.max(0, battleState.enemy.speed * 2 / (battleState.enemy.speed + 100000));
+            const enemySpeedFactor = Math.max(0, battleState.enemy.speed / (battleState.enemy.speed + 10000)) * battleRounds * 0.1;
             // 获取当前的宽度并去掉百分号
             const currentWidth = parseFloat(progressElement.style.width.replace('%', '')) || 0;
             // 更新进度条宽度
@@ -11175,7 +11178,7 @@ function decideEnemyCanPerform() {
         } else {
             setTimeout(enemyAttack(), 350);
         }
-    }, 20);  // 每 20 毫秒执行一次
+    }, 750);  // 每 750 毫秒执行一次
 }
 
 document.getElementById('enemy-speed-container').addEventListener('click', () => {
@@ -11537,7 +11540,7 @@ function applyEnemyMagicEffects(damage) {
 function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
     if (enemyHealthPercentage < 0.05 && Math.random() < 0.5 && drugInventory['延寿露'] && drugInventory['延寿露'].quantity > 0) {
         if (Math.random() < 0.8) {
-            const healthRecovered = Math.min(100000000, Math.floor(enemyMaxHealth * 0.2));
+            const healthRecovered = Math.min(2000000, Math.floor(enemyMaxHealth * 0.2));
             battleState.enemy.health = Math.min(enemyMaxHealth, battleState.enemy.health + healthRecovered);
             drugInventory['延寿露'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的延寿露的能量，恢复了${healthRecovered}点生命值。`, '#66CDAA');
@@ -11550,7 +11553,7 @@ function handleEnemySteal(enemyHealthPercentage, enemyManaPercentage) {
         return true;
     } else if (enemyManaPercentage < 0.05 && Math.random() < 0.5 && drugInventory['天山雪莲'] && drugInventory['天山雪莲'].quantity > 0) {
         if (Math.random() < 0.8) {
-            const manaRecovered = Math.min(50000000, Math.floor(enemyMaxMana * 0.2));
+            const manaRecovered = Math.min(2000000, Math.floor(enemyMaxMana * 0.2));
             battleState.enemy.mana = Math.min(enemyMaxMana, battleState.enemy.mana + manaRecovered);
             drugInventory['天山雪莲'].quantity -= 1;
             logBattleEvent(`🥷【敌人偷窃】邪佞窥探了你的锦囊，吸收了一个来自你所拥有的天山雪莲的能量，恢复了${manaRecovered}点法力值。`, '#66CDAA');
@@ -16277,7 +16280,7 @@ let jinnangItems = [
     { name: 'glowingSoul', displayName: '发光之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909844a.png', price: 150, quantity: 0, description: '用于宠物7~12进化' },
     { name: 'activeSoul', displayName: '活跃之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e90984b7.png', price: 200, quantity: 0, description: '用于宠物13~18进化' },
     { name: 'jumpingSoul', displayName: '跳动之灵', url: 'https://pic.imgdb.cn/item/6656e81dd9c307b7e909843e.png', price: 300, quantity: 0, description: '用于宠物19~24进化' },
-    { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '万化灵丹的终极形态，可令宠物刷新出10~12个技能' },
+    { name: 'ultraSkillBoomer', displayName: '仙人醍醐', url: 'https://pic.imgdb.cn/item/6662eda05e6d1bfa0530b827.png', price: 50000, quantity: 0, description: '宠物修炼时绝佳的媒介，可通过叠加使用大幅提升修炼所得' },
     { name: 'mutationScroll', displayName: '灵异秘卷', url: 'https://pic.imgdb.cn/item/669754f0d9c307b7e9bfec4f.png', price: 50000, quantity: 0, description: '上古卷轴，记录着上古神兽的培养之道，使用后可培养出拥有资质更强大的宠物' },
     { name: 'lostBook', displayName: '遗失的洛书·密钥', url: 'https://pic.imgdb.cn/item/669a7ce3d9c307b7e9450f04.png', price: 30000, quantity: 0, description: '解锁神器「遗失的洛书」的关键道具' },
     { name: 'fragmentedMap', displayName: '残页的河图·灵匙', url: 'https://pic.imgdb.cn/item/669a7ce2d9c307b7e9450ef4.png', price: 30000, quantity: 0, description: '解锁神器「残页的河图」的关键「钥匙」' },
@@ -23148,24 +23151,7 @@ function upgradeWisdom() {
 }
 
 function trainSkills() {
-    const ultraSkillBoomer = jinnangItems.find(item => item.name === 'ultraSkillBoomer');
-    
-    if (ultraSkillBoomer && ultraSkillBoomer.quantity > 0) {
-        showInfoBox("你拥有极为珍贵的仙人醍醐，可以直接让宠物醍醐灌顶，掌握大量技能，是否使用？", 
-        () => {
-            if (useItem('ultraSkillBoomer', 1)) {
-                const selectedSkills = selectRandomSkills(10, 12, currentPet.skills.length);
-                updateSkillsAndNotify(selectedSkills);
-            } else {
-                executeTransmutationPillLogic();
-            }
-        }, 
-        () => {
-            executeTransmutationPillLogic();
-        });
-    } else {
-        executeTransmutationPillLogic();
-    }
+    executeTransmutationPillLogic();
 }
 
 function executeTransmutationPillLogic() {
@@ -23272,14 +23258,20 @@ function createSkillElement(skill, skillsInDrawer = false) {
             /* 使用更具体的选择器来覆盖默认样式 */
             .skills-in-drawer div.s-skillsInDrawer {
                 background-color: #4a90e2 !important;
+                background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0e.png) !important;
+                background-position: center !important;
             }
             
             .skills-in-drawer div.ss-skillsInDrawer {
                 background-color: #844a0f !important;
+                background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0d.png) !important;
+                background-position: center !important;
             }
             
             .skills-in-drawer div.sss-skillsInDrawer {
                 background-color: #b71540 !important;
+                background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0b.png) !important;
+                background-position: center !important;
             }
         `;
         document.head.appendChild(styleSheet);

@@ -725,6 +725,7 @@
             color: #f1f8ff;
             text-shadow: 0 0 5px gold;
         }
+
         .bottom-bar .info {
             display: flex;
             flex-direction: column;
@@ -1228,9 +1229,8 @@
             flex-direction: row;
             justify-content: space-between;
             min-height: 300px;
-            background-image: url(https://pic.imgdb.cn/item/66a89fd8d9c307b7e9f8bbf3.gif);
             background-size: cover;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             margin-top: 5px;
         }
         .progress-bars {
@@ -1253,6 +1253,35 @@
             padding: 10px;
             align-items: center;
         }
+
+        .skills-in-drawer {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            padding: 10px;
+            background-color: #3a575a;
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            color: white;
+            border: 1px black;
+            justify-items: center;
+            gap: 10px;
+        }
+
+        .skills-in-drawer div{
+            height: 38px;
+            width: 38px;
+            border: 1px double rgb(255 255 255 / 90%);
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 1px inset;
+            overflow: hidden;
+            font-size: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2px;
+            flex-direction: row;
+            background-color: #666666;  /* 默认灰色背景 */
+            cursor: pointer;
+        }
+        
         .image-frame {
             display: flex;
             /* 设置图片框的尺寸，可以根据需要调整 */
@@ -2921,6 +2950,7 @@
                             </div>
                     </div>
                 </div>
+                <div class='skills-in-drawer' id='skills-in-drawer'></div>
                 <div class="button-grid">
                     <button onclick="trainAttributes()">金子培养</button>
                     <button onclick="trainSkills()">洗练技能</button>
@@ -6050,6 +6080,7 @@ function deleteAllPetData() {
 function storeCurrentPetData() {
     if (currentPet && currentPet.name) {
         const skillsArea = document.getElementById("skills-area");
+        const skillsDrawer = document.getElementById("skills-in-drawer");
         const existingSkills = Array.from(skillsArea.children).map(skillDiv => {
             const [name, rarity] = skillDiv.innerText.split(' (');
             return {
@@ -6208,21 +6239,24 @@ function restorePetData(petName) {
         }
         if (savedPetData.existingSkills) {
             const skillsArea = document.getElementById("skills-area");
-            skillsArea.innerHTML = ''; // 清空当前技能
+            const skillsDrawerArea = document.getElementById("skills-in-drawer");
+            
+            // 清空两个区域
+            skillsArea.innerHTML = '';
+            skillsDrawerArea.innerHTML = '';
+            
             savedPetData.existingSkills.forEach(skill => {
-                const skillDiv = document.createElement('div');
-                skillDiv.innerText = `${skill.name} (${skill.rarity})`;
-                skillDiv.onclick = () => {
-                    deleteSkill(skill, skillDiv, skillsArea);
-                };
-                if (skill.rarity === 'S') {
-                    skillDiv.classList.add('s-skill');
-                } else if (skill.rarity === 'SS') {
-                    skillDiv.classList.add('ss-skill');
-                } else if (skill.rarity === 'SSS') {
-                    skillDiv.classList.add('sss-skill');
-                }
+                // 为两个区域分别创建技能元素
+                const skillDiv = createSkillElement(skill);
+                const drawerSkillDiv = createSkillElement(skill, true);
+                
+                // 设置各自的点击删除事件
+                skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea);
+                drawerSkillDiv.onclick = () => deleteSkill(skill, drawerSkillDiv, skillsDrawerArea);
+                
+                // 添加到各自的区域
                 skillsArea.appendChild(skillDiv);
+                skillsDrawerArea.appendChild(drawerSkillDiv);
             });
         }
 
@@ -7263,12 +7297,13 @@ function setBackgroundImage(imageUrl) {
     }
 }
 
-function logBattleEvent(event, color = 'white') {
+function logBattleEvent(event, color = 'white', fontSize = '12px') {
     const logDiv = document.getElementById("log");
     if (logDiv) {
         const newEvent = document.createElement("p");
         newEvent.innerText = event;
         newEvent.style.color = color; // 设置文字颜色
+        newEvent.style.fontSize = fontSize;
         logDiv.appendChild(newEvent);
 
         // 检查日志条目数，如果超过 100 条，则删除最早的条目
@@ -9404,7 +9439,7 @@ function selectSkillAndCalculateMultiplier(type) {
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
         isSkillUsed = true;
-        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold');
+        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold' , '20px');
         if (type === 'physical') {
             const manaCost = Math.floor((Math.random() * (200 - 50 + 1) * skillLevel));
             battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
@@ -9492,7 +9527,8 @@ function performAttack(type) {
         showNextBattlePrompt(true);
         return;
     }
-    playerTurn = false;
+    
+    setTimeout(500, playerTurn = false);
 }
 
 function checkWaterAmuletChance() {
@@ -23203,34 +23239,91 @@ function getRandomSkillNum(probabilities) {
         
 function updateSkillsArea(selectedSkills) {
     const skillsArea = document.getElementById("skills-area");
+    const skillsDrawerArea = document.getElementById("skills-in-drawer");
     const existingSkills = Array.from(skillsArea.children).map(skillDiv => skillDiv.innerText.split(' ')[0]);
+    
     skillsArea.innerHTML = "";
+    skillsDrawerArea.innerHTML = ""; // 清空抽屉区域
+    
     selectedSkills.forEach(skill => {
         if (!existingSkills.includes(skill.name)) {
-            const skillDiv = document.createElement("div");
-            skillDiv.innerText = `${skill.name} (${skill.rarity})`;
-            skillDiv.onclick = () => {
-                deleteSkill(skill, skillDiv, skillsArea);
-            };
-            if (skill.rarity === 'S') {
-                skillDiv.classList.add('s-skill');
-            } else if (skill.rarity === 'SS') {
-                skillDiv.classList.add('ss-skill');
-            } else if (skill.rarity === 'SSS') {
-                skillDiv.classList.add('sss-skill');
-            }
+            // 为主区域创建技能元素
+            const skillDiv = createSkillElement(skill);
+            const drawerSkillDiv = createSkillElement(skill, true); // 为抽屉区域创建独立的技能元素
+            
+            // 添加点击事件,删除对应区域的元素
+            skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea);
+            drawerSkillDiv.onclick = () => deleteSkill(skill, drawerSkillDiv, skillsDrawerArea);
+            
+            // 分别添加到不同区域
             skillsArea.appendChild(skillDiv);
+            skillsDrawerArea.appendChild(drawerSkillDiv);
         }
     });
 }
 
-function createSkills(name, rarity, type, level, multiplier, description) {
-    // 使用函数参数的实际值，而不是字符串
-    const skillsArea = document.getElementById("skills-area");
+// 抽取创建技能元素的公共函数
+function createSkillElement(skill, skillsInDrawer = false) {
+    // 如果还没有添加过样式，则添加样式定义
+    if (skillsInDrawer && !document.getElementById('skillsDrawerStyles')) {
+        const styleSheet = document.createElement('style');
+        styleSheet.id = 'skillsDrawerStyles';
+        styleSheet.textContent = `
+            /* 使用更具体的选择器来覆盖默认样式 */
+            .skills-in-drawer div.s-skillsInDrawer {
+                background-color: #4a90e2 !important;
+            }
+            
+            .skills-in-drawer div.ss-skillsInDrawer {
+                background-color: #844a0f !important;
+            }
+            
+            .skills-in-drawer div.sss-skillsInDrawer {
+                background-color: #b71540 !important;
+            }
+        `;
+        document.head.appendChild(styleSheet);
+    }
+    
     const skillDiv = document.createElement("div");
+    skillDiv.innerText = `${skill.name} (${skill.rarity})`;
+    
+    if (skillsInDrawer) {
+        switch(skill.rarity) {
+            case 'S':
+                skillDiv.classList.add('s-skillsInDrawer');
+                break;
+            case 'SS':
+                skillDiv.classList.add('ss-skillsInDrawer');
+                break;
+            case 'SSS':
+                skillDiv.classList.add('sss-skillsInDrawer');
+                break;
+        }
+    } else {
+        // 原有的主区域样式处理
+        const stylePrefix = '-skill';
+        switch(skill.rarity) {
+            case 'S':
+                skillDiv.classList.add(`s${stylePrefix}`);
+                break;
+            case 'SS':
+                skillDiv.classList.add(`ss${stylePrefix}`);
+                break;
+            case 'SSS':
+                skillDiv.classList.add(`sss${stylePrefix}`);
+                break;
+        }
+    }
+    
+    return skillDiv;
+}
+
+function createSkills(name, rarity, type, level, multiplier, description) {
+    const skillsArea = document.getElementById("skills-area");
+    const skillsDrawerArea = document.getElementById("skills-in-drawer");
     const existingSkills = Array.from(skillsArea.children).map(skillDiv => skillDiv.innerText.split(' ')[0]);
     const sssSkills = currentPet.skills.filter(skill => {
-        // 匹配 existingSkills 中的技能名称
         return existingSkills.includes(skill.name) && skill.rarity === 'SSS';
     });
 
@@ -23260,29 +23353,30 @@ function createSkills(name, rarity, type, level, multiplier, description) {
     }
     
     const skill = currentPet.skills.find(s => s.name === name);
-    skillDiv.innerText = `${name} (${rarity})`;  // 在页面上显示技能名称和稀有度
     showInfoBox(`成功学会${name}，技能效果：${description}`);
-    skillDiv.onclick = () => {
-        deleteSkill(skill, skillDiv, skillsArea);
-    };
-    if (rarity === 'S') {
-        skillDiv.classList.add('s-skill');
-    } else if (rarity === 'SS') {
-        skillDiv.classList.add('ss-skill');
-    } else if (rarity === 'SSS') {
-        skillDiv.classList.add('sss-skill');
-    }
+
+    // 为两个区域创建独立的技能元素
+    const skillDiv = createSkillElement(skill, false);
+    const drawerSkillDiv = createSkillElement(skill, true);
+    
+    // 设置点击事件
+    skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea, drawerSkillDiv, skillsDrawerArea);
+    drawerSkillDiv.onclick = () => deleteSkill(skill, drawerSkillDiv, skillsDrawerArea, skillDiv, skillsArea);
+    
+    // 添加到各自的区域
     skillsArea.appendChild(skillDiv);
+    skillsDrawerArea.appendChild(drawerSkillDiv);
+    syncSkillsAreas();
 }
 
-function deleteSkill(skill, skillDiv, skillsArea) {
-    // 在 currentPet.skills 中找到与 skillDiv 对应的技能对象
+function deleteSkill(skill, clickedDiv, clickedArea, pairedDiv, pairedArea) {
     const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
     const skillType = matchingSkill.type;
 
     if (matchingSkill) {
         let skillLevel = matchingSkill.level ? matchingSkill.level : 1;
         let skillMultiplier = calculateSkillLevelAndMultiplier(matchingSkill).skillMultiplier;
+
 
         const skillTypeMap = {
             "PA": "物理攻击技能，与物理攻击力相关",
@@ -23308,33 +23402,43 @@ function deleteSkill(skill, skillDiv, skillsArea) {
         const skillDescription = matchingSkill.description;
         const skillTypeDescription = skillTypeMap[skillType] || "未知类型技能";
 
-        // 定义确认删除技能的回调函数
         function onConfirm() {
-            // 删除技能的DOM元素
-            
+            // 重置技能等级和系数
             const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
             matchingSkill.level = 1;
             const deleteResult = calculateSkillLevelAndMultiplier(matchingSkill);
             skillLevel = deleteResult.skillLevel;
             skillMultiplier = deleteResult.skillMultiplier;
             
-            skillsArea.removeChild(skillDiv);
-
+            // 先检查元素是否存在于对应的父元素中
+            const skillsArea = document.getElementById("skills-area");
+            const skillsDrawerArea = document.getElementById("skills-in-drawer");
+            
+            // 安全地删除元素
+            function safeRemoveChild(parent, child) {
+                if (parent && child && parent.contains(child)) {
+                    parent.removeChild(child);
+                }
+            }
+            
+            // 从两个区域中删除技能元素
+            safeRemoveChild(skillsArea, clickedDiv);
+            safeRemoveChild(skillsDrawerArea, clickedDiv);
+            
             // 获取当前技能列表并更新评分
             const remainingSkills = Array.from(skillsArea.children).map(div => {
                 const [name, rarity] = div.innerText.split(' (');
                 return { name, rarity: rarity.replace(')', '') };
             });
-
+            
             updateSkillScore(remainingSkills);
+            syncSkillsAreas();
         }
 
-        // 定义取消删除技能的回调函数
         function onCancel() {
             console.log('取消删除技能');
         }
 
-        // 显示信息框，展示对应技能的描述并传入回调函数
         showInfoBox(
             `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n⚠️上述说明仅用于还原原版游戏内容，真实作用：\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
             () => {
@@ -23345,16 +23449,40 @@ function deleteSkill(skill, skillDiv, skillsArea) {
                 );
             },
             onCancel,
-            'black' // 可选的颜色参数
+            'black'
         );
     } else {
         console.error('未找到匹配的技能');
-        // 可以考虑在UI中给出用户友好的提示
         showInfoBox('未找到匹配的技能，删除操作无法进行。', null, null, 'red');
     }
+    syncSkillsAreas();
 }
 
+function syncSkillsAreas() {
+    const skillsArea = document.getElementById("skills-area");
+    const skillsDrawerArea = document.getElementById("skills-in-drawer");
+    
+    // 获取主区域的技能列表作为基准
+    const mainSkills = Array.from(skillsArea.children).map(div => {
+        const [name, rarity] = div.innerText.split(' (');
+        return { name, rarity: rarity.replace(')', '') };
+    });
+    
+    // 清空抽屉区域
+    skillsDrawerArea.innerHTML = '';
+    
+    // 重新创建抽屉区域的技能元素
+    mainSkills.forEach(skill => {
+        const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
+        if (matchingSkill) {
+            const drawerSkillDiv = createSkillElement(matchingSkill, true);
+            drawerSkillDiv.onclick = () => deleteSkill(matchingSkill, drawerSkillDiv, skillsDrawerArea);
+            skillsDrawerArea.appendChild(drawerSkillDiv);
+        }
+    });
+}
 
+        
 // 技能效果的定时器需要全局定义，计时器可以不定义，使用battleState.enemy[status]即可
 let bleedingInterval = null;
 let healingInterval = null;
@@ -24477,6 +24605,7 @@ function updateAttributePanel() {
 
     updateRemainingPointsDisplay();
     bonusAttributesDisplay();
+    syncSkillsAreas();
 }
 
 function calculateGrowthRateDisplayAndValue(qualities) {
@@ -25651,6 +25780,7 @@ function saveGameState() {
     const petSelect = document.getElementById('pet-select');
     const petsInSelect = Array.from(petSelect.options).map(option => option.value);
     const skillsArea = document.getElementById("skills-area");
+    const skillsDrawer = document.getElementById("skills-in-drawer");
     const existingSkills = Array.from(skillsArea.children).map(skillDiv => {
         const [name, rarity] = skillDiv.innerText.split(' (');
         return {
@@ -25750,8 +25880,7 @@ function clearOldItems() {
     // 更新 UI 或者执行其他相关的清理操作
     updateJinnangItems();
     showInfoBox("旧的道具数据已删除。");
-}
-
+    }
         
 // 存储道具数据
 function storeItems() {
@@ -26003,21 +26132,24 @@ function loadGameState(auto = false) {
             }
             if (savedState.existingSkills) {
                 const skillsArea = document.getElementById("skills-area");
-                skillsArea.innerHTML = ''; // 清空当前技能
+                const skillsDrawerArea = document.getElementById("skills-in-drawer");
+                
+                // 清空两个区域的当前技能
+                skillsArea.innerHTML = '';
+                skillsDrawerArea.innerHTML = '';
+                
                 savedState.existingSkills.forEach(skill => {
-                    const skillDiv = document.createElement('div');
-                    skillDiv.innerText = `${skill.name} (${skill.rarity})`;
-                    skillDiv.onclick = () => {
-                        deleteSkill(skill, skillDiv, skillsArea);
-                    };
-                    if (skill.rarity === 'S') {
-                        skillDiv.classList.add('s-skill');
-                    } else if (skill.rarity === 'SS') {
-                        skillDiv.classList.add('ss-skill');
-                    } else if (skill.rarity === 'SSS') {
-                        skillDiv.classList.add('sss-skill');
-                    }
+                    // 为两个区域分别创建技能元素
+                    const skillDiv = createSkillElement(skill);
+                    const drawerSkillDiv = createSkillElement(skill, true);
+                    
+                    // 分别设置点击事件
+                    skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea);
+                    drawerSkillDiv.onclick = () => deleteSkill(skill, drawerSkillDiv, skillsDrawerArea);
+                    
+                    // 分别添加到对应区域
                     skillsArea.appendChild(skillDiv);
+                    skillsDrawerArea.appendChild(drawerSkillDiv);
                 });
             }
             if (savedState.secondAscensionSkill && savedState.reenableAscension) {

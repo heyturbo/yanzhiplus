@@ -1265,6 +1265,7 @@
             justify-items: center;
             gap: 10px;
             text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+            height: 100px;
         }
 
         .skills-in-drawer div{
@@ -7404,8 +7405,13 @@ function calculateSkillAttributes() {
                     }
                     // 未来拓展更多...
                 };               
+
+                maxLifeSpan = 5000;
+                if (skill.type === 'N' && skill.name === '长寿') {
+                    maxLifeSpan = 5000 + Math.round(168 * levelMultiplier * skillLevel);
+                }
                 
-                if (skill.type === 'N') {
+                if (skill.type === 'N' && skill.name !== '长寿') {
                     skillAttributes.health += Math.round(168 * levelMultiplier);
                     skillAttributes.mana += Math.round(98 * levelMultiplier);
                     skillAttributes.physicalAttack += Math.round(64 * levelMultiplier);
@@ -22539,6 +22545,7 @@ function fulfillPetSkill() {
     } else {
         showInfoBox("没有找到可添加的技能，或所有技能已添加！");
     }
+    updateAttributePanel();
 }
 
 function getMissingSkills(allSkills) {
@@ -23256,6 +23263,12 @@ function createSkillElement(skill, skillsInDrawer = false) {
         styleSheet.id = 'skillsDrawerStyles';
         styleSheet.textContent = `
             /* 使用更具体的选择器来覆盖默认样式 */
+            .skills-in-drawer div.a-skillsInDrawer {
+                background-color: #4a90e2 !important;
+                background-image: url(https://pic1.imgdb.cn/item/677fea29d0e0a243d4f2d284.png) !important;
+                background-position: center !important;
+            }
+            
             .skills-in-drawer div.s-skillsInDrawer {
                 background-color: #4a90e2 !important;
                 background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0e.png) !important;
@@ -23282,6 +23295,9 @@ function createSkillElement(skill, skillsInDrawer = false) {
     
     if (skillsInDrawer) {
         switch(skill.rarity) {
+            case 'A':
+                skillDiv.classList.add('a-skillsInDrawer');
+                break;
             case 'S':
                 skillDiv.classList.add('s-skillsInDrawer');
                 break;
@@ -23353,12 +23369,12 @@ function createSkills(name, rarity, type, level, multiplier, description) {
     
     // 设置点击事件
     skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea, drawerSkillDiv, skillsDrawerArea);
-    drawerSkillDiv.onclick = () => deleteSkill(skill, drawerSkillDiv, skillsDrawerArea, skillDiv, skillsArea);
+    drawerSkillDiv.onclick = () => levelUpSkill();
     
     // 添加到各自的区域
     skillsArea.appendChild(skillDiv);
     skillsDrawerArea.appendChild(drawerSkillDiv);
-    syncSkillsAreas();
+    updateAttributePanel();
 }
 
 function deleteSkill(skill, clickedDiv, clickedArea, pairedDiv, pairedArea) {
@@ -23432,7 +23448,7 @@ function deleteSkill(skill, clickedDiv, clickedArea, pairedDiv, pairedArea) {
         }
 
         showInfoBox(
-            `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n⚠️上述说明仅用于还原原版游戏内容，真实作用：\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
+            `\n${skill.name} ${skillLevel}级：${skillDescription}\n\n⚠️上述说明来自「天书奇谈」官方页面，在本模拟器中的真实作用：\n\n这是一个${skillTypeDescription}，当前技能系数为${(skillMultiplier * 100).toFixed(0)}%\n\n你是否要删除此技能?`,
             () => {
                 showInfoBox(`你确定要删除${skill.name}吗？该操作无法恢复！`,
                     onConfirm,
@@ -24567,6 +24583,7 @@ function updateAttributePanel() {
     const qualities = pet.qualities;
     const { growthRateDisplay, growthRate } = calculateGrowthRateDisplayAndValue(qualities);
     const gemFirstAttributes = getGemFirstAttributes();
+    const skillsArea = document.getElementById("skills-area");
 
     const currentAttributes = attributesForTraning();
     // 此数组用于更新显示属性左边的总值
@@ -24595,6 +24612,14 @@ function updateAttributePanel() {
     document.getElementById("attribute-agility").innerText = totalAttributes.agility;
     document.getElementById("attribute-faith").innerText = totalAttributes.faith;
 
+    const remainingSkills = Array.from(skillsArea.children).map(div => {
+        const [name, rarity] = div.innerText.split(' (');
+        return { name, rarity: rarity.replace(')', '') };
+    });
+    
+    updateSkillScore(remainingSkills);
+    calculateSkillAttributes();
+        
     updateRemainingPointsDisplay();
     bonusAttributesDisplay();
     syncSkillsAreas();

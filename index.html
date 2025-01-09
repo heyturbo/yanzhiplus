@@ -1345,12 +1345,12 @@
         }
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
             gap: 10px 0px; /* 调整按钮之间的间距 */
             align-items: stretch;
-            justify-items: stretch;
             margin-bottom': 1';
             margin: 10px 0px 10px 0px;
+            justify-items: stretch;
+            grid-template-columns: repeat(5, 1fr);
         }
         .button-grid button {
             /* 你可以在这里添加更多的样式来定制按钮的外观 */
@@ -1937,40 +1937,55 @@
         }
         
         .battle-system-drawer-toggle {
-            font-size: 24px;
+            font-size: 15px;
+            text-align: center;
+            padding: 5px;
+            background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
+            background-repeat: repeat;
+            background-size: contain;
+            color: #E3A73B;
             cursor: pointer;
-            padding: 0px 0px 0px 0px;
-            text-align: left;
+            box-shadow: inset 0px 1px 2px 0px #E3A73B;
+            border: 1px solid black;
+            margin-bottom: 5px;
         }
         
         .battle-system-content {
             display: flex;
             flex-direction: column;
-            padding: 5px;
             width: 100%;
-            justify-content: space-between;
+            justify-content: flex-start;
+            border-radius: 2px;
+            background-color: #DFBF6E;
+            color: #ffffff;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 1px solid black;
         }
         
         .battle-system-info-wrapper {
             display: flex;
-            width: 100%;
+            width: auto;
+            padding: 5px;
             flex-direction: row;
             flex-wrap: nowrap;
-            gap: 2px;
+            gap: 5px;
+            justify-content: space-around;
         }
         
         .battle-system-pet-info, .battle-system-enemy-info {
-            border: 1px solid #ccc;
-            padding: 5px;
+            border: 1px solid rgba(0, 0, 0, 0.8);
+            padding: 0px;
             margin-bottom: 10px;
             font-size: 12px;
             flex: 1;
             display: flex;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 5px;
+            background: rgba(0, 0, 0, 0.5);
             line-height: 14px;
             min-height50%: 5;
             flex-direction: column;
+            align-items: center;
         }
         /* 非暴击时，快速渐进渐出 */
         .normal-hit-animation {
@@ -2086,23 +2101,26 @@
         }
         
         .battle-system-log {
-            border: 1px solid #ccc;
-            padding: 5px;
+            padding: 10px;
             margin-bottom: 0px;
-            max-height: 380px;
+            height: 360px;
             overflow-y: clip;
             font-size: 12px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 5px;
-            width: 97%;
+            background: rgba(0, 0, 0, 0.5);
+            width: auto;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
         }
                 /* 直接针对日志内容的样式 */
         #log {
             display: block;
             unicode-bidi: isolate;
             overflow-y: auto;
-            max-height: 75%;
+            height: 80%;
             line-height: 20px;
+            background-color: #3a575a;
+            box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+            border: 1px solid #fff;
         }
 
         /* 日志条目的样式 */
@@ -2964,7 +2982,7 @@
                     <button onclick="transformPet()">属性专精</button>
                     <button id="petArms" onclick="handlePetArmsClick()">宠物武装</button>
                     <button onclick="petCollection()">宠物图鉴</button>
-                    <button onclick="showBiography()">解锁传记</button>
+                    <button onclick="openWuxingDisplay()">五行面板</button>
                     <button onclick="jumpToQuality()">查看资质</button>
                 </div>
             </div>
@@ -3138,7 +3156,7 @@
             <button onclick="useAssignedItem()">使用道具</button>
             <button onclick="useAllItems()">批量使用</button>
             <button onclick="deleteItems()">丢弃道具</button>
-            <button onclick="openWuxingDisplay()">五行面板</button>
+            <button onclick="enlargeCapacity();">背包扩容</button>
         </div>
     </div>
 
@@ -3185,7 +3203,7 @@
                     <img id="battleOverlayImage" src="" alt="Battle Animation" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
-        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">&times;</div>
+        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">点击退出战斗</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
@@ -3206,7 +3224,7 @@
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;box-shadow: 0px 0px 2px 1px #fff;">
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="your-pet-physical-attack"></span></p>
                         <p>🧙法攻: <span id="your-pet-magic-attack"></span></p>
@@ -3242,7 +3260,7 @@
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;justify-content: space-between;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;box-shadow: 0px 0px 2px 1px #fff;">
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="enemy-pet-physical-attack"></span></p>
                         <p>🧙法攻: <span id="enemy-pet-magic-attack"></span></p>
@@ -3345,7 +3363,7 @@
                 <h2 id="battle-log-head" style="cursor:pointer;">战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
             </div>
-            <div class="battle-system-actions">
+            <div class="button-grid button" style="grid-template-columns: repeat(6, 1fr);padding: 2px;gap: 10px;">
                 <button onclick="performAttack('physical')">物攻</button>
                 <button onclick="performDefense()">格挡</button>
                 <button onclick="performHeal()">治疗</button>
@@ -6849,7 +6867,7 @@ function startBattle() {
     onBattleState = true;
 
     if (!firstStartBattle) {
-        logBattleEvent("这里是战斗面板");
+        logBattleEvent("【提示】这里是战斗面板，点击上方战斗记录字样可清屏", 'gold', '20px');
         firstStartBattle = true;
     }
     
@@ -8006,6 +8024,7 @@ function handleQiongQiSkill() {
 function openHongHuangTreasure() {
     const treasure = [
         { displayName: '资质仙丹礼包*2', name: 'qualityEnhancePillPKG', quantity: 2, chance: 5 },
+        { displayName: '源泉的生命箱', name: 'lifeBox', quantity: 1, chance: 1 },
         { displayName: '集中值（4点）*10', name: 'attentionValue', quantity: 10, chance: 5 },
         { displayName: '灵兽悟道书', name: 'learningValueBook', quantity: 1, chance: 5 },
         { displayName: '灵兽清心丹', name: 'resetAdvancementPill', quantity: 1, chance: 5 },
@@ -8016,7 +8035,7 @@ function openHongHuangTreasure() {
         { displayName: '锻造工具', name: 'forgeTool', quantity: 1, chance: 5 },
         { displayName: '修为灵丹（橙）*6', name: 'cultivationPill500', quantity: 6, chance: 5 },
         { displayName: '高级神兽丹', name: 'advancedSkillPill', quantity: 1, chance: 5 },
-        { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 5 },
+        { displayName: '灵兽符文', name: 'magicPetAmulet', quantity: 1, chance: 4 },
         { displayName: '一等分解符*2', name: 'firstFragments', quantity: 2, chance: 8 },
         { displayName: '蓝色武装原料*5', name: 'blueArmComponents', quantity: 5, chance: 4.9 },
         { displayName: '神圣天赋赐福', name: 'talentedBless', quantity: 1, chance: 1, specialAction: () => generateItemToJinnang('talentedBless', '神圣天赋赐福', 'https://pic.imgdb.cn/item/66e00000d9c307b7e9d4ecb6.png', 24500, 1, '神圣的天赋加成术，可以立即获得一个当前宠物可用的技能加成')  },
@@ -8302,6 +8321,7 @@ function updateEnemyStatusDisplay() {
 function getPlayerStatus() {
     let status = [];
     if (playerTurn) status.push("⚔️");
+    if (lifeBoxMode) status.push('肉盾模式')
     if (battleState.player.defensing) status.push("蓄力中");
     if (battleState.player.shocked) status.push("触电");
     if (battleState.player.shielded) status.push("护盾");
@@ -9458,10 +9478,10 @@ function selectSkillAndCalculateMultiplier(type) {
         }
     } else {
         if (type === 'physical') {
-            logBattleEvent("⚔️【玩家攻击】你用拳头平A了对方。");
+            logBattleEvent("⚔️【玩家攻击】你用拳头平A了对方。",null,'20px');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667123f9d9c307b7e9e34049.gif');
         } else if (type === 'magical') {
-            logBattleEvent("⚔️【玩家攻击】你操控小树枝击向了对方。");
+            logBattleEvent("⚔️【玩家攻击】你操控小树枝击向了对方。",null,'20px');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/6671343bd9c307b7e9031c3d.gif');
         }
     }
@@ -9500,7 +9520,7 @@ function performAttack(type) {
     } else if (attackType === 'magical') {
         const result = performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
         if (result.retryPhysical) {
-            logBattleEvent("⚔️【玩家攻击】法力值不足，自动转为物理攻击。", 'red');
+            logBattleEvent("⚔️【玩家攻击】法力值不足，自动转为物理攻击。", 'red', '20px');
             performAttack('physical');
             return;
         }
@@ -11015,19 +11035,7 @@ function handleDamageReduction(damage, isCritical = false) {
     const formattedExtraShield = isNaN(extraShield) ? 0 : extraShield;
 
     // 打印战斗日志并更新UI
-    if (formattedFinalDamage >= 0) {
-        if (wiseDefenseManaCost != 0) {
-            logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
-        } else {
-            logBattleEvent(`格挡减少了${formattedFinalDamageReduction}点伤害，你最终受到 ${formattedFinalDamage} 点伤害。`, 'yellow');
-        }
-    } else {
-        if (wiseDefenseManaCost != 0) {
-            logBattleEvent(`智慧守护消耗${wiseDefenseManaCost}法力，减少了${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
-        } else {
-            logBattleEvent(`格挡为你减少了${formattedFinalDamageReduction}点伤害，溢出值转化为 ${Math.abs(formattedFinalDamage)} 点护盾。`, '#99FFFF');
-        }
-    }
+
     wiseDefenseManaCost = 0;
     handleReflectAndHeal(formattedFinalDamage);
     if (isCritical) {
@@ -16327,7 +16335,7 @@ let jinnangItems = [
     { name: 'qualityEnhancePill', displayName: '宠物资质仙丹', url: 'https://pic.imgdb.cn/item/66c9d327d9c307b7e9682c26.png', price: 50, quantity: 0, description: '直接使用，额外为当前宠物增加全套1240点资质（一步到位！），宠物升级时可以获得更多的属性加成' },
     { name: 'qualityEnhancePillPKG', displayName: '资质仙丹礼包', url: 'https://pic.imgdb.cn/item/66cc940fd9c307b7e9cb77b1.png', price: 50, quantity: 0, description: '直接使用，获得全套宠物资质仙丹*5' },
     { name: 'resetJinnang', displayName: '背包重置卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 1, description: '背包出错时使用（如出现undefined等），重置所有道具，使用后需要刷新页面' },
-    { name: 'enlargeCapacityCard', displayName: '背包扩容卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 1000, quantity: 1, description: '使用后开启1000背包容量' },
+    { name: 'enlargeCapacityCard', displayName: '背包扩容卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 1000, quantity: 0, description: '使用后开启1000背包容量' },
     { name: 'baiYinPKG', displayName: '白银VIP包裹', url: 'https://pic.imgdb.cn/item/66d5e69ed9c307b7e966f716.png', price: 100, quantity: 0, description: '使用后可得到30张试炼之地召唤卡' },
     { name: 'baiYinCard', displayName: '试炼之地召唤卡', url: 'https://pic.imgdb.cn/item/66d5e7b7d9c307b7e9685315.png', price: 0, quantity: 0, description: '使用后可以召唤白银之地的怪物，每次战斗胜利会获得不菲的经验值' },
     { name: 'attentionValue', displayName: '集中值（4点）', url: 'https://pic.imgdb.cn/item/66d1c3a5d9c307b7e9ddf3fa.png', price: 200, quantity: 0, description: '直接使用，给当前宠物增加4点集中值' },
@@ -16364,7 +16372,7 @@ let jinnangItems = [
     { name: 'extensionCharter', displayName: '续租契', url: 'https://pic.imgdb.cn/item/66e68b4ed9c307b7e962b841.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝时，经商时间可特许延长一个月（4周）' },
     { name: 'treasureWood', displayName: '珍宝案', url: 'https://pic.imgdb.cn/item/66e68b4dd9c307b7e962b7ca.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）在结算收益时，此法宝可提升20%未变现资产的收益' },
     { name: 'investmentCharter', displayName: '特许招商令', url: 'https://pic.imgdb.cn/item/66e68c8ed9c307b7e963c42d.png', price: 2000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）应用此法宝后，可额外增加一次投资次数' },
-    { name: 'merchantPointsCard', displayName: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', price: 1000, quantity: 5, description: '打开后可以获得2000点经商积分。经商积分用于在商店-倒买倒卖购买经商法宝，增加你的资产运作能力' },
+    { name: 'merchantPointsCard', displayName: '经商积分卡', url: 'https://pic.imgdb.cn/item/66e6a031d9c307b7e97c84c7.png', price: 1000, quantity: 0, description: '打开后可以获得2000点经商积分。经商积分用于在商店-倒买倒卖购买经商法宝，增加你的资产运作能力' },
     { name: 'wealthOfNations', displayName: '国富论', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e8c.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）亚当斯密作为经济学大师，认为管理者应当一定程度干涉市场，本年度市场每周商品数量下限将提升1' },
     { name: 'revokeSand', displayName: '唤神砂', url: 'https://pic.imgdb.cn/item/66e7aabfd9c307b7e9ce4e59.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）在精力不支时，仍然能够支持你进行一次买卖行为，生效后自动失效' },
     { name: 'qianKunBag', displayName: '乾坤袋', url: 'https://pic.imgdb.cn/item/66e82554d9c307b7e96cab02.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）即使市面并没有仓库内的货物，仍能够以进货价出售一次，生效后自动失效' },
@@ -16376,6 +16384,7 @@ let jinnangItems = [
     { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不增加周数' },
     { name: 'getLoan', displayName: '霸王贷款', url: 'https://pic.imgdb.cn/item/66f029d1f21886ccc0c125da.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）使用后立即获得5万元贷款，但5周后需要偿还50万元，若无力偿还将结束游戏，谨慎使用' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
+    { name: 'lifeBox', displayName: '源泉的生命箱', url: 'https://pic1.imgdb.cn/item/677ffb14d0e0a243d4f2d4de.png', price: 5, quantity: 0, description: '特殊道具，20分钟内增加一千万生命值上限，无法叠加使用' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -17014,7 +17023,8 @@ const itemEffects = {
     lifeGem: () => {
         currentLifeSpan = Math.min(maxLifeSpan, currentLifeSpan + 5000);
         showInfoBox(`成功恢复5000点寿命，当前宠物寿命为${currentLifeSpan}/${maxLifeSpan}。`);
-    }
+    },
+    lifeBox: () => useLifeBox()
 };
 
 function useAssignedItem() {
@@ -17169,7 +17179,51 @@ function useItemsInBatches(itemName, totalAmount) {
     processNextBatch();  // 开始异步批处理
 }
 
+const LIFE_BOX_BONUS = 10000000;
+const LIFE_BOX_DURATION = 1200000; // 20分钟
+let lifeBoxMode = false;
+let lifeBoxTimeout = null;
 
+function useLifeBox() {
+    try {
+        if (!drugBonus0 || typeof drugBonus0.health === 'undefined') {
+            throw new Error('生命值加成系统未初始化');
+        }
+        
+        if (!lifeBoxMode) {
+            if (lifeBoxTimeout) {
+                clearTimeout(lifeBoxTimeout);
+            }
+            
+            lifeBoxMode = true;
+            drugBonus0.health += LIFE_BOX_BONUS;
+            
+            lifeBoxTimeout = setTimeout(() => {
+                lifeBoxMode = false;
+                drugBonus0.health -= LIFE_BOX_BONUS;
+                lifeBoxTimeout = null;
+            }, LIFE_BOX_DURATION);
+            
+            showInfoBox('生命药水效果已生效，持续20分钟');
+            
+        } else {
+            showInfoBox('当前已有同类型效果生效，请稍后再试！');
+        }
+    } catch (error) {
+        console.error('使用生命药水时发生错误:', error);
+        showInfoBox('使用生命药水失败，请检查游戏状态', null, null, 'red');
+    }
+}
+
+function clearLifeBox() {
+    if (lifeBoxMode) {
+        clearTimeout(lifeBoxTimeout);
+        lifeBoxMode = false;
+        drugBonus0.health -= 10000000;
+        lifeBoxTimeout = null;
+    }
+}
+        
 function generateSealCard() {
     // 定义封印卡片的英文名称和对应的汉字名称映射
     const sealCardsMap = new Map([

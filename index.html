@@ -23628,6 +23628,9 @@ function syncSkillsAreas() {
 // 技能效果的定时器需要全局定义，计时器可以不定义，使用battleState.enemy[status]即可
 let bleedingInterval = null;
 let healingInterval = null;
+let globalPoisonInterval;
+let globalPoisonTimer;
+let globalPoisonActive = false;
         
 function applySpecialSkillEffects(skill, value = null) {
     // skill是一个数组，不是一个单独的变量名
@@ -23961,7 +23964,7 @@ function applySpecialSkillEffects(skill, value = null) {
                 }
                 showBattleOverlay('https://pic.imgdb.cn/item/66e90098d9c307b7e997cb6b.gif', 1500, 1, 1000);
             }
-        },
+        },        
         "蛇灿莲花": () => {
             const lifeSpanCost = Math.floor(0.5 * skillDetail.skillLevel);
             if (!checkLifeSpan(lifeSpanCost)) {
@@ -23972,17 +23975,19 @@ function applySpecialSkillEffects(skill, value = null) {
             currentLifeSpan = Math.max(0, currentLifeSpan - lifeSpanCost);
             
             // 清除现有的毒性效果
-            if (battleState.enemy.poisoned) {
-                clearInterval(battleState.enemy.poisonInterval);
-                clearTimeout(battleState.enemy.poisonedTimer);
+            if (globalPoisonActive) {
+                clearInterval(globalPoisonInterval);
+                clearTimeout(globalPoisonTimer);
             }
             
             let totalPoisonDamage = 0;
+            globalPoisonActive = true;
             battleState.enemy.poisoned = true;
         
             const cleanupPoison = () => {
-                clearInterval(battleState.enemy.poisonInterval);
-                clearTimeout(battleState.enemy.poisonedTimer);
+                clearInterval(globalPoisonInterval);
+                clearTimeout(globalPoisonTimer);
+                globalPoisonActive = false;
                 battleState.enemy.poisoned = false;
                 updateEnemyStatusDisplay();
                 if (totalPoisonDamage > 0) {
@@ -23990,8 +23995,8 @@ function applySpecialSkillEffects(skill, value = null) {
                 }
             };
         
-            battleState.enemy.poisonInterval = setInterval(() => {
-                if (!battleState.enemy.poisoned || battleState.enemy.health <= 0) {
+            globalPoisonInterval = setInterval(() => {
+                if (!globalPoisonActive || battleState.enemy.health <= 0) {
                     cleanupPoison();
                     if (battleState.enemy.health <= 0) {
                         showNextBattlePrompt(true);
@@ -24015,7 +24020,7 @@ function applySpecialSkillEffects(skill, value = null) {
             }, 200);
         
             const duration = 1000 + Math.round(playerCultivation / 240000) * 1000;
-            battleState.enemy.poisonedTimer = setTimeout(cleanupPoison, duration);
+            globalPoisonTimer = setTimeout(cleanupPoison, duration);
         },
     };
     

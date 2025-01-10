@@ -1884,7 +1884,6 @@
             border: 1px solid #888;
             width: 90%;
             max-width: 600px;
-            border-radius: 10px;
         }
         
         .close {
@@ -1937,7 +1936,7 @@
         }
         
         .battle-system-drawer-toggle {
-            font-size: 15px;
+            font-size: 16px;
             text-align: center;
             padding: 5px;
             background-image: url(https://pic.imgdb.cn/item/66bf32d9d9c307b7e9995d58.png);
@@ -2312,7 +2311,6 @@
             border: 2px solid #ccc;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 9999;
-            border-radius: 10px;
         }
         
         #battle-spirit-modal .modal-content {
@@ -3537,6 +3535,38 @@ const pets = {
             mutated: false
         },
     },
+    wunian: {
+        name: '无念',
+        rank: 'SSR',
+        image: 'https://pic1.imgdb.cn/item/67807f1bd0e0a243d4f2dded.png',
+        skills: [
+            { name: '天生蛮力', rarity: 'B', type: 'N', multiplier: 1.5, description: '物理攻击上升' },
+            { name: '冥想', rarity: 'B', type: 'HL', multiplier: 1.5, description: '每回合法力值恢复' },
+            { name: '战斗狂热', rarity: 'A', type: 'N', multiplier: 1.8, description: '物理爆击、速度上升' },
+            { name: '仙风道骨', rarity: 'A', type: 'N', multiplier: 1.8, description: '耐力、敏捷、强壮大幅提升' },
+            { name: '防护结界', rarity: 'B', type: 'PD', multiplier: 1.5, description: '法术防御上升' },
+            { name: '长寿', rarity: 'B', type: 'N', multiplier: 1.5, description: '寿命上限上升' },
+            { name: '天生魔爆', rarity: 'A', type: 'N', multiplier: 1.8, description: '物理暴击上升' },
+            { name: '天赐矫健', rarity: 'A', type: 'N', multiplier: 1.8, description: '物理和法术闪避上升' },
+            { name: '法力吸取', rarity: 'B', type: 'PA', multiplier: 1.5, description: '单体物理攻击并吸取法力值' },
+            { name: '全面进化', rarity: 'S', type: 'N', multiplier: 2.0, description: '耐力、敏捷、强壮上升' },
+            { name: '高级援护', rarity: 'B', type: 'PH', multiplier: 1.5, description: '援护己方单一目标' },
+            { name: '智慧守护', rarity: 'S', type: 'SH', multiplier: 2.0, description: '通过追随智慧与战斗的守护者,使此生物学会用法力值抵消一部分受到的伤害' },
+            { name: '金鳞战甲', rarity: 'SS', type: 'N', multiplier: 2.5, description: '大幅提升法术防御' },
+            { name: '蛇灿莲花', rarity: 'SS', type: 'PAE', multiplier: 3, description: '对敌方全体造成物理伤害，并有概率使被击中目标附加荼毒，持续3回合' },
+            { name: '靡靡之音', rarity: 'S', type: 'PP', multiplier: 2.5, description: '对敌方单体造成大量物理伤害，被击中目标100%附加荼毒，持续3回合' }
+        ],
+        qualities: {
+            tier: '普通',
+            growthRate: 100,
+            endurance: { current: 3000, min: 3000, max: 5400 },
+            strength: { current: 6500, min: 6500, max: 13100 },
+            faith: { current: 2000, min: 2000, max: 3200 },
+            agility: { current: 3250, min: 3250, max: 5950 },
+            intelligence: { current: 2000, min: 2000, max: 3200 },
+            mutated: false
+        },
+    },
     jiecheng: {
         name: '结城夏奈',
         rank: 'SSR',
@@ -4381,6 +4411,11 @@ const biographies = {
         "1️⃣————该宠物无传记",
         "2️⃣————说了没有传记",
         "3️⃣————真的没有传记"
+    ],
+    wunian: [
+        "1️⃣————等待主人公编撰",
+        "2️⃣————等待主人公编撰",
+        "3️⃣————等待主人公编撰"
     ],
     jiecheng: [
         "1️⃣————等待主人公编撰",
@@ -6320,7 +6355,13 @@ function handlePetChange(selectedPetKey, petSelectId) {
 
     // 检查选择的宠物是否是当前宠物
     if (currentPetKey === selectedPetKey) return;
-
+    
+    if (lifeBoxMode) {
+        lifeBoxMode = false;
+        clearLifeBox();
+        showInfoBox('源泉的生命箱效果已被清空');
+    }
+    
     const selectedPet = pets[selectedPetKey];
     if (selectedPet) {
         storeCurrentPetData(); // 存储当前宠物数据
@@ -6711,6 +6752,15 @@ let drugInventory = {
 };
 let collectCost = 100; // 初始采集花费
 let activeBuffs = {};
+let tempBonus = {
+    health: 0,
+    mana: 0,
+    physicalAttack: 0,
+    physicalDefense: 0,
+    magicAttack: 0,
+    magicDefense: 0,
+    speed: 0
+};
 let drugBonus0 = {
     health: 0,
     mana: 0,
@@ -7424,12 +7474,13 @@ function calculateSkillAttributes() {
                     // 未来拓展更多...
                 };               
 
-                maxLifeSpan = 5000;
                 if (skill.type === 'N' && skill.name === '长寿') {
                     maxLifeSpan = 5000 + Math.round(168 * levelMultiplier * skillLevel);
+                } else {
+                    maxLifeSpan = 5000;
                 }
                 
-                if (skill.type === 'N' && skill.name !== '长寿') {
+                if (skill.type === 'N') {
                     skillAttributes.health += Math.round(168 * levelMultiplier);
                     skillAttributes.mana += Math.round(98 * levelMultiplier);
                     skillAttributes.physicalAttack += Math.round(64 * levelMultiplier);
@@ -8685,7 +8736,7 @@ function levelUpSkill() {
 
     // 创建弹出界面
     const modal = document.createElement('div');
-    modal.style = 'width: 85%;max-height: 80%;background-color: rgba(0, 0, 0, 0.1);color: white;border: 1px solid rgb(221, 221, 221);border-radius: 5px;padding: 20px;overflow-y: scroll;position: relative;display: flex;flex-direction: column;justify-content: center;align-items: stretch;';
+    modal.style = 'width: 85%;max-height: 80%;background-color: rgba(0, 0, 0, 0.1);color: white;border: 1px solid rgb(221, 221, 221);padding: 20px;overflow-y: scroll;position: relative;display: flex;flex-direction: column;justify-content: center;align-items: stretch;';
     
     // 创建标题和关闭按钮
     const title = document.createElement('h2');
@@ -13708,7 +13759,7 @@ class DivineWeaponManager {
         }
 
         this.divineWeaponUI = document.createElement('div');
-        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border-radius: 10px; border: 1px solid #F5F5F5; width: 90%; padding: 10px; color: white; z-index: 9990;';
+        this.divineWeaponUI.style = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0, 0, 0, 0.8); border: 1px solid #F5F5F5; width: 90%; padding: 10px; color: white; z-index: 9990;';
         
         const lostBookTitle = this.lostBook.active ? `神品·遗失的洛书 (Lv${this.lostBook.level})` : '被封锁的上古神器（物理）';
         const lostBookDescription = this.lostBook.active 
@@ -13744,11 +13795,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升满</button>
+                    <button onclick="divineWeaponManager.description('lostBook')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 20px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -13760,11 +13811,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升满</button>
+                    <button onclick="divineWeaponManager.description('fragmentedMap')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">说明</button>
                 </div>
             </div>
             <div style="margin-bottom: 10px; border: 1px solid #F5F5F5; border-radius: 10px; padding: 10px;">
@@ -13776,11 +13827,11 @@ class DivineWeaponManager {
                     </div>
                 </div>
                 <div style="display: flex; justify-content: space-evenly; margin-top: 10px;">
-                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">开启</button>
-                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">刷新</button>
-                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升级</button>
-                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">升满</button>
-                    <button onclick="divineWeaponManager.description('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white; border-radius: 5px;">说明</button>
+                    <button onclick="divineWeaponManager.activateDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">开启</button>
+                    <button onclick="divineWeaponManager.refreshDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">刷新</button>
+                    <button onclick="divineWeaponManager.upgradeDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升级</button>
+                    <button onclick="divineWeaponManager.upgradeMaxDivineWeapon('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">升满</button>
+                    <button onclick="divineWeaponManager.description('nirvanaGem')" style="background: green; color: white; font-size: 14px; border: 1px solid white;">说明</button>
                 </div>
             </div>
             <div style="text-align: right;">
@@ -16384,7 +16435,7 @@ let jinnangItems = [
     { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不增加周数' },
     { name: 'getLoan', displayName: '霸王贷款', url: 'https://pic.imgdb.cn/item/66f029d1f21886ccc0c125da.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）使用后立即获得5万元贷款，但5周后需要偿还50万元，若无力偿还将结束游戏，谨慎使用' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
-    { name: 'lifeBox', displayName: '源泉的生命箱', url: 'https://pic1.imgdb.cn/item/677ffb14d0e0a243d4f2d4de.png', price: 5, quantity: 0, description: '特殊道具，20分钟内增加一千万生命值上限，无法叠加使用' },
+    { name: 'lifeBox', displayName: '源泉的生命箱', url: 'https://pic1.imgdb.cn/item/677ffb14d0e0a243d4f2d4de.png', price: 5, quantity: 0, description: '特殊道具，20分钟内增加一千万生命值上限，无法叠加使用；更换宠物、刷新页面会失效' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -17186,7 +17237,7 @@ let lifeBoxTimeout = null;
 
 function useLifeBox() {
     try {
-        if (!drugBonus0 || typeof drugBonus0.health === 'undefined') {
+        if (!tempBonus || typeof tempBonus.health === 'undefined') {
             throw new Error('生命值加成系统未初始化');
         }
         
@@ -17196,11 +17247,11 @@ function useLifeBox() {
             }
             
             lifeBoxMode = true;
-            drugBonus0.health += LIFE_BOX_BONUS;
+            tempBonus.health += LIFE_BOX_BONUS;
             
             lifeBoxTimeout = setTimeout(() => {
                 lifeBoxMode = false;
-                drugBonus0.health -= LIFE_BOX_BONUS;
+                tempBonus.health -= LIFE_BOX_BONUS;
                 lifeBoxTimeout = null;
             }, LIFE_BOX_DURATION);
             
@@ -17219,7 +17270,7 @@ function clearLifeBox() {
     if (lifeBoxMode) {
         clearTimeout(lifeBoxTimeout);
         lifeBoxMode = false;
-        drugBonus0.health -= 10000000;
+        tempBonus.health = Math.max(0, tempBonus.health - 10000000);
         lifeBoxTimeout = null;
     }
 }
@@ -19134,13 +19185,13 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
     const magicalDefenseBonus = 1 + collectedPetCount * 0.035;
     const speedBonus = 1 + collectedPetCount * 0.005;
 
-    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health + skillAttributes.health + drugBonus0.health;
-    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana + skillAttributes.mana + drugBonus0.mana;
-    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack;
-    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus) + drugBonus.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack;
-    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus) + drugBonus.physicalDefense + skillAttributes.physicalDefense + drugBonus0.physicalDefense;
-    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense;
-    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed + skillAttributes.speed + drugBonus0.speed;
+    baseSecondaryAttributes.health = Math.floor(baseSecondaryAttributes.health * hpBonus) + drugBonus.health + skillAttributes.health + drugBonus0.health + tempBonus.health;
+    baseSecondaryAttributes.mana = Math.floor(baseSecondaryAttributes.mana * mpBonus) + drugBonus.mana + skillAttributes.mana + drugBonus0.mana + tempBonus.mana;
+    baseSecondaryAttributes.physicalAttack = Math.floor(baseSecondaryAttributes.physicalAttack * physicalAttackBonus) + drugBonus.physicalAttack + skillAttributes.physicalAttack + drugBonus0.physicalAttack + tempBonus.physicalAttack;
+    baseSecondaryAttributes.magicAttack = Math.floor(baseSecondaryAttributes.magicAttack * magicalAttackBonus) + drugBonus.magicAttack + skillAttributes.magicAttack + drugBonus0.magicAttack + tempBonus.magicAttack;
+    baseSecondaryAttributes.physicalDefense = Math.floor(baseSecondaryAttributes.physicalDefense * physicalDefenseBonus) + drugBonus.physicalDefense + skillAttributes.physicalDefense + drugBonus0.physicalDefense + tempBonus.physicalDefense;
+    baseSecondaryAttributes.magicDefense = Math.floor(baseSecondaryAttributes.magicDefense * magicalDefenseBonus) + drugBonus.magicDefense + skillAttributes.magicDefense + drugBonus0.magicDefense + tempBonus.magicDefense;
+    baseSecondaryAttributes.speed = Math.floor(baseSecondaryAttributes.speed * speedBonus) + drugBonus.speed + skillAttributes.speed + drugBonus0.speed + tempBonus.speed;
 
     // 累加武装增益值，只包括二级属性的增益
     Object.keys(armsAttributes).forEach(key => {
@@ -23020,6 +23071,15 @@ function resetPet() {
     divinedWeaponStatus = false;
     document.body.style.backgroundImage = "";
     document.getElementById("hallucination-level").innerText = `${hallucinationLevel}`;
+    tempBonus = {
+        health: 0,
+        mana: 0,
+        magicAttack: 0,
+        magicDefense: 0,
+        physicalAttack: 0,
+        physicalDefense: 0,
+        speed: 0
+    };
     drugBonus0 = {
         health: 0,
         mana: 0,
@@ -23416,14 +23476,21 @@ function createSkills(name, rarity, type, level, multiplier, description) {
     
     const skill = currentPet.skills.find(s => s.name === name);
     showInfoBox(`成功学会${name}，技能效果：${description}`);
-
+    
     // 为两个区域创建独立的技能元素
     const skillDiv = createSkillElement(skill, false);
     const drawerSkillDiv = createSkillElement(skill, true);
     
-    // 设置点击事件
-    skillDiv.onclick = () => deleteSkill(skill, skillDiv, skillsArea, drawerSkillDiv, skillsDrawerArea);
-    drawerSkillDiv.onclick = () => levelUpSkill();
+    // 修改点击事件处理，添加事件对象 e 并阻止冒泡
+    skillDiv.onclick = (e) => {
+        e.stopPropagation(); // 阻止事件冒泡
+        deleteSkill(skill, skillDiv, skillsArea, drawerSkillDiv, skillsDrawerArea);
+    };
+    
+    drawerSkillDiv.onclick = (e) => {
+        e.stopPropagation(); // 阻止事件冒泡
+        levelUpSkill();
+    };
     
     // 添加到各自的区域
     skillsArea.appendChild(skillDiv);
@@ -23472,9 +23539,11 @@ function deleteSkill(skill, clickedDiv, clickedArea, pairedDiv, pairedArea) {
             skillLevel = deleteResult.skillLevel;
             skillMultiplier = deleteResult.skillMultiplier;
             
-            // 先检查元素是否存在于对应的父元素中
-            const skillsArea = document.getElementById("skills-area");
-            const skillsDrawerArea = document.getElementById("skills-in-drawer");
+            // 从数组中移除技能
+            const index = currentPet.skills.findIndex(s => s.name === skill.name);
+            if (index > -1) {
+                currentPet.skills.splice(index, 1);
+            }
             
             // 安全地删除元素
             function safeRemoveChild(parent, child) {
@@ -23484,17 +23553,22 @@ function deleteSkill(skill, clickedDiv, clickedArea, pairedDiv, pairedArea) {
             }
             
             // 从两个区域中删除技能元素
+            const skillsArea = document.getElementById("skills-area");
+            const skillsDrawerArea = document.getElementById("skills-in-drawer");
+            
             safeRemoveChild(skillsArea, clickedDiv);
             safeRemoveChild(skillsDrawerArea, clickedDiv);
             
-            // 获取当前技能列表并更新评分
+            // 更新评分
             const remainingSkills = Array.from(skillsArea.children).map(div => {
                 const [name, rarity] = div.innerText.split(' (');
                 return { name, rarity: rarity.replace(')', '') };
             });
             
             updateSkillScore(remainingSkills);
+            // 删除成功后再同步
             syncSkillsAreas();
+        
         }
 
         function onCancel() {
@@ -23538,7 +23612,11 @@ function syncSkillsAreas() {
         const matchingSkill = currentPet.skills.find(s => s.name === skill.name);
         if (matchingSkill) {
             const drawerSkillDiv = createSkillElement(matchingSkill, true);
-            drawerSkillDiv.onclick = () => deleteSkill(matchingSkill, drawerSkillDiv, skillsDrawerArea);
+            // 使用与 createSkills 相同的事件绑定方式
+            drawerSkillDiv.onclick = (e) => {
+                e.stopPropagation();
+                levelUpSkill();
+            };
             skillsDrawerArea.appendChild(drawerSkillDiv);
         }
     });
@@ -23551,7 +23629,7 @@ let healingInterval = null;
         
 function applySpecialSkillEffects(skill, value = null) {
     // skill是一个数组，不是一个单独的变量名
-    // value参数用于传递各行动函数具备潜再处理的结果数值，比如再处理伤害数值、恢复数值等
+    // value参数用于传递各行动函数具备潜在处理的结果数值，比如再处理伤害数值、恢复数值等
     // 这个函数主要处理战斗事件，非战斗事件的NE技能将独立处理
     const skillDetail = calculateSkillLevelAndMultiplier(skill); //得到skillLevel, skillMultiplier
     // 定义特殊技能及其对应的效果
@@ -23881,9 +23959,64 @@ function applySpecialSkillEffects(skill, value = null) {
                 }
                 showBattleOverlay('https://pic.imgdb.cn/item/66e90098d9c307b7e997cb6b.gif', 1500, 1, 1000);
             }
-        }
+        },
+        "蛇灿莲花": () => {
+            const lifeSpanCost = Math.floor(0.5 * skillDetail.skillLevel);
+            if (!checkLifeSpan(lifeSpanCost)) {
+                logBattleEvent(`附加中毒效果需要消耗${lifeSpanCost}点，宠物当前寿命不足！`, 'red');
+                performAttack('physical');
+                return;
+            }
+            currentLifeSpan = Math.max(0, currentLifeSpan - lifeSpanCost);
+            
+            // 清除现有的毒性效果
+            if (battleState.enemy.poisoned) {
+                clearInterval(battleState.enemy.poisonInterval);
+                clearTimeout(battleState.enemy.poisonedTimer);
+            }
+            
+            let totalPoisonDamage = 0;
+            battleState.enemy.poisoned = true;
+        
+            const cleanupPoison = () => {
+                clearInterval(battleState.enemy.poisonInterval);
+                clearTimeout(battleState.enemy.poisonedTimer);
+                battleState.enemy.poisoned = false;
+                updateEnemyStatusDisplay();
+                if (totalPoisonDamage > 0) {
+                    logBattleEvent(`持续时间内，敌人一共受到 ${totalPoisonDamage} 点毒性伤害。`, '#C10066');
+                }
+            };
+        
+            battleState.enemy.poisonInterval = setInterval(() => {
+                if (!battleState.enemy.poisoned || battleState.enemy.health <= 0) {
+                    cleanupPoison();
+                    if (battleState.enemy.health <= 0) {
+                        showNextBattlePrompt(true);
+                    }
+                    return;
+                }
+                
+                const poisonDamage = Math.floor(
+                    battleAttributes.magicAttack * 0.5 * 
+                    skillDetail.skillMultiplier * 
+                    (Math.random() * (1.1 - 0.9) + 0.9) * 
+                    (1 + playerCritDamage * 0.1)
+                );
+                
+                battleState.enemy.health = Math.max(0, battleState.enemy.health - poisonDamage);
+                totalPoisonDamage += poisonDamage;
+        
+                updateUI();
+                updateDamageValue(poisonDamage, false, 'extra-damage');
+                updateEnemyStatusDisplay();
+            }, 200);
+        
+            const duration = 1000 + Math.round(playerCultivation / 240000) * 1000;
+            battleState.enemy.poisonedTimer = setTimeout(cleanupPoison, duration);
+        },
     };
-
+    
     // 检查技能名是否在 specialSkills 中存在
     if (specialSkills[skill.name]) {
         // 如果技能存在，执行该技能的效果

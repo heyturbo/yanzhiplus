@@ -6357,7 +6357,6 @@ function handlePetChange(selectedPetKey, petSelectId) {
     if (currentPetKey === selectedPetKey) return;
     
     if (lifeBoxMode) {
-        lifeBoxMode = false;
         clearLifeBox();
         showInfoBox('源泉的生命箱效果已被清空');
     }
@@ -17258,7 +17257,10 @@ function useLifeBox() {
             showInfoBox('生命药水效果已生效，持续20分钟');
             
         } else {
-            showInfoBox('当前已有同类型效果生效，请稍后再试！');
+            showInfoBox('当前已有同类型效果生效，点击确认清除效果', () => {
+                clearLifeBox();
+                showInfoBox('源泉的生命箱效果被清除！','red');
+            },null,'red',null,null);
         }
     } catch (error) {
         console.error('使用生命药水时发生错误:', error);
@@ -17270,7 +17272,7 @@ function clearLifeBox() {
     if (lifeBoxMode) {
         clearTimeout(lifeBoxTimeout);
         lifeBoxMode = false;
-        tempBonus.health = Math.max(0, tempBonus.health - 10000000);
+        tempBonus.health = Math.min(0, tempBonus.health - 10000000);
         lifeBoxTimeout = null;
     }
 }

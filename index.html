@@ -1238,8 +1238,9 @@
             gap: 5px; /* 调整每个条目之间的间距 */
             flex-direction: column;
             justify-content: space-between;
-            min-width: 150px;
+            width: 50%;
             padding: 10px;
+            align-items: center;
         }
         .secondary-attributes {
             
@@ -1249,7 +1250,7 @@
             gap: 5px;
             flex-direction: column;
             justify-content: space-between;
-            width: 170px;
+            width: 50%;
             padding: 10px;
             align-items: center;
         }
@@ -1966,16 +1967,17 @@
             background-size: contain;
             color: #E3A73B;
             cursor: pointer;
-            box-shadow: inset 0px 1px 2px 0px #E3A73B;
+            box-shadow: 0px 1px 5px 0px rgba(0, 0, 0, 0.8);
             border: 1px solid black;
             margin-bottom: 5px;
+            font-weight: bold;
         }
         
         .battle-system-content {
             display: flex;
             flex-direction: column;
             width: 100%;
-            justify-content: flex-start;
+            justify-content: space-between;
             border-radius: 2px;
             background-color: #DFBF6E;
             color: #ffffff;
@@ -2008,6 +2010,7 @@
             min-height50%: 5;
             flex-direction: column;
             align-items: center;
+            border-radius: 2px;
         }
         /* 非暴击时，快速渐进渐出 */
         .normal-hit-animation {
@@ -2123,7 +2126,7 @@
         }
         
         .battle-system-log {
-            padding: 10px;
+            padding: 5px;
             margin-bottom: 0px;
             height: 300px;
             overflow-y: clip;
@@ -2132,6 +2135,9 @@
             width: auto;
             border-top: 1px solid black;
             border-bottom: 1px solid black;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
         }
                 /* 直接针对日志内容的样式 */
         #log {
@@ -3241,7 +3247,7 @@
                     <img id="battleOverlayImage" src="" alt="Battle Animation" style="width: 100%; height: 100%; object-fit: contain;">
                 </div>
             </div>
-        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">点击退出战斗</div>
+        <div class="battle-system-drawer-toggle" onclick="toggleFightingDrawer()">战斗</div>
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
@@ -3250,7 +3256,7 @@
                         <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
                             <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
                             <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
-                            <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="exp-bar-container">
+                            <div style="margin-bottom: 5px;margin-top:5px;position: relative;width: 100%;min-height: 12px;background-color: #35472C;border: 1px solid black;overflow: hidden;" id="exp-bar-container">
                                 <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(rgb(75, 0, 130), rgb(147, 112, 219), rgb(75, 0, 130));" id="exp-bar"></div>
                                 <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" id="exp-text"></span>
                             </div>
@@ -3398,7 +3404,7 @@
             </div>
             <div class="battle-pet-selector"><select id="battle-pet-select" onchange="changeBattlePet()"><option value="xiaojin"></option></select></div>
             <div class="battle-system-log">
-                <h2 id="battle-log-head" style="cursor:pointer;">战斗记录（第<span id="battleRounds"></span>轮）</h2>
+                <h2 id="battle-log-head" style="cursor:pointer;margin:0;">战斗记录（第<span id="battleRounds"></span>轮）</h2>
                 <div id="log"></div>
             </div>
             <div class="button-grid button" style="grid-template-columns: repeat(6, 1fr);padding: 2px;gap: 10px;">
@@ -4699,8 +4705,7 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V2.1.3
-                            \n- 新增积分商城，优化界面显示
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V2.1.2
                             \n- 上线高级天赋技能、游商和倒买倒卖小游戏（赚钱新方式！）
                             \n- 继续重构战斗代码（仍存在大量不稳定，技术有限）
                             \n- 上线宝石系统和相关道具，玩家可以在解锁第二件武装后，点击武装图标进行体验
@@ -8924,21 +8929,52 @@ function handleLevelUp() {
         showInfoBox('请选择一个技能！');
         return;
     }
-
     const skillName = selectedSkillElement.innerText.split(' ')[0];
     const skill = currentPet.skills.find(skill => skill.name === skillName);
-
     if (!skill) {
         showInfoBox('未找到该技能！');
         return;
     }
-
     if (skill.level >= 6 && skill.type === 'NE' && skill.byLearned) {
         skill.level = 6;
         return;
     }
     
     if (skill.byLearned) {
+        // 检查对应的技能书是否存在
+        const skillBook = jinnangItems.find(item => item.displayName === `${skill.name}天赋书` && item.quantity > 0);
+        
+        // 如果有技能书，询问玩家使用哪种方式升级
+        if (skillBook) {
+            showInfoBox(
+                `发现可用的${skillBook.displayName}，你想使用哪种方式升级？\n【确定】按钮：使用5个宇宙之心（必定成功）\n【取消】按钮：使用1本技能书（20%成功）`,
+                () => {
+                    // 使用宇宙之心升级
+                    const heart = jinnangItems.find(item => item.name === 'universalHeart' && item.quantity >= 5);
+                    if (heart) {
+                        useItem('universalHeart', 5);
+                        skill.level += 1;
+                        showInfoBox(`${skill.name} 成功升级至 ${skill.level} 级`);
+                    } else {
+                        showInfoBox('宇宙之心数量不足，无法升级！', null, null, 'red');
+                    }
+                },
+                () => {
+                    // 使用技能书升级
+                    if (Math.random() < 0.2) { // 20%成功率
+                        useItem(skillBook.name, 1);
+                        skill.level += 1;
+                        showInfoBox(`消耗一本${skillBook.displayName}，${skill.name} 成功升级至 ${skill.level} 级！`);
+                    } else {
+                        useItem(skillBook.name, 1);
+                        showInfoBox(`消耗一本${skillBook.displayName}，但 ${skill.name} 升级失败了！`, null, null, 'red');
+                    }
+                }
+            );
+            return;
+        }
+        
+        // 如果没有技能书，走原有的宇宙之心升级逻辑
         const heart = jinnangItems.find(item => item.name === 'universalHeart' && item.quantity >= 5);
         if (heart) {
             useItem('universalHeart', 5);
@@ -8946,14 +8982,13 @@ function handleLevelUp() {
             showInfoBox(`${skill.name} 成功升级至 ${skill.level} 级`);
             return;
         } else {
-            showInfoBox('高级天赋技能需要使用特殊道具”宇宙之心“才能升级，请尝试获取后再操作',null,null,'red');
+            showInfoBox('高级天赋技能需要使用特殊道具"宇宙之心"才能升级，请尝试获取后再操作', null, null, 'red');
             return;
         }
     }
 
-    // 提取成功率检查的逻辑
+    // 以下是原有的升级逻辑
     const checkSuccess = (rate) => Math.random() < rate;
-
     if (skill.level >= 28 && skill.level <= 29) {
         if (useItem('universalKernel', 5)) {
             if (checkSuccess(0.4)) {
@@ -8964,7 +8999,7 @@ function handleLevelUp() {
             }
             return;
         } else {
-            showInfoBox('你没有宇宙精华了！',null,null,'red');
+            showInfoBox('你没有宇宙精华了！', null, null, 'red');
             return;
         }
     }
@@ -9013,7 +9048,7 @@ function handleLevelUp() {
 function handleBulkLevelUp() {
     const skillMessages = [];
     currentPet.skills.forEach(skill => {
-        while (skill.level >= 10 && skill.level < 20 && currentExp >= (1200 + 200 * (skill.level - 10))) {
+        while (!skill.byLearned && skill.level >= 10 && skill.level < 20 && currentExp >= (1200 + 200 * (skill.level - 10))) {
             const expCost = 1200 + 200 * (skill.level - 10);
             currentExp -= expCost;
             skill.level += 1;
@@ -16391,7 +16426,7 @@ function throwWish() {
     // 检查幸运金币是否存在且数量大于0
     if (drugInventory["幸运金币"] && drugInventory["幸运金币"].quantity > 0) {
         const randomNumber = Math.random(); // 生成0到1之间的随机数
-        const luckyRate = luckyAccretion * 0.001; // 成功率修改为直接使用累积值
+        const luckyRate = luckyAccretion * 0.0005; // 成功率修改为直接使用累积值
         console.log(randomNumber,luckyRate);
         
         // 消耗一个幸运金币
@@ -16421,7 +16456,7 @@ function getWishResult() {
     }
     
     if (!throwWish()) {
-        showInfoBox(`消耗一个幸运金币，幸运值累积至${luckyAccretion}%`, null,null,'red','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2W-hG1s4AmHW7c_TKqQn6QAcENsRYTZSOTg&s','80px*80px');
+        showInfoBox(`消耗一个幸运金币，幸运值累积至${luckyAccretion}%`, null,null,'green','https://pic1.imgdb.cn/item/6782833dd0e0a243d4f37425.png','80px*80px');
     } else {
         addItemToJinnang('goldBox', 1);
         showInfoBox('成功得到幸运之神的眷顾，获得一个沉甸甸的金箱子！', null,null,'red','https://pic1.imgdb.cn/item/6781f46cd0e0a243d4f34115.png');
@@ -16441,6 +16476,7 @@ let jinnangItems = [
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
     { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后获得30000经验值' },
     { name: 'awakenPill', displayName: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', price: 500, quantity: 0, description: '宠物觉醒时必不可少的玄妙丹药' },
+    { name: 'spiritualWater', displayName: '无上养元水', url: 'https://pic1.imgdb.cn/item/67828b1ed0e0a243d4f37674.png', price: 5000, quantity: 0, description: '武器经历无上养元水的洗练会变得更加强大' },
     { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', price: 300, quantity: 0, description: '开启宠物幻化的必要道具' },
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
@@ -16476,7 +16512,7 @@ let jinnangItems = [
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升200点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
-    { name: 'creditCard100', displayName: '商城积分卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 2000, quantity: 0, description: '使用后可获得100商城积分，积分可用来购买积分商城的道具' },
+    { name: 'creditCard100', displayName: '商城积分卡', url: 'https://pic1.imgdb.cn/item/6782741ed0e0a243d4f36fa3.png', price: 2000, quantity: 0, description: '使用后可获得100商城积分，积分可用来购买积分商城的道具' },
     { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66cc940dd9c307b7e9cb758d.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性5点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
@@ -16554,6 +16590,7 @@ let jinnangItems = [
     { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不增加周数' },
     { name: 'getLoan', displayName: '霸王贷款', url: 'https://pic.imgdb.cn/item/66f029d1f21886ccc0c125da.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）使用后立即获得5万元贷款，但5周后需要偿还50万元，若无力偿还将结束游戏，谨慎使用' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
+    { name: 'magicMine', displayName: '魔矿', url: 'https://pic1.imgdb.cn/item/678276e7d0e0a243d4f3705b.png', price: 20000, quantity: 0, description: '散发出淡淡辉光的矿石，似乎具备润色武装的神奇功能（除第一件武装外恢复所有武装耐久）' },
     { name: 'goldBox', displayName: '沉甸甸的金箱', url: 'https://pic1.imgdb.cn/item/6781f46cd0e0a243d4f34115.png', price: 100000, quantity: 0, description: '装满财富的金箱子，使用可获得500锭金子' },
     { name: 'lifeBox', displayName: '源泉的生命箱', url: 'https://pic1.imgdb.cn/item/677ffb14d0e0a243d4f2d4de.png', price: 5, quantity: 0, description: '特殊道具，20分钟内增加一千万生命值上限，无法叠加使用；更换宠物、刷新页面会失效' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
@@ -17201,7 +17238,8 @@ const itemEffects = {
         goldAmount += 500000000;
         updateGoldDisplay(goldAmount);
         showInfoBox('获得500锭金子！');
-    }
+    },
+    magicMine: () => repairArmByMagicMine(),
 };
 
 function useAssignedItem() {
@@ -18116,6 +18154,53 @@ function repairArm(infoDiv, arm, key) {
         showInfoBox('你的蓝色武装原料数量不足5个，无法恢复耐久值！',null,null,'red');
     }
     updateAttributePanel();
+}
+
+function repairArmByMagicMine() {
+    // 检查是否有魔矿可用
+    const magicMine = jinnangItems.find(item => item.name === 'magicMine');
+    if (!magicMine || magicMine.quantity <= 0) {
+        showInfoBox('魔矿数量不足，无法修复！', null, null, 'red');
+        return;
+    }
+
+    // 检查是否有需要修复的武装
+    let needRepair = false;
+    Object.values(armsAttributes).forEach(arm => {
+        if (arm.unlocked && arm.enduranceValue < 500) {
+            needRepair = true;
+        }
+    });
+
+    if (!needRepair) {
+        showInfoBox('所有武装耐久度都很充足，无需修复！', null, null, 'red');
+        return;
+    }
+
+    // 确认是否修复
+    showInfoBox('你将消耗一个魔矿修复所有武装的耐久度，是否继续？', 
+        () => {
+            // 消耗魔矿
+            if (useItem('magicMine', 1)) {
+                // 修复所有已解锁武装的耐久度
+                Object.entries(armsAttributes).forEach(([key, arm]) => {
+                    if (arm.unlocked) {
+                        arm.enduranceValue = 500;
+                        // 更新对应的信息显示
+                        const infoDiv = document.querySelector(`.info-${key}`);
+                        if (infoDiv) {
+                            updateArmInfoDiv(infoDiv, arm, key);
+                        }
+                    }
+                });
+
+                refreshAndCheckAllArmsEndurance();
+                updateAttributePanel();
+                showInfoBox('所有武装耐久度已恢复！', null, null, 'red');
+            }
+        }, 
+        () => addItemToJinnang('magicMine',1),'red'
+    );
 }
         
 // 减少武装的耐久度
@@ -22812,6 +22897,9 @@ const creditItems = [
     { name: 'learningValueBook', price: 2000 },   
     { name: 'advancedExperienceBook', price: 666 },
     { name: 'luckyAmulet', price: 20000 },
+    { name: 'magicMine', price: 1000 },
+    { name: 'advancedSkillBook', price: 6888 },
+    { name: 'spiritualWater', price: 200 },
 ];
 
 function addItemToCreditShop(item, shopItems) {

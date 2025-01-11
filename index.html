@@ -2974,7 +2974,7 @@
                                 飞升: <span id="ascension-status">未飞升</span><button onclick="infoFeisheng()">?</button>
                             </div>
                             <div class="progress-bar">
-                                <button onclick="togglePetOverview()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                                <button onclick="sellPet()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
                             </div>
                             <div class="progress-bar">
                                 <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
@@ -3020,12 +3020,27 @@
             <div id="shop-description" class="jinnang-description-box">点击可以查看其详情和描述，每个物品的售价因其稀有程度而有所不同。</div>
             <div class="shop-bar">
                 <button onclick="buyItem()">购买道具</button>
-                <button onclick="sellPet()">宠物市场</button>
                 <button id="bless-gift-button" onclick="claimBlessGift()">新手礼包</button>
                 <button onclick="openScalping()">倒买倒卖</button>
+                <button onclick="openCreditShop()">积分商城</button>
                 <button onclick="refreshShop()">刷新商品</button>
             </div>
         </div>
+    </div>
+    <div class="shop-drawer" id="credit-shop">
+        <div class="drawer-toggle" onclick="openCreditShop()">积分商城</div>
+            <div class="shop-info" id="credit-shop-info">
+                <div id="shop-info-container"style="max-height: 400px;overflow-y: scroll;margin-bottom: 20px;">
+                    <div class="shop-items" id="credit-shop-items">
+                        <!-- 商店商品展示区 -->
+                    </div>
+                </div>
+                <div id="credit-shop-description" class="jinnang-description-box">花费金子购买商城道具时会获得积分，积分可以购买某些道具。</div>
+                <div class="shop-bar" style="justify-content:space-around;">
+                    <button id="buy-credit-item" onClick="buyCreditItems()">购买商品</button>
+                    <div id="credit-box" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;border: 1px solid #6f391c;display: flex;align-items: center;"><div style="background: #B19768;padding: 2px;margin-right: 2px;color: white;box-shadow: inset 0px 0px 2px 1px #E3D8B9;text-shadow: -1px -1px 0 #693331, 1px -1px 0 #693331, -1px 1px 0 #693331, 1px 1px 0 #693331;font-size: 14px;">当前积分:</div><span id="credit-detail" style="color: white; background: rgb(57, 87, 89); box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset; padding: 2px; font-size: 14px;"></span></div>
+                </div>
+            </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
         <div id="scalping-display-container" style="max-height: 768px;width: 385px;display: flex;flex-direction: column;align-items: center;justify-content: center;">
@@ -4684,7 +4699,8 @@ window.addEventListener('message', function(event) {
 
         
 function showGuide() {
-    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V2.1.2
+    const guideMessage =  ` \n欢迎大侠试玩养宠模拟器！当前是V2.1.3
+                            \n- 新增积分商城，优化界面显示
                             \n- 上线高级天赋技能、游商和倒买倒卖小游戏（赚钱新方式！）
                             \n- 继续重构战斗代码（仍存在大量不稳定，技术有限）
                             \n- 上线宝石系统和相关道具，玩家可以在解锁第二件武装后，点击武装图标进行体验
@@ -7042,7 +7058,9 @@ function handleVictory() {
     if (ascensionSkill.name === '财源滚滚' || secondAscensionSkill.name === '财源滚滚') {
         reward += calculateExtraReward();
     }
-
+    
+    if (Math.random() < 0.5) addItemToJinnang('creditCard100',1);
+    
     goldAmount += reward;
     updateGoldDisplay(goldAmount);
     updateTitle();
@@ -16373,7 +16391,8 @@ function throwWish() {
     // 检查幸运金币是否存在且数量大于0
     if (drugInventory["幸运金币"] && drugInventory["幸运金币"].quantity > 0) {
         const randomNumber = Math.random(); // 生成0到1之间的随机数
-        const luckyRate = luckyAccretion * 0.005; // 成功率修改为直接使用累积值
+        const luckyRate = luckyAccretion * 0.001; // 成功率修改为直接使用累积值
+        console.log(randomNumber,luckyRate);
         
         // 消耗一个幸运金币
         addDrugToInventory('幸运金币', -1);
@@ -16397,15 +16416,15 @@ function throwWish() {
 function getWishResult() {
     // 检查是否有足够的幸运金币
     if (!drugInventory["幸运金币"] || drugInventory["幸运金币"].quantity <= 0) {
-        showInfoBox('没有幸运金币可用', 'red');
+        showInfoBox('没有幸运金币可用', null,null,'red');
         return;
     }
     
     if (!throwWish()) {
-        showInfoBox(`消耗一个幸运金币，幸运值累积至${luckyAccretion}%`, 'red');
+        showInfoBox(`消耗一个幸运金币，幸运值累积至${luckyAccretion}%`, null,null,'red','https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR2W-hG1s4AmHW7c_TKqQn6QAcENsRYTZSOTg&s','80px*80px');
     } else {
         addItemToJinnang('goldBox', 1);
-        showInfoBox('成功得到幸运之神的眷顾，获得一个沉甸甸的金箱子！', 'red');
+        showInfoBox('成功得到幸运之神的眷顾，获得一个沉甸甸的金箱子！', null,null,'red','https://pic1.imgdb.cn/item/6781f46cd0e0a243d4f34115.png');
     }
 }
         
@@ -16457,6 +16476,7 @@ let jinnangItems = [
     { name: 'cultivationPill200', displayName: '修为灵丹（蓝）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650429.png', price: 1000, quantity: 0, description: '直接使用，当前宠物使用后可以提升200点修炼修为' },
     { name: 'cultivationPill500', displayName: '修为灵丹（橙）', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965043b.png', price: 3000, quantity: 0, description: '直接使用，高级修为灵丹，当前宠物使用后可提升500点修炼修为' },
     { name: 'eightyDiscountCard', displayName: '八折礼遇卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 0, quantity: 0, description: '拥有此道具时，商店购买商品可以享受8折优惠，请勿出售哦' },
+    { name: 'creditCard100', displayName: '商城积分卡', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e9650452.png', price: 2000, quantity: 0, description: '使用后可获得100商城积分，积分可用来购买积分商城的道具' },
     { name: 'luckyAmulet', displayName: '财运亨通', url: 'https://pic.imgdb.cn/item/66cc940dd9c307b7e9cb758d.png', price: 0, quantity: 0, description: '拥有此道具时，你会在赌场大发神威' },
     { name: 'celebrationCake', displayName: '庆典蛋糕', url: 'https://pic.imgdb.cn/item/66c369f2d9c307b7e965046c.png', price: 20, quantity: 0, description: '直接使用，安佳动物奶油/不含香精色素/低卡零糖蛋糕，使用后永久增加随机属性5点' },
     { name: 'advancedSkillPill', displayName: '高级神兽丹', url: 'https://pic.imgdb.cn/item/665c41e6d9c307b7e9590b5a.png', price: 6000, quantity: 0, description: '直接使用，当宠物技能不足上限时，可用于查缺补漏宠物技能，十分珍贵' },
@@ -16892,6 +16912,7 @@ const itemEffects = {
     cultivationPill200: () => increaseCultivation(200),
     cultivationPill500: () => increaseCultivation(500),
     blessGift: () => getBlessGift(),
+    creditCard100: () => playerCredit += 100,
     poisonSkillBook: () => {
         showInfoBox('你可以使用1本施毒之术兑换5个毒粉',
             () => {
@@ -20160,6 +20181,7 @@ function toggleShop() {
 function initShop() {
     refreshShop(true);  // 初始加载商品
     startShopTimer();   // 启动倒计时
+    initializeCreditShop();
 }
 
 function startShopTimer() {
@@ -22709,11 +22731,14 @@ function buyItem() {
         return showInfoBox("未知包裹类型，购买失败！");
     }
 
-    showInfoBox(`你花费了${convertPrice(price)}金购买${itemName}，本次消费为你节省了${convertPrice(originalPrice - price)}金`);
     updateTopBarItems();
     updateJinnangItems();
     goldAmount -= price;
     updateGoldDisplay(goldAmount);
+
+    const credit = Math.round(price * 0.001);
+    playerCredit += credit; //积分
+    showInfoBox(`你花费了 ${convertPrice(price)}金 购买 ${itemName} ，获得 ${credit} 点商城积分`);
     selectedItem.remove();
 }
 
@@ -22766,6 +22791,233 @@ function getMissingSkills(allSkills) {
         .map(div => div.innerText.split(" (")[0]);
 
     return allSkills.filter(skill => !currentSkillNames.includes(skill.name) && !currentSkillNames.byLearned);
+}
+
+let playerCredit = 0;
+        
+function openCreditShop() {
+    const drawer = document.getElementById('credit-shop');
+    const info = document.getElementById('credit-shop-info');
+    const credit = document.getElementById('credit-detail');
+
+    credit.innerText = playerCredit;
+    drawer.classList.toggle('open');
+    info.classList.toggle('open');
+}
+
+const creditItems = [
+    { name: 'universalHeart', price: 10000 },  
+    { name: 'hongHuang', price: 2888 },    
+    { name: 'qiongmeiCard', price: 500000 },  
+    { name: 'learningValueBook', price: 2000 },   
+    { name: 'advancedExperienceBook', price: 666 },
+    { name: 'luckyAmulet', price: 20000 },
+];
+
+function addItemToCreditShop(item, shopItems) {
+    // 从jinnangItems中找到对应的商品信息
+    const jinnangItem = jinnangItems.find(i => i.name === item.name);
+    if (!jinnangItem) return; // 如果未找到对应商品，直接返回
+
+    const itemDiv = document.createElement('div');
+    itemDiv.classList.add('shop-item');
+    itemDiv.dataset.name = item.name;
+    itemDiv.dataset.price = item.price;
+    itemDiv.dataset.type = 'credit'; // 标记为积分商品
+
+    itemDiv.innerHTML = `
+        <img src="${jinnangItem.url}" alt="${jinnangItem.displayName}" style="border: 1px solid black;height: 45px;width: 45px;">
+        <div class="item-text-container">
+            <div class="item-text-top">${jinnangItem.displayName}</div>
+            <div class="item-text-bottom">${item.price} 积分</div>
+        </div>`;
+
+    itemDiv.addEventListener('click', () => {
+        const infoBox = document.getElementById('credit-shop-description');
+        // 更新选择的UI效果
+        document.querySelectorAll('.shop-item').forEach(el => el.classList.remove('selected'));
+        itemDiv.classList.add('selected');
+        // 更新描述信息
+        infoBox.innerText = `${jinnangItem.displayName}，售价${item.price}积分。用途：${jinnangItem.description}`;
+    });
+
+    shopItems.appendChild(itemDiv);
+}
+
+function initializeCreditShop() {
+    const shopItems = document.getElementById('credit-shop-items');
+    shopItems.innerHTML = ''; // 清空现有内容
+
+    // 遍历积分商品列表并添加到商店
+    creditItems.forEach(item => {
+        addItemToCreditShop(item, shopItems);
+    });
+}
+
+let currentPurchaseInfo = null;
+
+function createQuantitySelector(maxQuantity) {
+    const content = document.createElement('div');
+    content.style.textAlign = 'center';
+    
+    // 创建标题
+    const title = document.createElement('div');
+    title.style.fontSize = '16px';
+    title.style.marginBottom = '15px';
+    title.style.color = '#92341C';
+    title.innerText = '请选择购买数量';
+    content.appendChild(title);
+    
+    // 创建数量控制容器
+    const controlsContainer = document.createElement('div');
+    controlsContainer.style.display = 'flex';
+    controlsContainer.style.alignItems = 'center';
+    controlsContainer.style.justifyContent = 'center';
+    controlsContainer.style.gap = '10px';
+    controlsContainer.style.marginBottom = '15px';
+    
+    // 减少按钮
+    const decreaseBtn = document.createElement('button');
+    decreaseBtn.innerText = '-';
+    decreaseBtn.style.cssText = `
+        width: 30px;
+        height: 30px;
+        background: linear-gradient(to bottom, #E47F47, #CE6633, #963D1C);
+        color: #F9DE9B;
+        border: 1px solid #6f391c;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        box-shadow: inset 0px 0px 2px 1px #87431F;
+    `;
+    
+    // 数量输入框
+    const quantityInput = document.createElement('input');
+    quantityInput.type = 'number';
+    quantityInput.value = '1';
+    quantityInput.min = '1';
+    quantityInput.max = maxQuantity;
+    quantityInput.style.cssText = `
+        width: 60px;
+        height: 28px;
+        text-align: center;
+        border: 1px solid #EBAC3B;
+        background-color: #DFBF6E;
+        color: #92341C;
+        font-size: 14px;
+    `;
+    
+    // 增加按钮
+    const increaseBtn = document.createElement('button');
+    increaseBtn.innerText = '+';
+    increaseBtn.style.cssText = decreaseBtn.style.cssText;
+    
+    // 总价显示
+    const totalCostDiv = document.createElement('div');
+    totalCostDiv.style.marginTop = '10px';
+    totalCostDiv.style.color = '#92341C';
+    totalCostDiv.style.fontSize = '14px';
+    
+    // 添加事件监听
+    const updateTotal = () => {
+        const quantity = parseInt(quantityInput.value) || 1;
+        const total = quantity * currentPurchaseInfo.price;
+        totalCostDiv.innerText = `总计消耗：${total} 积分`;
+        return total;
+    };
+    
+    const validateAndUpdate = () => {
+        let value = parseInt(quantityInput.value) || 1;
+        value = Math.max(1, Math.min(value, maxQuantity));
+        quantityInput.value = value;
+        return updateTotal();
+    };
+    
+    decreaseBtn.onclick = () => {
+        if (parseInt(quantityInput.value) > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+            validateAndUpdate();
+        }
+    };
+    
+    increaseBtn.onclick = () => {
+        if (parseInt(quantityInput.value) < maxQuantity) {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+            validateAndUpdate();
+        }
+    };
+    
+    quantityInput.onchange = validateAndUpdate;
+    
+    controlsContainer.appendChild(decreaseBtn);
+    controlsContainer.appendChild(quantityInput);
+    controlsContainer.appendChild(increaseBtn);
+    content.appendChild(controlsContainer);
+    content.appendChild(totalCostDiv);
+    
+    // 初始化总价显示
+    updateTotal();
+    
+    return {
+        element: content,
+        getQuantity: () => parseInt(quantityInput.value) || 1,
+        getTotal: validateAndUpdate
+    };
+}
+
+function buyCreditItems() {
+    const selectedItem = document.querySelector('#credit-shop-items .shop-item.selected');
+    if (!selectedItem) {
+        return showInfoBox("请选择一个商品进行购买！");
+    }
+
+    currentPurchaseInfo = {
+        name: selectedItem.dataset.name,
+        price: parseInt(selectedItem.dataset.price, 10)
+    };
+
+    const maxQuantity = Math.floor(playerCredit / currentPurchaseInfo.price);
+    if (maxQuantity < 1) {
+        return showInfoBox("积分不足，购买失败！");
+    }
+
+    const quantitySelector = createQuantitySelector(maxQuantity);
+    
+    showInfoBox(
+        "",
+        () => {
+            // 确认购买
+            const quantity = quantitySelector.getQuantity();
+            const totalCost = quantitySelector.getTotal();
+            
+            if (totalCost > playerCredit) {
+                showInfoBox("积分不足，购买失败！");
+                return;
+            }
+
+            // 执行购买
+            playerCredit -= totalCost;
+            addItemToJinnang(currentPurchaseInfo.name, quantity);
+
+            // 更新显示
+            document.getElementById('credit-detail').innerText = playerCredit;
+            updateJinnangItems();
+
+            const jinnangItem = jinnangItems.find(i => i.name === currentPurchaseInfo.name);
+            showInfoBox(`成功使用${totalCost}积分购买了${quantity}个${jinnangItem.displayName}`);
+            
+            currentPurchaseInfo = null;
+        },
+        () => {
+            // 取消购买
+            currentPurchaseInfo = null;
+        },
+        '#92341C'
+    );
+
+    // 将数量选择器添加到信息框中
+    const messageElement = currentInfoBox.querySelector('p');
+    messageElement.appendChild(quantitySelector.element);
 }
         
 // 初始化商店和倒计时
@@ -24518,14 +24770,14 @@ function getBlessGift() {
     addItemToJinnang('casinoCoverLetter', 10);
     addItemToJinnang('summonCharmPaper', 20);
     addItemToJinnang('celebrationCake', 5);
-    addItemToJinnang('advancedSkillPill', 1);
     addItemToJinnang('goldAmuletPackage', 1);
     addItemToJinnang('qualityEnhancePillPKG', 20);
     addItemToJinnang('forgeTool', 3);
     addItemToJinnang('cultivationPill200', 5);
     addItemToJinnang('advancedSkillBook', 1);
-    generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 10, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
-    addItemToJinnang('blueArmComponents', 600);
+    addItemToJinnang('creditCard100', 20);
+    generateItemToJinnang('hongHuang', '洪荒至尊仙葫', 'https://pic.imgdb.cn/item/66d0b3f3d9c307b7e995a14c.png', price = 8000, quantity = 5, description = '上古传说中的仙葫，流传久远，极其稀有，打开可获得随机珍稀道具');
+    addItemToJinnang('blueArmComponents', 625);
     generateItemToJinnang('tinyGoldBlock','小金锭','https://pic.imgdb.cn/item/66d6ef10d9c307b7e98acf88.png', price = 8000000, quantity =  10, description = '贵重的金属，卖掉能值不少钱，你也可以点击直接使用进行市场竞价');
     generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 100, 1, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石');
     generateItemToJinnang('pinkSixthGem', '六级粉红色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png', 100, 1, '尚未开光的灵石，使用后可得到一颗随机的6级粉红色宝石');    
@@ -26185,7 +26437,8 @@ function saveGameState() {
         highestAsset: highestAsset, //保存经商最高记录
         currentLifeSpan: currentLifeSpan,
         maxLifeSpan: maxLifeSpan, //宠物寿命上限
-        luckyAccretion: luckyAccretion
+        luckyAccretion: luckyAccretion,
+        playerCredit: playerCredit
     };
 
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -26387,6 +26640,9 @@ function loadGameState(auto = false) {
             } //这是资质仙丹的数值
             if (savedState.luckyAccretion) {
                 luckyAccretion = savedState.luckyAccretion;
+            }
+            if (savedState.playerCredit) {
+                playerCredit = savedState.playerCredit;
             }
             if (savedState.drugBonus0) {
                 drugBonus = savedState.drugBonus0;

@@ -3516,6 +3516,10 @@
                         <strong>基础属性：</strong>
                         <div id="baseAttribute">+ 12353 物理防御</div>
                     </div>
+                    <div style="display: flex;width: 100%;align-items: flex-start;flex-direction: column;color: yellow;">
+                        <strong>通灵属性：</strong>
+                        <div id="divined-attribute" style="font-size: 12px;display: flex;flex-direction: row;align-items: center;width:100%;">无<button onClick="refreshDivinedAttributes()" style="border: 1px solid rgb(111, 57, 28);background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28));box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset;font-size: 12px;border-radius: 5px;color: rgb(249, 222, 155);padding: 2px 10px;cursor: pointer;margin: 2px;transition: transform 0.1s, box-shadow 0.1s;width:20%;margin-left:10px;">通灵</button></div>
+                    </div>
                 </div>
                 <!-- 宝石孔显示 -->
                 <div>
@@ -15214,9 +15218,9 @@ document.getElementById('lotteryRuleButton').addEventListener('click', () => {
         <p>金子不够花，想要以小博大？</p>
         <ul>
             <li>玩家需选择6个数字，其中前5个数字为红球，第6个数字为蓝球。</li>
-            <li>每注200文金子，最低投注1注。</li>
+            <li>每注200文金子，最低投注100注。</li>
             <li>上次选号区会以红色显示当次中奖的数字。</li>
-            <li>倒计时10秒实时开奖，离开彩券界面会暂停计时。</li>
+            <li>投注后实时开奖，离开彩券界面会暂停计时。</li>
             <li>当玩家选择的数字和开奖数字匹配时，即可获得相应奖金。</li>
             <li>详细中奖规则：</li>
             <ul>
@@ -16476,7 +16480,7 @@ let jinnangItems = [
     { name: 'tejiWisdomPill', displayName: '特级悟性丹', url: 'https://pic.imgdb.cn/item/665de3fd5e6d1bfa05564912.png', price: 50, quantity: 0, description: '特制的悟性丹，用于21~25悟性的提升' },
     { name: 'advancedExperienceBook', displayName: '高级经验书', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e7b.png', price: 150, quantity: 0, description: '伟人的经验，使用后获得30000经验值' },
     { name: 'awakenPill', displayName: '醒悟丹', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a45.png', price: 500, quantity: 0, description: '宠物觉醒时必不可少的玄妙丹药' },
-    { name: 'spiritualWater', displayName: '无上养元水', url: 'https://pic1.imgdb.cn/item/67828b1ed0e0a243d4f37674.png', price: 5000, quantity: 0, description: '武器经历无上养元水的洗练会变得更加强大' },
+    { name: 'spiritualWater', displayName: '无上养元水', url: 'https://pic1.imgdb.cn/item/67828b1ed0e0a243d4f37674.png', price: 5000, quantity: 0, description: '武器经历无上养元水的洗练会变得更加强大，在武装界面“通灵”使用' },
     { name: 'coagulateStone', displayName: '凝魄石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa05609a0f.png', price: 300, quantity: 0, description: '开启宠物幻化的必要道具' },
     { name: 'seperateStone', displayName: '离魂石', url: 'https://pic.imgdb.cn/item/665ef5a15e6d1bfa056099a3.png', price: 200, quantity: 0, description: '用于提升宠物的幻化等级，以带来更稳定的成长率' },
     { name: 'ascensionStone', displayName: '飞升之石', url: 'https://pic.imgdb.cn/item/6656e734d9c307b7e9088e6d.png', price: 600, quantity: 0, description: '使你的宠物醍醐灌顶般超越自我' },
@@ -18006,6 +18010,7 @@ function showPetArmsWindow() {
         img.addEventListener('click', () => {
             if (arm.unlocked) {
                 openInlayGemDisplay(key);
+                updateDivinedDisplay(arm);
             } else {
                 showInfoBox('从第二件武装开始，点击武装图标可以进入强化页面，对武装进行强化、升星、镶嵌宝石等操作');
             }
@@ -18093,10 +18098,42 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
                                     agility: 0,
                                     faith: 0
                                 }
+                            },
+                            divinedAttribute: {
+                                physicalAttack: {
+                                    fixed: 0,      // 固定值加成
+                                    percentage: 0  // 百分比加成（存储为小数，如0.018代表18‰）
+                                },
+                                magicAttack: {
+                                    fixed: 0,
+                                    percentage: 0
+                                },
+                                physicalDefense: {
+                                    fixed: 0,
+                                    percentage: 0
+                                },
+                                magicDefense: {
+                                    fixed: 0,
+                                    percentage: 0
+                                },
+                                speed: {
+                                    fixed: 0,
+                                    percentage: 0
+                                },
+                                health: {
+                                    fixed: 0,
+                                    percentage: 0
+                                },
+                                mana: {
+                                    fixed: 0,
+                                    percentage: 0
+                                }
+                                // 注意：不再需要一级属性，因为通灵只影响二级属性
                             }
                         };
                         img.src = arm.url;
                         showPetArmsWindow();
+                        initializeDivinedAttributes(arm);
                         forgeButton.innerText = '锻造';
                         forgeButton.classList.remove('locked');
                         forgeButton.replaceWith(forgeButton.cloneNode(true));
@@ -18117,6 +18154,208 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
         showInfoBox("宠物等级不足，无法解锁！");
     }
 }
+
+//这是初始化新通灵系统的内容
+function initializeDivinedAttributes(arm) {
+    // 如果是旧数据结构，需要进行转换
+    if (arm.armState && typeof arm.armState.divinedAttribute.physicalAttack === 'number') {
+        const oldAttributes = { ...arm.armState.divinedAttribute };
+        
+        // 创建新的数据结构
+        arm.armState.divinedAttribute = {
+            physicalAttack: { fixed: 0, percentage: 0 },
+            magicAttack: { fixed: 0, percentage: 0 },
+            physicalDefense: { fixed: 0, percentage: 0 },
+            magicDefense: { fixed: 0, percentage: 0 },
+            speed: { fixed: 0, percentage: 0 },
+            health: { fixed: 0, percentage: 0 },
+            mana: { fixed: 0, percentage: 0 }
+        };
+
+        // 如果有旧的数值，将其转换为固定值
+        Object.entries(oldAttributes).forEach(([attr, value]) => {
+            if (arm.armState.divinedAttribute[attr]) {
+                arm.armState.divinedAttribute[attr].fixed = value;
+            }
+        });
+    }
+    
+    // 如果是全新初始化
+    if (!arm.armState.divinedAttribute) {
+        arm.armState.divinedAttribute = {
+            physicalAttack: { fixed: 0, percentage: 0 },
+            magicAttack: { fixed: 0, percentage: 0 },
+            physicalDefense: { fixed: 0, percentage: 0 },
+            magicDefense: { fixed: 0, percentage: 0 },
+            speed: { fixed: 0, percentage: 0 },
+            health: { fixed: 0, percentage: 0 },
+            mana: { fixed: 0, percentage: 0 }
+        };
+    }
+}
+        
+// 修改随机属性生成函数
+function getRandomDivinedAttribute() {
+    const secondaryAttributes = [
+        'physicalAttack', 'magicAttack', 'physicalDefense',
+        'magicDefense', 'speed', 'health', 'mana'
+    ];
+    
+    const attribute = secondaryAttributes[Math.floor(Math.random() * secondaryAttributes.length)];
+    const isPercentage = Math.random() < 0.5;
+    
+    if (isPercentage) {
+        let value;
+        if (attribute === 'speed') {
+            // 速度的千分比范围是[3‰~4‰]
+            value = Math.floor(Math.random() * 2 + 3) / 1000;
+        } else {
+            // 其他属性的千分比范围是[18‰~36‰]
+            value = Math.floor(Math.random() * 19 + 18) / 1000;
+        }
+        return { attribute, value, isPercentage: true };
+    } else {
+        let value;
+        if (attribute === 'speed') {
+            // 速度的固定值范围是[51~102]
+            value = Math.floor(Math.random() * (102 - 51 + 1) + 51);
+        } else {
+            // 其他属性的固定值范围是[768~1200]
+            value = Math.floor(Math.random() * (1200 - 768 + 1) + 768);
+        }
+        return { attribute, value, isPercentage: false };
+    }
+}
+
+// 检查是否有任何通灵属性
+function hasAnyDivinedAttribute(arm) {
+    if (!arm.armState?.divinedAttribute) return false;
+    
+    return Object.values(arm.armState.divinedAttribute).some(values => 
+        values.fixed > 0 || values.percentage > 0
+    );
+}
+
+// 通灵函数修改为使用 currentKey
+// 修改通灵函数中的属性重置和合并逻辑
+function refreshDivinedAttributes() {
+    if (!currentKey) {
+        showInfoBox('未选择武装！');
+        return;
+    }
+
+    const arm = armsAttributes[currentKey];
+    if (!arm) {
+        showInfoBox('该武装不存在！');
+        return;
+    }
+
+    const spiritualWater = jinnangItems.find(item => item.name === 'spiritualWater');
+    if (!spiritualWater || spiritualWater.quantity < 1) {
+        showInfoBox('需要消耗无上养元水才能进行通灵！', null, null, 'red');
+        return;
+    }
+
+    showInfoBox(
+        '是否消耗一瓶无上养元水进行通灵？通灵将重置当前的通灵属性！',
+        () => {
+            if (useItem('spiritualWater', 1)) {
+                // 完全重置通灵属性
+                Object.keys(arm.armState.divinedAttribute).forEach(key => {
+                    arm.armState.divinedAttribute[key] = {
+                        fixed: 0,
+                        percentage: 0
+                    };
+                });
+
+                // 随机决定本次通灵获得的属性数量（1-5个）
+                const attributeCount = Math.floor(Math.random() * 5) + 1;
+                const newAttributes = [];
+                for (let i = 0; i < attributeCount; i++) {
+                    newAttributes.push(getRandomDivinedAttribute());
+                }
+
+                // 分别合并固定值和百分比值
+                const mergedAttributes = {};
+                newAttributes.forEach(attr => {
+                    if (!mergedAttributes[attr.attribute]) {
+                        mergedAttributes[attr.attribute] = {
+                            fixed: 0,
+                            percentage: 0
+                        };
+                    }
+                    if (attr.isPercentage) {
+                        mergedAttributes[attr.attribute].percentage += attr.value;
+                    } else {
+                        mergedAttributes[attr.attribute].fixed += attr.value;
+                    }
+                });
+
+                // 更新arm的通灵属性
+                Object.entries(mergedAttributes).forEach(([attr, values]) => {
+                    arm.armState.divinedAttribute[attr] = values;
+                });
+
+                // 构建显示文本，分别显示固定值和千分比
+                const attributeDisplay = Object.entries(mergedAttributes)
+                    .map(([attr, values]) => {
+                        const parts = [];
+                        if (values.fixed > 0) {
+                            parts.push(`+${values.fixed} ${translateAttribute(attr)}`);
+                        }
+                        if (values.percentage > 0) {
+                            parts.push(`+${(values.percentage * 1000).toFixed(0)}‰ ${translateAttribute(attr)}`);
+                        }
+                        if (parts.length > 1) {
+                            return parts.join('\n'); // 如果同一属性有两种值，分行显示
+                        }
+                        return parts[0];
+                    })
+                    .filter(text => text)
+                    .join('\n');
+
+                updateDivinedDisplay(arm);
+                showInfoBox(`通灵成功！获得以下属性：\n${attributeDisplay}`);
+                updateAttributePanel();
+            }
+        },
+        null,
+        'red'
+    );
+}
+
+// 修改显示函数
+function updateDivinedDisplay(arm) {
+    const divinedElement = document.getElementById('divined-attribute');
+    if (!divinedElement) return;
+
+    if (!arm.armState?.divinedAttribute || !hasAnyDivinedAttribute(arm)) {
+        divinedElement.innerHTML = `无 <button id="divinedBtn" onClick="refreshDivinedAttributes()" style="border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 2px; transition: transform 0.1s, box-shadow 0.1s; display: block;width:20%;margin-left:10px;">通灵</button>`;
+        return;
+    }
+
+    const attributeTexts = [];
+    const attributes = Object.entries(arm.armState.divinedAttribute);
+    
+    for (const [attr, values] of attributes) {
+        if (values.fixed > 0 || values.percentage > 0) {
+            const parts = [];
+            if (values.fixed > 0) {
+                parts.push(`+${values.fixed}`);
+            }
+            if (values.percentage > 0) {
+                parts.push(`+${(values.percentage * 1000).toFixed(0)}‰`);
+            }
+            if (parts.length > 0) {
+                attributeTexts.push(`${parts.join('/')} ${translateAttribute(attr)}`);
+            }
+        }
+    }
+
+    const displayText = attributeTexts.length > 0 ? attributeTexts.join('，') : '无';
+    divinedElement.innerHTML = `${displayText} <button id="divinedBtn" onClick="refreshDivinedAttributes()" style="border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 2px; transition: transform 0.1s, box-shadow 0.1s; display: block;width:20%;margin-left:10px;">通灵</button>`;
+}
+
 
 function updateArmInfoDiv(infoDiv, arm, key) {
     let enduranceElement;  // 在函数作用域内声明
@@ -18745,6 +18984,9 @@ function openInlayGemDisplay(key) {
 
     // 根据星级数显示相应数量的星星
     const starDisplay = '⭐️'.repeat(arm.armState.starLevel || 0);
+    // 更新通灵显示
+    updateDivinedDisplay(armsAttributes[key]);
+
 
     // 更新星级显示为星星符号
     document.getElementById('starLevel').innerText = starDisplay;
@@ -19428,6 +19670,33 @@ function calculateSecondaryAttributes(currentAttributes, currentWisdom) {
         }
     });
 
+    // 在函数末尾添加通灵属性的计算
+    Object.keys(armsAttributes).forEach(key => {
+        const arm = armsAttributes[key];
+        if (arm.activated && arm.armState?.divinedAttribute) {
+            Object.entries(arm.armState.divinedAttribute).forEach(([attr, values]) => {
+                if (baseSecondaryAttributes[attr] !== undefined) {
+                    let baseValue = baseSecondaryAttributes[attr];
+                    let percentageBonus = 0;
+                    let fixedBonus = 0;
+    
+                    // 计算百分比加成
+                    if (values.percentage) {
+                        percentageBonus = Math.round(baseValue * values.percentage);
+                    }
+    
+                    // 计算固定值加成
+                    if (values.fixed) {
+                        fixedBonus = values.fixed;
+                    }
+    
+                    // 最终值 = 原始值 + 百分比加成 + 固定值加成
+                    baseSecondaryAttributes[attr] = Math.round(baseValue + percentageBonus + fixedBonus);
+                }
+            });
+        }
+    });
+        
     return baseSecondaryAttributes;
 }
 
@@ -22899,7 +23168,7 @@ const creditItems = [
     { name: 'luckyAmulet', price: 20000 },
     { name: 'magicMine', price: 1000 },
     { name: 'advancedSkillBook', price: 6888 },
-    { name: 'spiritualWater', price: 200 },
+    { name: 'spiritualWater', price: 500 },
 ];
 
 function addItemToCreditShop(item, shopItems) {
@@ -24959,6 +25228,11 @@ function upgradeWisdomTo() {
         generateItemToJinnang('purpleSixthGem', '六级淡紫色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc21.png', 100, 500, '尚未开光的灵石，使用后可得到一颗随机的6级淡紫色宝石');
         generateItemToJinnang('pinkSixthGem', '六级粉红色灵石', 'https://pic.imgdb.cn/item/66d9e814d9c307b7e93afc0d.png', 100, 500, '尚未开光的灵石，使用后可得到一颗随机的6级粉红色宝石');
         showInfoBox("获得六级粉红色、淡紫色宝石*500");
+        return;
+    }
+
+    if (target === "武装重置") {
+        resetArmsState();
         return;
     }
 

@@ -3160,7 +3160,7 @@
                 <button onclick="openTreasure()">开启宝箱</button>
                 <button onclick="openTenthTreasure()">十连开启</button>
                 <button onclick="collectTreasure()">取出道具</button>
-                <button onclick="openDivineShuixian()">模拟通灵</button>
+                <button onclick="getWishResult()">天赐祝福</button>
             </div>
         </div>
     </div>
@@ -16366,7 +16366,49 @@ function selectReward(rewardList) {
         }
     }
 }
-            
+
+let luckyAccretion = 0;
+
+function throwWish() {
+    // 检查幸运金币是否存在且数量大于0
+    if (drugInventory["幸运金币"] && drugInventory["幸运金币"].quantity > 0) {
+        const randomNumber = Math.random(); // 生成0到1之间的随机数
+        const luckyRate = luckyAccretion * 0.005; // 成功率修改为直接使用累积值
+        
+        // 消耗一个幸运金币
+        addDrugToInventory('幸运金币', -1);
+        
+        // 判断是否许愿成功
+        if (randomNumber < luckyRate) {
+            luckyAccretion = 0; // 成功后重置累积值
+            return true;
+        }
+        
+        if (luckyAccretion < 100) {
+            luckyAccretion += 1; // 失败后增加累积值
+        }
+        return false;
+    }
+    
+    // 如果没有幸运金币，不应该增加累积值
+    return false;
+}
+
+function getWishResult() {
+    // 检查是否有足够的幸运金币
+    if (!drugInventory["幸运金币"] || drugInventory["幸运金币"].quantity <= 0) {
+        showInfoBox('没有幸运金币可用', 'red');
+        return;
+    }
+    
+    if (!throwWish()) {
+        showInfoBox(`消耗一个幸运金币，幸运值累积至${luckyAccretion}%`, 'red');
+    } else {
+        addItemToJinnang('goldBox', 1);
+        showInfoBox('成功得到幸运之神的眷顾，获得一个沉甸甸的金箱子！', 'red');
+    }
+}
+        
 // 新增全局变量
 let jinnangCapacity = 2000;
 let jinnangItems = [
@@ -16492,6 +16534,7 @@ let jinnangItems = [
     { name: 'timeMachine', displayName: '百达翡丽', url: 'https://pic.imgdb.cn/item/66ed48f0f21886ccc007a9e5.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）令人着迷的百达翡丽605怀表，应用此法宝时，将有15%概率在每周刷新时不增加周数' },
     { name: 'getLoan', displayName: '霸王贷款', url: 'https://pic.imgdb.cn/item/66f029d1f21886ccc0c125da.png', price: 1000, quantity: 0, description: '【经商法宝】（仅在商店-倒买倒卖中使用）使用后立即获得5万元贷款，但5周后需要偿还50万元，若无力偿还将结束游戏，谨慎使用' },
     { name: 'jiechengxianai', displayName: '结城夏奈召唤卡', url: 'https://pic.imgdb.cn/item/66e856f0d9c307b7e9bee42a.png', price: 10000, quantity: 0, description: '召唤一位神秘女嘉宾和她的夫君' },
+    { name: 'goldBox', displayName: '沉甸甸的金箱', url: 'https://pic1.imgdb.cn/item/6781f46cd0e0a243d4f34115.png', price: 100000, quantity: 0, description: '装满财富的金箱子，使用可获得500锭金子' },
     { name: 'lifeBox', displayName: '源泉的生命箱', url: 'https://pic1.imgdb.cn/item/677ffb14d0e0a243d4f2d4de.png', price: 5, quantity: 0, description: '特殊道具，20分钟内增加一千万生命值上限，无法叠加使用；更换宠物、刷新页面会失效' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
@@ -17132,7 +17175,12 @@ const itemEffects = {
         currentLifeSpan = Math.min(maxLifeSpan, currentLifeSpan + 5000);
         showInfoBox(`成功恢复5000点寿命，当前宠物寿命为${currentLifeSpan}/${maxLifeSpan}。`);
     },
-    lifeBox: () => useLifeBox()
+    lifeBox: () => useLifeBox(),
+    goldBox: () => {
+        goldAmount += 500000000;
+        updateGoldDisplay(goldAmount);
+        showInfoBox('获得500锭金子！');
+    }
 };
 
 function useAssignedItem() {
@@ -20072,7 +20120,7 @@ function randomlyEventAfterSellingBlock() {
             }
         },
         () => {
-            showInfoBox('没关系，下次我还会带着更好的商品来拜访您！行走江湖，买卖是次要的，结识与奇珍异宝缔结良缘的各路豪杰才是最重要的！', null, null, null, merchantUrl, '80px * 80px');
+            showInfoBox('没关系，下次我还会带着更好的商品来拜访您！', null, null, null, merchantUrl, '80px * 80px');
         },
         null,
         merchantUrl,
@@ -26136,7 +26184,8 @@ function saveGameState() {
         scalpingScore: scalpingScore, //保存经商积分
         highestAsset: highestAsset, //保存经商最高记录
         currentLifeSpan: currentLifeSpan,
-        maxLifeSpan: maxLifeSpan //宠物寿命上限
+        maxLifeSpan: maxLifeSpan, //宠物寿命上限
+        luckyAccretion: luckyAccretion
     };
 
     localStorage.setItem('gameState', JSON.stringify(gameState));
@@ -26336,7 +26385,9 @@ function loadGameState(auto = false) {
             if (savedState.consumedPillCount) {
                 consumedPillCount = savedState.consumedPillCount;
             } //这是资质仙丹的数值
-            
+            if (savedState.luckyAccretion) {
+                luckyAccretion = savedState.luckyAccretion;
+            }
             if (savedState.drugBonus0) {
                 drugBonus = savedState.drugBonus0;
             }

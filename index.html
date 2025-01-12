@@ -18127,7 +18127,12 @@ function unlockArm(index, arm, infoDiv, forgeButton, img, energyForgeButton) {
                                 mana: {
                                     fixed: 0,
                                     percentage: 0
-                                }
+                                },
+                                endurance: 0,
+                                intelligence: 0,
+                                strength: 0,
+                                agility: 0,
+                                faith: 0
                                 // 注意：不再需要一级属性，因为通灵只影响二级属性
                             }
                         };
@@ -18169,7 +18174,12 @@ function initializeDivinedAttributes(arm) {
             magicDefense: { fixed: 0, percentage: 0 },
             speed: { fixed: 0, percentage: 0 },
             health: { fixed: 0, percentage: 0 },
-            mana: { fixed: 0, percentage: 0 }
+            mana: { fixed: 0, percentage: 0 },
+            endurance: 0,
+            intelligence: 0,
+            strength: 0,
+            agility: 0,
+            faith: 0
         };
 
         // 如果有旧的数值，将其转换为固定值
@@ -18189,138 +18199,185 @@ function initializeDivinedAttributes(arm) {
             magicDefense: { fixed: 0, percentage: 0 },
             speed: { fixed: 0, percentage: 0 },
             health: { fixed: 0, percentage: 0 },
-            mana: { fixed: 0, percentage: 0 }
+            mana: { fixed: 0, percentage: 0 },
+            endurance: 0,
+            intelligence: 0,
+            strength: 0,
+            agility: 0,
+            faith: 0
         };
     }
 }
         
 // 修改随机属性生成函数
 function getRandomDivinedAttribute() {
+    // 合并二级和一级属性列表
     const secondaryAttributes = [
         'physicalAttack', 'magicAttack', 'physicalDefense',
         'magicDefense', 'speed', 'health', 'mana'
     ];
+    const firstAttributes = [
+        'endurance', 'intelligence', 'strength', 'agility', 'faith'
+    ];
     
-    const attribute = secondaryAttributes[Math.floor(Math.random() * secondaryAttributes.length)];
+    // 70%概率选择二级属性，30%概率选择一级属性
+    const isSecondaryAttribute = Math.random() < 0.7;
+    const attributePool = isSecondaryAttribute ? secondaryAttributes : firstAttributes;
+    const attribute = attributePool[Math.floor(Math.random() * attributePool.length)];
+
+    // 如果是一级属性，直接返回固定值（范围90-180）
+    if (firstAttributes.includes(attribute)) {
+        const value = Math.floor(Math.random() * (180 - 90 + 1) + 90);
+        return { attribute, value, isFirstAttribute: true };
+    }
+
+    // 如果是二级属性，保持原有逻辑
     const isPercentage = Math.random() < 0.5;
-    
     if (isPercentage) {
         let value;
         if (attribute === 'speed') {
-            // 速度的千分比范围是[3‰~4‰]
             value = Math.floor(Math.random() * 2 + 3) / 1000;
         } else {
-            // 其他属性的千分比范围是[18‰~36‰]
             value = Math.floor(Math.random() * 19 + 18) / 1000;
         }
-        return { attribute, value, isPercentage: true };
+        return { attribute, value, isPercentage: true, isFirstAttribute: false };
     } else {
         let value;
         if (attribute === 'speed') {
-            // 速度的固定值范围是[51~102]
             value = Math.floor(Math.random() * (102 - 51 + 1) + 51);
         } else {
-            // 其他属性的固定值范围是[768~1200]
             value = Math.floor(Math.random() * (1200 - 768 + 1) + 768);
         }
-        return { attribute, value, isPercentage: false };
+        return { attribute, value, isPercentage: false, isFirstAttribute: false };
     }
 }
 
 // 检查是否有任何通灵属性
+// 修改检查函数以同时支持一级和二级属性
 function hasAnyDivinedAttribute(arm) {
     if (!arm.armState?.divinedAttribute) return false;
     
-    return Object.values(arm.armState.divinedAttribute).some(values => 
-        values.fixed > 0 || values.percentage > 0
-    );
+    for (const [attr, value] of Object.entries(arm.armState.divinedAttribute)) {
+        // 检查一级属性（数字类型且大于0）
+        if (typeof value === 'number' && value > 0) {
+            return true;
+        }
+        // 检查二级属性（对象类型且fixed或percentage大于0）
+        if (typeof value === 'object' && value !== null && 
+            (value.fixed > 0 || value.percentage > 0)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // 通灵函数修改为使用 currentKey
 // 修改通灵函数中的属性重置和合并逻辑
+// 添加一个获取带权重的随机数量的函数
+function getWeightedRandomCount() {
+    const random = Math.random();
+    if (random < 0.2) return 1;        // 20% 概率
+    if (random < 0.4) return 2;        // 20% 概率
+    if (random < 0.7) return 3;        // 30% 概率
+    if (random < 0.9) return 4;        // 20% 概率
+    return 5;                          // 10% 概率
+}
+
 function refreshDivinedAttributes() {
     if (!currentKey) {
         showInfoBox('未选择武装！');
         return;
     }
-
     const arm = armsAttributes[currentKey];
     if (!arm) {
         showInfoBox('该武装不存在！');
         return;
     }
-
     const spiritualWater = jinnangItems.find(item => item.name === 'spiritualWater');
     if (!spiritualWater || spiritualWater.quantity < 1) {
         showInfoBox('需要消耗无上养元水才能进行通灵！', null, null, 'red');
         return;
     }
 
+    useItem('spiritualWater', 1);
+    
+    // 先生成新的通灵结果但不应用
+    const attributeCount = getWeightedRandomCount();
+    const newAttributes = [];
+    for (let i = 0; i < attributeCount; i++) {
+        newAttributes.push(getRandomDivinedAttribute());
+    }
+
+    // 构建显示文本
+    const attributeDisplay = newAttributes.map(attr => {
+        if (attr.isFirstAttribute) {
+            return `+${attr.value} ${translateAttribute(attr.attribute)}`;
+        } else if (attr.isPercentage) {
+            return `+${(attr.value * 1000).toFixed(0)}‰ ${translateAttribute(attr.attribute)}`;
+        } else {
+            return `+${attr.value} ${translateAttribute(attr.attribute)}`;
+        }
+    }).join('\n');
+
+    // 创建临时合并结果（不应用）
+    const mergedAttributes = {};
+    newAttributes.forEach(attr => {
+        if (attr.isFirstAttribute) {
+            if (!mergedAttributes[attr.attribute]) {
+                mergedAttributes[attr.attribute] = 0;
+            }
+            mergedAttributes[attr.attribute] += attr.value;
+        } else {
+            if (!mergedAttributes[attr.attribute]) {
+                mergedAttributes[attr.attribute] = {
+                    fixed: 0,
+                    percentage: 0
+                };
+            }
+            if (attr.isPercentage) {
+                mergedAttributes[attr.attribute].percentage += attr.value;
+            } else {
+                mergedAttributes[attr.attribute].fixed += attr.value;
+            }
+        }
+    });
+
+    // 显示结果并等待玩家确认
     showInfoBox(
-        '是否消耗一瓶无上养元水进行通灵？通灵将重置当前的通灵属性！',
+        `得到新的通灵属性：\n\n${attributeDisplay}\n\n是否保存此次通灵结果？`,
         () => {
-            if (useItem('spiritualWater', 1)) {
-                // 完全重置通灵属性
-                Object.keys(arm.armState.divinedAttribute).forEach(key => {
+            // 重置二级属性
+            Object.keys(arm.armState.divinedAttribute).forEach(key => {
+                if (typeof arm.armState.divinedAttribute[key] === 'object') {
                     arm.armState.divinedAttribute[key] = {
                         fixed: 0,
                         percentage: 0
                     };
-                });
-
-                // 随机决定本次通灵获得的属性数量（1-5个）
-                const attributeCount = Math.floor(Math.random() * 5) + 1;
-                const newAttributes = [];
-                for (let i = 0; i < attributeCount; i++) {
-                    newAttributes.push(getRandomDivinedAttribute());
+                } else {
+                    arm.armState.divinedAttribute[key] = 0; // 重置一级属性
                 }
+            });
 
-                // 分别合并固定值和百分比值
-                const mergedAttributes = {};
-                newAttributes.forEach(attr => {
-                    if (!mergedAttributes[attr.attribute]) {
-                        mergedAttributes[attr.attribute] = {
-                            fixed: 0,
-                            percentage: 0
-                        };
-                    }
-                    if (attr.isPercentage) {
-                        mergedAttributes[attr.attribute].percentage += attr.value;
-                    } else {
-                        mergedAttributes[attr.attribute].fixed += attr.value;
-                    }
-                });
+            // 应用新属性
+            Object.entries(mergedAttributes).forEach(([attr, value]) => {
+                arm.armState.divinedAttribute[attr] = value;
+            });
 
-                // 更新arm的通灵属性
-                Object.entries(mergedAttributes).forEach(([attr, values]) => {
-                    arm.armState.divinedAttribute[attr] = values;
-                });
+            // 更新全局变量和显示
+            window.divinedFirstAttributes = {
+                endurance: arm.armState.divinedAttribute.endurance || 0,
+                intelligence: arm.armState.divinedAttribute.intelligence || 0,
+                strength: arm.armState.divinedAttribute.strength || 0,
+                agility: arm.armState.divinedAttribute.agility || 0,
+                faith: arm.armState.divinedAttribute.faith || 0
+            };
 
-                // 构建显示文本，分别显示固定值和千分比
-                const attributeDisplay = Object.entries(mergedAttributes)
-                    .map(([attr, values]) => {
-                        const parts = [];
-                        if (values.fixed > 0) {
-                            parts.push(`+${values.fixed} ${translateAttribute(attr)}`);
-                        }
-                        if (values.percentage > 0) {
-                            parts.push(`+${(values.percentage * 1000).toFixed(0)}‰ ${translateAttribute(attr)}`);
-                        }
-                        if (parts.length > 1) {
-                            return parts.join('\n'); // 如果同一属性有两种值，分行显示
-                        }
-                        return parts[0];
-                    })
-                    .filter(text => text)
-                    .join('\n');
-
-                updateDivinedDisplay(arm);
-                showInfoBox(`通灵成功！获得以下属性：\n${attributeDisplay}`);
-                updateAttributePanel();
-            }
+            // 更新显示
+            updateDivinedDisplay(arm);
+            updateAttributePanel();
         },
         null,
-        'red'
+        'black'
     );
 }
 
@@ -18338,25 +18395,56 @@ function updateDivinedDisplay(arm) {
     const attributes = Object.entries(arm.armState.divinedAttribute);
     
     for (const [attr, values] of attributes) {
-        if (values.fixed > 0 || values.percentage > 0) {
-            const parts = [];
-            if (values.fixed > 0) {
-                parts.push(`+${values.fixed}`);
+        if (typeof values === 'number') {
+            // 一级属性
+            if (values > 0) {
+                attributeTexts.push(`+${values} ${translateAttribute(attr)}`);
             }
-            if (values.percentage > 0) {
-                parts.push(`+${(values.percentage * 1000).toFixed(0)}‰`);
-            }
-            if (parts.length > 0) {
-                attributeTexts.push(`${parts.join('/')} ${translateAttribute(attr)}`);
+        } else {
+            // 二级属性
+            if (values.fixed > 0 || values.percentage > 0) {
+                const parts = [];
+                if (values.fixed > 0) {
+                    parts.push(`+${values.fixed}`);
+                }
+                if (values.percentage > 0) {
+                    parts.push(`+${(values.percentage * 1000).toFixed(0)}‰`);
+                }
+                if (parts.length > 0) {
+                    attributeTexts.push(`${parts.join('/')} ${translateAttribute(attr)}`);
+                }
             }
         }
     }
 
     const displayText = attributeTexts.length > 0 ? attributeTexts.join('，') : '无';
-    divinedElement.innerHTML = `${displayText} <button id="divinedBtn" onClick="refreshDivinedAttributes()" style="border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 2px; transition: transform 0.1s, box-shadow 0.1s; display: block;width:20%;margin-left:10px;">通灵</button>`;
+    divinedElement.innerHTML = `<div style="display:flex;text-align: start;">${displayText}</div><button id="divinedBtn" onClick="refreshDivinedAttributes()" style="border: 1px solid rgb(111, 57, 28); background: linear-gradient(rgb(228, 127, 71), rgb(206, 102, 51), rgb(150, 61, 28)); box-shadow: rgb(135, 67, 31) 0px 0px 2px 1px inset; font-size: 12px; border-radius: 5px; color: rgb(249, 222, 155); padding: 2px 10px; cursor: pointer; margin: 2px; transition: transform 0.1s, box-shadow 0.1s; display: block;width:20%;margin-left:10px;">通灵</button>`;
 }
 
+function getTotalDivinedFirstAttributes() {
+    const totalDivined = {
+        endurance: 0,
+        intelligence: 0,
+        strength: 0,
+        agility: 0,
+        faith: 0
+    };
 
+    // 遍历所有已激活的武装
+    Object.values(armsAttributes).forEach(arm => {
+        if (arm.activated && arm.armState?.divinedAttribute) {
+            // 累加每个一级属性的值
+            totalDivined.endurance += arm.armState.divinedAttribute.endurance || 0;
+            totalDivined.intelligence += arm.armState.divinedAttribute.intelligence || 0;
+            totalDivined.strength += arm.armState.divinedAttribute.strength || 0;
+            totalDivined.agility += arm.armState.divinedAttribute.agility || 0;
+            totalDivined.faith += arm.armState.divinedAttribute.faith || 0;
+        }
+    });
+
+    return totalDivined;
+}
+        
 function updateArmInfoDiv(infoDiv, arm, key) {
     let enduranceElement;  // 在函数作用域内声明
 
@@ -25439,39 +25527,45 @@ function calculateCurrentAttributes() {
 
     // 获取宝石增加的一级属性
     const gemFirstAttributes = getGemFirstAttributes();
+    const divinedFirstAttributes = getTotalDivinedFirstAttributes();
 
-    // 计算五个一级属性，加入宝石增益
+    // 计算一级属性，加入通灵增益
     const attributes = {
         endurance: calculateAttribute(qualities.endurance.current, growthRate, petLevel) 
             + bonusAttributes.endurance 
             + awakenAttributes.endurance 
             + additionalAttributes.endurance 
             + pillBonus 
-            + gemFirstAttributes.endurance, // 宝石增益
+            + gemFirstAttributes.endurance
+            + divinedFirstAttributes.endurance,  // 加入通灵增益
         intelligence: calculateAttribute(qualities.intelligence.current, growthRate, petLevel) 
             + bonusAttributes.intelligence 
             + awakenAttributes.intelligence 
             + additionalAttributes.intelligence 
             + pillBonus 
-            + gemFirstAttributes.intelligence, // 宝石增益
+            + gemFirstAttributes.intelligence
+            + divinedFirstAttributes.intelligence,  // 加入通灵增益
         strength: calculateAttribute(qualities.strength.current, growthRate, petLevel) 
             + bonusAttributes.strength 
             + awakenAttributes.strength 
             + additionalAttributes.strength 
             + pillBonus 
-            + gemFirstAttributes.strength, // 宝石增益
+            + gemFirstAttributes.strength
+            + divinedFirstAttributes.strength,  // 加入通灵增益
         agility: calculateAttribute(qualities.agility.current, growthRate, petLevel) 
             + bonusAttributes.agility 
             + awakenAttributes.agility 
             + additionalAttributes.agility 
             + pillBonus 
-            + gemFirstAttributes.agility, // 宝石增益
+            + gemFirstAttributes.agility
+            + divinedFirstAttributes.agility,  // 加入通灵增益
         faith: calculateAttribute(qualities.faith.current, growthRate, petLevel) 
             + bonusAttributes.faith 
             + awakenAttributes.faith 
             + additionalAttributes.faith 
             + pillBonus 
-            + gemFirstAttributes.faith // 宝石增益
+            + gemFirstAttributes.faith
+            + divinedFirstAttributes.faith  // 加入通灵增益
     };
 
     return attributes;
@@ -25502,13 +25596,15 @@ function updateAttributePanel() {
     const skillsArea = document.getElementById("skills-area");
 
     const currentAttributes = attributesForTraning();
+    const divinedFirstAttributes = getTotalDivinedFirstAttributes();
+    
     // 此数组用于更新显示属性左边的总值
     const totalAttributes = {
-        endurance: currentAttributes.endurance + awakenAttributes.endurance + gemFirstAttributes.endurance,
-        intelligence: currentAttributes.intelligence + awakenAttributes.intelligence + gemFirstAttributes.intelligence,
-        strength: currentAttributes.strength + awakenAttributes.strength + gemFirstAttributes.strength,
-        agility: currentAttributes.agility + awakenAttributes.agility + gemFirstAttributes.agility,
-        faith: currentAttributes.faith + awakenAttributes.faith + gemFirstAttributes.faith
+        endurance: currentAttributes.endurance + awakenAttributes.endurance + gemFirstAttributes.endurance + divinedFirstAttributes.endurance,
+        intelligence: currentAttributes.intelligence + awakenAttributes.intelligence + gemFirstAttributes.intelligence + divinedFirstAttributes.intelligence,
+        strength: currentAttributes.strength + awakenAttributes.strength + gemFirstAttributes.strength + divinedFirstAttributes.strength,
+        agility: currentAttributes.agility + awakenAttributes.agility + gemFirstAttributes.agility + divinedFirstAttributes.agility,
+        faith: currentAttributes.faith + awakenAttributes.faith + gemFirstAttributes.faith + divinedFirstAttributes.faith
     };
 
     //console.log("Total Attributes:", totalAttributes);

@@ -2000,6 +2000,7 @@
         
         .battle-system-pet-info, .battle-system-enemy-info {
             border: 1px solid rgba(0, 0, 0, 0.8);
+            padding: 0px;
             margin-bottom: 10px;
             font-size: 12px;
             flex: 1;
@@ -2008,8 +2009,8 @@
             line-height: 14px;
             min-height50%: 5;
             flex-direction: column;
+            align-items: center;
             border-radius: 2px;
-            padding: 2px;
         }
         /* 非暴击时，快速渐进渐出 */
         .normal-hit-animation {
@@ -3250,9 +3251,9 @@
             <div class="battle-system-info-wrapper">
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
-                    <div style="display: flex;justify-content: center;position:relative;border-radius: 5px;padding: 2px;height: 60px;align-items: center;">
+                    <div style="display: flex;justify-content: center;position:relative;align-items: center;border-radius: 5px;padding: 2px;height: 60px;">
                         <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
-                        <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 100%;height: 60px;">
+                        <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
                             <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
                             <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
                             <div style="margin-bottom: 5px;margin-top:5px;position: relative;width: 100%;min-height: 12px;background-color: #35472C;border: 1px solid black;overflow: hidden;" id="exp-bar-container">
@@ -3267,7 +3268,7 @@
                     <div id="visualEffectsContainer">
                         <div id="enemyEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;justify-content: space-around;">
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="your-pet-physical-attack"></span></p>
                         <p>🧙法攻: <span id="your-pet-magic-attack"></span></p>
@@ -3286,9 +3287,9 @@
                 </div>
                 <div class="battle-system-enemy-info">
                     <h2><span id="enemy-name">邪佞</span> lv<span id="enemy-level">1</span></h2>
-                    <div style="display: flex;justify-content: center;position:relative;border-radius: 5px;padding: 2px;height: 60px;align-items: center;">
+                    <div style="display: flex;justify-content: center;position:relative;align-items: center;border-radius: 5px;padding: 2px;height: 60px;">
                         <img id="enemy-image" onclick="autoBattle()" src="https://pic.imgdb.cn/item/6678135ed9c307b7e9060dd6.gif" alt="邪佞" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
-                        <div id="enemy-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 100%;height: 60px;">
+                        <div id="enemy-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
                             <span style="margin-top:5px;" id="enemy-pet-health"></span><span id="enemy-max-health"></span>
                             <span style="margin-top:5px;" id="enemy-pet-mana"></span><span id="enemy-max-mana"></span>
                             <div style="margin-bottom: 5px; margin-top:5px; position: relative; width: 100%; min-height: 12px; background-color: #35472C; border: 1px solid black;" id="enemy-speed-container">
@@ -3303,7 +3304,7 @@
                     <div id="visualEffectsContainer">
                         <div id="playerEffect" class="visual-effect"></div>
                     </div>
-                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;justify-content: space-around;">
+                    <div style="line-height: 16px;display: flex;flex-direction: row;flex-wrap: nowrap;text-align: left;gap: 5px;text-wrap: nowrap;overflow-x: hidden;margin-bottom: 10px;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;padding: 5px;">
                     <div style="width: 85px;">
                         <p>🗡物攻: <span id="enemy-pet-physical-attack"></span></p>
                         <p>🧙法攻: <span id="enemy-pet-magic-attack"></span></p>
@@ -18251,12 +18252,22 @@ function getRandomDivinedAttribute() {
 }
 
 // 检查是否有任何通灵属性
+// 修改检查函数以同时支持一级和二级属性
 function hasAnyDivinedAttribute(arm) {
     if (!arm.armState?.divinedAttribute) return false;
     
-    return Object.values(arm.armState.divinedAttribute).some(values => 
-        values.fixed > 0 || values.percentage > 0
-    );
+    for (const [attr, value] of Object.entries(arm.armState.divinedAttribute)) {
+        // 检查一级属性（数字类型且大于0）
+        if (typeof value === 'number' && value > 0) {
+            return true;
+        }
+        // 检查二级属性（对象类型且fixed或percentage大于0）
+        if (typeof value === 'object' && value !== null && 
+            (value.fixed > 0 || value.percentage > 0)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // 通灵函数修改为使用 currentKey
@@ -18287,86 +18298,85 @@ function refreshDivinedAttributes() {
         return;
     }
 
-    showInfoBox(
-        '是否消耗一瓶无上养元水进行通灵？通灵将重置当前的通灵属性！',
-        () => {
-            if (useItem('spiritualWater', 1)) {
-                // 重置二级属性
-                Object.keys(arm.armState.divinedAttribute).forEach(key => {
-                    if (typeof arm.armState.divinedAttribute[key] === 'object') {
-                        arm.armState.divinedAttribute[key] = {
-                            fixed: 0,
-                            percentage: 0
-                        };
-                    } else {
-                        arm.armState.divinedAttribute[key] = 0; // 重置一级属性
-                    }
-                });
+    useItem('spiritualWater', 1);
+    
+    // 先生成新的通灵结果但不应用
+    const attributeCount = getWeightedRandomCount();
+    const newAttributes = [];
+    for (let i = 0; i < attributeCount; i++) {
+        newAttributes.push(getRandomDivinedAttribute());
+    }
 
-                const attributeCount = getWeightedRandomCount();
-                const newAttributes = [];
-                for (let i = 0; i < attributeCount; i++) {
-                    newAttributes.push(getRandomDivinedAttribute());
-                }
+    // 构建显示文本
+    const attributeDisplay = newAttributes.map(attr => {
+        if (attr.isFirstAttribute) {
+            return `+${attr.value} ${translateAttribute(attr.attribute)}`;
+        } else if (attr.isPercentage) {
+            return `+${(attr.value * 1000).toFixed(0)}‰ ${translateAttribute(attr.attribute)}`;
+        } else {
+            return `+${attr.value} ${translateAttribute(attr.attribute)}`;
+        }
+    }).join('\n');
 
-                // 分别处理一级和二级属性
-                const mergedAttributes = {};
-                newAttributes.forEach(attr => {
-                    if (attr.isFirstAttribute) {
-                        // 一级属性直接累加
-                        if (!mergedAttributes[attr.attribute]) {
-                            mergedAttributes[attr.attribute] = 0;
-                        }
-                        mergedAttributes[attr.attribute] += attr.value;
-                    } else {
-                        // 二级属性保持原有逻辑
-                        if (!mergedAttributes[attr.attribute]) {
-                            mergedAttributes[attr.attribute] = {
-                                fixed: 0,
-                                percentage: 0
-                            };
-                        }
-                        if (attr.isPercentage) {
-                            mergedAttributes[attr.attribute].percentage += attr.value;
-                        } else {
-                            mergedAttributes[attr.attribute].fixed += attr.value;
-                        }
-                    }
-                });
-
-                // 更新属性
-                Object.entries(mergedAttributes).forEach(([attr, value]) => {
-                    arm.armState.divinedAttribute[attr] = value;
-                });
-
-                // 构建显示文本
-                const attributeDisplay = newAttributes.map(attr => {
-                    if (attr.isFirstAttribute) {
-                        return `+${attr.value} ${translateAttribute(attr.attribute)}`;
-                    } else if (attr.isPercentage) {
-                        return `+${(attr.value * 1000).toFixed(0)}‰ ${translateAttribute(attr.attribute)}`;
-                    } else {
-                        return `+${attr.value} ${translateAttribute(attr.attribute)}`;
-                    }
-                }).join('\n');
-
-                updateDivinedDisplay(arm);
-                showInfoBox(`通灵成功！获得以下属性：\n${attributeDisplay}`);
-                
-                // 更新全局变量和显示
-                window.divinedFirstAttributes = {
-                    endurance: arm.armState.divinedAttribute.endurance || 0,
-                    intelligence: arm.armState.divinedAttribute.intelligence || 0,
-                    strength: arm.armState.divinedAttribute.strength || 0,
-                    agility: arm.armState.divinedAttribute.agility || 0,
-                    faith: arm.armState.divinedAttribute.faith || 0
-                };
-                
-                updateAttributePanel();
+    // 创建临时合并结果（不应用）
+    const mergedAttributes = {};
+    newAttributes.forEach(attr => {
+        if (attr.isFirstAttribute) {
+            if (!mergedAttributes[attr.attribute]) {
+                mergedAttributes[attr.attribute] = 0;
             }
+            mergedAttributes[attr.attribute] += attr.value;
+        } else {
+            if (!mergedAttributes[attr.attribute]) {
+                mergedAttributes[attr.attribute] = {
+                    fixed: 0,
+                    percentage: 0
+                };
+            }
+            if (attr.isPercentage) {
+                mergedAttributes[attr.attribute].percentage += attr.value;
+            } else {
+                mergedAttributes[attr.attribute].fixed += attr.value;
+            }
+        }
+    });
+
+    // 显示结果并等待玩家确认
+    showInfoBox(
+        `得到新的通灵属性：\n\n${attributeDisplay}\n\n是否保存此次通灵结果？`,
+        () => {
+            // 重置二级属性
+            Object.keys(arm.armState.divinedAttribute).forEach(key => {
+                if (typeof arm.armState.divinedAttribute[key] === 'object') {
+                    arm.armState.divinedAttribute[key] = {
+                        fixed: 0,
+                        percentage: 0
+                    };
+                } else {
+                    arm.armState.divinedAttribute[key] = 0; // 重置一级属性
+                }
+            });
+
+            // 应用新属性
+            Object.entries(mergedAttributes).forEach(([attr, value]) => {
+                arm.armState.divinedAttribute[attr] = value;
+            });
+
+            // 更新全局变量和显示
+            window.divinedFirstAttributes = {
+                endurance: arm.armState.divinedAttribute.endurance || 0,
+                intelligence: arm.armState.divinedAttribute.intelligence || 0,
+                strength: arm.armState.divinedAttribute.strength || 0,
+                agility: arm.armState.divinedAttribute.agility || 0,
+                faith: arm.armState.divinedAttribute.faith || 0
+            };
+
+            // 更新显示
+            updateDivinedDisplay(arm);
+            updateAttributePanel();
         },
         null,
-        'red'
+        'black'
     );
 }
 

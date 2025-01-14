@@ -1022,7 +1022,6 @@
             color: #87431f;
             font-size: 16px;
             height: 100%;
-            background-image: url('https://pic.imgdb.cn/item/66ea60acf21886ccc04b6877.jpg');
             background-position: center;
             background-size: cover;
             background-repeat: no-repeat;
@@ -1046,6 +1045,62 @@
             border: 1px solid black;
             padding: 5px;
             justify-content: space-between;
+            min-height: 480px;
+        }
+        .highlight-investment {
+          position: relative;
+          /* 保持按钮原有样式 */
+          /* 添加动画效果 */
+          animation: pulse 2s infinite;
+        }
+        
+        /* 创建光环效果 */
+        .highlight-investment::after {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          border-radius: inherit; /* 继承按钮的圆角 */
+          background: #ffd70038;
+          z-index: -1;
+          animation: glow 2s infinite;
+        }
+        
+        /* 脉冲动画 */
+        @keyframes pulse {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        
+        /* 光环动画 */
+        @keyframes glow {
+          0% {
+            opacity: 0.5;
+            box-shadow: 0 0 5px #ffd700,
+                        0 0 10px #ffd700,
+                        0 0 15px #ffd700;
+          }
+          50% {
+            opacity: 1;
+            box-shadow: 0 0 10px red,
+                        0 0 20px red,
+                        0 0 30px red;
+          }
+          100% {
+            opacity: 0.5;
+            box-shadow: 0 0 5px #ffd700,
+                        0 0 10px #ffd700,
+                        0 0 15px #ffd700;
+          }
         }
         .select-gadgets {
             position: fixed;
@@ -3060,7 +3115,7 @@
             </div>
     </div>
     <div class="scalping-display" id="scalping-display" style="display:none;">
-        <div id="scalping-display-container" style="max-height: 768px;width: 385px;display: flex;flex-direction: column;align-items: center;justify-content: center;">
+        <div id="scalping-display-container" style="max-height: 768px;display: flex;flex-direction: column;align-items: center;justify-content: center;">
             <div id="scalping-head" class="drawer-toggle" style="font-weight:bold;padding:5px;width: 100%;height:20px;display: flex;flex-direction: row;justify-content: space-between;align-items: center;"><button id="scalping-description" class="scalping-head-button" onclick="showInfoScalping()" style="margin-left:5px;">?</button><div>自由经商（积分：<span id="scalping-score">0</span>）</div><button id="close-scalping-button" onclick="openScalping(true)" class="scalping-head-button" style="margin-right:5px">x</button></div>
             <div class="scalping-container" id="scalping-container" >
                 <div style="width: 100%;display: flex;flex-direction: column;align-items: center;gap: 10px;margin-top: 5px;" id="scalping-upper-area">
@@ -3079,7 +3134,7 @@
                         </div>
                         <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
                             <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: row;align-items: center;">
-                                <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">经商法宝</button>
+                                <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">法宝</button>
                                 <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
                                     <!-- 动态生成法宝 -->
                                 </div>

@@ -439,23 +439,25 @@
 
         /* 顶部栏样式 */
         .top-bar {
-            width: 90%;
-            margin: 5px 5px;
-            padding: 5px;
-            background-color: rgb(255 255 255 / 41%);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            border-radius: 10px;
             flex-direction: row;
             flex-wrap: nowrap;
-            border: 1px groove white;
+            padding: 4px;
+            background-color: #DFBF6E;
+            color: #92341c;
+            background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
+            background-repeat: repeat;
+            background-size: auto;
+            border: 2px double #93341d;
+            box-shadow: inset 0px 0px 1px 1px #92341C;
         }
         
         .top-bar div {
             display: flex;
             font-size: 12px;
-            color: #5d4201;
+            color: #93341d;
             align-items: center;
             flex-direction: column;
         }
@@ -631,6 +633,7 @@
           background: #6f391c;
           border-radius: 2px;
           color: #92341c;
+          z-index: 9999;
         }
         .skill-detail-panel {
           font-size: 14px;
@@ -777,7 +780,7 @@
             gap: 4px;
             display: flex;
             flex-direction: column;
-            padding: 10px 20px 0px 20px;
+            padding: 10px 20px 10px 20px;
             margin: 0px 5px;
             min-height: 80px;
             align-items: stretch;
@@ -897,6 +900,7 @@
             border-radius: 10px 10px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s;
+            z-index: 9999;
         }
         .quality-drawer.open {
             transform: translateY(0);
@@ -948,6 +952,7 @@
             border-radius: 10px 10px 0 0;
             transition: transform 0.3s;
             transform: translateY(100%);
+            z-index: 9999;
         }
         .shop-drawer.open {
             transform: translateY(0);
@@ -1250,6 +1255,7 @@
             border-radius: 10px 10px 0 0;
             transition: transform 0.3s;
             transform: translateY(100%);
+            z-index: 1000;
         }
         .attribute-drawer.open {
             transform: translateY(0);
@@ -1439,6 +1445,7 @@
             border-radius: 10px 10px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s;
+            z-index: 9999;
         }
         .treasure-drawer.open {
             transform: translateY(0);
@@ -1664,6 +1671,7 @@
             transform: translateY(100%);
             transition: transform 0.3s;
             align-content: center;
+            z-index: 9999;
         }
         .jinnang-drawer.open {
             transform: translateY(0);
@@ -1674,6 +1682,7 @@
             background-repeat: repeat;
             background-size: auto;
             border: 1px solid black;
+            z-index: 9999;
         }
         .jinnang-info {
             padding: 5px;
@@ -1757,6 +1766,7 @@
             display: flex;
             background-position: center;
             flex-direction: column;
+            z-index: 9999;
         }
         
         .lottery-drawer.open {
@@ -2888,45 +2898,45 @@
         </div>
         <div class="skills" id="skills-area"></div>
     </div>
-    <div class="top-bar">
-        <div>
-            <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
-            <div>悟性丹</div>
-            <div><span id="high-grade-pill">100</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png" alt="万化灵丹">
-            <div>万化灵丹</div>
-            <div><span id="transmutation-pill">20</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
-            <div>还童丹</div>
-            <div><span id="reborn-pill">20</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png" alt="还童金丹">
-            <div>还童金丹</div>
-            <div><span id="golden-reborn-pill">5</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png" alt="冰魄还童丹">
-            <div>冰魄丹</div>
-            <div><span id="bingpo-reborn-pill">5</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
-            <div>资质金丹</div>
-            <div><span id="quality-pill">20</span></div>
-        </div>
-        <div>
-            <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
-            <div>灵异丹</div>
-            <div><span id="miraculous-pill">1</span></div>
-        </div>
-    </div>
     <div class="quality-drawer" id="quality-drawer">
         <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
+        <div id='top-bar-items-panel' class="top-bar">
+                <div>
+                    <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
+                    <div>悟性丹</div>
+                    <div><span id="high-grade-pill">100</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png" alt="万化灵丹">
+                    <div>万化灵丹</div>
+                    <div><span id="transmutation-pill">20</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
+                    <div>还童丹</div>
+                    <div><span id="reborn-pill">20</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png" alt="还童金丹">
+                    <div>还童金丹</div>
+                    <div><span id="golden-reborn-pill">5</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png" alt="冰魄还童丹">
+                    <div>冰魄丹</div>
+                    <div><span id="bingpo-reborn-pill">5</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
+                    <div>资质金丹</div>
+                    <div><span id="quality-pill">20</span></div>
+                </div>
+                <div>
+                    <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
+                    <div>灵异丹</div>
+                    <div><span id="miraculous-pill">1</span></div>
+                </div>
+            </div>
         <div class="quality-info" id="quality-info">
             <div class="drawer-container">
                 <div class="quality-container">
@@ -3110,6 +3120,7 @@
                 <div id="credit-shop-description" class="jinnang-description-box">花费金子购买商城道具时会获得积分，积分可以购买某些道具。</div>
                 <div class="shop-bar" style="justify-content:space-around;">
                     <button id="buy-credit-item" onClick="buyCreditItems()">购买商品</button>
+                    <button id="exchange-credit" onClick="exchangeCredit()">兑换积分</button>
                     <div id="credit-box" style="background: #69482B;padding: 2px 2px;box-shadow: inset 0px 0px 2px 0px #69482B;border: 1px solid #6f391c;display: flex;align-items: center;"><div style="background: #B19768;padding: 2px;margin-right: 2px;color: white;box-shadow: inset 0px 0px 2px 1px #E3D8B9;text-shadow: -1px -1px 0 #693331, 1px -1px 0 #693331, -1px 1px 0 #693331, 1px 1px 0 #693331;font-size: 14px;">当前积分:</div><span id="credit-detail" style="color: white; background: rgb(57, 87, 89); box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset; padding: 2px; font-size: 14px;"></span></div>
                 </div>
             </div>
@@ -3318,8 +3329,8 @@
                 <div class="battle-system-pet-info">
                     <h2><span id="your-pet-name">小金牛</span> lv<span id="your-pet-level">1</span></h2>
                     <div style="display: flex;justify-content: center;position:relative;align-items: center;border-radius: 5px;padding: 2px;height: 60px;">
-                        <img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;">
-                        <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;">
+                        <div id='your-pet-color'><img id="your-pet-image" src="https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif" alt="小金牛" style="width: 50px;height: 50px;box-shadow: black 0px 0px 2px 0px;cursor: pointer;"></div>
+                        <div id="player-progress-container" style="display:flex;flex-direction:column;justify-content: flex-start;align-items: stretch;margin-left: 5px;width: 120px;height: 60px;z-index:1;">
                             <span style="margin-top:5px;" id="your-pet-health"></span><span id="your-pet-max-health"></span>
                             <span style="margin-top:5px;" id="your-pet-mana"></span><span id="your-pet-max-mana"></span>
                             <div style="margin-bottom: 5px;margin-top:5px;position: relative;width: 100%;min-height: 12px;background-color: #35472C;border: 1px solid black;overflow: hidden;" id="exp-bar-container">
@@ -3549,6 +3560,7 @@
                     </select>
                 </div>
             </div>
+            <div style="cursor:pointer;">名字： <span id='personalized-name'>小金牛</span></div>
             <div>当前称号： <span id="personal-honor">初来乍到</span></div>
             <div>游戏版本： <span id="game-version">V2.1.2</span></div>
             <div id="loadContainer" style="display:flex; justify-content: space-around; width: 100%;">

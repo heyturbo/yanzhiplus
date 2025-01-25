@@ -1750,16 +1750,14 @@
         .lottery-drawer {
             position: fixed;
             margin: 0px 0px 0px 0px;
-            padding: 20px 0px 0px 0px;
             bottom: 0px;
-            width: 95%;
+            width: 100%;
             background-color: rgb(255 255 255 / 90%);
             
              /* 图片平铺 */
              /* 保持原图大小 */
              /* 背景固定 */
             box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-            border-radius: 10px 10px 0 0;
             transform: translateY(100%);
             transition: transform 0.3s;
             max-height: 90%;
@@ -1787,41 +1785,50 @@
         }
         
         .lottery-top {
-            margin-bottom: 0px;
-            display: flex;
+        display: flex;
+        gap: 5px;
+        justify-content: space-between;
+        flex-wrap: nowrap;
         }
         .lottery-middle {
             margin-bottom: 0px;
             width: auto;
             align-items: center;
             padding: 5px;
+            gap: 20px;
         }
         .lottery-bottom {
             margin-bottom: 0px;
-            width: auto;
+            width: 90%;
             padding: 5px;
         }
         .lottery-footer {
             margin-bottom: 10px;
+            margin-top: 10px;
             width: 100%;
             display: flex;
         }
         .lottery-box {
-            border: 1px solid #e0e0e0;
-            border-radius: 5px;
-            padding: 0px;
-            margin: 5px 0;
-            text-align: justify;
-            background-color: #f9f9f9;
-            font-weight: bold;
+        overflow: hidden;
+        display: flex;
+        margin-bottom: 0px;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        background: rgb(57, 87, 89);
+        box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+        padding: 2px 4px;
+        font-size: 14px;
+        min-width: 20%;
         }
         .lottery-number-box {
             font-weight: bold;
             width: 100%;
         }
         .lottery-number-box {
-            border-radius: 5px;
-            margin: 15px 0;
+            /* border-radius: 5px; */
+            margin: 5px 0;
             text-align: center;
             background-color: hwb(0deg 98% 2% / 50%);
         }
@@ -1834,7 +1841,7 @@
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            border: 1px dotted rgb(0 0 0);
+            border: 1px solid rgb(0 0 0);
         }
         
         #lotteryNumberButtons button {
@@ -1856,7 +1863,7 @@
         
         .lottery-controls {
             display: flex;
-            justify-content: center;
+            justify-content: space-evenly;
             gap: 0px 10px;
             padding: 5px;
             flex-direction: row;
@@ -3282,42 +3289,51 @@
         </div>
     </div>
 
-    <div class="lottery-drawer" id="lotteryDrawer">        
-        <div class="lottery-section lottery-top">
-            <div class="lottery-box" id="lotteryPrizePool" style="display:none;">奖池: 无上限奖池</div>
-            <div class="lottery-box" id="lotteryResultAmount">积累奖金: 0</div>
-            <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
-            <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
-        </div>
-        <div class="lottery-section lottery-middle">
-            <div class="lottery-number-box" id="lotteryDrawResults">开奖区: </div>
-            <div class="lottery-number-box" id="lastSelectedNumbers">上次选号: </div>
-            <div class="lottery-number-box" id="lotteryAvailableNumbers" style="display: flex;flex-direction: column;">备选区: 
-                <div id="lotteryNumberButtons"></div>
-            </div>
-            <div class="lottery-controls">
-                <button id="lotteryIncreaseBet100" style="background-color: #4ec149;color: white;border-radius: 50%;width: 50px;height: 50px;padding: 5px;box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.5);">+ 100</button>
-                <button id="lotteryIncreaseBet">+ 500</button>
-                <button id="lotteryBetButton">投注</button>
-                <button id="lotteryIncreaseThousandBet">+1000</button>
-                <button id="lotteryIncreaseBet5000" style="background-color: darkred;color: white;border-radius: 50%;width: 50px;height: 50px;padding: 5px;box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.5);">+ 5000</button>
-                <!-- 规则信息框 -->
-                <div id="lotteryRuleModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <div id="ruleContent"></div>
+    <div class="lottery-drawer" id="lotteryDrawer">
+        <div class="drawer-toggle" id="lottery-top-bar" onclick="toggleLotteryDrawer()">彩票铺子🌈</div>
+        <!--div class="lottery-section lottery-top"-->
+        <div class="attribute-info open" id="lottery-content-container">
+            <div class="drawer-container" id="lottery-inpage-decorations">
+                <div class="lottery-section lottery-top" id="lottery-top">
+                    <div class="lottery-box" id="lotteryPrizePool" style="display:none;">奖池: 无上限奖池</div>
+                    <div class="lottery-box" id="lotteryResultAmount">积累奖金: 0</div>
+                    <div class="lottery-box" id="lotteryBetCount">投注数: 0</div>
+                    <div class="lottery-box" id="lotteryBetAmount">投注金: 0</div>
+                </div>
+                <div class="lottery-section lottery-top" id="lottery-numbers">
+                    <div class="lottery-number-box" id="lotteryDrawResults">开奖区: </div>
+                    <div class="lottery-number-box" id="lastSelectedNumbers">买定区: </div>
+                </div>
+                <div class="lottery-section lottery-middle">
+
+                    <div class="lottery-number-box" id="lotteryAvailableNumbers" style="display: flex;flex-direction: column;"> 
+                        <div class="lottery-section lottery-bottom">
+                            <div class="lottery-number-box" id="lotterySelectedNumbers">已选: </div>
+                        </div>
+                        <div id="lotteryNumberButtons"></div>
+                    </div>
+                    <div class="lottery-controls">
+                        <button id="lotteryIncreaseBet100" style="background-color: #4ec149;color: white;border-radius: 50%;width: 50px;height: 50px;padding: 5px;box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.5);">+ 100</button>
+                        <button id="lotteryIncreaseBet">+ 500</button>
+                        <button id="lotteryBetButton">投注</button>
+                        <button id="lotteryIncreaseThousandBet">+1000</button>
+                        <button id="lotteryIncreaseBet5000" style="background-color: darkred;color: white;border-radius: 50%;width: 50px;height: 50px;padding: 5px;box-shadow: 0px 0px 6px 1px rgba(0, 0, 0, 0.5);">+ 5000</button>
+                        <!-- 规则信息框 -->
+                        <div id="lotteryRuleModal" class="modal">
+                            <div class="modal-content">
+                                <span class="close">&times;</span>
+                                <div id="ruleContent"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
+                <div class="lottery-section lottery-footer">
+                    <button id="lotteryClaimPrize">领奖</button>
+                    <button id="lotteryRuleButton">规则</button>
+                    <button id="clearBet" onclick="clearBet()">赎回</button>
+                </div>
             </div>
-        </div>
-        <div class="lottery-section lottery-bottom">
-            <div class="lottery-number-box" id="lotterySelectedNumbers">已选: </div>
-            
-        </div>
-        <div class="lottery-section lottery-footer">
-            <button id="lotteryClaimPrize">领奖</button>
-            <button id="lotteryRuleButton">规则</button>
-            <button id="closeLottry" onclick="toggleLotteryDrawer()">退出</button>
         </div>
     </div>
     <div id="fightingDrawer" class="battle-system-drawer">
@@ -3542,6 +3558,7 @@
             </div>
             <div class="treasure-action">
                 <button id="buySummonCharmButton" class="treasure-action button">购买灵符</button>
+                <button id="exchangeStampButton" onclick="exchangeStamp()" class="treasure-action button">兑换印花</button>
                 <button id="closePetShop" class="treasure-action button">关闭商店</button>
             </div>
         </div>

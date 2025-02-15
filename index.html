@@ -450,8 +450,9 @@
             background-image: url(https://pic.imgdb.cn/item/663885620ea9cb14033e4f6e.png);
             background-repeat: repeat;
             background-size: auto;
-            border: 2px double #93341d;
-            box-shadow: inset 0px 0px 1px 1px #92341C;
+            border: 2px solid #93341d;
+            margin: 4px;
+            font-weight: bold;
         }
         
         .top-bar div {
@@ -1396,9 +1397,12 @@
              /* 使两个子容器分布在容器的两边 */
             gap: 2px; /* 调整两列之间的间距 */
             padding: 2px;
-            width: 100%;
+            width: auto;
             flex-direction: row;
             justify-content: space-between;
+            border: 2px solid #92341c;
+            margin: 4px;
+            font-weight: bold;
         }
         
         .quality-details {
@@ -2910,53 +2914,54 @@
     </div>
     <div class="quality-drawer" id="quality-drawer">
         <div class="drawer-toggle" onclick="toggleDrawer()">宠物资质</div>
-        <div id='top-bar-items-panel' class="top-bar">
-                <div>
-                    <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
-                    <div>悟性丹</div>
-                    <div><span id="high-grade-pill">100</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png" alt="万化灵丹">
-                    <div>万化灵丹</div>
-                    <div><span id="transmutation-pill">20</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
-                    <div>还童丹</div>
-                    <div><span id="reborn-pill">20</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png" alt="还童金丹">
-                    <div>还童金丹</div>
-                    <div><span id="golden-reborn-pill">5</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png" alt="冰魄还童丹">
-                    <div>冰魄丹</div>
-                    <div><span id="bingpo-reborn-pill">5</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
-                    <div>资质金丹</div>
-                    <div><span id="quality-pill">20</span></div>
-                </div>
-                <div>
-                    <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
-                    <div>灵异丹</div>
-                    <div><span id="miraculous-pill">1</span></div>
-                </div>
-            </div>
+        
         <div class="quality-info" id="quality-info">
             <div class="drawer-container">
+                <div id='top-bar-items-panel' class="top-bar">
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208aea.png" alt="高级悟性丹">
+                        <div>悟性丹</div>
+                        <div><span id="high-grade-pill">100</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/66541c01d9c307b7e9208add.png" alt="万化灵丹">
+                        <div>万化灵丹</div>
+                        <div><span id="transmutation-pill">20</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca6423.png" alt="神兽还童丹">
+                        <div>还童丹</div>
+                        <div><span id="reborn-pill">20</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/6655a92ad9c307b7e9c04265.png" alt="还童金丹">
+                        <div>还童金丹</div>
+                        <div><span id="golden-reborn-pill">5</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/665ef0855e6d1bfa055800f4.png" alt="冰魄还童丹">
+                        <div>冰魄丹</div>
+                        <div><span id="bingpo-reborn-pill">5</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/6654a944d9c307b7e9ca63f5.png" alt="资质重生丹">
+                        <div>资质金丹</div>
+                        <div><span id="quality-pill">20</span></div>
+                    </div>
+                    <div>
+                        <img src="https://pic.imgdb.cn/item/66556068d9c307b7e9681672.png" alt="灵异金丹">
+                        <div>灵异丹</div>
+                        <div><span id="miraculous-pill">1</span></div>
+                    </div>
+                </div>
                 <div class="quality-container">
                     <div class="quality-details">
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">名称: <span id="quality-name">小金牛</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">品质: <span id="quality-tier">普通</span></div>
-                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">成长率: <span id="quality-growth-rate">100%</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">成长: <span id="quality-growth-rate">100%</span></div>
                         <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-start;">变异: <span id="quality-mutated">未变异</span></div>
-                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">进化等级: <span id="evolution-level">0</span></div>
-                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">当前悟性: <span id="current-wisdom">0</span></div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: center;">进化: <span id="evolution-level">0</span>级</div>
+                        <div style="display: flex;gap: 10px;flex-direction: row;align-items: center;width: 100%;justify-content: flex-end;">悟性: <span id="current-wisdom">0</span></div>
                     </div>
                 </div>
                 <div class="quality-bar-container">

@@ -404,6 +404,7 @@
             font-size: 24px;
             flex-direction: column;
             cursor: not-allowed;
+            display: none;
         }
 
         #baiyinOverlay {
@@ -1339,6 +1340,7 @@
             gap: 10px;
             text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
             height: 100px;
+            margin: 5px;
         }
 
         .skills-in-drawer div{
@@ -1358,6 +1360,34 @@
             background-image: url(https://pic1.imgdb.cn/item/677f9b49d0e0a243d4f29b0c.png);
             background-position: center;
         }
+
+        .elixir-system-panel {
+        display: flex;
+        padding: 10px;
+        background-color: #3a575b;
+        box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
+        color: white;
+        border: 1px black;
+        justify-items: center;
+        gap: 10px;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+        height: 100px;
+        margin: 5px;
+        justify-content: space-between;
+        }
+
+        .elixir-system-button {display: flex;flex-direction: column;justify-content: space-between;height: 100%;font-size: 12px;width: 100%;}
+
+        .elixir-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+        
+        .elixir-squares {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+}
         
         .image-frame {
             display: flex;
@@ -2831,6 +2861,8 @@
 .info-text {
     flex-grow: 1;
 }
+
+
    </style>
 </head>
 <body>
@@ -3091,6 +3123,22 @@
                     </div>
                 </div>
                 <div class='skills-in-drawer' id='skills-in-drawer'></div>
+                <!--内丹系统-->
+                <div class='elixir-system-panel' id='elixir-system'>
+                    <div class='elixir-container' id='elixir-container'>
+                        <div class='elixir-squares' id='1st-elixir-squares'></div>
+                        <div class='elixir-squares' id='2nd-elixir-squares'></div>
+                        <div class='elixir-squares' id='3rd-elixir-squares'></div>
+                    </div>
+                    <div class="elixir-system-button" id='elixir-button'>
+                        <button onclick="equipElixir()" style="font-size: 12px;">装备内丹</button>
+                        <button onclick="disgorge()" style="font-size: 12px;">吐出内丹</button>
+                        <button onclick="engulf()" style="font-size: 12px;">吞噬物品</button>
+                        <button onclick="internalize()" style="font-size: 12px;">消化内丹</button>
+                        <button onclick="invigorate()" style="font-size: 12px;">补充元气</button>
+                    </div>
+                </div>
+                <!--内丹系统-->
                 <div class="button-grid">
                     <button onclick="trainAttributes()">金子培养</button>
                     <button onclick="trainSkills()">洗练技能</button>
@@ -3154,13 +3202,13 @@
                         </div>
                     </div>
                     <div class="scalping-asset-area" id="scalping-asset-area">
-                        <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;width: 40%;overflow: hidden;text-wrap: nowrap;font-size: 12px;">
-                            <div>💵 现金流：<span id="current-cash">0</span></div>
-                            <div>🗃 总资产：<span id="net-asset">0</span></div>
+                        <div style="display: flex;flex-direction: column;gap: 5px;font-weight: bold;width: 40%;overflow: hidden;text-wrap: nowrap;font-size: 14px;">
+                            <div>💵 现金：<span id="current-cash">0</span></div>
+                            <div>🗃 资产：<span id="net-asset">0</span></div>
                         </div>
                         <div id="scalping-gadgets-container" style="font-size: 12px;font-weight: bold;">
                             <div style="margin-top: 5px;margin-bottom: 5px;display: flex;gap: 2px;flex-direction: row;align-items: center;">
-                                <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">法宝</button>
+                                <button id="add-scalping-gadgets" onclick="selectSaclpingGadgets()">使用法宝</button>
                                 <div id="applied-scalping-gadgets" style="display: flex;gap: 2px;flex-direction: row;flex-wrap: nowrap;">
                                     <!-- 动态生成法宝 -->
                                 </div>

@@ -1301,7 +1301,6 @@
             font-size: 14px;
             flex-direction: row;
             justify-content: space-between;
-            min-height: 300px;
             background-size: cover;
             margin-bottom: 5px;
             margin-top: 5px;
@@ -1363,7 +1362,7 @@
 
         .elixir-system-panel {
         display: flex;
-        padding: 10px;
+        padding: 2px;
         background-color: #3a575b;
         box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;
         color: white;
@@ -1376,7 +1375,7 @@
         justify-content: space-between;
         }
 
-        .elixir-system-button {display: grid;grid-template-columns: repeat(2, 3fr);justify-content: space-between;font-size: 12px;align-items: center;align-content: space-between;width: 100px;}
+        .elixir-system-button {display: grid;grid-template-columns: repeat(2, 3fr);justify-content: space-between;font-size: 12px;align-items: center;align-content: space-between;width: 100px;padding: 2px;}
 
         .elixir-container {
     display: flex;
@@ -2665,6 +2664,16 @@
     background-size: auto;
     border: 1px solid black;
 }
+
+.drawer-sub-container {
+    display:flex;
+    flex-direction: column;
+    max-height: 500px;
+    overflow-y: scroll;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+
 /* 通用弹出面板样式 */
 .mission-popup-panel, .summon-popup-panel, .pet-shop-popup-panel {
     height: 500px;
@@ -3059,87 +3068,89 @@
         <div class="drawer-toggle" onclick="toggleAttributeDrawer()">属性</div>
         <div class="attribute-info" id="attribute-info">
             <div class="drawer-container">
-                <div class="attributes-container">
-                    <div class="progress-bars">
-                        <div class="progress-bar">
-                            等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
+                <div class="drawer-sub-container">
+                    <div class="attributes-container">
+                        <div class="progress-bars">
+                            <div class="progress-bar">
+                                等级: <span id="pet-level">1</span><button onclick="absorbExperience()">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                成长率: <span id="attribute-growth-rate"></span><button onclick="infoChengzhanglv()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                寿命: <span id="attribute-life-span"></span><button onclick="infoShouming()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                潜力点: <span id="remaining-points-display"></span><button onclick="infoQianlidian()">?</button>
+                            </div>
+                            <div class="progress-bar">
+                                耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                智力: <span id="attribute-intelligence"></span><span id="bonusAttribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                强壮: <span id="attribute-strength"></span><span id="bonusAttribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                敏捷: <span id="attribute-agility"></span><span id="bonusAttribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">+</button>
+                            </div>
+                            <div class="progress-bar">
+                                信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
+                            </div>
                         </div>
-                        <div class="progress-bar">
-                            品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            成长率: <span id="attribute-growth-rate"></span><button onclick="infoChengzhanglv()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            寿命: <span id="attribute-life-span"></span><button onclick="infoShouming()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            潜力点: <span id="remaining-points-display"></span><button onclick="infoQianlidian()">?</button>
-                        </div>
-                        <div class="progress-bar">
-                            耐力: <span id="attribute-endurance"></span><span id="bonusAttribute-endurance"></span><button class="increase-btn" onclick="increaseBonusAttribute('endurance')">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            智力: <span id="attribute-intelligence"></span><span id="bonusAttribute-intelligence"></span><button class="increase-btn" onclick="increaseBonusAttribute('intelligence')">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            强壮: <span id="attribute-strength"></span><span id="bonusAttribute-strength"></span><button class="increase-btn" onclick="increaseBonusAttribute('strength')">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            敏捷: <span id="attribute-agility"></span><span id="bonusAttribute-agility"></span><button class="increase-btn" onclick="increaseBonusAttribute('agility')">+</button>
-                        </div>
-                        <div class="progress-bar">
-                            信仰: <span id="attribute-faith"></span><span id="bonusAttribute-faith"></span><button class="increase-btn" onclick="increaseBonusAttribute('faith')">+</button>
+                        <div class="secondary-attributes">
+                                <div class="progress-bar">
+                                    觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
+                                </div>
+                                <div class="progress-bar">
+                                    飞升: <span id="ascension-status">未飞升</span><button onclick="ascend()">+</button>
+                                </div>
+                                <div class="progress-bar">
+                                    <button onclick="sellPet()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
+                                </div>
+                                <div class="progress-bar">
+                                    <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
+                                </div>
+                                <div class="progress-bar">
+                                    <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
+                                </div>
+                                <div id="secondary-attributes-panel" style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;cursor:pointer;">
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color: white;width: 60px;text-align: center;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color: white;width: 60px;text-align: center;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度值: <span style="color: white;width: 60px;text-align: center;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                                </div>
                         </div>
                     </div>
-                    <div class="secondary-attributes">
-                            <div class="progress-bar">
-                                觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
-                            </div>
-                            <div class="progress-bar">
-                                飞升: <span id="ascension-status">未飞升</span><button onclick="ascend()">+</button>
-                            </div>
-                            <div class="progress-bar">
-                                <button onclick="sellPet()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
-                            </div>
-                            <div class="progress-bar">
-                                <button onclick="infoXiuwei()">修为</button><span id="player-cultivation">0</span><button onclick="upgradePlayerCultivation()">+</button>
-                            </div>
-                            <div class="progress-bar">
-                                <button onclick="infoWuxing()">悟性</button><span id="attribute-wisdom"></span><button onclick="upgradeWisdom()">+</button>
-                            </div>
-                            <div id="secondary-attributes-panel" style="gap: 4px;display: flex;flex-direction: column;width: 100%;background: rgb(57, 87, 89);box-shadow: rgb(30, 46, 47) 0px 0px 5px 2px inset;color: #77CFBA;padding: 4px;cursor:pointer;">
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">生命值: <span style="color: white;width: 60px;text-align: center;" id="secondary-health"></span> <span id="secondary-health-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法力值: <span style="color: white;width: 60px;text-align: center;" id="secondary-mana"></span> <span id="secondary-mana-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-attack"></span> <span id="secondary-physical-attack-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">物理防: <span style="color: white;width: 60px;text-align: center;" id="secondary-physical-defense"></span> <span id="secondary-physical-defense-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
-                                <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度值: <span style="color: white;width: 60px;text-align: center;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
-                            </div>
+                    <div class='skills-in-drawer' id='skills-in-drawer'></div>
+                    <!--内丹系统-->
+                    <div class='elixir-system-panel' id='elixir-system'>
+                        <div class='elixir-container' id='elixir-container'>
+                            <div class='elixir-squares' id='1st-elixir-squares'></div>
+                            <div class='elixir-squares' id='2nd-elixir-squares'></div>
+                            <div class='elixir-squares' id='3rd-elixir-squares'></div>
+                        </div>
+                        <div class="elixir-system-button" id='elixir-button'>
+                            <button onclick="equipElixir()" style="font-size: 12px;padding: 4px;">内丹</button>
+                            <button onclick="disgorge()" style="font-size: 12px;padding: 4px;">吐纳</button>
+                            <button onclick="engulf()" style="font-size: 12px;padding: 4px;">吞噬</button>
+                            <button onclick="internalize()" style="font-size: 12px;padding: 4px;">消化</button>
+                            <button onclick="invigorate()" style="font-size: 12px;padding: 4px;">补元</button>
+                            <button onclick="infoElixir()" style="font-size: 12px;padding: 4px;">说明</button>
+                        </div>
                     </div>
+                    <!--内丹系统-->
                 </div>
-                <div class='skills-in-drawer' id='skills-in-drawer'></div>
-                <!--内丹系统-->
-                <div class='elixir-system-panel' id='elixir-system'>
-                    <div class='elixir-container' id='elixir-container'>
-                        <div class='elixir-squares' id='1st-elixir-squares'></div>
-                        <div class='elixir-squares' id='2nd-elixir-squares'></div>
-                        <div class='elixir-squares' id='3rd-elixir-squares'></div>
-                    </div>
-                    <div class="elixir-system-button" id='elixir-button'>
-                        <button onclick="equipElixir()" style="font-size: 12px;padding: 4px;">内丹</button>
-                        <button onclick="disgorge()" style="font-size: 12px;padding: 4px;">吐纳</button>
-                        <button onclick="engulf()" style="font-size: 12px;padding: 4px;">吞噬</button>
-                        <button onclick="internalize()" style="font-size: 12px;padding: 4px;">消化</button>
-                        <button onclick="invigorate()" style="font-size: 12px;padding: 4px;">补元</button>
-                        <button onclick="infoElixir()" style="font-size: 12px;padding: 4px;">说明</button>
-                    </div>
-                </div>
-                <!--内丹系统-->
                 <div class="button-grid">
                     <button onclick="trainAttributes()">金子培养</button>
                     <button onclick="trainSkills()">洗练技能</button>

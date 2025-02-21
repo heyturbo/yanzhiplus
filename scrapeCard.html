@@ -1,65 +1,52 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>刮刮乐</title>
-    <link rel="stylesheet" href="scrapeCard.css">
-</head>
-<body>
-    <!-- 刮刮卡游戏容器 -->
-    <div class="scrape-container" id="scrape-drawer">
-        <div class="scrape-drawer-toggle" id="scrape-top-bar" onclick="toggleScrapeDrawer()">刮刮乐🎲</div>
-        <div class="scrape-content open" id="scrape-content-container">
-            <div class="scrape-drawer-inner" id="scrape-inpage-decorations">
-                <!-- 顶部信息区 -->
-                <div class="scrape-section scrape-top" id="scrape-top">
-                    <div class="scrape-info-box" id="scrape-balance">余额: <span id="scrape-gold-amount">0</span></div>
-                    <div class="scrape-info-box" id="scrape-win-count">中奖次数: 0</div>
-                    <div class="scrape-info-box" id="scrape-total-spent">总花费: 0</div>
-                </div>
-                
-                <!-- 卡片区域 -->
-                <div class="scrape-section scrape-middle" id="scrape-card-area">
-                    <div class="scrape-card" id="scrape-card">
-                        <div class="scrape-card-inner">
-                            <div class="scrape-card-cover" id="scrape-card-cover">
-                                <span class="scrape-card-instruction">刮一刮，好运来！</span>
-                            </div>
-                            <div class="scrape-card-content" id="scrape-card-content">
-                                <div class="scrape-prize-text" id="scrape-prize-text">试试手气！</div>
-                                <div class="scrape-prize-amount" id="scrape-prize-amount">???</div>
-                            </div>
+<!-- scratchcard.html -->
+<div class="scrape-container" id="scrape-drawer">
+    <div class="scrape-drawer-toggle" id="scrape-top-bar" onclick="toggleScrapeDrawer()">刮刮乐🎲</div>
+    <div class="scrape-content" id="scrape-content-container">
+        <div class="scrape-drawer-inner" id="scrape-inpage-decorations">
+            <!-- 顶部信息区 -->
+            <div class="scrape-section scrape-top" id="scrape-top">
+                <div class="scrape-info-box" id="scrape-balance">余额: <span id="scrape-gold-amount">0</span></div>
+                <div class="scrape-info-box" id="scrape-win-count">中奖次数: 0</div>
+                <div class="scrape-info-box" id="scrape-total-spent">总花费: 0</div>
+            </div>
+            
+            <!-- 卡片区域 -->
+            <div class="scrape-section scrape-middle" id="scrape-card-area">
+                <div class="scrape-card" id="scrape-card">
+                    <div class="scrape-card-inner">
+                        <div class="scrape-card-cover" id="scrape-card-cover">
+                            <span class="scrape-card-instruction">刮一刮，好运来！</span>
+                        </div>
+                        <div class="scrape-card-content" id="scrape-card-content">
+                            <div class="scrape-prize-text" id="scrape-prize-text">试试手气！</div>
+                            <div class="scrape-prize-amount" id="scrape-prize-amount">???</div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- 控制区域 -->
-                <div class="scrape-section scrape-controls" id="scrape-controls">
-                    <div class="scrape-card-selection">
-                        <button class="scrape-card-button active" data-price="500" id="scrape-card-normal">普通卡 (500金)</button>
-                        <button class="scrape-card-button" data-price="2000" id="scrape-card-premium">高级卡 (2000金)</button>
-                        <button class="scrape-card-button" data-price="10000" id="scrape-card-deluxe">豪华卡 (10000金)</button>
-                    </div>
-                    
-                    <div class="scrape-action-buttons">
-                        <button class="scrape-button-buy" id="scrape-buy-card">购买刮刮卡</button>
-                        <button class="scrape-button-rules" id="scrape-show-rules">游戏规则</button>
-                        <button class="scrape-button-reset" id="scrape-reset-game">重置统计</button>
-                    </div>
+            </div>
+            
+            <!-- 控制区域 -->
+            <div class="scrape-section scrape-controls" id="scrape-controls">
+                <div class="scrape-card-selection">
+                    <button class="scrape-card-button active" data-price="500" id="scrape-card-normal">普通卡 (500金)</button>
+                    <button class="scrape-card-button" data-price="2000" id="scrape-card-premium">高级卡 (2000金)</button>
+                    <button class="scrape-card-button" data-price="10000" id="scrape-card-deluxe">豪华卡 (10000金)</button>
                 </div>
                 
-                <!-- 中奖记录 -->
-                <div class="scrape-section scrape-history" id="scrape-history">
-                    <div class="scrape-history-title">最近中奖记录</div>
-                    <div class="scrape-history-list" id="scrape-history-list">
-                        <!-- 动态插入中奖记录 -->
-                    </div>
+                <div class="scrape-action-buttons">
+                    <button class="scrape-button-buy" id="scrape-buy-card">购买刮刮卡</button>
+                    <button class="scrape-button-rules" id="scrape-show-rules">游戏规则</button>
+                    <button class="scrape-button-reset" id="scrape-reset-game">重置统计</button>
+                </div>
+            </div>
+            
+            <!-- 中奖记录 -->
+            <div class="scrape-section scrape-history" id="scrape-history">
+                <div class="scrape-history-title">最近中奖记录</div>
+                <div class="scrape-history-list" id="scrape-history-list">
+                    <!-- 动态插入中奖记录 -->
                 </div>
             </div>
         </div>
     </div>
-
-    <script src="scrapeCard.js"></script>
-</body>
-</html>
+</div>

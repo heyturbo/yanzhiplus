@@ -36,7 +36,7 @@
         resetButton.addEventListener('click', resetStats);
         
         // 初始更新显示
-        updateGoldDisplay();
+        updateLotteryGoldDisplay();
         updateStats();
         
         // 初始选择普通卡
@@ -80,7 +80,7 @@
         // 扣除金币并更新统计
         window.goldAmount -= cardPrice;
         scrapeGameState.stats.totalSpent += cardPrice;
-        updateGoldDisplay();
+        updateLotteryGoldDisplay();
         updateStats();
         
         // 准备刮刮卡
@@ -271,7 +271,7 @@
                     addToHistory(prize);
                     scrapeGameState.stats.winCount++;
                     window.goldAmount += prize.amount;
-                    updateGoldDisplay();
+                    updateLotteryGoldDisplay();
                     updateStats();
                 }
             }
@@ -407,7 +407,7 @@
     }
     
     // 更新金币显示
-    function updateGoldDisplay() {
+    function updateLotteryGoldDisplay() {
         const goldAmountElement = document.getElementById('scrape-gold-amount');
         
         // 确保goldAmount是定义的
@@ -419,8 +419,8 @@
         goldAmountElement.textContent = window.goldAmount;
         
         // 如果有全局更新函数，也调用它
-        if (typeof window.updateGoldDisplay === 'function') {
-            window.updateGoldDisplay(window.goldAmount);
+        if (typeof window.updateLotteryGoldDisplay === 'function') {
+            window.updateLotteryGoldDisplay(window.goldAmount);
         }
     }
     

@@ -1,4 +1,4 @@
-/* 刮刮卡游戏样式 */
+/* scratchcard.css */
 .scrape-container {
     width: 100%;
     max-width: 600px;
@@ -10,6 +10,7 @@
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     position: relative;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .scrape-drawer-toggle {
@@ -89,7 +90,7 @@
     height: 100%;
     background: linear-gradient(135deg, #ff9900, #ffcc00, #ff9900);
     background-size: 200% 200%;
-    animation: gradientShift 5s ease infinite;
+    animation: scrape-gradientShift 5s ease infinite;
     border-radius: 10px;
     display: flex;
     justify-content: center;
@@ -251,17 +252,17 @@
 }
 
 /* 动画 */
-@keyframes gradientShift {
+@keyframes scrape-gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
 
 .scrape-win-animation {
-    animation: winPulse 0.5s ease-in-out 3;
+    animation: scrape-winPulse 0.5s ease-in-out 3;
 }
 
-@keyframes winPulse {
+@keyframes scrape-winPulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.1); }
     100% { transform: scale(1); }

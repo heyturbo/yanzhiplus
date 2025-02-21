@@ -1302,7 +1302,6 @@
             flex-direction: row;
             justify-content: space-between;
             background-size: cover;
-            margin-bottom: 5px;
             margin-top: 5px;
         }
         .progress-bars {
@@ -2873,7 +2872,10 @@
     flex-grow: 1;
 }
 
-
+@keyframes shine {
+    0% { background-position: -100% 0; }
+    100% { background-position: 100% 0; }
+}
    </style>
 </head>
 <body>
@@ -3080,6 +3082,9 @@
                                 品质: <span id="attribute-tier"></span><button onclick="infoPinzhi()">?</button>
                             </div>
                             <div class="progress-bar">
+                                觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
+                            </div>
+                            <div class="progress-bar">
                                 幻化: <span id="hallucination-level">0</span><button onclick="fastHallucinatePet()">+</button>
                             </div>
                             <div class="progress-bar">
@@ -3108,11 +3113,12 @@
                             </div>
                         </div>
                         <div class="secondary-attributes">
+
                                 <div class="progress-bar">
-                                    觉醒: <span id="awaken-status">未觉醒</span><button onclick="infoJuexing()">?</button>
+                                    <button onclick="infoAscend()">飞升</button><span id="ascension-status">未飞升</span><button onclick="ascend()">+</button>
                                 </div>
                                 <div class="progress-bar">
-                                    飞升: <span id="ascension-status">未飞升</span><button onclick="ascend()">+</button>
+                                    <button onclick="infoSuit()">套装</button><span id="suit-bonus">无</span><button onclick="applySuitEffects()">+</button>
                                 </div>
                                 <div class="progress-bar">
                                     <button onclick="sellPet()">评分</button><span id="skill-score">0</span><button onclick="infoPingfen()">?</button>
@@ -3131,9 +3137,26 @@
                                     <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术攻: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-attack"></span> <span id="secondary-magic-attack-bonus"></span></div>
                                     <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">法术防: <span style="color: white;width: 60px;text-align: center;" id="secondary-magic-defense"></span> <span id="secondary-magic-defense-bonus"></span></div>
                                     <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">速度值: <span style="color: white;width: 60px;text-align: center;" id="secondary-speed"></span> <span id="secondary-speed-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">暴击率: <span style="color: white;width: 60px;text-align: center;" id="secondary-player-crit-rate"></span> <span id="secondary-player-crit-rate-bonus"></span></div>
+                                    <div style="display: flex;flex-direction: row;justify-content: space-between;gap: 5px;align-items: center;">爆伤值: <span style="color: white;width: 60px;text-align: center;" id="secondary-player-crit-damage"></span> <span id="secondary-player-crit-damage-bonus"></span></div>
                                 </div>
                         </div>
                     </div>
+                    <!--经验值显示条-->
+                    <div style="margin-bottom: 5px; position: relative; width: 100%; min-height: 16px; background-color: rgba(20, 20, 35, 0.6);box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5); overflow: hidden;" id="attribute-exp-bar-container">
+                        <!-- 经验条背景发光效果 -->
+                        <div style="position: absolute; left: 0; top: 0; height: 100%; width: 100%; background: radial-gradient(ellipse at center, rgba(75, 0, 130, 0.2) 0%, rgba(0, 0, 0, 0) 70%); pointer-events: none;"></div>
+                        
+                        <!-- 经验条填充部分 -->
+                        <div style="position: absolute; left: 0px; top: 0px; height: 100%; width: 49.5192%; background: linear-gradient(90deg, rgba(118, 74, 241, 0.9), rgba(147, 112, 219, 0.9)); box-shadow: 0 0 10px rgba(147, 112, 219, 0.7);transition: width 0.3s ease-out;" id="attribute-exp-bar"></div>
+                        
+                        <!-- 经验条光晕效果 -->
+                        <div style="position: absolute; left: 0; top: 0; height: 100%; width: 49.5192%; background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0) 100%); background-size: 200% 100%; animation: shine 2s infinite; pointer-events: none; " id="attribute-exp-shine"></div>
+                        
+                        <!-- 经验值文本 -->
+                        <span style="position: absolute; top: 0; left: 0; right: 0; z-index: 1; font-size: 12px; font-weight: bold; color: white; text-align: center; line-height: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.8);" id="attribute-exp-text"></span>
+                    </div>
+                    <!--经验值显示条-->
                     <div class='skills-in-drawer' id='skills-in-drawer'></div>
                     <!--内丹系统-->
                     <div class='elixir-system-panel' id='elixir-system'>

@@ -1,3 +1,19 @@
+function toggleScrapeCardGame() {
+    if (!scrapeCardLoaded) {
+        // 首次点击时加载刮刮卡游戏
+        loadScrapeCardModule();
+        scrapeCardLoaded = true;
+    } else {
+        // 已经加载过，则切换显示/隐藏
+        const drawer = document.getElementById('scrape-drawer');
+        if (drawer && typeof toggleScrapeDrawer === 'function') {
+            toggleScrapeDrawer();
+        } else {
+            console.error('刮刮卡模块未正确加载');
+        }
+    }
+}
+
 // 刮刮卡游戏模块
 document.addEventListener('DOMContentLoaded', function() {
     // 初始化游戏状态

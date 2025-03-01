@@ -7967,12 +7967,8 @@ const battleQuestSystem = {
     // 创建任务UI
     createQuestUI: function() {
         // 创建任务按钮
-        const questButton = document.createElement('button');
-        const buttonContanier = document.getElementById('battle-button-grid');
-        questButton.id = 'battle-quest-button';
-        questButton.innerText = '任务';
-        
-        buttonContanier.appendChild(questButton);
+        const questButton = document.getElementById('quest-button');
+
         
         // 创建任务面板
         const questPanel = document.createElement('div');

@@ -10147,17 +10147,3 @@ function integrateBattlePassSystem() {
         };
     }
 }
-
-
-// 启动集成
-document.addEventListener('DOMContentLoaded', function() {
-    // 等待原始战斗系统加载完成
-    const checkSystemReady = setInterval(() => {
-        if (typeof battleState !== 'undefined' && typeof showNextBattlePrompt === 'function') {
-            clearInterval(checkSystemReady);
-            integrateBattleQuestSystem();
-            integrateBattlePassSystem();
-            integrateBattleRankingSystem();
-        }
-    }, 500);
-});

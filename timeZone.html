@@ -9,175 +9,384 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Arial', sans-serif;
+            font-family: 'SF Pro Display', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            transition: all 0.3s ease;
         }
         
         body {
-            background-color: #f5f7fa;
-            color: #333;
+            background-color: #f7f9fc;
+            color: #334155;
             padding: 20px;
             max-width: 100%;
             margin: 0 auto;
+            font-size: 16px;
+            line-height: 1.5;
         }
         
         .container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 24px;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
         
         h1 {
-            font-size: 24px;
+            font-size: 28px;
             margin-bottom: 10px;
-            color: #2c3e50;
+            color: #1e293b;
+            font-weight: 700;
+        }
+        
+        h2 {
+            font-size: 22px;
+            margin-bottom: 18px;
+            color: #334155;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.6s ease-out;
+            transform: translateZ(0);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 3px 6px rgba(0, 0, 0, 0.05);
         }
         
         .current-time {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .current-time-label {
+            font-size: 16px;
+            color: #64748b;
+            margin-bottom: 10px;
         }
         
         .current-time-display {
-            font-size: 32px;
-            font-weight: bold;
+            font-size: 36px;
+            font-weight: 700;
             text-align: center;
-            margin: 10px 0;
-            color: #3498db;
+            margin: 5px 0 10px;
+            color: #3b82f6;
+            transition: color 0.3s;
+        }
+        
+        .current-time-display.updating {
+            animation: pulse 0.5s ease;
         }
         
         .dst-info {
             font-size: 14px;
-            color: #e74c3c;
+            color: #ef4444;
             text-align: center;
-            margin-top: 5px;
+            margin-top: 8px;
+            font-weight: 500;
+            transition: opacity 0.3s;
         }
         
         .time-input {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
         }
         
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 8px;
+            margin-bottom: 20px;
         }
         
         label {
-            font-weight: bold;
-            color: #2c3e50;
+            font-weight: 600;
+            color: #475569;
+            font-size: 15px;
         }
         
         select, input {
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+            padding: 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
             font-size: 16px;
+            background-color: #f8fafc;
+            color: #334155;
+            transition: all 0.2s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 18px;
+            padding-right: 40px;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #93c5fd;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background-color: #fff;
         }
         
         input[type="datetime-local"] {
             width: 100%;
         }
         
-        button {
-            background-color: #3498db;
+        .convert-btn {
+            background-color: #3b82f6;
             color: white;
             border: none;
-            border-radius: 5px;
-            padding: 12px;
+            border-radius: 10px;
+            padding: 14px;
             font-size: 16px;
             cursor: pointer;
             width: 100%;
-            transition: background-color 0.3s;
+            transition: all 0.2s;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
         
-        button:hover {
-            background-color: #2980b9;
+        .convert-btn:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .convert-btn:active {
+            transform: translateY(0);
+        }
+        
+        .convert-btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.3s;
+        }
+        
+        .convert-btn:active:after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            transition: 0s;
         }
         
         .time-zones {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .region-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #64748b;
+            margin: 15px 0 8px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .region-title:first-child {
+            margin-top: 0;
         }
         
         .zone {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            padding: 16px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+            transition: transform 0.2s, background-color 0.2s;
         }
         
-        .zone:last-child {
-            border-bottom: none;
+        .zone:hover {
+            background-color: #f1f5f9;
+            transform: translateX(2px);
+        }
+        
+        .zone-info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
         
         .zone-name {
-            font-weight: bold;
-            color: #2c3e50;
+            font-weight: 600;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
         
         .zone-time {
-            color: #3498db;
+            color: #0f172a;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
         }
         
         .zone-info {
-            font-size: 12px;
-            color: #7f8c8d;
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
         }
         
-        /* 分区标题样式 */
-        .region-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #7f8c8d;
-            margin: 15px 0 5px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        /* 夏令时标记 */
-        .dst-badge {
+        .date-badge {
             display: inline-block;
-            background-color: #e74c3c;
-            color: white;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 3px;
-            margin-left: 5px;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .date-badge.yesterday {
+            background-color: #fef2f2;
+            color: #ef4444;
+            border: 1px solid #fee2e2;
+        }
+        
+        .date-badge.today {
+            background-color: #ecfdf5;
+            color: #10b981;
+            border: 1px solid #d1fae5;
+        }
+        
+        .date-badge.tomorrow {
+            background-color: #eff6ff;
+            color: #3b82f6;
+            border: 1px solid #dbeafe;
+        }
+        
+        .zone-date {
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .dst-badge {
+            display: inline-flex;
+            align-items: center;
+            background-color: #fef2f2;
+            color: #ef4444;
+            font-size: 12px;
+            padding: 3px 6px;
+            border-radius: 6px;
+            margin-left: 6px;
             vertical-align: middle;
+            font-weight: 500;
+            border: 1px solid #fee2e2;
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                gap: 16px;
+            }
+            
+            .current-time-display {
+                font-size: 28px;
+            }
+            
+            .card {
+                padding: 18px;
+            }
+            
+            .zone {
+                grid-template-columns: 1fr auto;
+                gap: 10px;
+            }
+            
+            .zone-name {
+                grid-column: 1;
+                grid-row: 1;
+            }
+            
+            .zone-time {
+                grid-column: 1;
+                grid-row: 2;
+            }
+            
+            .date-badge {
+                grid-column: 2;
+                grid-row: 1 / span 2;
+                align-self: center;
+            }
+            
+            .zone-info {
+                grid-column: 1 / span 2;
+                grid-row: 3;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>国际时区转换工具</h1>
-            <p>查看全球主要城市的当前时间</p>
+            <h1>国际时区转换</h1>
+            <p>查看全球主要城市的精确时间</p>
         </div>
         
-        <div class="current-time">
-            <div>您的本地时间：</div>
+        <div class="card current-time">
+            <div class="current-time-label">您的本地时间</div>
             <div class="current-time-display" id="local-time"></div>
             <div class="dst-info" id="dst-info"></div>
         </div>
         
-        <div class="time-input">
+        <div class="card time-input">
             <h2>自定义时间</h2>
             <div class="input-group">
-                <label for="timezone-select">选择时区:</label>
+                <label for="timezone-select">选择基准时区:</label>
                 <select id="timezone-select">
                     <!-- 时区选项将由JavaScript动态生成 -->
                 </select>
@@ -186,10 +395,12 @@
                 <label for="custom-time">选择日期和时间:</label>
                 <input type="datetime-local" id="custom-time">
             </div>
-            <button id="convert-btn">转换时间</button>
+            <button id="convert-btn" class="convert-btn">
+                转换时间
+            </button>
         </div>
         
-        <div class="time-zones" id="time-zones-container">
+        <div class="card time-zones" id="time-zones-container">
             <!-- 时区信息将由JavaScript动态生成 -->
         </div>
     </div>
@@ -235,11 +446,13 @@
             { region: "协调时间", name: "UTC", code: "UTC", emoji: "🌐", info: "协调世界时 (UTC+0)" },
         ];
         
+        // 存储参考日期（用于日期对比）
+        let referenceDate = null;
+        
         // 初始化页面
         function initializePage() {
             updateLocalTime();
             populateTimezoneSelect();
-            updateAllTimeZones(new Date());
             setInitialCustomTime();
             
             // 设置定时器每秒更新时间
@@ -247,6 +460,10 @@
             
             // 添加转换按钮点击事件
             document.getElementById('convert-btn').addEventListener('click', convertCustomTime);
+            
+            // 设置参考日期为今天
+            referenceDate = new Date();
+            referenceDate.setHours(0, 0, 0, 0); // 设置为当天的0时
         }
         
         // 更新本地时间显示
@@ -255,6 +472,12 @@
             const localTimeElement = document.getElementById('local-time');
             const dstInfoElement = document.getElementById('dst-info');
             
+            // 添加更新动画
+            localTimeElement.classList.add('updating');
+            setTimeout(() => {
+                localTimeElement.classList.remove('updating');
+            }, 500);
+            
             // 格式化本地时间显示
             localTimeElement.textContent = formatDateTime(now);
             
@@ -262,8 +485,9 @@
             const isDST = isDaylightSavingTime(now);
             if (isDST) {
                 dstInfoElement.textContent = "当前使用夏令时";
+                dstInfoElement.style.opacity = "1";
             } else {
-                dstInfoElement.textContent = "";
+                dstInfoElement.style.opacity = "0";
             }
             
             // 如果没有手动设置时间，也更新所有时区
@@ -294,6 +518,17 @@
                 minute: '2-digit', 
                 second: '2-digit',
                 hour12: false
+            };
+            
+            return new Intl.DateTimeFormat('zh-CN', options).format(date);
+        }
+        
+        // 格式化日期（不含时间）
+        function formatDate(date) {
+            const options = { 
+                year: 'numeric', 
+                month: 'numeric', 
+                day: 'numeric'
             };
             
             return new Intl.DateTimeFormat('zh-CN', options).format(date);
@@ -355,33 +590,74 @@
                 return;
             }
             
-            // 解析选定的时区和时间
+            // 获取选定的时区
             const selectedTimezone = timezoneSelect.value;
-            const customDateTime = new Date(customTimeInput.value);
             
-            // 计算UTC时间
-            const utcTime = calculateUTCTime(customDateTime, selectedTimezone);
+            // 解析用户输入的日期时间（这会被解释为本地时区的时间）
+            const inputDate = new Date(customTimeInput.value);
             
-            // 标记正在使用自定义时间
-            customTimeActive = true;
+            // 获取用户本地时区
+            const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             
-            // 更新所有时区显示
-            updateAllTimeZones(utcTime);
-        }
-        
-        // 计算UTC时间
-        function calculateUTCTime(localTime, timezone) {
-            // 创建一个表示指定时区当地时间的字符串
-            const timeString = localTime.toLocaleString('en-US', { timeZone: timezone });
+            // 创建一个参考日期（使用输入的时间）
+            const refDate = new Date();
             
-            // 创建基于该字符串的Date对象（此时是在本地时区）
-            const localDate = new Date(timeString);
+            // 获取选定时区的偏移信息
+            const selectedFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: selectedTimezone,
+                timeZoneName: 'longOffset'
+            });
             
-            // 计算本地时间与UTC之间的偏移量
-            const localOffset = localDate.getTimezoneOffset() * 60000;
+            const selectedFormatted = selectedFormatter.format(refDate);
+            const selectedOffsetMatch = selectedFormatted.match(/GMT([+-])(\d{2}):(\d{2})/);
             
-            // 将本地时间转换为UTC毫秒时间戳
-            return new Date(localTime.getTime() + localOffset);
+            // 获取用户本地时区的偏移信息
+            const localFormatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: localTimezone,
+                timeZoneName: 'longOffset'
+            });
+            
+            const localFormatted = localFormatter.format(refDate);
+            const localOffsetMatch = localFormatted.match(/GMT([+-])(\d{2}):(\d{2})/);
+            
+            if (selectedOffsetMatch && localOffsetMatch) {
+                // 解析选定时区的偏移
+                const selectedSign = selectedOffsetMatch[1] === '+' ? 1 : -1;
+                const selectedHours = parseInt(selectedOffsetMatch[2], 10);
+                const selectedMinutes = parseInt(selectedOffsetMatch[3], 10);
+                const selectedTotalMinutes = selectedSign * (selectedHours * 60 + selectedMinutes);
+                
+                // 解析本地时区的偏移
+                const localSign = localOffsetMatch[1] === '+' ? 1 : -1;
+                const localHours = parseInt(localOffsetMatch[2], 10);
+                const localMinutes = parseInt(localOffsetMatch[3], 10);
+                const localTotalMinutes = localSign * (localHours * 60 + localMinutes);
+                
+                // 计算时区差异（分钟）
+                const diffMinutes = selectedTotalMinutes - localTotalMinutes;
+                
+                // 调整时间，考虑时区差异
+                // 关键点：我们要把输入时间视为选定时区的时间，需要减去时区差异
+                const adjustedTime = new Date(inputDate.getTime() - diffMinutes * 60 * 1000);
+                
+                // 设置参考日期
+                // 对于参考日期，使用用户输入的日期但重置时间为0点
+                referenceDate = new Date(inputDate);
+                referenceDate.setHours(0, 0, 0, 0);
+                
+                // 标记正在使用自定义时间
+                customTimeActive = true;
+                
+                // 显示转换按钮动画
+                const convertBtn = document.getElementById('convert-btn');
+                convertBtn.classList.add('active');
+                setTimeout(() => convertBtn.classList.remove('active'), 300);
+                
+                // 更新所有时区显示
+                updateAllTimeZones(adjustedTime);
+            } else {
+                alert('无法获取时区信息，请重试');
+            }
         }
         
         // 更新所有时区显示
@@ -392,7 +668,7 @@
             // 按区域分组时区
             const regions = [...new Set(timeZones.map(tz => tz.region))];
             
-            regions.forEach(region => {
+            regions.forEach((region, regionIndex) => {
                 // 添加区域标题
                 const regionTitle = document.createElement('div');
                 regionTitle.className = 'region-title';
@@ -400,15 +676,64 @@
                 container.appendChild(regionTitle);
                 
                 // 添加该区域的所有时区
-                timeZones.filter(tz => tz.region === region).forEach(zone => {
+                timeZones.filter(tz => tz.region === region).forEach((zone, zoneIndex) => {
                     const zoneElement = document.createElement('div');
                     zoneElement.className = 'zone';
+                    zoneElement.style.animationDelay = `${(regionIndex * 0.1 + zoneIndex * 0.05)}s`;
                     
                     // 格式化该时区的时间
-                    const zoneTime = formatTimeInTimezone(baseTime, zone.code);
+                    const localizedTime = new Date(baseTime);
+                    const formatter = new Intl.DateTimeFormat('zh-CN', {
+                        timeZone: zone.code,
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+                    
+                    // 完整日期时间字符串
+                    const formattedDateTime = formatter.format(localizedTime);
+                    
+                    // 分离日期和时间
+                    const [formattedDate, formattedTime] = formattedDateTime.split(' ');
                     
                     // 检测该时区是否使用夏令时
                     const isDST = checkDSTforTimezone(baseTime, zone.code);
+                    
+                    // 为日期比较创建日期对象
+                    const dateFormatter = new Intl.DateTimeFormat('en-CA', {
+                        timeZone: zone.code,
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    });
+                    
+                    const dateStr = dateFormatter.format(localizedTime);
+                    const zoneDateObj = new Date(dateStr);
+                    
+                    // 确定日期关系（今天、昨天、明天）
+                    let dateRelation = "";
+                    let dateBadgeClass = "";
+                    
+                    const timeDiff = zoneDateObj.getTime() - referenceDate.getTime();
+                    const dayDiff = Math.round(timeDiff / (1000 * 60 * 60 * 24));
+                    
+                    if (dayDiff < 0) {
+                        dateRelation = "前一天";
+                        dateBadgeClass = "yesterday";
+                    } else if (dayDiff > 0) {
+                        dateRelation = "后一天";
+                        dateBadgeClass = "tomorrow";
+                    } else {
+                        dateRelation = "今天";
+                        dateBadgeClass = "today";
+                    }
+                    
+                    // 创建名称和信息容器
+                    const infoContainer = document.createElement('div');
+                    infoContainer.className = 'zone-info-container';
                     
                     const nameElement = document.createElement('div');
                     nameElement.className = 'zone-name';
@@ -422,36 +747,36 @@
                         nameElement.appendChild(dstBadge);
                     }
                     
-                    const timeElement = document.createElement('div');
-                    timeElement.className = 'zone-time';
-                    timeElement.textContent = zoneTime;
+                    const dateElement = document.createElement('div');
+                    dateElement.className = 'zone-date';
+                    dateElement.textContent = formattedDate;
                     
                     const infoElement = document.createElement('div');
                     infoElement.className = 'zone-info';
                     infoElement.textContent = zone.info;
                     
-                    zoneElement.appendChild(nameElement);
+                    infoContainer.appendChild(nameElement);
+                    infoContainer.appendChild(dateElement);
+                    infoContainer.appendChild(infoElement);
+                    
+                    // 创建时间元素
+                    const timeElement = document.createElement('div');
+                    timeElement.className = 'zone-time';
+                    timeElement.textContent = formattedTime;
+                    
+                    // 创建日期徽章
+                    const dateBadge = document.createElement('div');
+                    dateBadge.className = `date-badge ${dateBadgeClass}`;
+                    dateBadge.textContent = dateRelation;
+                    
+                    // 组装元素
+                    zoneElement.appendChild(infoContainer);
                     zoneElement.appendChild(timeElement);
-                    zoneElement.appendChild(infoElement);
+                    zoneElement.appendChild(dateBadge);
                     
                     container.appendChild(zoneElement);
                 });
             });
-        }
-        
-        // 在特定时区格式化时间
-        function formatTimeInTimezone(date, timezone) {
-            const options = {
-                year: 'numeric',
-                month: 'numeric',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false,
-                timeZone: timezone
-            };
-            
-            return new Intl.DateTimeFormat('zh-CN', options).format(date);
         }
         
         // 检查特定时区是否使用夏令时

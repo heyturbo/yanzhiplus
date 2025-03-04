@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国际时区转换工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 20px;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .current-time {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .current-time-display {
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            color: #3498db;
+        }
+        
+        .dst-info {
+            font-size: 14px;
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .time-input {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        label {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        select, input {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        input[type="datetime-local"] {
+            width: 100%;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .time-zones {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .zone {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .zone:last-child {
+            border-bottom: none;
+        }
+        
+        .zone-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .zone-time {
+            color: #3498db;
+        }
+        
+        .zone-info {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        /* 分区标题样式 */
+        .region-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #7f8c8d;
+            margin: 15px 0 5px 0;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        /* 夏令时标记 */
+        .dst-badge {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 3px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>国际时区转换工具</h1>
+            <p>查看全球主要城市的当前时间</p>
+        </div>
+        
+        <div class="current-time">
+            <div>您的本地时间：</div>
+            <div class="current-time-display" id="local-time"></div>
+            <div class="dst-info" id="dst-info"></div>
+        </div>
+        
+        <div class="time-input">
+            <h2>自定义时间</h2>
+            <div class="input-group">
+                <label for="timezone-select">选择时区:</label>
+                <select id="timezone-select">
+                    <!-- 时区选项将由JavaScript动态生成 -->
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="custom-time">选择日期和时间:</label>
+                <input type="datetime-local" id="custom-time">
+            </div>
+            <button id="convert-btn">转换时间</button>
+        </div>
+        
+        <div class="time-zones" id="time-zones-container">
+            <!-- 时区信息将由JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 定义全球主要时区
+        const timeZones = [
+            // 亚洲
+            { region: "亚洲", name: "北京", code: "Asia/Shanghai", emoji: "🇨🇳", info: "中国标准时间 (UTC+8)" },
+            { region: "亚洲", name: "东京", code: "Asia/Tokyo", emoji: "🇯🇵", info: "日本标准时间 (UTC+9)" },
+            { region: "亚洲", name: "新加坡", code: "Asia/Singapore", emoji: "🇸🇬", info: "新加坡标准时间 (UTC+8)" },
+            { region: "亚洲", name: "香港", code: "Asia/Hong_Kong", emoji: "🇭🇰", info: "香港时间 (UTC+8)" },
+            { region: "亚洲", name: "曼谷", code: "Asia/Bangkok", emoji: "🇹🇭", info: "泰国标准时间 (UTC+7)" },
+            { region: "亚洲", name: "孟买", code: "Asia/Kolkata", emoji: "🇮🇳", info: "印度标准时间 (UTC+5:30)" },
+            { region: "亚洲", name: "迪拜", code: "Asia/Dubai", emoji: "🇦🇪", info: "海湾标准时间 (UTC+4)" },
+            
+            // 欧洲
+            { region: "欧洲", name: "伦敦", code: "Europe/London", emoji: "🇬🇧", info: "格林威治标准时间 (UTC+0/+1)" },
+            { region: "欧洲", name: "巴黎", code: "Europe/Paris", emoji: "🇫🇷", info: "中欧时间 (UTC+1/+2)" },
+            { region: "欧洲", name: "柏林", code: "Europe/Berlin", emoji: "🇩🇪", info: "中欧时间 (UTC+1/+2)" },
+            { region: "欧洲", name: "莫斯科", code: "Europe/Moscow", emoji: "🇷🇺", info: "莫斯科标准时间 (UTC+3)" },
+            
+            // 北美洲
+            { region: "北美洲", name: "纽约", code: "America/New_York", emoji: "🇺🇸", info: "美国东部时间 (UTC-5/-4)" },
+            { region: "北美洲", name: "芝加哥", code: "America/Chicago", emoji: "🇺🇸", info: "美国中部时间 (UTC-6/-5)" },
+            { region: "北美洲", name: "丹佛", code: "America/Denver", emoji: "🇺🇸", info: "美国山地时间 (UTC-7/-6)" },
+            { region: "北美洲", name: "洛杉矶", code: "America/Los_Angeles", emoji: "🇺🇸", info: "美国太平洋时间 (UTC-8/-7)" },
+            { region: "北美洲", name: "多伦多", code: "America/Toronto", emoji: "🇨🇦", info: "加拿大东部时间 (UTC-5/-4)" },
+            
+            // 大洋洲
+            { region: "大洋洲", name: "悉尼", code: "Australia/Sydney", emoji: "🇦🇺", info: "澳大利亚东部时间 (UTC+10/+11)" },
+            { region: "大洋洲", name: "奥克兰", code: "Pacific/Auckland", emoji: "🇳🇿", info: "新西兰标准时间 (UTC+12/+13)" },
+            
+            // 南美洲
+            { region: "南美洲", name: "圣保罗", code: "America/Sao_Paulo", emoji: "🇧🇷", info: "巴西利亚时间 (UTC-3/-2)" },
+            { region: "南美洲", name: "布宜诺斯艾利斯", code: "America/Argentina/Buenos_Aires", emoji: "🇦🇷", info: "阿根廷标准时间 (UTC-3)" },
+            
+            // 非洲
+            { region: "非洲", name: "开罗", code: "Africa/Cairo", emoji: "🇪🇬", info: "东欧时间 (UTC+2)" },
+            { region: "非洲", name: "约翰内斯堡", code: "Africa/Johannesburg", emoji: "🇿🇦", info: "南非标准时间 (UTC+2)" },
+            
+            // 世界协调时间
+            { region: "协调时间", name: "UTC", code: "UTC", emoji: "🌐", info: "协调世界时 (UTC+0)" },
+        ];
+        
+        // 初始化页面
+        function initializePage() {
+            updateLocalTime();
+            populateTimezoneSelect();
+            updateAllTimeZones(new Date());
+            setInitialCustomTime();
+            
+            // 设置定时器每秒更新时间
+            setInterval(updateLocalTime, 1000);
+            
+            // 添加转换按钮点击事件
+            document.getElementById('convert-btn').addEventListener('click', convertCustomTime);
+        }
+        
+        // 更新本地时间显示
+        function updateLocalTime() {
+            const now = new Date();
+            const localTimeElement = document.getElementById('local-time');
+            const dstInfoElement = document.getElementById('dst-info');
+            
+            // 格式化本地时间显示
+            localTimeElement.textContent = formatDateTime(now);
+            
+            // 检测是否使用夏令时
+            const isDST = isDaylightSavingTime(now);
+            if (isDST) {
+                dstInfoElement.textContent = "当前使用夏令时";
+            } else {
+                dstInfoElement.textContent = "";
+            }
+            
+            // 如果没有手动设置时间，也更新所有时区
+            if (!customTimeActive) {
+                updateAllTimeZones(now);
+            }
+        }
+        
+        // 检测是否使用夏令时
+        function isDaylightSavingTime(date) {
+            const jan = new Date(date.getFullYear(), 0, 1);
+            const jul = new Date(date.getFullYear(), 6, 1);
+            
+            const janOffset = jan.getTimezoneOffset();
+            const julOffset = jul.getTimezoneOffset();
+            
+            // 如果冬季和夏季的时区偏移不同，并且当前偏移等于夏季偏移，则使用夏令时
+            return janOffset !== julOffset && date.getTimezoneOffset() === Math.min(janOffset, julOffset);
+        }
+        
+        // 格式化日期时间
+        function formatDateTime(date) {
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false
+            };
+            
+            return new Intl.DateTimeFormat('zh-CN', options).format(date);
+        }
+        
+        // 填充时区选择下拉框
+        function populateTimezoneSelect() {
+            const select = document.getElementById('timezone-select');
+            
+            // 添加用户本地时区作为第一个选项
+            const localOption = document.createElement('option');
+            localOption.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            localOption.textContent = `本地时区 (${localOption.value})`;
+            select.appendChild(localOption);
+            
+            // 按区域分组时区
+            const regions = [...new Set(timeZones.map(tz => tz.region))];
+            
+            regions.forEach(region => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = region;
+                
+                // 添加该区域的所有时区
+                timeZones.filter(tz => tz.region === region).forEach(zone => {
+                    const option = document.createElement('option');
+                    option.value = zone.code;
+                    option.textContent = `${zone.emoji} ${zone.name} (${zone.info})`;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
+            });
+        }
+        
+        // 设置初始自定义时间
+        function setInitialCustomTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            const initialDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+            document.getElementById('custom-time').value = initialDateTime;
+        }
+        
+        // 标记表示是否正在使用自定义时间
+        let customTimeActive = false;
+        
+        // 转换自定义时间
+        function convertCustomTime() {
+            const timezoneSelect = document.getElementById('timezone-select');
+            const customTimeInput = document.getElementById('custom-time');
+            
+            // 如果没有选择时间，则返回
+            if (!customTimeInput.value) {
+                alert('请选择一个有效的日期和时间');
+                return;
+            }
+            
+            // 解析选定的时区和时间
+            const selectedTimezone = timezoneSelect.value;
+            const customDateTime = new Date(customTimeInput.value);
+            
+            // 计算UTC时间
+            const utcTime = calculateUTCTime(customDateTime, selectedTimezone);
+            
+            // 标记正在使用自定义时间
+            customTimeActive = true;
+            
+            // 更新所有时区显示
+            updateAllTimeZones(utcTime);
+        }
+        
+        // 计算UTC时间
+        function calculateUTCTime(localTime, timezone) {
+            // 创建一个表示指定时区当地时间的字符串
+            const timeString = localTime.toLocaleString('en-US', { timeZone: timezone });
+            
+            // 创建基于该字符串的Date对象（此时是在本地时区）
+            const localDate = new Date(timeString);
+            
+            // 计算本地时间与UTC之间的偏移量
+            const localOffset = localDate.getTimezoneOffset() * 60000;
+            
+            // 将本地时间转换为UTC毫秒时间戳
+            return new Date(localTime.getTime() + localOffset);
+        }
+        
+        // 更新所有时区显示
+        function updateAllTimeZones(baseTime) {
+            const container = document.getElementById('time-zones-container');
+            container.innerHTML = '';
+            
+            // 按区域分组时区
+            const regions = [...new Set(timeZones.map(tz => tz.region))];
+            
+            regions.forEach(region => {
+                // 添加区域标题
+                const regionTitle = document.createElement('div');
+                regionTitle.className = 'region-title';
+                regionTitle.textContent = region;
+                container.appendChild(regionTitle);
+                
+                // 添加该区域的所有时区
+                timeZones.filter(tz => tz.region === region).forEach(zone => {
+                    const zoneElement = document.createElement('div');
+                    zoneElement.className = 'zone';
+                    
+                    // 格式化该时区的时间
+                    const zoneTime = formatTimeInTimezone(baseTime, zone.code);
+                    
+                    // 检测该时区是否使用夏令时
+                    const isDST = checkDSTforTimezone(baseTime, zone.code);
+                    
+                    const nameElement = document.createElement('div');
+                    nameElement.className = 'zone-name';
+                    nameElement.innerHTML = `${zone.emoji} ${zone.name}`;
+                    
+                    // 如果使用夏令时，添加标记
+                    if (isDST) {
+                        const dstBadge = document.createElement('span');
+                        dstBadge.className = 'dst-badge';
+                        dstBadge.textContent = '夏令时';
+                        nameElement.appendChild(dstBadge);
+                    }
+                    
+                    const timeElement = document.createElement('div');
+                    timeElement.className = 'zone-time';
+                    timeElement.textContent = zoneTime;
+                    
+                    const infoElement = document.createElement('div');
+                    infoElement.className = 'zone-info';
+                    infoElement.textContent = zone.info;
+                    
+                    zoneElement.appendChild(nameElement);
+                    zoneElement.appendChild(timeElement);
+                    zoneElement.appendChild(infoElement);
+                    
+                    container.appendChild(zoneElement);
+                });
+            });
+        }
+        
+        // 在特定时区格式化时间
+        function formatTimeInTimezone(date, timezone) {
+            const options = {
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: timezone
+            };
+            
+            return new Intl.DateTimeFormat('zh-CN', options).format(date);
+        }
+        
+        // 检查特定时区是否使用夏令时
+        function checkDSTforTimezone(date, timezone) {
+            // 创建一个1月的日期和一个7月的日期（北半球夏冬季）
+            const janDate = new Date(date.getFullYear(), 0, 1);
+            const julDate = new Date(date.getFullYear(), 6, 1);
+            
+            // 获取这两个日期在指定时区的格式化时间
+            const janFormatted = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                timeZoneName: 'short'
+            }).format(janDate);
+            
+            const julFormatted = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                timeZoneName: 'short'
+            }).format(julDate);
+            
+            // 如果两个时间的时区名称不同，说明存在夏令时切换
+            const isDSTExists = janFormatted.split(' ').pop() !== julFormatted.split(' ').pop();
+            
+            if (!isDSTExists) {
+                return false;
+            }
+            
+            // 获取当前日期在指定时区的格式化时间
+            const currentFormatted = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                timeZoneName: 'short'
+            }).format(date);
+            
+            // 获取当前的时区缩写
+            const currentZoneAbbr = currentFormatted.split(' ').pop();
+            
+            // 获取冬季的时区缩写
+            const winterZoneAbbr = janFormatted.split(' ').pop();
+            
+            // 如果当前时区缩写与冬季时区缩写不同，则说明正在使用夏令时
+            return currentZoneAbbr !== winterZoneAbbr;
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', initializePage);
+    </script>
+</body>
+</html>

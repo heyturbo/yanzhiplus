@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>马桶大作战</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background-color: #f0f8ff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            background-image: linear-gradient(to bottom, #a7d7f9, #deedff);
+        }
+        
+        #game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #header {
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+        
+        #game-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 10px;
+        }
+        
+        #stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        #cleanliness-bar-container {
+            width: 100%;
+            height: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        #cleanliness-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #e74c3c, #f39c12, #f1c40f, #2ecc71);
+            transition: width 0.3s;
+        }
+        
+        #toilet-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            width: 100%;
+        }
+        
+        #toilet {
+            width: 80%;
+            max-width: 300px;
+            position: relative;
+            transform-origin: bottom center;
+        }
+        
+        #toilet-bowl {
+            fill: #fff;
+            transition: fill 0.5s;
+        }
+        
+        #toilet-seat {
+            transform-origin: 50% 30%;
+            transition: transform 0.3s;
+        }
+        
+        #water {
+            fill: #a7d7f9;
+            transition: fill 0.5s;
+        }
+        
+        #bubbles {
+            opacity: 0;
+        }
+        
+        .bubble {
+            animation: bubble 2s ease-in infinite;
+            animation-delay: calc(var(--delay) * 0.3s);
+            transform-origin: center;
+            opacity: 0;
+        }
+        
+        @keyframes bubble {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-20px) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        #splash {
+            position: absolute;
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2980b9;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .splash-animation {
+            animation: splash 0.5s ease-out;
+        }
+        
+        @keyframes splash {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+        
+        #tools {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px 15px 0 0;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+        }
+        
+        .tool {
+            width: 50px;
+            height: 50px;
+            margin: 0 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .tool:active {
+            transform: scale(0.9);
+        }
+        
+        .tool img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+        
+        .tool-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #e74c3c;
+            color: white;
+            font-size: 0.7rem;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .tool-disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        #notification {
+            position: absolute;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+            z-index: 100;
+        }
+        
+        #shop-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: #3498db;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 20;
+            cursor: pointer;
+        }
+        
+        #shop-button img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+        
+        #modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        #modal-content {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        #modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        #modal.show #modal-content {
+            transform: translateY(0);
+        }
+        
+        #close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+        
+        #shop-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .shop-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .shop-item:hover {
+            background-color: #eaeaea;
+        }
+        
+        .shop-item-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            background-color: #3498db;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .shop-item-icon img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+        
+        .shop-item-details {
+            flex: 1;
+        }
+        
+        .shop-item-title {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .shop-item-desc {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .shop-item-price {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+        
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(to bottom, #a7d7f9, #deedff);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        #start-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #start-button {
+            padding: 15px 30px;
+            background-color: #2ecc71;
+            color: white;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        #start-button:active {
+            transform: scale(0.95);
+        }
+        
+        #game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        #game-over.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        #game-over-title {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        #game-over-score {
+            font-size: 1.5rem;
+            color: #f1c40f;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        #restart-button {
+            padding: 15px 30px;
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        #restart-button:active {
+            transform: scale(0.95);
+        }
+        
+        .event-animation {
+            position: absolute;
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        @keyframes fall {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh - 150px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .falling {
+            animation: fall 1.5s ease-in forwards;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .floating {
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        #achievement {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background-color: rgba(46, 204, 113, 0.9);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+            text-align: center;
+            z-index: 2000;
+            transition: transform 0.5s;
+        }
+        
+        #achievement.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        #tutorial {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+        
+        #tutorial-content {
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            width: 80%;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        #tutorial-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        #tutorial-text {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #2c3e50;
+        }
+        
+        #tutorial-next {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .step {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: #ddd;
+            margin: 0 5px;
+        }
+        
+        .step.active {
+            background-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="header">
+            <div id="game-title">马桶大作战</div>
+            <div id="stats">
+                <div class="stat">
+                    <div class="stat-label">分数</div>
+                    <div class="stat-value" id="score">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">金币</div>
+                    <div class="stat-value" id="coins">0</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-label">等级</div>
+                    <div class="stat-value" id="level">1</div>
+                </div>
+            </div>
+            <div id="cleanliness-bar-container">
+                <div id="cleanliness-bar"></div>
+            </div>
+        </div>
+        
+        <div id="toilet-container">
+            <svg id="toilet" viewBox="0 0 200 250">
+                <defs>
+                    <radialGradient id="water-gradient" cx="50%" cy="50%" r="50%" fx="50%" fy="50%">
+                        <stop offset="0%" stop-color="#a7d7f9" />
+                        <stop offset="100%" stop-color="#3498db" />
+                    </radialGradient>
+                </defs>
+                
+                <!-- Toilet base -->
+                <path d="M40,150 C40,220 160,220 160,150 L160,120 L40,120 Z" fill="#f0f0f0" stroke="#d0d0d0" stroke-width="2"/>
+                
+                <!-- Toilet bowl -->
+                <ellipse id="toilet-bowl" cx="100" cy="150" rx="50" ry="30" fill="#fff" stroke="#d0d0d0" stroke-width="2"/>
+                
+                <!-- Water -->
+                <ellipse id="water" cx="100" cy="150" rx="40" ry="20" fill="url(#water-gradient)"/>
+                
+                <!-- Bubbles -->
+                <g id="bubbles">
+                    <circle class="bubble" cx="85" cy="145" r="3" fill="#fff" style="--delay: 0"></circle>
+                    <circle class="bubble" cx="95" cy="150" r="2" fill="#fff" style="--delay: 1"></circle>
+                    <circle class="bubble" cx="110" cy="145" r="4" fill="#fff" style="--delay: 2"></circle>
+                    <circle class="bubble" cx="100" cy="155" r="3" fill="#fff" style="--delay: 3"></circle>
+                    <circle class="bubble" cx="115" cy="155" r="2" fill="#fff" style="--delay: 4"></circle>
+                </g>
+                
+                <!-- Toilet seat -->
+                <g id="toilet-seat">
+                    <path d="M40,120 C40,85 160,85 160,120 L160,130 L40,130 Z" fill="#f0f0f0" stroke="#d0d0d0" stroke-width="2"/>
+                    <ellipse cx="100" cy="120" rx="60" ry="35" fill="#f0f0f0" stroke="#d0d0d0" stroke-width="2"/>
+                    <ellipse cx="100" cy="120" rx="50" ry="25" fill="#fff" stroke="#d0d0d0" stroke-width="2"/>
+                </g>
+            </svg>
+            <div id="splash">💦</div>
+        </div>
+        
+        <div id="tools">
+            <div class="tool" id="brush-tool">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjUxLjMxIDM2My4wM2wtNTMuMDctNTMuMDctMTYwLjE5IDE2MC4xOWM2LjE2IDYuMTYgMTQuMTcgOS4yNCAyMi4yMiA5LjI0IDYuNTMgMCA5Ni02LjMyIDE0NC01My45MiA0OC42My00Ny42OSA1NC4yNS0xMzcuNTQgNTQuMjUtMTQ0IDAtOC4wNS0zLjA4LTE2LjA2LTkuMjQtMjIuMjJsLTc5Ljg0IDc5Ljg0LTkuNDMgMjMuOTN6bTc2LjM1LTc2LjM0bDE0MS40Mi0xNDEuNDJjMTUuNjItMTUuNjIgMTUuNjItNDAuOTUgMC01Ni41Ny0xNS42My0xNS42My00MC45Ni0xNS42My01Ni41NyAwbC0xNDEuNDIgMTQxLjQyLTI2LjU0LTI2LjU0Yy04LjE5LTguMTktMjAuOTktNy45NC0yOC44MyAuNzlsLTc5Ljg0IDc5Ljg0Yy04LjE1IDguMTUtOC4zOSAyMS40MS0uNTQgMjkuMjZsMEw4OC41MyAzNjdsNTMuNTYtNTMuNTZjLTE3LjMyLTQuMjEtMzUuMzctMS41Ny00OC40MiAxMS40Ny0zOC4zNyAzOC4zOC00NS4xOSA4MC44My00Ny41OCA5OS41N2wtMzkuMyAzOWMtMy4yNiAzLjI2LTMuMjYgOC41NCAwIDExLjc5bDExLjc5IDExLjc5YzMuMjYgMy4yNiA4LjUzIDMuMjYgMTEuNzkgMGwzOS4zLTM5LjNjMTguNzQtMi4zOSA2MS4xOS05LjIxIDk5LjU3LTQ3LjU4IDEzLjA1LTEzLjA0IDE1LjY4LTMxLjEgMTEuNDctNDguNDJsNTMuNTYtNTMuNTYgNTMuMDggNTMuMDggMjMuOTMtOS40M0wzMTYuMiAyNjAuMzZsNDEuODcgNDEuODdjMTUuNjMgMTUuNjMgNDAuOTYgMTUuNjMgNTYuNTcgMCAxNS42Mi0xNS42MyAxNS42Mi00MC45NiAwLTU2LjU3bC00MS44Ny00MS44NyAyMy45My05LjQzeiIgZmlsbD0iIzM0OThkYiIvPjwvc3ZnPgo=" alt="刷子">
+                <span class="tool-count" id="brush-count">∞</span>
+            </div>
+            <div class="tool" id="bleach-tool">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMTY0IDE2VjE0NkgyOHYzMDRhNDYuNzIgNDYuNzIgMCAwIDAgNDYuNjkgNDZoMzYyLjYyQTQ2LjcyIDQ2LjcyIDAgMCAwIDQ4NCA0NTBWMjAyYTQ2LjcyIDQ2LjcyIDAgMCAwLTQ2LjY5LTQ2SDMwMFYxNmMwLTguODQtNy4xNi0xNi0xNi0xNmgtMTA0Yy04Ljg0IDAtMTYgNy4xNi0xNiAxNnoiIGZpbGw9IiMxYmJjOWIiLz48cGF0aCBkPSJNNDM3LjMxIDE4OEg3NC42OUE2Mi44NyA2Mi44NyAwIDAgMCAxMiAyNTAuODlWNDYxLjExQTYyLjg3IDYyLjg3IDAgMCAwIDc0LjY5IDUyNGgzNjIuNjJBNjIuODcgNjIuODcgMCAwIDAgNTAwIDQ2MS4xMVYyNTAuODlBNjIuODcgNjIuODcgMCAwIDAgNDM3LjMxIDE4OHptMjkuNzEgMjEwLjY2YzAgMjEuMzYtMTUuNDQgMzkuODItMzYuNjYgNDMuMzlMMjc2IDQ2NC4yID05LjM1IDM2Mi4wOEMxLjYzIDM3MC43MSAwIDM2NS40IDAgMzc4LjcyVjI1MC44OUMwIDIzOS42MyA5LjA4IDIzMCAxOS44MyAyMzBoMzIuMjRsLjI5LjBlOWM3NC4wOCAxOS4yTDI2MCAzMjcuODhsNTIuMDEtNTEuMzljNC4yNy00LjE0IDExLjMtNC4xNCAxNS41NS4wMmE5LjU3IDkuNTcgMCAwIDEgMCAxMy45NGwtNjQgNjNjLTEuODQgMS44NC00LjM4IDIuNzYtNy4wMiAyLjU1LTIuNjQtLjIxLTUuMDQtMS41My02LjUzLTMuNjJsLTM2LjUxLTUwLjQzLTE4Ni4wMi03OS43di0uMDFhMTYuMDEgMTYuMDEgMCAwIDEtMTEuNy0xNS40YzAtOC44NCA3LjE2LTE1IDE2LjAxLTE1aDM5My41YzEwLjc1IDAgMTkuODMgOS42MiAxOS44MyAyMC44OXYxNDcuODN6IiBmaWxsPSIjZmZmIi8+PC9zdmc+Cg==" alt="漂白剂">
+                <span class="tool-count" id="bleach-count">0</span>
+            </div>
+            <div class="tool" id="plunger-tool">
+                <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNNDMxLjk2IDE0NC45NEwzNjAgNzMuMDEgMzQ4Ljk5IDg0IDE3NS4xNiAyNTcuODNsLTI4LjI5LTI4LjI5YTggOCAwIDAgMC0xMS4zMSAwbC0xMS4zMiAxMS4zMUw3OS4zMiAxOTUuOTRhOCA4IDAgMCAwLTExLjMxIDBMNTYuNCAyMDcuNTRhOCA4IDAgMCAwIDAgMTEuMzJsMTUyLjkxIDE1Mi45YTggOCAwIDAgMCAxMS4zMSAwbDExLjYxLTExLjYxYTggOCAwIDAgMCAwLTExLjMxbC0yOC4yOS0yOC4yOSAxNzMuNzctMTczLjgzIDExLTExLjAxIDcyIDcyLjAxYTggOCAwIDAgMCAxMS4zMSAwbDExLTExLjAxYTguMDEgOC4wMSAwIDAgMC0uMDYtMTEuMjd6IiBmaWxsPSIjZTc0YzNjIi8+PHBhdGggZD0iTTMwNi41OCAyNzYuNDhsLTI2LjEzIDI2LjEzYy00Ljg2IDQuODYtMTIuODQgNC44NS0xNy43Ny0uMDhsLTk2LjcyLTk2LjcyYy0xNC40LTE0LjQtMzcuOTYtMTQuMzEtNTIuNDUuMDlsLTU5LjM0IDU5LjM0YS44My44MyAwIDAgMCAuMDEgMS4xN0wyNzQuNTggNDg2LjgyYTMxLjg1IDMxLjg1IDAgMCAwIDQ1LjA0IDBsNzEuMDgtNzEuMDhjMTIuNDItMTIuNDIgMTIuNDMtMzIuNjEuMDEtNDUuMDNsLTgzLjMzLTgzLjMzYy0uMzMtLjMyLS40Ny0uNzktLjQtMS4yMy4wNy0uNDQuMzUtLjgzLjc0LTEuMDVsMzIuMzYtMTguNzlhMTIzLjQ5IDEyMy40OSAwIDAgMCA1OC4xLTY4LjI2bDMuMTctNy45M2M1LjQtMTMuNDcgMjMuMDktNi45IDIzLjA5IDguNTl2NDZjMCAzLjE5LTEuMjggNi4yNC0zLjU0IDguNDlsLTM3LjU1IDM3LjU1YTEyLjAyIDEyLjAyIDAgMCAwLTMuNDYgOC40OXYyOS4xMnMwIC4wMS0uMDEgMGEyMi40MiAyMi40MiAwIDAgMCA2LjU2IDE1Ljg3bDI0Ljg5IDI0Ljg5YzguNzYgOC43NiA4Ljc2IDIyLjk4IDAgMzEuNzRsLTE0LjE5IDE0LjE5Yy03LjY1IDcuNjUtMTIuMDMgMTguMDQtMTIuMTcgMjguODctLjE1IDExLjMzLTEzLjg4IDE3LjEtMjEuNjUgOS4wMi03LjQxLTcuNy03LjQxLTE5Ljk3IDAtMjcuNjdsNy41LTcuNWMzLjEyLTMuMTIgMy4xMi04LjE5IDAtMTEuMzFsLTI0Ljg5LTI0Ljg5YTYuMDMgNi4wMyAwIDAgMS0xLjc3LTQuMjJ2LTI5LjEyYzAtMS42MS42NC0zLjE2IDEuNzctNC4yOWwzNy41NS0zNy41NWM1LjE0LTUuMTQgOC4wMi0xMi4xIDguMDItMTkuMzR2LTQ2YzAtMjcuMzctMzEuMTEtNDMuMjctNTEuOTUtMjYuNjVsLTMuMTcgMi41MmMtMTYuMTcgMTIuODgtMjguMTMgMzEuMDgtMzQuMiA1MS44NGwtMS41OSA1LjQyYy0yLjA2IDYuOTktOS41OCAxMS4wNi0xNi43OCA5LjA0LTguMzctMi4zNC0xMi40MS0xMS42OC03Ljg2LTE5LjQxbDE3LjQ1LTI5LjZjMjAuNi0zNC45NiA1OC43My01Ni4zMiAxMDAuMDEtNTYuMzIgMzMuNjQgMCA2NC41NyAxNC43OSA4NS41NSA0MC41MWw1LjU5IDYuODVjMi4zNSAyLjg4IDUuOTQgNC41IDkuNjkgNC4zNyA2LjkzLS4yNyAxMi4yLTYuMjcgMTEuOTMtMTMuMmExMi4wMyAxMi4wMyAwIDAgMC0zLjU1LTguMDJsLTU1LjM5LTU1LjM5Yy03LjgtNy44LTIwLjQ1LTcuOC0yOC4yNSAwbC0yNi4xMyAyNi4xM2MtNC44NiA0Ljg2LTEyLjg0IDQuODUtMTcuNzctLjA4bC05Ni43Mi05Ni43MmMtMTQuNC0xNC40LTM3Ljk2LTE0LjMxLTUyLjQ1LjA5bC01OS4zNCA1OS4zNGEuODMuODMgMCAwIDAgLjAxIDEuMTdsMjIwLjQxIDIyMC40MWMxMi40MiAxMi40MiAzMi42MSAxMi40MiA0NS4wMyAwbDcxLjA4LTcxLjA4YzEyLjQyLTEyLjQyIDEyLjQzLTMyLjYxLjAxLTQ1LjAzbC01NS4xMy01NS4xM2MtNC45NC00Ljk0LTQuOTMtMTIuOTEuMDEtMTcuODVsNTUuMTMtNTUuMTNjMTIuNDItMTIuNDIgMTIuNDItMzIuNjEgMC00NS4wM2wtNTUuMTMtNTUuMTNjLTQuODYtNC44Ni00Ljg2LTEyLjgzIDAtMTcuNjl6IiBmaWxsPSIjZTc0YzNjIi8+PC9zdmc+Cg==" alt="马桶塞">
+                <span class="tool-count" id="plunger-count">0</span>
+            </div>
+        </div>
+        
+        <div id="shop-button">
+            <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzYgNTEyIj48cGF0aCBkPSJNNTI4LjEyIDMwMS4zMTljMCAxNDUuODctMTMwLjI1NSAyMTAuNjgtMjQwLjEyIDIxMC42OFMzMS44NzUgNDQ3LjE4OCAzMS44NzUgMzAxLjMxOSAyODggLjAwNCAyODggLjAwNHMyNDAuMTIgMTU1LjQ1IDI0MC4xMiAzMDEuMzE1eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yMTAuMjU1IDQyMS42NXY0NS4zYzAgMjUuNSAzOC45NyA0NS43OSA3Ny44NDUgNDUuNzlzNzcuODQ1LTIwLjI5IDc3Ljg0NS00NS43OXYtNDUuM2MtNjguMDU1IDI3LjE5LTg3LjQzNSAyNy4xOC0xNTUuNjkgMHptNjMuMjM1LTE2Ni41MWwtMjUuNzQgOS4yMnMyNjYuNjcgOTYuNTAyIDY2LjgyLTcxLjMzYy01Ni42LTQ3LjA2Mi01My42NyA2LjIzLTUzLjY3IDYuMjNsLTQxLjA1IDE0LjY2eiIgZmlsbD0iI2YxYzQwZiIvPjxwYXRoIGQ9Ik0zNDguMDc1IDI1NWM4LjEgMCAxNC42NTUgNi41OTggMTQuNjU1IDE0Ljc1IDAgNy45OTgtNi40IDEzLjYtMTQuNCAxNC42NDh2MjIuNDA1YzAgOC41NDYtNi45MDUgMTUuNS0xNS40IDE1LjUtOC41IDAtMTYuMTk2LTYuOTUyLTE2LjE5Ni0xNS41di0yMmMtNy40LTEuMTk5LTE4LjkwNi0zLjM0OC0yOS40LTkuODQ4LTgtNC45OTgtMTUuNzA0LTExLjg5OC0xOS4zLTIwLjc5OC0yLjA5OC01LjA5OC0zLjA5NC0xMC4yOTgtMy4wOTQtMTUuMTUtLjA1Mi03Ljk5OCA2LjEtMTUuMDQgMTQuMS0xNy4wNDYgNC41NDYtMS4xMDIgOS4yNTItLjMgMTMuMzAyIDIuMDk3IDQuMSAyLjQwMiA3LjEgNi4zNTIgOC40NSAxMS4zMDIgMS45NDggNy4wNSA4LjY0OCAxMi45IDIwLjY0OCAxNi43NSA2Ljk5NiAyLjI0OCAxNC4zIDMuMyAyMC4xIDMuMzQ4eiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0xMjAgMzQ1LjY0di00MmgxNC4zM2wtMTguMDgtMjcuNzJjLTIuNDgtMy44My0yLjk4LTguNjQtMS4zMy0xMi45M2wyMy0zMS4zM2EyOS45OCAyOS45OCAwIDAxMjUuNTgtMTQuMzNjNi4wMSAwIDExLjczIDEuNzUgMTYuNjQgNS4wNmw0Ljc2IDMuMjJjMTcuMiAxMS42MyAzNi45MiAxNy43OCA1Ny4xIDE3Ljc4IDguNDUgMCAxNS4zMyA2Ljg3IDE1LjMzIDE1LjMzdjgwaDEwLjY3YzkuOTQgMCAxNi4xNiAxMC44MiAxMC45NyAxOS4xN2wtMTEuNzQgMTguODNjLTMuMjYgNS4yNC03LjY2IDkuNjQtMTIuOSAxMi45bC05LjUgNS45NGMtOC4zNSA1LjI0LTE4LjAzIDgtMjcuOTQgOGgtNjAuNTJjLTMuNzMgMC03LjQtLjczLTEwLjg1LTIuMTZsLTMwLjAzLTEyLjQ5Yy00LjE3LTEuNzMtNi44OS01LjgyLTYuODktMTAuMzV6IiBmaWxsPSIjZmZmIi8+PC9zdmc+" alt="商店">
+        </div>
+    </div>
+    
+    <div id="modal">
+        <div id="modal-content">
+            <div id="close-modal">×</div>
+            <h2>马桶清洁商店</h2>
+            <p>当前金币: <span id="shop-coins">0</span></p>
+            <div id="shop-items">
+                <div class="shop-item" data-item="bleach">
+                    <div class="shop-item-icon">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMTY0IDE2VjE0NkgyOHYzMDRhNDYuNzIgNDYuNzIgMCAwIDAgNDYuNjkgNDZoMzYyLjYyQTQ2LjcyIDQ2LjcyIDAgMCAwIDQ4NCA0NTBWMjAyYTQ2LjcyIDQ2LjcyIDAgMCAwLTQ2LjY5LTQ2SDMwMFYxNmMwLTguODQtNy4xNi0xNi0xNi0xNmgtMTA0Yy04Ljg0IDAtMTYgNy4xNi0xNiAxNnoiIGZpbGw9IiMxYmJjOWIiLz48cGF0aCBkPSJNNDM3LjMxIDE4OEg3NC42OUE2Mi44NyA2Mi44NyAwIDAgMCAxMiAyNTAuODlWNDYxLjExQTYyLjg3IDYyLjg3IDAgMCAwIDc0LjY5IDUyNGgzNjIuNjJBNjIuODcgNjIuODcgMCAwIDAgNTAwIDQ2MS4xMVYyNTAuODlBNjIuODcgNjIuODcgMCAwIDAgNDM3LjMxIDE4OHptMjkuNzEgMjEwLjY2YzAgMjEuMzYtMTUuNDQgMzkuODItMzYuNjYgNDMuMzlMMjc2IDQ2NC4yIC05LjM1IDM2Mi4wOEMxLjYzIDM3MC43MSAwIDM2NS40IDAgMzc4LjcyVjI1MC44OUMwIDIzOS42MyA5LjA4IDIzMCAxOS44MyAyMzBoMzIuMjRsLjI5LjBlOWM3NC4wOCAxOS4yTDI2MCAzMjcuODhsNTIuMDEtNTEuMzljNC4yNy00LjE0IDExLjMtNC4xNCAxNS41NS4wMmE5LjU3IDkuNTcgMCAwIDEgMCAxMy45NGwtNjQgNjNjLTEuODQgMS44NC00LjM4IDIuNzYtNy4wMiAyLjU1LTIuNjQtLjIxLTUuMDQtMS41My02LjUzLTMuNjJsLTM2LjUxLTUwLjQzLTE4Ni4wMi03OS43di0uMDFhMTYuMDEgMTYuMDEgMCAwIDEtMTEuNy0xNS40YzAtOC44NCA3LjE2LTE1IDE2LjAxLTE1aDM5My41YzEwLjc1IDAgMTkuODMgOS42MiAxOS44MyAyMC44OXYxNDcuODN6IiBmaWxsPSIjZmZmIi8+PC9zdmc+Cg==" alt="漂白剂">
+                    </div>
+                    <div class="shop-item-details">
+                        <div class="shop-item-title">高级漂白剂</div>
+                        <div class="shop-item-desc">立即恢复50%清洁度</div>
+                    </div>
+                    <div class="shop-item-price">50金币</div>
+                </div>
+                <div class="shop-item" data-item="plunger">
+                    <div class="shop-item-icon">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNNDMxLjk2IDE0NC45NEwzNjAgNzMuMDEgMzQ4Ljk5IDg0IDE3NS4xNiAyNTcuODNsLTI4LjI5LTI4LjI5YTggOCAwIDAgMC0xMS4zMSAwbC0xMS4zMiAxMS4zMUw3OS4zMiAxOTUuOTRhOCA4IDAgMCAwLTExLjMxIDBMNTYuNCAyMDcuNTRhOCA4IDAgMCAwIDAgMTEuMzJsMTUyLjkxIDE1Mi45YTggOCAwIDAgMCAxMS4zMSAwbDExLjYxLTExLjYxYTggOCAwIDAgMCAwLTExLjMxbC0yOC4yOS0yOC4yOSAxNzMuNzctMTczLjgzIDExLTExLjAxIDcyIDcyLjAxYTggOCAwIDAgMCAxMS4zMSAwbDExLTExLjAxYTguMDEgOC4wMSAwIDAgMC0uMDYtMTEuMjd6IiBmaWxsPSIjZTc0YzNjIi8+PHBhdGggZD0iTTMwNi41OCAyNzYuNDhsLTI2LjEzIDI2LjEzYy00Ljg2IDQuODYtMTIuODQgNC44NS0xNy43Ny0uMDhsLTk2LjcyLTk2LjcyYy0xNC40LTE0LjQtMzcuOTYtMTQuMzEtNTIuNDUuMDlsLTU5LjM0IDU5LjM0YS44My44MyAwIDAgMCAuMDEgMS4xN0wyNzQuNTggNDg2LjgyYTMxLjg1IDMxLjg1IDAgMCAwIDQ1LjA0IDBsNzEuMDgtNzEuMDhjMTIuNDItMTIuNDIgMTIuNDMtMzIuNjEuMDEtNDUuMDNsLTgzLjMzLTgzLjMzYy0uMzMtLjMyLS40Ny0uNzktLjQtMS4yMy4wNy0uNDQuMzUtLjgzLjc0LTEuMDVsMzIuMzYtMTguNzlhMTIzLjQ5IDEyMy40OSAwIDAgMCA1OC4xLTY4LjI2bDMuMTctNy45M2M1LjQtMTMuNDcgMjMuMDktNi45IDIzLjA5IDguNTl2NDZjMCAzLjE5LTEuMjggNi4yNC0zLjU0IDguNDlsLTM3LjU1IDM3LjU1YTEyLjAyIDEyLjAyIDAgMCAwLTMuNDYgOC40OXYyOS4xMnMwIC4wMS0uMDEgMGEyMi40MiAyMi40MiAwIDAgMCA2LjU2IDE1Ljg3bDI0Ljg5IDI0Ljg5YzguNzYgOC43NiA4Ljc2IDIyLjk4IDAgMzEuNzRsLTE0LjE5IDE0LjE5Yy03LjY1IDcuNjUtMTIuMDMgMTguMDQtMTIuMTcgMjguODctLjE1IDExLjMzLTEzLjg4IDE3LjEtMjEuNjUgOS4wMi03LjQxLTcuNy03LjQxLTE5Ljk3IDAtMjcuNjdsNy41LTcuNWMzLjEyLTMuMTIgMy4xMi04LjE5IDAtMTEuMzFsLTI0Ljg5LTI0Ljg5YTYuMDMgNi4wMyAwIDAgMS0xLjc3LTQuMjJ2LTI5LjEyYzAtMS42MS42NC0zLjE2IDEuNzctNC4yOWwzNy41NS0zNy41NWM1LjE0LTUuMTQgOC4wMi0xMi4xIDguMDItMTkuMzR2LTQ2YzAtMjcuMzctMzEuMTEtNDMuMjctNTEuOTUtMjYuNjVsLTMuMTcgMi41MmMtMTYuMTcgMTIuODgtMjguMTMgMzEuMDgtMzQuMiA1MS44NGwtMS41OSA1LjQyYy0yLjA2IDYuOTktOS41OCAxMS4wNi0xNi43OCA5LjA0LTguMzctMi4zNC0xMi40MS0xMS42OC03Ljg2LTE5LjQxbDE3LjQ1LTI5LjZjMjAuNi0zNC45NiA1OC43My01Ni4zMiAxMDAuMDEtNTYuMzIgMzMuNjQgMCA2NC41NyAxNC43OSA4NS41NSA0MC41MWw1LjU5IDYuODVjMi4zNSAyLjg4IDUuOTQgNC41IDkuNjkgNC4zNyA2LjkzLS4yNyAxMi4yLTYuMjcgMTEuOTMtMTMuMmExMi4wMyAxMi4wMyAwIDAgMC0zLjU1LTguMDJsLTU1LjM5LTU1LjM5Yy03LjgtNy44LTIwLjQ1LTcuOC0yOC4yNSAwbC0yNi4xMyAyNi4xM2MtNC44NiA0Ljg2LTEyLjg0IDQuODUtMTcuNzctLjA4bC05Ni43Mi05Ni43MmMtMTQuNC0xNC40LTM3Ljk2LTE0LjMxLTUyLjQ1LjA5bC01OS4zNCA1OS4zNGEuODMuODMgMCAwIDAgLjAxIDEuMTdsMjIwLjQxIDIyMC40MWMxMi40MiAxMi40MiAzMi42MSAxMi40MiA0NS4wMyAwbDcxLjA4LTcxLjA4YzEyLjQyLTEyLjQyIDEyLjQzLTMyLjYxLjAxLTQ1LjAzbC01NS4xMy01NS4xM2MtNC45NC00Ljk0LTQuOTMtMTIuOTEuMDEtMTcuODVsNTUuMTMtNTUuMTNjMTIuNDItMTIuNDIgMTIuNDItMzIuNjEgMC00NS4wM2wtNTUuMTMtNTUuMTNjLTQuODYtNC44Ni00Ljg2LTEyLjgzIDAtMTcuNjl6IiBmaWxsPSIjZTc0YzNjIi8+PC9zdmc+Cg==" alt="马桶塞">
+                    </div>
+                    <div class="shop-item-details">
+                        <div class="shop-item-title">强力马桶塞</div>
+                        <div class="shop-item-desc">防止水管堵塞事件</div>
+                    </div>
+                    <div class="shop-item-price">80金币</div>
+                </div>
+                <div class="shop-item" data-item="auto-cleaner">
+                    <div class="shop-item-icon">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNMjU2LjQ1NSA4YzYuNiAwIDEyIDUuNCAyIDEydjI0YzAgNi42LTUuNCAxMi0xMiAxMmgtMjRjLTYuNiAwLTEyLTUuNC0xMi0xMlYyMGMwLTYuNiA1LjQtMTIgMTItMTJoMjR6bS0xMjMuOSA0OC4yMmMzLjMtNS43NiAxMC42LTcuNzQgMTYuMy00LjQ0bDIwLjc2IDEyYzUuNjcgMy4yOCA3LjczIDEwLjYgNC40NSAxNi4yOWwtMTIgMjAuNzVjLTMuMjcgNS42Ny0xMC42IDcuNzMtMTYuMjggNC40NWwtMjAuNzYtMTJjLTUuNjctMy4yOC03LjczLTEwLjYtNC40NS0xNi4yOWwxMi0yMC43NnptMTg0IDEyLjc1YzMuMjcgNS42NyAxLjIgMTMtNC40NyAxNi4zbC0yMC43NCAxMmMtNS42OCAzLjI4LTEzIDEuMjItMTYuMjgtNC40NWwtMTItMjAuNzVjLTMuMjgtNS43LTEuMjItMTMgNC40NS0xNi4zbDIwLjc0LTEyYzUuNjgtMy4yOCAxMy0xLjIyIDE2LjI4IDQuNDVsMTIgMjAuNzV6TTI1Ni40NTUgMTEyYzc5LjUgMCAxNDQgNjQuNSAxNDQgMTQ0cy02NC41IDE0NC0xNDQgMTQ0LTE0NC02NC41LTE0NC0xNDQgNjQuNS0xNDQgMTQ0LTE0NHptMCAyNGMtNjYuMiAwLTEyMCA1My44LTEyMCAxMjBzNTMuOCAxMjAgMTIwIDEyMCAxMjAtNTMuOCAxMjAtMTIwLTUzLjgtMTIwLTEyMC0xMjB6bTAgMjRjNTMgMCA5NiA0MyA5NiA5NnMtNDMgOTYtOTYgOTYtOTYtNDMtOTYtOTYgNDMtOTYgOTYtOTZ6bS0xLjUgOTYuM2w0Mi4yNSA0Mi4yNWM5LjM3IDkuMzcgOS4zNyAyNC41NyAwIDMzLjk0LTkuMzggOS4zNy0yNC42IDkuMzctMzMuOTQgMGwtNTYuMjUtNTYuMjVjLS4zMi0uMzItLjYxLS42Ni0uODktMS4wMi04LjEtNi41Ni0zLjE2LTE4LjE0IDguMjctMjAuMTYgNi4zLTE4LjA4IDIzLjU3LTMxLjM2IDQ0LjA3LTMxLjUyIDcuOTgtLjA1IDE0LjMgNi42IDE0LjE3IDE0LjU4LS4wOCA0LjUzLTIuMTcgOC41OC01LjM4IDExLjI3LTcuMTIgNi04LjM3IDE2Ljc4LTIuMTkgMjMuNjYtLjE4LS4wNS0uMzctLjExLS41NS0uMTZzLS4zNi0uMTEtLjU1LS4xYy0yLjY4LS42My01LjUyLS4yLTguMDEgMS41NHoiIGZpbGw9IiMyZWNjNzEiLz48L3N2Zz4K" alt="自动清洁器">
+                    </div>
+                    <div class="shop-item-details">
+                        <div class="shop-item-title">自动清洁系统</div>
+                        <div class="shop-item-desc">每30秒自动清洁5%</div>
+                    </div>
+                    <div class="shop-item-price">200金币</div>
+                </div>
+                <div class="shop-item" data-item="level-up">
+                    <div class="shop-item-icon">
+                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1NzYgNTEyIj48cGF0aCBkPSJNNDcxLjkgMzA0LjkgMzM2LjE1IDE1NkwyODggMjE3LjZsLTQyLjcxLTQzLjIxYy0zLjExOC0xMC41Ni0zLjExOC0xMy4zMS44ODItMjMuNDFsMzQtODZDMjg1LjAzIDUzLjY5IDI3NC44MSA1MCAyNTYgNTBjLTE5LjY5IDAtMzggMjAtOTYgMjBDOTkuODMgNzAgNDAuMiA5MS45NCAxLjc2IDE0My44Yy04LjM2IDE3LjQ3LTIuNCAzOC4zNyAxMy41NiA0OS45MWwxMDYuOCA3Ny41OEM4OS42NiAzMDUuNCA4MCAxNDguOCA4MCAxMDRjMC01LjY0OCA0LjE4NS0xMCA5LjQtMTAgMy4wMDIgMCA1LjgxIDEuNDQ1IDcuNTkgMy44OGE1NTcuMzEgNTU3LjMxIDAgMSAzNyA3MC4yMWMxLjUgMi4zNDRjLjI2MzguMzY0NC41MDQuNzQyNC43MzcgMS4wOTcuOC4wNDggMS4wOTMuMTAxNCAxLjQ4NCAyLjUzOUMxNDcuOTEgMjI5LjIgMTgwLjAxIDA4MCAxOTIuMDEgMzUzNyAyMTQgMzUzLjM5YzIyLjM2LTEuMzYgNDEuNzMtOC4xOTMgNTguMTMtMTkuNTFDMjY5LjIzIDMzMC4zMyAyNzEuOTIgMzE5LjkzIDI4OC4zMiAzMDRsMC01OS0uMDA5Ny4wMTM3TDMzNiAxODIuNGwxMzkuMiAxNTEuNTFjMS41OSAxLjkzOCAyLjc2OSA0LjE1MiAzLjQzOSA2LjUzMy4wMTkuMzItLjE5LjQ0OS0uMTk5LjQ0OWwuMDAyLS4wMDEuMjE4LS4yMThjMy40MjkgMTEuODggMTUuMDEgMTYuMzggMTYuMzI0IDE2LjA3OEw1NDUgMzk1LjY1YzUuNjggMi4xMjUgMTEuOTUuODkwNiAxNi4wNS0zLjIwMiA0LjA5MS00LjA0OSA1LjQwOS0xMC4yMiAzLjM3OS0xNS45MWwtNDUuNTYtMTI3LjAzYy0yLjM2LTYuNTk4LTguMTI1LTExLjA3LTE0Ljk5LTExLjYxLTE0LjQxLTEuMTMzLTI0LjMzOS0xMS4xMS0yNC41MDktMTEuMjksNy4yMzktNy4xOTktOS45NzktMjEuNzE5LTcuNzk5LTIxLjciIGZpbGw9IiNlNzRjM2MiLz48L3N2Zz4K" alt="升级">
+                    </div>
+                    <div class="shop-item-details">
+                        <div class="shop-item-title">清洁技能升级</div>
+                        <div class="shop-item-desc">提升基础清洁效果</div>
+                    </div>
+                    <div class="shop-item-price">150金币</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="achievement">
+        <span id="achievement-text">成就解锁: 首次清洁!</span>
+    </div>
+    
+    <div id="notification"></div>
+    
+    <div id="start-screen">
+        <div id="start-title">马桶大作战</div>
+        <div id="start-button">开始游戏</div>
+    </div>
+    
+    <div id="game-over">
+        <div id="game-over-title">游戏结束!</div>
+        <div id="game-over-score">你的得分: <span id="final-score">0</span></div>
+        <div id="restart-button">重新开始</div>
+    </div>
+    
+    <div id="tutorial">
+        <div id="tutorial-content">
+            <div class="progress-steps">
+                <div class="step active"></div>
+                <div class="step"></div>
+                <div class="step"></div>
+            </div>
+            <div id="tutorial-title">欢迎来到马桶大作战!</div>
+            <div id="tutorial-text">在这个游戏中，你需要保持马桶的清洁度。随着时间推移，马桶会变脏，你需要点击马桶来清洁它。</div>
+            <button id="tutorial-next">下一步</button>
+        </div>
+    </div>
+    
+    <script>
+        // 游戏状态
+        const gameState = {
+            cleanliness: 100,
+            score: 0,
+            coins: 0,
+            level: 1,
+            tools: {
+                brush: { count: Infinity, power: 5 },
+                bleach: { count: 0, power: 50 },
+                plunger: { count: 0, used: false }
+            },
+            upgrades: {
+                autoCleaner: { owned: false, interval: null },
+                cleaningPower: 1
+            },
+            events: {
+                lastEventTime: 0,
+                eventTimeout: null,
+                currentEvent: null
+            },
+            gameOver: false,
+            achievements: {
+                firstClean: false,
+                level5: false,
+                score1000: false,
+                superClean: false
+            }
+        };
+        
+        // DOM 元素
+        const elements = {
+            cleanlinessBar: document.getElementById('cleanliness-bar'),
+            scoreDisplay: document.getElementById('score'),
+            coinsDisplay: document.getElementById('coins'),
+            levelDisplay: document.getElementById('level'),
+            toilet: document.getElementById('toilet'),
+            toiletBowl: document.getElementById('toilet-bowl'),
+            toiletSeat: document.getElementById('toilet-seat'),
+            water: document.getElementById('water'),
+            bubbles: document.getElementById('bubbles'),
+            splash: document.getElementById('splash'),
+            brushTool: document.getElementById('brush-tool'),
+            bleachTool: document.getElementById('bleach-tool'),
+            plungerTool: document.getElementById('plunger-tool'),
+            brushCount: document.getElementById('brush-count'),
+            bleachCount: document.getElementById('bleach-count'),
+            plungerCount: document.getElementById('plunger-count'),
+            shopButton: document.getElementById('shop-button'),
+            modal: document.getElementById('modal'),
+            closeModal: document.getElementById('close-modal'),
+            shopItems: document.querySelectorAll('.shop-item'),
+            shopCoins: document.getElementById('shop-coins'),
+            notification: document.getElementById('notification'),
+            startScreen: document.getElementById('start-screen'),
+            startButton: document.getElementById('start-button'),
+            gameOver: document.getElementById('game-over'),
+            finalScore: document.getElementById('final-score'),
+            restartButton: document.getElementById('restart-button'),
+            achievement: document.getElementById('achievement'),
+            achievementText: document.getElementById('achievement-text'),
+            tutorial: document.getElementById('tutorial'),
+            tutorialTitle: document.getElementById('tutorial-title'),
+            tutorialText: document.getElementById('tutorial-text'),
+            tutorialNext: document.getElementById('tutorial-next'),
+            tutorialSteps: document.querySelectorAll('.step')
+        };
+        
+        // 游戏主循环
+        let gameLoop;
+        
+        // 游戏初始化
+        function initGame() {
+            // 重置游戏状态
+            gameState.cleanliness = 100;
+            gameState.score = 0;
+            gameState.coins = 0;
+            gameState.level = 1;
+            gameState.tools.brush.power = 5;
+            gameState.tools.bleach.count = 0;
+            gameState.tools.plunger.count = 0;
+            gameState.tools.plunger.used = false;
+            gameState.upgrades.autoCleaner.owned = false;
+            gameState.upgrades.cleaningPower = 1;
+            gameState.gameOver = false;
+            
+            if (gameState.upgrades.autoCleaner.interval) {
+                clearInterval(gameState.upgrades.autoCleaner.interval);
+                gameState.upgrades.autoCleaner.interval = null;
+            }
+            
+            if (gameState.events.eventTimeout) {
+                clearTimeout(gameState.events.eventTimeout);
+                gameState.events.eventTimeout = null;
+            }
+            
+            // 更新显示
+            updateDisplays();
+            
+            // 隐藏游戏结束屏幕
+            elements.gameOver.classList.remove('show');
+            
+            // 开始游戏循环
+            if (gameLoop) clearInterval(gameLoop);
+            
+            gameLoop = setInterval(() => {
+                if (gameState.gameOver) return;
+                
+                // 随时间减少清洁度
+                decreaseCleanliness(0.5);
+                
+                // 检查是否应该触发随机事件
+                if (Date.now() - gameState.events.lastEventTime > 10000) {
+                    if (Math.random() < 0.3) {
+                        triggerRandomEvent();
+                    }
+                }
+                
+                // 增加得分
+                gameState.score += 1;
+                
+                // 检查是否升级
+                if (gameState.score >= gameState.level * 200) {
+                    levelUp();
+                }
+                
+                // 更新显示
+                updateDisplays();
+                
+            }, 1000);
+        }
+        
+        // 更新显示
+        function updateDisplays() {
+            // 更新清洁度条
+            elements.cleanlinessBar.style.width = `${gameState.cleanliness}%`;
+            
+            // 更新分数、金币和等级显示
+            elements.scoreDisplay.textContent = gameState.score;
+            elements.coinsDisplay.textContent = gameState.coins;
+            elements.levelDisplay.textContent = gameState.level;
+            
+            // 更新道具数量显示
+            elements.bleachCount.textContent = gameState.tools.bleach.count;
+            elements.plungerCount.textContent = gameState.tools.plunger.count;
+            
+            // 更新商店中的金币显示
+            elements.shopCoins.textContent = gameState.coins;
+            
+            // 根据清洁度更新马桶外观
+            updateToiletAppearance();
+            
+            // 检查游戏结束条件
+            if (gameState.cleanliness <= 0 && !gameState.gameOver) {
+                endGame();
+            }
+            
+            // 检查成就
+            checkAchievements();
+        }
+        
+        // 更新马桶外观
+        function updateToiletAppearance() {
+            // 根据清洁度更改颜色
+            if (gameState.cleanliness > 80) {
+                elements.toiletBowl.setAttribute('fill', '#fff');
+                elements.water.setAttribute('fill', 'url(#water-gradient)');
+            } else if (gameState.cleanliness > 60) {
+                elements.toiletBowl.setAttribute('fill', '#f9f9f9');
+                elements.water.setAttribute('fill', '#81d4fa');
+            } else if (gameState.cleanliness > 40) {
+                elements.toiletBowl.setAttribute('fill', '#f5f5f5');
+                elements.water.setAttribute('fill', '#4fc3f7');
+            } else if (gameState.cleanliness > 20) {
+                elements.toiletBowl.setAttribute('fill', '#eeeeee');
+                elements.water.setAttribute('fill', '#29b6f6');
+            } else {
+                elements.toiletBowl.setAttribute('fill', '#e0e0e0');
+                elements.water.setAttribute('fill', '#0288d1');
+            }
+        }
+        
+        // 减少清洁度
+        function decreaseCleanliness(amount) {
+            gameState.cleanliness = Math.max(0, gameState.cleanliness - amount);
+            updateDisplays();
+        }
+        
+        // 增加清洁度
+        function increaseCleanliness(amount) {
+            const effectiveAmount = amount * gameState.upgrades.cleaningPower;
+            gameState.cleanliness = Math.min(100, gameState.cleanliness + effectiveAmount);
+            updateDisplays();
+            
+            // 添加气泡动画
+            elements.bubbles.style.opacity = '1';
+            setTimeout(() => {
+                elements.bubbles.style.opacity = '0';
+            }, 2000);
+            
+            // 添加飞溅动画
+            elements.splash.style.left = `${Math.random() * 60 + 20}%`;
+            elements.splash.style.top = `${Math.random() * 20 + 40}%`;
+            elements.splash.classList.add('splash-animation');
+            setTimeout(() => {
+                elements.splash.classList.remove('splash-animation');
+            }, 500);
+            
+            // 晃动马桶座圈
+            elements.toiletSeat.style.transform = 'rotate(-5deg)';
+            setTimeout(() => {
+                elements.toiletSeat.style.transform = 'rotate(0deg)';
+            }, 300);
+        }
+        
+        // 升级
+        function levelUp() {
+            gameState.level++;
+            gameState.coins += 50;
+            showNotification(`升级到 ${gameState.level} 级! 奖励 50 金币`);
+        }
+        
+        // 触发随机事件
+        function triggerRandomEvent() {
+            if (gameState.events.currentEvent) return;
+            
+            gameState.events.lastEventTime = Date.now();
+            
+            const events = [
+                { id: 'guest', probability: 0.3, name: '访客使用', effect: -20, duration: 5000, description: '有人使用了马桶，清洁度迅速下降!' },
+                { id: 'waterShortage', probability: 0.2, name: '供水不足', effect: 0.5, duration: 15000, description: '水压不足，清洁效率降低50%!' },
+                { id: 'clog', probability: 0.15, name: '管道堵塞', effect: -5, duration: 10000, description: '马桶管道堵塞，清洁度持续下降!' },
+                { id: 'specialCleaner', probability: 0.2, name: '特效清洁剂', effect: 2, duration: 10000, description: '发现高效清洁剂，清洁效率提升100%!' },
+                { id: 'inspection', probability: 0.15, name: '卫生检查', effect: 0, duration: 8000, description: '卫生检查员来了，保持高清洁度可获得奖励!' }
+            ];
+            
+            // 根据概率选择事件
+            let totalProb = 0;
+            const rand = Math.random();
+            let selectedEvent = null;
+            
+            for (const event of events) {
+                totalProb += event.probability;
+                if (rand <= totalProb) {
+                    selectedEvent = event;
+                    break;
+                }
+            }
+            
+            // 如果选择了管道堵塞事件且玩家有马桶塞道具，则使用马桶塞
+            if (selectedEvent.id === 'clog' && gameState.tools.plunger.count > 0 && !gameState.tools.plunger.used) {
+                gameState.tools.plunger.count--;
+                gameState.tools.plunger.used = true;
+                updateDisplays();
+                showNotification('马桶塞自动使用，阻止了管道堵塞!');
+                setTimeout(() => {
+                    gameState.tools.plunger.used = false;
+                }, 20000);
+                return;
+            }
+            
+            gameState.events.currentEvent = selectedEvent;
+            showNotification(`事件: ${selectedEvent.name} - ${selectedEvent.description}`);
+            
+            // 创建事件动画
+            createEventAnimation(selectedEvent);
+            
+            // 根据事件类型执行效果
+            switch (selectedEvent.id) {
+                case 'guest':
+                    decreaseCleanliness(selectedEvent.effect);
+                    break;
+                    
+                case 'waterShortage':
+                    // 减少清洁效率，将在事件结束时恢复
+                    gameState.upgrades.cleaningPower *= selectedEvent.effect;
+                    break;
+                    
+                case 'clog':
+                    // 持续减少清洁度直到事件结束
+                    const clogInterval = setInterval(() => {
+                        if (!gameState.events.currentEvent || gameState.events.currentEvent.id !== 'clog') {
+                            clearInterval(clogInterval);
+                            return;
+                        }
+                        decreaseCleanliness(selectedEvent.effect);
+                    }, 1000);
+                    break;
+                    
+                case 'specialCleaner':
+                    // 提高清洁效率，将在事件结束时恢复
+                    gameState.upgrades.cleaningPower *= selectedEvent.effect;
+                    break;
+                    
+                case 'inspection':
+                    // 检查事件结束时的清洁度，给予奖励
+                    break;
+            }
+            
+            // 设置事件持续时间
+            gameState.events.eventTimeout = setTimeout(() => {
+                // 事件结束，恢复正常状态
+                if (selectedEvent.id === 'waterShortage') {
+                    gameState.upgrades.cleaningPower /= selectedEvent.effect;
+                } else if (selectedEvent.id === 'specialCleaner') {
+                    gameState.upgrades.cleaningPower /= selectedEvent.effect;
+                } else if (selectedEvent.id === 'inspection') {
+                    // 根据当前清洁度给予奖励
+                    if (gameState.cleanliness > 80) {
+                        const reward = Math.floor(gameState.cleanliness / 10);
+                        gameState.coins += reward;
+                        showNotification(`检查通过! 获得 ${reward} 金币奖励`);
+                    } else {
+                        showNotification('检查不合格! 没有获得奖励');
+                    }
+                }
+                
+                gameState.events.currentEvent = null;
+            }, selectedEvent.duration);
+        }
+        
+        // 创建事件动画
+        function createEventAnimation(event) {
+            const container = document.getElementById('toilet-container');
+            const animation = document.createElement('div');
+            animation.className = 'event-animation';
+            
+            switch(event.id) {
+                case 'guest':
+                    animation.innerHTML = '👤';
+                    animation.style.fontSize = '40px';
+                    animation.style.left = '75%';
+                    animation.style.top = '30%';
+                    animation.classList.add('falling');
+                    break;
+                    
+                case 'waterShortage':
+                    animation.innerHTML = '💧';
+                    animation.style.fontSize = '40px';
+                    animation.style.left = '30%';
+                    animation.style.top = '40%';
+                    animation.style.opacity = '0.5';
+                    animation.classList.add('floating');
+                    break;
+                    
+                case 'clog':
+                    animation.innerHTML = '⚠️';
+                    animation.style.fontSize = '40px';
+                    animation.style.left = '50%';
+                    animation.style.top = '60%';
+                    animation.classList.add('floating');
+                    break;
+                    
+                case 'specialCleaner':
+                    animation.innerHTML = '✨';
+                    animation.style.fontSize = '40px';
+                    animation.style.left = '60%';
+                    animation.style.top = '50%';
+                    animation.classList.add('floating');
+                    break;
+                    
+                case 'inspection':
+                    animation.innerHTML = '👮';
+                    animation.style.fontSize = '40px';
+                    animation.style.left = '20%';
+                    animation.style.top = '30%';
+                    animation.classList.add('floating');
+                    break;
+            }
+            
+            container.appendChild(animation);
+            
+            // 移除动画元素
+            setTimeout(() => {
+                container.removeChild(animation);
+            }, event.duration);
+        }
+        
+        // 显示通知
+        function showNotification(message) {
+            elements.notification.textContent = message;
+            elements.notification.style.opacity = '1';
+            
+            setTimeout(() => {
+                elements.notification.style.opacity = '0';
+            }, 3000);
+        }
+        
+        // 结束游戏
+        function endGame() {
+            gameState.gameOver = true;
+            clearInterval(gameLoop);
+            
+            if (gameState.upgrades.autoCleaner.interval) {
+                clearInterval(gameState.upgrades.autoCleaner.interval);
+            }
+            
+            elements.finalScore.textContent = gameState.score;
+            elements.gameOver.classList.add('show');
+        }
+        
+        // 检查成就
+        function checkAchievements() {
+            if (!gameState.achievements.firstClean && gameState.score > 10) {
+                gameState.achievements.firstClean = true;
+                showAchievement('成就解锁: 初级清洁工!');
+            }
+            
+            if (!gameState.achievements.level5 && gameState.level >= 5) {
+                gameState.achievements.level5 = true;
+                showAchievement('成就解锁: 清洁专家!');
+                gameState.coins += 100;
+            }
+            
+            if (!gameState.achievements.score1000 && gameState.score >= 1000) {
+                gameState.achievements.score1000 = true;
+                showAchievement('成就解锁: 坚持不懈!');
+                gameState.coins += 200;
+            }
+            
+            if (!gameState.achievements.superClean && gameState.cleanliness >= 95 && gameState.score > 500) {
+                gameState.achievements.superClean = true;
+                showAchievement('成就解锁: 洁净如新!');
+                gameState.coins += 150;
+            }
+        }
+        
+        // 显示成就
+        function showAchievement(text) {
+            elements.achievementText.textContent = text;
+            elements.achievement.classList.add('show');
+            
+            setTimeout(() => {
+                elements.achievement.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 事件监听器
+        function setupEventListeners() {
+            // 马桶点击事件
+            elements.toilet.addEventListener('click', () => {
+                if (gameState.gameOver) return;
+                
+                increaseCleanliness(gameState.tools.brush.power);
+                gameState.coins += 1;
+                updateDisplays();
+            });
+            
+            // 刷子道具点击事件
+            elements.brushTool.addEventListener('click', () => {
+                if (gameState.gameOver) return;
+                
+                increaseCleanliness(gameState.tools.brush.power * 2);
+                showNotification('使用刷子进行清洁!');
+            });
+            
+            // 漂白剂道具点击事件
+            elements.bleachTool.addEventListener('click', () => {
+                if (gameState.gameOver || gameState.tools.bleach.count <= 0) return;
+                
+                gameState.tools.bleach.count--;
+                increaseCleanliness(gameState.tools.bleach.power);
+                showNotification('使用漂白剂进行深度清洁!');
+            });
+            
+            // 马桶塞道具点击事件
+            elements.plungerTool.addEventListener('click', () => {
+if (gameState.gameOver || gameState.tools.plunger.count <= 0) return;
+                
+                if (gameState.events.currentEvent && gameState.events.currentEvent.id === 'clog') {
+                    // 如果当前有管道堵塞事件，立即解除
+                    gameState.tools.plunger.count--;
+                    clearTimeout(gameState.events.eventTimeout);
+                    gameState.events.currentEvent = null;
+                    showNotification('使用马桶塞解决了管道堵塞!');
+                } else {
+                    gameState.tools.plunger.count--;
+                    gameState.tools.plunger.used = true;
+                    showNotification('马桶塞已激活，将阻止下一次管道堵塞!');
+                    setTimeout(() => {
+                        if (gameState.tools.plunger.used) {
+                            gameState.tools.plunger.used = false;
+                            showNotification('马桶塞效果已过期!');
+                        }
+                    }, 30000);
+                }
+                
+                updateDisplays();
+            });
+            
+            // 商店按钮点击事件
+            elements.shopButton.addEventListener('click', () => {
+                elements.modal.classList.add('show');
+            });
+            
+            // 关闭商店按钮点击事件
+            elements.closeModal.addEventListener('click', () => {
+                elements.modal.classList.remove('show');
+            });
+            
+            // 商店物品点击事件
+            elements.shopItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const itemType = item.getAttribute('data-item');
+                    let price = 0;
+                    
+                    switch (itemType) {
+                        case 'bleach':
+                            price = 50;
+                            if (gameState.coins >= price) {
+                                gameState.coins -= price;
+                                gameState.tools.bleach.count++;
+                                showNotification('购买了高级漂白剂!');
+                            } else {
+                                showNotification('金币不足!');
+                            }
+                            break;
+                            
+                        case 'plunger':
+                            price = 80;
+                            if (gameState.coins >= price) {
+                                gameState.coins -= price;
+                                gameState.tools.plunger.count++;
+                                showNotification('购买了强力马桶塞!');
+                            } else {
+                                showNotification('金币不足!');
+                            }
+                            break;
+                            
+                        case 'auto-cleaner':
+                            price = 200;
+                            if (gameState.upgrades.autoCleaner.owned) {
+                                showNotification('已经拥有自动清洁系统!');
+                                return;
+                            }
+                            
+                            if (gameState.coins >= price) {
+                                gameState.coins -= price;
+                                gameState.upgrades.autoCleaner.owned = true;
+                                
+                                // 启动自动清洁定时器
+                                gameState.upgrades.autoCleaner.interval = setInterval(() => {
+                                    if (!gameState.gameOver) {
+                                        increaseCleanliness(5);
+                                    }
+                                }, 30000);
+                                
+                                showNotification('安装了自动清洁系统!');
+                            } else {
+                                showNotification('金币不足!');
+                            }
+                            break;
+                            
+                        case 'level-up':
+                            price = 150;
+                            if (gameState.coins >= price) {
+                                gameState.coins -= price;
+                                gameState.upgrades.cleaningPower += 0.5;
+                                gameState.tools.brush.power += 2;
+                                showNotification('清洁能力提升!');
+                            } else {
+                                showNotification('金币不足!');
+                            }
+                            break;
+                    }
+                    
+                    updateDisplays();
+                });
+            });
+            
+            // 开始按钮点击事件
+            elements.startButton.addEventListener('click', () => {
+                elements.startScreen.style.display = 'none';
+                showTutorial();
+            });
+            
+            // 重新开始按钮点击事件
+            elements.restartButton.addEventListener('click', () => {
+                initGame();
+            });
+            
+            // 教程下一步按钮点击事件
+            elements.tutorialNext.addEventListener('click', () => {
+                advanceTutorial();
+            });
+        }
+        
+        // 显示教程
+        let tutorialStep = 0;
+        const tutorialData = [
+            {
+                title: "欢迎来到马桶大作战!",
+                text: "在这个游戏中，你需要保持马桶的清洁度。随着时间推移，马桶会变脏，你需要点击马桶来清洁它。"
+            },
+            {
+                title: "清洁工具",
+                text: "游戏底部有各种清洁工具。基础刷子无限使用，而漂白剂和马桶塞需要在商店购买。点击右上角的商店图标可以购买更多工具和升级。"
+            },
+            {
+                title: "小心随机事件!",
+                text: "游戏中会随机出现各种事件，如访客使用、管道堵塞等，这些事件会影响清洁度。使用正确的工具应对这些事件，保持马桶清洁!"
+            }
+        ];
+        
+        function showTutorial() {
+            tutorialStep = 0;
+            updateTutorialContent();
+            elements.tutorial.style.display = 'flex';
+        }
+        
+        function advanceTutorial() {
+            tutorialStep++;
+            if (tutorialStep >= tutorialData.length) {
+                elements.tutorial.style.display = 'none';
+                initGame();
+                return;
+            }
+            
+            updateTutorialContent();
+        }
+        
+        function updateTutorialContent() {
+            elements.tutorialTitle.textContent = tutorialData[tutorialStep].title;
+            elements.tutorialText.textContent = tutorialData[tutorialStep].text;
+            
+            // 更新进度指示器
+            elements.tutorialSteps.forEach((step, index) => {
+                if (index === tutorialStep) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            });
+        }
+        
+        // 初始化游戏
+        function init() {
+            setupEventListeners();
+            // 游戏开始时显示开始屏幕
+            elements.startScreen.style.display = 'flex';
+        }
+        
+        // 加载后启动游戏
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>

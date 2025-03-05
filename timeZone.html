@@ -42,17 +42,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
-        }
-        
         h1 {
             font-size: 28px;
             margin-bottom: 10px;
@@ -103,10 +92,6 @@
             margin: 5px 0 10px;
             color: #3b82f6;
             transition: color 0.3s;
-        }
-        
-        .current-time-display.updating {
-            animation: pulse 0.5s ease;
         }
         
         .dst-info {
@@ -238,32 +223,6 @@
             transform: translateY(0);
         }
         
-        .convert-btn:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120%;
-            height: 120%;
-            background-color: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
-            transition: transform 0.5s, opacity 0.3s;
-        }
-        
-        .convert-btn:active:after {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            transition: 0s;
-        }
-        
-        .convert-btn.active:after {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-            transition: 0s;
-        }
-        
         .time-zones {
             display: flex;
             flex-direction: column;
@@ -290,9 +249,8 @@
             background-color: #f8fafc;
             border-radius: 12px;
             margin-bottom: 10px;
-            animation: slideIn 0.3s ease-out;
-            transition: transform 0.2s, background-color 0.2s;
-            position: relative;
+            opacity: 1;
+            transition: background-color 0.2s, transform 0.2s;
         }
         
         .zone:hover {
@@ -451,7 +409,6 @@
     <div class="container">
         <div class="header">
             <h1>国际时区转换</h1>
-            <p>查看全球主要城市的精确时间</p>
         </div>
         
         <div class="card current-time">
@@ -531,6 +488,11 @@
             { region: "协调时间", name: "UTC", code: "UTC", emoji: "🌐", info: "协调世界时 (UTC+0)", favorite: false },
         ];
         
+        // 内存中存储收藏夹（localStorage的替代方案）
+        const memoryStorage = {
+            favoriteTimeZones: []
+        };
+        
         // 存储参考日期（用于日期对比）
         let referenceDate = null;
         
@@ -540,6 +502,18 @@
         // 时间格式设置
         let use24HFormat = true;
         
+        // 检查存储是否可用
+        function isStorageAvailable() {
+            try {
+                const testKey = '__storage_test__';
+                window.localStorage.setItem(testKey, testKey);
+                window.localStorage.removeItem(testKey);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+        
         // 初始化页面
         function initializePage() {
             loadFavorites();
@@ -547,7 +521,7 @@
             populateTimezoneSelect();
             setInitialCustomTime();
             
-            // 设置定时器每秒更新时间
+            // 设置定时器每秒更新时间 - 但不使用闪烁效果
             setInterval(updateLocalTime, 1000);
             
             // 添加转换按钮点击事件
@@ -590,12 +564,13 @@
                     let hasVisibleZones = false;
                     
                     // 查找该区域下所有可见的时区
-                    while (nextElement && !nextElement.classList.contains('region-title')) {
-                        if (nextElement.classList.contains('zone') && nextElement.style.display !== 'none') {
+                    let currentElement = nextElement;
+                    while (currentElement && !currentElement.classList.contains('region-title')) {
+                        if (currentElement.classList.contains('zone') && currentElement.style.display !== 'none') {
                             hasVisibleZones = true;
                             break;
                         }
-                        nextElement = nextElement.nextElementSibling;
+                        currentElement = currentElement.nextElementSibling;
                     }
                     
                     title.style.display = hasVisibleZones ? 'block' : 'none';
@@ -609,31 +584,48 @@
         
         // 加载收藏的时区
         function loadFavorites() {
-            const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-            timeZones.forEach(zone => {
-                zone.favorite = favorites.includes(zone.code);
-            });
+            try {
+                if (isStorageAvailable()) {
+                    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
+                    timeZones.forEach(zone => {
+                        zone.favorite = favorites.includes(zone.code);
+                    });
+                } else {
+                    // 使用内存存储的替代方案
+                    timeZones.forEach(zone => {
+                        zone.favorite = memoryStorage.favoriteTimeZones.includes(zone.code);
+                    });
+                }
+            } catch (e) {
+                console.log('Error loading favorites:', e);
+                // 出错时忽略，继续使用默认值
+            }
         }
         
         // 保存收藏的时区
         function saveFavorites() {
-            const favorites = timeZones.filter(zone => zone.favorite).map(zone => zone.code);
-            localStorage.setItem('favorites', JSON.stringify(favorites));
+            try {
+                const favorites = timeZones.filter(zone => zone.favorite).map(zone => zone.code);
+                
+                if (isStorageAvailable()) {
+                    localStorage.setItem('favorites', JSON.stringify(favorites));
+                } else {
+                    // 使用内存存储的替代方案
+                    memoryStorage.favoriteTimeZones = favorites;
+                }
+            } catch (e) {
+                console.log('Error saving favorites:', e);
+                // 出错时忽略
+            }
         }
         
-        // 更新本地时间显示
+        // 更新本地时间显示 - 移除闪烁效果
         function updateLocalTime() {
             const now = new Date();
             const localTimeElement = document.getElementById('local-time');
             const dstInfoElement = document.getElementById('dst-info');
             
-            // 添加更新动画
-            localTimeElement.classList.add('updating');
-            setTimeout(() => {
-                localTimeElement.classList.remove('updating');
-            }, 500);
-            
-            // 格式化本地时间显示
+            // 直接更新时间，不添加闪烁动画
             localTimeElement.textContent = formatDateTime(now);
             
             // 检测是否使用夏令时
@@ -823,16 +815,21 @@
             
             customTimeActive = true;
             
-            // 显示转换按钮动画
+            // 更新转换按钮文本以指示成功
             const convertBtn = document.getElementById('convert-btn');
-            convertBtn.classList.add('active');
-            setTimeout(() => convertBtn.classList.remove('active'), 300);
+            const originalText = convertBtn.textContent;
+            convertBtn.textContent = '✓ 转换成功';
+            
+            // 3秒后恢复原文本
+            setTimeout(() => {
+                convertBtn.textContent = originalText;
+            }, 1500);
             
             // 更新所有时区
             updateAllTimeZones(utcTime);
         }
         
-        // 更新所有时区显示
+        // 更新所有时区显示 - 移除闪烁动画
         function updateAllTimeZones(baseTime) {
             const container = document.getElementById('time-zones-container');
             container.innerHTML = '';
@@ -848,7 +845,7 @@
                 
                 // 添加收藏的时区
                 timeZones.filter(zone => zone.favorite).forEach((zone, index) => {
-                    createZoneElement(zone, baseTime, container, 0, index);
+                    createZoneElement(zone, baseTime, container);
                 });
             }
             
@@ -863,20 +860,16 @@
                 container.appendChild(regionTitle);
                 
                 // 添加该区域的所有非收藏时区
-                timeZones.filter(tz => tz.region === region && !tz.favorite).forEach((zone, zoneIndex) => {
-                    createZoneElement(zone, baseTime, container, regionIndex + 1, zoneIndex);
+                timeZones.filter(tz => tz.region === region && !tz.favorite).forEach((zone) => {
+                    createZoneElement(zone, baseTime, container);
                 });
             });
-            
-            // 优化性能：限制动画数量
-            optimizeAnimations();
         }
         
-        // 创建时区元素
-        function createZoneElement(zone, baseTime, container, regionIndex, zoneIndex) {
+        // 创建时区元素 - 移除闪烁动画
+        function createZoneElement(zone, baseTime, container) {
             const zoneElement = document.createElement('div');
             zoneElement.className = 'zone';
-            zoneElement.style.animationDelay = `${(regionIndex * 0.1 + zoneIndex * 0.05)}s`;
             
             // 格式化该时区的时间
             const localizedTime = new Date(baseTime);
@@ -994,7 +987,7 @@
                 favoriteBtn.innerHTML = zone.favorite ? '★' : '☆';
                 favoriteBtn.title = zone.favorite ? '取消收藏' : '添加到收藏';
                 
-                // 保存收藏到localStorage
+                // 保存收藏
                 saveFavorites();
                 
                 // 重新排序时区，将收藏放在顶部
@@ -1008,33 +1001,6 @@
             zoneElement.appendChild(favoriteBtn);
             
             container.appendChild(zoneElement);
-        }
-        
-        // 优化动画性能
-        function optimizeAnimations() {
-            // 限制动画数量
-            const MAX_ANIMATED_ZONES = 10;
-            const allZones = document.querySelectorAll('.zone');
-            
-            if (allZones.length > MAX_ANIMATED_ZONES) {
-                // 找出可见的时区
-                const visibleZones = Array.from(allZones).filter(zone => {
-                    const rect = zone.getBoundingClientRect();
-                    return rect.top >= 0 && rect.bottom <= window.innerHeight;
-                });
-                
-                // 只为可见区域内的前MAX_ANIMATED_ZONES个元素保留动画
-                visibleZones.slice(0, MAX_ANIMATED_ZONES).forEach(zone => {
-                    zone.style.animation = 'slideIn 0.3s ease-out';
-                });
-                
-                // 移除其他元素的动画
-                Array.from(allZones)
-                    .filter(zone => !visibleZones.slice(0, MAX_ANIMATED_ZONES).includes(zone))
-                    .forEach(zone => {
-                        zone.style.animation = 'none';
-                    });
-            }
         }
         
         // 页面加载完成后初始化

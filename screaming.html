@@ -2854,7 +2854,7 @@ function createCheckInUI() {
     checkInContainer.style.transform = 'translateX(150%)';
     checkInContainer.style.transition = 'transform 0.3s ease-out';
     checkInContainer.style.maxHeight = '80vh';
-    checkInContainer.style.overflowY = 'auto';
+    checkInContainer.style.overflowY = 'scroll';
     
     // 添加标题
     const title = document.createElement('h3');
@@ -3469,7 +3469,7 @@ function showBigScreenText() {
     container.style.display = 'flex';
     container.style.justifyContent = 'center';
     container.style.alignItems = 'center';
-    container.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+    container.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // 初始透明度为0.7
     container.style.zIndex = '200';
     container.style.opacity = '0';
     container.style.transition = 'opacity 0.3s';
@@ -3491,9 +3491,10 @@ function showBigScreenText() {
     container.appendChild(textElem);
     document.body.appendChild(container);
     
-    // 动画显示
+    // 动画显示，使用可见度控制
     setTimeout(() => {
-        container.style.opacity = '1';
+        // 应用可见度控制确保界面可见
+        VisibilityController.applyVisibilityControl(container, 1);
         textElem.style.transform = 'scale(1.2) rotate(5deg)';
         
         // 震动屏幕
@@ -4325,7 +4326,6 @@ function createRandomEasterEgg(intensity) {
     }
 }
 
-// 彩蛋1: 流星效果
 function createFallingStars() {
     const stars = isLowPerformanceDevice ? 10 : 20;
     
@@ -4397,11 +4397,14 @@ function createFallingStars() {
         }, i * (isLowPerformanceDevice ? 200 : 100));
     }
     
-    // 显示彩蛋标题
-    showEasterEggTitle('流星雨', '✨');
+    // 不再显示彩蛋标题
+    // showEasterEggTitle('流星雨', '✨'); - 已移除
 }
 
-// 彩蛋2: 彩虹模式
+/**
+ * 修改版本的彩虹模式 - 不显示彩蛋标题
+ */
+// 修改彩虹模式效果
 function createRainbowMode() {
     // 创建彩虹背景
     const rainbow = document.createElement('div');
@@ -4418,9 +4421,10 @@ function createRainbowMode() {
     
     document.body.appendChild(rainbow);
     
-    // 显示背景
+    // 显示背景，使用可见度控制
     setTimeout(() => {
-        rainbow.style.opacity = '0.2';
+        // 确保彩虹效果不会完全遮挡界面
+        VisibilityController.applyVisibilityControl(rainbow, 0.2);
         
         // 创建彩虹粒子
         if (!isLowPerformanceDevice) {
@@ -4438,10 +4442,8 @@ function createRainbowMode() {
             }, 1000);
         }, 5000);
     }, 10);
-    
-    // 显示彩蛋标题
-    showEasterEggTitle('彩虹模式', '🌈');
 }
+
 
 // 彩虹粒子
 function createRainbowParticles() {
@@ -4505,15 +4507,16 @@ function createRainbowParticles() {
 }
 
 // 彩蛋3: 黑客帝国效果
+// 修改 Matrix 效果函数确保可见度
 function createMatrixEffect() {
-    // 创建黑色背景
+    // 创建半透明黑色背景，使用VisibilityController确保可见度
     const matrix = document.createElement('div');
     matrix.style.position = 'fixed';
     matrix.style.top = '0';
     matrix.style.left = '0';
     matrix.style.width = '100%';
     matrix.style.height = '100%';
-    matrix.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    matrix.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // 初始透明度设置为0.7
     matrix.style.opacity = '0';
     matrix.style.transition = 'opacity 1s';
     matrix.style.zIndex = '100';
@@ -4521,9 +4524,10 @@ function createMatrixEffect() {
     
     document.body.appendChild(matrix);
     
-    // 显示背景
+    // 使用VisibilityController控制显示
     setTimeout(() => {
-        matrix.style.opacity = '1';
+        // 应用可见度控制，限制最大不透明度
+        VisibilityController.applyVisibilityControl(matrix, 1);
         
         // 创建掉落文字
         if (!isLowPerformanceDevice) {
@@ -4541,9 +4545,6 @@ function createMatrixEffect() {
             }, 1000);
         }, 5000);
     }, 10);
-    
-    // 显示彩蛋标题
-    showEasterEggTitle('黑客帝国', '👨‍💻');
 }
 
 // 黑客帝国文字
@@ -4685,9 +4686,10 @@ function createHeartExplosion() {
         }, i * (isLowPerformanceDevice ? 50 : 30));
     }
     
-    // 显示彩蛋标题
-    showEasterEggTitle('爱的爆发', '💖');
+    // 不再显示彩蛋标题
+    // showEasterEggTitle('爱的爆发', '💖'); - 已移除
 }
+
 
 // 显示彩蛋标题
 function showEasterEggTitle(title, emoji) {
@@ -5030,7 +5032,7 @@ function createSmokeElement(container) {
 function createExplosionEffect(intensity) {
     if (intensity < 95) return; // 只在几乎满强度时触发
     
-    // 创建爆炸容器
+    // 创建爆炸容器，使用可见度控制
     const explosionContainer = document.createElement('div');
     explosionContainer.style.position = 'fixed';
     explosionContainer.style.top = '0';
@@ -5044,9 +5046,11 @@ function createExplosionEffect(intensity) {
     
     document.body.appendChild(explosionContainer);
     
-    // 闪光效果
+    // 闪光效果，使用可见度控制
     setTimeout(() => {
-        explosionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        // 设置背景颜色，通过VisibilityController控制透明度
+        explosionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+        VisibilityController.applyVisibilityControl(explosionContainer, 0.7);
         
         // 震动屏幕
         shakeScreen(8);
@@ -5081,6 +5085,68 @@ function createExplosionEffect(intensity) {
     showBigScreenText();
 }
 
+// 安全地创建蒙层的新函数
+function createSafeOverlay(color, zIndex, duration = 500) {
+    // 使用可见度控制器创建安全的蒙层
+    const overlay = VisibilityController.createSafeOverlay(color, zIndex);
+    document.body.appendChild(overlay);
+    
+    // 设置初始状态
+    overlay.style.opacity = '0';
+    
+    // 淡入显示
+    setTimeout(() => {
+        VisibilityController.fadeInSafely(overlay, duration);
+    }, 10);
+    
+    return overlay;
+}
+
+function integrateVisibilityController() {
+    console.log('正在集成可见度控制器...');
+    
+    // 替换原有的特效函数
+    if (typeof window.createMatrixEffect === 'function') {
+        console.log('覆盖 Matrix 效果函数');
+        window.originalCreateMatrixEffect = window.createMatrixEffect;
+        window.createMatrixEffect = createMatrixEffect;
+    }
+    
+    if (typeof window.createRainbowMode === 'function') {
+        console.log('覆盖彩虹模式函数');
+        window.originalCreateRainbowMode = window.createRainbowMode;
+        window.createRainbowMode = createRainbowMode;
+    }
+    
+    if (typeof window.showBigScreenText === 'function') {
+        console.log('覆盖全屏文字函数');
+        window.originalShowBigScreenText = window.showBigScreenText;
+        window.showBigScreenText = showBigScreenText;
+    }
+    
+    if (typeof window.createExplosionEffect === 'function') {
+        console.log('覆盖爆炸效果函数');
+        window.originalCreateExplosionEffect = window.createExplosionEffect;
+        window.createExplosionEffect = createExplosionEffect;
+    }
+    
+    if (typeof window.createFullscreenTextAnimation === 'function') {
+        console.log('增强全屏文字动画函数');
+        // 保存对原始函数的引用
+        window.originalCreateFullscreenTextAnimation = window.createFullscreenTextAnimation;
+        
+        // 替换为增强版本，确保使用原始引用避免递归
+        window.createFullscreenTextAnimation = function(intensity) {
+            return enhancedCreateFullscreenTextAnimation(intensity);
+        };
+    }
+    
+    // 修改任何使用不透明度的函数
+    patchOpacityProperties();
+    
+    console.log('可见度控制器集成完成');
+}
+        
 // 创建爆炸碎片
 function createExplosionDebris() {
     const debrisCount = isLowPerformanceDevice ? 20 : 50;
@@ -5264,7 +5330,7 @@ function createEmotionAnalysisReport() {
     reportContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
     reportContainer.style.padding = '20px';
     reportContainer.style.zIndex = '1000';
-    reportContainer.style.overflowY = 'auto';
+    reportContainer.style.overflowY = 'scroll';
     reportContainer.style.opacity = '0';
     reportContainer.style.transition = 'opacity 0.3s, transform 0.3s';
     
@@ -5876,6 +5942,230 @@ document.addEventListener('DOMContentLoaded', installCyberScreamEnhancements);
         window.addEventListener('beforeunload', function() {
             localStorage.setItem('totalRelease', totalRelease.toString());
         });
+
+// 特效可见度控制器 - 确保主界面至少有50%可见度
+const VisibilityController = {
+    // 最大允许的不透明度（确保主界面至少50%可见度）
+    MAX_OPACITY: 0.5,
+    
+    // 应用透明度控制到元素
+    applyVisibilityControl: function(element, desiredOpacity = 1.0) {
+        // 将期望的不透明度限制在安全范围内
+        const safeOpacity = Math.min(desiredOpacity, this.MAX_OPACITY);
+        
+        // 应用安全不透明度
+        if (element && element.style) {
+            element.style.opacity = safeOpacity.toString();
+            
+            // 为特定类型的效果调整背景颜色的alpha通道
+            if (element.style.backgroundColor && element.style.backgroundColor.includes('rgba')) {
+                const bgColor = element.style.backgroundColor;
+                const parts = bgColor.match(/rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/);
+                
+                if (parts && parts.length >= 5) {
+                    const r = parseInt(parts[1]);
+                    const g = parseInt(parts[2]);
+                    const b = parseInt(parts[3]);
+                    // 替换alpha值，确保不超过最大值
+                    const newAlpha = Math.min(parseFloat(parts[4]), this.MAX_OPACITY);
+                    element.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${newAlpha})`;
+                }
+            }
+        }
+        
+        return safeOpacity;
+    },
+    
+    // 创建安全的覆盖层
+    createSafeOverlay: function(color = 'rgba(0, 0, 0, 0.5)', zIndex = 100) {
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.pointerEvents = 'none';
+        overlay.style.zIndex = zIndex.toString();
+        
+        // 确保覆盖层不会完全遮挡界面
+        if (color.includes('rgba')) {
+            const parts = color.match(/rgba\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)/);
+            if (parts && parts.length >= 5) {
+                const r = parseInt(parts[1]);
+                const g = parseInt(parts[2]);
+                const b = parseInt(parts[3]);
+                // 应用安全的透明度
+                const safeAlpha = Math.min(parseFloat(parts[4]), this.MAX_OPACITY);
+                overlay.style.backgroundColor = `rgba(${r}, ${g}, ${b}, ${safeAlpha})`;
+            } else {
+                overlay.style.backgroundColor = color;
+            }
+        } else {
+            // 对于非rgba颜色，应用最大不透明度
+            overlay.style.backgroundColor = color;
+            overlay.style.opacity = this.MAX_OPACITY.toString();
+        }
+        
+        return overlay;
+    },
+    
+    // 逐渐显示元素，确保不超过最大透明度
+    fadeInSafely: function(element, duration = 1000, targetOpacity = 1.0) {
+        if (!element || !element.style) return;
+        
+        // 计算安全的目标不透明度
+        const safeTargetOpacity = Math.min(targetOpacity, this.MAX_OPACITY);
+        
+        // 设置初始状态
+        element.style.opacity = '0';
+        
+        // 应用过渡效果
+        element.style.transition = `opacity ${duration}ms`;
+        
+        // 延迟一帧，确保初始不透明度被应用
+        setTimeout(() => {
+            element.style.opacity = safeTargetOpacity.toString();
+        }, 10);
+        
+        // 返回应用的安全不透明度值
+        return safeTargetOpacity;
+    }
+};
+
+// 集成可见度控制器到尖叫仪系统
+function integrateVisibilityController() {
+    console.log('正在集成可见度控制器...');
+    
+    // 替换原有的特效函数
+    if (typeof window.createMatrixEffect === 'function') {
+        console.log('覆盖 Matrix 效果函数');
+        window.originalCreateMatrixEffect = window.createMatrixEffect;
+        window.createMatrixEffect = createMatrixEffect;
+    }
+    
+    if (typeof window.createRainbowMode === 'function') {
+        console.log('覆盖彩虹模式函数');
+        window.originalCreateRainbowMode = window.createRainbowMode;
+        window.createRainbowMode = createRainbowMode;
+    }
+    
+    if (typeof window.showBigScreenText === 'function') {
+        console.log('覆盖全屏文字函数');
+        window.originalShowBigScreenText = window.showBigScreenText;
+        window.showBigScreenText = showBigScreenText;
+    }
+    
+    if (typeof window.createExplosionEffect === 'function') {
+        console.log('覆盖爆炸效果函数');
+        window.originalCreateExplosionEffect = window.createExplosionEffect;
+        window.createExplosionEffect = createExplosionEffect;
+    }
+    
+    if (typeof window.createFullscreenTextAnimation === 'function') {
+        console.log('增强全屏文字动画函数');
+        // 保存对原始函数的引用
+        window.originalCreateFullscreenTextAnimation = window.createFullscreenTextAnimation;
+        
+        // 替换为增强版本，确保使用原始引用避免递归
+        window.createFullscreenTextAnimation = function(intensity) {
+            return enhancedCreateFullscreenTextAnimation(intensity);
+        };
+    }
+    
+    // 修改任何使用不透明度的函数
+    patchOpacityProperties();
+    
+    console.log('可见度控制器集成完成');
+}
+
+// 修补全屏覆盖函数中的不透明度属性
+function patchOpacityProperties() {
+    // 查找所有可能全屏覆盖的函数并打补丁
+    const functionsToCheck = [
+        'showEmotionBurst',
+        'createShockwaveRings',
+        'createSmokeOverlay'
+    ];
+    
+    functionsToCheck.forEach(funcName => {
+        if (typeof window[funcName] === 'function') {
+            console.log(`正在修补 ${funcName} 函数`);
+            const originalFunc = window[funcName];
+            
+            window[funcName] = function() {
+                // 调用原始函数
+                const result = originalFunc.apply(this, arguments);
+                
+                // 找到新添加的全屏元素
+                setTimeout(() => {
+                    // 检查最近添加的全屏元素
+                    const fullscreenElements = document.querySelectorAll('div[style*="position: fixed"][style*="width: 100%"][style*="height: 100%"]');
+                    
+                    fullscreenElements.forEach(element => {
+                        // 只处理最近添加的元素
+                        if (element.style.zIndex >= 50) {
+                            VisibilityController.applyVisibilityControl(element, parseFloat(element.style.opacity) || 1);
+                        }
+                    });
+                }, 50);
+                
+                return result;
+            };
+        }
+    });
+}
+
+// 通用函数，用于安全地设置元素不透明度
+function setSafeOpacity(element, opacity) {
+    if (!element || !element.style) return;
+    return VisibilityController.applyVisibilityControl(element, opacity);
+}
+
+// 修复任何添加的黑色背景
+function fixDarkBackgrounds() {
+    // 查找页面上的黑色背景层
+    const darkLayers = document.querySelectorAll('div[style*="background-color: rgba(0, 0, 0,"]');
+    darkLayers.forEach(layer => {
+        VisibilityController.applyVisibilityControl(layer, parseFloat(layer.style.opacity) || 1);
+    });
+    
+    // 还要检查纯黑色背景
+    const blackLayers = document.querySelectorAll('div[style*="background-color: rgb(0, 0, 0)"]');
+    blackLayers.forEach(layer => {
+        VisibilityController.applyVisibilityControl(layer, parseFloat(layer.style.opacity) || 1);
+    });
+}
+
+// 每秒检查一次黑色背景，并修复
+function startBackgroundMonitor() {
+    setInterval(fixDarkBackgrounds, 1000);
+}
+
+// 导出到全局
+window.VisibilityUtils = {
+    setSafeOpacity,
+    fixDarkBackgrounds,
+    startBackgroundMonitor,
+    integrateVisibilityController,
+    createSafeOverlay
+};
+
+// 自动集成
+document.addEventListener('DOMContentLoaded', function() {
+    // 等待页面和VisibilityController加载完成
+    setTimeout(() => {
+        if (window.VisibilityController) {
+            integrateVisibilityController();
+            startBackgroundMonitor();
+            console.log('可见度控制系统已启动');
+        } else {
+            console.warn('可见度控制器未找到，无法集成');
+        }
+    }, 1000);
+});
+        
+// 导出到全局作用域，以便在其他地方使用
+window.VisibilityController = VisibilityController;
     </script>
 </body>
 </html>

@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>赛博尖叫仪器 - 释放你的压力</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        
+        body {
+            font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f0f0f0;
+            color: #333;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            position: absolute;
+            top: 10%;
+            transition: transform 0.3s, color 0.3s;
+        }
+        
+        .scream-button {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            box-shadow: 8px 8px 16px #d1d1d1, -8px -8px 16px #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .scream-button:active {
+            transform: scale(0.95);
+            box-shadow: 4px 4px 8px #d1d1d1, -4px -4px 8px #ffffff;
+        }
+        
+        .scream-icon {
+            width: 70%;
+            height: 70%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M12,3C17.5,3 22,6.58 22,11C22,15.42 17.5,19 12,19C10.76,19 9.57,18.82 8.47,18.5C5.55,21 2,21 2,21C4.33,18.67 4.7,17.1 4.75,16.5C3.05,15.07 2,13.13 2,11C2,6.58 6.5,3 12,3M11,14V16H13V14H11M11,12H13V6H11V12Z'/%3E%3C/svg%3E");
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        
+        .intensity-meter {
+            width: 80%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-top: 40px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .intensity-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4CAF50, #FFEB3B, #FF5722);
+            border-radius: 10px;
+            transition: width 0.2s;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+        }
+        
+        .stat-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .particles-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 5%;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            max-width: 300px;
+            line-height: 1.4;
+        }
+        
+        .emotion-indicator {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+            top: 65%;
+        }
+        
+        .wave-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .wave {
+            position: absolute;
+            border: 2px solid rgba(255, 165, 0, 0.5);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+        }
+        
+        .achievement-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 10px;
+            max-width: 300px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: translateX(110%);
+            transition: transform 0.3s;
+            z-index: 10;
+        }
+        
+        .achievement-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 11;
+        }
+        
+        .achievement-icon {
+            width: 24px;
+            height: 24px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M20,2H4V4L9.81,8.36C6.14,9.57 4.14,13.53 5.35,17.2C6.56,20.87 10.5,22.87 14.19,21.66C17.86,20.45 19.86,16.5 18.65,12.82C17.95,10.71 16.3,9.05 14.19,8.36L20,4V2M14.94,19.5L12,17.78L9.06,19.5L9.84,16.17L7.25,13.93L10.66,13.64L12,10.5L13.34,13.64L16.75,13.93L14.16,16.17L14.94,19.5Z'/%3E%3C/svg%3E");
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .achievement-list {
+            list-style-type: none;
+        }
+        
+        .achievement-item {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            opacity: 0.5;
+        }
+        
+        .achievement-item.unlocked {
+            background-color: #e8f5e9;
+            opacity: 1;
+        }
+        
+        .achievement-name {
+            font-weight: bold;
+        }
+        
+        .achievement-description {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* 音波效果 */
+        .sound-waves {
+            position: absolute;
+            width: 100%;
+            height: 50px;
+            bottom: 30%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .sound-wave {
+            width: 4px;
+            height: 20px;
+            background-color: rgba(255, 255, 255, 0.7);
+            margin: 0 2px;
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+        
+        /* 加特效模式 */
+        .fx-mode-toggle {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        /* 提示浮层 */
+        .tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 14px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 20;
+        }
+        
+        /* 模式开关 */
+        .mode-indicator {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            opacity: 0;
+            transform: translateX(-100%);
+            transition: transform 0.3s, opacity 0.3s;
+            z-index: 10;
+        }
+        
+        .mode-indicator.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .mode-indicator:before {
+            content: '';
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .mode-indicator.calm:before {
+            background-color: #4CAF50;
+        }
+        
+        .mode-indicator.release:before {
+            background-color: #FF9800;
+        }
+        
+        .mode-indicator.fury:before {
+            background-color: #F44336;
+        }
+        
+        @media (max-width: 480px) {
+            .scream-button {
+                width: 160px;
+                height: 160px;
+            }
+            
+            .title {
+                font-size: 20px;
+                top: 5%;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+                align-items: center;
+            }
+            
+            .stat-box {
+                width: 100%;
+                max-width: 200px;
+            }
+            
+            .intensity-meter {
+                margin-top: 30px;
+                width: 90%;
+            }
+            
+            .achievement-toggle {
+                top: 10px;
+                right: 10px;
+                width: 30px;
+                height: 30px;
+            }
+            
+            .achievement-icon {
+                width: 18px;
+                height: 18px;
+            }
+            
+            .fx-mode-toggle {
+                top: 10px;
+                left: 10px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            .mode-indicator {
+                top: 50px;
+                left: 10px;
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+            
+            .sound-waves {
+                bottom: 25%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">赛博尖叫仪器</h1>
+        
+        <div class="scream-button" id="screamButton">
+            <div class="scream-icon"></div>
+        </div>
+        
+        <div class="intensity-meter">
+            <div class="intensity-fill" id="intensityFill"></div>
+        </div>
+        
+        <div class="emotion-indicator" id="emotionIndicator"></div>
+        
+        <div class="sound-waves" id="soundWaves">
+            <!-- 将在JS中动态生成 -->
+        </div>
+        
+        <div class="stats">
+            <div class="stat-box">
+                尖叫强度: <span id="intensityValue">0</span>%
+            </div>
+            <div class="stat-box">
+                总释放值: <span id="totalRelease">0</span>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            长按或快速点击尖叫按钮来释放你的压力。尖叫强度越高，效果越明显！尝试不同的操作来发现更多效果。
+        </div>
+        
+        <div class="particles-container" id="particlesContainer"></div>
+        <div class="wave-container" id="waveContainer"></div>
+        
+        <div class="achievement-toggle" id="achievementToggle">
+            <div class="achievement-icon"></div>
+        </div>
+        
+        <div class="achievement-container" id="achievementContainer">
+            <h3 style="margin-bottom: 10px;">解锁成就</h3>
+            <ul class="achievement-list" id="achievementList">
+                <!-- 将在JS中动态生成 -->
+            </ul>
+        </div>
+        
+        <div class="fx-mode-toggle" id="fxModeToggle">特效模式</div>
+        
+        <div class="mode-indicator calm" id="modeIndicator">平静模式</div>
+        
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <script>
+        // 游戏主要变量
+        let isPressed = false;
+        let intensity = 0;
+        let totalRelease = 0;
+        let particleInterval;
+        let shakingTimeout;
+        let fxMode = false;
+        let currentMode = 'calm'; // calm, release, fury
+        
+        // DOM元素
+        const screamButton = document.getElementById('screamButton');
+        const intensityFill = document.getElementById('intensityFill');
+        const intensityValue = document.getElementById('intensityValue');
+        const totalReleaseElement = document.getElementById('totalRelease');
+        const particlesContainer = document.getElementById('particlesContainer');
+        const waveContainer = document.getElementById('waveContainer');
+        const emotionIndicator = document.getElementById('emotionIndicator');
+        const title = document.querySelector('.title');
+        const body = document.body;
+        const achievementToggle = document.getElementById('achievementToggle');
+        const achievementContainer = document.getElementById('achievementContainer');
+        const achievementList = document.getElementById('achievementList');
+        const soundWaves = document.getElementById('soundWaves');
+        const fxModeToggle = document.getElementById('fxModeToggle');
+        const modeIndicator = document.getElementById('modeIndicator');
+        const tooltip = document.getElementById('tooltip');
+        
+        // 初始化声波元素
+        for (let i = 0; i < 15; i++) {
+            const wave = document.createElement('div');
+            wave.classList.add('sound-wave');
+            soundWaves.appendChild(wave);
+        }
+        const soundWaveElements = document.querySelectorAll('.sound-wave');
+        
+        // 情绪标签
+        const emotions = [
+            { threshold: 0, text: "平静", color: "#4CAF50" },
+            { threshold: 20, text: "些许烦躁", color: "#8BC34A" },
+            { threshold: 40, text: "压力缓解中", color: "#CDDC39" },
+            { threshold: 60, text: "用力宣泄!", color: "#FFC107" },
+            { threshold: 80, text: "尽情释放!!", color: "#FF9800" },
+            { threshold: 95, text: "爆发!!!!", color: "#FF5722" }
+        ];
+        
+        // 成就系统
+        const achievements = [
+            { id: 'first-scream', threshold: 1, name: '初次尖叫', description: '完成你的第一次尖叫' },
+            { id: 'stress-relief', threshold: 100, name: '压力缓解', description: '累计释放值达到100' },
+            { id: 'scream-master', threshold: 500, name: '尖叫大师', description: '累计释放值达到500' },
+            { id: 'therapy-session', threshold: 1000, name: '心理治疗', description: '累计释放值达到1000' },
+            { id: 'zen-mode', threshold: 2000, name: '禅意人生', description: '累计释放值达到2000' },
+            { id: 'rapid-fire', type: 'click', count: 10, name: '急速点击', description: '快速连续点击10次' },
+            { id: 'endurance', type: 'duration', seconds: 5, name: '持久尖叫', description: '持续尖叫5秒钟' },
+            { id: 'max-intensity', type: 'intensity', level: 100, name: '强力宣泄', description: '达到100%尖叫强度' },
+            { id: 'mode-master', type: 'special', condition: 'allModes', name: '模式掌控者', description: '体验所有尖叫模式' }
+        ];
+        
+        // 初始化成就列表
+        initAchievements();
+        
+        // 按下按钮
+        screamButton.addEventListener('mousedown', startScream);
+        screamButton.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            startScream();
+        });
+        
+        // 松开按钮
+        window.addEventListener('mouseup', stopScream);
+        window.addEventListener('touchend', stopScream);
+        
+        // 快速点击
+        let clickCount = 0;
+        let clickTimer;
+        screamButton.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimer);
+            
+            // 检查快速点击成就
+            checkClickAchievement(clickCount);
+            
+            clickTimer = setTimeout(() => {
+                if (clickCount >= 3) {
+                    // 快速点击增加爆发性尖叫
+                    burstScream(clickCount * 10);
+                }
+                clickCount = 0;
+            }, 500);
+        });
+        
+        // 成就按钮点击
+        achievementToggle.addEventListener('click', toggleAchievements);
+        
+        // 特效模式切换
+        fxModeToggle.addEventListener('click', toggleFxMode);
+        
+        // 工具提示
+        function showTooltip(element, text) {
+            const rect = element.getBoundingClientRect();
+            tooltip.textContent = text;
+            tooltip.style.top = `${rect.bottom + 10}px`;
+            tooltip.style.left = `${rect.left + rect.width/2 - 60}px`;
+            tooltip.style.opacity = 1;
+            
+            setTimeout(() => {
+                tooltip.style.opacity = 0;
+            }, 2000);
+        }
+        
+        // 为按钮添加提示
+        fxModeToggle.addEventListener('mouseenter', () => {
+            showTooltip(fxModeToggle, '切换不同的尖叫特效模式');
+        });
+        
+        achievementToggle.addEventListener('mouseenter', () => {
+            showTooltip(achievementToggle, '查看你的成就');
+        });
+        
+        function toggleFxMode() {
+            fxMode = !fxMode;
+            fxModeToggle.textContent = fxMode ? "返回普通模式" : "特效模式";
+            
+            if (fxMode) {
+                showTooltip(fxModeToggle, '特效模式启用，尝试不同的尖叫方式！');
+                // 随机选择一种特效模式
+                const modes = ['release', 'fury'];
+                switchMode(modes[Math.floor(Math.random() * modes.length)]);
+            } else {
+                switchMode('calm');
+            }
+        }
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            modeIndicator.className = 'mode-indicator ' + mode;
+            
+            switch(mode) {
+                case 'calm':
+                    modeIndicator.textContent = '平静模式';
+                    break;
+                case 'release':
+                    modeIndicator.textContent = '释放模式';
+                    break;
+                case 'fury':
+                    modeIndicator.textContent = '狂怒模式';
+                    break;
+            }
+            
+            modeIndicator.classList.add('active');
+            setTimeout(() => {
+                modeIndicator.classList.remove('active');
+            }, 2000);
+            
+            // 检查是否解锁了所有模式成就
+            const modeAchievement = achievements.find(a => a.type === 'special' && a.condition === 'allModes');
+            const allModes = ['calm', 'release', 'fury'];
+            const usedModes = new Set(JSON.parse(localStorage.getItem('usedModes') || '[]'));
+            usedModes.add(mode);
+            localStorage.setItem('usedModes', JSON.stringify([...usedModes]));
+            
+            if (usedModes.size === allModes.length) {
+                unlockAchievement(modeAchievement);
+            }
+        }
+        
+        function toggleAchievements() {
+            const isVisible = achievementContainer.style.transform === 'translateX(0%)';
+            achievementContainer.style.transform = isVisible ? 'translateX(110%)' : 'translateX(0%)';
+        }
+        
+        function initAchievements() {
+            achievementList.innerHTML = '';
+            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+            
+            achievements.forEach(achievement => {
+                const item = document.createElement('li');
+                item.classList.add('achievement-item');
+                if (unlockedAchievements.includes(achievement.id)) {
+                    item.classList.add('unlocked');
+                }
+                
+                const name = document.createElement('div');
+                name.classList.add('achievement-name');
+                name.textContent = achievement.name;
+                
+                const description = document.createElement('div');
+                description.classList.add('achievement-description');
+                description.textContent = achievement.description;
+                
+                item.appendChild(name);
+                item.appendChild(description);
+                achievementList.appendChild(item);
+            });
+        }
+        
+        function checkClickAchievement(count) {
+            const clickAchievement = achievements.find(a => a.type === 'click');
+            if (clickAchievement && count >= clickAchievement.count) {
+                unlockAchievement(clickAchievement);
+            }
+        }
+        
+        // 持续尖叫计时
+        let screamStartTime = 0;
+        let screamDurationInterval;
+        
+        function checkDurationAchievement() {
+            const durationAchievement = achievements.find(a => a.type === 'duration');
+            const duration = (Date.now() - screamStartTime) / 1000;
+            
+            if (durationAchievement && duration >= durationAchievement.seconds) {
+                unlockAchievement(durationAchievement);
+                clearInterval(screamDurationInterval);
+            }
+        }
+        
+        function startScream() {
+            if (isPressed) return;
+            isPressed = true;
+            
+            // 记录开始时间，并设置持续检查
+            screamStartTime = Date.now();
+            screamDurationInterval = setInterval(checkDurationAchievement, 100);
+            
+            // 持续增加尖叫强度
+            const intensityInterval = setInterval(() => {
+                if (!isPressed) {
+                    clearInterval(intensityInterval);
+                    return;
+                }
+                
+                // 不同模式下强度增加速度不同
+                let intensityIncrease = 1;
+                if (currentMode === 'release') intensityIncrease = 1.5;
+                if (currentMode === 'fury') intensityIncrease = 2;
+                
+                increaseIntensity(intensityIncrease);
+            }, 50);
+            
+            // 生成粒子效果
+            particleInterval = setInterval(createParticles, 100);
+            
+            // 显示声波
+            soundWaves.style.opacity = 1;
+            animateSoundWaves();
+            
+            // 创建音波纹效果
+            if (fxMode) {
+                createWaveEffect();
+            }
+        }
+        
+        function stopScream() {
+            if (!isPressed) return;
+            isPressed = false;
+            
+            // 清除持续检查
+            clearInterval(screamDurationInterval);
+            
+            // 快速降低尖叫强度
+            const cooldownInterval = setInterval(() => {
+                let cooldownRate = 2;
+                if (currentMode === 'fury') cooldownRate = 1; // 狂怒模式冷却慢
+                
+                decreaseIntensity(cooldownRate);
+                if (intensity <= 0) {
+                    clearInterval(cooldownInterval);
+                    soundWaves.style.opacity = 0;
+                }
+            }, 50);
+            
+            clearInterval(particleInterval);
+        }
+        
+        function increaseIntensity(amount) {
+            intensity = Math.min(100, intensity + amount);
+            updateIntensityDisplay();
+            applyIntensityEffects();
+            
+            // 检查最大强度成就
+            if (intensity >= 100) {
+                const maxIntensityAchievement = achievements.find(a => a.type === 'intensity');
+                if (maxIntensityAchievement) {
+                    unlockAchievement(maxIntensityAchievement);
+                }
+            }
+        }
+        
+        function decreaseIntensity(amount) {
+            intensity = Math.max(0, intensity - amount);
+            updateIntensityDisplay();
+            applyIntensityEffects();
+        }
+        
+        function burstScream(amount) {
+            // 爆发式增加强度，同时累计释放值
+            increaseIntensity(amount);
+            totalRelease += amount * 2;
+            totalReleaseElement.textContent = Math.floor(totalRelease);
+            
+            // 创建大量粒子
+            for (let i = 0; i < amount; i++) {
+                setTimeout(() => {
+                    createParticles(amount / 2);
+                }, i * 50);
+            }
+            
+            // 屏幕震动效果
+            shakeScreen(amount / 10);
+            
+            // 显示爆发文字
+            showEmotionText("爆发!!!", "#FF5722", 1000);
+            
+            // 特效模式下创建波纹
+            if (fxMode) {
+                createBurstEffect(amount);
+            }
+        }
+        
+        function updateIntensityDisplay() {
+            intensityFill.style.width = `${intensity}%`;
+            intensityValue.textContent = Math.floor(intensity);
+            
+            // 累计释放值
+            if (intensity > 0) {
+                const releaseIncrement = intensity / 100 * (currentMode === 'fury' ? 2 : 1);
+                totalRelease += releaseIncrement;
+                totalReleaseElement.textContent = Math.floor(totalRelease);
+            }
+            
+            // 动画声波高度
+            animateSoundWaves();
+        }
+        
+        function applyIntensityEffects() {
+            // 根据强度改变背景颜色
+            let hue = 120 - (intensity * 1.2);
+            
+            // 不同模式的颜色差异
+            if (currentMode === 'release') {
+                hue = 40 - (intensity * 0.3);
+            } else if (currentMode === 'fury') {
+                hue = 360 - (intensity * 0.6);
+            }
+            
+            body.style.backgroundColor = `hsl(${hue}, ${50 + intensity/4}%, ${90 - intensity/4}%)`;
+            
+            // 按钮效果
+            const scale = 1 + (intensity / 500);
+            screamButton.style.transform = `scale(${scale})`;
+            
+            // 标题效果
+            const titleRotation = intensity / 50;
+            const titleOffset = intensity / 10;
+            title.style.transform = `translateY(${titleOffset}px) rotate(${titleRotation}deg)`;
+            title.style.color = `hsl(${hue}, 70%, 40%)`;
+            
+            // 显示情绪文字
+            for (let i = emotions.length - 1; i >= 0; i--) {
+                if (intensity >= emotions[i].threshold) {
+                    showEmotionText(emotions[i].text, emotions[i].color);
+                    break;
+                }
+            }
+            
+            // 当强度超过阈值时触发震动
+            if (intensity > 70 && !shakingTimeout) {
+                const shakeIntensity = intensity / 50;
+                shakeScreen(shakeIntensity);
+            }
+            
+            // 特效模式下的附加效果
+            if (fxMode) {
+                applyFxModeEffects();
+            }
+            
+            // 统计框缩放效果
+            const statBoxes = document.querySelectorAll('.stat-box');
+            statBoxes.forEach(box => {
+                box.style.transform = `scale(${1 + intensity/500})`;
+            });
+            
+            // 图标旋转
+            const screamIcon = document.querySelector('.scream-icon');
+            screamIcon.style.transform = `rotate(${intensity/2}deg)`;
+        }
+        
+        function applyFxModeEffects() {
+            // 根据不同模式应用不同的特效
+            switch (currentMode) {
+                case 'release':
+                    // 释放模式 - 更多粒子，彩色粒子
+                    if (intensity > 30 && Math.random() > 0.7) {
+                        createColorfulParticles(5 + Math.random() * 10);
+                    }
+                    break;
+                    
+                case 'fury':
+                    // 狂怒模式 - 火焰效果，屏幕震动更强烈
+                    if (intensity > 50) {
+                        createFireParticles(3 + Math.random() * 5);
+                        
+                        if (intensity > 80 && !shakingTimeout) {
+                            shakeScreen(intensity / 30);
+                        }
+                    }
+                    break;
+            }
+        }
+        
+        function createWaveEffect() {
+            waveContainer.style.opacity = 1;
+            
+            const wave = document.createElement('div');
+            wave.classList.add('wave');
+            wave.style.width = '10px';
+            wave.style.height = '10px';
+            
+            waveContainer.appendChild(wave);
+            
+            // 设置波纹的颜色，根据当前模式
+            let waveColor;
+            switch (currentMode) {
+                case 'calm':
+                    waveColor = 'rgba(76, 175, 80, 0.5)';
+                    break;
+                case 'release':
+                    waveColor = 'rgba(255, 152, 0, 0.5)';
+                    break;
+                case 'fury':
+                    waveColor = 'rgba(244, 67, 54, 0.5)';
+                    break;
+            }
+            wave.style.borderColor = waveColor;
+            
+            // 波纹动画
+            let scale = 0;
+            const waveInterval = setInterval(() => {
+                scale += 0.05;
+                wave.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                wave.style.opacity = 1 - scale/10;
+                
+                if (scale >= 10) {
+                    clearInterval(waveInterval);
+                    waveContainer.removeChild(wave);
+                    
+                    if (waveContainer.children.length === 0) {
+                        waveContainer.style.opacity = 0;
+                    }
+                }
+            }, 16);
+        }
+        
+        function createBurstEffect(amount) {
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const wave = document.createElement('div');
+                    wave.classList.add('wave');
+                    wave.style.width = '10px';
+                    wave.style.height = '10px';
+                    
+                    // 设置波纹的颜色，根据当前模式
+                    let waveColor;
+                    switch (currentMode) {
+                        case 'calm':
+                            waveColor = 'rgba(76, 175, 80, 0.7)';
+                            break;
+                        case 'release':
+                            waveColor = 'rgba(255, 152, 0, 0.7)';
+                            break;
+                        case 'fury':
+                            waveColor = 'rgba(244, 67, 54, 0.7)';
+                            break;
+                    }
+                    wave.style.borderColor = waveColor;
+                    wave.style.borderWidth = '3px';
+                    
+                    waveContainer.appendChild(wave);
+                    waveContainer.style.opacity = 1;
+                    
+                    // 波纹动画
+                    let scale = 0;
+                    const maxScale = 15 + amount/5;
+                    const waveInterval = setInterval(() => {
+                        scale += 0.2;
+                        wave.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                        wave.style.opacity = 1 - scale/maxScale;
+                        
+                        if (scale >= maxScale) {
+                            clearInterval(waveInterval);
+                            waveContainer.removeChild(wave);
+                            
+                            if (waveContainer.children.length === 0) {
+                                waveContainer.style.opacity = 0;
+                            }
+                        }
+                    }, 16);
+                }, i * 200);
+            }
+        }
+        
+        function animateSoundWaves() {
+            soundWaveElements.forEach((wave, index) => {
+                // 计算每个声波元素的高度 - 基于强度和随机值
+                let height;
+                
+                if (intensity === 0) {
+                    height = 5;
+                } else {
+                    const baseHeight = 5 + (intensity / 5);
+                    const randomFactor = Math.sin(Date.now() / 200 + index * 0.5) * (intensity / 10);
+                    height = baseHeight + randomFactor;
+                }
+                
+                wave.style.height = `${Math.max(2, height)}px`;
+            });
+            
+            if (intensity > 0) {
+                requestAnimationFrame(animateSoundWaves);
+            }
+        }
+        
+        function showEmotionText(text, color, duration = 2000) {
+            emotionIndicator.textContent = text;
+            emotionIndicator.style.color = color;
+            emotionIndicator.style.opacity = 1;
+            
+            clearTimeout(emotionIndicator.fadeTimeout);
+            emotionIndicator.fadeTimeout = setTimeout(() => {
+                emotionIndicator.style.opacity = 0;
+            }, duration);
+        }
+        
+        function createParticles(count = 3) {
+            const particleCount = Math.floor(count * (intensity / 30));
+            if (particleCount <= 0) return;
+            
+            const buttonRect = screamButton.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2;
+            const centerY = buttonRect.top + buttonRect.height / 2;
+            
+            for (let i = 0; i < particleCount; i++) {
+                createParticle(centerX, centerY);
+            }
+        }
+        
+        function createColorfulParticles(count) {
+            const buttonRect = screamButton.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2;
+            const centerY = buttonRect.top + buttonRect.height / 2;
+            
+            for (let i = 0; i < count; i++) {
+                // 彩虹色粒子
+                const hue = Math.random() * 360;
+                const saturation = 80 + Math.random() * 20;
+                const lightness = 50 + Math.random() * 30;
+                
+                createParticle(centerX, centerY, {
+                    backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+                    size: 8 + Math.random() * 8,
+                    speed: 3 + Math.random() * 5,
+                    duration: 1500 + Math.random() * 1500
+                });
+            }
+        }
+        
+        function createFireParticles(count) {
+            const buttonRect = screamButton.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2;
+            const centerY = buttonRect.top + buttonRect.height / 2;
+            
+            for (let i = 0; i < count; i++) {
+                // 火焰色粒子
+                const hue = 20 + Math.random() * 40;
+                const saturation = 80 + Math.random() * 20;
+                const lightness = 50 + Math.random() * 30;
+                
+                // 粒子从下往上飘
+                const angle = Math.PI * (1.3 + Math.random() * 0.4); // 大约向上的方向
+                createParticle(centerX, centerY + 50, {
+                    backgroundColor: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+                    size: 8 + Math.random() * 12,
+                    speed: 2 + Math.random() * 4,
+                    duration: 1200 + Math.random() * 1500,
+                    angle: angle
+                });
+            }
+        }
+        
+        function createParticle(x, y, options = {}) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // 默认值与选项合并
+            const settings = Object.assign({
+                size: 5 + Math.random() * (intensity / 10),
+                speed: 2 + Math.random() * (intensity / 10),
+                duration: 1000 + Math.random() * 2000,
+                angle: Math.random() * Math.PI * 2
+            }, options);
+            
+            // 应用设置
+            particle.style.width = `${settings.size}px`;
+            particle.style.height = `${settings.size}px`;
+            
+            // 应用颜色 - 如果没有指定，则使用基于强度的颜色
+            if (!options.backgroundColor) {
+                const hue = 40 + (intensity * 2);
+                const saturation = 80 + Math.random() * 20;
+                const lightness = 50 + Math.random() * 20;
+                particle.style.backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            } else {
+                particle.style.backgroundColor = options.backgroundColor;
+            }
+            
+            // 初始位置
+            particle.style.left = `${x}px`;
+            particle.style.top = `${y}px`;
+            
+            // 添加到容器
+            particlesContainer.appendChild(particle);
+            
+            // 随机方向和速度
+            const vx = Math.cos(settings.angle) * settings.speed;
+            const vy = Math.sin(settings.angle) * settings.speed;
+            
+            // 粒子动画
+            const startTime = Date.now();
+            
+            function animateParticle() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / settings.duration;
+                
+                if (progress >= 1) {
+                    particlesContainer.removeChild(particle);
+                    return;
+                }
+                
+                const currentX = parseFloat(particle.style.left);
+                const currentY = parseFloat(particle.style.top);
+                
+                // 添加一点重力效果
+                const gravity = 0.05 * Math.pow(progress, 2);
+                
+                particle.style.left = `${currentX + vx}px`;
+                particle.style.top = `${currentY + vy + gravity}px`;
+                particle.style.opacity = 1 - progress;
+                
+                // 特效模式下的粒子可能有缩放效果
+                if (fxMode && currentMode === 'release') {
+                    const scale = 1 - progress * 0.5;
+                    particle.style.transform = `scale(${scale})`;
+                }
+                
+                requestAnimationFrame(animateParticle);
+            }
+            
+            requestAnimationFrame(animateParticle);
+        }
+        
+        function shakeScreen(intensity) {
+            if (shakingTimeout) return;
+            
+            const container = document.querySelector('.container');
+            const duration = intensity * 100;
+            const startTime = Date.now();
+            
+            function shake() {
+                const elapsed = Date.now() - startTime;
+                const progress = elapsed / duration;
+                
+                if (progress >= 1) {
+                    container.style.transform = 'translate(0, 0)';
+                    shakingTimeout = null;
+                    return;
+                }
+                
+                const xOffset = (Math.random() - 0.5) * intensity * 2;
+                const yOffset = (Math.random() - 0.5) * intensity * 2;
+                container.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+                
+                shakingTimeout = setTimeout(shake, 50);
+            }
+            
+            shake();
+        }
+        
+        function unlockAchievement(achievement) {
+            // 从本地存储中读取已解锁的成就
+            const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+            
+            // 如果已经解锁过，就不再显示通知
+            if (unlockedAchievements.includes(achievement.id)) {
+                return;
+            }
+            
+            // 更新已解锁的成就
+            unlockedAchievements.push(achievement.id);
+            localStorage.setItem('unlockedAchievements', JSON.stringify(unlockedAchievements));
+            
+            // 更新成就列表UI
+            const achievementItems = document.querySelectorAll('.achievement-item');
+            achievementItems.forEach((item, index) => {
+                if (index === achievements.findIndex(a => a.id === achievement.id)) {
+                    item.classList.add('unlocked');
+                }
+            });
+            
+            // 创建成就通知
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.bottom = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = '#4CAF50';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+            notification.style.zIndex = '1000';
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s';
+            notification.innerHTML = `<strong>成就解锁: ${achievement.name}</strong><br>${achievement.description}`;
+            
+            document.body.appendChild(notification);
+            
+            // 动画显示和消失
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }, 10);
+        }
+        
+        function checkAchievements() {
+            // 检查基于总释放值的成就
+            achievements.forEach(achievement => {
+                if (achievement.threshold && totalRelease >= achievement.threshold) {
+                    unlockAchievement(achievement);
+                }
+            });
+        }
+        
+        // 定期检查成就
+        setInterval(checkAchievements, 1000);
+        
+        // 添加一些互动提示
+        setTimeout(() => {
+            showEmotionText("长按或快速点击这里!", "#4CAF50", 3000);
+        }, 1000);
+        
+        // 模拟一些初始的粒子效果
+        setTimeout(() => {
+            const buttonRect = screamButton.getBoundingClientRect();
+            const centerX = buttonRect.left + buttonRect.width / 2;
+            const centerY = buttonRect.top + buttonRect.height / 2;
+            
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createParticle(centerX, centerY, {
+                        size: 5 + Math.random() * 5,
+                        speed: 1 + Math.random() * 2,
+                        backgroundColor: `rgba(200, 200, 200, ${0.5 + Math.random() * 0.3})`
+                    });
+                }, i * 200);
+            }
+        }, 1500);
+        
+        // 隐藏地址栏 - 移动端的技巧
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                window.scrollTo(0, 1);
+            }, 0);
+        });
+    </script>
+</body>
+</html>

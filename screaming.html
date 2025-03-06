@@ -50,7 +50,7 @@
             text-align: center;
             position: absolute;
             top: 10%;
-            transition: transform 0.3s, color 0.3s;
+            transition: transform 0.3s, color 0.3s, text-shadow 0.3s;
         }
         
         .scream-button {
@@ -63,7 +63,7 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
             position: relative;
             overflow: hidden;
             will-change: transform, box-shadow;
@@ -72,6 +72,17 @@
         .scream-button:active {
             transform: scale(0.95);
             box-shadow: 4px 4px 8px #d1d1d1, -4px -4px 8px #ffffff;
+        }
+        
+        .scream-button-pulse {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
         }
         
         .scream-icon {
@@ -92,6 +103,7 @@
             margin-top: 40px;
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
         }
         
         .intensity-fill {
@@ -101,6 +113,31 @@
             border-radius: 10px;
             transition: width 0.2s;
             will-change: width;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .intensity-fill:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg, 
+                rgba(255,255,255,0.1) 0%, 
+                rgba(255,255,255,0.3) 50%, 
+                rgba(255,255,255,0.1) 100%
+            );
+            transform: translateX(-100%);
+            animation: shineEffect 2s infinite;
+        }
+        
+        @keyframes shineEffect {
+            to {
+                transform: translateX(100%);
+            }
         }
         
         .stats {
@@ -117,8 +154,12 @@
             padding: 10px 15px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
             will-change: transform;
+        }
+        
+        .stat-box:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
         .particles-container {
@@ -148,6 +189,7 @@
             color: #666;
             max-width: 300px;
             line-height: 1.4;
+            transition: opacity 0.5s;
         }
         
         .emotion-indicator {
@@ -157,8 +199,18 @@
             font-size: 18px;
             font-weight: bold;
             opacity: 0;
-            transition: opacity 0.5s;
+            transition: opacity 0.5s, transform 0.5s;
             top: 65%;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+        }
+        
+        .emotion-emoji {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 0.5s, transform 0.5s;
+            pointer-events: none;
         }
         
         .wave-container {
@@ -216,6 +268,12 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             cursor: pointer;
             z-index: 11;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .achievement-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         
         .achievement-icon {
@@ -236,11 +294,17 @@
             border-radius: 5px;
             background-color: #f0f0f0;
             opacity: 0.5;
+            transition: opacity 0.3s, transform 0.3s, background-color 0.3s;
         }
         
         .achievement-item.unlocked {
             background-color: #e8f5e9;
             opacity: 1;
+        }
+        
+        .achievement-item.unlocked:hover {
+            transform: translateX(5px);
+            background-color: #c8e6c9;
         }
         
         .achievement-name {
@@ -287,6 +351,16 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             cursor: pointer;
             z-index: 10;
+            transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s;
+        }
+        
+        .fx-mode-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .fx-mode-toggle.active {
+            background-color: rgba(255, 193, 7, 0.8);
         }
         
         /* 提示浮层 */
@@ -299,8 +373,14 @@
             font-size: 14px;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.3s, transform 0.3s;
             z-index: 20;
+            transform: translateY(10px);
+        }
+        
+        .tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
         
         /* 模式开关 */
@@ -347,10 +427,242 @@
             background-color: #F44336;
         }
         
+        /* 新增：情绪记录功能 */
+        .emotion-history-toggle {
+            position: absolute;
+            top: 20px;
+            left: 80px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .emotion-history-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .emotion-history-container {
+            position: absolute;
+            top: 70px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 5px;
+            padding: 15px;
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transform: translateX(-110%);
+            transition: transform 0.3s;
+            z-index: 10;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .emotion-history-container.active {
+            transform: translateX(0);
+        }
+        
+        .emotion-chart {
+            width: 100%;
+            height: 150px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .emotion-chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 8px;
+            background: linear-gradient(to top, #4CAF50, #FFEB3B, #FF5722);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.5s;
+        }
+        
+        .emotion-chart-date {
+            position: absolute;
+            bottom: -20px;
+            font-size: 10px;
+            color: #666;
+            transform: rotate(-45deg);
+            transform-origin: top left;
+            white-space: nowrap;
+        }
+        
+        .emotion-history-entry {
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            font-size: 12px;
+        }
+        
+        .emotion-history-date {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+        
+        .emotion-history-intensity {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 10px;
+            color: white;
+            font-size: 10px;
+            margin-left: 5px;
+        }
+        
+        /* 新增：压力容器效果 */
+        .pressure-container {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, transparent 90%, rgba(255,0,0,0.2) 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        /* 新增：情绪爆发动画 */
+        .emotion-burst {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s;
+        }
+        
+        .emotion-burst-text {
+            font-size: 5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transform: scale(0.5);
+            opacity: 0;
+            transition: transform 0.5s, opacity 0.5s;
+        }
+        
+        /* 新增：音频可视化 */
+        .audio-visualizer {
+            position: absolute;
+            width: 100%;
+            height: 80px;
+            bottom: 20%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .audio-bar {
+            width: 6px;
+            height: 5px;
+            margin: 0 2px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 2px 2px 0 0;
+            transition: height 0.1s;
+        }
+        
+        /* 新增：天气情绪切换 */
+        .weather-toggle {
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .weather-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .weather-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .weather-rain {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -3;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .rain-drop {
+            position: absolute;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0.7));
+            width: 2px;
+            border-radius: 0 0 5px 5px;
+            pointer-events: none;
+        }
+        
+        .confetti-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: -3;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        /* 响应式设计 */
         @media (max-width: 480px) {
             .scream-button {
                 width: 160px;
                 height: 160px;
+            }
+            
+            .pressure-container {
+                width: 180px;
+                height: 180px;
             }
             
             .title {
@@ -374,11 +686,26 @@
                 width: 90%;
             }
             
-            .achievement-toggle {
+            .achievement-toggle, .emotion-history-toggle {
                 top: 10px;
-                right: 10px;
                 width: 30px;
                 height: 30px;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            
+            .achievement-toggle {
+                right: 10px;
+            }
+            
+            .emotion-history-toggle {
+                left: 10px;
+                top: 50px;
+                padding: 10px;
+                width: 20%;
+                position: absolute;
             }
             
             .achievement-icon {
@@ -389,6 +716,13 @@
             .fx-mode-toggle {
                 top: 10px;
                 left: 10px;
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            
+            .weather-toggle {
+                top: 50px;
+                right: 10px;
                 font-size: 12px;
                 padding: 6px 10px;
             }
@@ -404,10 +738,19 @@
                 bottom: 25%;
             }
             
+            .audio-visualizer {
+                bottom: 18%;
+                height: 60px;
+            }
+            
             .instructions {
                 font-size: 12px;
                 max-width: 280px;
                 bottom: 3%;
+            }
+            
+            .emotion-burst-text {
+                font-size: 3rem;
             }
         }
     </style>
@@ -416,8 +759,11 @@
     <div class="container">
         <h1 class="title">赛博尖叫仪</h1>
         
+        <div class="pressure-container" id="pressureContainer"></div>
+        
         <div class="scream-button" id="screamButton">
             <div class="scream-icon"></div>
+            <div class="scream-button-pulse" id="screamButtonPulse"></div>
         </div>
         
         <div class="intensity-meter">
@@ -430,6 +776,10 @@
             <!-- 将在JS中动态生成 -->
         </div>
         
+        <div class="audio-visualizer" id="audioVisualizer">
+            <!-- 将在JS中动态生成 -->
+        </div>
+        
         <div class="stats">
             <div class="stat-box">
                 尖叫强度: <span id="intensityValue">0</span>%
@@ -439,13 +789,15 @@
             </div>
         </div>
         
-        <div class="instructions">
+        <div class="instructions" id="instructions">
             <p>长按或快速点击尖叫按钮来释放你的压力。尖叫强度越高，效果越明显！</p>
             <p>条件允许可以寻找一个能放心尖叫的场所，一边尖叫一边使用此仪器测量你的情绪释放！</p>
         </div>
         
         <div class="particles-container" id="particlesContainer"></div>
         <div class="wave-container" id="waveContainer"></div>
+        <div class="weather-rain" id="weatherRain"></div>
+        <div class="confetti-container" id="confettiContainer"></div>
         
         <div class="achievement-toggle" id="achievementToggle">
             <div class="achievement-icon"></div>
@@ -460,9 +812,33 @@
         
         <div class="fx-mode-toggle" id="fxModeToggle">特效模式</div>
         
+        <div class="emotion-history-toggle" id="emotionHistoryToggle">情绪记录</div>
+        
+        <div class="emotion-history-container" id="emotionHistoryContainer">
+            <h3 style="margin-bottom: 10px;">情绪历史</h3>
+            <div class="emotion-chart" id="emotionChart">
+                <!-- 将在JS中动态生成 -->
+            </div>
+            <div style="margin-top: 25px;">
+                <h4 style="margin-bottom: 5px;">近期记录</h4>
+                <div id="emotionHistoryList">
+                    <!-- 将在JS中动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <div class="weather-toggle" id="weatherToggle">
+            <div class="weather-icon" id="weatherIcon"></div>
+            <span>情绪天气</span>
+        </div>
+        
         <div class="mode-indicator calm" id="modeIndicator">平静模式</div>
         
         <div class="tooltip" id="tooltip"></div>
+        
+        <div class="emotion-burst" id="emotionBurst">
+            <div class="emotion-burst-text" id="emotionBurstText"></div>
+        </div>
     </div>
 
     <script>
@@ -478,9 +854,39 @@
         let activeParticles = []; // 跟踪活动粒子
         let visibleParticlesCount = 0; // 可见粒子计数
         const MAX_PARTICLES = 100; // 最大粒子数量限制
+        let emotionHistory = []; // 情绪历史记录
+        let currentWeather = 'none'; // 当前情绪天气
+        let lastEmotionSave = 0; // 上次情绪保存时间
+        let userPersonality = {}; // 用户情绪个性设置
+        let emotionReleasePatterns = []; // 情绪释放模式
+        let comboCount = 0; // 连击次数
+        let lastClickTime = 0; // 上次点击时间
+        
+        // 表情符号库
+        const emojis = {
+            calm: ['😌', '😊', '🙂'],
+            slight: ['😐', '🙄', '😑'],
+            medium: ['😤', '😠', '😣'],
+            high: ['😡', '😤', '😫'],
+            extreme: ['🤬', '😱', '😵'],
+            release: ['😮‍💨', '😌', '😏'],
+            joy: ['😄', '😁', '🥳']
+        };
+        
+        // 情绪爆发短语
+        const burstPhrases = [
+            "释放!",
+            "痛快!",
+            "舒畅!",
+            "自由了!",
+            "爆发!",
+            "解脱了!",
+            "畅快!"
+        ];
         
         // DOM元素
         const screamButton = document.getElementById('screamButton');
+        const screamButtonPulse = document.getElementById('screamButtonPulse');
         const intensityFill = document.getElementById('intensityFill');
         const intensityValue = document.getElementById('intensityValue');
         const totalReleaseElement = document.getElementById('totalRelease');
@@ -496,6 +902,19 @@
         const fxModeToggle = document.getElementById('fxModeToggle');
         const modeIndicator = document.getElementById('modeIndicator');
         const tooltip = document.getElementById('tooltip');
+        const emotionHistoryToggle = document.getElementById('emotionHistoryToggle');
+        const emotionHistoryContainer = document.getElementById('emotionHistoryContainer');
+        const emotionChart = document.getElementById('emotionChart');
+        const emotionHistoryList = document.getElementById('emotionHistoryList');
+        const weatherToggle = document.getElementById('weatherToggle');
+        const weatherIcon = document.getElementById('weatherIcon');
+        const weatherRain = document.getElementById('weatherRain');
+        const confettiContainer = document.getElementById('confettiContainer');
+        const audioVisualizer = document.getElementById('audioVisualizer');
+        const pressureContainer = document.getElementById('pressureContainer');
+        const instructions = document.getElementById('instructions');
+        const emotionBurst = document.getElementById('emotionBurst');
+        const emotionBurstText = document.getElementById('emotionBurstText');
         
         // 检测设备性能
         const isLowPerformanceDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && 
@@ -514,14 +933,24 @@
         }
         const soundWaveElements = document.querySelectorAll('.sound-wave');
         
+        // 初始化音频可视化元素
+        const visualizerCount = isLowPerformanceDevice ? 15 : 30;
+        for (let i = 0; i < visualizerCount; i++) {
+            const bar = document.createElement('div');
+            bar.classList.add('audio-bar');
+            audioVisualizer.appendChild(bar);
+        }
+        const audioBarElements = document.querySelectorAll('.audio-bar');
+        
         // 情绪标签
         const emotions = [
-            { threshold: 0, text: "平静", color: "#4CAF50" },
-            { threshold: 20, text: "些许烦躁", color: "#8BC34A" },
-            { threshold: 40, text: "压力缓解中", color: "#CDDC39" },
-            { threshold: 60, text: "用力宣泄!", color: "#FFC107" },
-            { threshold: 80, text: "尽情释放!!", color: "#FF9800" },
-            { threshold: 95, text: "爆发!!!!", color: "#FF5722" }
+            { threshold: 0, text: "平静", color: "#4CAF50", emoji: emojis.calm },
+            { threshold: 20, text: "些许烦躁", color: "#8BC34A", emoji: emojis.slight },
+            { threshold: 40, text: "压力缓解中", color: "#CDDC39", emoji: emojis.medium },
+            { threshold: 60, text: "用力宣泄!", color: "#FFC107", emoji: emojis.high },
+            { threshold: 80, text: "尽情释放!!", color: "#FF9800", emoji: emojis.extreme },
+            { threshold: 95, text: "爆发!!!!", color: "#FF5722", emoji: emojis.extreme },
+            { threshold: 100, text: "完全释放!", color: "#E91E63", emoji: emojis.release }
         ];
         
         // 成就系统
@@ -534,11 +963,29 @@
             { id: 'rapid-fire', type: 'click', count: 10, name: '急速点击', description: '快速连续点击10次' },
             { id: 'endurance', type: 'duration', seconds: 5, name: '持久尖叫', description: '持续尖叫5秒钟' },
             { id: 'max-intensity', type: 'intensity', level: 100, name: '强力宣泄', description: '达到100%尖叫强度' },
-            { id: 'mode-master', type: 'special', condition: 'allModes', name: '模式掌控者', description: '体验所有尖叫模式' }
+            { id: 'mode-master', type: 'special', condition: 'allModes', name: '模式掌控者', description: '体验所有尖叫模式' },
+            // 新增成就
+            { id: 'combo-master', type: 'combo', count: 15, name: '连击大师', description: '达成15次连续点击' },
+            { id: 'emotion-analyst', type: 'history', count: 5, name: '情绪分析师', description: '记录5次情绪历史' },
+            { id: 'weather-explorer', type: 'weather', count: 3, name: '情绪气象员', description: '体验所有情绪天气' },
+            { id: 'total-explosion', type: 'burst', count: 3, name: '彻底爆发', description: '触发3次情绪爆发' },
+            { id: 'catharsis', type: 'special', condition: 'perfectRelease', name: '心灵净化', description: '在一次尖叫中完美释放压力' }
+        ];
+        
+        // 天气类型
+        const weatherTypes = [
+            { id: 'none', name: '晴朗', icon: '☀️', description: '平静的情绪状态' },
+            { id: 'rain', name: '小雨', icon: '🌧️', description: '轻微的情绪起伏' },
+            { id: 'thunder', name: '雷暴', icon: '⛈️', description: '强烈的情绪波动' },
+            { id: 'rainbow', name: '彩虹', icon: '🌈', description: '释放后的愉悦感' }
         ];
         
         // 初始化成就列表
         initAchievements();
+        
+        // 初始化情绪历史
+        loadEmotionHistory();
+        updateEmotionChart();
         
         // 主游戏循环
         function gameLoop(timestamp) {
@@ -553,6 +1000,20 @@
             if (intensity > 0 && soundWaves.style.opacity > 0) {
                 animateSoundWaves();
             }
+            
+            // 如果有音频可视化，更新音频条
+            if (intensity > 0 && audioVisualizer.style.opacity > 0) {
+                animateAudioVisualizer();
+            }
+            
+            // 更新压力容器效果
+            updatePressureContainer();
+            
+            // 更新天气效果
+            updateWeatherEffects();
+            
+            // 检查是否需要记录情绪
+            checkEmotionRecording();
             
             requestAnimationFrame(gameLoop);
         }
@@ -575,8 +1036,26 @@
         let clickCount = 0;
         let clickTimer;
         screamButton.addEventListener('click', () => {
+            const now = Date.now();
             clickCount++;
             clearTimeout(clickTimer);
+            
+            // 检查连击
+            if (now - lastClickTime < 500) {
+                comboCount++;
+                if (comboCount >= 3) {
+                    showComboText(comboCount);
+                }
+                
+                // 检查连击成就
+                const comboAchievement = achievements.find(a => a.type === 'combo');
+                if (comboAchievement && comboCount >= comboAchievement.count) {
+                    unlockAchievement(comboAchievement);
+                }
+            } else {
+                comboCount = 1;
+            }
+            lastClickTime = now;
             
             // 检查快速点击成就
             checkClickAchievement(clickCount);
@@ -588,13 +1067,70 @@
                 }
                 clickCount = 0;
             }, 500);
+            
+            // 按钮脉冲动画
+            animateButtonPulse();
         });
+        
+        // 按钮脉冲动画
+        function animateButtonPulse() {
+            screamButtonPulse.style.opacity = '0.8';
+            screamButtonPulse.style.transform = 'scale(0.8)';
+            
+            // 使用CSS动画进行过渡
+            screamButtonPulse.animate([
+                { opacity: 0.8, transform: 'scale(0.8)' },
+                { opacity: 0, transform: 'scale(2.0)' }
+            ], {
+                duration: 700,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                screamButtonPulse.style.opacity = '0';
+                screamButtonPulse.style.transform = 'scale(0.8)';
+            };
+        }
+        
+        // 显示连击文本
+        function showComboText(count) {
+            const comboText = document.createElement('div');
+            comboText.style.position = 'absolute';
+            comboText.style.top = '50%';
+            comboText.style.left = '50%';
+            comboText.style.transform = 'translate(-50%, -50%)';
+            comboText.style.color = count >= 10 ? '#FF5722' : (count >= 5 ? '#FF9800' : '#4CAF50');
+            comboText.style.fontWeight = 'bold';
+            comboText.style.fontSize = count >= 10 ? '24px' : '20px';
+            comboText.style.textShadow = '0 0 5px rgba(255,255,255,0.7)';
+            comboText.style.pointerEvents = 'none';
+            comboText.style.zIndex = '50';
+            comboText.textContent = `${count}连击!`;
+            
+            document.body.appendChild(comboText);
+            
+            // 动画
+            comboText.animate([
+                { transform: 'translate(-50%, -50%) scale(0.5)', opacity: 0 },
+                { transform: 'translate(-50%, -50%) scale(1.2)', opacity: 1, offset: 0.6 },
+                { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                document.body.removeChild(comboText);
+            };
+        }
         
         // 成就按钮点击
         achievementToggle.addEventListener('click', toggleAchievements);
         
+        // 情绪历史按钮点击
+        emotionHistoryToggle.addEventListener('click', toggleEmotionHistory);
+        
         // 特效模式切换
         fxModeToggle.addEventListener('click', toggleFxMode);
+        
+        // 天气模式切换
+        weatherToggle.addEventListener('click', toggleWeather);
         
         // 移动设备优化 - 处理触摸事件
         if ('ontouchstart' in window) {
@@ -625,10 +1161,10 @@
             tooltip.textContent = text;
             tooltip.style.top = `${rect.bottom + 10}px`;
             tooltip.style.left = `${rect.left + rect.width/2 - 60}px`;
-            tooltip.style.opacity = 1;
+            tooltip.classList.add('visible');
             
             setTimeout(() => {
-                tooltip.style.opacity = 0;
+                tooltip.classList.remove('visible');
             }, 2000);
         }
         
@@ -641,19 +1177,34 @@
             achievementToggle.addEventListener('mouseenter', () => {
                 showTooltip(achievementToggle, '查看你的成就');
             });
+            
+            emotionHistoryToggle.addEventListener('mouseenter', () => {
+                showTooltip(emotionHistoryToggle, '查看你的情绪历史记录');
+            });
+            
+            weatherToggle.addEventListener('mouseenter', () => {
+                showTooltip(weatherToggle, '切换情绪天气效果');
+            });
         }
         
         function toggleFxMode() {
             fxMode = !fxMode;
             fxModeToggle.textContent = fxMode ? "返回普通模式" : "特效模式";
+            fxModeToggle.classList.toggle('active', fxMode);
             
             if (fxMode) {
                 showTooltip(fxModeToggle, '特效模式启用，尝试不同的尖叫方式！');
                 // 随机选择一种特效模式
                 const modes = ['release', 'fury'];
                 switchMode(modes[Math.floor(Math.random() * modes.length)]);
+                
+                // 显示音频可视化
+                audioVisualizer.style.opacity = '1';
             } else {
                 switchMode('calm');
+                
+                // 隐藏音频可视化
+                audioVisualizer.style.opacity = '0';
             }
             
             // 反馈震动
@@ -662,6 +1213,238 @@
                     navigator.vibrate(30);
                 }
             } catch (e) {}
+            
+            // 添加切换特效
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.width = '30px';
+            ripple.style.height = '30px';
+            ripple.style.borderRadius = '50%';
+            ripple.style.backgroundColor = fxMode ? 'rgba(255, 193, 7, 0.5)' : 'rgba(76, 175, 80, 0.5)';
+            ripple.style.top = '50%';
+            ripple.style.left = '50%';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.pointerEvents = 'none';
+            
+            fxModeToggle.appendChild(ripple);
+            
+            // 动画
+            ripple.animate([
+                { transform: 'translate(-50%, -50%) scale(0.3)', opacity: 1 },
+                { transform: 'translate(-50%, -50%) scale(3)', opacity: 0 }
+            ], {
+                duration: 800,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                fxModeToggle.removeChild(ripple);
+            };
+        }
+        
+        function toggleEmotionHistory() {
+            // 切换情绪历史容器显示状态
+            const isVisible = emotionHistoryContainer.classList.contains('active');
+            emotionHistoryContainer.classList.toggle('active', !isVisible);
+            
+            if (!isVisible) {
+                // 更新情绪图表
+                updateEmotionChart();
+            }
+            
+            // 反馈震动
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(20);
+                }
+            } catch (e) {}
+        }
+        
+        function toggleWeather() {
+            // 循环切换天气
+            const currentIndex = weatherTypes.findIndex(w => w.id === currentWeather);
+            const nextIndex = (currentIndex + 1) % weatherTypes.length;
+            setWeather(weatherTypes[nextIndex].id);
+            
+            // 检查天气成就
+            const weatherAchievement = achievements.find(a => a.type === 'weather');
+            if (weatherAchievement) {
+                const usedWeathers = new Set(JSON.parse(localStorage.getItem('usedWeathers') || '[]'));
+                usedWeathers.add(weatherTypes[nextIndex].id);
+                localStorage.setItem('usedWeathers', JSON.stringify([...usedWeathers]));
+                
+                if (usedWeathers.size >= weatherAchievement.count) {
+                    unlockAchievement(weatherAchievement);
+                }
+            }
+            
+            // 反馈震动
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(20);
+                }
+            } catch (e) {}
+        }
+        
+        function setWeather(weatherId) {
+            // 设置当前天气
+            currentWeather = weatherId;
+            const weather = weatherTypes.find(w => w.id === weatherId);
+            
+            // 更新图标
+            weatherIcon.textContent = weather.icon;
+            
+            // 显示提示
+            showTooltip(weatherToggle, `${weather.name}: ${weather.description}`);
+            
+            // 清除任何现有的天气效果
+            weatherRain.innerHTML = '';
+            weatherRain.style.opacity = '0';
+            confettiContainer.innerHTML = '';
+            confettiContainer.style.opacity = '0';
+            
+            // 根据天气类型创建特效
+            switch (weatherId) {
+                case 'rain':
+                    createRaindrops();
+                    break;
+                case 'thunder':
+                    createRaindrops(true);
+                    break;
+                case 'rainbow':
+                    createConfetti();
+                    break;
+            }
+        }
+        
+        function createRaindrops(isThunder = false) {
+            weatherRain.style.opacity = '1';
+            const dropCount = isLowPerformanceDevice ? 30 : 100;
+            
+            for (let i = 0; i < dropCount; i++) {
+                createRaindrop(isThunder);
+            }
+        }
+        
+        function createRaindrop(isThunder = false) {
+            const drop = document.createElement('div');
+            drop.classList.add('rain-drop');
+            
+            // 随机位置和速度
+            const x = Math.random() * 100;
+            const delay = Math.random() * 5;
+            const duration = 0.5 + Math.random() * 1.5;
+            const height = 10 + Math.random() * 20;
+            
+            drop.style.left = `${x}%`;
+            drop.style.top = `-${height}px`;
+            drop.style.height = `${height}px`;
+            drop.style.opacity = isThunder ? '0.9' : '0.6';
+            drop.style.animationDelay = `${delay}s`;
+            
+            weatherRain.appendChild(drop);
+            
+            // 雨滴动画
+            drop.animate([
+                { transform: 'translateY(0)', opacity: isThunder ? 0.9 : 0.6 },
+                { transform: `translateY(${window.innerHeight + height}px)`, opacity: 0 }
+            ], {
+                duration: duration * 1000,
+                iterations: Infinity
+            });
+            
+            // 雷暴效果
+            if (isThunder && Math.random() < 0.01) {
+                createLightning();
+            }
+        }
+        
+        function createLightning() {
+            // 闪电效果
+            const lightning = document.createElement('div');
+            lightning.style.position = 'absolute';
+            lightning.style.width = '100%';
+            lightning.style.height = '100%';
+            lightning.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            lightning.style.top = '0';
+            lightning.style.left = '0';
+            lightning.style.pointerEvents = 'none';
+            lightning.style.zIndex = '5';
+            lightning.style.opacity = '0';
+            
+            document.body.appendChild(lightning);
+            
+            // 闪电动画
+            lightning.animate([
+                { opacity: 0 },
+                { opacity: 0.7, offset: 0.1 },
+                { opacity: 0.1, offset: 0.2 },
+                { opacity: 0.7, offset: 0.3 },
+                { opacity: 0 }
+            ], {
+                duration: 700,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                document.body.removeChild(lightning);
+            };
+            
+            // 雷声
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate([30, 50, 80]);
+                }
+            } catch (e) {}
+        }
+        
+        function createConfetti() {
+            confettiContainer.style.opacity = '1';
+            const confettiCount = isLowPerformanceDevice ? 30 : 100;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.classList.add('confetti');
+                    
+                    // 随机颜色
+                    const hue = Math.random() * 360;
+                    confetti.style.backgroundColor = `hsl(${hue}, 80%, 60%)`;
+                    
+                    // 随机位置和速度
+                    const size = 5 + Math.random() * 10;
+                    const x = Math.random() * 100;
+                    const delay = Math.random() * 5;
+                    const duration = 3 + Math.random() * 3;
+                    
+                    confetti.style.width = `${size}px`;
+                    confetti.style.height = `${size}px`;
+                    confetti.style.left = `${x}%`;
+                    confetti.style.top = `-${size}px`;
+                    
+                    confettiContainer.appendChild(confetti);
+                    
+                    // 彩纸动画
+                    confetti.animate([
+                        { 
+                            transform: 'translateY(0) rotate(0deg)', 
+                            opacity: 0.9 
+                        },
+                        { 
+                            transform: `translateY(${window.innerHeight + size}px) rotate(${720 + Math.random() * 360}deg)`, 
+                            opacity: 0 
+                        }
+                    ], {
+                        duration: duration * 1000,
+                        easing: 'ease-in',
+                        delay: delay * 1000,
+                        iterations: Infinity
+                    });
+                }, Math.random() * 1000);
+            }
+        }
+        
+        function updateWeatherEffects() {
+            // 根据强度调整天气效果
+            if (currentWeather === 'thunder' && Math.random() < intensity / 1000) {
+                createLightning();
+            }
         }
         
         function switchMode(mode) {
@@ -759,6 +1542,9 @@
             if (isPressed) return;
             isPressed = true;
             
+            // 显示压力容器
+            pressureContainer.style.opacity = '1';
+            
             // 记录开始时间，并设置持续检查
             screamStartTime = Date.now();
             screamDurationInterval = setInterval(checkDurationAchievement, 100);
@@ -782,11 +1568,21 @@
             particleInterval = setInterval(createParticles, 100);
             
             // 显示声波
-            soundWaves.style.opacity = 1;
+            soundWaves.style.opacity = '1';
+            
+            // 特效模式下显示音频可视化
+            if (fxMode) {
+                audioVisualizer.style.opacity = '1';
+            }
             
             // 创建音波纹效果
             if (fxMode && USE_COMPLEX_EFFECTS) {
                 createWaveEffect();
+            }
+            
+            // 显示情绪emoji
+            if (intensity > 20) {
+                showEmotionEmoji();
             }
             
             // 触发震动反馈
@@ -795,14 +1591,34 @@
                     navigator.vibrate([20, 30, 20]);
                 }
             } catch (e) {}
+            
+            // 隐藏说明
+            instructions.style.opacity = '0.3';
+            
+            // 按钮状态改变
+            screamButton.style.background = 'linear-gradient(145deg, #f5f5f5, #e0e0e0)';
         }
         
         function stopScream() {
             if (!isPressed) return;
             isPressed = false;
             
+            // 隐藏压力容器
+            pressureContainer.style.opacity = '0';
+            
             // 清除持续检查
             clearInterval(screamDurationInterval);
+            
+            // 检查完美释放成就
+            if (intensity >= 95) {
+                const perfectReleaseAchievement = achievements.find(a => a.type === 'special' && a.condition === 'perfectRelease');
+                if (perfectReleaseAchievement) {
+                    unlockAchievement(perfectReleaseAchievement);
+                }
+                
+                // 完美释放效果
+                showPerfectReleaseEffect();
+            }
             
             // 快速降低尖叫强度
             const cooldownInterval = setInterval(() => {
@@ -812,7 +1628,11 @@
                 decreaseIntensity(cooldownRate);
                 if (intensity <= 0) {
                     clearInterval(cooldownInterval);
-                    soundWaves.style.opacity = 0;
+                    soundWaves.style.opacity = '0';
+                    audioVisualizer.style.opacity = '0';
+                    
+                    // 重新显示说明
+                    instructions.style.opacity = '1';
                 }
             }, 50);
             
@@ -824,6 +1644,143 @@
                     navigator.vibrate(10);
                 }
             } catch (e) {}
+            
+            // 恢复按钮状态
+            screamButton.style.background = 'linear-gradient(145deg, #ffffff, #e6e6e6)';
+        }
+        
+        function showEmotionEmoji() {
+            if (visibleParticlesCount >= PARTICLE_LIMIT) return;
+            
+            // 根据当前强度选择情绪
+            let emojiSet = emojis.calm;
+            for (let i = emotions.length - 1; i >= 0; i--) {
+                if (intensity >= emotions[i].threshold) {
+                    emojiSet = emotions[i].emoji;
+                    break;
+                }
+            }
+            
+            // 随机选择一个表情
+            const emoji = emojiSet[Math.floor(Math.random() * emojiSet.length)];
+            
+            // 创建表情元素
+            const emojiElem = document.createElement('div');
+            emojiElem.classList.add('emotion-emoji');
+            emojiElem.textContent = emoji;
+            emojiElem.style.fontSize = `${Math.floor(24 + Math.random() * 12)}px`;
+            emojiElem.style.position = 'absolute';
+            
+            // 从按钮位置发射
+            const buttonRect = screamButton.getBoundingClientRect();
+            const startX = buttonRect.left + buttonRect.width / 2;
+            const startY = buttonRect.top + buttonRect.height / 2;
+            
+            // 随机角度
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 30 + Math.random() * 100;
+            const endX = startX + Math.cos(angle) * distance;
+            const endY = startY + Math.sin(angle) * distance;
+            
+            emojiElem.style.left = `${startX}px`;
+            emojiElem.style.top = `${startY}px`;
+            
+            document.body.appendChild(emojiElem);
+            
+            // 动画
+            emojiElem.style.opacity = '1';
+            emojiElem.style.transform = 'scale(1)';
+            
+            emojiElem.animate([
+                { left: `${startX}px`, top: `${startY}px`, transform: 'scale(0.5)', opacity: 0 },
+                { left: `${endX}px`, top: `${endY}px`, transform: 'scale(1.2)', opacity: 1, offset: 0.6 },
+                { left: `${endX}px`, top: `${endY - 50}px`, transform: 'scale(1)', opacity: 0 }
+            ], {
+                duration: 1500,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                document.body.removeChild(emojiElem);
+            };
+        }
+        
+        function showPerfectReleaseEffect() {
+            // 特效：完美释放
+            
+            // 设置彩虹天气
+            setWeather('rainbow');
+            
+            // 大量粒子爆发
+            const burstCount = isLowPerformanceDevice ? 30 : 100;
+            for (let i = 0; i < burstCount; i++) {
+                setTimeout(() => {
+                    const buttonRect = screamButton.getBoundingClientRect();
+                    const centerX = buttonRect.left + buttonRect.width / 2;
+                    const centerY = buttonRect.top + buttonRect.height / 2;
+                    
+                    createParticle(centerX, centerY, {
+                        backgroundColor: `hsl(${Math.random() * 360}, 80%, 60%)`,
+                        size: 8 + Math.random() * 8,
+                        speed: 3 + Math.random() * 5,
+                        duration: 2000 + Math.random() * 3000
+                    });
+                }, i * (isLowPerformanceDevice ? 30 : 10));
+            }
+            
+            // 显示完美释放文字
+            showEmotionBurst("完美释放!", "#E91E63");
+            
+            // 触发震动反馈
+            try {
+                if (navigator.vibrate) {
+                    const pattern = [];
+                    for (let i = 0; i < 5; i++) {
+                        pattern.push(30 + i * 10);
+                        pattern.push(20);
+                    }
+                    navigator.vibrate(pattern);
+                }
+            } catch (e) {}
+        }
+        
+        function showEmotionBurst(text, color) {
+            // 显示情绪爆发动画
+            emotionBurst.style.opacity = '1';
+            emotionBurst.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            emotionBurstText.textContent = text;
+            emotionBurstText.style.color = color;
+            
+            // 动画
+            emotionBurstText.style.transform = 'scale(0.5)';
+            emotionBurstText.style.opacity = '0';
+            
+            setTimeout(() => {
+                // 放大动画
+                emotionBurstText.style.transform = 'scale(1.2)';
+                emotionBurstText.style.opacity = '1';
+                
+                setTimeout(() => {
+                    // 缩小消失
+                    emotionBurstText.style.transform = 'scale(0.8)';
+                    emotionBurstText.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        emotionBurst.style.opacity = '0';
+                        emotionBurst.style.backgroundColor = 'transparent';
+                    }, 500);
+                }, 1500);
+            }, 100);
+            
+            // 检查爆发成就
+            const burstAchievement = achievements.find(a => a.type === 'burst');
+            if (burstAchievement) {
+                let burstCount = parseInt(localStorage.getItem('emotionBurstCount') || '0');
+                burstCount++;
+                localStorage.setItem('emotionBurstCount', burstCount);
+                
+                if (burstCount >= burstAchievement.count) {
+                    unlockAchievement(burstAchievement);
+                }
+            }
         }
         
         function increaseIntensity(amount) {
@@ -864,7 +1821,8 @@
             shakeScreen(amount / 10);
             
             // 显示爆发文字
-            showEmotionText("爆发!!!", "#FF5722", 1000);
+            const randomPhrase = burstPhrases[Math.floor(Math.random() * burstPhrases.length)];
+            showEmotionBurst(randomPhrase, "#FF5722");
             
             // 特效模式下创建波纹
             if (fxMode && USE_COMPLEX_EFFECTS) {
@@ -893,6 +1851,50 @@
                 const releaseIncrement = intensity / 100 * (currentMode === 'fury' ? 2 : 1);
                 totalRelease += releaseIncrement;
                 totalReleaseElement.textContent = Math.floor(totalRelease);
+                
+                // 保存总释放值
+                localStorage.setItem('totalRelease', totalRelease.toString());
+            }
+        }
+        
+        function updatePressureContainer() {
+            if (isPressed) {
+                // 更新压力容器效果
+                const scale = 1 + (intensity / 300);
+                pressureContainer.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                
+                // 更新压力容器颜色
+                const hue = 360 - (intensity * 3.6); // 从红色逐渐变为黄色再变为绿色
+                const saturation = 70 + (intensity / 5);
+                const lightness = 50;
+                const alpha = 0.1 + (intensity / 200);
+                
+                pressureContainer.style.background = `radial-gradient(circle, transparent 80%, hsla(${hue}, ${saturation}%, ${lightness}%, ${alpha}) 100%)`;
+                
+                // 添加脉冲效果
+                if (intensity > 70 && Math.random() > 0.9) {
+                    const pulse = document.createElement('div');
+                    pulse.style.position = 'absolute';
+                    pulse.style.width = '100%';
+                    pulse.style.height = '100%';
+                    pulse.style.borderRadius = '50%';
+                    pulse.style.background = `radial-gradient(circle, transparent 80%, hsla(${hue}, ${saturation}%, ${lightness}%, 0.7) 100%)`;
+                    pulse.style.top = '0';
+                    pulse.style.left = '0';
+                    
+                    pressureContainer.appendChild(pulse);
+                    
+                    // 动画
+                    pulse.animate([
+                        { transform: 'scale(0.9)', opacity: 0.7 },
+                        { transform: 'scale(1.1)', opacity: 0 }
+                    ], {
+                        duration: 500,
+                        easing: 'ease-out'
+                    }).onfinish = () => {
+                        pressureContainer.removeChild(pulse);
+                    };
+                }
             }
         }
         
@@ -914,15 +1916,21 @@
             screamButton.style.transform = `scale(${scale})`;
             
             // 标题效果
-            const titleRotation = intensity / 50;
+            const titleRotation = (intensity / 50) * (Math.random() > 0.5 ? 1 : -1);
             const titleOffset = intensity / 10;
             title.style.transform = `translateY(${titleOffset}px) rotate(${titleRotation}deg)`;
             title.style.color = `hsl(${hue}, 70%, 40%)`;
             
+            // 添加文字阴影效果，强度越高越明显
+            const textShadowBlur = intensity / 10;
+            const textShadowColor = `hsla(${hue}, 70%, 50%, 0.7)`;
+            title.style.textShadow = `0 0 ${textShadowBlur}px ${textShadowColor}`;
+            
             // 显示情绪文字
             for (let i = emotions.length - 1; i >= 0; i--) {
                 if (intensity >= emotions[i].threshold) {
-                    showEmotionText(emotions[i].text, emotions[i].color);
+                    const randomEmoji = emotions[i].emoji[Math.floor(Math.random() * emotions[i].emoji.length)];
+                    showEmotionText(`${emotions[i].text} ${randomEmoji}`, emotions[i].color);
                     break;
                 }
             }
@@ -942,11 +1950,22 @@
             const statBoxes = document.querySelectorAll('.stat-box');
             statBoxes.forEach(box => {
                 box.style.transform = `scale(${1 + intensity/500})`;
+                
+                // 增加阴影效果
+                const shadowBlur = 5 + (intensity / 10);
+                box.style.boxShadow = `0 ${2 + (intensity/50)}px ${shadowBlur}px rgba(0,0,0,${0.1 + (intensity/500)})`;
             });
             
             // 图标旋转
             const screamIcon = document.querySelector('.scream-icon');
-            screamIcon.style.transform = `rotate(${intensity/2}deg)`;
+            screamIcon.style.transform = `rotate(${intensity/2}deg) scale(${1 + intensity/300})`;
+            
+            // 情绪指示器动画
+            if (intensity > 40) {
+                emotionIndicator.style.transform = `scale(${1 + intensity/200}) translateY(${(Math.random() - 0.5) * (intensity / 50)}px)`;
+            } else {
+                emotionIndicator.style.transform = 'scale(1) translateY(0)';
+            }
         }
         
         function applyFxModeEffects() {
@@ -961,6 +1980,11 @@
                         const particleCount = isLowPerformanceDevice ? 3 : (5 + Math.random() * 10);
                         createColorfulParticles(particleCount);
                     }
+                    
+                    // 脉冲效果
+                    if (intensity > 50 && Math.random() > 0.95) {
+                        animateButtonPulse();
+                    }
                     break;
                     
                 case 'fury':
@@ -972,6 +1996,11 @@
                         if (intensity > 80 && !shakingTimeout && Math.random() > 0.7) {
                             shakeScreen(intensity / 30);
                         }
+                    }
+                    
+                    // 强度超过80，随机显示情绪爆发文字
+                    if (intensity > 80 && Math.random() > 0.98) {
+                        showEmotionEmoji();
                     }
                     break;
             }
@@ -1096,10 +2125,38 @@
             });
         }
         
+        function animateAudioVisualizer() {
+            audioBarElements.forEach((bar, index) => {
+                // 计算每个音频条的高度 - 基于强度和随机值
+                let height;
+                
+                if (intensity === 0) {
+                    height = 5;
+                } else {
+                    // 使用不同的频率创建更自然的波形
+                    const time = Date.now() / 100;
+                    const frequency = 0.1 + (index / audioBarElements.length) * 2;
+                    const amplitude = intensity / 5;
+                    
+                    const value = Math.sin(time * frequency) * amplitude;
+                    height = 5 + (intensity / 10) + value;
+                    
+                    // 中间的条更高
+                    const centerBoost = 1 - Math.abs((index - audioBarElements.length/2) / (audioBarElements.length/2));
+                    height *= (1 + centerBoost * 0.5);
+                }
+                
+                bar.style.height = `${Math.max(2, height)}px`;
+            });
+        }
+        
         function showEmotionText(text, color, duration = 2000) {
             emotionIndicator.textContent = text;
             emotionIndicator.style.color = color;
             emotionIndicator.style.opacity = 1;
+            
+            // 文字阴影效果
+            emotionIndicator.style.textShadow = `0 0 10px ${color.replace(')', ', 0.5)')}, 0 0 20px ${color.replace(')', ', 0.3)')}`;
             
             clearTimeout(emotionIndicator.fadeTimeout);
             emotionIndicator.fadeTimeout = setTimeout(() => {
@@ -1154,8 +2211,8 @@
             if (particleCount <= 0) return;
             
             const buttonRect = screamButton.getBoundingClientRect();
-            const centerX = buttonRect.left + buttonRect.width / 2;
-            const centerY = buttonRect.top + buttonRect.height / 2;
+const centerX = buttonRect.left + buttonRect.width / 2;
+                const centerY = buttonRect.top + buttonRect.height / 2;
             
             for (let i = 0; i < particleCount; i++) {
                 // 火焰色粒子
@@ -1267,6 +2324,13 @@
                     const scale = 1 - progress * 0.5;
                     elem.style.transform = `scale(${scale})`;
                 }
+                
+                // 添加旋转效果
+                if (fxMode && Math.random() > 0.8) {
+                    const rotationSpeed = (Math.random() - 0.5) * 10;
+                    const rotation = progress * 360 * rotationSpeed;
+                    elem.style.transform = `${elem.style.transform || ''} rotate(${rotation}deg)`;
+                }
             });
             
             // 清理完成的粒子
@@ -1349,7 +2413,7 @@
             notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
             notification.style.zIndex = '1000';
             notification.style.opacity = '0';
-            notification.style.transition = 'opacity 0.3s';
+            notification.style.transition = 'opacity 0.3s, transform 0.3s';
             notification.innerHTML = `<strong>成就解锁: ${achievement.name}</strong><br>${achievement.description}`;
             
             document.body.appendChild(notification);
@@ -1357,9 +2421,11 @@
             // 动画显示和消失
             setTimeout(() => {
                 notification.style.opacity = '1';
+                notification.style.transform = 'translateX(-50%) scale(1.05)';
                 
                 setTimeout(() => {
                     notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(-50%) scale(0.95)';
                     
                     setTimeout(() => {
                         document.body.removeChild(notification);
@@ -1373,6 +2439,30 @@
                     navigator.vibrate([30, 50, 30]);
                 }
             } catch (e) {}
+            
+            // 成就解锁特效
+            const achievementEffect = document.createElement('div');
+            achievementEffect.style.position = 'fixed';
+            achievementEffect.style.top = '0';
+            achievementEffect.style.left = '0';
+            achievementEffect.style.width = '100%';
+            achievementEffect.style.height = '100%';
+            achievementEffect.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+            achievementEffect.style.zIndex = '500';
+            achievementEffect.style.pointerEvents = 'none';
+            
+            document.body.appendChild(achievementEffect);
+            
+            // 动画
+            achievementEffect.animate([
+                { opacity: 0.2 },
+                { opacity: 0 }
+            ], {
+                duration: 1000,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                document.body.removeChild(achievementEffect);
+            };
         }
         
         function checkAchievements() {
@@ -1384,13 +2474,248 @@
             });
         }
         
+        function loadEmotionHistory() {
+            // 加载情绪历史记录
+            emotionHistory = JSON.parse(localStorage.getItem('emotionHistory') || '[]');
+            
+            // 加载总释放值
+            const savedTotalRelease = localStorage.getItem('totalRelease');
+            if (savedTotalRelease) {
+                totalRelease = parseFloat(savedTotalRelease);
+                totalReleaseElement.textContent = Math.floor(totalRelease);
+            }
+        }
+        
+        function saveEmotionRecord() {
+            // 保存当前情绪状态
+            const now = new Date();
+            const emotionRecord = {
+                date: now.toISOString(),
+                intensity: intensity,
+                mode: currentMode,
+                totalRelease: totalRelease,
+                weather: currentWeather
+            };
+            
+            // 添加到历史记录
+            emotionHistory.unshift(emotionRecord);
+            
+            // 限制历史记录长度
+            if (emotionHistory.length > 30) {
+                emotionHistory = emotionHistory.slice(0, 30);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('emotionHistory', JSON.stringify(emotionHistory));
+            
+            // 检查情绪记录成就
+            const historyAchievement = achievements.find(a => a.type === 'history');
+            if (historyAchievement && emotionHistory.length >= historyAchievement.count) {
+                unlockAchievement(historyAchievement);
+            }
+            
+            // 更新最后保存时间
+            lastEmotionSave = Date.now();
+        }
+        
+        function checkEmotionRecording() {
+            // 当强度超过50并且自上次保存已过去至少5分钟，或者强度达到最大，记录情绪
+            const timePassedMinutes = (Date.now() - lastEmotionSave) / (1000 * 60);
+            
+            if ((intensity >= 50 && timePassedMinutes >= 5) || intensity >= 95) {
+                saveEmotionRecord();
+            }
+        }
+        
+        function updateEmotionChart() {
+            // 更新情绪图表
+            emotionChart.innerHTML = '';
+            
+            // 获取最近的10条记录
+            const recentHistory = emotionHistory.slice(0, 10).reverse();
+            
+            // 如果没有记录，显示提示
+            if (recentHistory.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.style.position = 'absolute';
+                emptyMessage.style.top = '50%';
+                emptyMessage.style.left = '50%';
+                emptyMessage.style.transform = 'translate(-50%, -50%)';
+                emptyMessage.style.color = '#999';
+                emptyMessage.style.fontSize = '14px';
+                emptyMessage.textContent = '暂无情绪记录';
+                emotionChart.appendChild(emptyMessage);
+                
+                emotionHistoryList.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">暂无情绪记录</div>';
+                return;
+            }
+            
+            // 计算图表宽度
+            const chartWidth = emotionChart.offsetWidth;
+            const barWidth = Math.min(20, (chartWidth - 40) / recentHistory.length);
+            const barSpacing = (chartWidth - 40 - barWidth * recentHistory.length) / (recentHistory.length - 1);
+            
+            // 创建图表条和日期标签
+            recentHistory.forEach((record, index) => {
+                // 创建图表条
+                const bar = document.createElement('div');
+                bar.classList.add('emotion-chart-bar');
+                bar.style.left = `${20 + index * (barWidth + barSpacing)}px`;
+                bar.style.width = `${barWidth}px`;
+                bar.style.height = `0px`; // 初始化为0，然后动画增加高度
+                
+                // 设置颜色 - 根据情绪强度
+                let barColor;
+                for (let i = emotions.length - 1; i >= 0; i--) {
+                    if (record.intensity >= emotions[i].threshold) {
+                        barColor = emotions[i].color;
+                        break;
+                    }
+                }
+                
+                bar.style.background = barColor || '#4CAF50';
+                emotionChart.appendChild(bar);
+                
+                // 添加日期标签
+                const dateLabel = document.createElement('div');
+                dateLabel.classList.add('emotion-chart-date');
+                dateLabel.style.left = `${20 + index * (barWidth + barSpacing) + barWidth/2}px`;
+                
+                const date = new Date(record.date);
+                dateLabel.textContent = `${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                emotionChart.appendChild(dateLabel);
+                
+                // 添加提示
+                bar.addEventListener('mouseenter', () => {
+                    const tooltip = document.createElement('div');
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.bottom = '100%';
+                    tooltip.style.left = '50%';
+                    tooltip.style.transform = 'translateX(-50%)';
+                    tooltip.style.backgroundColor = 'rgba(0,0,0,0.7)';
+                    tooltip.style.color = 'white';
+                    tooltip.style.padding = '5px 8px';
+                    tooltip.style.borderRadius = '4px';
+                    tooltip.style.fontSize = '12px';
+                    tooltip.style.whiteSpace = 'nowrap';
+                    tooltip.style.zIndex = '100';
+                    tooltip.textContent = `强度: ${Math.round(record.intensity)}%, 模式: ${record.mode}`;
+                    
+                    bar.appendChild(tooltip);
+                });
+                
+                bar.addEventListener('mouseleave', () => {
+                    const tooltip = bar.querySelector('div');
+                    if (tooltip) {
+                        bar.removeChild(tooltip);
+                    }
+                });
+                
+                // 动画显示图表条
+                setTimeout(() => {
+                    bar.style.height = `${(record.intensity / 100) * 150}px`;
+                }, index * 100);
+            });
+            
+            // 更新情绪历史列表
+            updateEmotionHistoryList();
+        }
+        
+        function updateEmotionHistoryList() {
+            // 更新情绪历史列表
+            emotionHistoryList.innerHTML = '';
+            
+            // 如果没有记录，已在图表函数中处理
+            if (emotionHistory.length === 0) return;
+            
+            // 获取最近的5条记录
+            const recentHistory = emotionHistory.slice(0, 5);
+            
+            recentHistory.forEach(record => {
+                const entry = document.createElement('div');
+                entry.classList.add('emotion-history-entry');
+                
+                const date = new Date(record.date);
+                
+                const dateElem = document.createElement('div');
+                dateElem.classList.add('emotion-history-date');
+                dateElem.textContent = `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+                
+                // 计算背景颜色 - 根据模式和强度
+                let bgColor;
+                switch (record.mode) {
+                    case 'calm':
+                        bgColor = '#E8F5E9';
+                        break;
+                    case 'release':
+                        bgColor = '#FFF3E0';
+                        break;
+                    case 'fury':
+                        bgColor = '#FFEBEE';
+                        break;
+                }
+                
+                entry.style.backgroundColor = bgColor;
+                
+                // 添加情绪强度标签
+                const intensityElem = document.createElement('span');
+                intensityElem.classList.add('emotion-history-intensity');
+                intensityElem.textContent = `${Math.round(record.intensity)}%`;
+                
+                // 设置标签颜色
+                let intensityColor;
+                for (let i = emotions.length - 1; i >= 0; i--) {
+                    if (record.intensity >= emotions[i].threshold) {
+                        intensityColor = emotions[i].color;
+                        break;
+                    }
+                }
+                intensityElem.style.backgroundColor = intensityColor || '#4CAF50';
+                
+                dateElem.appendChild(intensityElem);
+                entry.appendChild(dateElem);
+                
+                // 添加详情
+                const detailsElem = document.createElement('div');
+                detailsElem.style.fontSize = '12px';
+                detailsElem.style.marginTop = '3px';
+                detailsElem.style.color = '#666';
+                
+                // 获取情绪文本
+                let emotionText = '平静';
+                for (let i = emotions.length - 1; i >= 0; i--) {
+                    if (record.intensity >= emotions[i].threshold) {
+                        emotionText = emotions[i].text;
+                        break;
+                    }
+                }
+                
+                // 获取天气文本
+                const weather = weatherTypes.find(w => w.id === record.weather) || weatherTypes[0];
+                
+                detailsElem.textContent = `情绪: ${emotionText} | 模式: ${
+                    record.mode === 'calm' ? '平静' : 
+                    record.mode === 'release' ? '释放' : '狂怒'
+                } | 天气: ${weather.name} ${weather.icon}`;
+                
+                entry.appendChild(detailsElem);
+                emotionHistoryList.appendChild(entry);
+            });
+        }
+        
         // 定期检查成就 - 降低检查频率以提高性能
         setInterval(checkAchievements, 2000);
+
+
+        
         
         // 添加一些互动提示
         setTimeout(() => {
             showEmotionText("长按或快速点击这里!", "#4CAF50", 3000);
         }, 1000);
+        
+        // 初始化天气
+        setWeather('none');
         
         // 模拟一些初始的粒子效果 - 低性能设备减少数量
         setTimeout(() => {
@@ -1410,6 +2735,3097 @@
             }
         }, 1500);
         
+        // 向用户介绍新功能
+        setTimeout(() => {
+            if (!localStorage.getItem('hasSeenIntro')) {
+                showTooltip(emotionHistoryToggle, '新功能: 情绪记录，记录你的压力释放历史');
+                
+                setTimeout(() => {
+                    showTooltip(weatherToggle, '新功能: 情绪天气，体验不同的视觉效果');
+                    
+                    setTimeout(() => {
+                        localStorage.setItem('hasSeenIntro', 'true');
+                    }, 2500);
+                }, 2500);
+            }
+        }, 3000);
+
+
+/**
+ * 1. 打卡系统 - 以月为维度的打卡界面
+ */
+
+// 打卡系统数据管理
+const CheckInSystem = {
+    // 获取打卡记录
+    getCheckInData() {
+        const data = localStorage.getItem('screamCheckInData');
+        return data ? JSON.parse(data) : {};
+    },
+    
+    // 保存打卡记录
+    saveCheckInData(data) {
+        localStorage.setItem('screamCheckInData', JSON.stringify(data));
+    },
+    
+    // 检查今天是否已打卡
+    isTodayCheckedIn() {
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        const data = this.getCheckInData();
+        return data[dateStr] ? true : false;
+    },
+    
+    // 获取当月打卡天数
+    getCurrentMonthCheckIns() {
+        const today = new Date();
+        const currentMonth = today.getMonth() + 1;
+        const currentYear = today.getFullYear();
+        const data = this.getCheckInData();
+        
+        let count = 0;
+        for (const dateStr in data) {
+            const [year, month] = dateStr.split('-').map(Number);
+            if (year === currentYear && month === currentMonth) {
+                count++;
+            }
+        }
+        
+        return count;
+    },
+    
+    // 打卡
+    checkIn(intensity) {
+        const today = new Date();
+        const dateStr = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        const data = this.getCheckInData();
+        
+        if (!data[dateStr]) {
+            data[dateStr] = {
+                timestamp: Date.now(),
+                intensity: intensity || 0,
+                mode: currentMode,
+                weather: currentWeather
+            };
+            
+            this.saveCheckInData(data);
+            return true;
+        }
+        
+        return false;
+    },
+    
+    // 获取指定月份的打卡数据
+    getMonthData(year, month) {
+        const data = this.getCheckInData();
+        const monthData = {};
+        
+        for (const dateStr in data) {
+            const [dataYear, dataMonth] = dateStr.split('-').map(Number);
+            if (dataYear === year && dataMonth === month) {
+                monthData[dateStr] = data[dateStr];
+            }
+        }
+        
+        return monthData;
+    }
+};
+
+// 创建并显示打卡界面
+function createCheckInUI() {
+    // 如果已存在，则移除旧的
+    const existingUI = document.getElementById('checkInContainer');
+    if (existingUI) {
+        document.body.removeChild(existingUI);
+    }
+    
+    // 创建打卡容器
+    const checkInContainer = document.createElement('div');
+    checkInContainer.id = 'checkInContainer';
+    checkInContainer.style.position = 'absolute';
+    checkInContainer.style.top = '70px';
+    checkInContainer.style.right = '70px';
+    checkInContainer.style.width = '300px';
+    checkInContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    checkInContainer.style.borderRadius = '8px';
+    checkInContainer.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+    checkInContainer.style.padding = '15px';
+    checkInContainer.style.zIndex = '100';
+    checkInContainer.style.transform = 'translateX(150%)';
+    checkInContainer.style.transition = 'transform 0.3s ease-out';
+    checkInContainer.style.maxHeight = '80vh';
+    checkInContainer.style.overflowY = 'auto';
+    
+    // 添加标题
+    const title = document.createElement('h3');
+    title.textContent = '每日打卡';
+    title.style.marginBottom = '15px';
+    title.style.borderBottom = '1px solid #eee';
+    title.style.paddingBottom = '8px';
+    checkInContainer.appendChild(title);
+    
+    // 当前月份状态
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const currentMonth = today.getMonth() + 1;
+    
+    const statusContainer = document.createElement('div');
+    statusContainer.style.marginBottom = '15px';
+    statusContainer.style.padding = '10px';
+    statusContainer.style.backgroundColor = '#f5f5f5';
+    statusContainer.style.borderRadius = '5px';
+    statusContainer.style.textAlign = 'center';
+    
+    const monthName = today.toLocaleString('default', { month: 'long' });
+    const checkInCount = CheckInSystem.getCurrentMonthCheckIns();
+    
+    statusContainer.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 5px;">${currentYear}年 ${monthName}</div>
+        <div>本月已打卡: <span style="color: #4CAF50; font-weight: bold;">${checkInCount}天</span></div>
+        <div style="margin-top: 5px; font-size: 12px; color: #666;">
+            ${CheckInSystem.isTodayCheckedIn() ? 
+                '✅ 今日已打卡' : 
+                '❗ 今日尚未打卡，尖叫强度达到50%时自动打卡'}
+        </div>
+    `;
+    
+    checkInContainer.appendChild(statusContainer);
+    
+    // 创建月历
+    const calendarContainer = document.createElement('div');
+    calendarContainer.style.marginBottom = '15px';
+    checkInContainer.appendChild(calendarContainer);
+    
+    // 月份选择器
+    const monthSelector = document.createElement('div');
+    monthSelector.style.display = 'flex';
+    monthSelector.style.justifyContent = 'space-between';
+    monthSelector.style.alignItems = 'center';
+    monthSelector.style.marginBottom = '10px';
+    
+    let displayYear = currentYear;
+    let displayMonth = currentMonth;
+    
+    const monthLabel = document.createElement('div');
+    monthLabel.style.fontWeight = 'bold';
+    monthLabel.textContent = `${displayYear}年 ${displayMonth}月`;
+    
+    const prevBtn = document.createElement('button');
+    prevBtn.textContent = '◀';
+    prevBtn.style.border = 'none';
+    prevBtn.style.background = '#f0f0f0';
+    prevBtn.style.borderRadius = '4px';
+    prevBtn.style.padding = '5px 10px';
+    prevBtn.style.cursor = 'pointer';
+    
+    const nextBtn = document.createElement('button');
+    nextBtn.textContent = '▶';
+    nextBtn.style.border = 'none';
+    nextBtn.style.background = '#f0f0f0';
+    nextBtn.style.borderRadius = '4px';
+    nextBtn.style.padding = '5px 10px';
+    nextBtn.style.cursor = 'pointer';
+    
+    monthSelector.appendChild(prevBtn);
+    monthSelector.appendChild(monthLabel);
+    monthSelector.appendChild(nextBtn);
+    
+    calendarContainer.appendChild(monthSelector);
+    
+    // 渲染日历函数
+    function renderCalendar(year, month) {
+        // 更新月份显示
+        monthLabel.textContent = `${year}年 ${month}月`;
+        
+        // 清除旧的日历
+        const oldCalendar = document.getElementById('calendarGrid');
+        if (oldCalendar) {
+            calendarContainer.removeChild(oldCalendar);
+        }
+        
+        // 创建日历网格
+        const calendarGrid = document.createElement('div');
+        calendarGrid.id = 'calendarGrid';
+        calendarGrid.style.display = 'grid';
+        calendarGrid.style.gridTemplateColumns = 'repeat(7, 1fr)';
+        calendarGrid.style.gap = '5px';
+        
+        // 添加星期标题
+        const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+        weekdays.forEach(day => {
+            const dayElem = document.createElement('div');
+            dayElem.textContent = day;
+            dayElem.style.textAlign = 'center';
+            dayElem.style.fontWeight = 'bold';
+            dayElem.style.padding = '5px 0';
+            dayElem.style.color = day === '日' || day === '六' ? '#FF5722' : '#333';
+            calendarGrid.appendChild(dayElem);
+        });
+        
+        // 获取当月第一天是星期几
+        const firstDay = new Date(year, month - 1, 1).getDay();
+        
+        // 获取当月天数
+        const daysInMonth = new Date(year, month, 0).getDate();
+        
+        // 获取打卡数据
+        const monthData = CheckInSystem.getMonthData(year, month);
+        
+        // 添加空白天
+        for (let i = 0; i < firstDay; i++) {
+            const emptyDay = document.createElement('div');
+            emptyDay.style.padding = '5px';
+            calendarGrid.appendChild(emptyDay);
+        }
+        
+        // 添加日期
+        for (let i = 1; i <= daysInMonth; i++) {
+            const dayElem = document.createElement('div');
+            const dateStr = `${year}-${month}-${i}`;
+            const isChecked = monthData[dateStr];
+            const isToday = year === currentYear && month === currentMonth && i === today.getDate();
+            
+            dayElem.textContent = i;
+            dayElem.style.textAlign = 'center';
+            dayElem.style.padding = '8px 0';
+            dayElem.style.border = '1px solid #eee';
+            dayElem.style.borderRadius = '4px';
+            dayElem.style.position = 'relative';
+            
+            // 设置样式
+            if (isChecked) {
+                dayElem.style.backgroundColor = '#E8F5E9';
+                dayElem.style.borderColor = '#81C784';
+                
+                // 添加打卡指示器
+                const indicator = document.createElement('span');
+                indicator.textContent = '✓';
+                indicator.style.position = 'absolute';
+                indicator.style.top = '2px';
+                indicator.style.right = '2px';
+                indicator.style.fontSize = '8px';
+                indicator.style.color = '#4CAF50';
+                dayElem.appendChild(indicator);
+                
+                // 显示打卡信息的悬停效果
+                dayElem.title = `尖叫强度: ${Math.round(monthData[dateStr].intensity)}%`;
+                
+                // 点击显示详情
+                dayElem.style.cursor = 'pointer';
+                dayElem.addEventListener('click', () => {
+                    showDayDetails(dateStr, monthData[dateStr]);
+                });
+            }
+            
+            if (isToday) {
+                dayElem.style.border = '2px solid #2196F3';
+                dayElem.style.fontWeight = 'bold';
+            }
+            
+            calendarGrid.appendChild(dayElem);
+        }
+        
+        calendarContainer.appendChild(calendarGrid);
+    }
+    
+    // 显示日期详情
+    function showDayDetails(dateStr, data) {
+        const detailsContainer = document.getElementById('dayDetails');
+        if (detailsContainer) {
+            checkInContainer.removeChild(detailsContainer);
+        }
+        
+        const details = document.createElement('div');
+        details.id = 'dayDetails';
+        details.style.marginTop = '15px';
+        details.style.padding = '10px';
+        details.style.backgroundColor = '#f9f9f9';
+        details.style.borderRadius = '5px';
+        details.style.fontSize = '14px';
+        
+        const date = new Date(data.timestamp);
+        const dateFormatted = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        
+        // 获取情绪文本
+        let emotionText = '平静';
+        for (let i = emotions.length - 1; i >= 0; i--) {
+            if (data.intensity >= emotions[i].threshold) {
+                emotionText = emotions[i].text;
+                break;
+            }
+        }
+        
+        // 获取天气文本
+        const weather = weatherTypes.find(w => w.id === data.weather) || weatherTypes[0];
+        
+        details.innerHTML = `
+            <div style="font-weight: bold; margin-bottom: 8px;">${dateStr} 打卡详情</div>
+            <div>打卡时间: ${dateFormatted}</div>
+            <div>尖叫强度: <span style="color: ${getIntensityColor(data.intensity)}; font-weight: bold;">${Math.round(data.intensity)}%</span></div>
+            <div>情绪状态: ${emotionText}</div>
+            <div>使用模式: ${data.mode === 'calm' ? '平静' : data.mode === 'release' ? '释放' : '狂怒'}</div>
+            <div>情绪天气: ${weather.name} ${weather.icon}</div>
+        `;
+        
+        checkInContainer.appendChild(details);
+    }
+    
+    // 获取强度颜色
+    function getIntensityColor(intensity) {
+        if (intensity >= 80) return '#FF5722';
+        if (intensity >= 60) return '#FF9800';
+        if (intensity >= 40) return '#CDDC39';
+        if (intensity >= 20) return '#8BC34A';
+        return '#4CAF50';
+    }
+    
+    // 切换月份事件
+    prevBtn.addEventListener('click', () => {
+        if (displayMonth === 1) {
+            displayYear--;
+            displayMonth = 12;
+        } else {
+            displayMonth--;
+        }
+        renderCalendar(displayYear, displayMonth);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (displayMonth === 12) {
+            displayYear++;
+            displayMonth = 1;
+        } else {
+            displayMonth++;
+        }
+        renderCalendar(displayYear, displayMonth);
+    });
+    
+    // 渲染初始日历
+    renderCalendar(displayYear, displayMonth);
+    
+    // 连续打卡统计
+    const streakContainer = document.createElement('div');
+    streakContainer.style.marginTop = '15px';
+    streakContainer.style.padding = '10px';
+    streakContainer.style.backgroundColor = '#fff3e0';
+    streakContainer.style.borderRadius = '5px';
+    streakContainer.style.textAlign = 'center';
+    
+    const streakCount = calculateStreak();
+    streakContainer.innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 5px;">连续打卡</div>
+        <div style="font-size: 24px; color: #FF9800; font-weight: bold;">${streakCount}天</div>
+        ${streakCount >= 7 ? '<div style="margin-top: 5px; font-size: 12px;">🔥 太棒了！继续保持！</div>' : ''}
+    `;
+    
+    checkInContainer.appendChild(streakContainer);
+    
+    // 添加关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.display = 'block';
+    closeBtn.style.width = '100%';
+    closeBtn.style.padding = '8px';
+    closeBtn.style.marginTop = '15px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.borderRadius = '4px';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.transition = 'background-color 0.2s';
+    
+    closeBtn.addEventListener('mouseenter', () => {
+        closeBtn.style.backgroundColor = '#e0e0e0';
+    });
+    
+    closeBtn.addEventListener('mouseleave', () => {
+        closeBtn.style.backgroundColor = '#f0f0f0';
+    });
+    
+    closeBtn.addEventListener('click', () => {
+        checkInContainer.style.transform = 'translateX(150%)';
+        setTimeout(() => {
+            if (document.body.contains(checkInContainer)) {
+                document.body.removeChild(checkInContainer);
+            }
+        }, 300);
+    });
+    
+    checkInContainer.appendChild(closeBtn);
+    
+    // 添加到页面
+    document.body.appendChild(checkInContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        checkInContainer.style.transform = 'translateX(0)';
+    }, 10);
+    
+    // 计算连续打卡天数
+    function calculateStreak() {
+        const data = CheckInSystem.getCheckInData();
+        let streak = 0;
+        let currentDate = new Date();
+        
+        // 如果今天没打卡，从昨天开始计算
+        if (!CheckInSystem.isTodayCheckedIn()) {
+            currentDate.setDate(currentDate.getDate() - 1);
+        }
+        
+        while (true) {
+            const dateStr = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+            if (data[dateStr]) {
+                streak++;
+                currentDate.setDate(currentDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        
+        return streak;
+    }
+    
+    return checkInContainer;
+}
+
+// 打卡按钮
+function createCheckInButton() {
+    const checkInBtn = document.createElement('div');
+    checkInBtn.id = 'checkInButton';
+    checkInBtn.style.position = 'absolute';
+    checkInBtn.style.top = '100px';
+    checkInBtn.style.right = '20px';
+    checkInBtn.style.background = 'rgba(255, 255, 255, 0.8)';
+    checkInBtn.style.borderRadius = '5px';
+    checkInBtn.style.padding = '8px 12px';
+    checkInBtn.style.fontSize = '14px';
+    checkInBtn.style.cursor = 'pointer';
+    checkInBtn.style.display = 'flex';
+    checkInBtn.style.alignItems = 'center';
+    checkInBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    checkInBtn.style.zIndex = '10';
+    checkInBtn.style.transition = 'transform 0.3s, box-shadow 0.3s';
+    
+    // 图标
+    const icon = document.createElement('span');
+    icon.textContent = '📅';
+    icon.style.marginRight = '5px';
+    
+    const text = document.createElement('span');
+    text.textContent = '打卡日历';
+    
+    checkInBtn.appendChild(icon);
+    checkInBtn.appendChild(text);
+    
+    // 如果今天已打卡，显示标记
+    if (CheckInSystem.isTodayCheckedIn()) {
+        const mark = document.createElement('span');
+        mark.textContent = '✓';
+        mark.style.marginLeft = '5px';
+        mark.style.color = '#4CAF50';
+        mark.style.fontWeight = 'bold';
+        checkInBtn.appendChild(mark);
+    }
+    
+    // 悬停效果
+    checkInBtn.addEventListener('mouseenter', () => {
+        checkInBtn.style.transform = 'scale(1.05)';
+        checkInBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+    });
+    
+    checkInBtn.addEventListener('mouseleave', () => {
+        checkInBtn.style.transform = 'scale(1)';
+        checkInBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    });
+    
+    // 点击事件
+    checkInBtn.addEventListener('click', () => {
+        createCheckInUI();
+        
+        // 触发震动反馈
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+        } catch (e) {}
+    });
+    
+    document.body.appendChild(checkInBtn);
+    return checkInBtn;
+}
+
+// 自动打卡函数 - 当强度达到阈值时触发
+function autoCheckIn(currentIntensity) {
+    if (currentIntensity >= 50 && !CheckInSystem.isTodayCheckedIn()) {
+        if (CheckInSystem.checkIn(currentIntensity)) {
+            // 打卡成功，显示通知
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = '#4CAF50';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+            notification.style.zIndex = '1000';
+            notification.style.display = 'flex';
+            notification.style.alignItems = 'center';
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s, transform 0.3s';
+            
+            const checkIcon = document.createElement('span');
+            checkIcon.textContent = '✓';
+            checkIcon.style.marginRight = '10px';
+            checkIcon.style.fontSize = '18px';
+            
+            const message = document.createElement('div');
+            message.innerHTML = `<strong>今日打卡成功!</strong><br>尖叫强度: ${Math.round(currentIntensity)}%`;
+            
+            notification.appendChild(checkIcon);
+            notification.appendChild(message);
+            
+            document.body.appendChild(notification);
+            
+            // 动画显示
+            setTimeout(() => {
+                notification.style.opacity = '1';
+                notification.style.transform = 'translateX(-50%) scale(1.05)';
+                
+                // 更新打卡按钮
+                const checkInBtn = document.getElementById('checkInButton');
+                if (checkInBtn) {
+                    const mark = document.createElement('span');
+                    mark.textContent = '✓';
+                    mark.style.marginLeft = '5px';
+                    mark.style.color = '#4CAF50';
+                    mark.style.fontWeight = 'bold';
+                    checkInBtn.appendChild(mark);
+                }
+                
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    notification.style.transform = 'translateX(-50%) scale(0.95)';
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(notification)) {
+                            document.body.removeChild(notification);
+                        }
+                    }, 300);
+                }, 3000);
+            }, 10);
+            
+            // 检查是否获得连续打卡成就
+            const streak = calculateStreak();
+            if (streak >= 7) {
+                // 7天连续打卡成就
+                const streakAchievement = {
+                    id: 'seven-day-streak',
+                    name: '坚持一周',
+                    description: '连续7天进行尖叫打卡'
+                };
+                
+                // 检查是否已解锁
+                const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+                if (!unlockedAchievements.includes(streakAchievement.id)) {
+                    // 解锁成就
+                    unlockAchievement(streakAchievement);
+                }
+            }
+        }
+    }
+}
+
+// 计算连续打卡天数
+function calculateStreak() {
+    const data = CheckInSystem.getCheckInData();
+    let streak = 0;
+    let currentDate = new Date();
+    
+    // 如果今天打卡了，从今天开始计算
+    const todayStr = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+    const hasTodayCheckedIn = data[todayStr];
+    
+    if (!hasTodayCheckedIn) {
+        currentDate.setDate(currentDate.getDate() - 1);
+    }
+    
+    while (true) {
+        const dateStr = `${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}`;
+        if (data[dateStr]) {
+            streak++;
+            currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+            break;
+        }
+    }
+    
+    return streak;
+}
+
+/**
+ * 2. 全屏文字/表情动画效果 - 增强视觉释放效果
+ */
+
+// 创建全屏情绪文字动画
+function createFullscreenTextAnimation(intensity) {
+    if (intensity < 70) return; // 只在强度较高时触发
+    
+    // 低性能设备降低粒子数
+    const textCount = isLowPerformanceDevice ? 10 : 30;
+    
+    // 确定要展示的文字类型
+    const textTypes = ['啊', 'a', 'あ', '哇', 'Ahhh', '呀', 'ああ'];
+    const emojis = ['😱', '😫', '😤', '😡', '🤬', '😵', '😭'];
+    
+    // 根据强度决定显示频率
+    const showEmoji = Math.random() > 0.7;
+    const showBigText = intensity > 90 && Math.random() > 0.8;
+    
+    // 如果需要显示大文字
+    if (showBigText) {
+        showBigScreenText();
+        return;
+    }
+    
+    // 创建多个文字/表情元素
+    for (let i = 0; i < textCount; i++) {
+        setTimeout(() => {
+            // 决定是文字还是表情
+            const isEmoji = showEmoji || Math.random() > 0.7;
+            
+            // 随机选择
+            const textContent = isEmoji 
+                ? emojis[Math.floor(Math.random() * emojis.length)]
+                : textTypes[Math.floor(Math.random() * textTypes.length)];
+            
+            // 创建元素
+            const textElem = document.createElement('div');
+            textElem.textContent = textContent;
+            textElem.style.position = 'absolute';
+            textElem.style.zIndex = '50';
+            textElem.style.userSelect = 'none';
+            textElem.style.pointerEvents = 'none';
+            textElem.style.color = getRandomEmotionColor(intensity);
+            textElem.style.opacity = '0';
+            textElem.style.fontSize = `${isEmoji ? 24 : 18 + Math.random() * 16}px`;
+            textElem.style.fontWeight = 'bold';
+            textElem.style.whiteSpace = 'nowrap';
+            
+            // 随机位置
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            textElem.style.left = `${x}px`;
+            textElem.style.top = `${y}px`;
+            
+            document.body.appendChild(textElem);
+            
+            // 动画
+            const direction = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 100;
+            const xEnd = x + Math.cos(direction) * distance;
+            const yEnd = y + Math.sin(direction) * distance;
+            
+            textElem.animate([
+                { 
+                    transform: 'scale(0.5) rotate(-10deg)', 
+                    opacity: 0,
+                    left: `${x}px`,
+                    top: `${y}px`
+                },
+                { 
+                    transform: 'scale(1.1) rotate(5deg)', 
+                    opacity: 1,
+                    left: `${xEnd}px`,
+                    top: `${yEnd}px`,
+                    offset: 0.6 
+                },
+                { 
+                    transform: 'scale(0.8) rotate(10deg)', 
+                    opacity: 0,
+                    left: `${xEnd}px`,
+                    top: `${yEnd - 30}px`
+                }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                if (document.body.contains(textElem)) {
+                    document.body.removeChild(textElem);
+                }
+            };
+        }, i * (isLowPerformanceDevice ? 100 : 50));
+    }
+}
+
+// 全屏大字效果
+function showBigScreenText() {
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.display = 'flex';
+    container.style.justifyContent = 'center';
+    container.style.alignItems = 'center';
+    container.style.backgroundColor = 'rgba(0, 0, 0, 0.4)';
+    container.style.zIndex = '200';
+    container.style.opacity = '0';
+    container.style.transition = 'opacity 0.3s';
+    container.style.pointerEvents = 'none';
+    
+    // 随机选择文字
+    const bigTexts = ['啊啊啊!', 'AHHHHH!', 'あああ!', '呀啊啊啊!'];
+    const selectedText = bigTexts[Math.floor(Math.random() * bigTexts.length)];
+    
+    const textElem = document.createElement('div');
+    textElem.textContent = selectedText;
+    textElem.style.fontSize = isLowPerformanceDevice ? '60px' : '100px';
+    textElem.style.fontWeight = 'bold';
+    textElem.style.color = 'white';
+    textElem.style.textShadow = '0 0 20px rgba(255, 0, 0, 0.7)';
+    textElem.style.transform = 'scale(0.5) rotate(-5deg)';
+    textElem.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    
+    container.appendChild(textElem);
+    document.body.appendChild(container);
+    
+    // 动画显示
+    setTimeout(() => {
+        container.style.opacity = '1';
+        textElem.style.transform = 'scale(1.2) rotate(5deg)';
+        
+        // 震动屏幕
+        shakeScreen(5);
+        
+        // 创建震撼波纹效果
+        if (!isLowPerformanceDevice) {
+            createShockwave();
+        }
+        
+        // 触发震动反馈
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate([30, 50, 100, 50, 30]);
+            }
+        } catch (e) {}
+        
+        setTimeout(() => {
+            // 淡出
+            textElem.style.transform = 'scale(0.8) rotate(0deg)';
+            container.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (document.body.contains(container)) {
+                    document.body.removeChild(container);
+                }
+            }, 500);
+        }, 1500);
+    }, 10);
+}
+
+// 创建冲击波效果
+function createShockwave() {
+    const shockwave = document.createElement('div');
+    shockwave.style.position = 'fixed';
+    shockwave.style.top = '50%';
+    shockwave.style.left = '50%';
+    shockwave.style.transform = 'translate(-50%, -50%) scale(0)';
+    shockwave.style.width = '10px';
+    shockwave.style.height = '10px';
+    shockwave.style.borderRadius = '50%';
+    shockwave.style.boxShadow = '0 0 0 2px rgba(255, 255, 255, 0.8)';
+    shockwave.style.zIndex = '190';
+    shockwave.style.pointerEvents = 'none';
+    
+    document.body.appendChild(shockwave);
+    
+    // 动画
+    shockwave.animate([
+        { transform: 'translate(-50%, -50%) scale(0)', opacity: 0.8 },
+        { transform: 'translate(-50%, -50%) scale(20)', opacity: 0 }
+    ], {
+        duration: 1000,
+        easing: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)'
+    }).onfinish = () => {
+        if (document.body.contains(shockwave)) {
+            document.body.removeChild(shockwave);
+        }
+    };
+}
+
+// 获取随机情绪颜色
+function getRandomEmotionColor(intensity) {
+    // 根据强度选择不同的颜色范围
+    let hue;
+    if (intensity > 80) {
+        // 高强度 - 红色到橙色
+        hue = Math.floor(Math.random() * 30);
+    } else if (intensity > 50) {
+        // 中强度 - 橙色到黄色
+        hue = Math.floor(30 + Math.random() * 30);
+    } else {
+        // 低强度 - 更广泛的颜色
+        hue = Math.floor(Math.random() * 60);
+    }
+    
+    const saturation = 70 + Math.random() * 30;
+    const lightness = 50 + Math.random() * 20;
+    
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+// 弹跳文字效果 - 在低强度时使用
+function createBouncingText(intensity) {
+    if (intensity > 70 || intensity < 20) return; // 只在中低强度时使用
+    
+    // 文字内容
+    const texts = ['哈', '嘿', '嘻', 'Ha', 'Hey', 'Yo', 'Hi'];
+    const selectedText = texts[Math.floor(Math.random() * texts.length)];
+    
+    // 创建元素
+    const textElem = document.createElement('div');
+    textElem.textContent = selectedText;
+    textElem.style.position = 'absolute';
+    textElem.style.zIndex = '40';
+    textElem.style.color = getRandomEmotionColor(intensity);
+    textElem.style.fontSize = `${18 + Math.random() * 10}px`;
+    textElem.style.fontWeight = 'bold';
+    textElem.style.userSelect = 'none';
+    textElem.style.pointerEvents = 'none';
+    
+    // 随机位置 - 从屏幕底部弹出
+    const x = Math.random() * window.innerWidth;
+    textElem.style.left = `${x}px`;
+    textElem.style.top = `${window.innerHeight}px`;
+    
+    document.body.appendChild(textElem);
+    
+    // 动画
+    const jumpHeight = 100 + Math.random() * 150;
+    const endX = x + (Math.random() - 0.5) * 100; // 随机横向偏移
+    
+    textElem.animate([
+        { 
+            transform: 'scale(0.5) rotate(-5deg)', 
+            top: `${window.innerHeight}px`,
+            left: `${x}px`
+        },
+        { 
+            transform: 'scale(1.2) rotate(5deg)', 
+            top: `${window.innerHeight - jumpHeight}px`,
+            left: `${(x + endX) / 2}px`,
+            offset: 0.5 
+        },
+        { 
+            transform: 'scale(0.8) rotate(-2deg)', 
+            top: `${window.innerHeight}px`,
+            left: `${endX}px`
+        }
+    ], {
+        duration: 800 + Math.random() * 500,
+        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+    }).onfinish = () => {
+        if (document.body.contains(textElem)) {
+            document.body.removeChild(textElem);
+        }
+    };
+}
+
+/**
+ * 3. 附加功能与彩蛋
+ */
+
+// 情绪瓶 - 保存当前情绪状态
+function createEmotionBottle(intensity, mode) {
+    // 创建情绪瓶界面
+    const bottleContainer = document.createElement('div');
+    bottleContainer.style.position = 'fixed';
+    bottleContainer.style.top = '50%';
+    bottleContainer.style.left = '50%';
+    bottleContainer.style.transform = 'translate(-50%, -50%)';
+    bottleContainer.style.width = '300px';
+    bottleContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    bottleContainer.style.borderRadius = '10px';
+    bottleContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.2)';
+    bottleContainer.style.padding = '20px';
+    bottleContainer.style.zIndex = '1000';
+    bottleContainer.style.display = 'flex';
+    bottleContainer.style.flexDirection = 'column';
+    bottleContainer.style.alignItems = 'center';
+    bottleContainer.style.opacity = '0';
+    bottleContainer.style.transition = 'opacity 0.3s, transform 0.3s';
+    
+    // 标题
+    const title = document.createElement('h3');
+    title.textContent = '保存情绪瓶';
+    title.style.marginBottom = '15px';
+    bottleContainer.appendChild(title);
+    
+    // 瓶子可视化
+    const bottleVisual = document.createElement('div');
+    bottleVisual.style.width = '80px';
+    bottleVisual.style.height = '120px';
+    bottleVisual.style.position = 'relative';
+    bottleVisual.style.margin = '10px 0 20px';
+    
+    // 瓶子轮廓
+    const bottleOutline = document.createElement('div');
+    bottleOutline.style.width = '80px';
+    bottleOutline.style.height = '120px';
+    bottleOutline.style.borderRadius = '5px 5px 40px 40px';
+    bottleOutline.style.border = '3px solid #ccc';
+    bottleOutline.style.position = 'absolute';
+    bottleOutline.style.overflow = 'hidden';
+    
+    // 瓶子盖子
+    const bottleCap = document.createElement('div');
+    bottleCap.style.width = '40px';
+    bottleCap.style.height = '15px';
+    bottleCap.style.backgroundColor = '#aaa';
+    bottleCap.style.borderRadius = '5px';
+    bottleCap.style.position = 'absolute';
+    bottleCap.style.top = '-15px';
+    bottleCap.style.left = '20px';
+    
+    // 瓶内液体
+    const bottleLiquid = document.createElement('div');
+    bottleLiquid.style.width = '100%';
+    bottleLiquid.style.height = `${intensity}%`;
+    bottleLiquid.style.backgroundColor = getBottleColor(intensity, mode);
+    bottleLiquid.style.position = 'absolute';
+    bottleLiquid.style.bottom = '0';
+    bottleLiquid.style.borderRadius = '0 0 37px 37px';
+    bottleLiquid.style.transition = 'height 1s';
+    
+    bottleOutline.appendChild(bottleLiquid);
+    bottleVisual.appendChild(bottleOutline);
+    bottleVisual.appendChild(bottleCap);
+    bottleContainer.appendChild(bottleVisual);
+    
+    // 情绪描述输入
+    const emotionDesc = document.createElement('textarea');
+    emotionDesc.placeholder = '描述你现在的心情...';
+    emotionDesc.style.width = '100%';
+    emotionDesc.style.height = '80px';
+    emotionDesc.style.padding = '10px';
+    emotionDesc.style.borderRadius = '5px';
+    emotionDesc.style.border = '1px solid #ddd';
+    emotionDesc.style.resize = 'none';
+    emotionDesc.style.marginBottom = '15px';
+    emotionDesc.style.fontFamily = 'inherit';
+    bottleContainer.appendChild(emotionDesc);
+    
+    // 按钮容器
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.width = '100%';
+    btnContainer.style.justifyContent = 'space-between';
+    
+    // 取消按钮
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = '取消';
+    cancelBtn.style.padding = '8px 15px';
+    cancelBtn.style.border = 'none';
+    cancelBtn.style.borderRadius = '5px';
+    cancelBtn.style.backgroundColor = '#f0f0f0';
+    cancelBtn.style.cursor = 'pointer';
+    cancelBtn.style.flex = '1';
+    cancelBtn.style.marginRight = '10px';
+    
+    // 保存按钮
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = '保存瓶子';
+    saveBtn.style.padding = '8px 15px';
+    saveBtn.style.border = 'none';
+    saveBtn.style.borderRadius = '5px';
+    saveBtn.style.backgroundColor = '#4CAF50';
+    saveBtn.style.color = 'white';
+    saveBtn.style.cursor = 'pointer';
+    saveBtn.style.flex = '1';
+    
+    btnContainer.appendChild(cancelBtn);
+    btnContainer.appendChild(saveBtn);
+    bottleContainer.appendChild(btnContainer);
+    
+    // 按钮事件
+    cancelBtn.addEventListener('click', () => {
+        closeEmotionBottle();
+    });
+    
+    saveBtn.addEventListener('click', () => {
+        saveEmotionToBottle(intensity, mode, emotionDesc.value);
+        closeEmotionBottle();
+        showSavedNotification();
+    });
+    
+    // 关闭函数
+    function closeEmotionBottle() {
+        bottleContainer.style.opacity = '0';
+        bottleContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        
+        setTimeout(() => {
+            if (document.body.contains(bottleContainer)) {
+                document.body.removeChild(bottleContainer);
+            }
+        }, 300);
+    }
+    
+    // 添加到页面
+    document.body.appendChild(bottleContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        bottleContainer.style.opacity = '1';
+        bottleContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 10);
+}
+
+// 根据强度和模式获取瓶子颜色
+function getBottleColor(intensity, mode) {
+    let hue;
+    
+    switch (mode) {
+        case 'calm':
+            hue = 120 - (intensity * 0.6); // 绿色到黄色
+            break;
+        case 'release':
+            hue = 40 - (intensity * 0.3); // 黄色到橙色
+            break;
+        case 'fury':
+            hue = 360 - (intensity * 0.6); // 红色范围
+            break;
+        default:
+            hue = 120 - intensity; // 默认绿色到红色
+    }
+    
+    return `hsl(${hue}, ${70 + intensity/4}%, ${50 + (100-intensity)/8}%)`;
+}
+
+// 保存情绪到瓶子
+function saveEmotionToBottle(intensity, mode, description) {
+    const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
+    
+    bottleData.push({
+        timestamp: Date.now(),
+        intensity: intensity,
+        mode: mode,
+        description: description,
+        weather: currentWeather
+    });
+    
+    // 限制瓶子数量
+    if (bottleData.length > 20) {
+        bottleData.shift();
+    }
+    
+    localStorage.setItem('emotionBottles', JSON.stringify(bottleData));
+}
+
+// 显示保存成功通知
+function showSavedNotification() {
+    const notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.backgroundColor = '#4CAF50';
+    notification.style.color = 'white';
+    notification.style.padding = '10px 20px';
+    notification.style.borderRadius = '5px';
+    notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    notification.style.zIndex = '1000';
+    notification.style.opacity = '0';
+    notification.style.transition = 'opacity 0.3s, transform 0.3s';
+    notification.innerHTML = `<strong>情绪瓶保存成功!</strong><br>你可以在"情绪瓶收藏"中查看`;
+    
+    document.body.appendChild(notification);
+    
+    // 动画显示
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(-50%) scale(1.05)';
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(-50%) scale(0.95)';
+            
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 3000);
+    }, 10);
+}
+
+// 创建情绪瓶按钮
+function createEmotionBottleButton() {
+    // 如果已存在，则不重复创建
+    if (document.getElementById('emotionBottleButton')) return;
+    
+    const bottleBtn = document.createElement('div');
+    bottleBtn.id = 'emotionBottleButton';
+    bottleBtn.style.position = 'absolute';
+    bottleBtn.style.bottom = '20px';
+    bottleBtn.style.left = '20px';
+    bottleBtn.style.background = 'rgba(255, 255, 255, 0.8)';
+    bottleBtn.style.borderRadius = '5px';
+    bottleBtn.style.padding = '8px 12px';
+    bottleBtn.style.fontSize = '14px';
+    bottleBtn.style.cursor = 'pointer';
+    bottleBtn.style.display = 'flex';
+    bottleBtn.style.alignItems = 'center';
+    bottleBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    bottleBtn.style.zIndex = '10';
+    bottleBtn.style.transition = 'transform 0.3s, box-shadow 0.3s';
+    
+    // 图标
+    const icon = document.createElement('span');
+    icon.textContent = '🧪';
+    icon.style.marginRight = '5px';
+    
+    const text = document.createElement('span');
+    text.textContent = '情绪瓶';
+    
+    bottleBtn.appendChild(icon);
+    bottleBtn.appendChild(text);
+    
+    // 悬停效果
+    bottleBtn.addEventListener('mouseenter', () => {
+        bottleBtn.style.transform = 'scale(1.05)';
+        bottleBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+    });
+    
+    bottleBtn.addEventListener('mouseleave', () => {
+        bottleBtn.style.transform = 'scale(1)';
+        bottleBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    });
+    
+    // 点击事件 - 根据当前状态不同行为
+    bottleBtn.addEventListener('click', () => {
+        if (intensity >= 30) {
+            // 当前有足够的情绪强度，可以保存
+            createEmotionBottle(intensity, currentMode);
+        } else {
+            // 情绪强度不足，显示瓶子收藏
+            showEmotionBottleCollection();
+        }
+        
+        // 触发震动反馈
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+        } catch (e) {}
+    });
+    
+    document.body.appendChild(bottleBtn);
+    return bottleBtn;
+}
+
+// 显示情绪瓶收藏
+function showEmotionBottleCollection() {
+    // 创建情绪瓶收藏界面
+    const collectionContainer = document.createElement('div');
+    collectionContainer.style.position = 'fixed';
+    collectionContainer.style.top = '50%';
+    collectionContainer.style.left = '50%';
+    collectionContainer.style.transform = 'translate(-50%, -50%)';
+    collectionContainer.style.width = '90%';
+    collectionContainer.style.maxWidth = '500px';
+    collectionContainer.style.maxHeight = '80vh';
+    collectionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    collectionContainer.style.borderRadius = '10px';
+    collectionContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
+    collectionContainer.style.padding = '20px';
+    collectionContainer.style.zIndex = '1000';
+    collectionContainer.style.overflowY = 'auto';
+    collectionContainer.style.opacity = '0';
+    collectionContainer.style.transition = 'opacity 0.3s, transform 0.3s';
+    
+    // 标题
+    const title = document.createElement('h3');
+    title.textContent = '情绪瓶收藏';
+    title.style.marginBottom = '15px';
+    title.style.textAlign = 'center';
+    collectionContainer.appendChild(title);
+    
+    // 获取情绪瓶数据
+    const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
+    
+    if (bottleData.length === 0) {
+        // 空收藏提示
+        const emptyMessage = document.createElement('div');
+        emptyMessage.style.textAlign = 'center';
+        emptyMessage.style.padding = '30px 0';
+        emptyMessage.style.color = '#666';
+        emptyMessage.innerHTML = '你的收藏还是空的<br>尖叫并将情绪保存到瓶子里吧!';
+        collectionContainer.appendChild(emptyMessage);
+    } else {
+        // 创建瓶子网格
+        const bottleGrid = document.createElement('div');
+        bottleGrid.style.display = 'grid';
+        bottleGrid.style.gridTemplateColumns = 'repeat(auto-fill, minmax(100px, 1fr))';
+        bottleGrid.style.gap = '15px';
+        bottleGrid.style.marginBottom = '20px';
+        
+        // 逆序显示瓶子（最新的在前面）
+        bottleData.slice().reverse().forEach((bottle, index) => {
+            const bottleItem = document.createElement('div');
+            bottleItem.style.display = 'flex';
+            bottleItem.style.flexDirection = 'column';
+            bottleItem.style.alignItems = 'center';
+            bottleItem.style.cursor = 'pointer';
+            
+            // 瓶子可视化
+            const bottleVisual = document.createElement('div');
+            bottleVisual.style.width = '40px';
+            bottleVisual.style.height = '70px';
+            bottleVisual.style.position = 'relative';
+            bottleVisual.style.marginBottom = '5px';
+            
+            // 瓶子轮廓
+            const bottleOutline = document.createElement('div');
+            bottleOutline.style.width = '40px';
+            bottleOutline.style.height = '70px';
+            bottleOutline.style.borderRadius = '3px 3px 20px 20px';
+            bottleOutline.style.border = '2px solid #ccc';
+            bottleOutline.style.position = 'absolute';
+            bottleOutline.style.overflow = 'hidden';
+            
+            // 瓶子盖子
+            const bottleCap = document.createElement('div');
+            bottleCap.style.width = '20px';
+            bottleCap.style.height = '8px';
+            bottleCap.style.backgroundColor = '#aaa';
+            bottleCap.style.borderRadius = '3px';
+            bottleCap.style.position = 'absolute';
+            bottleCap.style.top = '-8px';
+            bottleCap.style.left = '10px';
+            
+            // 瓶内液体
+            const bottleLiquid = document.createElement('div');
+            bottleLiquid.style.width = '100%';
+            bottleLiquid.style.height = `${bottle.intensity}%`;
+            bottleLiquid.style.backgroundColor = getBottleColor(bottle.intensity, bottle.mode);
+            bottleLiquid.style.position = 'absolute';
+            bottleLiquid.style.bottom = '0';
+            bottleLiquid.style.borderRadius = '0 0 18px 18px';
+            
+            bottleOutline.appendChild(bottleLiquid);
+            bottleVisual.appendChild(bottleOutline);
+            bottleVisual.appendChild(bottleCap);
+            
+            // 日期标签
+            const date = new Date(bottle.timestamp);
+            const dateLabel = document.createElement('div');
+            dateLabel.textContent = `${date.getMonth() + 1}/${date.getDate()}`;
+            dateLabel.style.fontSize = '12px';
+            dateLabel.style.color = '#666';
+            
+            bottleItem.appendChild(bottleVisual);
+            bottleItem.appendChild(dateLabel);
+            
+            // 点击查看详情
+            bottleItem.addEventListener('click', () => {
+                showBottleDetails(bottle);
+            });
+            
+            bottleGrid.appendChild(bottleItem);
+        });
+        
+        collectionContainer.appendChild(bottleGrid);
+    }
+    
+    // 关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.display = 'block';
+    closeBtn.style.width = '100%';
+    closeBtn.style.padding = '10px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '5px';
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.marginTop = '10px';
+    
+    closeBtn.addEventListener('click', () => {
+        collectionContainer.style.opacity = '0';
+        collectionContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        
+        setTimeout(() => {
+            if (document.body.contains(collectionContainer)) {
+                document.body.removeChild(collectionContainer);
+            }
+        }, 300);
+    });
+    
+    collectionContainer.appendChild(closeBtn);
+    
+    // 添加到页面
+    document.body.appendChild(collectionContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        collectionContainer.style.opacity = '1';
+        collectionContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 10);
+}
+
+// 显示瓶子详情
+function showBottleDetails(bottle) {
+    // 创建详情界面
+    const detailsContainer = document.createElement('div');
+    detailsContainer.style.position = 'fixed';
+    detailsContainer.style.top = '50%';
+    detailsContainer.style.left = '50%';
+    detailsContainer.style.transform = 'translate(-50%, -50%)';
+    detailsContainer.style.width = '300px';
+    detailsContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    detailsContainer.style.borderRadius = '10px';
+    detailsContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
+    detailsContainer.style.padding = '20px';
+    detailsContainer.style.zIndex = '1001';
+    detailsContainer.style.opacity = '0';
+    detailsContainer.style.transition = 'opacity 0.3s, transform 0.3s';
+    
+    // 标题
+    const title = document.createElement('h3');
+    title.textContent = '情绪瓶详情';
+    title.style.marginBottom = '15px';
+    title.style.textAlign = 'center';
+    detailsContainer.appendChild(title);
+    
+    // 瓶子可视化 - 大版本
+    const bottleVisual = document.createElement('div');
+    bottleVisual.style.width = '80px';
+    bottleVisual.style.height = '120px';
+    bottleVisual.style.position = 'relative';
+    bottleVisual.style.margin = '0 auto 20px';
+    
+    // 瓶子轮廓
+    const bottleOutline = document.createElement('div');
+    bottleOutline.style.width = '80px';
+    bottleOutline.style.height = '120px';
+    bottleOutline.style.borderRadius = '5px 5px 40px 40px';
+    bottleOutline.style.border = '3px solid #ccc';
+    bottleOutline.style.position = 'absolute';
+    bottleOutline.style.overflow = 'hidden';
+    
+    // 瓶子盖子
+    const bottleCap = document.createElement('div');
+    bottleCap.style.width = '40px';
+    bottleCap.style.height = '15px';
+    bottleCap.style.backgroundColor = '#aaa';
+    bottleCap.style.borderRadius = '5px';
+    bottleCap.style.position = 'absolute';
+    bottleCap.style.top = '-15px';
+    bottleCap.style.left = '20px';
+    
+    // 瓶内液体
+    const bottleLiquid = document.createElement('div');
+    bottleLiquid.style.width = '100%';
+    bottleLiquid.style.height = '0%';
+    bottleLiquid.style.backgroundColor = getBottleColor(bottle.intensity, bottle.mode);
+    bottleLiquid.style.position = 'absolute';
+    bottleLiquid.style.bottom = '0';
+    bottleLiquid.style.borderRadius = '0 0 37px 37px';
+    bottleLiquid.style.transition = 'height 1s';
+    
+    bottleOutline.appendChild(bottleLiquid);
+    bottleVisual.appendChild(bottleOutline);
+    bottleVisual.appendChild(bottleCap);
+    detailsContainer.appendChild(bottleVisual);
+    
+    // 详情信息
+    const detailsInfo = document.createElement('div');
+    detailsInfo.style.backgroundColor = '#f9f9f9';
+    detailsInfo.style.padding = '15px';
+    detailsInfo.style.borderRadius = '5px';
+    detailsInfo.style.marginBottom = '15px';
+    
+    const date = new Date(bottle.timestamp);
+    const dateFormatted = `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+    
+    detailsInfo.innerHTML = `
+        <div style="margin-bottom: 8px;"><strong>保存时间:</strong> ${dateFormatted}</div>
+        <div style="margin-bottom: 8px;"><strong>情绪强度:</strong> <span style="color: ${getIntensityColor(bottle.intensity)};">${Math.round(bottle.intensity)}%</span></div>
+        <div style="margin-bottom: 8px;"><strong>情绪模式:</strong> ${bottle.mode === 'calm' ? '平静' : bottle.mode === 'release' ? '释放' : '狂怒'}</div>
+        <div><strong>情绪天气:</strong> ${(weatherTypes.find(w => w.id === bottle.weather) || weatherTypes[0]).name} ${(weatherTypes.find(w => w.id === bottle.weather) || weatherTypes[0]).icon}</div>
+    `;
+    
+    detailsContainer.appendChild(detailsInfo);
+    
+    // 情绪描述
+    if (bottle.description) {
+        const descriptionContainer = document.createElement('div');
+        descriptionContainer.style.marginBottom = '15px';
+        
+        const descriptionTitle = document.createElement('div');
+        descriptionTitle.textContent = '情绪描述:';
+        descriptionTitle.style.fontWeight = 'bold';
+        descriptionTitle.style.marginBottom = '5px';
+        
+        const descriptionText = document.createElement('div');
+        descriptionText.textContent = bottle.description;
+        descriptionText.style.backgroundColor = '#f0f0f0';
+        descriptionText.style.padding = '10px';
+        descriptionText.style.borderRadius = '5px';
+        descriptionText.style.fontSize = '14px';
+        
+        descriptionContainer.appendChild(descriptionTitle);
+        descriptionContainer.appendChild(descriptionText);
+        detailsContainer.appendChild(descriptionContainer);
+    }
+    
+    // 按钮容器
+    const btnContainer = document.createElement('div');
+    btnContainer.style.display = 'flex';
+    btnContainer.style.justifyContent = 'space-between';
+    
+    // 删除按钮
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = '删除瓶子';
+    deleteBtn.style.padding = '8px 15px';
+    deleteBtn.style.border = 'none';
+    deleteBtn.style.borderRadius = '5px';
+    deleteBtn.style.backgroundColor = '#f44336';
+    deleteBtn.style.color = 'white';
+    deleteBtn.style.cursor = 'pointer';
+    deleteBtn.style.flex = '1';
+    deleteBtn.style.marginRight = '10px';
+    
+    // 关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.padding = '8px 15px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '5px';
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.flex = '1';
+    
+    btnContainer.appendChild(deleteBtn);
+    btnContainer.appendChild(closeBtn);
+    detailsContainer.appendChild(btnContainer);
+    
+    // 按钮事件
+    deleteBtn.addEventListener('click', () => {
+        deleteEmotionBottle(bottle.timestamp);
+        closeDetails();
+        
+        // 重新显示收藏
+        setTimeout(() => {
+            showEmotionBottleCollection();
+        }, 300);
+    });
+    
+    closeBtn.addEventListener('click', () => {
+        closeDetails();
+    });
+    
+    // 关闭函数
+    function closeDetails() {
+        detailsContainer.style.opacity = '0';
+        detailsContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        
+        setTimeout(() => {
+            if (document.body.contains(detailsContainer)) {
+                document.body.removeChild(detailsContainer);
+            }
+        }, 300);
+    }
+    
+    // 添加到页面
+    document.body.appendChild(detailsContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        detailsContainer.style.opacity = '1';
+        detailsContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+        
+        // 液体动画
+        setTimeout(() => {
+            bottleLiquid.style.height = `${bottle.intensity}%`;
+        }, 300);
+    }, 10);
+}
+
+// 删除情绪瓶
+function deleteEmotionBottle(timestamp) {
+    const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
+    const updatedData = bottleData.filter(bottle => bottle.timestamp !== timestamp);
+    localStorage.setItem('emotionBottles', JSON.stringify(updatedData));
+    
+    // 显示删除成功提示
+    const notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.bottom = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.backgroundColor = '#f44336';
+    notification.style.color = 'white';
+    notification.style.padding = '10px 20px';
+    notification.style.borderRadius = '5px';
+    notification.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    notification.style.zIndex = '1000';
+    notification.style.opacity = '0';
+    notification.style.transition = 'opacity 0.3s, transform 0.3s';
+    notification.textContent = '情绪瓶已删除';
+    
+    document.body.appendChild(notification);
+    
+    // 动画显示
+    setTimeout(() => {
+        notification.style.opacity = '1';
+        notification.style.transform = 'translateX(-50%) scale(1.05)';
+        
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(-50%) scale(0.95)';
+            
+            setTimeout(() => {
+                if (document.body.contains(notification)) {
+                    document.body.removeChild(notification);
+                }
+            }, 300);
+        }, 2000);
+    }, 10);
+}
+
+// 创建随机彩蛋功能 - 有10%的概率在高强度尖叫后触发
+function createRandomEasterEgg(intensity) {
+    if (intensity < 80 || Math.random() > 0.1) return;
+    
+    // 可用的彩蛋列表
+    const easterEggs = [
+        createFallingStars,
+        createRainbowMode,
+        createMatrixEffect,
+        createHeartExplosion
+    ];
+    
+    // 随机选择一个彩蛋
+    const randomEgg = easterEggs[Math.floor(Math.random() * easterEggs.length)];
+    randomEgg();
+    
+    // 解锁彩蛋成就
+    const easterEggAchievement = {
+        id: 'easter-egg-finder',
+        name: '彩蛋发现者',
+        description: '触发了一个隐藏的特殊效果'
+    };
+    
+    // 检查是否已解锁
+    const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+    if (!unlockedAchievements.includes(easterEggAchievement.id)) {
+        unlockAchievement(easterEggAchievement);
+    }
+}
+
+// 彩蛋1: 流星效果
+function createFallingStars() {
+    const stars = isLowPerformanceDevice ? 10 : 20;
+    
+    for (let i = 0; i < stars; i++) {
+        setTimeout(() => {
+            const star = document.createElement('div');
+            star.style.position = 'fixed';
+            star.style.width = '3px';
+            star.style.height = '3px';
+            star.style.backgroundColor = 'white';
+            star.style.borderRadius = '50%';
+            star.style.boxShadow = '0 0 20px 2px white';
+            star.style.top = '0';
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.zIndex = '50';
+            star.style.pointerEvents = 'none';
+            
+            document.body.appendChild(star);
+            
+            const duration = 1000 + Math.random() * 2000;
+            const endX = parseFloat(star.style.left) + (Math.random() - 0.5) * 50;
+            
+            star.animate([
+                { top: '0%', left: star.style.left, opacity: 1, transform: 'scale(0.3)' },
+                { 
+                    top: '100%', 
+                    left: `${endX}%`, 
+                    opacity: 0,
+                    transform: 'scale(1.5)'
+                }
+            ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+            }).onfinish = () => {
+                if (document.body.contains(star)) {
+                    document.body.removeChild(star);
+                }
+            };
+            
+            // 尾迹效果
+            for (let j = 0; j < 5; j++) {
+                setTimeout(() => {
+                    const tail = document.createElement('div');
+                    tail.style.position = 'fixed';
+                    tail.style.width = '2px';
+                    tail.style.height = '2px';
+                    tail.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                    tail.style.borderRadius = '50%';
+                    tail.style.top = `${(j + 1) * 2}%`;
+                    tail.style.left = `${parseFloat(star.style.left) + ((endX - parseFloat(star.style.left)) * (j + 1) / 10)}%`;
+                    tail.style.zIndex = '49';
+                    tail.style.pointerEvents = 'none';
+                    
+                    document.body.appendChild(tail);
+                    
+                    tail.animate([
+                        { opacity: 0.7 },
+                        { opacity: 0 }
+                    ], {
+                        duration: duration - (j * 100),
+                        easing: 'ease-out'
+                    }).onfinish = () => {
+                        if (document.body.contains(tail)) {
+                            document.body.removeChild(tail);
+                        }
+                    };
+                }, j * 50);
+            }
+        }, i * (isLowPerformanceDevice ? 200 : 100));
+    }
+    
+    // 显示彩蛋标题
+    showEasterEggTitle('流星雨', '✨');
+}
+
+// 彩蛋2: 彩虹模式
+function createRainbowMode() {
+    // 创建彩虹背景
+    const rainbow = document.createElement('div');
+    rainbow.style.position = 'fixed';
+    rainbow.style.top = '0';
+    rainbow.style.left = '0';
+    rainbow.style.width = '100%';
+    rainbow.style.height = '100%';
+    rainbow.style.background = 'linear-gradient(to bottom, violet, indigo, blue, green, yellow, orange, red)';
+    rainbow.style.opacity = '0';
+    rainbow.style.transition = 'opacity 1s';
+    rainbow.style.zIndex = '-10';
+    rainbow.style.pointerEvents = 'none';
+    
+    document.body.appendChild(rainbow);
+    
+    // 显示背景
+    setTimeout(() => {
+        rainbow.style.opacity = '0.2';
+        
+        // 创建彩虹粒子
+        if (!isLowPerformanceDevice) {
+            createRainbowParticles();
+        }
+        
+        // 5秒后淡出
+        setTimeout(() => {
+            rainbow.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (document.body.contains(rainbow)) {
+                    document.body.removeChild(rainbow);
+                }
+            }, 1000);
+        }, 5000);
+    }, 10);
+    
+    // 显示彩蛋标题
+    showEasterEggTitle('彩虹模式', '🌈');
+}
+
+// 彩虹粒子
+function createRainbowParticles() {
+    for (let i = 0; i < 30; i++) {
+        setTimeout(() => {
+            const particle = document.createElement('div');
+            particle.style.position = 'fixed';
+            particle.style.width = `${5 + Math.random() * 10}px`;
+            particle.style.height = particle.style.width;
+            particle.style.borderRadius = '50%';
+            
+            // 彩虹色
+            const hue = Math.random() * 360;
+            particle.style.backgroundColor = `hsl(${hue}, 80%, 60%)`;
+            particle.style.boxShadow = `0 0 10px hsl(${hue}, 80%, 60%)`;
+            
+            // 随机位置
+            particle.style.top = `${Math.random() * 100}%`;
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.zIndex = '5';
+            particle.style.opacity = '0';
+            particle.style.pointerEvents = 'none';
+            
+            document.body.appendChild(particle);
+            
+            // 动画
+            const duration = 2000 + Math.random() * 3000;
+            const finalY = parseFloat(particle.style.top) + (Math.random() - 0.5) * 50;
+            const finalX = parseFloat(particle.style.left) + (Math.random() - 0.5) * 50;
+            
+            particle.animate([
+                { 
+                    transform: 'scale(0) rotate(0deg)', 
+                    opacity: 0,
+                    top: particle.style.top,
+                    left: particle.style.left 
+                },
+                { 
+                    transform: 'scale(1) rotate(180deg)', 
+                    opacity: 0.8,
+                    top: `${(parseFloat(particle.style.top) + finalY) / 2}%`,
+                    left: `${(parseFloat(particle.style.left) + finalX) / 2}%`,
+                    offset: 0.5 
+                },
+                { 
+                    transform: 'scale(0) rotate(360deg)', 
+                    opacity: 0,
+                    top: `${finalY}%`,
+                    left: `${finalX}%` 
+                }
+            ], {
+                duration: duration,
+                easing: 'ease-in-out'
+            }).onfinish = () => {
+                if (document.body.contains(particle)) {
+                    document.body.removeChild(particle);
+                }
+            };
+        }, i * 100);
+    }
+}
+
+// 彩蛋3: 黑客帝国效果
+function createMatrixEffect() {
+    // 创建黑色背景
+    const matrix = document.createElement('div');
+    matrix.style.position = 'fixed';
+    matrix.style.top = '0';
+    matrix.style.left = '0';
+    matrix.style.width = '100%';
+    matrix.style.height = '100%';
+    matrix.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    matrix.style.opacity = '0';
+    matrix.style.transition = 'opacity 1s';
+    matrix.style.zIndex = '100';
+    matrix.style.pointerEvents = 'none';
+    
+    document.body.appendChild(matrix);
+    
+    // 显示背景
+    setTimeout(() => {
+        matrix.style.opacity = '1';
+        
+        // 创建掉落文字
+        if (!isLowPerformanceDevice) {
+            createMatrixText(matrix);
+        }
+        
+        // 5秒后淡出
+        setTimeout(() => {
+            matrix.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (document.body.contains(matrix)) {
+                    document.body.removeChild(matrix);
+                }
+            }, 1000);
+        }, 5000);
+    }, 10);
+    
+    // 显示彩蛋标题
+    showEasterEggTitle('黑客帝国', '👨‍💻');
+}
+
+// 黑客帝国文字
+function createMatrixText(container) {
+    const columns = isLowPerformanceDevice ? 10 : Math.floor(window.innerWidth / 20);
+    
+    for (let i = 0; i < columns; i++) {
+        const column = document.createElement('div');
+        column.style.position = 'absolute';
+        column.style.top = '0';
+        column.style.left = `${(i / columns) * 100}%`;
+        column.style.width = `${100 / columns}%`;
+        column.style.textAlign = 'center';
+        column.style.color = '#0f0';
+        column.style.fontSize = '14px';
+        column.style.fontFamily = 'monospace';
+        column.style.whiteSpace = 'nowrap';
+        
+        container.appendChild(column);
+        
+        // 初始延迟
+        const delay = Math.random() * 2000;
+        
+        setTimeout(() => {
+            let position = -Math.floor(Math.random() * 5);
+            const speed = 50 + Math.random() * 100;
+            
+            // 添加字符
+            function addChar() {
+                if (!document.body.contains(container) || !document.body.contains(column)) return;
+                
+                if (position >= 0) {
+                    if (position >= 30) {
+                        // 开始淡出顶部字符
+                        const chars = column.querySelectorAll('span');
+                        if (chars.length > 0) {
+                            chars[0].style.opacity = '0';
+                            setTimeout(() => {
+                                if (column.contains(chars[0])) {
+                                    column.removeChild(chars[0]);
+                                }
+                            }, 500);
+                        }
+                    }
+                    
+                    const char = document.createElement('span');
+                    char.textContent = getRandomMatrixChar();
+                    char.style.display = 'block';
+                    char.style.opacity = '0';
+                    char.style.transition = 'opacity 0.3s';
+                    
+                    column.appendChild(char);
+                    
+                    setTimeout(() => {
+                        if (document.body.contains(char)) {
+                            char.style.opacity = '1';
+                        }
+                    }, 10);
+                }
+                
+                position++;
+                setTimeout(addChar, speed);
+            }
+            
+            addChar();
+        }, delay);
+    }
+}
+
+// 随机黑客帝国字符
+function getRandomMatrixChar() {
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$#%*+=-@";
+    return chars.charAt(Math.floor(Math.random() * chars.length));
+}
+
+// 彩蛋4: 心形爆炸
+function createHeartExplosion() {
+    const hearts = isLowPerformanceDevice ? 20 : 50;
+    const colors = ['#ff6b6b', '#ff8787', '#fa5252', '#f03e3e', '#e03131'];
+    
+    // 创建爆炸中心点
+    const center = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+    };
+    
+    for (let i = 0; i < hearts; i++) {
+        setTimeout(() => {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.style.position = 'fixed';
+            heart.style.fontSize = `${12 + Math.random() * 20}px`;
+            heart.style.top = `${center.y}px`;
+            heart.style.left = `${center.x}px`;
+            heart.style.transform = 'translate(-50%, -50%)';
+            heart.style.zIndex = '50';
+            heart.style.opacity = '0';
+            heart.style.pointerEvents = 'none';
+            
+            document.body.appendChild(heart);
+            
+            // 随机方向和距离
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 200;
+            const endX = center.x + Math.cos(angle) * distance;
+            const endY = center.y + Math.sin(angle) * distance;
+            
+            // 动画
+            const duration = 1000 + Math.random() * 2000;
+            
+            heart.animate([
+                { 
+                    top: `${center.y}px`, 
+                    left: `${center.x}px`, 
+                    transform: 'translate(-50%, -50%) scale(0.5) rotate(0deg)', 
+                    opacity: 0 
+                },
+                { 
+                    top: `${center.y + (endY - center.y) * 0.5}px`, 
+                    left: `${center.x + (endX - center.x) * 0.5}px`, 
+                    transform: 'translate(-50%, -50%) scale(1.5) rotate(180deg)', 
+                    opacity: 1,
+                    offset: 0.5 
+                },
+                { 
+                    top: `${endY}px`, 
+                    left: `${endX}px`, 
+                    transform: 'translate(-50%, -50%) scale(0.5) rotate(360deg)', 
+                    opacity: 0 
+                }
+            ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }).onfinish = () => {
+                if (document.body.contains(heart)) {
+                    document.body.removeChild(heart);
+                }
+            };
+        }, i * (isLowPerformanceDevice ? 50 : 30));
+    }
+    
+    // 显示彩蛋标题
+    showEasterEggTitle('爱的爆发', '💖');
+}
+
+// 显示彩蛋标题
+function showEasterEggTitle(title, emoji) {
+    const titleContainer = document.createElement('div');
+    titleContainer.style.position = 'fixed';
+    titleContainer.style.top = '20%';
+    titleContainer.style.left = '50%';
+    titleContainer.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    titleContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    titleContainer.style.color = 'white';
+    titleContainer.style.padding = '10px 20px';
+    titleContainer.style.borderRadius = '10px';
+    titleContainer.style.fontSize = '24px';
+    titleContainer.style.fontWeight = 'bold';
+    titleContainer.style.zIndex = '200';
+    titleContainer.style.opacity = '0';
+    titleContainer.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    titleContainer.style.textAlign = 'center';
+    titleContainer.style.pointerEvents = 'none';
+    
+    titleContainer.innerHTML = `
+        <div style="font-size: 30px; margin-bottom: 5px;">${emoji}</div>
+        <div>彩蛋触发: ${title}</div>
+    `;
+    
+    document.body.appendChild(titleContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        titleContainer.style.opacity = '1';
+        titleContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+        
+        setTimeout(() => {
+            titleContainer.style.opacity = '0';
+            titleContainer.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            
+            setTimeout(() => {
+                if (document.body.contains(titleContainer)) {
+                    document.body.removeChild(titleContainer);
+                }
+            }, 500);
+        }, 2500);
+    }, 10);
+}
+
+/**
+ * 4. 核心函数 - 需要与现有系统集成的关键函数
+ */
+
+// 初始化所有新功能
+function initEnhancedFeatures() {
+    // 创建打卡按钮
+    createCheckInButton();
+    
+    // 创建情绪瓶按钮
+    createEmotionBottleButton();
+    
+    // 添加新成就
+    addNewAchievements();
+}
+
+// 添加新成就
+function addNewAchievements() {
+    const newAchievements = [
+        { id: 'seven-day-streak', name: '坚持一周', description: '连续7天进行尖叫打卡' },
+        { id: 'bottle-collector', name: '情绪收藏家', description: '保存10个情绪瓶' },
+        { id: 'easter-egg-finder', name: '彩蛋发现者', description: '触发了一个隐藏的特殊效果' },
+        { id: 'text-explosion', name: '文字爆发', description: '触发了全屏文字动画效果' }
+    ];
+    
+    // 检查现有成就列表，并添加新成就
+    newAchievements.forEach(achievement => {
+        const exists = achievements.some(a => a.id === achievement.id);
+        if (!exists) {
+            achievements.push(achievement);
+        }
+    });
+    
+    // 刷新成就列表UI
+    initAchievements();
+}
+
+// 更新函数 - 与现有intensity更新函数集成
+function updateIntensityWithVisuals(intensity) {
+    // 根据强度决定触发不同的视觉效果
+    if (intensity >= 70) {
+        // 高强度 - 文字爆发
+        createFullscreenTextAnimation(intensity);
+        
+        // 检查文字爆发成就
+        if (intensity >= 90) {
+            const textExplosionAchievement = achievements.find(a => a.id === 'text-explosion');
+            if (textExplosionAchievement) {
+                const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+                if (!unlockedAchievements.includes(textExplosionAchievement.id)) {
+                    unlockAchievement(textExplosionAchievement);
+                }
+            }
+        }
+        
+        // 随机彩蛋
+        createRandomEasterEgg(intensity);
+    } else if (intensity >= 20 && intensity < 70) {
+        // 中低强度 - 弹跳文字
+        if (Math.random() > 0.7) {
+            createBouncingText(intensity);
+        }
+    }
+    
+    // 自动打卡
+    autoCheckIn(intensity);
+    
+    // 检查情绪瓶收藏成就
+    checkBottleCollectorAchievement();
+}
+
+// 继续上一部分代码 - 从checkBottleCollectorAchievement函数继续
+
+// 检查情绪瓶收藏成就
+function checkBottleCollectorAchievement() {
+    const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
+    const bottleCollectorAchievement = achievements.find(a => a.id === 'bottle-collector');
+    
+    if (bottleCollectorAchievement && bottleData.length >= 10) {
+        const unlockedAchievements = JSON.parse(localStorage.getItem('unlockedAchievements') || '[]');
+        if (!unlockedAchievements.includes(bottleCollectorAchievement.id)) {
+            unlockAchievement(bottleCollectorAchievement);
+        }
+    }
+}
+
+/**
+ * 5. 集成函数 - 将新功能与现有系统集成
+ */
+
+// 主要集成函数 - 修改现有的updateIntensityDisplay函数
+function enhancedUpdateIntensityDisplay() {
+    // 调用原始函数
+    updateIntensityDisplay();
+    
+    // 添加视觉效果增强
+    updateIntensityWithVisuals(intensity);
+}
+
+// 修改现有的startScream函数
+function enhancedStartScream() {
+    // 调用原始函数
+    startScream();
+    
+    // 可能触发随机的特殊效果
+    if (fxMode && Math.random() > 0.9) {
+        setTimeout(() => {
+            createFullscreenTextAnimation(intensity);
+        }, 500);
+    }
+}
+
+// 修改现有的stopScream函数
+function enhancedStopScream() {
+    // 调用原始函数
+    stopScream();
+    
+    // 如果强度够高，可能出现情绪瓶提示
+    if (intensity >= 80) {
+        setTimeout(() => {
+            suggestEmotionBottle();
+        }, 1000);
+    }
+}
+
+// 修改现有的checkAchievements函数
+function enhancedCheckAchievements() {
+    // 调用原始函数
+    checkAchievements();
+    
+    // 检查新成就
+    checkBottleCollectorAchievement();
+}
+
+// 建议保存情绪瓶
+function suggestEmotionBottle() {
+    const suggestion = document.createElement('div');
+    suggestion.style.position = 'fixed';
+    suggestion.style.bottom = '100px';
+    suggestion.style.left = '50%';
+    suggestion.style.transform = 'translateX(-50%) scale(0.8)';
+    suggestion.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    suggestion.style.color = '#333';
+    suggestion.style.padding = '10px 20px';
+    suggestion.style.borderRadius = '5px';
+    suggestion.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.2)';
+    suggestion.style.zIndex = '100';
+    suggestion.style.textAlign = 'center';
+    suggestion.style.opacity = '0';
+    suggestion.style.transition = 'all 0.3s';
+    suggestion.style.cursor = 'pointer';
+    
+    suggestion.innerHTML = `
+        <div style="font-size: 16px; margin-bottom: 5px;">情绪强烈，要保存到情绪瓶吗？</div>
+        <div style="font-size: 12px; color: #666;">保存后可以在情绪瓶中回顾</div>
+    `;
+    
+    // 点击事件
+    suggestion.addEventListener('click', () => {
+        // 隐藏提示
+        suggestion.style.opacity = '0';
+        suggestion.style.transform = 'translateX(-50%) scale(0.7)';
+        
+        setTimeout(() => {
+            if (document.body.contains(suggestion)) {
+                document.body.removeChild(suggestion);
+            }
+            
+            // 显示情绪瓶保存界面
+            createEmotionBottle(intensity, currentMode);
+        }, 300);
+    });
+    
+    // 添加到页面
+    document.body.appendChild(suggestion);
+    
+    // 动画显示
+    setTimeout(() => {
+        suggestion.style.opacity = '1';
+        suggestion.style.transform = 'translateX(-50%) scale(1)';
+        
+        // 自动消失
+        setTimeout(() => {
+            if (document.body.contains(suggestion)) {
+                suggestion.style.opacity = '0';
+                suggestion.style.transform = 'translateX(-50%) scale(0.7)';
+                
+                setTimeout(() => {
+                    if (document.body.contains(suggestion)) {
+                        document.body.removeChild(suggestion);
+                    }
+                }, 300);
+            }
+        }, 5000);
+    }, 10);
+}
+
+/**
+ * 6. 额外功能 - 视频级别的尖叫特效
+ */
+
+// 创建烟雾云叠加效果 - 高级视觉效果
+function createSmokeOverlay(intensity) {
+    // 低性能设备跳过
+    if (isLowPerformanceDevice) return;
+    
+    // 强度不足则不显示
+    if (intensity < 70) return;
+    
+    // 创建烟雾容器
+    const smokeContainer = document.createElement('div');
+    smokeContainer.style.position = 'fixed';
+    smokeContainer.style.top = '0';
+    smokeContainer.style.left = '0';
+    smokeContainer.style.width = '100%';
+    smokeContainer.style.height = '100%';
+    smokeContainer.style.pointerEvents = 'none';
+    smokeContainer.style.zIndex = '5';
+    smokeContainer.style.opacity = '0';
+    smokeContainer.style.transition = 'opacity 1s';
+    
+    document.body.appendChild(smokeContainer);
+    
+    // 烟雾量基于强度
+    const smokeCount = Math.floor((intensity - 60) / 10);
+    
+    // 创建多个烟雾元素
+    for (let i = 0; i < smokeCount; i++) {
+        setTimeout(() => {
+            createSmokeElement(smokeContainer);
+        }, i * 200);
+    }
+    
+    // 显示烟雾
+    setTimeout(() => {
+        smokeContainer.style.opacity = '1';
+        
+        // 持续时间基于强度
+        const duration = 2000 + (intensity * 30);
+        
+        setTimeout(() => {
+            smokeContainer.style.opacity = '0';
+            
+            setTimeout(() => {
+                if (document.body.contains(smokeContainer)) {
+                    document.body.removeChild(smokeContainer);
+                }
+            }, 1000);
+        }, duration);
+    }, 10);
+}
+
+// 创建单个烟雾元素
+function createSmokeElement(container) {
+    const smoke = document.createElement('div');
+    
+    // 随机大小和位置
+    const size = 100 + Math.random() * 200;
+    const posX = Math.random() * 100;
+    const posY = Math.random() * 100;
+    
+    smoke.style.position = 'absolute';
+    smoke.style.width = `${size}px`;
+    smoke.style.height = `${size}px`;
+    smoke.style.borderRadius = '50%';
+    smoke.style.background = 'radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%)';
+    smoke.style.top = `${posY}%`;
+    smoke.style.left = `${posX}%`;
+    smoke.style.transform = 'translate(-50%, -50%) scale(0)';
+    smoke.style.opacity = '0';
+    
+    container.appendChild(smoke);
+    
+    // 动画
+    const duration = 3000 + Math.random() * 2000;
+    const delay = Math.random() * 500;
+    
+    setTimeout(() => {
+        smoke.animate([
+            { transform: 'translate(-50%, -50%) scale(0)', opacity: 0 },
+            { transform: 'translate(-50%, -50%) scale(0.8)', opacity: 0.8, offset: 0.3 },
+            { transform: 'translate(-50%, -50%) scale(1.5)', opacity: 0 }
+        ], {
+            duration: duration,
+            easing: 'ease-out'
+        }).onfinish = () => {
+            if (container.contains(smoke)) {
+                container.removeChild(smoke);
+            }
+        };
+    }, delay);
+}
+
+// 创建爆炸特效 - 极高强度释放
+function createExplosionEffect(intensity) {
+    if (intensity < 95) return; // 只在几乎满强度时触发
+    
+    // 创建爆炸容器
+    const explosionContainer = document.createElement('div');
+    explosionContainer.style.position = 'fixed';
+    explosionContainer.style.top = '0';
+    explosionContainer.style.left = '0';
+    explosionContainer.style.width = '100%';
+    explosionContainer.style.height = '100%';
+    explosionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+    explosionContainer.style.transition = 'background-color 0.1s';
+    explosionContainer.style.zIndex = '200';
+    explosionContainer.style.pointerEvents = 'none';
+    
+    document.body.appendChild(explosionContainer);
+    
+    // 闪光效果
+    setTimeout(() => {
+        explosionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+        
+        // 震动屏幕
+        shakeScreen(8);
+        
+        // 震动反馈
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 20, 100, 20, 50]);
+            }
+        } catch (e) {}
+        
+        setTimeout(() => {
+            explosionContainer.style.backgroundColor = 'rgba(255, 255, 255, 0)';
+            
+            // 创建碎片
+            if (!isLowPerformanceDevice) {
+                createExplosionDebris();
+            }
+            
+            // 创建冲击波
+            createShockwaveRings();
+            
+            setTimeout(() => {
+                if (document.body.contains(explosionContainer)) {
+                    document.body.removeChild(explosionContainer);
+                }
+            }, 3000);
+        }, 100);
+    }, 10);
+    
+    // 显示爆发文字
+    showBigScreenText();
+}
+
+// 创建爆炸碎片
+function createExplosionDebris() {
+    const debrisCount = isLowPerformanceDevice ? 20 : 50;
+    const center = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+    };
+    
+    for (let i = 0; i < debrisCount; i++) {
+        const debris = document.createElement('div');
+        debris.style.position = 'fixed';
+        debris.style.width = `${3 + Math.random() * 8}px`;
+        debris.style.height = `${3 + Math.random() * 8}px`;
+        debris.style.backgroundColor = getRandomEmotionColor(100);
+        debris.style.borderRadius = '50%';
+        debris.style.top = `${center.y}px`;
+        debris.style.left = `${center.x}px`;
+        debris.style.zIndex = '50';
+        debris.style.pointerEvents = 'none';
+        
+        document.body.appendChild(debris);
+        
+        // 随机角度和速度
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 5 + Math.random() * 15;
+        const distance = speed * (10 + Math.random() * 20);
+        
+        // 终点位置
+        const endX = center.x + Math.cos(angle) * distance;
+        const endY = center.y + Math.sin(angle) * distance;
+        
+        // 动画
+        debris.animate([
+            { top: `${center.y}px`, left: `${center.x}px`, opacity: 1, transform: 'scale(1)' },
+            { 
+                top: `${endY}px`, 
+                left: `${endX}px`, 
+                opacity: 0, 
+                transform: 'scale(0)'
+            }
+        ], {
+            duration: 1000 + Math.random() * 1000,
+            easing: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)'
+        }).onfinish = () => {
+            if (document.body.contains(debris)) {
+                document.body.removeChild(debris);
+            }
+        };
+    }
+}
+
+// 创建冲击波环
+function createShockwaveRings() {
+    const ringsCount = 3;
+    const center = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2
+    };
+    
+    for (let i = 0; i < ringsCount; i++) {
+        setTimeout(() => {
+            const ring = document.createElement('div');
+            ring.style.position = 'fixed';
+            ring.style.top = `${center.y}px`;
+            ring.style.left = `${center.x}px`;
+            ring.style.width = '10px';
+            ring.style.height = '10px';
+            ring.style.borderRadius = '50%';
+            ring.style.border = '3px solid white';
+            ring.style.boxShadow = '0 0 10px white';
+            ring.style.transform = 'translate(-50%, -50%) scale(0)';
+            ring.style.zIndex = '100';
+            ring.style.pointerEvents = 'none';
+            
+            document.body.appendChild(ring);
+            
+            // 动画
+            ring.animate([
+                { transform: 'translate(-50%, -50%) scale(0)', opacity: 0.8, borderWidth: '3px' },
+                { transform: 'translate(-50%, -50%) scale(40)', opacity: 0, borderWidth: '1px' }
+            ], {
+                duration: 1500,
+                easing: 'cubic-bezier(0.215, 0.610, 0.355, 1.000)'
+            }).onfinish = () => {
+                if (document.body.contains(ring)) {
+                    document.body.removeChild(ring);
+                }
+            };
+        }, i * 300);
+    }
+}
+
+/**
+ * 7. 辅助功能增强 - 帮助提示和引导功能
+ */
+
+// 创建随机提示
+function createRandomTip() {
+    const tips = [
+        "长按按钮持续尖叫，或者快速点击尖叫按钮！",
+        "当强度达到50%时会自动打卡，记录你的情绪状态。",
+        "尝试切换不同的尖叫模式，体验不同的视觉效果。",
+        "强度越高，情绪表现越丰富，有可能触发特殊效果哦！",
+        "达到90%以上的强度可能触发爆发效果，超过95%会有惊喜！",
+        "情绪瓶可以保存你的情绪状态，未来可以回顾当时的心情。",
+        "连续打卡7天可以解锁特殊成就！",
+        "切换情绪天气可以改变视觉氛围，尝试所有天气可以解锁成就。",
+        "特效模式下尖叫效果更加丰富多彩！",
+        "每种尖叫模式都有独特的视觉效果，全部体验可以解锁模式掌控者成就。"
+    ];
+    
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+    
+    // 创建提示元素
+    const tipContainer = document.createElement('div');
+    tipContainer.style.position = 'fixed';
+    tipContainer.style.bottom = '80px';
+    tipContainer.style.left = '50%';
+    tipContainer.style.transform = 'translateX(-50%) scale(0.9)';
+    tipContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    tipContainer.style.color = 'white';
+    tipContainer.style.padding = '10px 15px';
+    tipContainer.style.borderRadius = '5px';
+    tipContainer.style.fontSize = '14px';
+    tipContainer.style.maxWidth = '280px';
+    tipContainer.style.textAlign = 'center';
+    tipContainer.style.zIndex = '100';
+    tipContainer.style.opacity = '0';
+    tipContainer.style.transition = 'all 0.3s';
+    
+    // 添加提示图标和文字
+    tipContainer.innerHTML = `
+        <div style="margin-bottom: 5px; font-size: 16px;">💡 小提示</div>
+        <div>${randomTip}</div>
+    `;
+    
+    document.body.appendChild(tipContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        tipContainer.style.opacity = '1';
+        tipContainer.style.transform = 'translateX(-50%) scale(1)';
+        
+        // 自动消失
+        setTimeout(() => {
+            tipContainer.style.opacity = '0';
+            tipContainer.style.transform = 'translateX(-50%) scale(0.9)';
+            
+            setTimeout(() => {
+                if (document.body.contains(tipContainer)) {
+                    document.body.removeChild(tipContainer);
+                }
+            }, 300);
+        }, 6000);
+    }, 10);
+}
+
+// 创建情绪分析报告
+function createEmotionAnalysisReport() {
+    // 从历史数据中获取分析
+    const emotionData = JSON.parse(localStorage.getItem('emotionHistory') || '[]');
+    const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
+    const checkInData = CheckInSystem.getCheckInData();
+    
+    // 如果没有足够数据，则不显示
+    if (emotionData.length < 3 && Object.keys(checkInData).length < 3) {
+        return showNoDataMessage();
+    }
+    
+    // 创建报告容器
+    const reportContainer = document.createElement('div');
+    reportContainer.style.position = 'fixed';
+    reportContainer.style.top = '50%';
+    reportContainer.style.left = '50%';
+    reportContainer.style.transform = 'translate(-50%, -50%)';
+    reportContainer.style.width = '90%';
+    reportContainer.style.maxWidth = '500px';
+    reportContainer.style.maxHeight = '80vh';
+    reportContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    reportContainer.style.borderRadius = '10px';
+    reportContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
+    reportContainer.style.padding = '20px';
+    reportContainer.style.zIndex = '1000';
+    reportContainer.style.overflowY = 'auto';
+    reportContainer.style.opacity = '0';
+    reportContainer.style.transition = 'opacity 0.3s, transform 0.3s';
+    
+    // 标题
+    const title = document.createElement('h3');
+    title.textContent = '情绪分析报告';
+    title.style.marginBottom = '15px';
+    title.style.textAlign = 'center';
+    reportContainer.appendChild(title);
+    
+    // 分析摘要
+    const summary = document.createElement('div');
+    summary.style.backgroundColor = '#f5f5f5';
+    summary.style.padding = '15px';
+    summary.style.borderRadius = '5px';
+    summary.style.marginBottom = '20px';
+    
+    // 计算基本统计数据
+    const checkInCount = Object.keys(checkInData).length;
+    const bottleCount = bottleData.length;
+    
+    // 计算平均强度
+    let totalIntensity = 0;
+    let intensityCount = 0;
+    
+    // 从打卡和情绪瓶数据计算强度
+    for (const date in checkInData) {
+        totalIntensity += checkInData[date].intensity;
+        intensityCount++;
+    }
+    
+    bottleData.forEach(bottle => {
+        totalIntensity += bottle.intensity;
+        intensityCount++;
+    });
+    
+    const avgIntensity = intensityCount > 0 ? Math.round(totalIntensity / intensityCount) : 0;
+    
+    // 查找最高强度
+    let maxIntensity = 0;
+    
+    for (const date in checkInData) {
+        if (checkInData[date].intensity > maxIntensity) {
+            maxIntensity = checkInData[date].intensity;
+        }
+    }
+    
+    bottleData.forEach(bottle => {
+        if (bottle.intensity > maxIntensity) {
+            maxIntensity = bottle.intensity;
+        }
+    });
+    
+    // 计算情绪模式分布
+    const modeDistribution = {
+        calm: 0,
+        release: 0,
+        fury: 0
+    };
+    
+    for (const date in checkInData) {
+        modeDistribution[checkInData[date].mode]++;
+    }
+    
+    bottleData.forEach(bottle => {
+        modeDistribution[bottle.mode]++;
+    });
+    
+    // 计算模式百分比
+    const modeTotal = modeDistribution.calm + modeDistribution.release + modeDistribution.fury;
+    const modePercentages = {
+        calm: modeTotal > 0 ? Math.round((modeDistribution.calm / modeTotal) * 100) : 0,
+        release: modeTotal > 0 ? Math.round((modeDistribution.release / modeTotal) * 100) : 0,
+        fury: modeTotal > 0 ? Math.round((modeDistribution.fury / modeTotal) * 100) : 0
+    };
+    
+    // 拼接摘要HTML
+    summary.innerHTML = `
+        <div style="margin-bottom: 10px; font-weight: bold;">数据摘要</div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>总打卡次数: <strong>${checkInCount}次</strong></div>
+            <div>情绪瓶收藏: <strong>${bottleCount}个</strong></div>
+            <div>平均情绪强度: <strong style="color: ${getIntensityColor(avgIntensity)};">${avgIntensity}%</strong></div>
+            <div>最高情绪强度: <strong style="color: ${getIntensityColor(maxIntensity)};">${Math.round(maxIntensity)}%</strong></div>
+        </div>
+        
+        <div style="margin-top: 15px; margin-bottom: 10px; font-weight: bold;">情绪模式分析</div>
+        <div style="display: flex; height: 20px; border-radius: 10px; overflow: hidden; margin-bottom: 5px;">
+            <div style="width: ${modePercentages.calm}%; background-color: #4CAF50;"></div>
+            <div style="width: ${modePercentages.release}%; background-color: #FF9800;"></div>
+            <div style="width: ${modePercentages.fury}%; background-color: #F44336;"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+            <div>平静模式 ${modePercentages.calm}%</div>
+            <div>释放模式 ${modePercentages.release}%</div>
+            <div>狂怒模式 ${modePercentages.fury}%</div>
+        </div>
+    `;
+    
+    reportContainer.appendChild(summary);
+    
+    // 情绪趋势图表
+    if (emotionData.length >= 3) {
+        const trendContainer = document.createElement('div');
+        trendContainer.style.marginBottom = '20px';
+        
+        const trendTitle = document.createElement('div');
+        trendTitle.textContent = '情绪强度趋势';
+        trendTitle.style.fontWeight = 'bold';
+        trendTitle.style.marginBottom = '10px';
+        
+        const trendChart = document.createElement('div');
+        trendChart.style.height = '150px';
+        trendChart.style.backgroundColor = '#f9f9f9';
+        trendChart.style.borderRadius = '5px';
+        trendChart.style.position = 'relative';
+        trendChart.style.marginBottom = '20px';
+        
+        trendContainer.appendChild(trendTitle);
+        trendContainer.appendChild(trendChart);
+        
+        // 创建趋势线图
+        createTrendLineChart(trendChart, emotionData.slice(0, 10));
+        
+        reportContainer.appendChild(trendContainer);
+    }
+    
+    // 情绪分析和建议
+    const analysisContainer = document.createElement('div');
+    analysisContainer.style.backgroundColor = '#e8f5e9';
+    analysisContainer.style.padding = '15px';
+    analysisContainer.style.borderRadius = '5px';
+    analysisContainer.style.marginBottom = '20px';
+    
+    // 根据数据生成分析和建议
+    const analysis = generateEmotionAnalysis(avgIntensity, maxIntensity, modePercentages);
+    
+    analysisContainer.innerHTML = `
+        <div style="margin-bottom: 10px; font-weight: bold;">情绪分析</div>
+        <div style="margin-bottom: 15px;">${analysis.analysis}</div>
+        <div style="margin-bottom: 10px; font-weight: bold;">建议</div>
+        <div>${analysis.suggestions}</div>
+    `;
+    
+    reportContainer.appendChild(analysisContainer);
+    
+    // 关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '关闭';
+    closeBtn.style.display = 'block';
+    closeBtn.style.width = '100%';
+    closeBtn.style.padding = '10px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '5px';
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.cursor = 'pointer';
+    closeBtn.style.marginTop = '10px';
+    
+    closeBtn.addEventListener('click', () => {
+        reportContainer.style.opacity = '0';
+        reportContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        
+        setTimeout(() => {
+            if (document.body.contains(reportContainer)) {
+                document.body.removeChild(reportContainer);
+            }
+        }, 300);
+    });
+    
+    reportContainer.appendChild(closeBtn);
+    
+    // 添加到页面
+    document.body.appendChild(reportContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        reportContainer.style.opacity = '1';
+        reportContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 10);
+}
+
+/**
+ * 根据情绪强度返回对应的颜色代码
+ * @param {number} intensity 情绪强度值（0-100）
+ * @returns {string} 颜色代码
+ */
+function getIntensityColor(intensity) {
+    if (intensity >= 90) return '#FF5722'; // 深橙色 - 极高强度
+    if (intensity >= 75) return '#FF9800'; // 橙色 - 高强度
+    if (intensity >= 50) return '#FFC107'; // 琥珀色 - 中高强度
+    if (intensity >= 30) return '#CDDC39'; // 酸橙色 - 中等强度
+    if (intensity >= 10) return '#8BC34A'; // 浅绿色 - 低强度
+    return '#4CAF50'; // 绿色 - 很低强度
+}
+
+// 确保此函数在全局范围内可用
+window.getIntensityColor = getIntensityColor;
+        
+// 创建趋势线图
+function createTrendLineChart(container, data) {
+    // 反转数据，最新的在右侧
+    const chartData = data.slice().reverse();
+    
+    // 获取最大强度用于缩放
+    let maxIntensity = 0;
+    chartData.forEach(record => {
+        if (record.intensity > maxIntensity) {
+            maxIntensity = record.intensity;
+        }
+    });
+    
+    // 确保最大值至少为100，为图表留出足够空间
+    maxIntensity = Math.max(100, maxIntensity);
+    
+    // 创建线图
+    const chartWidth = container.offsetWidth;
+    const chartHeight = container.offsetHeight;
+    const padding = 20;
+    const availableWidth = chartWidth - (padding * 2);
+    const availableHeight = chartHeight - (padding * 2);
+    
+    // 创建点和连接线
+    const pointRadius = 4;
+    let pathD = '';
+    
+    chartData.forEach((record, index) => {
+        const x = padding + (index / (chartData.length - 1)) * availableWidth;
+        const y = chartHeight - (padding + (record.intensity / maxIntensity) * availableHeight);
+        
+        // 创建点
+        const point = document.createElement('div');
+        point.style.position = 'absolute';
+        point.style.width = `${pointRadius * 2}px`;
+        point.style.height = `${pointRadius * 2}px`;
+        point.style.backgroundColor = getIntensityColor(record.intensity);
+        point.style.borderRadius = '50%';
+        point.style.left = `${x - pointRadius}px`;
+        point.style.top = `${y - pointRadius}px`;
+        point.style.zIndex = '2';
+        
+        // 添加提示
+        const date = new Date(record.date);
+        const dateStr = `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2, '0')}`;
+        point.title = `${dateStr}: ${Math.round(record.intensity)}%`;
+        
+        container.appendChild(point);
+        
+        // 构建路径
+        if (index === 0) {
+            pathD = `M ${x} ${y}`;
+        } else {
+            pathD += ` L ${x} ${y}`;
+        }
+    });
+    
+    // 创建SVG线图
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '100%');
+    svg.setAttribute('height', '100%');
+    svg.style.position = 'absolute';
+    svg.style.top = '0';
+    svg.style.left = '0';
+    svg.style.zIndex = '1';
+    
+    // 创建路径
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', pathD);
+    path.setAttribute('stroke', '#2196F3');
+    path.setAttribute('stroke-width', '2');
+    path.setAttribute('fill', 'none');
+    
+    svg.appendChild(path);
+    container.appendChild(svg);
+    
+    // 添加网格线
+    const gridLines = 4;
+    for (let i = 0; i <= gridLines; i++) {
+        const y = padding + (i / gridLines) * availableHeight;
+        const gridLine = document.createElement('div');
+        gridLine.style.position = 'absolute';
+        gridLine.style.width = `${availableWidth}px`;
+        gridLine.style.height = '1px';
+        gridLine.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+        gridLine.style.left = `${padding}px`;
+        gridLine.style.top = `${y}px`;
+        
+        container.appendChild(gridLine);
+        
+        // 添加标签
+        const label = document.createElement('div');
+        label.textContent = `${Math.round(maxIntensity - (i / gridLines) * maxIntensity)}%`;
+        label.style.position = 'absolute';
+        label.style.fontSize = '10px';
+        label.style.color = '#666';
+        label.style.right = '5px';
+        label.style.top = `${y - 5}px`;
+        
+        container.appendChild(label);
+    }
+}
+
+// 生成情绪分析和建议
+function generateEmotionAnalysis(avgIntensity, maxIntensity, modePercentages) {
+    // 根据数据生成个性化分析
+    let analysis = '';
+    let suggestions = '';
+    
+    // 基于平均强度的分析
+    if (avgIntensity < 30) {
+        analysis = "你的整体情绪强度较低，表明你可能较为平静或未充分释放情绪。";
+        suggestions = "尝试更频繁地使用尖叫仪，或者在使用时完全投入，让自己的情绪得到更充分的释放。";
+    } else if (avgIntensity < 60) {
+        analysis = "你的整体情绪强度适中，表明你能够适度地释放情绪，不会过度压抑也不会情绪激烈。";
+        suggestions = "继续保持这种平衡，同时可以尝试不同的尖叫模式，探索更丰富的情绪表达方式。";
+    } else if (avgIntensity < 80) {
+        analysis = "你的整体情绪强度较高，表明你能够充分释放情绪，情感表达较为丰富。";
+        suggestions = "多尝试平静模式，学习在高强度释放后找回平衡，形成释放-平静的良性循环。";
+    } else {
+        analysis = "你的整体情绪强度非常高，表明你的情绪表达非常强烈，能够释放内心的强烈感受。";
+        suggestions = "适当关注情绪高涨后的自我调节，记录高强度情绪的触发原因，帮助理解自己的情绪模式。";
+    }
+    
+    // 基于最高强度的分析
+    if (maxIntensity >= 95) {
+        analysis += " 你的最高情绪强度达到了顶峰，说明你有能力完全释放自己的情绪。";
+        suggestions += " 在达到高强度后，不要忘记使用情绪瓶记录，帮助回顾和理解这些强烈的情绪时刻。";
+    }
+    
+    // 基于模式分布的分析
+    const dominantMode = getDominantMode(modePercentages);
+    
+    if (dominantMode === 'calm') {
+        analysis += " 你倾向于使用平静模式，表明你更喜欢温和地表达情绪。";
+        suggestions += " 偶尔也可以尝试释放模式或狂怒模式，体验不同的情绪释放方式，可能会发现新的情绪宣泄路径。";
+    } else if (dominantMode === 'release') {
+        analysis += " 你倾向于使用释放模式，表明你注重情绪的积极释放和转化。";
+        suggestions += " 这种模式很好地平衡了情绪释放和控制，继续保持，同时也可以记录哪些释放方式对你最有效。";
+    } else if (dominantMode === 'fury') {
+        analysis += " 你倾向于使用狂怒模式，表明你需要强烈地宣泄内心的激烈情绪。";
+        suggestions += " 在使用狂怒模式后，给自己一些时间冷静下来，可以辅以深呼吸或其他放松技巧，帮助情绪稳定。";
+    }
+    
+    return {
+        analysis: analysis,
+        suggestions: suggestions
+    };
+}
+
+// 获取主导模式
+function getDominantMode(modePercentages) {
+    const modes = ['calm', 'release', 'fury'];
+    let highestPercentage = 0;
+    let dominantMode = 'calm';
+    
+    modes.forEach(mode => {
+        if (modePercentages[mode] > highestPercentage) {
+            highestPercentage = modePercentages[mode];
+            dominantMode = mode;
+        }
+    });
+    
+    return dominantMode;
+}
+
+// 显示无数据消息
+function showNoDataMessage() {
+    const messageContainer = document.createElement('div');
+    messageContainer.style.position = 'fixed';
+    messageContainer.style.top = '50%';
+    messageContainer.style.left = '50%';
+    messageContainer.style.transform = 'translate(-50%, -50%)';
+    messageContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+    messageContainer.style.padding = '20px';
+    messageContainer.style.borderRadius = '10px';
+    messageContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.2)';
+    messageContainer.style.zIndex = '1000';
+    messageContainer.style.textAlign = 'center';
+    messageContainer.style.opacity = '0';
+    messageContainer.style.transition = 'opacity 0.3s, transform 0.3s';
+    
+    messageContainer.innerHTML = `
+        <div style="font-size: 24px; margin-bottom: 10px;">📊</div>
+        <div style="font-weight: bold; margin-bottom: 10px;">暂无足够的数据</div>
+        <div style="margin-bottom: 15px;">需要至少3条情绪记录才能生成分析报告</div>
+        <div>多使用尖叫仪并打卡记录，很快就能看到你的情绪分析！</div>
+    `;
+    
+    // 添加关闭按钮
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '知道了';
+    closeBtn.style.marginTop = '15px';
+    closeBtn.style.padding = '8px 15px';
+    closeBtn.style.border = 'none';
+    closeBtn.style.borderRadius = '5px';
+    closeBtn.style.backgroundColor = '#f0f0f0';
+    closeBtn.style.cursor = 'pointer';
+    
+    closeBtn.addEventListener('click', () => {
+        messageContainer.style.opacity = '0';
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(0.9)';
+        
+        setTimeout(() => {
+            if (document.body.contains(messageContainer)) {
+                document.body.removeChild(messageContainer);
+            }
+        }, 300);
+    });
+    
+    messageContainer.appendChild(closeBtn);
+    
+    document.body.appendChild(messageContainer);
+    
+    // 动画显示
+    setTimeout(() => {
+        messageContainer.style.opacity = '1';
+        messageContainer.style.transform = 'translate(-50%, -50%) scale(1)';
+    }, 10);
+}
+
+// 创建分析按钮
+function createAnalysisButton() {
+    const analysisBtn = document.createElement('div');
+    analysisBtn.id = 'analysisButton';
+    analysisBtn.style.position = 'absolute';
+    analysisBtn.style.bottom = '20px';
+    analysisBtn.style.right = '20px';
+    analysisBtn.style.background = 'rgba(255, 255, 255, 0.8)';
+    analysisBtn.style.borderRadius = '5px';
+    analysisBtn.style.padding = '8px 12px';
+    analysisBtn.style.fontSize = '14px';
+    analysisBtn.style.cursor = 'pointer';
+    analysisBtn.style.display = 'flex';
+    analysisBtn.style.alignItems = 'center';
+    analysisBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    analysisBtn.style.zIndex = '10';
+    analysisBtn.style.transition = 'transform 0.3s, box-shadow 0.3s';
+    
+    // 图标
+    const icon = document.createElement('span');
+    icon.textContent = '📊';
+    icon.style.marginRight = '5px';
+    
+    const text = document.createElement('span');
+    text.textContent = '情绪分析';
+    
+    analysisBtn.appendChild(icon);
+    analysisBtn.appendChild(text);
+    
+    // 悬停效果
+    analysisBtn.addEventListener('mouseenter', () => {
+        analysisBtn.style.transform = 'scale(1.05)';
+        analysisBtn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+    });
+    
+    analysisBtn.addEventListener('mouseleave', () => {
+        analysisBtn.style.transform = 'scale(1)';
+        analysisBtn.style.boxShadow = '0 2px 5px rgba(0, 0, 0, 0.1)';
+    });
+    
+    // 点击事件
+    analysisBtn.addEventListener('click', () => {
+        createEmotionAnalysisReport();
+        
+        // 触发震动反馈
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
+            }
+        } catch (e) {}
+    });
+    
+    document.body.appendChild(analysisBtn);
+    return analysisBtn;
+}
+
+/**
+ * 8. 系统集成代码 - 安装所有功能
+ */
+
+// 完整安装函数 - 在页面加载完成后调用此函数
+function installCyberScreamEnhancements() {
+    // 初始化所有新功能
+    initEnhancedFeatures();
+    
+    // 创建分析按钮
+    createAnalysisButton();
+    
+    // 替换核心函数
+    // 注意: 在实际整合中，你可能需要修改原始函数而不是替换它们
+    // 这里提供了两种方法：替换或增强
+    
+    // 方法1: 直接替换函数（如果可行）
+    // window.updateIntensityDisplay = enhancedUpdateIntensityDisplay;
+    // window.startScream = enhancedStartScream;
+    // window.stopScream = enhancedStopScream;
+    // window.checkAchievements = enhancedCheckAchievements;
+    
+    // 方法2: 扩展现有函数（推荐）
+    // 使用这种方法，保留原始功能并添加新功能
+    const originalUpdateIntensityDisplay = window.updateIntensityDisplay;
+    window.updateIntensityDisplay = function() {
+        originalUpdateIntensityDisplay.apply(this, arguments);
+        updateIntensityWithVisuals(intensity);
+    };
+    
+    const originalStartScream = window.startScream;
+    window.startScream = function() {
+        originalStartScream.apply(this, arguments);
+        if (fxMode && Math.random() > 0.9) {
+            setTimeout(() => {
+                createFullscreenTextAnimation(intensity);
+            }, 500);
+        }
+    };
+    
+    const originalStopScream = window.stopScream;
+    window.stopScream = function() {
+        originalStopScream.apply(this, arguments);
+        if (intensity >= 80) {
+            setTimeout(() => {
+                suggestEmotionBottle();
+            }, 1000);
+        }
+    };
+    
+    const originalCheckAchievements = window.checkAchievements;
+    window.checkAchievements = function() {
+        originalCheckAchievements.apply(this, arguments);
+        checkBottleCollectorAchievement();
+    };
+    
+    // 添加定时提示
+    setTimeout(() => {
+        createRandomTip();
+        
+        // 每3-5分钟显示一个随机提示
+        setInterval(() => {
+            if (Math.random() > 0.7) { // 70%的概率显示提示
+                createRandomTip();
+            }
+        }, 3 * 60 * 1000 + Math.random() * 2 * 60 * 1000);
+    }, 30 * 1000); // 30秒后显示第一个提示
+    
+    // 打印安装成功消息
+    console.log('赛博尖叫仪增强功能已安装 🎉');
+}
+
+// 导出所有函数供外部使用
+window.CyberScreamEnhanced = {
+    install: installCyberScreamEnhancements,
+    createCheckInUI: createCheckInUI,
+    createEmotionBottle: createEmotionBottle,
+    showEmotionBottleCollection: showEmotionBottleCollection,
+    createFullscreenTextAnimation: createFullscreenTextAnimation,
+    createEmotionAnalysisReport: createEmotionAnalysisReport,
+    createRandomEasterEgg: createRandomEasterEgg
+};
+
+// 自动安装（可选 - 取消注释以启用）
+document.addEventListener('DOMContentLoaded', installCyberScreamEnhancements);
+        
         // 隐藏地址栏 - 移动端的技巧
         window.addEventListener('load', function() {
             setTimeout(function() {
@@ -1419,8 +5835,8 @@
         
         // 优化滚动行为
         document.addEventListener('touchmove', function(e) {
-            if (e.target.closest('.achievement-container')) {
-                // 允许成就容器内部滚动
+            if (e.target.closest('.achievement-container') || e.target.closest('.emotion-history-container')) {
+                // 允许成就容器和情绪历史容器内部滚动
                 e.stopPropagation();
             } else {
                 // 防止页面滚动
@@ -1436,6 +5852,29 @@
                     stopScream();
                 }
             }
+        });
+        
+        // 处理窗口大小变化
+        window.addEventListener('resize', function() {
+            // 更新情绪图表
+            if (emotionHistoryContainer.classList.contains('active')) {
+                updateEmotionChart();
+            }
+        });
+        
+        // 处理方向变化 - 移动设备
+        window.addEventListener('orientationchange', function() {
+            // 短暂延迟后更新图表，等待方向变化完成
+            setTimeout(function() {
+                if (emotionHistoryContainer.classList.contains('active')) {
+                    updateEmotionChart();
+                }
+            }, 300);
+        });
+        
+        // 处理网页关闭时保存数据
+        window.addEventListener('beforeunload', function() {
+            localStorage.setItem('totalRelease', totalRelease.toString());
         });
     </script>
 </body>

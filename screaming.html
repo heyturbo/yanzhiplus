@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>赛博尖叫仪器 - 释放你的压力</title>
+    <title>赛博尖叫仪 - 释放你的压力</title>
     <style>
         * {
             margin: 0;
@@ -11,6 +11,9 @@
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
             user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         
         body {
@@ -25,6 +28,7 @@
             justify-content: center;
             align-items: center;
             transition: background-color 0.3s;
+            touch-action: manipulation;
         }
         
         .container {
@@ -62,6 +66,7 @@
             transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
             overflow: hidden;
+            will-change: transform, box-shadow;
         }
         
         .scream-button:active {
@@ -76,6 +81,7 @@
             background-position: center;
             background-repeat: no-repeat;
             transition: opacity 0.3s, transform 0.3s;
+            will-change: transform;
         }
         
         .intensity-meter {
@@ -94,6 +100,7 @@
             background: linear-gradient(90deg, #4CAF50, #FFEB3B, #FF5722);
             border-radius: 10px;
             transition: width 0.2s;
+            will-change: width;
         }
         
         .stats {
@@ -111,6 +118,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             transition: transform 0.3s;
+            will-change: transform;
         }
         
         .particles-container {
@@ -121,6 +129,7 @@
             left: 0;
             pointer-events: none;
             z-index: -1;
+            overflow: hidden;
         }
         
         .particle {
@@ -128,6 +137,7 @@
             background-color: rgba(255, 255, 255, 0.8);
             border-radius: 50%;
             pointer-events: none;
+            will-change: transform, opacity;
         }
         
         .instructions {
@@ -161,6 +171,7 @@
             z-index: -2;
             opacity: 0;
             transition: opacity 0.5s;
+            overflow: hidden;
         }
         
         .wave {
@@ -171,6 +182,7 @@
             left: 50%;
             transform: translate(-50%, -50%) scale(0);
             opacity: 1;
+            will-change: transform, opacity;
         }
         
         .achievement-container {
@@ -187,6 +199,7 @@
             transform: translateX(110%);
             transition: transform 0.3s;
             z-index: 10;
+            -webkit-overflow-scrolling: touch;
         }
         
         .achievement-toggle {
@@ -259,6 +272,7 @@
             margin: 0 2px;
             border-radius: 2px;
             transition: height 0.1s;
+            will-change: height;
         }
         
         /* 加特效模式 */
@@ -389,12 +403,18 @@
             .sound-waves {
                 bottom: 25%;
             }
+            
+            .instructions {
+                font-size: 12px;
+                max-width: 280px;
+                bottom: 3%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="title">赛博尖叫仪器</h1>
+        <h1 class="title">赛博尖叫仪</h1>
         
         <div class="scream-button" id="screamButton">
             <div class="scream-icon"></div>
@@ -420,7 +440,8 @@
         </div>
         
         <div class="instructions">
-            长按或快速点击尖叫按钮来释放你的压力。尖叫强度越高，效果越明显！尝试不同的操作来发现更多效果。
+            <p>长按或快速点击尖叫按钮来释放你的压力。尖叫强度越高，效果越明显！</p>
+            <p>条件允许可以寻找一个能放心尖叫的场所，一边尖叫一边使用此仪器测量你的情绪释放！</p>
         </div>
         
         <div class="particles-container" id="particlesContainer"></div>
@@ -453,6 +474,10 @@
         let shakingTimeout;
         let fxMode = false;
         let currentMode = 'calm'; // calm, release, fury
+        let lastFrameTime = 0;
+        let activeParticles = []; // 跟踪活动粒子
+        let visibleParticlesCount = 0; // 可见粒子计数
+        const MAX_PARTICLES = 100; // 最大粒子数量限制
         
         // DOM元素
         const screamButton = document.getElementById('screamButton');
@@ -472,8 +497,17 @@
         const modeIndicator = document.getElementById('modeIndicator');
         const tooltip = document.getElementById('tooltip');
         
-        // 初始化声波元素
-        for (let i = 0; i < 15; i++) {
+        // 检测设备性能
+        const isLowPerformanceDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && 
+            (navigator.hardwareConcurrency < 4 || !navigator.deviceMemory || navigator.deviceMemory < 4);
+        
+        // 根据设备性能调整参数
+        const PARTICLE_LIMIT = isLowPerformanceDevice ? 30 : MAX_PARTICLES;
+        const USE_COMPLEX_EFFECTS = !isLowPerformanceDevice;
+        
+        // 初始化声波元素 - 低性能设备减少数量
+        const waveCount = isLowPerformanceDevice ? 9 : 15;
+        for (let i = 0; i < waveCount; i++) {
             const wave = document.createElement('div');
             wave.classList.add('sound-wave');
             soundWaves.appendChild(wave);
@@ -505,6 +539,26 @@
         
         // 初始化成就列表
         initAchievements();
+        
+        // 主游戏循环
+        function gameLoop(timestamp) {
+            if (!lastFrameTime) lastFrameTime = timestamp;
+            const deltaTime = timestamp - lastFrameTime;
+            lastFrameTime = timestamp;
+            
+            // 更新所有粒子
+            updateParticles(deltaTime);
+            
+            // 如果有声波显示，更新声波
+            if (intensity > 0 && soundWaves.style.opacity > 0) {
+                animateSoundWaves();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 开始游戏循环
+        requestAnimationFrame(gameLoop);
         
         // 按下按钮
         screamButton.addEventListener('mousedown', startScream);
@@ -542,8 +596,31 @@
         // 特效模式切换
         fxModeToggle.addEventListener('click', toggleFxMode);
         
+        // 移动设备优化 - 处理触摸事件
+        if ('ontouchstart' in window) {
+            document.addEventListener('touchmove', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault(); // 防止双指缩放
+                }
+            }, { passive: false });
+            
+            // 启用触摸反馈 - 在支持的浏览器中
+            try {
+                if (navigator.vibrate) {
+                    screamButton.addEventListener('touchstart', () => {
+                        navigator.vibrate(20);
+                    });
+                }
+            } catch (e) {
+                console.log('Vibration API not supported');
+            }
+        }
+        
         // 工具提示
         function showTooltip(element, text) {
+            // 移动设备上不显示工具提示
+            if ('ontouchstart' in window) return;
+            
             const rect = element.getBoundingClientRect();
             tooltip.textContent = text;
             tooltip.style.top = `${rect.bottom + 10}px`;
@@ -556,13 +633,15 @@
         }
         
         // 为按钮添加提示
-        fxModeToggle.addEventListener('mouseenter', () => {
-            showTooltip(fxModeToggle, '切换不同的尖叫特效模式');
-        });
-        
-        achievementToggle.addEventListener('mouseenter', () => {
-            showTooltip(achievementToggle, '查看你的成就');
-        });
+        if (!('ontouchstart' in window)) {
+            fxModeToggle.addEventListener('mouseenter', () => {
+                showTooltip(fxModeToggle, '切换不同的尖叫特效模式');
+            });
+            
+            achievementToggle.addEventListener('mouseenter', () => {
+                showTooltip(achievementToggle, '查看你的成就');
+            });
+        }
         
         function toggleFxMode() {
             fxMode = !fxMode;
@@ -576,6 +655,13 @@
             } else {
                 switchMode('calm');
             }
+            
+            // 反馈震动
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(30);
+                }
+            } catch (e) {}
         }
         
         function switchMode(mode) {
@@ -614,6 +700,13 @@
         function toggleAchievements() {
             const isVisible = achievementContainer.style.transform === 'translateX(0%)';
             achievementContainer.style.transform = isVisible ? 'translateX(110%)' : 'translateX(0%)';
+            
+            // 反馈震动
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(20);
+                }
+            } catch (e) {}
         }
         
         function initAchievements() {
@@ -690,12 +783,18 @@
             
             // 显示声波
             soundWaves.style.opacity = 1;
-            animateSoundWaves();
             
             // 创建音波纹效果
-            if (fxMode) {
+            if (fxMode && USE_COMPLEX_EFFECTS) {
                 createWaveEffect();
             }
+            
+            // 触发震动反馈
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate([20, 30, 20]);
+                }
+            } catch (e) {}
         }
         
         function stopScream() {
@@ -718,6 +817,13 @@
             }, 50);
             
             clearInterval(particleInterval);
+            
+            // 触发震动反馈
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate(10);
+                }
+            } catch (e) {}
         }
         
         function increaseIntensity(amount) {
@@ -746,11 +852,12 @@
             totalRelease += amount * 2;
             totalReleaseElement.textContent = Math.floor(totalRelease);
             
-            // 创建大量粒子
-            for (let i = 0; i < amount; i++) {
+            // 创建大量粒子 - 低性能设备降低数量
+            const particleCount = isLowPerformanceDevice ? Math.min(amount, 15) : amount;
+            for (let i = 0; i < particleCount; i++) {
                 setTimeout(() => {
-                    createParticles(amount / 2);
-                }, i * 50);
+                    createParticles(amount / (isLowPerformanceDevice ? 4 : 2));
+                }, i * (isLowPerformanceDevice ? 100 : 50));
             }
             
             // 屏幕震动效果
@@ -760,9 +867,21 @@
             showEmotionText("爆发!!!", "#FF5722", 1000);
             
             // 特效模式下创建波纹
-            if (fxMode) {
+            if (fxMode && USE_COMPLEX_EFFECTS) {
                 createBurstEffect(amount);
             }
+            
+            // 强烈震动反馈
+            try {
+                if (navigator.vibrate) {
+                    const pattern = [];
+                    for (let i = 0; i < 3; i++) {
+                        pattern.push(30 + i * 10);
+                        pattern.push(20);
+                    }
+                    navigator.vibrate(pattern);
+                }
+            } catch (e) {}
         }
         
         function updateIntensityDisplay() {
@@ -775,9 +894,6 @@
                 totalRelease += releaseIncrement;
                 totalReleaseElement.textContent = Math.floor(totalRelease);
             }
-            
-            // 动画声波高度
-            animateSoundWaves();
         }
         
         function applyIntensityEffects() {
@@ -818,7 +934,7 @@
             }
             
             // 特效模式下的附加效果
-            if (fxMode) {
+            if (fxMode && USE_COMPLEX_EFFECTS) {
                 applyFxModeEffects();
             }
             
@@ -835,20 +951,25 @@
         
         function applyFxModeEffects() {
             // 根据不同模式应用不同的特效
+            // 低性能设备降低概率
+            const effectChance = isLowPerformanceDevice ? 0.3 : 0.7;
+            
             switch (currentMode) {
                 case 'release':
                     // 释放模式 - 更多粒子，彩色粒子
-                    if (intensity > 30 && Math.random() > 0.7) {
-                        createColorfulParticles(5 + Math.random() * 10);
+                    if (intensity > 30 && Math.random() > 1 - effectChance) {
+                        const particleCount = isLowPerformanceDevice ? 3 : (5 + Math.random() * 10);
+                        createColorfulParticles(particleCount);
                     }
                     break;
                     
                 case 'fury':
                     // 狂怒模式 - 火焰效果，屏幕震动更强烈
-                    if (intensity > 50) {
-                        createFireParticles(3 + Math.random() * 5);
+                    if (intensity > 50 && Math.random() > 1 - effectChance) {
+                        const particleCount = isLowPerformanceDevice ? 2 : (3 + Math.random() * 5);
+                        createFireParticles(particleCount);
                         
-                        if (intensity > 80 && !shakingTimeout) {
+                        if (intensity > 80 && !shakingTimeout && Math.random() > 0.7) {
                             shakeScreen(intensity / 30);
                         }
                     }
@@ -857,6 +978,8 @@
         }
         
         function createWaveEffect() {
+            if (visibleParticlesCount > PARTICLE_LIMIT * 0.8) return;
+            
             waveContainer.style.opacity = 1;
             
             const wave = document.createElement('div');
@@ -890,7 +1013,9 @@
                 
                 if (scale >= 10) {
                     clearInterval(waveInterval);
-                    waveContainer.removeChild(wave);
+                    if (waveContainer.contains(wave)) {
+                        waveContainer.removeChild(wave);
+                    }
                     
                     if (waveContainer.children.length === 0) {
                         waveContainer.style.opacity = 0;
@@ -900,7 +1025,12 @@
         }
         
         function createBurstEffect(amount) {
-            for (let i = 0; i < 3; i++) {
+            if (visibleParticlesCount > PARTICLE_LIMIT * 0.7) return;
+            
+            // 低性能设备降低波纹数量
+            const waveCount = isLowPerformanceDevice ? 1 : 3;
+            
+            for (let i = 0; i < waveCount; i++) {
                 setTimeout(() => {
                     const wave = document.createElement('div');
                     wave.classList.add('wave');
@@ -936,14 +1066,16 @@
                         
                         if (scale >= maxScale) {
                             clearInterval(waveInterval);
-                            waveContainer.removeChild(wave);
+                            if (waveContainer.contains(wave)) {
+                                waveContainer.removeChild(wave);
+                            }
                             
                             if (waveContainer.children.length === 0) {
                                 waveContainer.style.opacity = 0;
                             }
                         }
                     }, 16);
-                }, i * 200);
+                }, i * (isLowPerformanceDevice ? 400 : 200));
             }
         }
         
@@ -962,10 +1094,6 @@
                 
                 wave.style.height = `${Math.max(2, height)}px`;
             });
-            
-            if (intensity > 0) {
-                requestAnimationFrame(animateSoundWaves);
-            }
         }
         
         function showEmotionText(text, color, duration = 2000) {
@@ -980,7 +1108,9 @@
         }
         
         function createParticles(count = 3) {
-            const particleCount = Math.floor(count * (intensity / 30));
+            if (visibleParticlesCount >= PARTICLE_LIMIT) return;
+            
+            const particleCount = Math.floor(Math.min(count * (intensity / 30), PARTICLE_LIMIT - visibleParticlesCount));
             if (particleCount <= 0) return;
             
             const buttonRect = screamButton.getBoundingClientRect();
@@ -993,11 +1123,16 @@
         }
         
         function createColorfulParticles(count) {
+            if (visibleParticlesCount >= PARTICLE_LIMIT) return;
+            
+            const particleCount = Math.min(count, PARTICLE_LIMIT - visibleParticlesCount);
+            if (particleCount <= 0) return;
+            
             const buttonRect = screamButton.getBoundingClientRect();
             const centerX = buttonRect.left + buttonRect.width / 2;
             const centerY = buttonRect.top + buttonRect.height / 2;
             
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 // 彩虹色粒子
                 const hue = Math.random() * 360;
                 const saturation = 80 + Math.random() * 20;
@@ -1013,11 +1148,16 @@
         }
         
         function createFireParticles(count) {
+            if (visibleParticlesCount >= PARTICLE_LIMIT) return;
+            
+            const particleCount = Math.min(count, PARTICLE_LIMIT - visibleParticlesCount);
+            if (particleCount <= 0) return;
+            
             const buttonRect = screamButton.getBoundingClientRect();
             const centerX = buttonRect.left + buttonRect.width / 2;
             const centerY = buttonRect.top + buttonRect.height / 2;
             
-            for (let i = 0; i < count; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 // 火焰色粒子
                 const hue = 20 + Math.random() * 40;
                 const saturation = 80 + Math.random() * 20;
@@ -1036,6 +1176,8 @@
         }
         
         function createParticle(x, y, options = {}) {
+            visibleParticlesCount++;
+            
             const particle = document.createElement('div');
             particle.classList.add('particle');
             
@@ -1072,38 +1214,75 @@
             const vx = Math.cos(settings.angle) * settings.speed;
             const vy = Math.sin(settings.angle) * settings.speed;
             
-            // 粒子动画
-            const startTime = Date.now();
+            // 将粒子添加到活动粒子数组
+            const particleData = {
+                element: particle,
+                x: x,
+                y: y,
+                vx: vx,
+                vy: vy,
+                opacity: 1,
+                gravity: 0.05,
+                startTime: Date.now(),
+                duration: settings.duration,
+                finished: false
+            };
             
-            function animateParticle() {
-                const elapsed = Date.now() - startTime;
-                const progress = elapsed / settings.duration;
+            activeParticles.push(particleData);
+            
+            return particleData;
+        }
+        
+        function updateParticles(deltaTime) {
+            const now = Date.now();
+            const particlesToRemove = [];
+            
+            activeParticles.forEach(particle => {
+                if (particle.finished) return;
+                
+                const elapsed = now - particle.startTime;
+                const progress = elapsed / particle.duration;
                 
                 if (progress >= 1) {
-                    particlesContainer.removeChild(particle);
+                    particle.finished = true;
+                    particlesToRemove.push(particle);
                     return;
                 }
                 
-                const currentX = parseFloat(particle.style.left);
-                const currentY = parseFloat(particle.style.top);
+                // 更新位置
+                particle.x += particle.vx;
+                particle.y += particle.vy + (particle.gravity * Math.pow(progress, 2));
                 
-                // 添加一点重力效果
-                const gravity = 0.05 * Math.pow(progress, 2);
+                // 更新opacity
+                particle.opacity = 1 - progress;
                 
-                particle.style.left = `${currentX + vx}px`;
-                particle.style.top = `${currentY + vy + gravity}px`;
-                particle.style.opacity = 1 - progress;
+                // 更新DOM
+                const elem = particle.element;
+                elem.style.left = `${particle.x}px`;
+                elem.style.top = `${particle.y}px`;
+                elem.style.opacity = particle.opacity;
                 
                 // 特效模式下的粒子可能有缩放效果
                 if (fxMode && currentMode === 'release') {
                     const scale = 1 - progress * 0.5;
-                    particle.style.transform = `scale(${scale})`;
+                    elem.style.transform = `scale(${scale})`;
                 }
-                
-                requestAnimationFrame(animateParticle);
-            }
+            });
             
-            requestAnimationFrame(animateParticle);
+            // 清理完成的粒子
+            if (particlesToRemove.length > 0) {
+                particlesToRemove.forEach(particle => {
+                    if (particlesContainer.contains(particle.element)) {
+                        particlesContainer.removeChild(particle.element);
+                    }
+                    visibleParticlesCount--;
+                    
+                    const index = activeParticles.indexOf(particle);
+                    if (index !== -1) {
+                        activeParticles.splice(index, 1);
+                    }
+                });
+            }
         }
         
         function shakeScreen(intensity) {
@@ -1112,6 +1291,9 @@
             const container = document.querySelector('.container');
             const duration = intensity * 100;
             const startTime = Date.now();
+            
+            // 低性能设备降低震动强度
+            let shakeMultiplier = isLowPerformanceDevice ? 0.7 : 1;
             
             function shake() {
                 const elapsed = Date.now() - startTime;
@@ -1123,8 +1305,8 @@
                     return;
                 }
                 
-                const xOffset = (Math.random() - 0.5) * intensity * 2;
-                const yOffset = (Math.random() - 0.5) * intensity * 2;
+                const xOffset = (Math.random() - 0.5) * intensity * 2 * shakeMultiplier;
+                const yOffset = (Math.random() - 0.5) * intensity * 2 * shakeMultiplier;
                 container.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
                 
                 shakingTimeout = setTimeout(shake, 50);
@@ -1184,6 +1366,13 @@
                     }, 300);
                 }, 3000);
             }, 10);
+            
+            // 触发震动反馈
+            try {
+                if (navigator.vibrate) {
+                    navigator.vibrate([30, 50, 30]);
+                }
+            } catch (e) {}
         }
         
         function checkAchievements() {
@@ -1195,21 +1384,22 @@
             });
         }
         
-        // 定期检查成就
-        setInterval(checkAchievements, 1000);
+        // 定期检查成就 - 降低检查频率以提高性能
+        setInterval(checkAchievements, 2000);
         
         // 添加一些互动提示
         setTimeout(() => {
             showEmotionText("长按或快速点击这里!", "#4CAF50", 3000);
         }, 1000);
         
-        // 模拟一些初始的粒子效果
+        // 模拟一些初始的粒子效果 - 低性能设备减少数量
         setTimeout(() => {
+            const particleCount = isLowPerformanceDevice ? 3 : 5;
             const buttonRect = screamButton.getBoundingClientRect();
             const centerX = buttonRect.left + buttonRect.width / 2;
             const centerY = buttonRect.top + buttonRect.height / 2;
             
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 setTimeout(() => {
                     createParticle(centerX, centerY, {
                         size: 5 + Math.random() * 5,
@@ -1225,6 +1415,27 @@
             setTimeout(function() {
                 window.scrollTo(0, 1);
             }, 0);
+        });
+        
+        // 优化滚动行为
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.closest('.achievement-container')) {
+                // 允许成就容器内部滚动
+                e.stopPropagation();
+            } else {
+                // 防止页面滚动
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // 处理浏览器可见性变化 - 节省电池
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // 页面不可见时停止游戏循环和动画
+                if (isPressed) {
+                    stopScream();
+                }
+            }
         });
     </script>
 </body>

@@ -2837,6 +2837,7 @@ function createCheckInUI() {
     const existingUI = document.getElementById('checkInContainer');
     if (existingUI) {
         document.body.removeChild(existingUI);
+        return;
     }
     
     // 创建打卡容器
@@ -2853,7 +2854,7 @@ function createCheckInUI() {
     checkInContainer.style.zIndex = '100';
     checkInContainer.style.transform = 'translateX(150%)';
     checkInContainer.style.transition = 'transform 0.3s ease-out';
-    checkInContainer.style.maxHeight = '500px';
+    checkInContainer.style.maxHeight = '640px';
     checkInContainer.style.overflowY = 'scroll';
     
     // 添加标题
@@ -5410,6 +5411,7 @@ function createEmotionAnalysisReport() {
     const existingModal = document.getElementById("emotion-report");
     if (existingModal) {
         existingModal.remove();
+        return;
     }
     
     // 如果没有足够数据，则不显示
@@ -5426,7 +5428,7 @@ function createEmotionAnalysisReport() {
     reportContainer.style.transform = 'translate(-50%, -50%)';
     reportContainer.style.width = '90%';
     reportContainer.style.maxWidth = '500px';
-    reportContainer.style.maxHeight = '500px';
+    reportContainer.style.maxHeight = '660px';
     reportContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
     reportContainer.style.borderRadius = '10px';
     reportContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';
@@ -5566,6 +5568,8 @@ function createEmotionAnalysisReport() {
     analysisContainer.style.padding = '15px';
     analysisContainer.style.borderRadius = '5px';
     analysisContainer.style.marginBottom = '20px';
+    analysisContainer.style.height = '200px';
+    analysisContainer.style.overflowY = 'scroll';
     
     // 根据数据生成分析和建议
     const analysis = generateEmotionAnalysis(avgIntensity, maxIntensity, modePercentages);

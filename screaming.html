@@ -2853,7 +2853,7 @@ function createCheckInUI() {
     checkInContainer.style.zIndex = '100';
     checkInContainer.style.transform = 'translateX(150%)';
     checkInContainer.style.transition = 'transform 0.3s ease-out';
-    checkInContainer.style.maxHeight = '80vh';
+    checkInContainer.style.maxHeight = '500px';
     checkInContainer.style.overflowY = 'scroll';
     
     // 添加标题
@@ -5146,6 +5146,102 @@ function integrateVisibilityController() {
     
     console.log('可见度控制器集成完成');
 }
+
+// 增强版的全屏文字动画 - 修复未定义错误
+function enhancedCreateFullscreenTextAnimation(intensity) {
+    // 基本逻辑与原始函数相同，但增加了可见度控制
+    if (intensity < 70) return; // 只在强度较高时触发
+    
+    // 低性能设备降低粒子数
+    const textCount = isLowPerformanceDevice ? 10 : 30;
+    
+    // 确定要展示的文字类型
+    const textTypes = ['啊', 'a', 'あ', '哇', 'Ahhh', '呀', 'ああ'];
+    const emojis = ['😱', '😫', '😤', '😡', '🤬', '😵', '😭'];
+    
+    // 根据强度决定显示频率
+    const showEmoji = Math.random() > 0.7;
+    const showBigText = intensity > 90 && Math.random() > 0.8;
+    
+    // 如果需要显示大文字，确保使用可见度控制
+    if (showBigText) {
+        showBigScreenText();
+        return;
+    }
+    
+    // 创建多个文字/表情元素，确保系统性能
+    for (let i = 0; i < textCount; i++) {
+        setTimeout(() => {
+            if (visibleParticlesCount >= PARTICLE_LIMIT) return;
+            
+            // 决定是文字还是表情
+            const isEmoji = showEmoji || Math.random() > 0.7;
+            
+            // 随机选择
+            const textContent = isEmoji 
+                ? emojis[Math.floor(Math.random() * emojis.length)]
+                : textTypes[Math.floor(Math.random() * textTypes.length)];
+            
+            // 创建元素
+            const textElem = document.createElement('div');
+            textElem.textContent = textContent;
+            textElem.style.position = 'absolute';
+            textElem.style.zIndex = '50';
+            textElem.style.userSelect = 'none';
+            textElem.style.pointerEvents = 'none';
+            textElem.style.color = getRandomEmotionColor(intensity);
+            textElem.style.opacity = '0';
+            textElem.style.fontSize = `${isEmoji ? 24 : 18 + Math.random() * 16}px`;
+            textElem.style.fontWeight = 'bold';
+            textElem.style.whiteSpace = 'nowrap';
+            
+            // 随机位置
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            textElem.style.left = `${x}px`;
+            textElem.style.top = `${y}px`;
+            
+            document.body.appendChild(textElem);
+            visibleParticlesCount++;
+            
+            // 动画
+            const direction = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 100;
+            const xEnd = x + Math.cos(direction) * distance;
+            const yEnd = y + Math.sin(direction) * distance;
+            
+            textElem.animate([
+                { 
+                    transform: 'scale(0.5) rotate(-10deg)', 
+                    opacity: 0,
+                    left: `${x}px`,
+                    top: `${y}px`
+                },
+                { 
+                    transform: 'scale(1.1) rotate(5deg)', 
+                    opacity: 1,
+                    left: `${xEnd}px`,
+                    top: `${yEnd}px`,
+                    offset: 0.6 
+                },
+                { 
+                    transform: 'scale(0.8) rotate(10deg)', 
+                    opacity: 0,
+                    left: `${xEnd}px`,
+                    top: `${yEnd - 30}px`
+                }
+            ], {
+                duration: 1000 + Math.random() * 1000,
+                easing: 'ease-out'
+            }).onfinish = () => {
+                if (document.body.contains(textElem)) {
+                    document.body.removeChild(textElem);
+                    visibleParticlesCount--;
+                }
+            };
+        }, i * (isLowPerformanceDevice ? 100 : 50));
+    }
+}
         
 // 创建爆炸碎片
 function createExplosionDebris() {
@@ -5310,6 +5406,11 @@ function createEmotionAnalysisReport() {
     const emotionData = JSON.parse(localStorage.getItem('emotionHistory') || '[]');
     const bottleData = JSON.parse(localStorage.getItem('emotionBottles') || '[]');
     const checkInData = CheckInSystem.getCheckInData();
+
+    const existingModal = document.getElementById("emotion-report");
+    if (existingModal) {
+        existingModal.remove();
+    }
     
     // 如果没有足够数据，则不显示
     if (emotionData.length < 3 && Object.keys(checkInData).length < 3) {
@@ -5318,13 +5419,14 @@ function createEmotionAnalysisReport() {
     
     // 创建报告容器
     const reportContainer = document.createElement('div');
+    reportContainer.id = "emotion-report";
     reportContainer.style.position = 'fixed';
     reportContainer.style.top = '50%';
     reportContainer.style.left = '50%';
     reportContainer.style.transform = 'translate(-50%, -50%)';
     reportContainer.style.width = '90%';
     reportContainer.style.maxWidth = '500px';
-    reportContainer.style.maxHeight = '80vh';
+    reportContainer.style.maxHeight = '500px';
     reportContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
     reportContainer.style.borderRadius = '10px';
     reportContainer.style.boxShadow = '0 5px 20px rgba(0, 0, 0, 0.3)';

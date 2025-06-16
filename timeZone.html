@@ -27,7 +27,7 @@
             display: flex;
             flex-direction: column;
             gap: 24px;
-            max-width: 600px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
@@ -103,25 +103,45 @@
             transition: opacity 0.3s;
         }
         
+        .time-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
         .format-toggle {
             display: flex;
             gap: 5px;
-            margin-top: 10px;
         }
         
-        .format-btn {
-            padding: 5px 10px;
-            border-radius: 5px;
+        .format-btn, .now-btn {
+            padding: 8px 16px;
+            border-radius: 8px;
             border: 1px solid #e2e8f0;
             background-color: #f8fafc;
             font-size: 14px;
             cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         
         .format-btn.active {
             background-color: #3b82f6;
             color: white;
             border-color: #3b82f6;
+        }
+        
+        .now-btn {
+            background-color: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+        
+        .now-btn:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
         }
         
         .search-container {
@@ -242,15 +262,22 @@
             margin-top: 0;
         }
         
+        .zones-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
         .zone {
             display: grid;
             grid-template-columns: auto 1fr auto;
             padding: 16px;
             background-color: #f8fafc;
             border-radius: 12px;
-            margin-bottom: 10px;
             opacity: 1;
             transition: background-color 0.2s, transform 0.2s;
+            position: relative;
         }
         
         .zone:hover {
@@ -354,6 +381,12 @@
             transform: scale(1.2);
         }
         
+        @media (max-width: 1024px) {
+            .zones-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 480px) {
             body {
                 padding: 15px;
@@ -402,6 +435,15 @@
                 right: 8px;
                 font-size: 18px;
             }
+            
+            .time-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .zones-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -414,9 +456,12 @@
         <div class="card current-time">
             <div class="current-time-label">您的本地时间</div>
             <div class="current-time-display" id="local-time"></div>
-            <div class="format-toggle">
-                <button id="format-24h" class="format-btn active">24小时制</button>
-                <button id="format-12h" class="format-btn">12小时制</button>
+            <div class="time-controls">
+                <div class="format-toggle">
+                    <button id="format-24h" class="format-btn active">24小时制</button>
+                    <button id="format-12h" class="format-btn">12小时制</button>
+                </div>
+                <button id="now-btn" class="now-btn">现在</button>
             </div>
             <div class="dst-info" id="dst-info"></div>
         </div>
@@ -448,7 +493,7 @@
     </div>
 
     <script>
-        // 定义全球主要时区
+        // 定义全球主要时区（扩展版本）
         const timeZones = [
             // 亚洲
             { region: "亚洲", name: "北京", code: "Asia/Shanghai", emoji: "🇨🇳", info: "中国标准时间 (UTC+8)", favorite: false },
@@ -458,12 +503,22 @@
             { region: "亚洲", name: "曼谷", code: "Asia/Bangkok", emoji: "🇹🇭", info: "泰国标准时间 (UTC+7)", favorite: false },
             { region: "亚洲", name: "孟买", code: "Asia/Kolkata", emoji: "🇮🇳", info: "印度标准时间 (UTC+5:30)", favorite: false },
             { region: "亚洲", name: "迪拜", code: "Asia/Dubai", emoji: "🇦🇪", info: "海湾标准时间 (UTC+4)", favorite: false },
+            { region: "亚洲", name: "首尔", code: "Asia/Seoul", emoji: "🇰🇷", info: "韩国标准时间 (UTC+9)", favorite: false },
+            { region: "亚洲", name: "台北", code: "Asia/Taipei", emoji: "🇹🇼", info: "台北标准时间 (UTC+8)", favorite: false },
+            { region: "亚洲", name: "吉隆坡", code: "Asia/Kuala_Lumpur", emoji: "🇲🇾", info: "马来西亚标准时间 (UTC+8)", favorite: false },
+            { region: "亚洲", name: "马尼拉", code: "Asia/Manila", emoji: "🇵🇭", info: "菲律宾标准时间 (UTC+8)", favorite: false },
+            { region: "亚洲", name: "雅加达", code: "Asia/Jakarta", emoji: "🇮🇩", info: "印度尼西亚西部时间 (UTC+7)", favorite: false },
             
             // 欧洲
             { region: "欧洲", name: "伦敦", code: "Europe/London", emoji: "🇬🇧", info: "格林威治标准时间 (UTC+0/+1)", favorite: false },
             { region: "欧洲", name: "巴黎", code: "Europe/Paris", emoji: "🇫🇷", info: "中欧时间 (UTC+1/+2)", favorite: false },
             { region: "欧洲", name: "柏林", code: "Europe/Berlin", emoji: "🇩🇪", info: "中欧时间 (UTC+1/+2)", favorite: false },
             { region: "欧洲", name: "莫斯科", code: "Europe/Moscow", emoji: "🇷🇺", info: "莫斯科标准时间 (UTC+3)", favorite: false },
+            { region: "欧洲", name: "罗马", code: "Europe/Rome", emoji: "🇮🇹", info: "中欧时间 (UTC+1/+2)", favorite: false },
+            { region: "欧洲", name: "马德里", code: "Europe/Madrid", emoji: "🇪🇸", info: "中欧时间 (UTC+1/+2)", favorite: false },
+            { region: "欧洲", name: "阿姆斯特丹", code: "Europe/Amsterdam", emoji: "🇳🇱", info: "中欧时间 (UTC+1/+2)", favorite: false },
+            { region: "欧洲", name: "苏黎世", code: "Europe/Zurich", emoji: "🇨🇭", info: "中欧时间 (UTC+1/+2)", favorite: false },
+            { region: "欧洲", name: "斯德哥尔摩", code: "Europe/Stockholm", emoji: "🇸🇪", info: "中欧时间 (UTC+1/+2)", favorite: false },
             
             // 北美洲
             { region: "北美洲", name: "纽约", code: "America/New_York", emoji: "🇺🇸", info: "美国东部时间 (UTC-5/-4)", favorite: false },
@@ -471,18 +526,31 @@
             { region: "北美洲", name: "丹佛", code: "America/Denver", emoji: "🇺🇸", info: "美国山地时间 (UTC-7/-6)", favorite: false },
             { region: "北美洲", name: "洛杉矶", code: "America/Los_Angeles", emoji: "🇺🇸", info: "美国太平洋时间 (UTC-8/-7)", favorite: false },
             { region: "北美洲", name: "多伦多", code: "America/Toronto", emoji: "🇨🇦", info: "加拿大东部时间 (UTC-5/-4)", favorite: false },
+            { region: "北美洲", name: "温哥华", code: "America/Vancouver", emoji: "🇨🇦", info: "加拿大太平洋时间 (UTC-8/-7)", favorite: false },
+            { region: "北美洲", name: "蒙特利尔", code: "America/Montreal", emoji: "🇨🇦", info: "加拿大东部时间 (UTC-5/-4)", favorite: false },
+            { region: "北美洲", name: "卡尔加里", code: "America/Edmonton", emoji: "🇨🇦", info: "加拿大山地时间 (UTC-7/-6)", favorite: false },
+            { region: "北美洲", name: "墨西哥城", code: "America/Mexico_City", emoji: "🇲🇽", info: "墨西哥中部时间 (UTC-6/-5)", favorite: false },
             
             // 大洋洲
             { region: "大洋洲", name: "悉尼", code: "Australia/Sydney", emoji: "🇦🇺", info: "澳大利亚东部时间 (UTC+10/+11)", favorite: false },
+            { region: "大洋洲", name: "墨尔本", code: "Australia/Melbourne", emoji: "🇦🇺", info: "澳大利亚东部时间 (UTC+10/+11)", favorite: false },
+            { region: "大洋洲", name: "珀斯", code: "Australia/Perth", emoji: "🇦🇺", info: "澳大利亚西部时间 (UTC+8)", favorite: false },
             { region: "大洋洲", name: "奥克兰", code: "Pacific/Auckland", emoji: "🇳🇿", info: "新西兰标准时间 (UTC+12/+13)", favorite: false },
+            { region: "大洋洲", name: "火奴鲁鲁", code: "Pacific/Honolulu", emoji: "🇺🇸", info: "夏威夷标准时间 (UTC-10)", favorite: false },
             
             // 南美洲
             { region: "南美洲", name: "圣保罗", code: "America/Sao_Paulo", emoji: "🇧🇷", info: "巴西利亚时间 (UTC-3/-2)", favorite: false },
             { region: "南美洲", name: "布宜诺斯艾利斯", code: "America/Argentina/Buenos_Aires", emoji: "🇦🇷", info: "阿根廷标准时间 (UTC-3)", favorite: false },
+            { region: "南美洲", name: "利马", code: "America/Lima", emoji: "🇵🇪", info: "秘鲁标准时间 (UTC-5)", favorite: false },
+            { region: "南美洲", name: "圣地亚哥", code: "America/Santiago", emoji: "🇨🇱", info: "智利标准时间 (UTC-4/-3)", favorite: false },
+            { region: "南美洲", name: "加拉加斯", code: "America/Caracas", emoji: "🇻🇪", info: "委内瑞拉标准时间 (UTC-4)", favorite: false },
             
             // 非洲
             { region: "非洲", name: "开罗", code: "Africa/Cairo", emoji: "🇪🇬", info: "东欧时间 (UTC+2)", favorite: false },
             { region: "非洲", name: "约翰内斯堡", code: "Africa/Johannesburg", emoji: "🇿🇦", info: "南非标准时间 (UTC+2)", favorite: false },
+            { region: "非洲", name: "拉各斯", code: "Africa/Lagos", emoji: "🇳🇬", info: "西非时间 (UTC+1)", favorite: false },
+            { region: "非洲", name: "卡萨布兰卡", code: "Africa/Casablanca", emoji: "🇲🇦", info: "摩洛哥标准时间 (UTC+0/+1)", favorite: false },
+            { region: "非洲", name: "内罗毕", code: "Africa/Nairobi", emoji: "🇰🇪", info: "东非时间 (UTC+3)", favorite: false },
             
             // 世界协调时间
             { region: "协调时间", name: "UTC", code: "UTC", emoji: "🌐", info: "协调世界时 (UTC+0)", favorite: false },
@@ -521,7 +589,7 @@
             populateTimezoneSelect();
             setInitialCustomTime();
             
-            // 设置定时器每秒更新时间 - 但不使用闪烁效果
+            // 设置定时器每秒更新时间
             setInterval(updateLocalTime, 1000);
             
             // 添加转换按钮点击事件
@@ -540,6 +608,31 @@
                 this.classList.add('active');
                 document.getElementById('format-24h').classList.remove('active');
                 updateLocalTime();
+            });
+            
+            // 添加"现在"按钮点击事件
+            document.getElementById('now-btn').addEventListener('click', function() {
+                customTimeActive = false;
+                const now = new Date();
+                referenceDate = new Date(now);
+                referenceDate.setHours(0, 0, 0, 0);
+                
+                // 更新自定义时间输入为当前时间
+                setInitialCustomTime();
+                
+                // 更新按钮状态
+                const nowBtn = this;
+                const originalText = nowBtn.textContent;
+                nowBtn.textContent = '✓ 已更新';
+                nowBtn.style.backgroundColor = '#059669';
+                
+                setTimeout(() => {
+                    nowBtn.textContent = originalText;
+                    nowBtn.style.backgroundColor = '#10b981';
+                }, 1500);
+                
+                // 立即更新所有时区显示
+                updateAllTimeZones(now);
             });
             
             // 添加搜索功能
@@ -563,14 +656,13 @@
                     const nextElement = title.nextElementSibling;
                     let hasVisibleZones = false;
                     
-                    // 查找该区域下所有可见的时区
-                    let currentElement = nextElement;
-                    while (currentElement && !currentElement.classList.contains('region-title')) {
-                        if (currentElement.classList.contains('zone') && currentElement.style.display !== 'none') {
-                            hasVisibleZones = true;
-                            break;
-                        }
-                        currentElement = currentElement.nextElementSibling;
+                    if (nextElement && nextElement.classList.contains('zones-grid')) {
+                        const zonesInGrid = nextElement.querySelectorAll('.zone');
+                        zonesInGrid.forEach(zone => {
+                            if (zone.style.display !== 'none') {
+                                hasVisibleZones = true;
+                            }
+                        });
                     }
                     
                     title.style.display = hasVisibleZones ? 'block' : 'none';
@@ -579,7 +671,7 @@
             
             // 设置参考日期为今天
             referenceDate = new Date();
-            referenceDate.setHours(0, 0, 0, 0); // 设置为当天的0时
+            referenceDate.setHours(0, 0, 0, 0);
         }
         
         // 加载收藏的时区
@@ -591,14 +683,12 @@
                         zone.favorite = favorites.includes(zone.code);
                     });
                 } else {
-                    // 使用内存存储的替代方案
                     timeZones.forEach(zone => {
                         zone.favorite = memoryStorage.favoriteTimeZones.includes(zone.code);
                     });
                 }
             } catch (e) {
                 console.log('Error loading favorites:', e);
-                // 出错时忽略，继续使用默认值
             }
         }
         
@@ -610,22 +700,19 @@
                 if (isStorageAvailable()) {
                     localStorage.setItem('favorites', JSON.stringify(favorites));
                 } else {
-                    // 使用内存存储的替代方案
                     memoryStorage.favoriteTimeZones = favorites;
                 }
             } catch (e) {
                 console.log('Error saving favorites:', e);
-                // 出错时忽略
             }
         }
         
-        // 更新本地时间显示 - 移除闪烁效果
+        // 更新本地时间显示
         function updateLocalTime() {
             const now = new Date();
             const localTimeElement = document.getElementById('local-time');
             const dstInfoElement = document.getElementById('dst-info');
             
-            // 直接更新时间，不添加闪烁动画
             localTimeElement.textContent = formatDateTime(now);
             
             // 检测是否使用夏令时
@@ -653,33 +740,25 @@
         
         // 检测是否使用夏令时
         function isDaylightSavingTime(date) {
-            // 使用改进的DST检测方法
             const jan = new Date(date.getFullYear(), 0, 1);
             const jul = new Date(date.getFullYear(), 6, 1);
             
             const janOffset = jan.getTimezoneOffset();
             const julOffset = jul.getTimezoneOffset();
             
-            // 如果冬季和夏季的时区偏移不同，并且当前偏移等于夏季偏移，则使用夏令时
             return janOffset !== julOffset && date.getTimezoneOffset() === Math.min(janOffset, julOffset);
         }
         
         // 使用更可靠的方法检测特定时区是否使用夏令时
         function checkDSTforTimezone(date, timezone) {
-            // 创建两个日期6个月间隔，用于检测DST变化
             const january = new Date(date.getFullYear(), 0, 1);
             const july = new Date(date.getFullYear(), 6, 1);
             
-            // 获取两个日期的UTC偏移（分钟）
             const januaryOffset = getUTCOffsetInMinutes(january, timezone);
             const julyOffset = getUTCOffsetInMinutes(july, timezone);
             
-            // 如果偏移不同，则该时区有DST
             if (januaryOffset !== julyOffset) {
-                // 获取当前日期的偏移
                 const currentOffset = getUTCOffsetInMinutes(date, timezone);
-                
-                // 如果当前偏移等于较大的(夏季)偏移，DST处于活动状态
                 return currentOffset === Math.max(januaryOffset, julyOffset);
             }
             
@@ -688,7 +767,6 @@
         
         // 获取特定时区的UTC偏移（分钟）
         function getUTCOffsetInMinutes(date, timezone) {
-            // 格式化日期并提取UTC偏移
             const formatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: timezone,
                 timeZoneName: 'longOffset'
@@ -717,7 +795,7 @@
             if (match) {
                 return `${match[1]}${match[2]}:${match[3]}`;
             }
-            return 'Z'; // 默认为UTC
+            return 'Z';
         }
         
         // 格式化日期时间
@@ -729,7 +807,7 @@
                 hour: '2-digit', 
                 minute: '2-digit', 
                 second: '2-digit',
-                hour12: !use24HFormat // 根据设置使用12或24小时制
+                hour12: !use24HFormat
             };
             
             return new Intl.DateTimeFormat('zh-CN', options).format(date);
@@ -763,7 +841,6 @@
                 const optgroup = document.createElement('optgroup');
                 optgroup.label = region;
                 
-                // 添加该区域的所有时区
                 timeZones.filter(tz => tz.region === region).forEach(zone => {
                     const option = document.createElement('option');
                     option.value = zone.code;
@@ -788,7 +865,7 @@
             document.getElementById('custom-time').value = initialDateTime;
         }
         
-        // 转换自定义时间（改进的更可靠方法）
+        // 转换自定义时间
         function convertCustomTime() {
             const timezoneSelect = document.getElementById('timezone-select');
             const customTimeInput = document.getElementById('custom-time');
@@ -798,38 +875,31 @@
                 return;
             }
             
-            // 获取选定的时区
             const selectedTimezone = timezoneSelect.value;
-            const inputDateTime = customTimeInput.value; // 格式: "2025-03-05T15:30"
+            const inputDateTime = customTimeInput.value;
             
-            // 创建ISO字符串，包含时区标识符
             const [datePart, timePart] = inputDateTime.split('T');
             const isoString = `${datePart}T${timePart}:00${getTimezoneOffsetString(selectedTimezone)}`;
             
-            // 转换为UTC时间
             const utcTime = new Date(isoString);
             
-            // 设置参考日期
             referenceDate = new Date(utcTime);
             referenceDate.setHours(0, 0, 0, 0);
             
             customTimeActive = true;
             
-            // 更新转换按钮文本以指示成功
             const convertBtn = document.getElementById('convert-btn');
             const originalText = convertBtn.textContent;
             convertBtn.textContent = '✓ 转换成功';
             
-            // 3秒后恢复原文本
             setTimeout(() => {
                 convertBtn.textContent = originalText;
             }, 1500);
             
-            // 更新所有时区
             updateAllTimeZones(utcTime);
         }
         
-        // 更新所有时区显示 - 移除闪烁动画
+        // 更新所有时区显示（使用双列网格布局）
         function updateAllTimeZones(baseTime) {
             const container = document.getElementById('time-zones-container');
             container.innerHTML = '';
@@ -843,35 +913,45 @@
                 favoritesTitle.textContent = '收藏的时区';
                 container.appendChild(favoritesTitle);
                 
-                // 添加收藏的时区
-                timeZones.filter(zone => zone.favorite).forEach((zone, index) => {
-                    createZoneElement(zone, baseTime, container);
+                const favoritesGrid = document.createElement('div');
+                favoritesGrid.className = 'zones-grid';
+                
+                timeZones.filter(zone => zone.favorite).forEach((zone) => {
+                    createZoneElement(zone, baseTime, favoritesGrid);
                 });
+                
+                container.appendChild(favoritesGrid);
             }
             
             // 按区域分组添加其余时区
             const regions = [...new Set(timeZones.map(tz => tz.region))];
             
-            regions.forEach((region, regionIndex) => {
-                // 添加区域标题
-                const regionTitle = document.createElement('div');
-                regionTitle.className = 'region-title';
-                regionTitle.textContent = region;
-                container.appendChild(regionTitle);
+            regions.forEach((region) => {
+                const regionZones = timeZones.filter(tz => tz.region === region && !tz.favorite);
                 
-                // 添加该区域的所有非收藏时区
-                timeZones.filter(tz => tz.region === region && !tz.favorite).forEach((zone) => {
-                    createZoneElement(zone, baseTime, container);
-                });
+                if (regionZones.length > 0) {
+                    const regionTitle = document.createElement('div');
+                    regionTitle.className = 'region-title';
+                    regionTitle.textContent = region;
+                    container.appendChild(regionTitle);
+                    
+                    const regionGrid = document.createElement('div');
+                    regionGrid.className = 'zones-grid';
+                    
+                    regionZones.forEach((zone) => {
+                        createZoneElement(zone, baseTime, regionGrid);
+                    });
+                    
+                    container.appendChild(regionGrid);
+                }
             });
         }
         
-        // 创建时区元素 - 移除闪烁动画
+        // 创建时区元素
         function createZoneElement(zone, baseTime, container) {
             const zoneElement = document.createElement('div');
             zoneElement.className = 'zone';
             
-            // 格式化该时区的时间
             const localizedTime = new Date(baseTime);
             const formatter = new Intl.DateTimeFormat('zh-CN', {
                 timeZone: zone.code,
@@ -880,19 +960,14 @@
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit',
-                hour12: !use24HFormat // 根据设置使用12或24小时制
+                hour12: !use24HFormat
             });
             
-            // 完整日期时间字符串
             const formattedDateTime = formatter.format(localizedTime);
-            
-            // 分离日期和时间
             const [formattedDate, formattedTime] = formattedDateTime.split(' ');
             
-            // 检测该时区是否使用夏令时
             const isDST = checkDSTforTimezone(baseTime, zone.code);
             
-            // 为日期比较创建日期对象
             const dateFormatter = new Intl.DateTimeFormat('en-CA', {
                 timeZone: zone.code,
                 year: 'numeric',
@@ -903,7 +978,6 @@
             const dateStr = dateFormatter.format(localizedTime);
             const zoneDateObj = new Date(dateStr);
             
-            // 确定日期关系（今天、昨天、明天）
             let dateRelation = "";
             let dateBadgeClass = "";
             
@@ -921,14 +995,12 @@
                 dateBadgeClass = "today";
             }
             
-            // 创建名称和信息容器
             const infoContainer = document.createElement('div');
             infoContainer.className = 'zone-info-container';
             
             const nameElement = document.createElement('div');
             nameElement.className = 'zone-name';
             
-            // 添加日夜图标
             const hourFormatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: zone.code,
                 hour: 'numeric',
@@ -936,7 +1008,6 @@
             });
             const hour = parseInt(hourFormatter.format(localizedTime), 10);
             
-            // 确定是白天还是夜晚（6am-6pm是白天）
             const isDaytime = hour >= 6 && hour < 18;
             const dayNightIcon = document.createElement('span');
             dayNightIcon.className = 'day-night-icon';
@@ -944,10 +1015,8 @@
             dayNightIcon.title = isDaytime ? '白天' : '夜间';
             nameElement.appendChild(dayNightIcon);
             
-            // 添加时区名称
             nameElement.innerHTML += `${zone.emoji} ${zone.name}`;
             
-            // 如果使用夏令时，添加标记
             if (isDST) {
                 const dstBadge = document.createElement('span');
                 dstBadge.className = 'dst-badge';
@@ -967,17 +1036,14 @@
             infoContainer.appendChild(dateElement);
             infoContainer.appendChild(infoElement);
             
-            // 创建时间元素
             const timeElement = document.createElement('div');
             timeElement.className = 'zone-time';
             timeElement.textContent = formattedTime;
             
-            // 创建日期徽章
             const dateBadge = document.createElement('div');
             dateBadge.className = `date-badge ${dateBadgeClass}`;
             dateBadge.textContent = dateRelation;
             
-            // 添加收藏按钮
             const favoriteBtn = document.createElement('button');
             favoriteBtn.className = 'favorite-btn';
             favoriteBtn.innerHTML = zone.favorite ? '★' : '☆';
@@ -987,14 +1053,10 @@
                 favoriteBtn.innerHTML = zone.favorite ? '★' : '☆';
                 favoriteBtn.title = zone.favorite ? '取消收藏' : '添加到收藏';
                 
-                // 保存收藏
                 saveFavorites();
-                
-                // 重新排序时区，将收藏放在顶部
                 updateAllTimeZones(baseTime);
             });
             
-            // 组装元素
             zoneElement.appendChild(infoContainer);
             zoneElement.appendChild(timeElement);
             zoneElement.appendChild(dateBadge);

@@ -3,12 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>人生歧路</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <style>
     :root {
       --primary-grad-start: #6a82fb; --primary-grad-end: #fc5c7d;
       --text-color: #333; --bg-light: #ffffff; --bg-grey: #f7f8fc;
       --border-color: #eef0f5; --progress-bar-bg: #e9ecef;
+    }
+    /* 移动端体验优化 */
+    html, body {
+      overscroll-behavior-y: contain; /* 禁止下拉刷新 */
     }
     body {
       margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -22,7 +26,6 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; text-align: center;
       display: none; box-sizing: border-box;
     }
-    /* 转折点通知 */
     #turningPointNotifier {
       position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
       background: linear-gradient(120deg, #ffc3a0, #ffafbd); color: #a54e2a;
@@ -43,9 +46,9 @@
     
     button { padding: 12px 18px; margin: 8px 4px; font-size: 16px; border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.3s; font-weight: 500; }
     .action-buttons button, .modal-content button { background: linear-gradient(120deg, #6a82fb, #fc5c7d); }
-    .action-buttons button:hover:not(:disabled), .modal-content button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(106, 130, 251, 0.4); }
+    .action-buttons button:hover:not(:disabled), .modal-content button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(106, 130, 251, 0.4); }
     button:disabled { background: #ccc !important; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; }
-    .upgrade-btn { background: linear-gradient(120deg, #84fab0, #8fd3f4); }
+    .upgrade-btn { background: linear-gradient(120deg, #84fab0, #8fd3f4); display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
     .upgrade-btn:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(135, 221, 240, 0.6); }
     
     #log { margin-top: 20px; padding: 10px; background: var(--bg-grey); border-radius: 10px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 13px; border: 1px solid var(--border-color); }
@@ -65,7 +68,7 @@
     <div class="game-box" id="gameBox">
       <h1>人生歧路</h1>
       <div class="status-panel">
-        <div id="totalRewardDisplay">0 元</div>
+        <div id="totalRewardDisplay" class="total-reward-display">0 元</div>
         <div class="progress-bar-container"><div class="progress-bar" id="freedomProgressBar"></div><div class="progress-bar-text" id="freedomProgressText"></div></div>
         <div class="sub-stats">
           <span>机会: <span id="chances">0</span></span>
@@ -83,25 +86,23 @@
         <h2>自我增值</h2>
         <button onclick="buyUpgrade('crit')" id="critUpgradeBtn" class="upgrade-btn"><span></span><span></span></button>
         <button onclick="buyUpgrade('reward')" id="rewardUpgradeBtn" class="upgrade-btn"><span></span><span></span></button>
+        <button onclick="buyUpgrade('market')" id="marketUpgradeBtn" class="upgrade-btn"><span></span><span></span></button>
       </div>
       <div id="log"></div>
     </div>
   </div>
 
   <div class="modal" id="ageModal"><div class="modal-content"><h2>人生开局</h2><p>你希望在多少岁时退休？</p><div><button onclick="startGame(20)">20岁</button><button onclick="startGame(30)">30岁</button><button onclick="startGame(40)">40岁</button><button onclick="startGame(50)">50岁</button><button onclick="startGame(60)">60岁</button><button onclick="startGame(70)">70岁</button><button onclick="startGame(80)">80岁</button></div></div></div>
-  <div class="modal" id="creditModal" style="display: none;"><div class="modal-content"><h2>信贷中心</h2><p>这是你人生唯一一次申请信贷的机会，获得的资金将背负20%的利息，未来30%的收入将自动用于还款。</p><div><button class="choice-btn" onclick="takeLoan(10000)">小额贷款<small>获得 10,000 元，总计需偿还 12,000 元。</small></button><button class="choice-btn" onclick="takeLoan(50000)">大额贷款<small>获得 50,000 元，总计需偿还 60,000 元。</small></button><button onclick="document.getElementById('creditModal').style.display = 'none'">再想想</button></div></div></div>
+  <div class="modal" id="creditModal" style="display: none;"><div class="modal-content"><h2>信贷中心</h2><p id="creditModalDescription"></p><div id="creditOptions"></div><button onclick="document.getElementById('creditModal').style.display = 'none'">再想想</button></div></div>
   <div class="modal" id="turningPointModal" style="display: none;"><div class="modal-content"><h2>关键转折点</h2><p>你站在人生的十字路口，必须做出选择：</p><div id="turningPointChoices"></div></div></div>
-  <div class="modal" id="settlementModal" style="display: none;"><div class="modal-content"><h2>人生总结报告</h2><p id="evaluationText"></p><button onclick="location.reload()">开启新的人生</button></div></div>
+  <div class="modal" id="settlementModal" style="display: none;"><div class="modal-content"><h2>人生总结报告</h2><p id="evaluationText"></p><button onclick="resetGame()">开启新的人生</button></div></div>
 
   <script>
-    // --- 游戏核心变量 ---
     let chances, totalReward, ticketPrice, retirementAge, freedomGoal, isTurningPointTriggered, turningPointIgnoreCount;
-    let ticketCount, upgrades, turningPointChoice, debt, loanTaken;
-    const LOAN_REPAYMENT_RATE = 0.3;
+    let ticketCount, upgrades, turningPointChoice, debt, loanTakenCount, credit;
     let costMultipliers = { ticket: 1.0, upgrade: 1.0 };
     let displayedTurningPoints = [];
 
-    // --- 关键转折点事件池 ---
     const allTurningPoints = [
         { id: 'era_wind', name: '时代东风', desc: '在接下来的5次努力中，你的所有收入都将翻倍。', effect: () => { upgrades.reward.tempMultiplier = 2; upgrades.reward.tempMultiplierTurns = 5; addLog('💨 你抓住了时代的东风！'); } },
         { id: 'home_haven', name: '家的港湾', desc: '你的家庭是你坚实的后盾，他们无条件为你提供了 30,000 元。', effect: () => { totalReward += 30000; addLog('🏡 家人给了你一笔钱，让你倍感温暖。'); } },
@@ -109,126 +110,120 @@
         { id: 'elite_edu', name: '精英教育', desc: '你花费巨资进行深造，基础回报等级直接提升5级！', effect: () => { for(let i=0; i<5; i++){ upgrades.reward.baseMultiplier += upgrades.reward.multiplierIncrement; } upgrades.reward.level += 5; addLog('🎓 精英教育让你脱胎换骨！'); } },
         { id: 'diligence', name: '勤能补拙', desc: '你的勤奋感动了上天，立刻获得3次额外的机会。', effect: () => { chances += 3; addLog('💪 你的勤奋获得了回报！'); } },
         { id: 'two_birds', name: '一石二鸟', desc: '你发现了一个绝佳机会，下一次“自我增值”的成本将降低90%。', effect: () => { costMultipliers.upgradeOnce = 0.1; addLog('🎯 你发现了一个一石二鸟的机会！'); } },
-        { id: 'health_crisis', name: '健康危机', desc: '一场意外的疾病让你损失了当前50%的积蓄。', effect: () => { totalReward = Math.floor(totalReward * 0.5); addLog('💔 健康危机让你损失惨重。'); } },
-        { id: 'lottery', name: '天降横财', desc: '你中了一张彩票，暴击率永久提升2%。', effect: () => { upgrades.crit.baseChance += 0.02; addLog('🎉 恭喜！你中了大奖！'); } },
+        { id: 'credit_leap', name: '信用飞跃', desc: '你的良好记录获得了认可，下一次贷款的利息将降低50%！', effect: () => { credit.interestModifier = 0.5; addLog('🚀 你的信用评级飞跃，获得了更优的贷款条件！'); } },
+        { id: 'debt_restructure', name: '债务重组', desc: '一个千载难逢的机会，你当前的债务被立刻免除了30%！', effect: () => { debt = Math.floor(debt * 0.7); addLog('💼 你成功进行了债务重组，压力大减！'); } },
         { id: 'noble_help', name: '贵人相助', desc: '一位神秘的贵人帮你还清了当前50%的债务。若无债务，则直接赠予你15,000元。', effect: () => { if (debt > 0) { debt = Math.floor(debt * 0.5); } else { totalReward += 15000; } addLog('🤝 一位贵人向你伸出了援手。'); } },
-        { id: 'stock_crash', name: '投资失利', desc: '金融市场崩溃，你的Ticket价值清零，全部作废。', effect: () => { chances -= ticketCount; ticketCount = 0; addLog('📉 市场崩溃，你的所有风险投资都化为泡影。'); } },
+        { id: 'financial_innovation', name: '金融创新', desc: '你接触到了新的金融工具，下一次贷款的额度将提升100%！', effect: () => { credit.amountModifier = 2.0; addLog('📈 金融创新让你的融资能力大增！'); } },
         { id: 'inspiration', name: '灵光一闪', desc: '你对人生有了新的感悟，下一次购买Ticket将额外获得2次机会。', effect: () => { upgrades.ticketBonus = 2; addLog('💡 你突然灵光一闪！'); } },
-        { id: 'burnout', name: '职业倦怠', desc: '你感到身心俱疲，接下来的3次努力收入都将减半。', effect: () => { upgrades.reward.tempMultiplier = 0.5; upgrades.reward.tempMultiplierTurns = 3; addLog('😫 你感到了职业倦怠。'); } },
+        { id: 'lottery', name: '天降横财', desc: '你中了一张彩票，暴击率永久提升2%。', effect: () => { upgrades.crit.baseChance += 0.02; addLog('🎉 恭喜！你中了大奖！'); } },
     ];
+    
+    const initialUpgrades = {
+        crit: { level: 1, cost: 10000, baseChance: 0.01, chanceIncrement: 0.005, costMultiplier: 3.5 },
+        reward: { level: 1, cost: 8000, baseMultiplier: 1.0, multiplierIncrement: 0.1, costMultiplier: 3 },
+        market: { level: 1, cost: 15000, priceReduction: 0.05, costMultiplier: 4 }
+    };
+
+    function initCreditSystem() { credit = { level: 0, baseAmount: 50000, baseInterest: 0.2, baseRepaymentRate: 0.3, interestModifier: 1.0, amountModifier: 1.0 }; }
+
+    function resetGame() {
+        document.getElementById('settlementModal').style.display = 'none';
+        document.getElementById('gameBox').style.display = 'none';
+        document.getElementById('log').innerHTML = '';
+        document.getElementById('ageModal').style.display = 'flex';
+    }
 
     function startGame(age) {
         retirementAge = age;
         chances = (age - 20) / 10 + 1;
         freedomGoal = 100000 * Math.pow(1.8, (age - 20) / 10);
         
-        totalReward = 0; ticketPrice = 1; ticketCount = 0; debt = 0; loanTaken = false;
+        totalReward = 0; ticketPrice = 1; ticketCount = 0; debt = 0; loanTakenCount = 0;
         isTurningPointTriggered = false; turningPointChoice = null; turningPointIgnoreCount = 0;
         costMultipliers = { ticket: 1.0, upgrade: 1.0 };
-        upgrades = {
-            crit: { level: 1, cost: 10000, baseChance: 0.01, chanceIncrement: 0.005, costMultiplier: 3.5 },
-            reward: { level: 1, cost: 8000, baseMultiplier: 1.0, multiplierIncrement: 0.1, costMultiplier: 3 }
-        };
+        upgrades = JSON.parse(JSON.stringify(initialUpgrades));
+        initCreditSystem();
 
         document.getElementById('ageModal').style.display = 'none';
         document.getElementById('gameBox').style.display = 'block';
+        document.querySelectorAll('.game-box button').forEach(b => b.disabled = false);
         addLog(`你选择了 ${age} 岁退休，人生开始了...`);
         updateUI();
     }
 
     function updateUI() {
+        const netWorth = totalReward - debt;
         document.getElementById('chances').innerText = chances;
         document.getElementById('ticketCount').innerText = ticketCount;
-        document.getElementById('ticketBtn').innerText = `风险投资 (${(ticketPrice * costMultipliers.ticket).toLocaleString()} 元)`;
-        document.getElementById('totalRewardDisplay').innerText = `${totalReward.toLocaleString()} 元`;
+        document.getElementById('ticketBtn').innerText = `风险投资 (${ticketPrice.toLocaleString()} 元)`;
+        document.getElementById('totalRewardDisplay').innerText = `${netWorth.toLocaleString()} 元`;
+        document.getElementById('totalRewardDisplay').style.color = netWorth < 0 ? '#e53935' : '#333';
 
-        if (debt > 0) {
-            document.getElementById('debtStatus').style.display = 'inline';
-            document.getElementById('debtAmount').innerText = debt.toLocaleString();
-        } else {
-            document.getElementById('debtStatus').style.display = 'none';
-        }
+        if (debt > 0) { document.getElementById('debtStatus').style.display = 'inline'; document.getElementById('debtAmount').innerText = debt.toLocaleString(); } 
+        else { document.getElementById('debtStatus').style.display = 'none'; }
 
-        const progress = Math.min((totalReward / freedomGoal) * 100, 100);
-        document.getElementById('freedomProgressBar').style.width = `${progress}%`;
+        const progress = Math.min((netWorth / freedomGoal) * 100, 100);
+        document.getElementById('freedomProgressBar').style.width = `${Math.max(0, progress)}%`;
         document.getElementById('freedomProgressText').innerText = `财富自由: ${progress.toFixed(1)}% (目标: ${freedomGoal.toLocaleString()})`;
 
-        document.getElementById('ticketBtn').disabled = totalReward < (ticketPrice * costMultipliers.ticket);
-        document.getElementById('creditBtn').disabled = loanTaken;
+        document.getElementById('ticketBtn').disabled = totalReward < ticketPrice;
         
-        ['crit', 'reward'].forEach(type => {
+        ['crit', 'reward', 'market'].forEach(type => {
             const upg = upgrades[type];
             const btn = document.getElementById(`${type}UpgradeBtn`);
             let currentCost = Math.floor(upg.cost * costMultipliers.upgrade);
             if(costMultipliers.upgradeOnce) currentCost = Math.floor(currentCost * costMultipliers.upgradeOnce);
-            btn.children[0].innerText = `${type === 'crit' ? '提升暴击率' : '提升基础回报'} (Lv. ${upg.level})`;
+            let name = '';
+            if (type === 'crit') name = '提升暴击率';
+            else if (type === 'reward') name = '提升基础回报';
+            else if (type === 'market') name = '学习金融知识';
+            btn.children[0].innerText = `${name} (Lv. ${upg.level})`;
             btn.children[1].innerText = `花费 ${currentCost.toLocaleString()}`;
             btn.disabled = totalReward < currentCost;
         });
     }
 
-    function addLog(html) {
-        const p = document.createElement('p');
-        p.innerHTML = html;
-        document.getElementById('log').prepend(p);
-    }
+    function addLog(html) { const p = document.createElement('p'); p.innerHTML = html; document.getElementById('log').prepend(p); }
 
     function pressButton() {
         if (chances <= 0) { alert("机会已用完！"); return; }
-
         if (document.getElementById('turningPointNotifier').style.display === 'block') {
             turningPointIgnoreCount++;
-            if (turningPointIgnoreCount >= 3) {
-                document.getElementById('turningPointNotifier').style.display = 'none';
-                addLog('你犹豫了太久，与一个重要的转折点擦肩而过。');
-            }
+            if (turningPointIgnoreCount >= 3) { document.getElementById('turningPointNotifier').style.display = 'none'; addLog('你犹豫了太久，与一个重要的转折点擦肩而过。'); }
         }
-
         chances--;
         let reward = Math.floor(((Math.random() < 0.9) ? (Math.random() * 100 + 1) : (Math.random() * 9999 + 100)) * upgrades.reward.baseMultiplier);
         
-        if (upgrades.reward.tempMultiplier && upgrades.reward.tempMultiplierTurns > 0) {
-            reward = Math.floor(reward * upgrades.reward.tempMultiplier);
-            upgrades.reward.tempMultiplierTurns--;
-        }
-
+        if (upgrades.reward.tempMultiplier && upgrades.reward.tempMultiplierTurns > 0) { reward = Math.floor(reward * upgrades.reward.tempMultiplier); upgrades.reward.tempMultiplierTurns--; }
         if (Math.random() < upgrades.crit.baseChance) { reward *= 10; addLog('⚡ 命运的暴击！'); }
         
         if (debt > 0) {
-            let payment = Math.min(debt, Math.floor(reward * LOAN_REPAYMENT_RATE));
-            debt -= payment;
-            reward -= payment;
+            const repaymentRate = Math.min(credit.baseRepaymentRate + (credit.level - 1) * 0.1, 1.0);
+            let payment = Math.min(debt, Math.floor(reward * repaymentRate));
+            debt -= payment; reward -= payment;
             addLog(`自动还款 ${payment.toLocaleString()} 元。`);
             if (debt === 0) { addLog('恭喜！你已还清所有债务！'); }
         }
         
         totalReward += reward;
         addLog(`努力: 获得 ${reward.toLocaleString()} 元`);
-        
-        if (chances === 0 && ticketCount === 0 && !isTurningPointTriggered) {
-            isTurningPointTriggered = true;
-            document.getElementById('turningPointNotifier').style.display = 'block';
-        }
+        if (chances === 0 && ticketCount === 0 && !isTurningPointTriggered) { isTurningPointTriggered = true; document.getElementById('turningPointNotifier').style.display = 'block'; }
         updateUI();
     }
 
     function activateTurningPoint() {
         const notifier = document.getElementById('turningPointNotifier');
         if (notifier.style.display !== 'block') return;
-        
         const shuffled = allTurningPoints.sort(() => 0.5 - Math.random());
         displayedTurningPoints = shuffled.slice(0, 3);
-        
         const choicesContainer = document.getElementById('turningPointChoices');
         choicesContainer.innerHTML = '';
         displayedTurningPoints.forEach(choice => {
-            const btn = document.createElement('button');
-            btn.className = 'choice-btn';
+            const btn = document.createElement('button'); btn.className = 'choice-btn';
             btn.innerHTML = `${choice.name}<small>${choice.desc}</small>`;
             btn.onclick = () => makeTurningPointChoice(choice.id);
             choicesContainer.appendChild(btn);
         });
-
         document.getElementById('turningPointModal').style.display = 'flex';
         notifier.style.display = 'none';
     }
@@ -236,78 +231,98 @@
     function makeTurningPointChoice(choiceId) {
         turningPointChoice = choiceId;
         const choice = allTurningPoints.find(c => c.id === choiceId);
-        if (choice) {
-            choice.effect();
-        }
+        if (choice) { choice.effect(); }
         document.getElementById('turningPointModal').style.display = 'none';
         updateUI();
     }
 
     function openCreditModal() {
+        const currentLevel = credit.level;
+        const currentInterest = (credit.baseInterest + currentLevel * 0.15) * credit.interestModifier;
+        const currentRepaymentRate = Math.min(credit.baseRepaymentRate + currentLevel * 0.1, 1.0);
+        const loanAmount = Math.floor(credit.baseAmount / Math.pow(2, currentLevel)) * credit.amountModifier;
+        document.getElementById('creditModalDescription').innerText = `这是你第 ${currentLevel + 1} 次申请信贷。当前利率为 ${(currentInterest * 100).toFixed(0)}%，未来 ${(currentRepaymentRate * 100).toFixed(0)}% 的收入将自动用于还款。`;
+        const optionsContainer = document.getElementById('creditOptions'); optionsContainer.innerHTML = '';
+        if (loanAmount > 1) {
+            const btn = document.createElement('button'); btn.className = 'choice-btn';
+            const repaymentAmount = Math.floor(loanAmount * (1 + currentInterest));
+            btn.innerHTML = `申请贷款<small>获得 ${loanAmount.toLocaleString()} 元，总计需偿还 ${repaymentAmount.toLocaleString()} 元。</small>`;
+            btn.onclick = () => takeLoan(loanAmount, repaymentAmount);
+            optionsContainer.appendChild(btn);
+        } else { optionsContainer.innerHTML = '<p>你的信用已经破产，无法再获得任何贷款。</p>'; }
         document.getElementById('creditModal').style.display = 'flex';
     }
 
-    function takeLoan(amount) {
-        loanTaken = true;
-        totalReward += amount;
-        debt += Math.floor(amount * 1.2);
-        addLog(`💰 你申请了 ${amount.toLocaleString()} 元的贷款，开始了负债前行的人生。`);
+    function takeLoan(amount, repaymentAmount) {
+        loanTakenCount++; totalReward += amount; debt += repaymentAmount;
+        addLog(`💰 你第 ${loanTakenCount} 次申请贷款，获得了 ${amount.toLocaleString()} 元。`);
+        credit.level++; credit.interestModifier = 1.0; credit.amountModifier = 1.0;
         document.getElementById('creditModal').style.display = 'none';
         updateUI();
     }
 
     function buyTicket() {
-        const cost = Math.floor(ticketPrice * costMultipliers.ticket);
-        if (totalReward < cost) return;
-        totalReward -= cost; ticketCount++; chances++;
-        if(upgrades.ticketBonus) {
-            chances += upgrades.ticketBonus;
-            addLog(`触发了“灵光一闪”，额外获得 ${upgrades.ticketBonus} 次机会！`);
-            delete upgrades.ticketBonus;
-        }
-        addLog(`🧾 第 ${ticketCount} 次风险投资，花费 ${cost.toLocaleString()} 元。`);
-        ticketPrice *= 2;
+        if (totalReward < ticketPrice) return;
+        totalReward -= ticketPrice; ticketCount++; chances++;
+        if(upgrades.ticketBonus) { chances += upgrades.ticketBonus; addLog(`触发了“灵光一闪”，额外获得 ${upgrades.ticketBonus} 次机会！`); delete upgrades.ticketBonus; }
+        addLog(`🧾 第 ${ticketCount} 次风险投资，花费 ${ticketPrice.toLocaleString()} 元。`);
+        
+        // 新的、更复杂的定价公式
+        const priceIncreaseMultiplier = Math.max(1.1, 1.6 - (upgrades.market.level - 1) * upgrades.market.priceReduction);
+        ticketPrice = Math.floor(ticketPrice * priceIncreaseMultiplier) + ticketCount * 50;
+        
         updateUI();
     }
     
     function buyUpgrade(type) {
         const upg = upgrades[type];
         let cost = Math.floor(upg.cost * costMultipliers.upgrade);
-        if (costMultipliers.upgradeOnce) {
-            cost = Math.floor(cost * costMultipliers.upgradeOnce);
-            delete costMultipliers.upgradeOnce;
-        }
+        if (costMultipliers.upgradeOnce) { cost = Math.floor(cost * costMultipliers.upgradeOnce); delete costMultipliers.upgradeOnce; }
         if (totalReward < cost) return;
         totalReward -= cost; upg.level++;
-        if (type === 'crit') upg.baseChance += upg.chanceIncrement; else upg.baseMultiplier += upg.multiplierIncrement;
-        addLog(`🔧 自我增值，花费 ${cost.toLocaleString()}。`);
+        if (type === 'crit') upg.baseChance += upg.chanceIncrement; 
+        else if (type === 'reward') upg.baseMultiplier += upg.multiplierIncrement;
+        addLog(`🔧 自我增值 (${type}), 花费 ${cost.toLocaleString()}。`);
         upg.cost = Math.floor(upg.cost * upg.costMultiplier);
         updateUI();
     }
 
     function settle() {
-      document.querySelectorAll('.action-buttons button, .upgrade-btn').forEach(b => b.disabled = true);
+      document.querySelectorAll('.game-box button').forEach(b => b.disabled = true);
       const evaluationText = generateEvaluation();
       document.getElementById("evaluationText").innerText = evaluationText;
       document.getElementById("settlementModal").style.display = "flex";
     }
 
     function generateEvaluation() {
-        const goalScore = Math.min(totalReward / freedomGoal, 1) * 100;
+        const finalNetWorth = totalReward - debt;
+        const goalScore = Math.min(finalNetWorth / freedomGoal, 1) * 100;
         const ambitionScore = 100 - (retirementAge - 20) / 60 * 100;
+        const growthLevel = upgrades.crit.level + upgrades.reward.level + upgrades.market.level - 3;
         const personas = [
-            { name: "破产的赌徒", desc: "你的人生是一场豪赌，杠杆加满，风险拉满。但命运并未站在你这边，最终，你不仅没能实现财富自由，反而背负着一身债务狼狈离场。你的故事警示后人：不要与趋势为敌。", cond: () => debt > 0 },
-            { name: "精明的资本家", desc: "你深谙资本的运作之道，在关键时刻果断举债，利用杠杆撬动了远超自身的资源。最终，你不仅还清了所有债务，还积累了惊人的财富。你不是钱的主人，你是驾驭钱的神。", cond: () => loanTaken && debt === 0 && goalScore > 120 },
+            { name: "债务的奴隶", desc: "你的人生被无尽的贷款吞噬。每一次借贷都像饮鸩止渴，最终让你陷入了万劫不复的深渊。你的净资产为负，不仅没能实现自由，反而成为了数字的奴隶。这是一个关于失控和毁灭的悲剧。", cond: () => finalNetWorth < 0 },
+            { name: "杠杆之王", desc: "你将“借贷”的艺术发挥到了极致。在人生的关键节点，你果断举债，用别人的钱为你铺就了通往成功的红毯。最终，你不仅还清了所有债务，还积累了远超目标的惊人财富。你的人生证明了，风险与回报永远是孪生兄弟。", cond: () => loanTakenCount > 2 && debt === 0 && goalScore > 120 },
+            { name: "Bootstrap传奇", desc: "你只在最关键的时刻动用了一次杠杆，用这“第一桶金”撬动了整个未来，之后便依靠自己的能力稳步前行，再未向资本低头。你的故事，是关于精准判断和强大执行力的最佳范本。", cond: () => loanTakenCount === 1 && debt === 0 && goalScore > 100 },
             { name: "天选的创业者", desc: "你选择了英年早退，却凭借惊人的胆识和无与伦比的运气，在极短时间内完成了财富的原始积累，并远超目标。你的故事将被写进教科书，成为无数人模仿却无法复制的传奇。", cond: () => ambitionScore > 60 && goalScore >= 100 && ticketCount > 5 },
-            { name: "孤独的求道者", desc: "你对世俗的财富目标不屑一顾，将所有资源都投入到自我增值中。虽然最终的财富可能并不惊人，但你内在的成长无人能及。你的人生证明了，过程比结果更重要。", cond: () => (upgrades.crit.level + upgrades.reward.level) > 10 && ticketCount < 5 && goalScore < 50 },
-            { name: "勤勉的工匠", desc: "你选择了漫长而稳健的道路，不相信一夜暴富的神话，只相信持续的努力和投入。你的人生没有大起大落，但通过不懈的奋斗和自我提升，最终也实现了体面的生活。", cond: () => ambitionScore < 40 && (upgrades.crit.level + upgrades.reward.level) > 5 && goalScore > 70 },
-            { name: "幸运的庸人", desc: "你的人生似乎被命运格外眷顾，或许是继承了遗产，或许是抓住了某个转瞬即逝的风口。你并未付出太多努力，也未曾进行高风险的投资，却也获得了不错的结局。这份幸运，是你的天赋，也是你的诅咒。", cond: () => turningPointChoice === 'home_haven' && goalScore > 80 && ticketCount < 5 && (upgrades.crit.level + upgrades.reward.level) < 5 },
+            { name: "孤独的求道者", desc: "你对世俗的财富目标不屑一顾，将所有资源都投入到自我增值中。虽然最终的财富可能并不惊人，但你内在的成长无人能及。你的人生证明了，过程比结果更重要。", cond: () => growthLevel > 10 && ticketCount < 5 && goalScore < 50 },
+            { name: "稳健的保守派", desc: "你的人生信条是“决不负债”。面对信贷的诱惑，你始终不为所动，坚信只有脚踏实地的收入才最可靠。这份稳健让你免于破产，但也可能错过了某些一飞冲天的机会。", cond: () => loanTakenCount === 0 && finalNetWorth > 0 },
+            { name: "勤勉的工匠", desc: "你选择了漫长而稳健的道路，不相信一夜暴富的神话，只相信持续的努力和投入。你的人生没有大起大落，但通过不懈的奋斗和自我提升，最终也实现了体面的生活。", cond: () => ambitionScore < 40 && growthLevel > 5 && goalScore > 70 },
             { name: "被时代抛弃的人", desc: "你选择了最长的奋斗年限，却在时代的浪潮中迷失了方向。无论是投资、成长还是把握机会，你似乎都慢了一步。最终，漫长的人生只留下了一声叹息和微薄的积蓄。", cond: () => ambitionScore < 20 && goalScore < 20 },
             { name: "一个标准的普通人", desc: "你的人生就像这个世界上99%的人一样。有过梦想，有过挣扎，也曾站在选择的十字路口。不好不坏，不悲不喜，最终过上了安稳而平凡的一生。这，或许就是生活的真相。", cond: () => true }
         ];
         const matchedPersona = personas.find(p => p.cond());
-        return `【人生原型】: ${matchedPersona.name}\n\n${matchedPersona.desc}\n\n------\n【人生数据】\n退休年龄: ${retirementAge}岁\n最终财富: ${totalReward.toLocaleString()}元\n财富自由完成度: ${goalScore.toFixed(1)}%\n风险投资次数: ${ticketCount}次\n自我增值等级: ${upgrades.crit.level + upgrades.reward.level - 2}级\n最终负债: ${debt.toLocaleString()}元`;
+        return `【人生原型】: ${matchedPersona.name}\n\n${matchedPersona.desc}\n\n------\n【人生数据】\n退休年龄: ${retirementAge}岁\n最终净资产: ${finalNetWorth.toLocaleString()}元\n财富自由完成度: ${Math.max(0, goalScore).toFixed(1)}%\n风险投资次数: ${ticketCount}次\n贷款次数: ${loanTakenCount}次\n自我增值等级: ${growthLevel}级`;
     }
+
+    // --- 移动端体验优化脚本 ---
+    let lastTouch = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = new Date().getTime();
+        if (now - lastTouch <= 300) {
+            event.preventDefault();
+        }
+        lastTouch = now;
+    }, false);
 
     window.onload = () => { document.getElementById('ageModal').style.display = 'flex'; };
   </script>

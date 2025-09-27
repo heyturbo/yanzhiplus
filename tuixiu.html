@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8">
+  <title>人生模拟器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    :root {
+      --primary-grad-start: #6a82fb;
+      --primary-grad-end: #fc5c7d;
+      --accent-grad-start: #ffc3a0;
+      --accent-grad-end: #ffafbd;
+      --text-color: #333;
+      --bg-light: #ffffff;
+      --bg-grey: #f7f8fc;
+      --border-color: #eef0f5;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .game-box {
+      background: var(--bg-light);
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+      display: none; /* Initially hidden */
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 26px;
+      background: linear-gradient(120deg, var(--primary-grad-start), var(--primary-grad-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 状态面板 */
+    .status-panel {
+      background: var(--bg-grey);
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border: 1px solid var(--border-color);
+    }
+    .total-reward-display {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+    }
+    .sub-stats {
+      display: flex;
+      justify-content: space-around;
+      font-size: 15px;
+      color: #555;
+    }
+
+    /* 按钮 */
+    .action-buttons button, .upgrade-btn {
+      padding: 12px 18px;
+      margin: 8px 4px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+    .action-buttons button {
+      background: linear-gradient(120deg, var(--primary-grad-start), var(--primary-grad-end));
+    }
+    .action-buttons button:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(106, 130, 251, 0.4);
+    }
+    .action-buttons button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    /* 升级区域 */
+    .upgrades-section {
+      margin-top: 25px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+    .upgrades-section h2 { font-size: 18px; margin: 0 0 10px; color: #555; }
+    .upgrade-btn {
+      width: 100%;
+      background: linear-gradient(120deg, #84fab0, #8fd3f4);
+      display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
+    }
+    .upgrade-btn:hover:not(:disabled) {
+       transform: translateY(-2px);
+       box-shadow: 0 4px 10px rgba(135, 221, 240, 0.6);
+    }
+    .upgrade-btn:disabled { background: #e0e0e0; cursor: not-allowed; color: #999; }
+    
+    /* 日志 */
+    #log {
+      margin-top: 20px; padding: 10px; background: var(--bg-grey); border-radius: 10px;
+      text-align: left; max-height: 150px; overflow-y: auto; font-size: 13px;
+      border: 1px solid var(--border-color);
+    }
+    #log p { margin: 6px 0; padding: 0 5px; line-height: 1.5; }
+
+    /* 动态奖励样式 */
+    .reward-normal { color: #333; }
+    .reward-hundred { color: #007bff; font-weight: bold; }
+    .reward-thousand { color: #ff9800; font-size: 1.1em; font-weight: bold; }
+    .reward-big { color: #e53935; font-size: 1.2em; font-weight: bold; animation: pulse 0.8s infinite alternate; }
+    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
+
+    /* 模态框/弹窗 */
+    .modal {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); display: flex; justify-content: center;
+      align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;
+    }
+    .modal-content {
+      background: white; padding: 30px; border-radius: 15px;
+      max-width: 500px; width: 100%; text-align: center;
+    }
+    .modal-content h2 { margin-top: 0; }
+    .modal-content p { color: #666; line-height: 1.6; }
+    .age-options button { margin: 5px; }
+    #evaluationText { text-align: left; white-space: pre-wrap; margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <div class="game-box" id="gameBox">
+    <h1>人生模拟器</h1>
+    <div class="status-panel">
+      <div id="totalRewardDisplay" class="total-reward-display">0 元</div>
+      <div class="sub-stats">
+        <span>机会: <span id="chances">0</span></span>
+        <span>Tickets: <span id="ticketCount">0</span></span>
+      </div>
+    </div>
+    <div class="action-buttons">
+      <button onclick="pressButton()" id="pressBtn">努力一次</button>
+      <button onclick="buyTicket()" id="ticketBtn">风险投资 (1 元)</button>
+      <button onclick="settle()" id="settleBtn">结算人生</button>
+    </div>
+    <div class="upgrades-section">
+      <h2>自我增值</h2>
+      <button onclick="buyUpgrade('crit')" id="critUpgradeBtn" class="upgrade-btn">
+        <span>提升暴击率 (Lv. 1)</span><span>花费 10000</span>
+      </button>
+      <button onclick="buyUpgrade('reward')" id="rewardUpgradeBtn" class="upgrade-btn">
+        <span>提升基础回报 (Lv. 1)</span><span>花费 8000</span>
+      </button>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <!-- 初始年龄选择弹窗 -->
+  <div class="modal" id="ageModal">
+    <div class="modal-content">
+      <h2>人生开局</h2>
+      <p>在开始你的“人生”之前，请做出第一个重大决定：<br>你希望在多少岁时退休？</p>
+      <div class="age-options">
+        <button onclick="startGame(20)">20岁 (1次机会)</button>
+        <button onclick="startGame(30)">30岁 (2次机会)</button>
+        <button onclick="startGame(40)">40岁 (3次机会)</button>
+        <button onclick="startGame(50)">50岁 (4次机会)</button>
+        <button onclick="startGame(60)">60岁 (5次机会)</button>
+        <button onclick="startGame(70)">70岁 (6次机会)</button>
+        <button onclick="startGame(80)">80岁 (7次机会)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结算评语弹窗 -->
+  <div class="modal" id="settlementModal" style="display: none;">
+    <div class="modal-content">
+      <h2>人生总结报告</h2>
+      <p id="evaluationText"></p>
+      <button onclick="restartGame()">开启新的人生</button>
+    </div>
+  </div>
+
+  <div id="messageBox"></div> <!-- 消息提示框，样式在之前版本中已定义 -->
+
+  <script>
+    let chances, totalReward, ticketPrice, ticketCount, retirementAge;
+    let upgrades;
+    
+    const initialUpgrades = {
+      crit: { level: 1, cost: 10000, baseChance: 0.01, chanceIncrement: 0.005, costMultiplier: 3.5 },
+      reward: { level: 1, cost: 8000, baseMultiplier: 1.0, multiplierIncrement: 0.1, costMultiplier: 3 }
+    };
+
+    function startGame(age) {
+      retirementAge = age;
+      chances = (age - 20) / 10 + 1;
+      
+      totalReward = 0;
+      ticketPrice = 1;
+      ticketCount = 0;
+      upgrades = JSON.parse(JSON.stringify(initialUpgrades));
+
+      document.getElementById("log").innerHTML = "";
+      document.getElementById("pressBtn").disabled = false;
+      document.getElementById("settleBtn").disabled = false;
+      
+      document.getElementById("ageModal").style.display = "none";
+      document.getElementById("gameBox").style.display = "block";
+      
+      addLog(`你选择了 ${age} 岁退休，获得了 ${chances} 次初始机会。人生开始了...`);
+      updateUI();
+    }
+
+    function updateUI() {
+      document.getElementById("chances").innerText = chances;
+      document.getElementById("ticketCount").innerText = ticketCount;
+      document.getElementById("ticketBtn").innerText = `风险投资 (${ticketPrice.toLocaleString()} 元)`;
+
+      const rewardDisplay = document.getElementById("totalRewardDisplay");
+      rewardDisplay.innerHTML = `${totalReward.toLocaleString()} 元`;
+      let cls = "reward-normal";
+      if (totalReward >= 1000000) cls = "reward-big";
+      else if (totalReward >= 10000) cls = "reward-thousand";
+      else if (totalReward >= 1000) cls = "reward-hundred";
+      rewardDisplay.className = `total-reward-display ${cls}`;
+
+      document.getElementById("ticketBtn").disabled = totalReward < ticketPrice;
+      document.getElementById("critUpgradeBtn").disabled = totalReward < upgrades.crit.cost;
+      document.getElementById("rewardUpgradeBtn").disabled = totalReward < upgrades.reward.cost;
+      
+      const critBtn = document.getElementById('critUpgradeBtn');
+      critBtn.children[0].innerText = `提升暴击率 (Lv. ${upgrades.crit.level})`;
+      critBtn.children[1].innerText = `花费 ${upgrades.crit.cost.toLocaleString()}`;
+
+      const rewardBtn = document.getElementById('rewardUpgradeBtn');
+      rewardBtn.children[0].innerText = `提升基础回报 (Lv. ${upgrades.reward.level})`;
+      rewardBtn.children[1].innerText = `花费 ${upgrades.reward.cost.toLocaleString()}`;
+    }
+
+    function addLog(html) {
+      const logEl = document.getElementById("log");
+      const p = document.createElement("p");
+      p.innerHTML = html;
+      logEl.prepend(p);
+    }
+
+    function formatReward(num) {
+      let cls = "reward-normal";
+      if (num >= 100000) cls = "reward-big";
+      else if (num >= 1000) cls = "reward-thousand";
+      else if (num >= 100) cls = "reward-hundred";
+      return `<span class="${cls}">${num.toLocaleString()}</span>`;
+    }
+
+    function getRandomReward() {
+      const rand = Math.random();
+      let baseReward = (rand < 0.9) ? (Math.floor(Math.random() * 100) + 1) : (Math.floor(Math.random() * 9999) + 100);
+      return Math.floor(baseReward * upgrades.reward.baseMultiplier);
+    }
+
+    function pressButton() {
+      if (chances <= 0) {
+        alert("机会已用完，请进行风险投资或直接结算。");
+        return;
+      }
+      chances--;
+      let reward = getRandomReward();
+      let eventMsg = "";
+
+      if (Math.random() < upgrades.crit.baseChance) {
+        reward *= 10;
+        eventMsg = "⚡ 命运的暴击！";
+        alert(eventMsg);
+      }
+      
+      totalReward += reward;
+      addLog(`第 ${ticketCount + ((retirementAge - 20) / 10 + 1) - chances} 次努力: 获得 ${formatReward(reward)} 元 ${eventMsg}`);
+      updateUI();
+    }
+
+    function buyTicket() {
+      if (totalReward < ticketPrice) return;
+      totalReward -= ticketPrice;
+      ticketCount++;
+      chances++;
+      
+      addLog(`🧾 进行第 ${ticketCount} 次风险投资，花费 ${ticketPrice.toLocaleString()} 元，获得1次额外机会。`);
+      
+      ticketPrice *= 2;
+      updateUI();
+    }
+    
+    function buyUpgrade(type) {
+        const upgrade = upgrades[type];
+        if (totalReward < upgrade.cost) return;
+
+        totalReward -= upgrade.cost;
+        upgrade.level++;
+        
+        let logMsg = "";
+        if (type === 'crit') {
+            upgrade.baseChance += upgrade.chanceIncrement;
+            logMsg = `🔧 你投资了自己，暴击率提升至 ${(upgrade.baseChance * 100).toFixed(2)}%！花费 ${upgrade.cost.toLocaleString()}。`;
+        } else if (type === 'reward') {
+            upgrade.baseMultiplier += upgrade.multiplierIncrement;
+            logMsg = `🔧 你参加了培训，基础回报提升至 ${upgrade.baseMultiplier.toFixed(1)}x！花费 ${upgrade.cost.toLocaleString()}。`;
+        }
+        
+        upgrade.cost = Math.floor(upgrade.cost * upgrade.costMultiplier);
+        addLog(logMsg);
+        updateUI();
+    }
+
+    function settle() {
+      document.getElementById("pressBtn").disabled = true;
+      document.getElementById("ticketBtn").disabled = true;
+      document.getElementById("settleBtn").disabled = true;
+      document.getElementById("critUpgradeBtn").disabled = true;
+      document.getElementById("rewardUpgradeBtn").disabled = true;
+
+      const evaluationText = generateEvaluation();
+      document.getElementById("evaluationText").innerText = evaluationText;
+      document.getElementById("settlementModal").style.display = "flex";
+    }
+
+    function generateEvaluation() {
+        // 1. 定义评价维度
+        let ageTier, rewardTier, ticketTier, upgradeTier;
+
+        if (retirementAge <= 30) ageTier = { name: "英年早退", text: `你选择了在 ${retirementAge} 岁就早早离场，梦想着以最短的时间换取最大的回报。` };
+        else if (retirementAge <= 60) ageTier = { name: "标准人生", text: `你规划了 ${retirementAge} 岁的标准退休路线，一步一个脚印。` };
+        else ageTier = { name: "大器晚成", text: `你决定奋斗到 ${retirementAge} 岁，相信时间会给予回报，属于典型的大器晚成型选手。` };
+
+        if (totalReward < 10000) rewardTier = { name: "勉强糊口", text: `然而，你最终的积蓄仅有 ${totalReward.toLocaleString()} 元，在这个时代，这笔钱可能只够勉强糊口。` };
+        else if (totalReward < 500000) rewardTier = { name: "小有成就", text: `最终，你带着 ${totalReward.toLocaleString()} 元光荣退休，算得上小有成就，生活无忧。` };
+        else if (totalReward < 10000000) rewardTier = { name: "人生赢家", text: `恭喜！你以 ${totalReward.toLocaleString()} 元的巨款结束了奋斗，成为了不折不扣的人生赢家。` };
+        else rewardTier = { name: "富可敌国", text: `你的名字足以载入史册！${totalReward.toLocaleString()} 元的财富，让你达到了富可敌国的境界。` };
+
+        const totalUpgradeLevel = upgrades.crit.level + upgrades.reward.level - 2;
+        if (totalUpgradeLevel === 0) upgradeTier = { name: "原地踏步", text: "在个人成长方面，你似乎信奉“无为而治”，从未进行任何投资。" };
+        else if (totalUpgradeLevel <= 5) upgradeTier = { name: "偶尔充电", text: `你进行了 ${totalUpgradeLevel} 次自我提升，偶尔会想起来要给自己充充电。` };
+        else upgradeTier = { name: "终身学习者", text: `你狂热地进行了 ${totalUpgradeLevel} 次自我增值，是个不折不扣的终身学习者。` };
+
+        if (ticketCount === 0) ticketTier = { name: "绝对保守", text: "面对风险，你选择了绝对的保守，从未进行过一次“风险投资”。" };
+        else if (ticketCount <= 5) ticketTier = { name: "谨慎投机", text: `你尝试了 ${ticketCount} 次风险投资，行事相当谨慎。` };
+        else ticketTier = { name: "激进赌徒", text: `你疯狂加码了 ${ticketCount} 次，像一个红了眼的赌徒，坚信风险背后是无尽的财富。` };
+
+        // 2. 组合生成最终评语
+        let finalVerdict = "";
+        if (rewardTier.name === "富可敌国" || (rewardTier.name === "人生赢家" && ageTier.name === "英年早退")) {
+            finalVerdict = "天选之子：你的人生堪称传奇！无论是运气、胆识还是远见，你都远超常人。";
+        } else if (rewardTier.name === "勉强糊口" && ageTier.name === "大器晚成") {
+            finalVerdict = "沉寂的一生：你付出了漫长的时间，却收获甚微。或许是时运不济，或许是努力错了方向，这结果令人唏嘘。";
+        } else if (ticketTier.name === "激进赌徒" && rewardTier.name === "勉强糊口") {
+            finalVerdict = "豪赌的代价：你将身家性命都押在了风险投资上，但命运并未眷顾你。高风险并未带来高回报，反而让你一贫如洗。";
+        } else if (upgradeTier.name === "终身学习者" && rewardTier.name !== "勉强糊口") {
+            finalVerdict = "知识改变命运：你坚定地相信投资自己才是最好的投资。事实证明，你的远见卓识为你带来了丰厚的回报。";
+        } else {
+            finalVerdict = "一个普通人：像大多数人一样，你的人生在平凡中开始，在平凡中落幕。不好不坏，但真实。";
+        }
+
+        return `${ageTier.text}\n${rewardTier.text}\n\n${upgradeTier.text}\n${ticketTier.text}\n\n【最终评定】\n${finalVerdict}`;
+    }
+
+    function restartGame() {
+      document.getElementById("settlementModal").style.display = "none";
+      document.getElementById("gameBox").style.display = "none";
+      document.getElementById("ageModal").style.display = "flex";
+    }
+
+    // 初始调用
+    window.onload = () => {
+        document.getElementById("ageModal").style.display = "flex";
+    };
+  </script>
+</body>
+</html>

@@ -2,392 +2,314 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8">
-  <title>人生模拟器</title>
+  <title>人生歧路</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     :root {
-      --primary-grad-start: #6a82fb;
-      --primary-grad-end: #fc5c7d;
-      --accent-grad-start: #ffc3a0;
-      --accent-grad-end: #ffafbd;
-      --text-color: #333;
-      --bg-light: #ffffff;
-      --bg-grey: #f7f8fc;
-      --border-color: #eef0f5;
+      --primary-grad-start: #6a82fb; --primary-grad-end: #fc5c7d;
+      --text-color: #333; --bg-light: #ffffff; --bg-grey: #f7f8fc;
+      --border-color: #eef0f5; --progress-bar-bg: #e9ecef;
     }
-
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      background: linear-gradient(135deg, var(--primary-grad-start), var(--primary-grad-end));
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
+      margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #434343, #000000);
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; padding: 20px; box-sizing: border-box;
     }
-
+    .game-container { position: relative; max-width: 450px; width: 100%; }
     .game-box {
-      background: var(--bg-light);
-      padding: 25px;
-      border-radius: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      max-width: 450px;
-      width: 100%;
-      text-align: center;
-      display: none; /* Initially hidden */
+      background: var(--bg-light); padding: 25px; border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2); width: 100%; text-align: center;
+      display: none; box-sizing: border-box;
     }
-
-    h1 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 26px;
-      background: linear-gradient(120deg, var(--primary-grad-start), var(--primary-grad-end));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    /* 转折点通知 */
+    #turningPointNotifier {
+      position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(120deg, #ffc3a0, #ffafbd); color: #a54e2a;
+      padding: 8px 20px; border-radius: 20px; font-weight: 700;
+      cursor: pointer; z-index: 1001; box-shadow: 0 0 15px #ffc3a0;
+      animation: pulse-glow 1.5s infinite alternate; display: none;
     }
-
-    /* 状态面板 */
-    .status-panel {
-      background: var(--bg-grey);
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 20px;
-      border: 1px solid var(--border-color);
-    }
-    .total-reward-display {
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 10px;
-      transition: all 0.3s ease;
-      letter-spacing: 1px;
-    }
-    .sub-stats {
-      display: flex;
-      justify-content: space-around;
-      font-size: 15px;
-      color: #555;
-    }
-
-    /* 按钮 */
-    .action-buttons button, .upgrade-btn {
-      padding: 12px 18px;
-      margin: 8px 4px;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      color: white;
-      cursor: pointer;
-      transition: all 0.3s;
-      font-weight: 500;
-    }
-    .action-buttons button {
-      background: linear-gradient(120deg, var(--primary-grad-start), var(--primary-grad-end));
-    }
-    .action-buttons button:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(106, 130, 251, 0.4);
-    }
-    .action-buttons button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
-
-    /* 升级区域 */
-    .upgrades-section {
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 1px solid var(--border-color);
-    }
-    .upgrades-section h2 { font-size: 18px; margin: 0 0 10px; color: #555; }
-    .upgrade-btn {
-      width: 100%;
-      background: linear-gradient(120deg, #84fab0, #8fd3f4);
-      display: flex; justify-content: space-between; align-items: center; box-sizing: border-box;
-    }
-    .upgrade-btn:hover:not(:disabled) {
-       transform: translateY(-2px);
-       box-shadow: 0 4px 10px rgba(135, 221, 240, 0.6);
-    }
-    .upgrade-btn:disabled { background: #e0e0e0; cursor: not-allowed; color: #999; }
+    @keyframes pulse-glow { from { box-shadow: 0 0 5px #ffc3a0; } to { box-shadow: 0 0 25px #ffafbd, 0 0 10px #fff; } }
     
-    /* 日志 */
-    #log {
-      margin-top: 20px; padding: 10px; background: var(--bg-grey); border-radius: 10px;
-      text-align: left; max-height: 150px; overflow-y: auto; font-size: 13px;
-      border: 1px solid var(--border-color);
-    }
+    h1 { margin: 0 0 20px; font-size: 28px; background: linear-gradient(120deg, var(--primary-grad-start), var(--primary-grad-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .status-panel { background: var(--bg-grey); border-radius: 12px; padding: 15px; margin-bottom: 20px; border: 1px solid var(--border-color); }
+    .total-reward-display { font-size: 32px; font-weight: 700; margin-bottom: 10px; }
+    .progress-bar-container { background: var(--progress-bar-bg); border-radius: 10px; height: 20px; margin: 10px 0; overflow: hidden; position: relative; }
+    .progress-bar { background: linear-gradient(90deg, #90f7ec, #32ccbc); height: 100%; width: 0%; border-radius: 10px; transition: width 0.5s ease; }
+    .progress-bar-text { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #333; font-weight: 600; }
+    .sub-stats { display: flex; justify-content: space-around; font-size: 15px; color: #555; }
+    .debt-status { color: #e53935; font-weight: 600; }
+    
+    button { padding: 12px 18px; margin: 8px 4px; font-size: 16px; border: none; border-radius: 10px; color: white; cursor: pointer; transition: all 0.3s; font-weight: 500; }
+    .action-buttons button, .modal-content button { background: linear-gradient(120deg, #6a82fb, #fc5c7d); }
+    .action-buttons button:hover:not(:disabled), .modal-content button:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(106, 130, 251, 0.4); }
+    button:disabled { background: #ccc !important; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; }
+    .upgrade-btn { background: linear-gradient(120deg, #84fab0, #8fd3f4); }
+    .upgrade-btn:hover:not(:disabled) { box-shadow: 0 4px 10px rgba(135, 221, 240, 0.6); }
+    
+    #log { margin-top: 20px; padding: 10px; background: var(--bg-grey); border-radius: 10px; text-align: left; max-height: 150px; overflow-y: auto; font-size: 13px; border: 1px solid var(--border-color); }
     #log p { margin: 6px 0; padding: 0 5px; line-height: 1.5; }
-
-    /* 动态奖励样式 */
-    .reward-normal { color: #333; }
-    .reward-hundred { color: #007bff; font-weight: bold; }
-    .reward-thousand { color: #ff9800; font-size: 1.1em; font-weight: bold; }
-    .reward-big { color: #e53935; font-size: 1.2em; font-weight: bold; animation: pulse 0.8s infinite alternate; }
-    @keyframes pulse { from { transform: scale(1); } to { transform: scale(1.05); } }
-
-    /* 模态框/弹窗 */
-    .modal {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6); display: flex; justify-content: center;
-      align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box;
-    }
-    .modal-content {
-      background: white; padding: 30px; border-radius: 15px;
-      max-width: 500px; width: 100%; text-align: center;
-    }
-    .modal-content h2 { margin-top: 0; }
-    .modal-content p { color: #666; line-height: 1.6; }
-    .age-options button { margin: 5px; }
-    #evaluationText { text-align: left; white-space: pre-wrap; margin-bottom: 20px; }
+    
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; padding: 20px; box-sizing: border-box; backdrop-filter: blur(5px); }
+    .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 100%; text-align: center; }
+    .modal-content h2 { margin-top: 0; } .modal-content p { color: #666; line-height: 1.6; }
+    .choice-btn { display: block; width: 100%; margin: 10px 0 !important; text-align: left; }
+    .choice-btn small { display: block; font-weight: normal; font-size: 13px; opacity: 0.8; }
+    #evaluationText { text-align: left; white-space: pre-wrap; margin-bottom: 20px; max-height: 50vh; overflow-y: auto; }
   </style>
 </head>
 <body>
-  <div class="game-box" id="gameBox">
-    <h1>人生模拟器</h1>
-    <div class="status-panel">
-      <div id="totalRewardDisplay" class="total-reward-display">0 元</div>
-      <div class="sub-stats">
-        <span>机会: <span id="chances">0</span></span>
-        <span>Tickets: <span id="ticketCount">0</span></span>
+  <div class="game-container">
+    <div id="turningPointNotifier" onclick="activateTurningPoint()">✨ 命运歧路</div>
+    <div class="game-box" id="gameBox">
+      <h1>人生歧路</h1>
+      <div class="status-panel">
+        <div id="totalRewardDisplay">0 元</div>
+        <div class="progress-bar-container"><div class="progress-bar" id="freedomProgressBar"></div><div class="progress-bar-text" id="freedomProgressText"></div></div>
+        <div class="sub-stats">
+          <span>机会: <span id="chances">0</span></span>
+          <span id="debtStatus" style="display: none;">负债: <span id="debtAmount">0</span></span>
+          <span>Tickets: <span id="ticketCount">0</span></span>
+        </div>
       </div>
-    </div>
-    <div class="action-buttons">
-      <button onclick="pressButton()" id="pressBtn">努力一次</button>
-      <button onclick="buyTicket()" id="ticketBtn">风险投资 (1 元)</button>
-      <button onclick="settle()" id="settleBtn">结算人生</button>
-    </div>
-    <div class="upgrades-section">
-      <h2>自我增值</h2>
-      <button onclick="buyUpgrade('crit')" id="critUpgradeBtn" class="upgrade-btn">
-        <span>提升暴击率 (Lv. 1)</span><span>花费 10000</span>
-      </button>
-      <button onclick="buyUpgrade('reward')" id="rewardUpgradeBtn" class="upgrade-btn">
-        <span>提升基础回报 (Lv. 1)</span><span>花费 8000</span>
-      </button>
-    </div>
-    <div id="log"></div>
-  </div>
-
-  <!-- 初始年龄选择弹窗 -->
-  <div class="modal" id="ageModal">
-    <div class="modal-content">
-      <h2>人生开局</h2>
-      <p>在开始你的“人生”之前，请做出第一个重大决定：<br>你希望在多少岁时退休？</p>
-      <div class="age-options">
-        <button onclick="startGame(20)">20岁 (1次机会)</button>
-        <button onclick="startGame(30)">30岁 (2次机会)</button>
-        <button onclick="startGame(40)">40岁 (3次机会)</button>
-        <button onclick="startGame(50)">50岁 (4次机会)</button>
-        <button onclick="startGame(60)">60岁 (5次机会)</button>
-        <button onclick="startGame(70)">70岁 (6次机会)</button>
-        <button onclick="startGame(80)">80岁 (7次机会)</button>
+      <div class="action-buttons">
+        <button onclick="pressButton()" id="pressBtn">努力一次</button>
+        <button onclick="buyTicket()" id="ticketBtn">风险投资</button>
+        <button onclick="openCreditModal()" id="creditBtn">申请信贷</button>
+        <button onclick="settle()" id="settleBtn">结算人生</button>
       </div>
+      <div class="upgrades-section">
+        <h2>自我增值</h2>
+        <button onclick="buyUpgrade('crit')" id="critUpgradeBtn" class="upgrade-btn"><span></span><span></span></button>
+        <button onclick="buyUpgrade('reward')" id="rewardUpgradeBtn" class="upgrade-btn"><span></span><span></span></button>
+      </div>
+      <div id="log"></div>
     </div>
   </div>
 
-  <!-- 结算评语弹窗 -->
-  <div class="modal" id="settlementModal" style="display: none;">
-    <div class="modal-content">
-      <h2>人生总结报告</h2>
-      <p id="evaluationText"></p>
-      <button onclick="restartGame()">开启新的人生</button>
-    </div>
-  </div>
-
-  <div id="messageBox"></div> <!-- 消息提示框，样式在之前版本中已定义 -->
+  <div class="modal" id="ageModal"><div class="modal-content"><h2>人生开局</h2><p>你希望在多少岁时退休？</p><div><button onclick="startGame(20)">20岁</button><button onclick="startGame(30)">30岁</button><button onclick="startGame(40)">40岁</button><button onclick="startGame(50)">50岁</button><button onclick="startGame(60)">60岁</button><button onclick="startGame(70)">70岁</button><button onclick="startGame(80)">80岁</button></div></div></div>
+  <div class="modal" id="creditModal" style="display: none;"><div class="modal-content"><h2>信贷中心</h2><p>这是你人生唯一一次申请信贷的机会，获得的资金将背负20%的利息，未来30%的收入将自动用于还款。</p><div><button class="choice-btn" onclick="takeLoan(10000)">小额贷款<small>获得 10,000 元，总计需偿还 12,000 元。</small></button><button class="choice-btn" onclick="takeLoan(50000)">大额贷款<small>获得 50,000 元，总计需偿还 60,000 元。</small></button><button onclick="document.getElementById('creditModal').style.display = 'none'">再想想</button></div></div></div>
+  <div class="modal" id="turningPointModal" style="display: none;"><div class="modal-content"><h2>关键转折点</h2><p>你站在人生的十字路口，必须做出选择：</p><div id="turningPointChoices"></div></div></div>
+  <div class="modal" id="settlementModal" style="display: none;"><div class="modal-content"><h2>人生总结报告</h2><p id="evaluationText"></p><button onclick="location.reload()">开启新的人生</button></div></div>
 
   <script>
-    let chances, totalReward, ticketPrice, ticketCount, retirementAge;
-    let upgrades;
-    
-    const initialUpgrades = {
-      crit: { level: 1, cost: 10000, baseChance: 0.01, chanceIncrement: 0.005, costMultiplier: 3.5 },
-      reward: { level: 1, cost: 8000, baseMultiplier: 1.0, multiplierIncrement: 0.1, costMultiplier: 3 }
-    };
+    // --- 游戏核心变量 ---
+    let chances, totalReward, ticketPrice, retirementAge, freedomGoal, isTurningPointTriggered, turningPointIgnoreCount;
+    let ticketCount, upgrades, turningPointChoice, debt, loanTaken;
+    const LOAN_REPAYMENT_RATE = 0.3;
+    let costMultipliers = { ticket: 1.0, upgrade: 1.0 };
+    let displayedTurningPoints = [];
+
+    // --- 关键转折点事件池 ---
+    const allTurningPoints = [
+        { id: 'era_wind', name: '时代东风', desc: '在接下来的5次努力中，你的所有收入都将翻倍。', effect: () => { upgrades.reward.tempMultiplier = 2; upgrades.reward.tempMultiplierTurns = 5; addLog('💨 你抓住了时代的东风！'); } },
+        { id: 'home_haven', name: '家的港湾', desc: '你的家庭是你坚实的后盾，他们无条件为你提供了 30,000 元。', effect: () => { totalReward += 30000; addLog('🏡 家人给了你一笔钱，让你倍感温暖。'); } },
+        { id: 'comeback', name: '卷土重来', desc: '你总结了过去的经验，风险投资的成本永久恢复到初始状态。', effect: () => { ticketPrice = 1; addLog('🔄 你决定卷土重来，投资成本大大降低！'); } },
+        { id: 'elite_edu', name: '精英教育', desc: '你花费巨资进行深造，基础回报等级直接提升5级！', effect: () => { for(let i=0; i<5; i++){ upgrades.reward.baseMultiplier += upgrades.reward.multiplierIncrement; } upgrades.reward.level += 5; addLog('🎓 精英教育让你脱胎换骨！'); } },
+        { id: 'diligence', name: '勤能补拙', desc: '你的勤奋感动了上天，立刻获得3次额外的机会。', effect: () => { chances += 3; addLog('💪 你的勤奋获得了回报！'); } },
+        { id: 'two_birds', name: '一石二鸟', desc: '你发现了一个绝佳机会，下一次“自我增值”的成本将降低90%。', effect: () => { costMultipliers.upgradeOnce = 0.1; addLog('🎯 你发现了一个一石二鸟的机会！'); } },
+        { id: 'health_crisis', name: '健康危机', desc: '一场意外的疾病让你损失了当前50%的积蓄。', effect: () => { totalReward = Math.floor(totalReward * 0.5); addLog('💔 健康危机让你损失惨重。'); } },
+        { id: 'lottery', name: '天降横财', desc: '你中了一张彩票，暴击率永久提升2%。', effect: () => { upgrades.crit.baseChance += 0.02; addLog('🎉 恭喜！你中了大奖！'); } },
+        { id: 'noble_help', name: '贵人相助', desc: '一位神秘的贵人帮你还清了当前50%的债务。若无债务，则直接赠予你15,000元。', effect: () => { if (debt > 0) { debt = Math.floor(debt * 0.5); } else { totalReward += 15000; } addLog('🤝 一位贵人向你伸出了援手。'); } },
+        { id: 'stock_crash', name: '投资失利', desc: '金融市场崩溃，你的Ticket价值清零，全部作废。', effect: () => { chances -= ticketCount; ticketCount = 0; addLog('📉 市场崩溃，你的所有风险投资都化为泡影。'); } },
+        { id: 'inspiration', name: '灵光一闪', desc: '你对人生有了新的感悟，下一次购买Ticket将额外获得2次机会。', effect: () => { upgrades.ticketBonus = 2; addLog('💡 你突然灵光一闪！'); } },
+        { id: 'burnout', name: '职业倦怠', desc: '你感到身心俱疲，接下来的3次努力收入都将减半。', effect: () => { upgrades.reward.tempMultiplier = 0.5; upgrades.reward.tempMultiplierTurns = 3; addLog('😫 你感到了职业倦怠。'); } },
+    ];
 
     function startGame(age) {
-      retirementAge = age;
-      chances = (age - 20) / 10 + 1;
-      
-      totalReward = 0;
-      ticketPrice = 1;
-      ticketCount = 0;
-      upgrades = JSON.parse(JSON.stringify(initialUpgrades));
+        retirementAge = age;
+        chances = (age - 20) / 10 + 1;
+        freedomGoal = 100000 * Math.pow(1.8, (age - 20) / 10);
+        
+        totalReward = 0; ticketPrice = 1; ticketCount = 0; debt = 0; loanTaken = false;
+        isTurningPointTriggered = false; turningPointChoice = null; turningPointIgnoreCount = 0;
+        costMultipliers = { ticket: 1.0, upgrade: 1.0 };
+        upgrades = {
+            crit: { level: 1, cost: 10000, baseChance: 0.01, chanceIncrement: 0.005, costMultiplier: 3.5 },
+            reward: { level: 1, cost: 8000, baseMultiplier: 1.0, multiplierIncrement: 0.1, costMultiplier: 3 }
+        };
 
-      document.getElementById("log").innerHTML = "";
-      document.getElementById("pressBtn").disabled = false;
-      document.getElementById("settleBtn").disabled = false;
-      
-      document.getElementById("ageModal").style.display = "none";
-      document.getElementById("gameBox").style.display = "block";
-      
-      addLog(`你选择了 ${age} 岁退休，获得了 ${chances} 次初始机会。人生开始了...`);
-      updateUI();
+        document.getElementById('ageModal').style.display = 'none';
+        document.getElementById('gameBox').style.display = 'block';
+        addLog(`你选择了 ${age} 岁退休，人生开始了...`);
+        updateUI();
     }
 
     function updateUI() {
-      document.getElementById("chances").innerText = chances;
-      document.getElementById("ticketCount").innerText = ticketCount;
-      document.getElementById("ticketBtn").innerText = `风险投资 (${ticketPrice.toLocaleString()} 元)`;
+        document.getElementById('chances').innerText = chances;
+        document.getElementById('ticketCount').innerText = ticketCount;
+        document.getElementById('ticketBtn').innerText = `风险投资 (${(ticketPrice * costMultipliers.ticket).toLocaleString()} 元)`;
+        document.getElementById('totalRewardDisplay').innerText = `${totalReward.toLocaleString()} 元`;
 
-      const rewardDisplay = document.getElementById("totalRewardDisplay");
-      rewardDisplay.innerHTML = `${totalReward.toLocaleString()} 元`;
-      let cls = "reward-normal";
-      if (totalReward >= 1000000) cls = "reward-big";
-      else if (totalReward >= 10000) cls = "reward-thousand";
-      else if (totalReward >= 1000) cls = "reward-hundred";
-      rewardDisplay.className = `total-reward-display ${cls}`;
+        if (debt > 0) {
+            document.getElementById('debtStatus').style.display = 'inline';
+            document.getElementById('debtAmount').innerText = debt.toLocaleString();
+        } else {
+            document.getElementById('debtStatus').style.display = 'none';
+        }
 
-      document.getElementById("ticketBtn").disabled = totalReward < ticketPrice;
-      document.getElementById("critUpgradeBtn").disabled = totalReward < upgrades.crit.cost;
-      document.getElementById("rewardUpgradeBtn").disabled = totalReward < upgrades.reward.cost;
-      
-      const critBtn = document.getElementById('critUpgradeBtn');
-      critBtn.children[0].innerText = `提升暴击率 (Lv. ${upgrades.crit.level})`;
-      critBtn.children[1].innerText = `花费 ${upgrades.crit.cost.toLocaleString()}`;
+        const progress = Math.min((totalReward / freedomGoal) * 100, 100);
+        document.getElementById('freedomProgressBar').style.width = `${progress}%`;
+        document.getElementById('freedomProgressText').innerText = `财富自由: ${progress.toFixed(1)}% (目标: ${freedomGoal.toLocaleString()})`;
 
-      const rewardBtn = document.getElementById('rewardUpgradeBtn');
-      rewardBtn.children[0].innerText = `提升基础回报 (Lv. ${upgrades.reward.level})`;
-      rewardBtn.children[1].innerText = `花费 ${upgrades.reward.cost.toLocaleString()}`;
+        document.getElementById('ticketBtn').disabled = totalReward < (ticketPrice * costMultipliers.ticket);
+        document.getElementById('creditBtn').disabled = loanTaken;
+        
+        ['crit', 'reward'].forEach(type => {
+            const upg = upgrades[type];
+            const btn = document.getElementById(`${type}UpgradeBtn`);
+            let currentCost = Math.floor(upg.cost * costMultipliers.upgrade);
+            if(costMultipliers.upgradeOnce) currentCost = Math.floor(currentCost * costMultipliers.upgradeOnce);
+            btn.children[0].innerText = `${type === 'crit' ? '提升暴击率' : '提升基础回报'} (Lv. ${upg.level})`;
+            btn.children[1].innerText = `花费 ${currentCost.toLocaleString()}`;
+            btn.disabled = totalReward < currentCost;
+        });
     }
 
     function addLog(html) {
-      const logEl = document.getElementById("log");
-      const p = document.createElement("p");
-      p.innerHTML = html;
-      logEl.prepend(p);
-    }
-
-    function formatReward(num) {
-      let cls = "reward-normal";
-      if (num >= 100000) cls = "reward-big";
-      else if (num >= 1000) cls = "reward-thousand";
-      else if (num >= 100) cls = "reward-hundred";
-      return `<span class="${cls}">${num.toLocaleString()}</span>`;
-    }
-
-    function getRandomReward() {
-      const rand = Math.random();
-      let baseReward = (rand < 0.9) ? (Math.floor(Math.random() * 100) + 1) : (Math.floor(Math.random() * 9999) + 100);
-      return Math.floor(baseReward * upgrades.reward.baseMultiplier);
+        const p = document.createElement('p');
+        p.innerHTML = html;
+        document.getElementById('log').prepend(p);
     }
 
     function pressButton() {
-      if (chances <= 0) {
-        alert("机会已用完，请进行风险投资或直接结算。");
-        return;
-      }
-      chances--;
-      let reward = getRandomReward();
-      let eventMsg = "";
+        if (chances <= 0) { alert("机会已用完！"); return; }
 
-      if (Math.random() < upgrades.crit.baseChance) {
-        reward *= 10;
-        eventMsg = "⚡ 命运的暴击！";
-        alert(eventMsg);
-      }
-      
-      totalReward += reward;
-      addLog(`第 ${ticketCount + ((retirementAge - 20) / 10 + 1) - chances} 次努力: 获得 ${formatReward(reward)} 元 ${eventMsg}`);
-      updateUI();
+        if (document.getElementById('turningPointNotifier').style.display === 'block') {
+            turningPointIgnoreCount++;
+            if (turningPointIgnoreCount >= 3) {
+                document.getElementById('turningPointNotifier').style.display = 'none';
+                addLog('你犹豫了太久，与一个重要的转折点擦肩而过。');
+            }
+        }
+
+        chances--;
+        let reward = Math.floor(((Math.random() < 0.9) ? (Math.random() * 100 + 1) : (Math.random() * 9999 + 100)) * upgrades.reward.baseMultiplier);
+        
+        if (upgrades.reward.tempMultiplier && upgrades.reward.tempMultiplierTurns > 0) {
+            reward = Math.floor(reward * upgrades.reward.tempMultiplier);
+            upgrades.reward.tempMultiplierTurns--;
+        }
+
+        if (Math.random() < upgrades.crit.baseChance) { reward *= 10; addLog('⚡ 命运的暴击！'); }
+        
+        if (debt > 0) {
+            let payment = Math.min(debt, Math.floor(reward * LOAN_REPAYMENT_RATE));
+            debt -= payment;
+            reward -= payment;
+            addLog(`自动还款 ${payment.toLocaleString()} 元。`);
+            if (debt === 0) { addLog('恭喜！你已还清所有债务！'); }
+        }
+        
+        totalReward += reward;
+        addLog(`努力: 获得 ${reward.toLocaleString()} 元`);
+        
+        if (chances === 0 && ticketCount === 0 && !isTurningPointTriggered) {
+            isTurningPointTriggered = true;
+            document.getElementById('turningPointNotifier').style.display = 'block';
+        }
+        updateUI();
+    }
+
+    function activateTurningPoint() {
+        const notifier = document.getElementById('turningPointNotifier');
+        if (notifier.style.display !== 'block') return;
+        
+        const shuffled = allTurningPoints.sort(() => 0.5 - Math.random());
+        displayedTurningPoints = shuffled.slice(0, 3);
+        
+        const choicesContainer = document.getElementById('turningPointChoices');
+        choicesContainer.innerHTML = '';
+        displayedTurningPoints.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerHTML = `${choice.name}<small>${choice.desc}</small>`;
+            btn.onclick = () => makeTurningPointChoice(choice.id);
+            choicesContainer.appendChild(btn);
+        });
+
+        document.getElementById('turningPointModal').style.display = 'flex';
+        notifier.style.display = 'none';
+    }
+
+    function makeTurningPointChoice(choiceId) {
+        turningPointChoice = choiceId;
+        const choice = allTurningPoints.find(c => c.id === choiceId);
+        if (choice) {
+            choice.effect();
+        }
+        document.getElementById('turningPointModal').style.display = 'none';
+        updateUI();
+    }
+
+    function openCreditModal() {
+        document.getElementById('creditModal').style.display = 'flex';
+    }
+
+    function takeLoan(amount) {
+        loanTaken = true;
+        totalReward += amount;
+        debt += Math.floor(amount * 1.2);
+        addLog(`💰 你申请了 ${amount.toLocaleString()} 元的贷款，开始了负债前行的人生。`);
+        document.getElementById('creditModal').style.display = 'none';
+        updateUI();
     }
 
     function buyTicket() {
-      if (totalReward < ticketPrice) return;
-      totalReward -= ticketPrice;
-      ticketCount++;
-      chances++;
-      
-      addLog(`🧾 进行第 ${ticketCount} 次风险投资，花费 ${ticketPrice.toLocaleString()} 元，获得1次额外机会。`);
-      
-      ticketPrice *= 2;
-      updateUI();
+        const cost = Math.floor(ticketPrice * costMultipliers.ticket);
+        if (totalReward < cost) return;
+        totalReward -= cost; ticketCount++; chances++;
+        if(upgrades.ticketBonus) {
+            chances += upgrades.ticketBonus;
+            addLog(`触发了“灵光一闪”，额外获得 ${upgrades.ticketBonus} 次机会！`);
+            delete upgrades.ticketBonus;
+        }
+        addLog(`🧾 第 ${ticketCount} 次风险投资，花费 ${cost.toLocaleString()} 元。`);
+        ticketPrice *= 2;
+        updateUI();
     }
     
     function buyUpgrade(type) {
-        const upgrade = upgrades[type];
-        if (totalReward < upgrade.cost) return;
-
-        totalReward -= upgrade.cost;
-        upgrade.level++;
-        
-        let logMsg = "";
-        if (type === 'crit') {
-            upgrade.baseChance += upgrade.chanceIncrement;
-            logMsg = `🔧 你投资了自己，暴击率提升至 ${(upgrade.baseChance * 100).toFixed(2)}%！花费 ${upgrade.cost.toLocaleString()}。`;
-        } else if (type === 'reward') {
-            upgrade.baseMultiplier += upgrade.multiplierIncrement;
-            logMsg = `🔧 你参加了培训，基础回报提升至 ${upgrade.baseMultiplier.toFixed(1)}x！花费 ${upgrade.cost.toLocaleString()}。`;
+        const upg = upgrades[type];
+        let cost = Math.floor(upg.cost * costMultipliers.upgrade);
+        if (costMultipliers.upgradeOnce) {
+            cost = Math.floor(cost * costMultipliers.upgradeOnce);
+            delete costMultipliers.upgradeOnce;
         }
-        
-        upgrade.cost = Math.floor(upgrade.cost * upgrade.costMultiplier);
-        addLog(logMsg);
+        if (totalReward < cost) return;
+        totalReward -= cost; upg.level++;
+        if (type === 'crit') upg.baseChance += upg.chanceIncrement; else upg.baseMultiplier += upg.multiplierIncrement;
+        addLog(`🔧 自我增值，花费 ${cost.toLocaleString()}。`);
+        upg.cost = Math.floor(upg.cost * upg.costMultiplier);
         updateUI();
     }
 
     function settle() {
-      document.getElementById("pressBtn").disabled = true;
-      document.getElementById("ticketBtn").disabled = true;
-      document.getElementById("settleBtn").disabled = true;
-      document.getElementById("critUpgradeBtn").disabled = true;
-      document.getElementById("rewardUpgradeBtn").disabled = true;
-
+      document.querySelectorAll('.action-buttons button, .upgrade-btn').forEach(b => b.disabled = true);
       const evaluationText = generateEvaluation();
       document.getElementById("evaluationText").innerText = evaluationText;
       document.getElementById("settlementModal").style.display = "flex";
     }
 
     function generateEvaluation() {
-        // 1. 定义评价维度
-        let ageTier, rewardTier, ticketTier, upgradeTier;
-
-        if (retirementAge <= 30) ageTier = { name: "英年早退", text: `你选择了在 ${retirementAge} 岁就早早离场，梦想着以最短的时间换取最大的回报。` };
-        else if (retirementAge <= 60) ageTier = { name: "标准人生", text: `你规划了 ${retirementAge} 岁的标准退休路线，一步一个脚印。` };
-        else ageTier = { name: "大器晚成", text: `你决定奋斗到 ${retirementAge} 岁，相信时间会给予回报，属于典型的大器晚成型选手。` };
-
-        if (totalReward < 10000) rewardTier = { name: "勉强糊口", text: `然而，你最终的积蓄仅有 ${totalReward.toLocaleString()} 元，在这个时代，这笔钱可能只够勉强糊口。` };
-        else if (totalReward < 500000) rewardTier = { name: "小有成就", text: `最终，你带着 ${totalReward.toLocaleString()} 元光荣退休，算得上小有成就，生活无忧。` };
-        else if (totalReward < 10000000) rewardTier = { name: "人生赢家", text: `恭喜！你以 ${totalReward.toLocaleString()} 元的巨款结束了奋斗，成为了不折不扣的人生赢家。` };
-        else rewardTier = { name: "富可敌国", text: `你的名字足以载入史册！${totalReward.toLocaleString()} 元的财富，让你达到了富可敌国的境界。` };
-
-        const totalUpgradeLevel = upgrades.crit.level + upgrades.reward.level - 2;
-        if (totalUpgradeLevel === 0) upgradeTier = { name: "原地踏步", text: "在个人成长方面，你似乎信奉“无为而治”，从未进行任何投资。" };
-        else if (totalUpgradeLevel <= 5) upgradeTier = { name: "偶尔充电", text: `你进行了 ${totalUpgradeLevel} 次自我提升，偶尔会想起来要给自己充充电。` };
-        else upgradeTier = { name: "终身学习者", text: `你狂热地进行了 ${totalUpgradeLevel} 次自我增值，是个不折不扣的终身学习者。` };
-
-        if (ticketCount === 0) ticketTier = { name: "绝对保守", text: "面对风险，你选择了绝对的保守，从未进行过一次“风险投资”。" };
-        else if (ticketCount <= 5) ticketTier = { name: "谨慎投机", text: `你尝试了 ${ticketCount} 次风险投资，行事相当谨慎。` };
-        else ticketTier = { name: "激进赌徒", text: `你疯狂加码了 ${ticketCount} 次，像一个红了眼的赌徒，坚信风险背后是无尽的财富。` };
-
-        // 2. 组合生成最终评语
-        let finalVerdict = "";
-        if (rewardTier.name === "富可敌国" || (rewardTier.name === "人生赢家" && ageTier.name === "英年早退")) {
-            finalVerdict = "天选之子：你的人生堪称传奇！无论是运气、胆识还是远见，你都远超常人。";
-        } else if (rewardTier.name === "勉强糊口" && ageTier.name === "大器晚成") {
-            finalVerdict = "沉寂的一生：你付出了漫长的时间，却收获甚微。或许是时运不济，或许是努力错了方向，这结果令人唏嘘。";
-        } else if (ticketTier.name === "激进赌徒" && rewardTier.name === "勉强糊口") {
-            finalVerdict = "豪赌的代价：你将身家性命都押在了风险投资上，但命运并未眷顾你。高风险并未带来高回报，反而让你一贫如洗。";
-        } else if (upgradeTier.name === "终身学习者" && rewardTier.name !== "勉强糊口") {
-            finalVerdict = "知识改变命运：你坚定地相信投资自己才是最好的投资。事实证明，你的远见卓识为你带来了丰厚的回报。";
-        } else {
-            finalVerdict = "一个普通人：像大多数人一样，你的人生在平凡中开始，在平凡中落幕。不好不坏，但真实。";
-        }
-
-        return `${ageTier.text}\n${rewardTier.text}\n\n${upgradeTier.text}\n${ticketTier.text}\n\n【最终评定】\n${finalVerdict}`;
+        const goalScore = Math.min(totalReward / freedomGoal, 1) * 100;
+        const ambitionScore = 100 - (retirementAge - 20) / 60 * 100;
+        const personas = [
+            { name: "破产的赌徒", desc: "你的人生是一场豪赌，杠杆加满，风险拉满。但命运并未站在你这边，最终，你不仅没能实现财富自由，反而背负着一身债务狼狈离场。你的故事警示后人：不要与趋势为敌。", cond: () => debt > 0 },
+            { name: "精明的资本家", desc: "你深谙资本的运作之道，在关键时刻果断举债，利用杠杆撬动了远超自身的资源。最终，你不仅还清了所有债务，还积累了惊人的财富。你不是钱的主人，你是驾驭钱的神。", cond: () => loanTaken && debt === 0 && goalScore > 120 },
+            { name: "天选的创业者", desc: "你选择了英年早退，却凭借惊人的胆识和无与伦比的运气，在极短时间内完成了财富的原始积累，并远超目标。你的故事将被写进教科书，成为无数人模仿却无法复制的传奇。", cond: () => ambitionScore > 60 && goalScore >= 100 && ticketCount > 5 },
+            { name: "孤独的求道者", desc: "你对世俗的财富目标不屑一顾，将所有资源都投入到自我增值中。虽然最终的财富可能并不惊人，但你内在的成长无人能及。你的人生证明了，过程比结果更重要。", cond: () => (upgrades.crit.level + upgrades.reward.level) > 10 && ticketCount < 5 && goalScore < 50 },
+            { name: "勤勉的工匠", desc: "你选择了漫长而稳健的道路，不相信一夜暴富的神话，只相信持续的努力和投入。你的人生没有大起大落，但通过不懈的奋斗和自我提升，最终也实现了体面的生活。", cond: () => ambitionScore < 40 && (upgrades.crit.level + upgrades.reward.level) > 5 && goalScore > 70 },
+            { name: "幸运的庸人", desc: "你的人生似乎被命运格外眷顾，或许是继承了遗产，或许是抓住了某个转瞬即逝的风口。你并未付出太多努力，也未曾进行高风险的投资，却也获得了不错的结局。这份幸运，是你的天赋，也是你的诅咒。", cond: () => turningPointChoice === 'home_haven' && goalScore > 80 && ticketCount < 5 && (upgrades.crit.level + upgrades.reward.level) < 5 },
+            { name: "被时代抛弃的人", desc: "你选择了最长的奋斗年限，却在时代的浪潮中迷失了方向。无论是投资、成长还是把握机会，你似乎都慢了一步。最终，漫长的人生只留下了一声叹息和微薄的积蓄。", cond: () => ambitionScore < 20 && goalScore < 20 },
+            { name: "一个标准的普通人", desc: "你的人生就像这个世界上99%的人一样。有过梦想，有过挣扎，也曾站在选择的十字路口。不好不坏，不悲不喜，最终过上了安稳而平凡的一生。这，或许就是生活的真相。", cond: () => true }
+        ];
+        const matchedPersona = personas.find(p => p.cond());
+        return `【人生原型】: ${matchedPersona.name}\n\n${matchedPersona.desc}\n\n------\n【人生数据】\n退休年龄: ${retirementAge}岁\n最终财富: ${totalReward.toLocaleString()}元\n财富自由完成度: ${goalScore.toFixed(1)}%\n风险投资次数: ${ticketCount}次\n自我增值等级: ${upgrades.crit.level + upgrades.reward.level - 2}级\n最终负债: ${debt.toLocaleString()}元`;
     }
 
-    function restartGame() {
-      document.getElementById("settlementModal").style.display = "none";
-      document.getElementById("gameBox").style.display = "none";
-      document.getElementById("ageModal").style.display = "flex";
-    }
-
-    // 初始调用
-    window.onload = () => {
-        document.getElementById("ageModal").style.display = "flex";
-    };
+    window.onload = () => { document.getElementById('ageModal').style.display = 'flex'; };
   </script>
 </body>
 </html>

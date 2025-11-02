@@ -2161,7 +2161,7 @@ function showInfoBox(message, onConfirm, onCancel, textColor = '#92341C', imageU
     infoBox.style.width = '80%';
     infoBox.style.maxHeight = '100%';
     infoBox.style.minHeight = '10%';
-    infoBox.style.zIndex = '9999';
+    infoBox.style.zIndex = '99999';
     infoBox.style.fontSize = '14px';
     infoBox.style.padding = '5px 20px 5px 20px';
     infoBox.style.backgroundColor = '#DFBF6E';
@@ -11323,7 +11323,7 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
     "dialogue": "你对修炼者说的话（50-80字）"
 }
 
-请根据当前亲密度等级和角色设定，生成一个符合修仙世界观的冒险故事。亲密度越高，冒险越精彩，奖励越丰厚。`;
+请根据当前亲密度等级和角色设定，生成一个符合角色人设的冒险故事。亲密度越高，冒险越精彩，奖励越丰厚。`;
     } else if (mode === INTERACTION_MODES.GAME) {
         systemPrompt += `\n\n当前模式：趣味游戏
 你需要以JSON格式返回游戏互动，格式如下：
@@ -11337,7 +11337,7 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
     "dialogue": "你对修炼者说的话（30-50字）"
 }
 
-请设计一个符合修仙世界观且有趣的互动游戏。`;
+请设计一个符合角色背景人设且有趣的互动游戏。`;
     } else if (mode === INTERACTION_MODES.TRAINING) {
         systemPrompt += `\n\n当前模式：灵力修炼
 你需要以JSON格式返回修炼结果，格式如下：
@@ -11366,7 +11366,7 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
 礼物信息：${additionalContext.giftInfo || '一份心意'}
 请给出真挚且符合角色性格的反应。`;
     } else {
-        systemPrompt += `\n\n请以${currentPet.name}的身份，用符合角色设定的语气回复修炼者。回复要自然、生动，可以适当使用修仙世界的术语。回复长度控制在100-200字之间。`;
+        systemPrompt += `\n\n请以${currentPet.name}的身份，用符合角色设定的语气回复修炼者。回复要自然、生动，可以适当使用传记故事的术语。回复长度控制在100-200字之间。`;
     }
 
     const messages = [
@@ -11819,7 +11819,7 @@ function createAdventureMode(inputArea, chatArea, interactionManager) {
         text-align: center;
         opacity: 0.8;
     `;
-    info.textContent = `今日已探险 ${interactionManager.dailyInteractions} 次`;
+    info.textContent = '快来和你的灵宠出发探险吧！';
 
     const startBtn = document.createElement('button');
     startBtn.textContent = '🗺️ 开始探险';
@@ -11846,7 +11846,7 @@ function createAdventureMode(inputArea, chatArea, interactionManager) {
     
     startBtn.onclick = async () => {
         startBtn.disabled = true;
-        startBtn.textContent = '探险中...';
+        startBtn.textContent = '探险中...稍后返回';
         
         try {
             const result = await callDeepSeekAPI(
@@ -11987,7 +11987,7 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
         { name: '灵果', cost: 5000, emoji: '🍎' },
         { name: '灵石', cost: 10000, emoji: '💎' },
         { name: '法宝', cost: 50000, emoji: '⚔️' },
-        { name: '仙丹', cost: 100000, emoji: '💊' }
+        { name: '仙丹', cost: 100000, emoji: '🟡' }
     ];
 
     gifts.forEach(gift => {
@@ -12297,7 +12297,10 @@ function triggerRandomEvent(event, interactionManager, chatArea) {
         border: 2px solid #FFD700;
         border-radius: 15px;
         padding: 20px;
-        margin-bottom: 15px;
+        margin: 0 auto 15px auto;
+        max-width: 90%;
+        width: 100%;
+        box-sizing: border-box;
         box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
         animation: pulse 2s infinite;
     `;
@@ -12325,13 +12328,13 @@ function triggerRandomEvent(event, interactionManager, chatArea) {
     }
     
     eventDiv.innerHTML = `
-        <div style="text-align: center; font-size: 24px; margin-bottom: 10px;">✨ 随机事件 ✨</div>
-        <div style="font-size: 18px; font-weight: bold; color: #FF9800; margin-bottom: 10px; text-align: center;">${event.name}</div>
-        <div style="color: #333; line-height: 1.8; margin-bottom: 15px; text-align: center;">${event.description}</div>
+        <div style="text-align: center; font-size: clamp(18px, 5vw, 24px); margin-bottom: 10px;">✨ 随机事件 ✨</div>
+        <div style="font-size: clamp(16px, 4vw, 18px); font-weight: bold; color: #FF9800; margin-bottom: 10px; text-align: center;">${event.name}</div>
+        <div style="color: #333; line-height: 1.8; margin-bottom: 15px; text-align: center; font-size: clamp(14px, 3.5vw, 16px);">${event.description}</div>
         <div style="background: white; border-radius: 10px; padding: 15px; text-align: center;">
-            <div style="color: #FF9800; font-weight: bold; margin-bottom: 8px;">获得奖励：</div>
-            <div style="color: #333; font-size: 16px;">💰 ${convertPrice(reward)}金子</div>
-            <div style="color: #E91E63; font-size: 16px;">❤ +${intimacyGain}亲密度</div>
+            <div style="color: #FF9800; font-weight: bold; margin-bottom: 8px; font-size: clamp(14px, 3.5vw, 16px);">获得奖励：</div>
+            <div style="color: #333; font-size: clamp(14px, 3.5vw, 16px); margin-bottom: 5px;">💰 ${convertPrice(reward)}金子</div>
+            <div style="color: #E91E63; font-size: clamp(14px, 3.5vw, 16px);">❤ +${intimacyGain}亲密度</div>
         </div>
     `;
     

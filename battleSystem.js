@@ -6,7 +6,7 @@ let drugInventory = {
     "三花丸": { quantity: 5, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beefcb.png", tier: 3, description: "绿色品阶，每1.5秒恢复2%法力值，持续3秒，可叠加生效" },
     "狂暴之魂": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea2fd.png", tier: 0, description: "橙色品阶，永久提高1%暴击率" },
     "神力仙丹": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea310.png", tier: 2, description: "蓝色品阶，20秒内暴击伤害提高50%" },
-    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高1%暴击伤害，最多可使用此道具提升至350%" },
+    "慧心糖果": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea328.png", tier: 0, description: "橙色品阶，永久提高1%暴击伤害，最多可提升至350%" },
     "狂暴印记": { quantity: 0, url: "https://pic.imgdb.cn/item/666c1408d9c307b7e9cea34b.png", tier: 2, description: "蓝色品阶，20秒内暴击率提高50%" },
     "武尊秘露": { quantity: 1, url: "https://pic.imgdb.cn/item/666c0afbd9c307b7e9beef97.png", tier: 1, description: "紫色品阶，20秒内增加150%物理攻击力。" },
     "延寿露": { quantity: 0, url: "https://pic.imgdb.cn/item/666d311dd9c307b7e996b5b7.png", tier: 3, description: "绿色品阶，恢复玩家20%的生命值" },

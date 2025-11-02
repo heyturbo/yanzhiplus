@@ -7,7 +7,7 @@ const pets = {
         rank: 'R',
         image: 'https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif',
         skills: [
-            { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2.5, description: '物理攻击技能，小金牛使出浑身解数朝妖怪进行致命一击。' },
+            { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '物理攻击技能，小金牛使出浑身解数朝妖怪进行致命一击。' },
             { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合恢复一定量的法力值' },
             { name: '破军神力', rarity: 'B', type: 'N', multiplier: 3, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
             { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，宠物可获得一定的耐力提升。' },
@@ -11103,7 +11103,7 @@ const DEEPSEEK_CONFIG = {
     model: 'deepseek-chat',
     baseUrl: 'https://api.deepseek.com',
     stream: true,
-    temperature: 1
+    temperature: 0.3
 };
 
 // ============ 互动模式配置 ============
@@ -11247,7 +11247,6 @@ const PROACTIVE_MESSAGE_CONFIG = {
     }
 };
 
-
 // ============ 随机事件配置 ============
 const RANDOM_EVENTS = [
     {
@@ -11281,7 +11280,6 @@ const RANDOM_EVENTS = [
 ];
 
 // ============ 互动数据管理 ============
-// ============ 互动数据管理 ============
 class InteractionManager {
     constructor() {
         this.loadData();
@@ -11292,7 +11290,10 @@ class InteractionManager {
         // ========== 主动消息系统 ==========
         this.proactiveMessageTimer = null;
         this.isProactiveSystemActive = false;
-        this.consecutiveProactiveCount = 0; // 连续主动消息计数
+        this.consecutiveProactiveCount = 0;
+        
+        // ========== 新增：存储各模式的互动记录（HTML） ==========
+        this.modeRecords = this.modeRecords || [];
     }
 
     getStorageKey(petName) {
@@ -11317,6 +11318,8 @@ class InteractionManager {
             this.dailyInteractions = data.dailyInteractions || 0;
             this.lastResetDate = data.lastResetDate || new Date().toDateString();
             this.totalGiftsReceived = data.totalGiftsReceived || 0;
+            this.damageBonus = data.damageBonus || 0;
+            this.modeRecords = data.modeRecords || []; // ⚠️ 新增
         } else {
             this.intimacy = 0;
             this.interactionCount = 0;
@@ -11325,11 +11328,14 @@ class InteractionManager {
             this.dailyInteractions = 0;
             this.lastResetDate = new Date().toDateString();
             this.totalGiftsReceived = 0;
+            this.damageBonus = 0;
+            this.modeRecords = []; // ⚠️ 新增
         }
         
         this.personality = this.loadOrGeneratePersonality(currentPetName);
         this.checkDailyReset();
     }
+
 
     loadOrGeneratePersonality(petName) {
         const key = this.getPersonalityKey(petName);
@@ -11363,13 +11369,26 @@ class InteractionManager {
             lastInteractionTime: this.lastInteractionTime,
             dailyInteractions: this.dailyInteractions,
             lastResetDate: this.lastResetDate,
-            totalGiftsReceived: this.totalGiftsReceived
+            totalGiftsReceived: this.totalGiftsReceived,
+            damageBonus: this.damageBonus || 0,
+            modeRecords: this.modeRecords.slice(-30) // ⚠️ 新增：保留最近30条
         };
         localStorage.setItem(key, JSON.stringify(data));
         
         const personalityKey = this.getPersonalityKey(currentPetName);
         localStorage.setItem(personalityKey, this.personality);
     }
+
+    // ========== 新增：保存模式记录（包含HTML） ==========
+    saveModeRecord(mode, htmlContent, timestamp = Date.now()) {
+        this.modeRecords.push({
+            mode: mode,
+            html: htmlContent,
+            timestamp: timestamp
+        });
+        this.saveData();
+    }
+
 
     addInteraction(points = 1) {
         this.interactionCount += 1;
@@ -12036,9 +12055,10 @@ ${personalityRule.特殊规则}
 }`;
     }
     
-    // ========== 送礼模式 ==========
+    // ========== 送礼模式（增强版） ==========
     else if (mode === INTERACTION_MODES.GIFT) {
         const giftInfo = additionalContext.giftInfo || '一份礼物';
+        const itemPrice = additionalContext.itemPrice || 0; // ⚠️ 新增：道具价值
         
         const personalityGiftReaction = {
             '果敢': { base: 15, max: 25, reaction: '直接表达喜悦，不掩饰' },
@@ -12060,16 +12080,28 @@ ${personalityRule.特殊规则}
         
         const giftReact = personalityGiftReaction[personality] || { base: 15, max: 25, reaction: '真诚地表达感谢' };
         
+        // ⚠️ 根据道具价值调整亲密度范围
+        let priceMultiplier = 1.0;
+        if (itemPrice >= 100000) priceMultiplier = 1.8; // 极品道具
+        else if (itemPrice >= 50000) priceMultiplier = 1.5; // 高级道具
+        else if (itemPrice >= 10000) priceMultiplier = 1.2; // 中级道具
+        else priceMultiplier = 0.8; // 普通道具
+        
+        const adjustedBase = Math.floor(giftReact.base * priceMultiplier);
+        const adjustedMax = Math.floor(giftReact.max * priceMultiplier);
+        
         systemPrompt += `\n\n【送礼模式】玩家送给你：${giftInfo}
-你的${personality}性格反应：${giftReact.reaction}
-
-你必须严格按照JSON格式回复：
-{
-    "reaction": "完全体现${personality}性格的收礼反应（80-150字，要有情感细节）",
-    "intimacy_gain": ${giftReact.base}到${giftReact.max}之间的随机整数,
-    "dialogue": "你用${personality}性格说的感谢话（30-60字）",
-    "special_response": ${interactionManager.intimacy > 500 ? 'true（高亲密度触发特殊剧情）' : 'false'}
-}`;
+    【道具价值】${itemPrice}金子（${itemPrice >= 50000 ? '非常珍贵' : itemPrice >= 10000 ? '很有价值' : '普通礼物'}）
+    你的${personality}性格反应：${giftReact.reaction}
+    
+    你必须严格按照JSON格式回复：
+    {
+        "reaction": "完全体现${personality}性格的收礼反应（80-150字，要有情感细节，价值越高越激动）",
+        "intimacy_gain": ${adjustedBase}到${adjustedMax}之间的随机整数,
+        "dialogue": "你用${personality}性格说的感谢话（30-60字，价值高时更热情）",
+        "special_response": ${interactionManager.intimacy > 500 ? 'true' : 'false'},
+        ${interactionManager.intimacy > 500 && itemPrice >= 30000 ? '"special_scene": "触发特殊剧情的详细描述（100-200字，包含emoji、动作、氛围渲染）"' : ''}
+    }`;
     }
 
     const messages = [
@@ -12111,7 +12143,6 @@ ${personalityRule.特殊规则}
         throw error;
     }
 }
-
 
 // ========== 显示互动界面 ==========
 function showInteractionInterface() {
@@ -12173,13 +12204,12 @@ function showInteractionInterface() {
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 24px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     `;
 
     const titleInfo = document.createElement('div');
     titleInfo.innerHTML = `
-        <div style="color: white; font-size: 20px; font-weight: bold; margin-bottom: 3px;">${interactionManager.personality}的${currentPet.name}</div>
+        <div style="color: white; font-size: 16px; font-weight: bold; margin-bottom: 3px;">${interactionManager.personality}的${currentPet.name}</div>
         <div id="intimacy-display" style="color: ${intimacyInfo.color}; font-size: 14px; display: flex; align-items: center; gap: 5px;">
             <span>❤</span>
             <span>${intimacyInfo.level}</span>
@@ -12206,7 +12236,7 @@ function showInteractionInterface() {
         border-radius: 20px;
         padding: 5px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 14px;
         transition: all 0.3s;
         backdrop-filter: blur(5px);
     `;
@@ -12224,7 +12254,7 @@ function showInteractionInterface() {
         border-radius: 20px;
         padding: 5px;
         cursor: pointer;
-        font-size: 16px;
+        font-size: 14px;
         transition: all 0.3s;
         backdrop-filter: blur(5px);
     `;
@@ -12292,7 +12322,7 @@ function showInteractionInterface() {
             border-radius: 15px;
             padding: 5px;
             cursor: ${isLocked ? 'not-allowed' : 'pointer'};
-            font-size: 16px;
+            font-size: 14px;
             transition: all 0.3s;
             white-space: nowrap;
         `;
@@ -12322,12 +12352,42 @@ function showInteractionInterface() {
         gap: 15px;
     `;
 
-    // 加载历史消息
+    // ========== 恢复所有历史记录（聊天+其他模式） ==========
+    const allRecords = [];
+
+    // 1. 添加聊天记录
     interactionManager.chatHistory.slice(-20).forEach(msg => {
-        appendMessage(msg.content, msg.role, chatArea);
+        allRecords.push({
+            type: 'chat',
+            timestamp: msg.timestamp,
+            content: msg
+        });
     });
 
-    if (interactionManager.chatHistory.length === 0) {
+    // 2. 添加其他模式记录
+    interactionManager.modeRecords.forEach(record => {
+        allRecords.push({
+            type: 'mode',
+            timestamp: record.timestamp,
+            content: record
+        });
+    });
+
+    // 3. 按时间戳排序
+    allRecords.sort((a, b) => a.timestamp - b.timestamp);
+
+    // 4. 渲染所有记录
+    allRecords.forEach(record => {
+        if (record.type === 'chat') {
+            appendMessage(record.content.content, record.content.role, chatArea);
+        } else if (record.type === 'mode') {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = record.content.html;
+            chatArea.appendChild(tempDiv.firstChild);
+        }
+    });
+
+    if (allRecords.length === 0) {
         const welcomeMsg = document.createElement('div');
         welcomeMsg.style.cssText = `
             background: rgba(255, 255, 255, 0.1);
@@ -12343,6 +12403,8 @@ function showInteractionInterface() {
         `;
         chatArea.appendChild(welcomeMsg);
     }
+
+
 
     // ========== 输入区域 ==========
     const inputArea = document.createElement('div');
@@ -12645,7 +12707,7 @@ function switchMode(mode, interactionManager, chatArea) {
     }
 }
 
-// ========== 冒险模式 ==========
+// ========== 冒险模式（完全重写，交互式场景） ==========
 function createAdventureMode(inputArea, chatArea, interactionManager) {
     inputArea.innerHTML = '';
     
@@ -12663,10 +12725,10 @@ function createAdventureMode(inputArea, chatArea, interactionManager) {
         text-align: center;
         opacity: 0.8;
     `;
-    info.textContent = '快来和你的灵宠出发探险吧！';
+    info.textContent = '与你的灵宠一起踏上未知的冒险旅程！';
 
     const startBtn = document.createElement('button');
-    startBtn.textContent = '🗺️ 开始探险';
+    startBtn.textContent = '🗺️ 开始冒险';
     startBtn.style.cssText = `
         background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         color: white;
@@ -12690,28 +12752,383 @@ function createAdventureMode(inputArea, chatArea, interactionManager) {
     
     startBtn.onclick = async () => {
         startBtn.disabled = true;
-        startBtn.textContent = '探险中...稍后返回';
+        startBtn.textContent = '冒险准备中...';
         
-        try {
-            const result = await callDeepSeekAPI(
-                `我想和你一起去探险，带我发现一些有趣的事物吧！`,
-                interactionManager,
-                INTERACTION_MODES.ADVENTURE
-            );
-            
-            const data = parseAIResponse(result.choices[0].message.content);
-            handleAdventureResult(data, interactionManager, chatArea);
-        } catch (error) {
-            showInfoBox('探险失败，请稍后再试！');
-        } finally {
-            startBtn.disabled = false;
-            startBtn.textContent = '🗺️ 开始探险';
-        }
+        await generateInteractiveAdventure(interactionManager, chatArea, startBtn);
     };
 
     adventureContainer.appendChild(info);
     adventureContainer.appendChild(startBtn);
     inputArea.appendChild(adventureContainer);
+}
+
+// ========== 生成交互式冒险场景（带重试机制） ==========
+async function generateInteractiveAdventure(interactionManager, chatArea, startBtn, retryCount = 0) {
+    const MAX_RETRIES = 2;
+    
+    try {
+        const intimacyLevel = interactionManager.getIntimacyLevel();
+        
+        const adventurePrompt = `你是${currentPet.name}，性格是${interactionManager.personality}。
+当前亲密度：${intimacyLevel.level}（${interactionManager.intimacy}点）
+
+【交互式冒险任务】
+你要带领玩家进入一个沉浸式冒险场景，根据你的${interactionManager.personality}性格设计场景风格。
+
+场景要求：
+1. 冒险场景要生动具体（150-250字），体现${interactionManager.personality}性格特点
+2. 提供3个不同类型的选择：
+   - 【冒险抉择】（如：探索、逃跑、谈判等）- 根据性格和亲密度判定成败
+   - 【概率游戏】（如：猜拳、骰子、抽签等）- 纯随机，但结果有好有坏
+   - 【智慧挑战】（如：解谜、识别陷阱等）- 需要玩家思考选择
+
+3. 每个选择都有独特的风险和收益：
+   - 成功：奖励${15000 + Math.floor(interactionManager.intimacy / 10)}~${40000 + Math.floor(interactionManager.intimacy / 5)}金子，亲密度+10~25
+   - 失败：可能损失10000~30000金子（取决于选择类型），亲密度-5~-15
+   - 平局：小额奖励或无损失，亲密度+3~8
+
+4. 必须严格按照以下JSON格式回复：
+{
+    "scene_description": "冒险场景描述（150-250字，体现${interactionManager.personality}性格）",
+    "choices": [
+        {
+            "type": "adventure",
+            "text": "选项1描述（冒险抉择，30-50字）",
+            "success_rate": 50到90之间的整数（根据亲密度和性格调整）,
+            "success_reward": { "gold": 整数, "intimacy": 整数 },
+            "fail_penalty": { "gold": 整数（负数）, "intimacy": 整数（负数） }
+        },
+        {
+            "type": "gamble",
+            "text": "选项2描述（概率游戏，30-50字）",
+            "win_rate": 33到50之间的整数,
+            "win_reward": { "gold": 整数, "intimacy": 整数 },
+            "lose_penalty": { "gold": 整数（负数）, "intimacy": 整数（负数） },
+            "draw_reward": { "gold": 整数, "intimacy": 整数 }
+        },
+        {
+            "type": "puzzle",
+            "text": "选项3描述（智慧挑战，30-50字）",
+            "question": "谜题或问题",
+            "correct_answer": 0到2之间的整数（正确选项索引）,
+            "options": ["选项A", "选项B", "选项C"],
+            "success_reward": { "gold": 整数, "intimacy": 整数 },
+            "fail_penalty": { "gold": 整数（负数）, "intimacy": 整数（负数） }
+        }
+    ],
+    "personality_comment": "你用${interactionManager.personality}性格说的开场白（40-70字）"
+}`;
+
+        const response = await fetch(`${DEEPSEEK_CONFIG.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+            },
+            body: JSON.stringify({
+                model: DEEPSEEK_CONFIG.model,
+                messages: [
+                    { role: "system", content: adventurePrompt },
+                    { role: "user", content: "生成冒险场景" }
+                ],
+                stream: false,
+                temperature: 0.85
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API调用失败: ${response.status}`);
+        }
+
+        const result = await response.json();
+        const aiMessage = result.choices[0].message.content.trim();
+        const data = parseAIResponse(aiMessage);
+        
+        // ========== 验证JSON结构 ==========
+        if (!data || !data.scene_description || !data.choices || data.choices.length !== 3) {
+            throw new Error('JSON格式不正确');
+        }
+        
+        // 显示冒险场景
+        displayInteractiveAdventure(data, interactionManager, chatArea);
+        
+        startBtn.disabled = false;
+        startBtn.textContent = '🗺️ 开始冒险';
+        
+    } catch (error) {
+        console.error(`冒险生成失败（尝试${retryCount + 1}/${MAX_RETRIES + 1}）:`, error);
+        
+        if (retryCount < MAX_RETRIES) {
+            // 重试
+            showInfoBox(`冒险场景生成出错，正在重试（${retryCount + 1}/${MAX_RETRIES}）...`, null, 2000, 'orange');
+            await generateInteractiveAdventure(interactionManager, chatArea, startBtn, retryCount + 1);
+        } else {
+            // 重试失败
+            showInfoBox('冒险场景生成失败，请稍后再试！', null, 3000, 'red');
+            startBtn.disabled = false;
+            startBtn.textContent = '🗺️ 开始冒险';
+        }
+    }
+}
+
+// ========== 显示交互式冒险场景 ==========
+function displayInteractiveAdventure(data, interactionManager, chatArea) {
+    const adventureDiv = document.createElement('div');
+    adventureDiv.style.cssText = `
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,255,0.95) 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.5s ease-out;
+    `;
+    
+    let choicesHtml = '';
+    data.choices.forEach((choice, index) => {
+        const typeIcons = { adventure: '⚔️', gamble: '🎲', puzzle: '🧩' };
+        const typeNames = { adventure: '冒险抉择', gamble: '概率游戏', puzzle: '智慧挑战' };
+        
+        choicesHtml += `
+            <button class="adventure-choice" data-index="${index}" style="
+                display: block;
+                width: 100%;
+                background: white;
+                border: 2px solid #f093fb;
+                border-radius: 10px;
+                padding: 12px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                transition: all 0.3s;
+                color: #333;
+                text-align: left;
+                font-size: 14px;
+            ">
+                ${typeIcons[choice.type]} ${typeNames[choice.type]}：${choice.text}
+            </button>
+        `;
+    });
+    
+    adventureDiv.innerHTML = `
+        <div style="font-size: 18px; font-weight: bold; color: #f093fb; margin-bottom: 15px;">🗺️ 冒险场景</div>
+        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${data.scene_description}</div>
+        <div style="color: #666; font-style: italic; border-left: 3px solid #f093fb; padding-left: 10px; margin-bottom: 15px;">
+            ${currentPet.name}：${data.personality_comment}
+        </div>
+        <div style="margin-bottom: 10px; color: #666; font-size: 13px;">请选择你的行动：</div>
+        <div>${choicesHtml}</div>
+    `;
+    
+    chatArea.appendChild(adventureDiv);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    // ⚠️ 新增：保存冒险场景记录
+    interactionManager.saveModeRecord(INTERACTION_MODES.ADVENTURE, adventureDiv.outerHTML);
+    
+    // 绑定选择事件
+    setTimeout(() => {
+        const choiceBtns = adventureDiv.querySelectorAll('.adventure-choice');
+        choiceBtns.forEach((btn, idx) => {
+            btn.onmouseover = () => {
+                if (!btn.disabled) {
+                    btn.style.background = '#f9e6ff';
+                    btn.style.transform = 'translateX(5px)';
+                }
+            };
+            btn.onmouseout = () => {
+                if (!btn.disabled) {
+                    btn.style.background = 'white';
+                    btn.style.transform = 'translateX(0)';
+                }
+            };
+            btn.onclick = function() {
+                choiceBtns.forEach(b => b.disabled = true);
+                handleAdventureChoice(data.choices[idx], interactionManager, chatArea, this);
+            };
+        });
+    }, 100);
+}
+
+// ========== 处理冒险选择结果 ==========
+function handleAdventureChoice(choice, interactionManager, chatArea, buttonElement) {
+    let resultHtml = '';
+    let goldChange = 0;
+    let intimacyChange = 0;
+    
+    if (choice.type === 'adventure') {
+        // 冒险抉择：根据成功率判定
+        const isSuccess = Math.random() * 100 < choice.success_rate;
+        
+        if (isSuccess) {
+            goldChange = choice.success_reward.gold;
+            intimacyChange = choice.success_reward.intimacy;
+            buttonElement.style.background = '#c8e6c9';
+            buttonElement.style.borderColor = '#4CAF50';
+            resultHtml = `✅ 成功！获得${convertPrice(goldChange)}金子，亲密度+${intimacyChange}`;
+        } else {
+            goldChange = choice.fail_penalty.gold;
+            intimacyChange = choice.fail_penalty.intimacy;
+            buttonElement.style.background = '#ffcdd2';
+            buttonElement.style.borderColor = '#f44336';
+            resultHtml = `❌ 失败！损失${convertPrice(Math.abs(goldChange))}金子，亲密度${intimacyChange}`;
+        }
+    } else if (choice.type === 'gamble') {
+        // 概率游戏：胜/平/负
+        const random = Math.random() * 100;
+        
+        if (random < choice.win_rate) {
+            goldChange = choice.win_reward.gold;
+            intimacyChange = choice.win_reward.intimacy;
+            buttonElement.style.background = '#c8e6c9';
+            buttonElement.style.borderColor = '#4CAF50';
+            resultHtml = `🎉 大胜！获得${convertPrice(goldChange)}金子，亲密度+${intimacyChange}`;
+        } else if (random < choice.win_rate + 25) {
+            goldChange = choice.draw_reward.gold;
+            intimacyChange = choice.draw_reward.intimacy;
+            buttonElement.style.background = '#fff9c4';
+            buttonElement.style.borderColor = '#FFC107';
+            resultHtml = `🤝 平局！获得${convertPrice(goldChange)}金子，亲密度+${intimacyChange}`;
+        } else {
+            goldChange = choice.lose_penalty.gold;
+            intimacyChange = choice.lose_penalty.intimacy;
+            buttonElement.style.background = '#ffcdd2';
+            buttonElement.style.borderColor = '#f44336';
+            resultHtml = `💔 失败！损失${convertPrice(Math.abs(goldChange))}金子，亲密度${intimacyChange}`;
+        }
+    } else if (choice.type === 'puzzle') {
+        // 智慧挑战：弹出问题
+        showPuzzleDialog(choice, interactionManager, chatArea, buttonElement);
+        return; // 不立即结算
+    }
+    
+    // 应用奖惩
+    goldAmount += goldChange;
+    updateGoldDisplay(goldAmount);
+    interactionManager.addInteraction(intimacyChange);
+    updateIntimacyDisplay(interactionManager);
+    
+    // 显示结果
+    const resultDiv = document.createElement('div');
+    resultDiv.style.cssText = `
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+        padding: 10px;
+        margin-top: 10px;
+        text-align: center;
+        font-weight: bold;
+        color: ${goldChange >= 0 ? '#4CAF50' : '#f44336'};
+    `;
+    resultDiv.textContent = resultHtml;
+    buttonElement.parentElement.appendChild(resultDiv);
+
+    // ⚠️ 新增：保存冒险结果记录
+    interactionManager.saveModeRecord(
+        INTERACTION_MODES.ADVENTURE, 
+        buttonElement.parentElement.parentElement.outerHTML // 保存整个冒险场景+结果
+    );
+    
+    showInfoBox(resultHtml, null, 3000, goldChange >= 0 ? 'green' : 'red');
+}
+
+// ========== 智慧挑战弹窗 ==========
+function showPuzzleDialog(choice, interactionManager, chatArea, buttonElement) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10005;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        background: white;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    `;
+    
+    let optionsHtml = '';
+    choice.options.forEach((opt, idx) => {
+        optionsHtml += `
+            <button class="puzzle-option" data-index="${idx}" style="
+                display: block;
+                width: 100%;
+                background: #f5f5f5;
+                border: 2px solid #ddd;
+                border-radius: 10px;
+                padding: 12px;
+                margin-bottom: 10px;
+                cursor: pointer;
+                transition: all 0.3s;
+                font-size: 14px;
+            ">${opt}</button>
+        `;
+    });
+    
+    dialog.innerHTML = `
+        <div style="font-size: 20px; font-weight: bold; color: #f093fb; margin-bottom: 15px; text-align: center;">🧩 智慧挑战</div>
+        <div style="color: #333; line-height: 1.6; margin-bottom: 20px;">${choice.question}</div>
+        <div>${optionsHtml}</div>
+    `;
+    
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+    
+    const optionBtns = dialog.querySelectorAll('.puzzle-option');
+    optionBtns.forEach((btn, idx) => {
+        btn.onmouseover = () => btn.style.background = '#e3f2fd';
+        btn.onmouseout = () => btn.style.background = '#f5f5f5';
+        btn.onclick = function() {
+            optionBtns.forEach(b => b.disabled = true);
+            
+            const isCorrect = idx === choice.correct_answer;
+            let goldChange, intimacyChange, resultHtml;
+            
+            if (isCorrect) {
+                goldChange = choice.success_reward.gold;
+                intimacyChange = choice.success_reward.intimacy;
+                this.style.background = '#c8e6c9';
+                this.style.borderColor = '#4CAF50';
+                buttonElement.style.background = '#c8e6c9';
+                buttonElement.style.borderColor = '#4CAF50';
+                resultHtml = `✅ 正确！获得${convertPrice(goldChange)}金子，亲密度+${intimacyChange}`;
+            } else {
+                goldChange = choice.fail_penalty.gold;
+                intimacyChange = choice.fail_penalty.intimacy;
+                this.style.background = '#ffcdd2';
+                this.style.borderColor = '#f44336';
+                buttonElement.style.background = '#ffcdd2';
+                buttonElement.style.borderColor = '#f44336';
+                optionBtns[choice.correct_answer].style.background = '#c8e6c9';
+                optionBtns[choice.correct_answer].style.borderColor = '#4CAF50';
+                resultHtml = `❌ 错误！损失${convertPrice(Math.abs(goldChange))}金子，亲密度${intimacyChange}`;
+            }
+            
+            goldAmount += goldChange;
+            updateGoldDisplay(goldAmount);
+            interactionManager.addInteraction(intimacyChange);
+            updateIntimacyDisplay(interactionManager);
+            
+            showInfoBox(resultHtml, null, 3000, isCorrect ? 'green' : 'red');
+
+            // ⚠️ 新增：保存智慧挑战结果记录
+            interactionManager.saveModeRecord(
+                INTERACTION_MODES.ADVENTURE, 
+                `<div>智慧挑战：${choice.question} - ${isCorrect ? '✅正确' : '❌错误'}</div>`
+            );
+            
+            setTimeout(() => document.body.removeChild(overlay), 2000);
+        };
+    });
 }
 
 // ========== 游戏模式 ==========
@@ -12765,7 +13182,7 @@ function createGameMode(inputArea, chatArea, interactionManager) {
     inputArea.appendChild(gameContainer);
 }
 
-// ========== 修炼模式 ==========
+// ========== 修炼模式（完全重写，深化机制） ==========
 function createTrainingMode(inputArea, chatArea, interactionManager) {
     inputArea.innerHTML = '';
     
@@ -12775,6 +13192,17 @@ function createTrainingMode(inputArea, chatArea, interactionManager) {
         flex-direction: column;
         gap: 10px;
     `;
+
+    const bonusInfo = document.createElement('div');
+    bonusInfo.style.cssText = `
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        padding: 10px;
+        color: white;
+        font-size: 13px;
+        text-align: center;
+    `;
+    bonusInfo.innerHTML = `当前伤害加成：<span style="color: #FFD700; font-weight: bold;">+${(interactionManager.damageBonus || 0).toFixed(2)}%</span>`;
 
     const startBtn = document.createElement('button');
     startBtn.textContent = '⚡ 开始修炼';
@@ -12795,144 +13223,469 @@ function createTrainingMode(inputArea, chatArea, interactionManager) {
         startBtn.disabled = true;
         startBtn.textContent = '修炼中...';
         
-        try {
-            const result = await callDeepSeekAPI(
-                `指导我修炼，帮助我提升实力！`,
-                interactionManager,
-                INTERACTION_MODES.TRAINING
-            );
-            
-            const data = parseAIResponse(result.choices[0].message.content);
-            handleTrainingResult(data, interactionManager, chatArea);
-        } catch (error) {
-            showInfoBox('修炼失败，请稍后再试！');
-        } finally {
-            startBtn.disabled = false;
-            startBtn.textContent = '⚡ 开始修炼';
-        }
+        await generateTrainingSession(interactionManager, chatArea, startBtn, bonusInfo);
     };
 
+    trainingContainer.appendChild(bonusInfo);
     trainingContainer.appendChild(startBtn);
     inputArea.appendChild(trainingContainer);
 }
 
+// ========== 生成修炼过程（带重试机制） ==========
+async function generateTrainingSession(interactionManager, chatArea, startBtn, bonusInfo, retryCount = 0) {
+    const MAX_RETRIES = 2;
+    
+    try {
+        const intimacyLevel = interactionManager.getIntimacyLevel();
+        const currentBonus = interactionManager.damageBonus || 0;
+        
+        const trainingPrompt = `你是${currentPet.name}，性格是${interactionManager.personality}。
+当前亲密度：${intimacyLevel.level}（${interactionManager.intimacy}点）
+当前伤害加成：${currentBonus.toFixed(2)}
+
+【修炼任务】
+你要指导玩家进行一次深度修炼，根据你的${interactionManager.personality}性格设计修炼方式。
+
+修炼机制：
+1. 修炼分为【基础修炼】【进阶修炼】【突破修炼】三种
+2. 成功率和收益根据亲密度和性格调整
+3. 成功后提升伤害加成0.1~1.5（根据修炼类型）
+
+必须严格按照以下JSON格式回复：
+{
+    "description": "修炼场景描述（120-200字，体现${interactionManager.personality}性格和修炼氛围）",
+    "training_type": "basic/advanced/breakthrough之一",
+    "success_rate": 40到85之间的整数（根据亲密度和性格调整）,
+    "success_result": {
+        "gold": ${20000 + Math.floor(interactionManager.intimacy / 5)}到${60000 + Math.floor(interactionManager.intimacy / 3)}之间的整数,
+        "intimacy": 10到25之间的整数,
+        "damage_bonus": 0.1到1.5之间的浮点数（保留2位小数，breakthrough最高）
+    },
+    "fail_result": {
+        "intimacy": 3到8之间的整数
+    },
+    "personality_guidance": "你用${interactionManager.personality}性格说的修炼指导（50-80字）"
+}`;
+
+        const response = await fetch(`${DEEPSEEK_CONFIG.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+            },
+            body: JSON.stringify({
+                model: DEEPSEEK_CONFIG.model,
+                messages: [
+                    { role: "system", content: trainingPrompt },
+                    { role: "user", content: "开始修炼" }
+                ],
+                stream: false,
+                temperature: 0.8
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`API调用失败: ${response.status}`);
+        }
+
+        const result = await response.json();
+        const aiMessage = result.choices[0].message.content.trim();
+        const data = parseAIResponse(aiMessage);
+        
+        // ========== 验证JSON结构 ==========
+        if (!data || !data.description || !data.success_result || !data.fail_result) {
+            throw new Error('JSON格式不正确');
+        }
+        
+        // 执行修炼判定
+        handleTrainingResult(data, interactionManager, chatArea, bonusInfo);
+        
+        startBtn.disabled = false;
+        startBtn.textContent = '⚡ 开始修炼';
+        
+    } catch (error) {
+        console.error(`修炼生成失败（尝试${retryCount + 1}/${MAX_RETRIES + 1}）:`, error);
+        
+        if (retryCount < MAX_RETRIES) {
+            showInfoBox(`修炼数据生成出错，正在重试（${retryCount + 1}/${MAX_RETRIES}）...`, null, 2000, 'red');
+            await generateTrainingSession(interactionManager, chatArea, startBtn, bonusInfo, retryCount + 1);
+        } else {
+            showInfoBox('修炼数据生成失败，请稍后再试！', null, 3000, 'red');
+            startBtn.disabled = false;
+            startBtn.textContent = '⚡ 开始修炼';
+        }
+    }
+}
+
+// ========== 送礼模式（从背包读取道具） ==========
 function createGiftMode(inputArea, chatArea, interactionManager) {
     inputArea.innerHTML = '';
     
     const giftContainer = document.createElement('div');
     giftContainer.style.cssText = `
-        display: flex;
-        flex-direction: column;
         gap: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+        padding: 5px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
     `;
 
-    const gifts = [
-        { name: '灵果', cost: 5000, emoji: '🍎' },
-        { name: '灵石', cost: 10000, emoji: '💎' },
-        { name: '法宝', cost: 50000, emoji: '⚔️' },
-        { name: '仙丹', cost: 100000, emoji: '🟡' }
-    ];
+    // ========== 遍历背包中数量不为0的道具 ==========
+    const availableItems = jinnangItems.filter(item => item.quantity > 0);
 
-    gifts.forEach(gift => {
-        const giftBtn = document.createElement('button');
-        giftBtn.innerHTML = `${gift.emoji} ${gift.name} (${convertPrice(gift.cost)}金子)`;
+    if (availableItems.length === 0) {
+        // 背包为空提示
+        const emptyMsg = document.createElement('div');
+        emptyMsg.style.cssText = `
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        `;
+        emptyMsg.textContent = '背包中没有可以赠送的道具';
+        giftContainer.appendChild(emptyMsg);
+        inputArea.appendChild(giftContainer);
+        return;
+    }
+
+    // 按价格排序（与updateJinnangItems保持一致）
+    const sortedItems = [...availableItems].sort((a, b) => b.price - a.price);
+
+    sortedItems.forEach(item => {
+        const giftBtn = document.createElement('div');
         giftBtn.className = 'gift-button';
         giftBtn.style.cssText = `
+            position: relative;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px;
             background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 15px;
-            padding: 12px 20px;
+            border: 1px solid rgb(131, 74, 15);
+            box-shadow: rgb(131, 74, 15) 0px 0px 0px 1px inset;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 15px;
             transition: all 0.3s;
         `;
+
+        giftBtn.innerHTML = `
+            <img src="${item.url}" alt="${item.name}" style="border: 1px solid black; height: 45px; width: 45px;">
+            <div class="item-text-container" style="flex: 1; margin-left: 10px;">
+                <div class="item-text-top" style="color: white; font-size: 14px; font-weight: bold;">${item.displayName}</div>
+                <div class="item-text-bottom" style="color: rgba(255,255,255,0.8); font-size: 12px;">${item.quantity}个</div>
+            </div>
+        `;
+
         giftBtn.onmouseover = () => {
-            if (!giftBtn.disabled) {
+            if (!giftBtn.dataset.disabled) {
                 giftBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+                giftBtn.style.border = '1px solid white';
+                giftBtn.style.boxShadow = 'white 0px 0px 0px 1px inset';
             }
         };
+
         giftBtn.onmouseout = () => {
-            if (!giftBtn.disabled) {
+            if (!giftBtn.dataset.disabled) {
                 giftBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+                giftBtn.style.border = '1px solid rgb(131, 74, 15)';
+                giftBtn.style.boxShadow = 'rgb(131, 74, 15) 0px 0px 0px 1px inset';
             }
         };
-        
+
         giftBtn.onclick = async () => {
-            if (goldAmount < gift.cost) {
-                showInfoBox('金子不足，无法赠送此礼物！');
-                return;
-            }
-            
             if (interactionManager.giftingSending) {
                 showInfoBox('请等待上一个礼物送达后再赠送！');
                 return;
             }
-            
-            // 禁用所有送礼按钮
+
+            // ========== 禁用所有送礼按钮 ==========
             interactionManager.giftingSending = true;
             const allGiftBtns = giftContainer.querySelectorAll('.gift-button');
             allGiftBtns.forEach(btn => {
-                btn.disabled = true;
+                btn.dataset.disabled = 'true';
                 btn.style.opacity = '0.5';
                 btn.style.cursor = 'not-allowed';
             });
-            
-            // 显示赠送中提示
-            const originalText = giftBtn.innerHTML;
-            giftBtn.innerHTML = `${gift.emoji} 赠送中...请稍候`;
-            
-            // 扣除金币
-            goldAmount -= gift.cost;
-            updateGoldDisplay(goldAmount);
-            
 
-            
+            // 显示赠送中提示
+            const originalContent = giftBtn.innerHTML;
+            giftBtn.innerHTML = `
+                <div style="color: white; text-align: center; width: 100%; padding: 10px;">
+                    🎁 ${currentPet.name}正在拆礼物...
+                </div>
+            `;
+
             try {
+                // ========== 调用AI，传递displayName、description和price ==========
                 const result = await callDeepSeekAPI(
-                    `我送给你一份${gift.name}`,
+                    `我送给你一份${item.displayName}`,
                     interactionManager,
                     INTERACTION_MODES.GIFT,
-                    { giftInfo: `${gift.name}（价值${convertPrice(gift.cost)}金子）` }
+                    { 
+                        giftInfo: `${item.displayName}（${item.description}）`,
+                        itemPrice: item.price || 0 // ⚠️ 新增：传递价格
+                    }
                 );
-                
-                // 移除加载提示
-                document.body.removeChild(loadingOverlay);
-                
+
                 const data = parseAIResponse(result.choices[0].message.content);
-                
+
                 if (!data) {
                     throw new Error('AI返回数据格式错误');
                 }
-                
-                handleGiftResult(data, gift, interactionManager, chatArea);
+
+                // ========== 扣除道具数量1 ==========
+                const itemInBag = jinnangItems.find(i => i.name === item.name);
+                if (itemInBag && itemInBag.quantity > 0) {
+                    itemInBag.quantity -= 1;
+                    updateJinnangItems();
+                }
+
+                // ⚠️ 处理送礼结果（增强版）
+                await handleGiftResultEnhanced(data, item, interactionManager, chatArea);
+
+                // 刷新送礼界面
+                createGiftMode(inputArea, chatArea, interactionManager);
+
+
             } catch (error) {
                 console.error('送礼错误:', error);
-                
-                // 移除加载提示
-                if (document.body.contains(loadingOverlay)) {
-                    document.body.removeChild(loadingOverlay);
-                }
-                
-                showInfoBox('赠送失败，金子已退回！');
-                goldAmount += gift.cost;
-                updateGoldDisplay(goldAmount);
+                showInfoBox('赠送失败，请重试！');
             } finally {
                 // 恢复按钮状态
                 interactionManager.giftingSending = false;
                 allGiftBtns.forEach(btn => {
-                    btn.disabled = false;
+                    btn.dataset.disabled = '';
                     btn.style.opacity = '1';
                     btn.style.cursor = 'pointer';
                 });
-                giftBtn.innerHTML = originalText;
+                giftBtn.innerHTML = originalContent;
             }
         };
-        
+
         giftContainer.appendChild(giftBtn);
     });
 
     inputArea.appendChild(giftContainer);
+}
+
+// ========== 处理送礼结果（增强版，含特殊剧情） ==========
+async function handleGiftResultEnhanced(data, item, interactionManager, chatArea) {
+    if (!data) {
+        console.error('送礼数据为空');
+        showInfoBox('送礼反馈异常：数据为空！');
+        return;
+    }
+
+    // 兼容不同的返回格式
+    const reaction = data.reaction || data.reply || '收到了你的礼物';
+    const intimacyGain = data.intimacy_gain || data.intimacy_change || 15;
+    const dialogue = data.dialogue || `谢谢你的${item.displayName}`;
+    const specialResponse = data.special_response || false;
+    const specialScene = data.special_scene || null;
+
+    const resultDiv = document.createElement('div');
+    resultDiv.style.cssText = `
+        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,245,0.95) 100%);
+        border-radius: 15px;
+        padding: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        animation: slideIn 0.5s ease-out;
+    `;
+
+    resultDiv.innerHTML = `
+        <div style="font-size: 18px; font-weight: bold; color: #E91E63; margin-bottom: 15px;">🎁 ${currentPet.name}收到了你的礼物</div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+            <img src="${item.url}" alt="${item.displayName}" style="width: 50px; height: 50px; border: 1px solid #ddd; border-radius: 5px;">
+            <div>
+                <div style="font-weight: bold; color: #333;">${item.displayName}</div>
+                <div style="font-size: 12px; color: #666;">${item.description}</div>
+                <div style="font-size: 11px; color: #FF9800;">价值：${convertPrice(item.price)}</div>
+            </div>
+        </div>
+        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${reaction}</div>
+        <div style="background: rgba(233, 30, 99, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+            <div style="color: #E91E63; font-weight: bold; margin-bottom: 8px;">感动值：</div>
+            <div style="color: #E91E63;">❤ 亲密度：+${intimacyGain}</div>
+            ${specialResponse ? '<div style="color: #FF9800; font-weight: bold;">✨ 亲密度已超过500，触发特殊剧情...</div>' : ''}
+        </div>
+        <div style="color: #666; font-style: italic; border-left: 3px solid #E91E63; padding-left: 10px;">
+            ${currentPet.name}：${dialogue}
+        </div>
+    `;
+
+    // ⚠️ 新增：为特殊剧情预留容器（初始隐藏）
+    const specialContainer = document.createElement('div');
+    specialContainer.id = 'special-scene-container';
+    specialContainer.style.cssText = `
+        display: none;
+        margin-top: 20px;
+        animation: fadeInDown 0.8s ease-out;
+    `;
+    resultDiv.appendChild(specialContainer);
+
+    chatArea.appendChild(resultDiv);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    interactionManager.addInteraction(intimacyGain);
+    interactionManager.totalGiftsReceived += 1;
+    interactionManager.saveData();
+    updateIntimacyDisplay(interactionManager);
+
+    // ⚠️ 保存送礼记录（此时特殊剧情还未显示）
+    interactionManager.saveModeRecord(INTERACTION_MODES.GIFT, resultDiv.outerHTML);
+
+    showInfoBox(`${currentPet.name}很高兴收到你的${item.displayName}，亲密度+${intimacyGain}！`);
+
+    // ========== 特殊剧情触发（在内部容器中显示） ==========
+    if (specialResponse && specialScene) {
+        await showSpecialGiftSceneInside(specialContainer, specialScene, item, interactionManager, resultDiv);
+    } else if (specialResponse && !specialScene) {
+        await showDefaultSpecialSceneInside(specialContainer, item, interactionManager, resultDiv);
+    }
+}
+
+// ========== 在卡片内部显示特殊剧情（AI生成版） ==========
+async function showSpecialGiftSceneInside(container, sceneDescription, item, interactionManager, parentDiv) {
+    // 延迟1秒后显示
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    container.style.display = 'block';
+    container.style.cssText = `
+        display: block;
+        margin-top: 20px;
+        background: linear-gradient(135deg, rgba(255,215,0,0.2) 0%, rgba(255,105,180,0.2) 100%);
+        border: 2px solid #FFD700;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 105, 180, 0.2);
+        animation: specialGlow 2s infinite, fadeInDown 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    `;
+
+    // 添加闪光特效
+    const sparkles = document.createElement('div');
+    sparkles.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        animation: sparkle 1.5s infinite;
+    `;
+    sparkles.innerHTML = '✨💫⭐✨💫⭐✨💫⭐'.split('').map((emoji, i) => 
+        `<span style="position: absolute; 
+                      left: ${Math.random() * 100}%; 
+                      top: ${Math.random() * 100}%; 
+                      font-size: ${12 + Math.random() * 20}px;
+                      animation: float ${2 + Math.random() * 2}s ease-in-out infinite;
+                      animation-delay: ${i * 0.2}s;">
+            ${emoji}
+        </span>`
+    ).join('');
+
+    container.appendChild(sparkles);
+
+    const content = document.createElement('div');
+    content.style.cssText = `position: relative; z-index: 1;`;
+    content.innerHTML = `
+        <div style="text-align: center; font-size: 20px; margin-bottom: 12px; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.8);">
+            ✨💖 特殊剧情触发 💖✨
+        </div>
+        <div style="background: rgba(255,255,255,0.9); border-radius: 12px; padding: 15px; margin-bottom: 12px;">
+            <div style="color: #333; line-height: 1.8; font-size: 14px; text-align: center;">${sceneDescription}</div>
+        </div>
+        <div style="text-align: center; color: #FF69B4; font-size: 13px; text-shadow: 0 1px 3px rgba(0,0,0,0.2);">
+            🎁 因为你赠送了珍贵的${item.displayName}，${currentPet.name}的心被深深触动了...
+        </div>
+    `;
+
+    container.appendChild(content);
+
+    // ⚠️ 更新存档（包含特殊剧情）
+    interactionManager.saveModeRecord(INTERACTION_MODES.GIFT, parentDiv.outerHTML);
+
+    // 添加动画样式
+    ensureSpecialGiftStyles();
+}
+
+// ========== 在卡片内部显示默认特殊场景（AI未返回时） ==========
+async function showDefaultSpecialSceneInside(container, item, interactionManager, parentDiv) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    container.style.display = 'block';
+    container.style.cssText = `
+        display: block;
+        margin-top: 20px;
+        background: linear-gradient(135deg, rgba(255,182,193,0.3) 0%, rgba(255,240,245,0.3) 100%);
+        border: 2px dashed #FFB6C1;
+        border-radius: 15px;
+        padding: 15px;
+        text-align: center;
+        animation: heartbeat 1.5s infinite, fadeInDown 0.8s ease-out;
+    `;
+
+    const emojiEffects = ['💖', '✨', '🌸', '💝', '🎊', '🌟', '💫', '🎀'];
+    const randomEmojis = Array(12).fill(0).map(() => 
+        emojiEffects[Math.floor(Math.random() * emojiEffects.length)]
+    ).join('');
+
+    container.innerHTML = `
+        <div style="font-size: 30px; margin-bottom: 10px; animation: rotate 2s linear infinite;">
+            ${randomEmojis}
+        </div>
+        <div style="color: #FF1493; font-size: 16px; font-weight: bold; margin-bottom: 8px;">
+            ${currentPet.name}被你的心意深深感动了！
+        </div>
+        <div style="color: #666; font-size: 13px;">
+            这份${item.displayName}让${currentPet.name}的心跳加速，你们之间的羁绊变得更加深厚...
+        </div>
+    `;
+
+    // ⚠️ 更新存档（包含特殊剧情）
+    interactionManager.saveModeRecord(INTERACTION_MODES.GIFT, parentDiv.outerHTML);
+
+    ensureSpecialGiftStyles();
+}
+
+// ========== 确保特殊礼物动画样式存在 ==========
+function ensureSpecialGiftStyles() {
+    if (!document.getElementById('special-gift-styles')) {
+        const style = document.createElement('style');
+        style.id = 'special-gift-styles';
+        style.textContent = `
+            @keyframes specialGlow {
+                0%, 100% { box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4), 0 0 20px rgba(255, 105, 180, 0.2); }
+                50% { box-shadow: 0 6px 25px rgba(255, 215, 0, 0.6), 0 0 35px rgba(255, 105, 180, 0.4); }
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.6; }
+                50% { transform: translateY(-15px) rotate(180deg); opacity: 1; }
+            }
+            @keyframes sparkle {
+                0%, 100% { opacity: 0.4; }
+                50% { opacity: 1; }
+            }
+            @keyframes fadeInDown {
+                from { opacity: 0; transform: translateY(-20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes heartbeat {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.03); }
+            }
+            @keyframes rotate {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 // ========== 解析 AI 返回的 JSON（增强版） ==========
@@ -12954,48 +13707,7 @@ function parseAIResponse(content) {
     }
 }
 
-// ========== 处理冒险结果 ==========
-function handleAdventureResult(data, interactionManager, chatArea) {
-    if (!data || !data.story) {
-        showInfoBox('探险数据异常，请重试！');
-        return;
-    }
-    
-    const resultDiv = document.createElement('div');
-    resultDiv.style.cssText = `
-        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,240,255,0.95) 100%);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        animation: slideIn 0.5s ease-out;
-    `;
-    
-    resultDiv.innerHTML = `
-        <div style="font-size: 18px; font-weight: bold; color: #667eea; margin-bottom: 15px;">🗺️ 探险归来</div>
-        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${data.story}</div>
-        <div style="background: rgba(102, 126, 234, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
-            <div style="color: #667eea; font-weight: bold; margin-bottom: 8px;">收获：</div>
-            <div style="color: #333;">💰 金子：+${convertPrice(data.reward.gold)}</div>
-            <div style="color: #E91E63;">❤ 亲密度：+${data.reward.intimacy}</div>
-        </div>
-        <div style="color: #666; font-style: italic; border-left: 3px solid #667eea; padding-left: 10px;">
-            ${currentPet.name}：${data.dialogue}
-        </div>
-    `;
-    
-    chatArea.appendChild(resultDiv);
-    chatArea.scrollTop = chatArea.scrollHeight;
-    
-    goldAmount += data.reward.gold;
-    updateGoldDisplay(goldAmount);
-    interactionManager.addInteraction(data.reward.intimacy);
-    updateIntimacyDisplay(interactionManager);
-    
-    showInfoBox(`探险成功！获得${convertPrice(data.reward.gold)}金子，亲密度+${data.reward.intimacy}`);
-}
-
-// ========== 处理游戏结果 ==========
+// ========== 处理游戏结果（增强版，带性格点评） ==========
 function handleGameResult(data, interactionManager, chatArea, inputArea) {
     if (!data || !data.question) {
         showInfoBox('游戏数据异常，请重试！');
@@ -13040,10 +13752,16 @@ function handleGameResult(data, interactionManager, chatArea, inputArea) {
         <div style="color: #666; font-style: italic; border-left: 3px solid #4facfe; padding-left: 10px;">
             ${currentPet.name}：${data.dialogue}
         </div>
+        <div id="pet-comment-${Date.now()}" style="margin-top: 15px; display: none;"></div>
     `;
     
     chatArea.appendChild(gameDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
+
+    // ⚠️ 新增：保存游戏题目记录
+    interactionManager.saveModeRecord(INTERACTION_MODES.GAME, gameDiv.outerHTML);
+    
+    const commentDiv = gameDiv.querySelector(`[id^="pet-comment-"]`);
     
     setTimeout(() => {
         const optionBtns = gameDiv.querySelectorAll('.game-option');
@@ -13060,7 +13778,7 @@ function handleGameResult(data, interactionManager, chatArea, inputArea) {
                     btn.style.transform = 'translateX(0)';
                 }
             };
-            btn.onclick = function() {
+            btn.onclick = async function() {
                 const selectedIndex = parseInt(this.dataset.index);
                 const isCorrect = selectedIndex === data.correct_answer;
                 
@@ -13083,18 +13801,78 @@ function handleGameResult(data, interactionManager, chatArea, inputArea) {
                     updateIntimacyDisplay(interactionManager);
                     showInfoBox('回答错误！但获得了2点亲密度安慰奖。');
                 }
+                // ⚠️ 新增：保存游戏结果记录（在生成点评之前）
+                interactionManager.saveModeRecord(
+                    INTERACTION_MODES.GAME, 
+                    gameDiv.outerHTML // 保存包含答案结果的完整题目
+                );
+                // ========== 生成性格化点评 ==========
+                await generatePersonalityComment(isCorrect, interactionManager, commentDiv);
             };
         });
     }, 100);
+    
 }
 
-// ========== 处理修炼结果 ==========
-function handleTrainingResult(data, interactionManager, chatArea) {
-    if (!data || !data.description) {
-        showInfoBox('修炼数据异常，请重试！');
-        return;
+// ========== 生成性格化点评 ==========
+async function generatePersonalityComment(isCorrect, interactionManager, commentDiv) {
+    try {
+        const commentPrompt = `你是${currentPet.name}，性格是${interactionManager.personality}。
+玩家刚才在游戏中${isCorrect ? '回答正确了' : '回答错误了'}。
+
+请用你的${interactionManager.personality}性格，对玩家的表现进行点评或反馈（30-60字）。
+要求：
+1. 完全体现${interactionManager.personality}性格特点
+2. 正确时可以赞美、鼓励或略带傲娇
+3. 错误时可以安慰、吐槽或教育
+4. 语气自然，不做作
+
+严格按照JSON格式回复：
+{
+    "comment": "你的点评（30-60字）"
+}`;
+
+        const response = await fetch(`${DEEPSEEK_CONFIG.baseUrl}/chat/completions`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+            },
+            body: JSON.stringify({
+                model: DEEPSEEK_CONFIG.model,
+                messages: [
+                    { role: "system", content: commentPrompt },
+                    { role: "user", content: "给出点评" }
+                ],
+                stream: false,
+                temperature: 0.85
+            })
+        });
+
+        if (!response.ok) throw new Error('点评生成失败');
+
+        const result = await response.json();
+        const data = parseAIResponse(result.choices[0].message.content);
+        
+        if (data && data.comment) {
+            commentDiv.style.display = 'block';
+            commentDiv.style.cssText += `
+                background: rgba(79, 172, 254, 0.1);
+                border-radius: 10px;
+                padding: 12px;
+                color: #333;
+                font-style: italic;
+                border-left: 3px solid #4facfe;
+            `;
+            commentDiv.innerHTML = `💬 ${currentPet.name}：${data.comment}`;
+        }
+    } catch (error) {
+        console.error('点评生成失败:', error);
     }
-    
+}
+
+// ========== 处理修炼结果（完全重写） ==========
+function handleTrainingResult(data, interactionManager, chatArea, bonusInfo) {
     const success = Math.random() * 100 < data.success_rate;
     
     const resultDiv = document.createElement('div');
@@ -13107,93 +13885,63 @@ function handleTrainingResult(data, interactionManager, chatArea) {
         animation: slideIn 0.5s ease-out;
     `;
     
+    const typeNames = {
+        basic: '基础修炼',
+        advanced: '进阶修炼',
+        breakthrough: '突破修炼'
+    };
+    
     if (success) {
+        const damageBonusGain = data.success_result.damage_bonus;
+        interactionManager.damageBonus = (interactionManager.damageBonus || 0) + damageBonusGain;
+        interactionManager.saveData();
+        
         resultDiv.innerHTML = `
-            <div style="font-size: 18px; font-weight: bold; color: #fa709a; margin-bottom: 15px;">⚡ 修炼成功</div>
+            <div style="font-size: 18px; font-weight: bold; color: #fa709a; margin-bottom: 15px;">⚡ 修炼成功 - ${typeNames[data.training_type]}</div>
             <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${data.description}</div>
             <div style="background: rgba(250, 112, 154, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
                 <div style="color: #fa709a; font-weight: bold; margin-bottom: 8px;">修炼成果：</div>
-                <div style="color: #333;">💰 灵石转化：+${convertPrice(data.reward.gold)}金子</div>
-                <div style="color: #E91E63;">❤ 心灵相通：+${data.reward.intimacy}亲密度</div>
+                <div style="color: #333;">💰 灵石转化：+${convertPrice(data.success_result.gold)}金子</div>
+                <div style="color: #E91E63;">❤ 心灵相通：+${data.success_result.intimacy}亲密度</div>
+                <div style="color: #FF9800;">⚔️ 伤害加成：+${damageBonusGain.toFixed(2)} (总计: ${interactionManager.damageBonus.toFixed(2)})</div>
             </div>
             <div style="color: #666; font-style: italic; border-left: 3px solid #fa709a; padding-left: 10px;">
-                ${currentPet.name}：${data.dialogue}
+                ${currentPet.name}：${data.personality_guidance}
             </div>
         `;
         
-        goldAmount += data.reward.gold;
+        goldAmount += data.success_result.gold;
         updateGoldDisplay(goldAmount);
-        interactionManager.addInteraction(data.reward.intimacy);
+        interactionManager.addInteraction(data.success_result.intimacy);
         updateIntimacyDisplay(interactionManager);
-        showInfoBox(`修炼成功！获得${convertPrice(data.reward.gold)}金子，亲密度+${data.reward.intimacy}`);
+        
+        // 更新伤害加成显示
+        bonusInfo.innerHTML = `当前伤害加成：<span style="color: #FFD700; font-weight: bold;">+${interactionManager.damageBonus.toFixed(2)}%</span>`;
+        
+        showInfoBox(`修炼成功！获得${convertPrice(data.success_result.gold)}金子，伤害加成+${damageBonusGain.toFixed(2)}`, null, 3000, 'green');
     } else {
         resultDiv.innerHTML = `
-            <div style="font-size: 18px; font-weight: bold; color: #999; margin-bottom: 15px;">⚡ 修炼受挫</div>
+            <div style="font-size: 18px; font-weight: bold; color: #999; margin-bottom: 15px;">⚡ 修炼受挫 - ${typeNames[data.training_type]}</div>
             <div style="color: #666; line-height: 1.8; margin-bottom: 15px;">修炼过程中遇到了瓶颈，虽未成功突破，但也有所感悟...</div>
             <div style="background: rgba(153, 153, 153, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
                 <div style="color: #999; font-weight: bold; margin-bottom: 8px;">获得：</div>
-                <div style="color: #E91E63;">❤ 亲密度：+3</div>
+                <div style="color: #E91E63;">❤ 亲密度：+${data.fail_result.intimacy}</div>
             </div>
             <div style="color: #666; font-style: italic; border-left: 3px solid #999; padding-left: 10px;">
                 ${currentPet.name}：不要气馁，修炼之路本就充满坎坷，我会一直陪伴你的。
             </div>
         `;
         
-        interactionManager.addInteraction(3);
+        interactionManager.addInteraction(data.fail_result.intimacy);
         updateIntimacyDisplay(interactionManager);
-        showInfoBox('修炼未能成功，但获得了3点亲密度。');
+        showInfoBox(`修炼未能成功，但获得了${data.fail_result.intimacy}点亲密度。`, null, 3000, 'red');
     }
     
     chatArea.appendChild(resultDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
-}
 
-// ========== 处理送礼结果（增强错误处理） ==========
-function handleGiftResult(data, gift, interactionManager, chatArea) {
-    if (!data) {
-        console.error('送礼数据为空');
-        showInfoBox('送礼反馈异常：数据为空！');
-        return;
-    }
-    
-    // 兼容不同的返回格式
-    const reaction = data.reaction || data.reply || '收到了你的礼物';
-    const intimacyGain = data.intimacy_gain || data.intimacy_change || 15;
-    const dialogue = data.dialogue || `谢谢你的${gift.name}`;
-    const specialResponse = data.special_response || false;
-    
-    const resultDiv = document.createElement('div');
-    resultDiv.style.cssText = `
-        background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,240,245,0.95) 100%);
-        border-radius: 15px;
-        padding: 20px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        animation: slideIn 0.5s ease-out;
-    `;
-    
-    resultDiv.innerHTML = `
-        <div style="font-size: 18px; font-weight: bold; color: #E91E63; margin-bottom: 15px;">🎁 ${currentPet.name}收到了你的礼物</div>
-        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${reaction}</div>
-        <div style="background: rgba(233, 30, 99, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
-            <div style="color: #E91E63; font-weight: bold; margin-bottom: 8px;">感动值：</div>
-            <div style="color: #E91E63;">❤ 亲密度：+${intimacyGain}</div>
-            ${specialResponse ? '<div style="color: #FF9800;">✨ 触发了特殊剧情！</div>' : ''}
-        </div>
-        <div style="color: #666; font-style: italic; border-left: 3px solid #E91E63; padding-left: 10px;">
-            ${currentPet.name}：${dialogue}
-        </div>
-    `;
-    
-    chatArea.appendChild(resultDiv);
-    chatArea.scrollTop = chatArea.scrollHeight;
-    
-    interactionManager.addInteraction(intimacyGain);
-    interactionManager.totalGiftsReceived += 1;
-    interactionManager.saveData();
-    updateIntimacyDisplay(interactionManager);
-    
-    showInfoBox(`${currentPet.name}很高兴收到你的${gift.name}，亲密度+${intimacyGain}！`);
+    // ⚠️ 新增：保存修炼记录
+    interactionManager.saveModeRecord(INTERACTION_MODES.TRAINING, resultDiv.outerHTML);
 }
 
 // ========== 触发随机事件 ==========
@@ -13247,6 +13995,9 @@ function triggerRandomEvent(event, interactionManager, chatArea) {
     
     chatArea.appendChild(eventDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
+
+    // ⚠️ 新增：保存随机事件记录
+    interactionManager.saveModeRecord('random_event', eventDiv.outerHTML);
     
     goldAmount += reward;
     updateGoldDisplay(goldAmount);

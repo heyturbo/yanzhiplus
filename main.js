@@ -6224,6 +6224,7 @@ let jinnangItems = [
     { name: 'elixirKnowHow', displayName: '灵丹妙诀', url: 'https://pic1.imgdb.cn/item/67b46e19d0e0a243d40088a4.png', price: 1500, quantity: 0, description: '对内丹使用，记载内丹修炼的秘法，使用可大幅增加内丹经验' },
     { name: 'roseForLove', displayName: '爱意恒久远', url: 'https://pic1.imgdb.cn/item/67bbff2cd0e0a243d4033504.png', price: 1500, quantity: 0, description: '送给当前宠物可直接提升99点亲密度' },
     { name: 'elixirExpDouble', displayName: '内丹经验加强剂', url: 'https://pic1.imgdb.cn/item/67bc0030d0e0a243d40335ca.png', price: 1500, quantity: 0, description: '使用后20分钟内可让战斗中获得的内丹经验翻倍，刷新页面将失效' },
+    { name: 'crystal', displayName: '魔法水晶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 10000, quantity: 0, description: '在宠物传记界面可以重塑当前宠物的性格' },
     { name: 'spiritBottle', displayName: '精灵魔瓶', url: 'https://pic.imgdb.cn/item/66d004a1d9c307b7e99d4b93.png', price: 0, quantity: 0, description: '打开精灵面板，这是一个未来可期的伙伴，可以给你提供极大的助力' }
 ];
 
@@ -11095,23 +11096,126 @@ function updatePetWisdom() {
     updateAttributePanel();
 }
         
+
 // ============ 角色互动系统配置 ============
 const DEEPSEEK_CONFIG = {
     apiKey: 'sk-67572ca244cb444ea530a4f66e7bdaeb',
     model: 'deepseek-chat',
     baseUrl: 'https://api.deepseek.com',
     stream: true,
-    temperature: 1.3
+    temperature: 1
 };
 
-// ============ 互动玩法配置 ============
+// ============ 互动模式配置 ============
 const INTERACTION_MODES = {
-    CHAT: 'chat',           // 聊天模式
-    ADVENTURE: 'adventure', // 冒险模式
-    GAME: 'game',          // 小游戏模式
-    GIFT: 'gift',          // 送礼模式
-    TRAINING: 'training'   // 修炼模式
+    CHAT: 'chat',
+    ADVENTURE: 'adventure',
+    GAME: 'game',
+    TRAINING: 'training',
+    GIFT: 'gift'
 };
+
+// ============ 性格特质配置 ============
+const PERSONALITY_TRAITS = [
+    '果敢', '害羞', '开朗', '自信', '暴躁', 
+    '冷静', '倔强', '保守', '放荡', '傲慢', 
+    '强势', '露骨', '消沉', '热情', '充满性张力'
+];
+
+// ============ 性格对亲密度影响的配置 ============
+const PERSONALITY_INTIMACY_RULES = {
+    '果敢': {
+        positive: { min: 8, max: 20 },      // 欣赏果断行为
+        neutral: { min: 3, max: 6 },
+        negative: { min: -15, max: -5 },    // 讨厌犹豫不决
+        特殊规则: '喜欢直接表达，赞赏会+15到+20；犹豫或软弱的话-10到-15'
+    },
+    '害羞': {
+        positive: { min: 5, max: 12 },      // 温柔对待有效
+        neutral: { min: 2, max: 5 },
+        negative: { min: -20, max: -10 },   // 非常怕过分亲密
+        特殊规则: '低亲密度(<200)时的亲密举动-15到-20；温柔体贴+10到+12；过于热情-8到-12'
+    },
+    '开朗': {
+        positive: { min: 10, max: 25 },     // 最容易开心
+        neutral: { min: 4, max: 8 },
+        negative: { min: -12, max: -5 },    // 容忍度高
+        特殊规则: '有趣互动+15到+25；沉闷无聊-8到-12；几乎不会因亲密举动生气'
+    },
+    '自信': {
+        positive: { min: 8, max: 18 },      // 欣赏认可
+        neutral: { min: 3, max: 7 },
+        negative: { min: -18, max: -8 },    // 讨厌质疑
+        特殊规则: '认可和赞美+12到+18；质疑或贬低-15到-18；过度谄媚-5'
+    },
+    '暴躁': {
+        positive: { min: 6, max: 15 },      // 难以取悦
+        neutral: { min: 2, max: 5 },
+        negative: { min: -25, max: -10 },   // 容易发火
+        特殊规则: '激怒性话语-20到-25；顺从和安抚+8到+15；反驳-15到-20'
+    },
+    '冷静': {
+        positive: { min: 5, max: 12 },      // 理性回应
+        neutral: { min: 3, max: 6 },
+        negative: { min: -10, max: -5 },    // 不易动怒
+        特殊规则: '深度交流+10到+12；浮夸表达-3到-5；情绪化行为-8到-10'
+    },
+    '倔强': {
+        positive: { min: 6, max: 14 },      // 需要认同
+        neutral: { min: 2, max: 5 },
+        negative: { min: -20, max: -8 },    // 讨厌强迫
+        特殊规则: '尊重想法+10到+14；强迫或命令-15到-20；说服需要循序渐进'
+    },
+    '保守': {
+        positive: { min: 5, max: 10 },      // 传统互动
+        neutral: { min: 2, max: 5 },
+        negative: { min: -18, max: -8 },    // 抗拒出格
+        特殊规则: '低亲密度(<250)时的出格话题-15到-18；得体交流+8到+10；传统礼仪+12'
+    },
+    '放荡': {
+        positive: { min: 12, max: 30 },     // 喜欢大胆
+        neutral: { min: 5, max: 10 },
+        negative: { min: -8, max: -3 },     // 容忍度极高
+        特殊规则: '大胆表达+20到+30；拘谨保守-5到-8；亲密举动即使低亲密度也+15'
+    },
+    '傲慢': {
+        positive: { min: 5, max: 12 },      // 难以讨好
+        neutral: { min: 1, max: 4 },
+        negative: { min: -20, max: -10 },   // 易被冒犯
+        特殊规则: '恭维过度-8；真诚认可+10到+12；冒犯或平等对话-15到-20'
+    },
+    '强势': {
+        positive: { min: 7, max: 16 },      // 欣赏服从
+        neutral: { min: 2, max: 6 },
+        negative: { min: -22, max: -10 },   // 不容挑战
+        特殊规则: '顺从配合+12到+16；挑战权威-18到-22；需要主导对话否则-5'
+    },
+    '露骨': {
+        positive: { min: 10, max: 25 },     // 喜欢直白
+        neutral: { min: 5, max: 10 },
+        negative: { min: -10, max: -5 },    // 讨厌虚伪
+        特殊规则: '直白表达+15到+25；含蓄暗示-3到-5；虚伪客套-8到-10'
+    },
+    '消沉': {
+        positive: { min: 8, max: 18 },      // 渴望温暖
+        neutral: { min: 2, max: 5 },
+        negative: { min: -25, max: -12 },   // 容易受伤
+        特殊规则: '真诚安慰+15到+18；忽视冷漠-20到-25；强迫开心-15'
+    },
+    '热情': {
+        positive: { min: 12, max: 28 },     // 热烈回应
+        neutral: { min: 5, max: 10 },
+        negative: { min: -15, max: -8 },    // 怕冷漠
+        特殊规则: '热情互动+20到+28；冷淡回应-12到-15；任何关注+10'
+    },
+    '充满性张力': {
+        positive: { min: 15, max: 30 },     // 暧昧最有效
+        neutral: { min: 6, max: 12 },
+        negative: { min: -12, max: -5 },    // 讨厌无趣
+        特殊规则: '暧昧撩拨+20到+30；正经八股-8到-12；亲密暗示即使低亲密度+18'
+    }
+};
+
 
 // ============ 随机事件配置 ============
 const RANDOM_EVENTS = [
@@ -11151,10 +11255,15 @@ class InteractionManager {
         this.loadData();
         this.currentMode = INTERACTION_MODES.CHAT;
         this.eventTriggered = false;
+        this.giftingSending = false; // 防止重复送礼
     }
 
     getStorageKey(petName) {
         return `pet_interaction_${petName}`;
+    }
+
+    getPersonalityKey(petName) {
+        return `pet_personality_${petName}`;
     }
 
     loadData() {
@@ -11181,7 +11290,24 @@ class InteractionManager {
             this.totalGiftsReceived = 0;
         }
         
+        // 加载或生成性格
+        this.personality = this.loadOrGeneratePersonality(currentPetName);
+        
         this.checkDailyReset();
+    }
+
+    loadOrGeneratePersonality(petName) {
+        const key = this.getPersonalityKey(petName);
+        const saved = localStorage.getItem(key);
+        
+        if (saved) {
+            return saved;
+        } else {
+            // 随机生成性格
+            const randomTrait = PERSONALITY_TRAITS[Math.floor(Math.random() * PERSONALITY_TRAITS.length)];
+            localStorage.setItem(key, randomTrait);
+            return randomTrait;
+        }
     }
 
     checkDailyReset() {
@@ -11206,12 +11332,16 @@ class InteractionManager {
             totalGiftsReceived: this.totalGiftsReceived
         };
         localStorage.setItem(key, JSON.stringify(data));
+        
+        // 单独保存性格（重要：确保性格重塑后能保存）
+        const personalityKey = this.getPersonalityKey(currentPetName);
+        localStorage.setItem(personalityKey, this.personality);
     }
 
     addInteraction(points = 1) {
         this.interactionCount += 1;
         this.dailyInteractions += 1;
-        this.intimacy += points;
+        this.intimacy = Math.max(0, this.intimacy + points); // 亲密度可以为负，但最小为0
         this.lastInteractionTime = Date.now();
         this.saveData();
     }
@@ -11237,7 +11367,6 @@ class InteractionManager {
         return { level: "心心相印", color: "#E91E63" };
     }
 
-    // 检查并触发随机事件
     checkRandomEvent() {
         if (this.eventTriggered) return null;
         
@@ -11251,6 +11380,14 @@ class InteractionManager {
         }
         
         return null;
+    }
+    
+    // 新增：更新性格的方法
+    updatePersonality(newPersonality) {
+        this.personality = newPersonality;
+        const currentPetName = document.getElementById("pet-select").value;
+        const personalityKey = this.getPersonalityKey(currentPetName);
+        localStorage.setItem(personalityKey, newPersonality);
     }
 }
 
@@ -11278,95 +11415,187 @@ function getUnlockedBiographies() {
     return unlockedBios;
 }
 
-// ============ DeepSeek API 调用（增强版） ============
+// ============ DeepSeek API 调用（流式版本） ============
+// ============ DeepSeek API 调用（流式版本） ============
 async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTION_MODES.CHAT, additionalContext = {}) {
     const currentPetName = document.getElementById("pet-select").value;
     const unlockedBios = getUnlockedBiographies();
     const intimacyLevel = interactionManager.getIntimacyLevel();
+    const personality = interactionManager.personality;
     
-    let systemPrompt = `你是${currentPet.name}，一个来自修仙世界的灵兽伙伴。`;
+    // 获取性格规则
+    const personalityRule = PERSONALITY_INTIMACY_RULES[personality] || PERSONALITY_INTIMACY_RULES['冷静'];
+    
+    let systemPrompt = `你是${currentPet.name}。
+你的性格特质是：${personality}。这个性格会深刻影响你的说话方式、行为举止和对事物的反应。请始终保持这个性格特质。`;
     
     if (unlockedBios.length > 0) {
         systemPrompt += `\n\n你的背景故事：\n${unlockedBios.join('\n\n')}`;
     } else {
-        systemPrompt += `\n\n由于修炼者对你了解不深，你的过去仍然是个谜。你可以保持一些神秘感，但也会逐渐向信任的修炼者展现真实的自己。`;
+        systemPrompt += `\n\n由于玩家对你了解不深，你的过去仍然是个谜。你可以保持一些神秘感，但也会逐渐向信任的玩家展现真实的自己。`;
     }
     
     systemPrompt += `\n\n当前亲密度等级：${intimacyLevel.level}（${interactionManager.intimacy}点）`;
     systemPrompt += `\n互动次数：${interactionManager.interactionCount}次`;
     
-    // 根据亲密度调整性格
+    // 根据亲密度调整性格表现
     if (intimacyLevel.level === "陌生") {
-        systemPrompt += `\n\n你对这位修炼者还不太熟悉，会保持一定的距离感和礼貌。回答简洁但不失礼貌。`;
+        systemPrompt += `\n\n你对这位玩家还不太熟悉，会保持一定的距离感和礼貌。回答简洁但不失礼貌。你的${personality}性格会相对内敛。`;
     } else if (intimacyLevel.level === "熟悉") {
-        systemPrompt += `\n\n你开始对这位修炼者有些了解，会稍微放松一些，偶尔展现个性。`;
+        systemPrompt += `\n\n你开始对这位玩家有些了解，会稍微放松一些，偶尔展现个性。你的${personality}特质开始显露。`;
     } else if (intimacyLevel.level === "友好") {
-        systemPrompt += `\n\n你已经将这位修炼者当作朋友，会更加主动地分享想法和感受。`;
+        systemPrompt += `\n\n你已经将这位玩家当作朋友，会更加主动地分享想法和感受。你的${personality}性格会更加明显。`;
     } else if (intimacyLevel.level === "亲密") {
-        systemPrompt += `\n\n你们之间建立了深厚的信任，你会毫无保留地表达自己，甚至会关心对方的感受。`;
+        systemPrompt += `\n\n你们之间建立了深厚的信任，你会毫无保留地表达自己，甚至会关心对方的感受。你的${personality}性格完全展现。`;
     } else if (intimacyLevel.level === "挚友") {
-        systemPrompt += `\n\n你们是最好的伙伴，你会用更亲昵的语气交流，分享内心深处的想法。`;
+        systemPrompt += `\n\n你们是最好的伙伴，你会用更亲昵的语气交流，分享内心深处的想法。你的${personality}性格会以最真实的方式呈现。`;
     } else {
-        systemPrompt += `\n\n你们心意相通，你会用最温暖、最真挚的方式与修炼者交流，甚至能感知对方的情绪。`;
+        systemPrompt += `\n\n你们心意相通，你会用最温暖、最真挚的方式与玩家交流，甚至能感知对方的情绪。你的${personality}性格与玩家完美契合。`;
     }
     
-    // 根据不同模式调整提示词
-    if (mode === INTERACTION_MODES.ADVENTURE) {
-        systemPrompt += `\n\n当前模式：冒险探索
-你需要以JSON格式返回冒险结果，格式如下：
+    // ========== 聊天模式 ==========
+    if (mode === INTERACTION_MODES.CHAT) {
+        systemPrompt += `\n\n【重要】你必须严格按照JSON格式回复，不要有任何多余文字：
 {
-    "story": "冒险故事描述（100-150字）",
-    "reward": {
-        "gold": 数值（0-50000之间的随机金币奖励）,
-        "intimacy": 数值（5-15之间的亲密度提升）
-    },
-    "dialogue": "你对修炼者说的话（50-80字）"
+    "reply": "你的回复内容（100-200字，完全体现${personality}性格特点）",
+    "intimacy_change": 亲密度变化值（整数），
+    "emotion": "当前情绪"
 }
 
-请根据当前亲密度等级和角色设定，生成一个符合角色人设的冒险故事。亲密度越高，冒险越精彩，奖励越丰厚。`;
-    } else if (mode === INTERACTION_MODES.GAME) {
-        systemPrompt += `\n\n当前模式：趣味游戏
-你需要以JSON格式返回游戏互动，格式如下：
+【${personality}性格的亲密度判定规则】
+${personalityRule.特殊规则}
+
+具体数值范围：
+- 正面积极的话：${personalityRule.positive.min}到${personalityRule.positive.max}
+- 普通中性的话：${personalityRule.neutral.min}到${personalityRule.neutral.max}
+- 负面冒犯的话：${personalityRule.negative.min}到${personalityRule.negative.max}
+
+请根据玩家的话语内容，严格遵循${personality}性格的特点，给出真实的反应和合理的亲密度变化。`;
+    }
+    
+    // ========== 冒险模式 ==========
+    else if (mode === INTERACTION_MODES.ADVENTURE) {
+        const personalityAdventureBonus = {
+            '果敢': { bonus: 1.3, style: '你会主动探索危险区域，带来更多刺激的冒险' },
+            '害羞': { bonus: 0.8, style: '你会选择相对安全的路线，但也有意外惊喜' },
+            '开朗': { bonus: 1.2, style: '你会用乐观的态度面对一切，探险充满欢乐' },
+            '冷静': { bonus: 1.1, style: '你会理性分析每个选择，探险更加高效' },
+            '暴躁': { bonus: 1.4, style: '你容易冲动行事，探险充满未知和刺激' },
+            '放荡': { bonus: 1.5, style: '你会带领玩家体验最刺激的冒险路线' }
+        };
+        
+        const advBonus = personalityAdventureBonus[personality] || { bonus: 1.0, style: '你会根据情况灵活选择探险路线' };
+        
+        systemPrompt += `\n\n【冒险模式】你的${personality}性格影响：${advBonus.style}
+        
+你必须严格按照JSON格式回复：
 {
-    "game_type": "游戏类型（猜谜/问答/挑战等）",
-    "question": "游戏问题或挑战描述",
+    "story": "根据${personality}性格编写150-250字的探险故事（要体现性格特点）",
+    "reward": {
+        "gold": ${Math.floor(15000 * advBonus.bonus)}到${Math.floor(40000 * advBonus.bonus)}之间的随机整数,
+        "intimacy": ${Math.floor(8 * advBonus.bonus)}到${Math.floor(20 * advBonus.bonus)}之间的随机整数
+    },
+    "dialogue": "你对这次探险的${personality}式评价（30-50字）"
+}`;
+    }
+    
+    // ========== 游戏模式 ==========
+    else if (mode === INTERACTION_MODES.GAME) {
+        const personalityGameStyle = {
+            '果敢': '出难度较高的挑战题，回答正确奖励更多',
+            '害羞': '出简单温和的题目，注重鼓励',
+            '开朗': '出有趣活泼的题目，充满欢乐',
+            '自信': '出考验智慧的题目，展现你的博学',
+            '暴躁': '出刁钻的题目，答错会有点不耐烦',
+            '冷静': '出逻辑严谨的题目，理性分析',
+            '倔强': '出有争议性的题目，坚持自己的观点',
+            '保守': '出传统文化类题目',
+            '放荡': '出大胆出格的题目，题目本身就很刺激',
+            '傲慢': '出高难度题目，答对才勉强认可',
+            '强势': '出命令式题目，要求绝对服从',
+            '露骨': '出直白坦率的题目，毫不掩饰',
+            '消沉': '出感性的题目，带着淡淡忧伤',
+            '热情': '出充满激情的题目，热烈互动',
+            '充满性张力': '出充满暧昧暗示的题目，答案也很撩人'
+        };
+        
+        systemPrompt += `\n\n【游戏模式】你的${personality}性格决定了出题风格：${personalityGameStyle[personality] || '出有趣的谜题'}
+
+你必须严格按照JSON格式回复：
+{
+    "game_type": "游戏类型（如：修仙知识问答、逻辑推理、猜谜等）",
+    "question": "完全体现${personality}性格的题目内容（50-100字）",
     "options": ["选项1", "选项2", "选项3", "选项4"],
-    "correct_answer": 正确答案的索引（0-3）,
-    "hint": "提示信息",
-    "reward_correct": 答对的奖励金币（1000-10000）,
-    "dialogue": "你对修炼者说的话（30-50字）"
-}
+    "correct_answer": 正确选项的索引（0-3的整数）,
+    "hint": "符合${personality}性格的提示（20-40字）",
+    "reward_correct": 10000到30000之间的随机整数,
+    "dialogue": "你用${personality}性格说的开场白（30-50字）"
+}`;
+    }
+    
+    // ========== 修炼模式 ==========
+    else if (mode === INTERACTION_MODES.TRAINING) {
+        const personalityTrainingEffect = {
+            '果敢': { rate: 75, bonus: 1.4, desc: '你会教授果断的修炼方式，成功率高' },
+            '害羞': { rate: 50, bonus: 0.9, desc: '你会温柔指导，但不够强势，成功率中等' },
+            '开朗': { rate: 65, bonus: 1.2, desc: '你会用快乐的方式修炼，效果不错' },
+            '冷静': { rate: 80, bonus: 1.3, desc: '你会理性分析修炼要点，成功率很高' },
+            '暴躁': { rate: 45, bonus: 1.6, desc: '你的修炼方式激进，成功时收益巨大但失败率高' },
+            '强势': { rate: 70, bonus: 1.5, desc: '你会强制性指导修炼，效果显著' },
+            '消沉': { rate: 40, bonus: 0.8, desc: '你的消极情绪影响修炼，成功率较低' },
+            '热情': { rate: 68, bonus: 1.3, desc: '你的热情会感染修炼过程，效果良好' }
+        };
+        
+        const trainEffect = personalityTrainingEffect[personality] || { rate: 60, bonus: 1.0, desc: '你会按常规方式指导修炼' };
+        
+        systemPrompt += `\n\n【修炼模式】你的${personality}性格影响：${trainEffect.desc}
 
-请设计一个符合角色背景人设且有趣的互动游戏。`;
-    } else if (mode === INTERACTION_MODES.TRAINING) {
-        systemPrompt += `\n\n当前模式：灵力修炼
-你需要以JSON格式返回修炼结果，格式如下：
+你必须严格按照JSON格式回复：
 {
-    "training_type": "修炼类型（吐纳/炼气/悟道等）",
-    "description": "修炼过程描述（80-120字）",
-    "success_rate": 成功率（0-100之间的数值）,
+    "description": "根据${personality}性格描述修炼过程（100-180字）",
+    "success_rate": ${trainEffect.rate},
     "reward": {
-        "gold": 修炼获得的灵石转换金币（5000-30000）,
-        "intimacy": 亲密度提升（3-10）
+        "gold": ${Math.floor(20000 * trainEffect.bonus)}到${Math.floor(60000 * trainEffect.bonus)}之间的随机整数,
+        "intimacy": ${Math.floor(10 * trainEffect.bonus)}到${Math.floor(25 * trainEffect.bonus)}之间的随机整数
     },
-    "dialogue": "你的指导和鼓励（40-60字）"
-}
+    "dialogue": "你用${personality}性格说的修炼指导（40-60字）"
+}`;
+    }
+    
+    // ========== 送礼模式 ==========
+    else if (mode === INTERACTION_MODES.GIFT) {
+        const giftInfo = additionalContext.giftInfo || '一份礼物';
+        
+        const personalityGiftReaction = {
+            '果敢': { base: 15, max: 25, reaction: '直接表达喜悦，不掩饰' },
+            '害羞': { base: 12, max: 20, reaction: '害羞地收下，脸红不敢看你' },
+            '开朗': { base: 18, max: 30, reaction: '超级开心，活泼地表达感谢' },
+            '自信': { base: 13, max: 22, reaction: '自信地收下，认为这是应得的' },
+            '暴躁': { base: 10, max: 18, reaction: '虽然嘴上嫌弃，但内心很高兴' },
+            '冷静': { base: 12, max: 20, reaction: '冷静地表示感谢，但眼神温柔' },
+            '倔强': { base: 11, max: 19, reaction: '嘴硬说不需要，但还是收下了' },
+            '保守': { base: 13, max: 21, reaction: '得体地表达感谢，符合礼节' },
+            '放荡': { base: 20, max: 35, reaction: '大胆而热情地回应，甚至有些撩人' },
+            '傲慢': { base: 8, max: 15, reaction: '高傲地收下，表现得不太在意' },
+            '强势': { base: 14, max: 23, reaction: '强势地要求下次送更好的' },
+            '露骨': { base: 16, max: 28, reaction: '直白地表达喜欢，毫不掩饰' },
+            '消沉': { base: 15, max: 26, reaction: '感动得快要哭了，情绪激动' },
+            '热情': { base: 19, max: 32, reaction: '超级热情地感谢，可能还会抱住你' },
+            '充满性张力': { base: 22, max: 40, reaction: '用充满暧昧的方式表达感谢，让人心跳加速' }
+        };
+        
+        const giftReact = personalityGiftReaction[personality] || { base: 15, max: 25, reaction: '真诚地表达感谢' };
+        
+        systemPrompt += `\n\n【送礼模式】玩家送给你：${giftInfo}
+你的${personality}性格反应：${giftReact.reaction}
 
-根据亲密度等级调整修炼难度和收益，亲密度越高，修炼效果越好。`;
-    } else if (mode === INTERACTION_MODES.GIFT) {
-        systemPrompt += `\n\n当前模式：赠送礼物
-修炼者想要送你礼物。你需要以JSON格式返回反应，格式如下：
+你必须严格按照JSON格式回复：
 {
-    "reaction": "你的反应描述（60-100字）",
-    "intimacy_gain": 亲密度提升（10-30之间，根据礼物价值和当前亲密度）,
-    "special_response": "是否触发特殊剧情（true/false）",
-    "dialogue": "你对修炼者说的话（50-80字）"
-}
-
-礼物信息：${additionalContext.giftInfo || '一份心意'}
-请给出真挚且符合角色性格的反应。`;
-    } else {
-        systemPrompt += `\n\n请以${currentPet.name}的身份，用符合角色设定的语气回复修炼者。回复要自然、生动，可以适当使用传记故事的术语。回复长度控制在100-200字之间。`;
+    "reaction": "完全体现${personality}性格的收礼反应（80-150字，要有情感细节）",
+    "intimacy_gain": ${giftReact.base}到${giftReact.max}之间的随机整数,
+    "dialogue": "你用${personality}性格说的感谢话（30-60字）",
+    "special_response": ${interactionManager.intimacy > 500 ? 'true（高亲密度触发特殊剧情）' : 'false'}
+}`;
     }
 
     const messages = [
@@ -11387,7 +11616,7 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
             body: JSON.stringify({
                 model: DEEPSEEK_CONFIG.model,
                 messages: messages,
-                stream: mode === INTERACTION_MODES.CHAT,
+                stream: mode === INTERACTION_MODES.CHAT, // 聊天模式使用流式
                 temperature: DEEPSEEK_CONFIG.temperature
             })
         });
@@ -11396,57 +11625,19 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
             throw new Error(`API request failed: ${response.status}`);
         }
 
-        return mode === INTERACTION_MODES.CHAT ? response.body : await response.json();
+        // 如果是流式响应，返回response对象供后续处理
+        if (mode === INTERACTION_MODES.CHAT) {
+            return response;
+        }
+        
+        // 非流式直接返回JSON
+        return await response.json();
     } catch (error) {
         console.error('DeepSeek API Error:', error);
         throw error;
     }
 }
 
-// ============ 流式读取响应 ============
-async function streamResponse(stream, onChunk, onComplete, onError) {
-    const reader = stream.getReader();
-    const decoder = new TextDecoder();
-    let fullResponse = '';
-
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            
-            if (done) {
-                onComplete(fullResponse);
-                break;
-            }
-
-            const chunk = decoder.decode(value, { stream: true });
-            const lines = chunk.split('\n').filter(line => line.trim() !== '');
-
-            for (const line of lines) {
-                if (line.startsWith('data: ')) {
-                    const data = line.slice(6);
-                    
-                    if (data === '[DONE]') {
-                        continue;
-                    }
-
-                    try {
-                        const parsed = JSON.parse(data);
-                        const content = parsed.choices[0]?.delta?.content || '';
-                        
-                        if (content) {
-                            fullResponse += content;
-                            onChunk(content, fullResponse);
-                        }
-                    } catch (e) {
-                        // 忽略JSON解析错误
-                    }
-                }
-            }
-        }
-    } catch (error) {
-        onError(error);
-    }
-}
 
 // ============ 显示互动界面 ============
 function showBiography() {
@@ -11461,12 +11652,31 @@ function showBiography() {
     showInteractionInterface();
 }
 
+// ========== 防止移动端输入自动放大的优化 ==========
+// 在HTML的head中添加viewport meta标签(如果还没有的话)
+function preventMobileInputZoom() {
+    let viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (!viewportMeta) {
+        viewportMeta = document.createElement('meta');
+        viewportMeta.name = 'viewport';
+        document.head.appendChild(viewportMeta);
+    }
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+}
+
+// 在页面加载时调用
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', preventMobileInputZoom);
+} else {
+    preventMobileInputZoom();
+}
+
+// ========== 显示互动界面 ==========
 function showInteractionInterface() {
     const currentPetName = document.getElementById("pet-select").value;
     const interactionManager = new InteractionManager();
     const intimacyInfo = interactionManager.getIntimacyLevel();
 
-    // 创建全屏遮罩
     const overlay = document.createElement('div');
     overlay.id = 'interaction-overlay';
     overlay.style.cssText = `
@@ -11527,7 +11737,7 @@ function showInteractionInterface() {
 
     const titleInfo = document.createElement('div');
     titleInfo.innerHTML = `
-        <div style="color: white; font-size: 20px; font-weight: bold; margin-bottom: 3px;">${currentPet.name}</div>
+        <div style="color: white; font-size: 20px; font-weight: bold; margin-bottom: 3px;">${interactionManager.personality}的${currentPet.name}</div>
         <div id="intimacy-display" style="color: ${intimacyInfo.color}; font-size: 14px; display: flex; align-items: center; gap: 5px;">
             <span>❤</span>
             <span>${intimacyInfo.level}</span>
@@ -11544,6 +11754,7 @@ function showInteractionInterface() {
         gap: 10px;
     `;
 
+    // ========== 传记按钮 ==========
     const biographyBtn = document.createElement('button');
     biographyBtn.textContent = '📖 传记';
     biographyBtn.style.cssText = `
@@ -11553,13 +11764,31 @@ function showInteractionInterface() {
         border-radius: 20px;
         padding: 8px 16px;
         cursor: pointer;
-        font-size: 14px;
+        font-size: 16px;
         transition: all 0.3s;
         backdrop-filter: blur(5px);
     `;
     biographyBtn.onmouseover = () => biographyBtn.style.background = 'rgba(255, 255, 255, 0.3)';
     biographyBtn.onmouseout = () => biographyBtn.style.background = 'rgba(255, 255, 255, 0.2)';
     biographyBtn.onclick = () => showBiographyPage(currentPetName, overlay);
+
+    // ========== 重塑按钮 ==========
+    const reshapeBtn = document.createElement('button');
+    reshapeBtn.textContent = '🔮 重塑';
+    reshapeBtn.style.cssText = `
+        background: rgba(138, 43, 226, 0.3);
+        color: white;
+        border: 1px solid rgba(138, 43, 226, 0.6);
+        border-radius: 20px;
+        padding: 8px 16px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s;
+        backdrop-filter: blur(5px);
+    `;
+    reshapeBtn.onmouseover = () => reshapeBtn.style.background = 'rgba(138, 43, 226, 0.5)';
+    reshapeBtn.onmouseout = () => reshapeBtn.style.background = 'rgba(138, 43, 226, 0.3)';
+    reshapeBtn.onclick = () => showReshapeConfirmation(interactionManager, titleInfo, currentPet.name);
 
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '✕';
@@ -11580,6 +11809,7 @@ function showInteractionInterface() {
     closeBtn.onclick = () => document.body.removeChild(overlay);
 
     actionButtons.appendChild(biographyBtn);
+    actionButtons.appendChild(reshapeBtn);
     actionButtons.appendChild(closeBtn);
 
     header.appendChild(titleSection);
@@ -11619,7 +11849,7 @@ function showInteractionInterface() {
             border-radius: 15px;
             padding: 8px 16px;
             cursor: ${isLocked ? 'not-allowed' : 'pointer'};
-            font-size: 14px;
+            font-size: 16px;
             transition: all 0.3s;
             white-space: nowrap;
         `;
@@ -11654,7 +11884,6 @@ function showInteractionInterface() {
         appendMessage(msg.content, msg.role, chatArea);
     });
 
-    // 如果没有历史消息，显示欢迎消息
     if (interactionManager.chatHistory.length === 0) {
         const welcomeMsg = document.createElement('div');
         welcomeMsg.style.cssText = `
@@ -11666,19 +11895,11 @@ function showInteractionInterface() {
             backdrop-filter: blur(10px);
         `;
         welcomeMsg.innerHTML = `
-            <div style="font-size: 18px; margin-bottom: 10px;">✨ 欢迎与${currentPet.name}互动 ✨</div>
+            <div style="font-size: 18px; margin-bottom: 10px;">✨ 欢迎与${interactionManager.personality}的${currentPet.name}互动 ✨</div>
             <div style="font-size: 14px; opacity: 0.8;">试着和${currentPet.name}聊聊天，或者尝试其他互动模式吧！</div>
         `;
         chatArea.appendChild(welcomeMsg);
     }
-
-    // 检查随机事件
-    setTimeout(() => {
-        const randomEvent = interactionManager.checkRandomEvent();
-        if (randomEvent) {
-            triggerRandomEvent(randomEvent, interactionManager, chatArea);
-        }
-    }, 2000);
 
     // ========== 输入区域 ==========
     const inputArea = document.createElement('div');
@@ -11690,10 +11911,8 @@ function showInteractionInterface() {
         backdrop-filter: blur(10px);
     `;
 
-    // 创建默认的聊天输入界面
     createChatInput(inputArea, chatArea, interactionManager);
 
-    // 组装界面
     container.appendChild(header);
     container.appendChild(modeBar);
     container.appendChild(chatArea);
@@ -11704,7 +11923,173 @@ function showInteractionInterface() {
     setTimeout(() => chatArea.scrollTop = chatArea.scrollHeight, 100);
 }
 
-// ========== 创建聊天输入界面 ==========
+// ========== 显示重塑确认对话框 ==========
+function showReshapeConfirmation(interactionManager, titleInfo, petName) {
+    if (!useItem('crystal',1)) {
+        showInfoBox('没有魔法水晶，宠物暂时无法重塑性格（可在积分商店购买获得）');
+        return;
+    }
+    // 创建全屏遮罩
+    const confirmOverlay = document.createElement('div');
+    confirmOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10004;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease-out;
+    `;
+
+    // 创建确认对话框
+    const confirmBox = document.createElement('div');
+    confirmBox.style.cssText = `
+        background: #000000d6;
+        border-radius: 20px;
+        padding: 30px;
+        max-width: 450px;
+        width: 90%;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        animation: bounceIn 0.4s ease-out;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    `;
+
+    confirmBox.innerHTML = `
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="font-size: 48px; margin-bottom: 15px;">🔮</div>
+            <div style="font-size: 22px; font-weight: bold; color: white; margin-bottom: 10px;">性格重塑</div>
+            <div style="font-size: 14px; color: rgba(255, 255, 255, 0.9); line-height: 1.6;">
+                重塑将随机赋予${petName}一个新的性格<br/>
+                当前性格：<span style="color: #FFD700; font-weight: bold;">${interactionManager.personality}</span>
+            </div>
+        </div>
+        <div style="background: rgba(0, 0, 0, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 20px;">
+            <div style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">⚠️ 注意事项：</div>
+            <div style="color: rgba(255, 255, 255, 0.8); font-size: 12px; line-height: 1.6;">
+                • 性格将随机生成，无法预知结果<br/>
+                • 聊天记录和亲密度将被保留<br/>
+                • 此操作不可撤销
+            </div>
+        </div>
+        <div id="personality-preview" style="background: rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 20px; display: none;">
+            <div style="color: #FFD700; font-size: 13px; margin-bottom: 8px;">✨ 新性格预览：</div>
+            <div id="new-personality-text" style="color: white; font-size: 16px; font-weight: bold;"></div>
+        </div>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="reshape-cancel-btn" style="
+                flex: 1;
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+                border: 1px solid rgba(255, 255, 255, 0.4);
+                border-radius: 10px;
+                padding: 12px 20px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: all 0.3s;
+            ">取消</button>
+            <button id="reshape-confirm-btn" style="
+                flex: 1;
+                background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+                color: #000;
+                border: none;
+                border-radius: 10px;
+                padding: 12px 20px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: bold;
+                transition: all 0.3s;
+            ">开始重塑</button>
+        </div>
+    `;
+
+    confirmOverlay.appendChild(confirmBox);
+    document.body.appendChild(confirmOverlay);
+
+    // 按钮事件
+    const cancelBtn = confirmBox.querySelector('#reshape-cancel-btn');
+    const confirmBtn = confirmBox.querySelector('#reshape-confirm-btn');
+
+    cancelBtn.onmouseover = () => cancelBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+    cancelBtn.onmouseout = () => cancelBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+    cancelBtn.onclick = () => {
+        document.body.removeChild(confirmOverlay);
+        addItemToJinnang('crystal',1);
+    };
+
+    confirmBtn.onmouseover = () => confirmBtn.style.transform = 'scale(1.05)';
+    confirmBtn.onmouseout = () => confirmBtn.style.transform = 'scale(1)';
+    confirmBtn.onclick = () => {
+        performReshape(interactionManager, titleInfo, petName, confirmOverlay, confirmBox);
+    };
+}
+
+// ========== 执行重塑 ==========
+function performReshape(interactionManager, titleInfo, petName, confirmOverlay, confirmBox) {
+    const confirmBtn = confirmBox.querySelector('#reshape-confirm-btn');
+    confirmBtn.disabled = true;
+    confirmBtn.style.opacity = '0.5';
+    confirmBtn.textContent = '重塑中...';
+
+    // 显示重塑动画
+    const preview = confirmBox.querySelector('#personality-preview');
+    preview.style.display = 'block';
+    const newPersonalityText = confirmBox.querySelector('#new-personality-text');
+    newPersonalityText.textContent = '正在从性格库中随机选择...';
+
+    // 模拟重塑过程
+    let countdown = 3;
+    const countdownInterval = setInterval(() => {
+        newPersonalityText.textContent = `重塑倒计时：${countdown}...`;
+        countdown--;
+        
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            
+            // 从PERSONALITY_TRAITS数组中随机选择新性格
+            const randomIndex = Math.floor(Math.random() * PERSONALITY_TRAITS.length);
+            const newPersonality = PERSONALITY_TRAITS[randomIndex];
+            
+            // 保存旧性格用于显示
+            const oldPersonality = interactionManager.personality;
+            
+            // 使用新方法更新性格并保存到localStorage
+            interactionManager.updatePersonality(newPersonality);
+            
+            console.log('性格已更新:', {
+                旧性格: oldPersonality,
+                新性格: newPersonality,
+                当前存储: localStorage.getItem(interactionManager.getPersonalityKey(petName))
+            });
+            
+            // 显示结果
+            newPersonalityText.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <span style="color: #FFD700;">${oldPersonality}</span> 
+                    <span style="color: rgba(255,255,255,0.6);">→</span> 
+                    <span style="color: #00FF00; font-size: 18px;">${newPersonality}</span>
+                </div>
+            `;
+            
+            // 更新标题
+            titleInfo.querySelector('div').textContent = `${newPersonality}的${petName}`;
+            
+            // 修改按钮
+            confirmBtn.textContent = '✓ 重塑完成';
+            confirmBtn.style.background = 'linear-gradient(135deg, #00FF00 0%, #00CC00 100%)';
+            
+            setTimeout(() => {
+                document.body.removeChild(confirmOverlay);
+                showInfoBox(`性格重塑成功！${petName}现在是${newPersonality}的性格了！`, null, 3000, 'green');
+            }, 2000);
+        }
+    }, 300);
+}
+
+// ========== 优化输入框以防止移动端自动放大 ==========
 function createChatInput(inputArea, chatArea, interactionManager) {
     inputArea.innerHTML = '';
     
@@ -11715,70 +12100,77 @@ function createChatInput(inputArea, chatArea, interactionManager) {
         align-items: flex-end;
     `;
 
-    const inputBox = document.createElement('textarea');
-    inputBox.id = 'chat-input';
-    inputBox.placeholder = `和${currentPet.name}说点什么...`;
-    inputBox.style.cssText = `
+    const textarea = document.createElement('textarea');
+    textarea.id = 'chat-input'; // 添加ID方便引用
+    textarea.placeholder = `和${currentPet.name}聊聊天吧...`;
+    textarea.style.cssText = `
         flex: 1;
-        background: rgba(255, 255, 255, 0.9);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 20px;
-        padding: 12px 16px;
-        font-size: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 12px 15px;
+        font-size: 16px;
         resize: none;
-        max-height: 100px;
-        min-height: 44px;
-        color: #333;
-        outline: none;
-        transition: all 0.3s;
+        min-height: 45px;
+        max-height: 120px;
+        font-family: inherit;
+        line-height: 1.4;
     `;
-    inputBox.onfocus = () => {
-        inputBox.style.background = 'white';
-        inputBox.style.borderColor = 'rgba(255, 255, 255, 0.6)';
-    };
-    inputBox.onblur = () => {
-        inputBox.style.background = 'rgba(255, 255, 255, 0.9)';
-        inputBox.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-    };
-    inputBox.oninput = () => {
-        inputBox.style.height = 'auto';
-        inputBox.style.height = Math.min(inputBox.scrollHeight, 100) + 'px';
-    };
+    
+    // 关键：防止移动端输入时自动放大
+    textarea.setAttribute('autocomplete', 'off');
+    textarea.setAttribute('autocorrect', 'off');
+    textarea.setAttribute('autocapitalize', 'off');
+    textarea.setAttribute('spellcheck', 'false');
 
     const sendBtn = document.createElement('button');
-    sendBtn.id = 'send-button';
+    sendBtn.id = 'send-button'; // ⚠️ 重要：添加ID
     sendBtn.textContent = '发送';
     sendBtn.style.cssText = `
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         border: none;
-        border-radius: 20px;
-        padding: 12px 30px;
+        border-radius: 15px;
+        padding: 12px 25px;
+        cursor: pointer;
         font-size: 16px;
         font-weight: bold;
-        cursor: pointer;
         transition: all 0.3s;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        height: 45px;
     `;
-    sendBtn.onmouseover = () => {
-        sendBtn.style.transform = 'translateY(-2px)';
-        sendBtn.style.boxShadow = '0 6px 15px rgba(0, 0, 0, 0.3)';
-    };
-    sendBtn.onmouseout = () => {
-        sendBtn.style.transform = 'translateY(0)';
-        sendBtn.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.2)';
+
+    sendBtn.onmouseover = () => sendBtn.style.transform = 'scale(1.05)';
+    sendBtn.onmouseout = () => sendBtn.style.transform = 'scale(1)';
+
+    // 发送消息的函数
+    const handleSend = () => {
+        sendMessage(textarea, chatArea, interactionManager);
     };
 
-    sendBtn.onclick = () => sendMessage(inputBox, chatArea, interactionManager);
-
-    inputBox.onkeydown = (e) => {
+    sendBtn.onclick = handleSend;
+    
+    textarea.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            sendMessage(inputBox, chatArea, interactionManager);
+            handleSend();
         }
-    };
+    });
 
-    inputContainer.appendChild(inputBox);
+    // 自动调整高度
+    textarea.addEventListener('input', () => {
+        textarea.style.height = '45px';
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    });
+
+    // 移动端优化：失去焦点时滚动到底部
+    textarea.addEventListener('blur', () => {
+        setTimeout(() => {
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }, 100);
+    });
+
+    inputContainer.appendChild(textarea);
     inputContainer.appendChild(sendBtn);
     inputArea.appendChild(inputContainer);
 }
@@ -11972,7 +12364,6 @@ function createTrainingMode(inputArea, chatArea, interactionManager) {
     inputArea.appendChild(trainingContainer);
 }
 
-// ========== 送礼模式 ==========
 function createGiftMode(inputArea, chatArea, interactionManager) {
     inputArea.innerHTML = '';
     
@@ -11993,6 +12384,7 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
     gifts.forEach(gift => {
         const giftBtn = document.createElement('button');
         giftBtn.innerHTML = `${gift.emoji} ${gift.name} (${convertPrice(gift.cost)}金子)`;
+        giftBtn.className = 'gift-button';
         giftBtn.style.cssText = `
             background: rgba(255, 255, 255, 0.2);
             color: white;
@@ -12003,8 +12395,16 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
             font-size: 15px;
             transition: all 0.3s;
         `;
-        giftBtn.onmouseover = () => giftBtn.style.background = 'rgba(255, 255, 255, 0.3)';
-        giftBtn.onmouseout = () => giftBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+        giftBtn.onmouseover = () => {
+            if (!giftBtn.disabled) {
+                giftBtn.style.background = 'rgba(255, 255, 255, 0.3)';
+            }
+        };
+        giftBtn.onmouseout = () => {
+            if (!giftBtn.disabled) {
+                giftBtn.style.background = 'rgba(255, 255, 255, 0.2)';
+            }
+        };
         
         giftBtn.onclick = async () => {
             if (goldAmount < gift.cost) {
@@ -12012,9 +12412,61 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
                 return;
             }
             
-            giftBtn.disabled = true;
+            if (interactionManager.giftingSending) {
+                showInfoBox('请等待上一个礼物送达后再赠送！');
+                return;
+            }
+            
+            // 禁用所有送礼按钮
+            interactionManager.giftingSending = true;
+            const allGiftBtns = giftContainer.querySelectorAll('.gift-button');
+            allGiftBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            });
+            
+            // 显示赠送中提示
+            const originalText = giftBtn.innerHTML;
+            giftBtn.innerHTML = `${gift.emoji} 赠送中...请稍候`;
+            
+            // 扣除金币
             goldAmount -= gift.cost;
             updateGoldDisplay(goldAmount);
+            
+            // 添加居中的过渡动画
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10002;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.cssText = `
+                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.95) 100%);
+                border-radius: 20px;
+                padding: 30px 40px;
+                text-align: center;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                animation: pulse 1.5s infinite;
+                max-width: 80%;
+            `;
+            loadingDiv.innerHTML = `
+                <div style="font-size: 48px; margin-bottom: 15px;">${gift.emoji}</div>
+                <div style="font-size: 18px; font-weight: bold; color: #E91E63; margin-bottom: 10px;">正在赠送礼物</div>
+                <div style="font-size: 14px; color: #666;">正在将${gift.name}送给${currentPet.name}...</div>
+            `;
+            
+            loadingOverlay.appendChild(loadingDiv);
+            document.body.appendChild(loadingOverlay);
             
             try {
                 const result = await callDeepSeekAPI(
@@ -12024,14 +12476,36 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
                     { giftInfo: `${gift.name}（价值${convertPrice(gift.cost)}金子）` }
                 );
                 
+                // 移除加载提示
+                document.body.removeChild(loadingOverlay);
+                
                 const data = parseAIResponse(result.choices[0].message.content);
+                
+                if (!data) {
+                    throw new Error('AI返回数据格式错误');
+                }
+                
                 handleGiftResult(data, gift, interactionManager, chatArea);
             } catch (error) {
+                console.error('送礼错误:', error);
+                
+                // 移除加载提示
+                if (document.body.contains(loadingOverlay)) {
+                    document.body.removeChild(loadingOverlay);
+                }
+                
                 showInfoBox('赠送失败，金子已退回！');
                 goldAmount += gift.cost;
                 updateGoldDisplay(goldAmount);
             } finally {
-                giftBtn.disabled = false;
+                // 恢复按钮状态
+                interactionManager.giftingSending = false;
+                allGiftBtns.forEach(btn => {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.cursor = 'pointer';
+                });
+                giftBtn.innerHTML = originalText;
             }
         };
         
@@ -12041,17 +12515,21 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
     inputArea.appendChild(giftContainer);
 }
 
-// ========== 解析 AI 返回的 JSON ==========
+// ========== 解析 AI 返回的 JSON（增强版） ==========
 function parseAIResponse(content) {
     try {
-        // 提取 JSON 部分
+        // 尝试提取 JSON 部分
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
-            return JSON.parse(jsonMatch[0]);
+            const parsed = JSON.parse(jsonMatch[0]);
+            return parsed;
         }
+        
+        console.warn('未找到JSON格式，原始内容:', content);
         return null;
     } catch (error) {
-        console.error('JSON parsing error:', error);
+        console.error('JSON解析错误:', error);
+        console.error('原始内容:', content);
         return null;
     }
 }
@@ -12089,7 +12567,6 @@ function handleAdventureResult(data, interactionManager, chatArea) {
     chatArea.appendChild(resultDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
     
-    // 应用奖励
     goldAmount += data.reward.gold;
     updateGoldDisplay(goldAmount);
     interactionManager.addInteraction(data.reward.intimacy);
@@ -12148,17 +12625,20 @@ function handleGameResult(data, interactionManager, chatArea, inputArea) {
     chatArea.appendChild(gameDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
     
-    // 添加选项点击事件
     setTimeout(() => {
         const optionBtns = gameDiv.querySelectorAll('.game-option');
         optionBtns.forEach(btn => {
             btn.onmouseover = () => {
-                btn.style.background = '#e3f2fd';
-                btn.style.transform = 'translateX(5px)';
+                if (!btn.disabled) {
+                    btn.style.background = '#e3f2fd';
+                    btn.style.transform = 'translateX(5px)';
+                }
             };
             btn.onmouseout = () => {
-                btn.style.background = 'white';
-                btn.style.transform = 'translateX(0)';
+                if (!btn.disabled) {
+                    btn.style.background = 'white';
+                    btn.style.transform = 'translateX(0)';
+                }
             };
             btn.onclick = function() {
                 const selectedIndex = parseInt(this.dataset.index);
@@ -12248,12 +12728,19 @@ function handleTrainingResult(data, interactionManager, chatArea) {
     chatArea.scrollTop = chatArea.scrollHeight;
 }
 
-// ========== 处理送礼结果 ==========
+// ========== 处理送礼结果（增强错误处理） ==========
 function handleGiftResult(data, gift, interactionManager, chatArea) {
-    if (!data || !data.reaction) {
-        showInfoBox('送礼反馈异常！');
+    if (!data) {
+        console.error('送礼数据为空');
+        showInfoBox('送礼反馈异常：数据为空！');
         return;
     }
+    
+    // 兼容不同的返回格式
+    const reaction = data.reaction || data.reply || '收到了你的礼物';
+    const intimacyGain = data.intimacy_gain || data.intimacy_change || 15;
+    const dialogue = data.dialogue || `谢谢你的${gift.name}`;
+    const specialResponse = data.special_response || false;
     
     const resultDiv = document.createElement('div');
     resultDiv.style.cssText = `
@@ -12267,26 +12754,26 @@ function handleGiftResult(data, gift, interactionManager, chatArea) {
     
     resultDiv.innerHTML = `
         <div style="font-size: 18px; font-weight: bold; color: #E91E63; margin-bottom: 15px;">🎁 ${currentPet.name}收到了你的礼物</div>
-        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${data.reaction}</div>
+        <div style="color: #333; line-height: 1.8; margin-bottom: 15px;">${reaction}</div>
         <div style="background: rgba(233, 30, 99, 0.1); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
             <div style="color: #E91E63; font-weight: bold; margin-bottom: 8px;">感动值：</div>
-            <div style="color: #E91E63;">❤ 亲密度：+${data.intimacy_gain}</div>
-            ${data.special_response ? '<div style="color: #FF9800;">✨ 触发了特殊剧情！</div>' : ''}
+            <div style="color: #E91E63;">❤ 亲密度：+${intimacyGain}</div>
+            ${specialResponse ? '<div style="color: #FF9800;">✨ 触发了特殊剧情！</div>' : ''}
         </div>
         <div style="color: #666; font-style: italic; border-left: 3px solid #E91E63; padding-left: 10px;">
-            ${currentPet.name}：${data.dialogue}
+            ${currentPet.name}：${dialogue}
         </div>
     `;
     
     chatArea.appendChild(resultDiv);
     chatArea.scrollTop = chatArea.scrollHeight;
     
-    interactionManager.addInteraction(data.intimacy_gain);
+    interactionManager.addInteraction(intimacyGain);
     interactionManager.totalGiftsReceived += 1;
     interactionManager.saveData();
     updateIntimacyDisplay(interactionManager);
     
-    showInfoBox(`${currentPet.name}很高兴收到你的${gift.name}，亲密度+${data.intimacy_gain}！`);
+    showInfoBox(`${currentPet.name}很高兴收到你的${gift.name}，亲密度+${intimacyGain}！`);
 }
 
 // ========== 触发随机事件 ==========
@@ -12349,12 +12836,17 @@ function triggerRandomEvent(event, interactionManager, chatArea) {
     showInfoBox(`触发随机事件【${event.name}】！获得${convertPrice(reward)}金子和${intimacyGain}亲密度！`);
 }
 
-// ========== 发送消息 ==========
+// ========== 发送消息（流式生成版本） ==========
 async function sendMessage(inputBox, chatArea, interactionManager) {
     const message = inputBox.value.trim();
     if (!message) return;
 
     const sendBtn = document.getElementById('send-button');
+    
+    if (!sendBtn) {
+        console.error('找不到发送按钮！');
+        return;
+    }
     
     inputBox.disabled = true;
     sendBtn.disabled = true;
@@ -12362,7 +12854,7 @@ async function sendMessage(inputBox, chatArea, interactionManager) {
 
     appendMessage(message, 'user', chatArea);
     inputBox.value = '';
-    inputBox.style.height = 'auto';
+    inputBox.style.height = '45px'; // 重置高度
 
     interactionManager.addChatHistory('user', message);
 
@@ -12371,34 +12863,90 @@ async function sendMessage(inputBox, chatArea, interactionManager) {
     chatArea.scrollTop = chatArea.scrollHeight;
 
     const messageContent = aiMessageDiv.querySelector('.message-content');
+    let fullResponse = '';
+    let displayText = '';
 
     try {
-        const stream = await callDeepSeekAPI(message, interactionManager);
-        
-        await streamResponse(
-            stream,
-            (chunk, fullResponse) => {
-                messageContent.textContent = fullResponse;
-                chatArea.scrollTop = chatArea.scrollHeight;
-            },
-            (fullResponse) => {
-                interactionManager.addChatHistory('assistant', fullResponse);
-                interactionManager.addInteraction(5);
-                updateIntimacyDisplay(interactionManager);
-                
-                inputBox.disabled = false;
-                sendBtn.disabled = false;
-                sendBtn.textContent = '发送';
-                inputBox.focus();
-            },
-            (error) => {
-                messageContent.innerHTML = `<span style="color: #ff6b6b;">❌ 发送失败: ${error.message}</span>`;
-                inputBox.disabled = false;
-                sendBtn.disabled = false;
-                sendBtn.textContent = '发送';
+        const response = await callDeepSeekAPI(message, interactionManager, INTERACTION_MODES.CHAT);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = chunk.split('\n');
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    const data = line.slice(6);
+                    if (data === '[DONE]') continue;
+
+                    try {
+                        const parsed = JSON.parse(data);
+                        const content = parsed.choices[0]?.delta?.content || '';
+                        fullResponse += content;
+
+                        // 实时提取并显示reply内容
+                        const jsonMatch = fullResponse.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            try {
+                                const tempParsed = JSON.parse(jsonMatch[0]);
+                                if (tempParsed.reply) {
+                                    displayText = tempParsed.reply;
+                                    messageContent.textContent = displayText;
+                                }
+                            } catch (e) {
+                                // JSON未完整，继续累积
+                            }
+                        }
+
+                        chatArea.scrollTop = chatArea.scrollHeight;
+                    } catch (e) {
+                        // 跳过无法解析的行
+                    }
+                }
             }
-        );
+        }
+
+        // 最终解析完整JSON
+        const finalData = parseAIResponse(fullResponse);
+        
+        if (finalData && finalData.reply) {
+            messageContent.textContent = finalData.reply;
+            
+            // 记录AI回复（只保存reply部分）
+            interactionManager.addChatHistory('assistant', finalData.reply);
+            
+            // 应用动态亲密度变化
+            const intimacyChange = finalData.intimacy_change || 5;
+            interactionManager.addInteraction(intimacyChange);
+            updateIntimacyDisplay(interactionManager);
+            
+            // 显示情绪和亲密度变化提示
+            const currentPetName = document.getElementById("pet-select").value;
+            if (intimacyChange > 50) {
+                showInfoBox(`${currentPetName}感到很${finalData.emotion || '开心'}！亲密度+${intimacyChange}`, null, 2500, 'green');
+            } else if (intimacyChange > 0) {
+                showInfoBox(`${currentPetName}感到${finalData.emotion || '愉快'} 亲密度+${intimacyChange}`, null, 2500, 'blue');
+            } else if (intimacyChange < 0) {
+                showInfoBox(`${currentPetName}感到${finalData.emotion || '不满'}... 亲密度${intimacyChange}`, null, 2500, 'red');
+            }
+        } else {
+            // 如果解析失败，显示原始文本
+            messageContent.textContent = fullResponse;
+            interactionManager.addChatHistory('assistant', fullResponse);
+            interactionManager.addInteraction(5);
+            updateIntimacyDisplay(interactionManager);
+        }
+        
+        inputBox.disabled = false;
+        sendBtn.disabled = false;
+        sendBtn.textContent = '发送';
+        inputBox.focus();
     } catch (error) {
+        console.error('发送消息错误:', error);
         messageContent.innerHTML = `<span style="color: #ff6b6b;">❌ 发送失败: ${error.message}</span>`;
         inputBox.disabled = false;
         sendBtn.disabled = false;
@@ -12413,6 +12961,7 @@ function createMessageBubble(content, role) {
         display: flex;
         ${role === 'user' ? 'justify-content: flex-end;' : 'justify-content: flex-start;'}
         animation: slideIn 0.3s ease-out;
+        margin-bottom: 12px;
     `;
 
     const bubble = document.createElement('div');
@@ -12663,6 +13212,7 @@ interactionStyle.textContent = `
     }
 `;
 document.head.appendChild(interactionStyle);
+
 
 
 
@@ -13396,6 +13946,7 @@ const creditItems = [
     { name: 'renameDew', price: 5000 }, 
     { name: 'dyePowders', price: 2000 }, 
     { name: 'resetDyeTool', price: 500 },
+    { name: 'crystal', price: 50000 },
 ];
 
 function addItemToCreditShop(item, shopItems) {

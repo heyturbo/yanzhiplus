@@ -254,8 +254,6 @@ function stopBattle() {
     logBattleEvent("战斗停止。");
 }
 
-let defeatedPets = []; // 记录已阵亡的宠物 { key: 'xiaojin', name: '小金牛' }
-let usedPets = []; // 记录所有已出战的宠物 { key: 'xiaojin', name: '小金牛' }
 
 // 内丹元气消耗函数
 function decreaseElixirVigor(isVictory = true) {
@@ -291,6 +289,27 @@ function decreaseElixirVigor(isVictory = true) {
     });
 }
 let elixirExpDoubleState = false;
+function checkElixirVigorStatus() {
+    const depletedElixirs = elixirStates.filter(elixir => 
+        elixir.applied && 
+        elixir.equipped && 
+        elixir.equippedPet === currentPet.name && 
+        elixir.vigor === 0
+    );
+
+    if (depletedElixirs.length > 0) {
+        const message = depletedElixirs.length === 1 
+            ? '有1个内丹元气已耗尽，请及时补充！' 
+            : `有${depletedElixirs.length}个内丹元气已耗尽，请及时补充！`;
+            
+        showInfoBox(message);
+    }
+}
+
+
+let defeatedPets = []; // 记录已阵亡的宠物 { key: 'xiaojin', name: '小金牛' }
+let usedPets = []; // 记录所有已出战的宠物 { key: 'xiaojin', name: '小金牛' }
+
 // 修改战斗结算函数
 function showNextBattlePrompt(playerWon) {
     if (playerWon) {
@@ -325,24 +344,6 @@ function showNextBattlePrompt(playerWon) {
             summonEnemy = false;
             return;
         }
-    }
-}
-
-// 可选：添加一个检查内丹元气状态的函数
-function checkElixirVigorStatus() {
-    const depletedElixirs = elixirStates.filter(elixir => 
-        elixir.applied && 
-        elixir.equipped && 
-        elixir.equippedPet === currentPet.name && 
-        elixir.vigor === 0
-    );
-
-    if (depletedElixirs.length > 0) {
-        const message = depletedElixirs.length === 1 
-            ? '有1个内丹元气已耗尽，请及时补充！' 
-            : `有${depletedElixirs.length}个内丹元气已耗尽，请及时补充！`;
-            
-        showInfoBox(message);
     }
 }
 
@@ -384,69 +385,9 @@ function handleVictory() {
 }
 
 function handlePetDefeat() {
-    const petSelect = document.getElementById("pet-select");
-    const selectedPetKey = petSelect.value;
-
-    const currentPetKey = Object.keys(pets).find(key => pets[key].name === currentPet.name);
-    defeatedPets.push({ key: currentPetKey, name: currentPet.name }); // 记录阵亡的宠物
-
-    if (defeatedPets.length === petSelect.options.length) {
-        // 所有宠物都已阵亡
-        applyDefeatPenalty();
-        logBattleEvent('所有宠物都已阵亡，本次战斗已失败！');
-        return;
-    }
-
-    if (petSelect.options.length > 1) {
-        promptPetSwitch(petSelect, selectedPetKey);
-    } else {
-        applyDefeatPenalty();
-        logBattleEvent('没有其他宠物可以更换，本次战斗已失败！');
-    }
-
-}
-
-let switchPetMood = true;
-
-function promptPetSwitch(petSelect, selectedPetKey) {
-    if (switchPetMood) {
-        showInfoBox(
-            `${currentPet.name}已阵亡, 是否更换至其他宠物继续战斗？点击取消不再显示此提示`,
-            () => {
-                let newOption;
-                let availableOptions = Array.from(petSelect.options)
-                    .map(option => {
-                        const petKey = Object.keys(pets).find(key => pets[key].name === option.value);
-                        return { key: petKey, name: option.value };
-                    })
-                    .filter(option => !usedPets.some(pet => pet.key === option.key)); // 过滤已出战的宠物
-    
-                if (availableOptions.length === 0) {
-                    // 如果没有可用的宠物，执行失败逻辑
-                    applyDefeatPenalty();
-                    logBattleEvent('没有可用的宠物进行更换，本次战斗已失败！');
-                    return;
-                }
-    
-                do {
-                    const randomIndex = Math.floor(Math.random() * availableOptions.length);
-                    newOption = availableOptions[randomIndex];
-                } while (newOption.key === selectedPetKey);
-    
-                petSelect.value = newOption.name;
-                usedPets.push(newOption); // 记录新选择的宠物
-                changePet();
-            },
-            () => {
-                switchPetMood = false;
-                applyDefeatPenalty();
-                logBattleEvent('本次战斗已失败！请加强一下再进来吧~','red','20px');
-            }
-        );
-    } else {
-        applyDefeatPenalty();
-        logBattleEvent('本次战斗已失败！请加强一下再进来吧~','crimson','20px');
-    }
+    // 直接应用失败惩罚并重新开始战斗
+    applyDefeatPenalty();
+    logBattleEvent('战斗失败！正在重新开始...', 'crimson', '20px');
 }
 
 function applyDefeatPenalty() {
@@ -462,26 +403,21 @@ function applyDefeatPenalty() {
 
     showBattleOverlay("https://pic.imgdb.cn/item/6672bfa5d9c307b7e9b19753.webp", 500, 1, 1000);
     increaseCurrentPetIntimacy(-5);
-    onBattleState = false;
-    showInfoBox(`您已经输掉此次战斗，扣除金子${convertPrice(penalty)}！点击确认继续战斗，取消回到主页。`,
-               () => {
-                   startBattle();
-                   updatePetInfo();
-               },
-               () => {
-                   stopBattle();
-                    const drawer = document.getElementById('fightingDrawer');
-                    const isOpen = drawer.classList.toggle('open');
-                    drawer.style.display = "none";
-               });
+    
+    // 直接重新开始战斗，不弹出提示
     updateGoldDisplay(goldAmount);
-    clearAutoBattle();
     defeatedPets = [];
     usedPets = [];
     resetBattleState(false);
     resetBuffState(false);
     extraShield = 0;
-} 
+    
+    // 延迟一小段时间后自动重新开始战斗，让玩家看到失败提示
+    setTimeout(() => {
+        startBattle();
+        updatePetInfo();
+    }, 1000);
+}
 
 function calculateExtraReward() {
     // 额外奖励计算逻辑
@@ -2511,6 +2447,281 @@ function handleBulkLevelUp() {
     updateUI();
 }
 
+// 新增：显示技能选择菜单
+function showSkillSelectionMenu(type, callback) {
+    const skillsArea = document.getElementById("skills-area");
+    if (!skillsArea) {
+        console.error("skills-area element not found.");
+        return;
+    }
+
+    // 获取对应类型的技能列表
+    let availableSkills = [];
+    const skillDivs = Array.from(skillsArea.children);
+    
+    skillDivs.forEach(skillDiv => {
+        const skillName = skillDiv.innerText.split(' ')[0];
+        const skill = currentPet.skills.find(s => s.name === skillName);
+        if (skill) {
+            if (type === 'physical' && (skill.type === 'PA' || skill.type === 'PAE')) {
+                availableSkills.push(skill);
+            } else if (type === 'magical' && (skill.type === 'MA' || skill.type === 'MAE')) {
+                availableSkills.push(skill);
+            }
+        }
+    });
+
+    // 如果没有可用技能，直接使用普通攻击
+    if (availableSkills.length === 0) {
+        callback(null);
+        return;
+    }
+
+    // 如果只有一个技能，直接使用并记录偏好
+    if (availableSkills.length === 1) {
+        playerSkillPreference[type] = availableSkills[0].name;
+        callback(availableSkills[0]);
+        return;
+    }
+
+    // 创建技能选择弹窗
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10000;
+    `;
+
+    const menu = document.createElement('div');
+    menu.style.cssText = `
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    `;
+
+    const title = document.createElement('h3');
+    title.textContent = type === 'physical' ? '选择物理技能' : '选择法术技能';
+    title.style.cssText = `
+        color: white;
+        text-align: center;
+        margin: 0 0 20px 0;
+        font-size: 24px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    `;
+    menu.appendChild(title);
+
+    const skillList = document.createElement('div');
+    skillList.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    `;
+
+    availableSkills.forEach(skill => {
+        const { skillLevel } = calculateSkillLevelAndMultiplier(skill);
+        
+        const skillButton = document.createElement('button');
+        const isPreferred = playerSkillPreference[type] === skill.name;
+        
+        skillButton.style.cssText = `
+            background: ${isPreferred ? 'linear-gradient(135deg, #ffd700 0%, #ffed4e 100%)' : 'white'};
+            border: ${isPreferred ? '3px solid #ff6b6b' : 'none'};
+            border-radius: 10px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        `;
+        
+        skillButton.innerHTML = `
+            ${isPreferred ? '<div style="position: absolute; top: 5px; right: 10px; color: #ff6b6b; font-weight: bold; font-size: 12px;">上次选择</div>' : ''}
+            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">
+                ${skill.name} Lv.${skillLevel}
+            </div>
+            <div style="font-size: 14px; color: #666;">
+                倍率: ${(skill.multiplier * (1 + 0.1 * (skillLevel - 1))).toFixed(2)}x
+            </div>
+        `;
+
+        skillButton.onmouseover = () => {
+            skillButton.style.transform = 'translateY(-2px)';
+            skillButton.style.boxShadow = '0 6px 12px rgba(0, 0, 0, 0.15)';
+            if (!isPreferred) {
+                skillButton.style.background = '#f0f0f0';
+            }
+        };
+
+        skillButton.onmouseout = () => {
+            skillButton.style.transform = 'translateY(0)';
+            skillButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            if (!isPreferred) {
+                skillButton.style.background = 'white';
+            }
+        };
+
+        skillButton.onclick = () => {
+            // 记录玩家的技能选择偏好
+            playerSkillPreference[type] = skill.name;
+            document.body.removeChild(overlay);
+            callback(skill);
+        };
+
+        skillList.appendChild(skillButton);
+    });
+
+    menu.appendChild(skillList);
+
+    // 添加取消按钮
+    const cancelButton = document.createElement('button');
+    cancelButton.textContent = '取消';
+    cancelButton.style.cssText = `
+        width: 100%;
+        margin-top: 15px;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid white;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: all 0.3s;
+    `;
+
+    cancelButton.onmouseover = () => {
+        cancelButton.style.background = 'rgba(255, 255, 255, 0.3)';
+    };
+
+    cancelButton.onmouseout = () => {
+        cancelButton.style.background = 'rgba(255, 255, 255, 0.2)';
+    };
+
+    cancelButton.onclick = () => {
+        document.body.removeChild(overlay);
+        // 取消不执行任何攻击
+    };
+
+    menu.appendChild(cancelButton);
+    overlay.appendChild(menu);
+    document.body.appendChild(overlay);
+}
+
+function getPreferredSkill(type) {
+    const skillsArea = document.getElementById("skills-area");
+    if (!skillsArea) {
+        return null;
+    }
+
+    const skillDivs = Array.from(skillsArea.children);
+    const availableSkills = [];
+    
+    skillDivs.forEach(skillDiv => {
+        const skillName = skillDiv.innerText.split(' ')[0];
+        const skill = currentPet.skills.find(s => s.name === skillName);
+        if (skill) {
+            if (type === 'physical' && (skill.type === 'PA' || skill.type === 'PAE')) {
+                availableSkills.push(skill);
+            } else if (type === 'magical' && (skill.type === 'MA' || skill.type === 'MAE')) {
+                availableSkills.push(skill);
+            }
+        }
+    });
+
+    // 如果没有可用技能，返回null（使用普通攻击）
+    if (availableSkills.length === 0) {
+        return null;
+    }
+
+    // 如果只有一个技能，直接返回
+    if (availableSkills.length === 1) {
+        return availableSkills[0];
+    }
+
+    // 如果有偏好设置且该技能仍然可用，返回偏好技能
+    if (playerSkillPreference[type]) {
+        const preferredSkill = availableSkills.find(s => s.name === playerSkillPreference[type]);
+        if (preferredSkill) {
+            return preferredSkill;
+        }
+    }
+
+    // 如果没有偏好或偏好技能不可用，返回第一个技能
+    return availableSkills[0];
+}
+
+// 修改：自动战斗专用的攻击函数
+function performAutoAttack(type) {
+    if (!attributesFetched || !battleState || !battleState.enemy || !playerTurn) {
+        return;
+    }
+
+    let attackType = battleState.player.taunt ? 'physical' : type;
+    
+    // 获取玩家偏好的技能
+    const selectedSkill = getPreferredSkill(attackType);
+    
+    const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(attackType, selectedSkill);
+
+    let damage = 0;
+
+    // 检查是否为特殊技能
+    if (selectedSkill && (selectedSkill.type === 'PAE' || selectedSkill.type === 'MAE')) {
+        applySpecialSkillEffects(selectedSkill);
+    } else {
+        // 使用原有的攻击处理逻辑
+        if (attackType === 'physical') {
+            damage = performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
+            // 物理攻击特有的后续效果处理
+            handlePostAttackEffects(attackType, damage, {
+                selectedSkill,
+                isCritical: checkCriticalHit(battleState.player.critRate),
+                skillMultiplier
+            });
+        } else {
+            const result = performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
+            if (result.retryPhysical) {
+                performAutoAttack('physical');
+                return;
+            }
+            damage = result.damage;
+            // 法术攻击特有的后续效果处理
+            handlePostAttackEffects(attackType, damage, {
+                selectedSkill,
+                isCritical: checkCriticalHit(battleState.player.critRate),
+                skillMultiplier
+            });
+        }
+    }
+
+    // 检查战斗状态并更新回合
+    if (battleState.enemy.health <= 0) {
+        updateEnemyAttributes();
+        showNextBattlePrompt(true);
+        return;
+    } else if (battleAttributes.health <= 0) {
+        showNextBattlePrompt(false);
+        return;
+    }
+
+    playerTurn = false;
+    updateUI();
+}
+
+
 function getSkillByType(type) {
     const skillsArea = document.getElementById("skills-area");
     if (!skillsArea) {
@@ -2540,35 +2751,19 @@ function calculateSkillLevelAndMultiplier(skill) {
     return { skillLevel, skillMultiplier };
 }
 
-function selectSkillAndCalculateMultiplier(type) {
-    let selectedSkills = [];
+// 修改后的函数：接收选中的技能作为参数
+function selectSkillAndCalculateMultiplier(type, selectedSkill = null) {
     let skillMultiplier = 1;
     let skillLevel = 1;
     let isSkillUsed = false;
 
-    const skillsArea = document.getElementById('skills-area');
-    const skillDivs = Array.from(skillsArea.children);
-    skillDivs.forEach(skillDiv => {
-        const skillName = skillDiv.innerText.split(' ')[0];
-        const skill = currentPet.skills.find(skill => skill.name === skillName);
-        if (skill) {
-            if (type === 'physical' && (skill.type === 'PA' || skill.type ==='PAE')) {
-                selectedSkills.push(skill);
-            } else if (type === 'magical' && (skill.type === 'MA' || skill.type === 'MAE')) {
-                selectedSkills.push(skill);
-            }
-        }
-    });
-    
-    const randomIndex = Math.floor(Math.random() * selectedSkills.length);
-    const selectedSkill = selectedSkills[randomIndex];
-    
-    if (selectedSkills.length > 0) {
+    if (selectedSkill) {
         const result = calculateSkillLevelAndMultiplier(selectedSkill);
         skillLevel = result.skillLevel;
         skillMultiplier = result.skillMultiplier;
         isSkillUsed = true;
-        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold' , '20px');
+        logBattleEvent(`你施放了 ${selectedSkill.name} ${skillLevel}级。`, 'gold', '20px');
+        
         if (type === 'physical') {
             const manaCost = Math.floor((Math.random() * (200 - 50 + 1) * skillLevel));
             battleAttributes.mana = Math.max(0, battleAttributes.mana - manaCost);
@@ -2578,71 +2773,80 @@ function selectSkillAndCalculateMultiplier(type) {
         }
     } else {
         if (type === 'physical') {
-            logBattleEvent("⚔️【玩家攻击】你用拳头平A了对方。",null,'20px');
+            logBattleEvent("⚔️【玩家攻击】你用拳头平A了对方。", null, '20px');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/667123f9d9c307b7e9e34049.gif');
         } else if (type === 'magical') {
-            logBattleEvent("⚔️【玩家攻击】你操控小树枝击向了对方。",null,'20px');
+            logBattleEvent("⚔️【玩家攻击】你操控小树枝击向了对方。", null, '20px');
             showEffect('playerEffect', 'https://pic.imgdb.cn/item/6671343bd9c307b7e9031c3d.gif');
         }
     }
 
     return { skillMultiplier, isSkillUsed, selectedSkill };
-}         
+}
 
-// 修改performAttack函数
+// 修改performAttack函数：添加技能选择逻辑
 function performAttack(type) {
     if (!attributesFetched || !battleState || !battleState.enemy || !playerTurn) {
         return;
     }
 
     let attackType = battleState.player.taunt ? 'physical' : type;
-    const { skillMultiplier, isSkillUsed, selectedSkill } = selectSkillAndCalculateMultiplier(attackType);
-
-    let damage = 0;
-    let isCritical = false;
-
-    // 检查是否为特殊技能
-    if (selectedSkill && (selectedSkill.type === 'PAE' || selectedSkill.type === 'MAE')) {
-        applySpecialSkillEffects(selectedSkill);
-    } else {
-        // 使用原有的攻击处理逻辑
-        if (attackType === 'physical') {
-            damage = performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
-            // 物理攻击特有的后续效果处理
-            handlePostAttackEffects(attackType, damage, {
-                selectedSkill,
-                isCritical: checkCriticalHit(battleState.player.critRate),
-                skillMultiplier
-            });
-        } else {
-            const result = performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
-            if (result.retryPhysical) {
-                performAttack('physical');
-                return;
-            }
-            damage = result.damage;
-            // 法术攻击特有的后续效果处理
-            handlePostAttackEffects(attackType, damage, {
-                selectedSkill,
-                isCritical: checkCriticalHit(battleState.player.critRate),
-                skillMultiplier
-            });
+    
+    // 显示技能选择菜单
+    showSkillSelectionMenu(attackType, (selectedSkill) => {
+        // 如果点击取消，直接返回
+        if (selectedSkill === undefined) {
+            return;
         }
-    }
 
-    // 检查战斗状态并更新回合
-    if (battleState.enemy.health <= 0) {
-        updateEnemyAttributes();
-        showNextBattlePrompt(true);
-        return;
-    } else if (battleAttributes.health <= 0) {
-        showNextBattlePrompt(false);
-        return;
-    }
+        const { skillMultiplier, isSkillUsed } = selectSkillAndCalculateMultiplier(attackType, selectedSkill);
 
-    playerTurn = false;
-    updateUI();
-};
+        let damage = 0;
+        let isCritical = false;
+
+        // 检查是否为特殊技能
+        if (selectedSkill && (selectedSkill.type === 'PAE' || selectedSkill.type === 'MAE')) {
+            applySpecialSkillEffects(selectedSkill);
+        } else {
+            // 使用原有的攻击处理逻辑
+            if (attackType === 'physical') {
+                damage = performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
+                // 物理攻击特有的后续效果处理
+                handlePostAttackEffects(attackType, damage, {
+                    selectedSkill,
+                    isCritical: checkCriticalHit(battleState.player.critRate),
+                    skillMultiplier
+                });
+            } else {
+                const result = performMagicalAttack(skillMultiplier, isSkillUsed, selectedSkill);
+                if (result.retryPhysical) {
+                    performAttack('physical');
+                    return;
+                }
+                damage = result.damage;
+                // 法术攻击特有的后续效果处理
+                handlePostAttackEffects(attackType, damage, {
+                    selectedSkill,
+                    isCritical: checkCriticalHit(battleState.player.critRate),
+                    skillMultiplier
+                });
+            }
+        }
+
+        // 检查战斗状态并更新回合
+        if (battleState.enemy.health <= 0) {
+            updateEnemyAttributes();
+            showNextBattlePrompt(true);
+            return;
+        } else if (battleAttributes.health <= 0) {
+            showNextBattlePrompt(false);
+            return;
+        }
+
+        playerTurn = false;
+        updateUI();
+    });
+}
 
 function performPhysicalAttack(skillMultiplier, isSkillUsed, selectedSkill) {
     const defenseFactor = (Math.random() * (1.2 - 0.8) + 0.8);
@@ -2943,7 +3147,6 @@ function checkBattleState(damage) {
     return false;
 }
 
-
 function f(x) {
     // 计算函数值
     const result = (x / (x + 300000)) - 0.1;
@@ -2951,8 +3154,6 @@ function f(x) {
     // 使用 Math.max 确保结果至少为 0
     return Math.max(result, 0);
 }
-        
-
 
 function checkWaterAmuletChance() {
     const activeEffects = applyWuxingEffects();
@@ -7046,6 +7247,12 @@ function enemyInfo() {
     });
 } //用于展示敌人信息界面和执行托管操作
 
+let playerSkillPreference = {
+    physical: null,  // 存储玩家上次选择的物理技能
+    magical: null    // 存储玩家上次选择的法术技能
+};
+
+// 修改：自动战斗函数
 function autoBattle() {
     if (!battleState || !battleState.enemy) {
         console.error("战斗状态未初始化");
@@ -7108,20 +7315,20 @@ function autoBattle() {
             }
     
             if (battleState.player.blindfold) {
-                // 玩家处于失明状态且处于玩家回合时，使用法术攻击
-                performAttack('magical');
+                // 玩家处于失明状态且处于玩家回合时，使用法术攻击（根据偏好）
+                performAutoAttack('magical');
             } else {
                 // 玩家不处于失明状态且处于玩家回合时
                 if (battleAttributes.magicAttack > 0.8 * battleAttributes.physicalAttack && !battleState.player.taunt) {
                     // 99% 概率使用法术攻击
                     if (Math.random() < 0.99) {
-                        performAttack('magical');
+                        performAutoAttack('magical');
                     } else {
-                        performAttack('physical');
+                        performAutoAttack('physical');
                     }
                 } else {
                     // 否则使用物理攻击
-                    performAttack('physical');
+                    performAutoAttack('physical');
                 }
             }
         }, 350);

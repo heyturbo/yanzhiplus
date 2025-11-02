@@ -1895,59 +1895,69 @@ function calculateDamage(baseDamage, isCritical, critDamage, playerEffect = fals
         baseDamage *= Math.floor(Math.max(0, damageRatio));
     }
     
+    // ========== 应用宠物修炼伤害加成 ==========
+    try {
+        const currentPetName = document.getElementById("pet-select")?.value;
+        if (currentPetName) {
+            const storageKey = `pet_interaction_${currentPetName}`;
+            const savedData = localStorage.getItem(storageKey);
+            
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const damageBonus = data.damageBonus || 0;
+                
+                if (damageBonus > 0) {
+                    baseDamage = Math.floor(baseDamage * (1 + damageBonus * 0.01));
+                    console.log(`${currentPetName}的伤害加成: +${damageBonus.toFixed(2)}, 最终伤害: ${baseDamage}`);
+                }
+            }
+        }
+    } catch (error) {
+        console.warn('宠物伤害加成应用失败:', error);
+    }
+    
     // 经脉伤害加成计算
     try {
-        // 检查经脉状态是否存在
         const state = getCurrentJingmaiState();
         if (state && state.jingmaiStates) {
             const currentLevel = state.jingmaiStates.currentLevel || 0;
             const stageNumber = getStageNumber(currentLevel);
             
-            // 当经脉阶数大于1时，应用伤害系数
             if (stageNumber > 1) {
-                // 基础伤害系数：(阶数*2)%
                 const stageDamageMultiplier = 1 + (stageNumber * 0.02);
                 baseDamage = Math.floor(baseDamage * stageDamageMultiplier);
                 
-                // 随机效果计算
                 const randomChance = Math.random();
                 let bonusMultiplier = 1;
                 
                 if (stageNumber >= 2 && stageNumber <= 10) {
-                    // 2~10阶段：10%概率*1.2
                     if (randomChance < 0.1) {
                         bonusMultiplier = 1.2;
                     }
                 } else if (stageNumber >= 11 && stageNumber <= 20) {
-                    // 11~20阶段：20%概率*1.4
                     if (randomChance < 0.2) {
                         bonusMultiplier = 1.4;
                     }
                 } else if (stageNumber >= 21 && stageNumber <= 30) {
-                    // 21~30阶段：30%概率*1.6
                     if (randomChance < 0.3) {
                         bonusMultiplier = 1.6;
                     }
                 } else if (stageNumber >= 31 && stageNumber <= 40) {
-                    // 31~40阶段：40%概率*1.8
                     if (randomChance < 0.4) {
                         bonusMultiplier = 1.8;
                     }
                 } else if (stageNumber >= 41) {
-                    // 41以上阶段：50%概率*2
                     if (randomChance < 0.5) {
                         bonusMultiplier = 2;
                     }
                 }
                 
-                // 应用随机加成
                 if (bonusMultiplier > 1) {
                     baseDamage = Math.floor(baseDamage * bonusMultiplier);
                 }
             }
         }
     } catch (error) {
-        // 边缘情况处理：如果经脉系统出现任何错误，保持原始伤害计算
         console.warn('经脉伤害加成计算出错，使用默认伤害:', error);
     }
     
@@ -7972,3 +7982,10 @@ function clearPlayerEffect() {
 } //清理敌人目前的减益效果
 
 const divineWeaponManager = new DivineWeaponManager();
+
+
+
+
+
+
+

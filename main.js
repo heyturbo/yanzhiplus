@@ -7,7 +7,7 @@ const pets = {
         rank: 'R',
         image: 'https://pic.imgdb.cn/item/66728efbd9c307b7e9576627.gif',
         skills: [
-            { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2, description: '物理攻击技能，小金牛使出浑身解数朝妖怪进行致命一击。' },
+            { name: '野性冲撞', rarity: 'A', type: 'PA', multiplier: 2.5, description: '物理攻击技能，小金牛使出浑身解数朝妖怪进行致命一击。' },
             { name: '冥想', rarity: 'B', type: 'HL', multiplier: 0.01, description: '被动技能，每回合恢复一定量的法力值' },
             { name: '破军神力', rarity: 'B', type: 'N', multiplier: 3, description: '被动技能，宠物获得大量的物理攻击力和法术攻击力。' },
             { name: '野性赐福', rarity: 'B', type: 'N', multiplier: 1, description: '被动技能，宠物可获得一定的耐力提升。' },

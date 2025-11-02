@@ -11216,6 +11216,37 @@ const PERSONALITY_INTIMACY_RULES = {
     }
 };
 
+// ============ 主动消息系统配置 ============
+const PROACTIVE_MESSAGE_CONFIG = {
+    // 亲密度阈值与推送间隔（秒）
+    intimacyIntervals: {
+        50: { min: 30, max: 50 },    // 陌生→熟悉：3-5分钟
+        150: { min: 30, max: 45 },   // 熟悉→友好：2-4分钟
+        300: { min: 30, max: 40 },    // 友好→亲密：1.5-3分钟
+        500: { min: 25, max: 35 },    // 亲密→挚友：1-2分钟
+        800: { min: 20, max: 30 }      // 挚友→心心相印：40-90秒
+    },
+
+    // 性格对推送频率的影响系数
+    personalityFrequencyMultiplier: {
+        '热情': 0.7,          // 更频繁
+        '开朗': 0.8,
+        '放荡': 0.75,
+        '充满性张力': 0.65,
+        '强势': 0.85,
+        '果敢': 0.9,
+        '害羞': 1.3,          // 更少
+        '保守': 1.2,
+        '消沉': 1.4,
+        '冷静': 1.1,
+        '自信': 0.95,
+        '暴躁': 1.0,
+        '倔强': 1.05,
+        '傲慢': 1.15,
+        '露骨': 0.8
+    }
+};
+
 
 // ============ 随机事件配置 ============
 const RANDOM_EVENTS = [
@@ -11250,12 +11281,18 @@ const RANDOM_EVENTS = [
 ];
 
 // ============ 互动数据管理 ============
+// ============ 互动数据管理 ============
 class InteractionManager {
     constructor() {
         this.loadData();
         this.currentMode = INTERACTION_MODES.CHAT;
         this.eventTriggered = false;
-        this.giftingSending = false; // 防止重复送礼
+        this.giftingSending = false;
+        
+        // ========== 主动消息系统 ==========
+        this.proactiveMessageTimer = null;
+        this.isProactiveSystemActive = false;
+        this.consecutiveProactiveCount = 0; // 连续主动消息计数
     }
 
     getStorageKey(petName) {
@@ -11290,9 +11327,7 @@ class InteractionManager {
             this.totalGiftsReceived = 0;
         }
         
-        // 加载或生成性格
         this.personality = this.loadOrGeneratePersonality(currentPetName);
-        
         this.checkDailyReset();
     }
 
@@ -11303,7 +11338,6 @@ class InteractionManager {
         if (saved) {
             return saved;
         } else {
-            // 随机生成性格
             const randomTrait = PERSONALITY_TRAITS[Math.floor(Math.random() * PERSONALITY_TRAITS.length)];
             localStorage.setItem(key, randomTrait);
             return randomTrait;
@@ -11333,7 +11367,6 @@ class InteractionManager {
         };
         localStorage.setItem(key, JSON.stringify(data));
         
-        // 单独保存性格（重要：确保性格重塑后能保存）
         const personalityKey = this.getPersonalityKey(currentPetName);
         localStorage.setItem(personalityKey, this.personality);
     }
@@ -11341,7 +11374,7 @@ class InteractionManager {
     addInteraction(points = 1) {
         this.interactionCount += 1;
         this.dailyInteractions += 1;
-        this.intimacy = Math.max(0, this.intimacy + points); // 亲密度可以为负，但最小为0
+        this.intimacy = Math.max(0, this.intimacy + points);
         this.lastInteractionTime = Date.now();
         this.saveData();
     }
@@ -11352,6 +11385,12 @@ class InteractionManager {
             content: content,
             timestamp: Date.now()
         });
+        
+        // ========== 重置主动消息计数（用户发言时） ==========
+        if (role === 'user') {
+            this.consecutiveProactiveCount = 0;
+        }
+        
         if (this.chatHistory.length > 30) {
             this.chatHistory = this.chatHistory.slice(-30);
         }
@@ -11382,12 +11421,416 @@ class InteractionManager {
         return null;
     }
     
-    // 新增：更新性格的方法
     updatePersonality(newPersonality) {
         this.personality = newPersonality;
         const currentPetName = document.getElementById("pet-select").value;
         const personalityKey = this.getPersonalityKey(currentPetName);
         localStorage.setItem(personalityKey, newPersonality);
+    }
+
+    // ========== 启动主动消息系统 ==========
+    startProactiveMessageSystem(chatArea) {
+        if (this.intimacy < 50) {
+            console.log('亲密度不足50，主动消息系统未启动');
+            return;
+        }
+
+        if (this.isProactiveSystemActive) {
+            console.log('主动消息系统已在运行');
+            return;
+        }
+
+        this.isProactiveSystemActive = true;
+        console.log('主动消息系统已启动');
+
+        const scheduleNextMessage = () => {
+            const interval = this.calculateProactiveInterval();
+            console.log(`下一条主动消息将在${Math.round(interval/1000)}秒后发送`);
+
+            this.proactiveMessageTimer = setTimeout(async () => {
+                if (!this.isProactiveSystemActive) return;
+
+                if (this.currentMode === INTERACTION_MODES.CHAT) {
+                    await this.sendProactiveMessage(chatArea);
+                }
+
+                scheduleNextMessage();
+            }, interval);
+        };
+
+        scheduleNextMessage();
+    }
+
+    stopProactiveMessageSystem() {
+        if (this.proactiveMessageTimer) {
+            clearTimeout(this.proactiveMessageTimer);
+            this.proactiveMessageTimer = null;
+        }
+        this.isProactiveSystemActive = false;
+        console.log('主动消息系统已停止');
+    }
+
+    calculateProactiveInterval() {
+        const config = PROACTIVE_MESSAGE_CONFIG.intimacyIntervals;
+        let baseInterval = { min: 180, max: 300 };
+
+        if (this.intimacy >= 800) {
+            baseInterval = config[800];
+        } else if (this.intimacy >= 500) {
+            baseInterval = config[500];
+        } else if (this.intimacy >= 300) {
+            baseInterval = config[300];
+        } else if (this.intimacy >= 150) {
+            baseInterval = config[150];
+        } else if (this.intimacy >= 50) {
+            baseInterval = config[50];
+        }
+
+        const personalityMultiplier = PROACTIVE_MESSAGE_CONFIG.personalityFrequencyMultiplier[this.personality] || 1.0;
+        
+        const min = baseInterval.min * personalityMultiplier;
+        const max = baseInterval.max * personalityMultiplier;
+        
+        return (min + Math.random() * (max - min)) * 1000;
+    }
+
+    // ========== 发送主动消息（改进版） ==========
+    async sendProactiveMessage(chatArea) {
+        try {
+            // ========== 检查连续主动消息数量 ==========
+            if (this.consecutiveProactiveCount >= 3) {
+                console.log('已发送3条主动消息，发送收尾消息并暂停');
+                await this.sendClosingMessage(chatArea);
+                this.stopProactiveMessageSystem();
+                return;
+            }
+
+            console.log(`正在生成第${this.consecutiveProactiveCount + 1}条主动消息...`);
+
+            const response = await fetch(`${DEEPSEEK_CONFIG.baseUrl}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: DEEPSEEK_CONFIG.model,
+                    messages: [
+                        {
+                            role: "system",
+                            content: this.generateProactiveSystemPrompt()
+                        },
+                        {
+                            role: "user",
+                            content: "现在主动说点什么吧"
+                        }
+                    ],
+                    stream: false,
+                    temperature: 0.95 // 提高温度增加多样性
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API调用失败: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const aiMessage = result.choices[0].message.content.trim();
+            const data = parseAIResponse(aiMessage);
+            
+            if (data && data.message) {
+                const proactiveDiv = this.createProactiveMessageBubble(data.message);
+                chatArea.appendChild(proactiveDiv);
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                this.addChatHistory('assistant', data.message);
+                this.consecutiveProactiveCount++; // 增加计数
+
+                console.log(`主动消息已发送 (${this.consecutiveProactiveCount}/3):`, data.message);
+            } else {
+                console.warn('主动消息格式错误，跳过显示');
+            }
+
+        } catch (error) {
+            console.error('发送主动消息失败:', error);
+        }
+    }
+
+    // ========== 新增：发送收尾消息 ==========
+    async sendClosingMessage(chatArea) {
+        try {
+            console.log('正在生成收尾消息...');
+
+            const closingPrompt = this.generateClosingSystemPrompt();
+
+            const response = await fetch(`${DEEPSEEK_CONFIG.baseUrl}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: DEEPSEEK_CONFIG.model,
+                    messages: [
+                        {
+                            role: "system",
+                            content: closingPrompt
+                        },
+                        {
+                            role: "user",
+                            content: "做个收尾吧"
+                        }
+                    ],
+                    stream: false,
+                    temperature: 0.8
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`API调用失败: ${response.status}`);
+            }
+
+            const result = await response.json();
+            const aiMessage = result.choices[0].message.content.trim();
+            const data = parseAIResponse(aiMessage);
+            
+            if (data && data.message) {
+                const closingDiv = this.createClosingMessageBubble(data.message);
+                chatArea.appendChild(closingDiv);
+                chatArea.scrollTop = chatArea.scrollHeight;
+
+                this.addChatHistory('assistant', data.message);
+                console.log('收尾消息已发送:', data.message);
+            }
+
+        } catch (error) {
+            console.error('发送收尾消息失败:', error);
+        }
+    }
+
+    // ========== 改进：生成主动消息提示词（更多样化） ==========
+    generateProactiveSystemPrompt() {
+        const currentPetName = document.getElementById("pet-select").value;
+        const intimacyLevel = this.getIntimacyLevel();
+        const unlockedBios = getUnlockedBiographies();
+
+        let prompt = `你是${currentPet.name}，性格是${this.personality}。`;
+        
+        if (unlockedBios.length > 0) {
+            prompt += `\n【背景设定】（仅供参考，不必照搬）：${unlockedBios.join(' ')}`;
+        }
+
+        prompt += `\n\n当前亲密度：${intimacyLevel.level}（${this.intimacy}点）`;
+        prompt += `\n这是你发出的第${this.consecutiveProactiveCount + 1}条主动消息`;
+
+        // ========== 丰富话题库（避免重复） ==========
+        const topicCategories = [
+            '分享最近的趣事或见闻',
+            '表达当下的情绪或感受',
+            '提出一个有趣的问题或话题',
+            '回忆过去的某个瞬间',
+            '对某件事发表看法或吐槽',
+            '关心玩家的状态或心情',
+            '分享一个小秘密或想法',
+            '提议一起做点什么',
+            '开个玩笑或讲个小故事',
+            '表达对玩家的感觉（根据亲密度）'
+        ];
+
+        const randomTopic = topicCategories[Math.floor(Math.random() * topicCategories.length)];
+
+        prompt += `\n\n【主动消息任务】你要主动向玩家说点什么（不是回复，而是主动发起）。`;
+        prompt += `\n【话题方向】${randomTopic}`;
+        prompt += `\n【重要原则】`;
+        prompt += `\n1. 背景故事只是你的身份设定，不要每次都重复提及或照本宣科`;
+        prompt += `\n2. 要像真实的人一样，结合聊天上下文灵活发挥`;
+        prompt += `\n3. 话题要多样化，不要总是聊同一类内容`;
+        prompt += `\n4. 可以结合最近的聊天内容（如果有的话）自然延伸话题`;
+        prompt += `\n5. 语气要符合${this.personality}性格，但内容要新鲜有趣`;
+
+        // 性格风格提示（简化版）
+        const personalityHints = {
+            '热情': '热情洋溢地表达',
+            '害羞': '有点不好意思但还是想说',
+            '开朗': '轻松愉快地聊',
+            '冷静': '理性而温和地提起',
+            '暴躁': '直接或带点抱怨地说',
+            '倔强': '坚持己见地表达',
+            '保守': '礼貌而得体地询问',
+            '放荡': '大胆撩人地说',
+            '傲慢': '高傲但又想聊的矛盾感',
+            '强势': '直接要求或命令',
+            '露骨': '毫不掩饰地直白表达',
+            '消沉': '带着淡淡忧郁地感叹',
+            '自信': '自信满满地分享',
+            '充满性张力': '暧昧撩人地暗示',
+            '果敢': '果断直接地提议'
+        };
+
+        prompt += `\n\n你的${this.personality}性格表现：${personalityHints[this.personality] || '自然表达'}`;
+
+        // 根据亲密度调整
+        const intimacyGuidance = {
+            "熟悉": "保持距离感，话题轻松但不深入",
+            "友好": "可以分享更多个人想法，语气更亲近",
+            "亲密": "可以说真心话，甚至关心对方",
+            "挚友": "用亲昵语气，说任何想说的话",
+            "心心相印": "表达深层情感，甚至有特殊暗示"
+        };
+
+        prompt += `\n亲密度指导：${intimacyGuidance[intimacyLevel.level] || '根据关系自然交流'}`;
+
+        prompt += `\n\n【回复格式】严格JSON：
+{
+    "message": "你主动说的话（50-120字，新鲜有趣，符合${this.personality}性格）"
+}`;
+
+        return prompt;
+    }
+
+    // ========== 新增：生成收尾消息提示词 ==========
+    generateClosingSystemPrompt() {
+        const currentPetName = document.getElementById("pet-select").value;
+        const intimacyLevel = this.getIntimacyLevel();
+
+        let prompt = `你是${currentPet.name}，性格是${this.personality}。`;
+        prompt += `\n当前亲密度：${intimacyLevel.level}`;
+        
+        prompt += `\n\n【收尾任务】你已经主动说了3句话，但玩家还没回应。`;
+        prompt += `\n现在要用符合${this.personality}性格的方式做一个自然的收尾，让对话暂停得不尴尬。`;
+
+        const closingStyles = {
+            '热情': '热情地表示"有空再聊"或期待回复',
+            '害羞': '有点不好意思地说"打扰了"或"我先忙了"',
+            '开朗': '轻松地说"先这样啦"或开个小玩笑结束',
+            '冷静': '理性地表示"先忙你的"或"有事再找我"',
+            '暴躁': '有点不耐烦但又不想太凶地说"算了先不说了"',
+            '倔强': '固执地说"反正我说完了"或"你随意"',
+            '保守': '礼貌地表示"不打扰了"或"回见"',
+            '放荡': '撩完就跑，留个悬念',
+            '傲慢': '高傲地说"哼，不理我就算了"',
+            '强势': '命令式地说"先去忙吧"或"等你回来"',
+            '露骨': '直白地说"想我了就说话"',
+            '消沉': '略带失落地说"那我先走了"',
+            '自信': '自信地说"先这样，有事找我"',
+            '充满性张力': '暧昧地说"想我的话...你懂的"',
+            '果敢': '果断地说"行了，先这样"'
+        };
+
+        prompt += `\n收尾风格：${closingStyles[this.personality] || '自然地结束话题'}`;
+
+        prompt += `\n\n【重要】`;
+        prompt += `\n1. 不要责怪玩家没回复，要自然收尾`;
+        prompt += `\n2. 可以表达期待下次聊天，但不强求`;
+        prompt += `\n3. 符合${this.personality}性格，让收尾也有个性`;
+        prompt += `\n4. 30-80字即可，简洁自然`;
+
+        prompt += `\n\n【回复格式】严格JSON：
+{
+    "message": "收尾的话（30-80字，符合${this.personality}性格）"
+}`;
+
+        return prompt;
+    }
+
+    // ========== 创建主动消息气泡 ==========
+    createProactiveMessageBubble(content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+            display: flex;
+            justify-content: flex-start;
+            animation: slideInFromLeft 0.5s ease-out;
+            margin-bottom: 12px;
+        `;
+
+        const bubble = document.createElement('div');
+        bubble.style.cssText = `
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgb(199 69 23 / 95%) 100%);
+            color: pink;
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            word-wrap: break-word;
+            line-height: 1.5;
+            position: relative;
+        `;
+
+        const badge = document.createElement('div');
+        badge.textContent = '✨主动';
+        badge.style.cssText = `
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #333;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        `;
+
+        const messageContent = document.createElement('div');
+        messageContent.textContent = content;
+        messageContent.style.marginTop = '8px';
+
+        bubble.appendChild(badge);
+        bubble.appendChild(messageContent);
+        messageDiv.appendChild(bubble);
+
+        return messageDiv;
+    }
+
+    // ========== 新增：创建收尾消息气泡 ==========
+    createClosingMessageBubble(content) {
+        const messageDiv = document.createElement('div');
+        messageDiv.style.cssText = `
+            display: flex;
+            justify-content: flex-start;
+            animation: slideInFromLeft 0.5s ease-out;
+            margin-bottom: 12px;
+        `;
+
+        const bubble = document.createElement('div');
+        bubble.style.cssText = `
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(255, 255, 255, 0.35) 100%);
+            color: white;
+            box-shadow: 0 3px 10px rgba(138, 43, 226, 0.3);
+            border: 1px solid rgba(138, 43, 226, 0.4);
+            word-wrap: break-word;
+            line-height: 1.5;
+            position: relative;
+        `;
+
+        const badge = document.createElement('div');
+        badge.textContent = '💤 告别';
+        badge.style.cssText = `
+            position: absolute;
+            top: -8px;
+            left: 10px;
+            background: linear-gradient(135deg, #9370db 0%, #ba55d3 100%);
+            color: white;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        `;
+
+        const messageContent = document.createElement('div');
+        messageContent.textContent = content;
+        messageContent.style.marginTop = '8px';
+
+        bubble.appendChild(badge);
+        bubble.appendChild(messageContent);
+        messageDiv.appendChild(bubble);
+
+        return messageDiv;
     }
 }
 
@@ -11415,7 +11858,38 @@ function getUnlockedBiographies() {
     return unlockedBios;
 }
 
-// ============ DeepSeek API 调用（流式版本） ============
+// ============ 显示互动界面 ============
+function showBiography() {
+    const currentPetName = document.getElementById("pet-select").value;
+    const skillScore = parseInt(document.getElementById("skill-score").innerText, 10);
+
+    if (skillScore < 1000000) {
+        showInfoBox("您的宠物评分过低，请提升到1000000后再试！（宠物传记共有3段，评分达到1000000、2000000和3000000时会分别解锁）");
+        return;
+    }
+
+    showInteractionInterface();
+}
+
+// ========== 防止移动端输入自动放大的优化 ==========
+// 在HTML的head中添加viewport meta标签(如果还没有的话)
+function preventMobileInputZoom() {
+    let viewportMeta = document.querySelector('meta[name="viewport"]');
+    if (!viewportMeta) {
+        viewportMeta = document.createElement('meta');
+        viewportMeta.name = 'viewport';
+        document.head.appendChild(viewportMeta);
+    }
+    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+}
+
+// 在页面加载时调用
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', preventMobileInputZoom);
+} else {
+    preventMobileInputZoom();
+}
+
 // ============ DeepSeek API 调用（流式版本） ============
 async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTION_MODES.CHAT, additionalContext = {}) {
     const currentPetName = document.getElementById("pet-select").value;
@@ -11457,7 +11931,7 @@ async function callDeepSeekAPI(userMessage, interactionManager, mode = INTERACTI
     if (mode === INTERACTION_MODES.CHAT) {
         systemPrompt += `\n\n【重要】你必须严格按照JSON格式回复，不要有任何多余文字：
 {
-    "reply": "你的回复内容（100-200字，完全体现${personality}性格特点）",
+    "reply": "你的回复内容（根据亲密程度控制回复长度，介于100-200字之间，完全体现${personality}的性格特点）",
     "intimacy_change": 亲密度变化值（整数），
     "emotion": "当前情绪"
 }
@@ -11639,38 +12113,6 @@ ${personalityRule.特殊规则}
 }
 
 
-// ============ 显示互动界面 ============
-function showBiography() {
-    const currentPetName = document.getElementById("pet-select").value;
-    const skillScore = parseInt(document.getElementById("skill-score").innerText, 10);
-
-    if (skillScore < 1000000) {
-        showInfoBox("您的宠物评分过低，请提升到1000000后再试！（宠物传记共有3段，评分达到1000000、2000000和3000000时会分别解锁）");
-        return;
-    }
-
-    showInteractionInterface();
-}
-
-// ========== 防止移动端输入自动放大的优化 ==========
-// 在HTML的head中添加viewport meta标签(如果还没有的话)
-function preventMobileInputZoom() {
-    let viewportMeta = document.querySelector('meta[name="viewport"]');
-    if (!viewportMeta) {
-        viewportMeta = document.createElement('meta');
-        viewportMeta.name = 'viewport';
-        document.head.appendChild(viewportMeta);
-    }
-    viewportMeta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
-}
-
-// 在页面加载时调用
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', preventMobileInputZoom);
-} else {
-    preventMobileInputZoom();
-}
-
 // ========== 显示互动界面 ==========
 function showInteractionInterface() {
     const currentPetName = document.getElementById("pet-select").value;
@@ -11705,7 +12147,7 @@ function showInteractionInterface() {
     const header = document.createElement('div');
     header.style.cssText = `
         background: rgba(0, 0, 0, 0.3);
-        padding: 15px 20px;
+        padding: 5px 20px;
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -11762,7 +12204,7 @@ function showInteractionInterface() {
         color: white;
         border: 1px solid rgba(255, 255, 255, 0.4);
         border-radius: 20px;
-        padding: 8px 16px;
+        padding: 5px;
         cursor: pointer;
         font-size: 16px;
         transition: all 0.3s;
@@ -11780,7 +12222,7 @@ function showInteractionInterface() {
         color: white;
         border: 1px solid rgba(138, 43, 226, 0.6);
         border-radius: 20px;
-        padding: 8px 16px;
+        padding: 5px;
         cursor: pointer;
         font-size: 16px;
         transition: all 0.3s;
@@ -11819,11 +12261,12 @@ function showInteractionInterface() {
     const modeBar = document.createElement('div');
     modeBar.style.cssText = `
         background: rgba(0, 0, 0, 0.2);
-        padding: 10px 20px;
+        padding: 5px;
         display: flex;
         gap: 10px;
         overflow-x: auto;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        justify-content: space-evenly;
     `;
 
     const modes = [
@@ -11847,7 +12290,7 @@ function showInteractionInterface() {
             color: ${isLocked ? '#999' : 'white'};
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 15px;
-            padding: 8px 16px;
+            padding: 5px;
             cursor: ${isLocked ? 'not-allowed' : 'pointer'};
             font-size: 16px;
             transition: all 0.3s;
@@ -11873,7 +12316,7 @@ function showInteractionInterface() {
     chatArea.style.cssText = `
         flex: 1;
         overflow-y: auto;
-        padding: 20px;
+        padding: 5px;
         display: flex;
         flex-direction: column;
         gap: 15px;
@@ -11889,7 +12332,7 @@ function showInteractionInterface() {
         welcomeMsg.style.cssText = `
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
-            padding: 20px;
+            padding: 5px;
             text-align: center;
             color: white;
             backdrop-filter: blur(10px);
@@ -11906,7 +12349,7 @@ function showInteractionInterface() {
     inputArea.id = 'input-area';
     inputArea.style.cssText = `
         background: rgba(0, 0, 0, 0.3);
-        padding: 15px 20px;
+        padding: 5px;
         border-top: 2px solid rgba(255, 255, 255, 0.2);
         backdrop-filter: blur(10px);
     `;
@@ -11921,6 +12364,15 @@ function showInteractionInterface() {
     document.body.appendChild(overlay);
 
     setTimeout(() => chatArea.scrollTop = chatArea.scrollHeight, 100);
+    
+    // ========== 新增：启动主动消息系统 ==========
+    interactionManager.startProactiveMessageSystem(chatArea);
+
+    // ========== 新增：界面关闭时停止系统 ==========
+    closeBtn.onclick = () => {
+        interactionManager.stopProactiveMessageSystem();
+        document.body.removeChild(overlay);
+    };
 }
 
 // ========== 显示重塑确认对话框 ==========
@@ -12434,39 +12886,7 @@ function createGiftMode(inputArea, chatArea, interactionManager) {
             goldAmount -= gift.cost;
             updateGoldDisplay(goldAmount);
             
-            // 添加居中的过渡动画
-            const loadingOverlay = document.createElement('div');
-            loadingOverlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                z-index: 10002;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            
-            const loadingDiv = document.createElement('div');
-            loadingDiv.style.cssText = `
-                background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 240, 245, 0.95) 100%);
-                border-radius: 20px;
-                padding: 30px 40px;
-                text-align: center;
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-                animation: pulse 1.5s infinite;
-                max-width: 80%;
-            `;
-            loadingDiv.innerHTML = `
-                <div style="font-size: 48px; margin-bottom: 15px;">${gift.emoji}</div>
-                <div style="font-size: 18px; font-weight: bold; color: #E91E63; margin-bottom: 10px;">正在赠送礼物</div>
-                <div style="font-size: 14px; color: #666;">正在将${gift.name}送给${currentPet.name}...</div>
-            `;
-            
-            loadingOverlay.appendChild(loadingDiv);
-            document.body.appendChild(loadingOverlay);
+
             
             try {
                 const result = await callDeepSeekAPI(
@@ -12927,11 +13347,11 @@ async function sendMessage(inputBox, chatArea, interactionManager) {
             // 显示情绪和亲密度变化提示
             const currentPetName = document.getElementById("pet-select").value;
             if (intimacyChange > 50) {
-                showInfoBox(`${currentPetName}感到很${finalData.emotion || '开心'}！亲密度+${intimacyChange}`, null, 2500, 'green');
-            } else if (intimacyChange > 0) {
-                showInfoBox(`${currentPetName}感到${finalData.emotion || '愉快'} 亲密度+${intimacyChange}`, null, 2500, 'blue');
+                showInfoBox(`${currentPet.name}感到很${finalData.emotion || '开心'}！亲密度+${intimacyChange}`, null, 2500, 'green');
+            } else if (intimacyChange > 15) {
+                showInfoBox(`${currentPet.name}感到${finalData.emotion || '愉快'} 亲密度+${intimacyChange}`, null, 2500, 'blue');
             } else if (intimacyChange < 0) {
-                showInfoBox(`${currentPetName}感到${finalData.emotion || '不满'}... 亲密度${intimacyChange}`, null, 2500, 'red');
+                showInfoBox(`${currentPet.name}感到${finalData.emotion || '不满'}... 亲密度${intimacyChange}`, null, 2500, 'red');
             }
         } else {
             // 如果解析失败，显示原始文本
@@ -13209,6 +13629,16 @@ interactionStyle.textContent = `
 
     #chat-messages::-webkit-scrollbar-thumb:hover {
         background: rgba(255, 255, 255, 0.5);
+    }
+    @keyframes slideInFromLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 `;
 document.head.appendChild(interactionStyle);

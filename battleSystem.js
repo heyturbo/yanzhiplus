@@ -3296,7 +3296,7 @@ const DamageDisplayManager = {
 };
 
 // 添加必要的CSS动画
-const battleStyle = document.createElement('battleStyle');
+const battleStyle = document.createElement('style');
 battleStyle.textContent = `
     @keyframes floatUpLeft {
         0% {
@@ -7972,3 +7972,10 @@ function clearPlayerEffect() {
 } //清理敌人目前的减益效果
 
 const divineWeaponManager = new DivineWeaponManager();
+
+
+
+
+
+
+

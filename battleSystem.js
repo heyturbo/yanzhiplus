@@ -3296,8 +3296,8 @@ const DamageDisplayManager = {
 };
 
 // 添加必要的CSS动画
-const style = document.createElement('style');
-style.textContent = `
+const battleStyle = document.createElement('battleStyle');
+battleStyle.textContent = `
     @keyframes floatUpLeft {
         0% {
             opacity: 1;
@@ -3348,7 +3348,7 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(battleStyle);
 
 // 重构后的updateDamageValue函数
 function updateDamageValue(damage, enemy = false, damageType = 'damage', isCritical = false) {
